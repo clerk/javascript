@@ -36,12 +36,16 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInChooseStrategyProps = React.HTMLAttributes<HTMLDivElement>;
-export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement>;
+export type SignInChooseStrategyProps = React.HTMLAttributes<HTMLDivElement> & {
+  asChild?: boolean;
+};
+export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement> & {
+  asChild?: boolean;
+};
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
-export function SignInChooseStrategy({ children, ...props }: SignInChooseStrategyProps) {
+export function SignInChooseStrategy({ asChild, children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeStateFirstFactor = useActiveTags(
     routerRef,
@@ -56,25 +60,27 @@ export function SignInChooseStrategy({ children, ...props }: SignInChooseStrateg
   );
 
   const activeState = activeStateFirstFactor || activeStateSecondFactor;
+  const Comp = asChild ? Slot : 'div';
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
-      <div {...props}>{children}</div>
+      <Comp {...props}>{children}</Comp>
     </SignInChooseStrategyCtx.Provider>
   ) : null;
 }
 
-export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
+export function SignInForgotPassword({ asChild, children, ...props }: SignInForgotPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(
     routerRef,
     ['step:verifications', 'step:first-factor', 'step:forgot-password'],
     ActiveTagsMode.all,
   );
+  const Comp = asChild ? Slot : 'div';
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
-      <div {...props}>{children}</div>
+      <Comp {...props}>{children}</Comp>
     </SignInChooseStrategyCtx.Provider>
   ) : null;
 }

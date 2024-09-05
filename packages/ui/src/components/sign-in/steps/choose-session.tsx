@@ -63,7 +63,10 @@ export function SignInChooseSession() {
   const { footerProps } = useCard();
 
   return (
-    <SignIn.Step name='choose-session'>
+    <SignIn.Step
+      asChild
+      name='choose-session'
+    >
       <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
         <Card.Content>
           <Card.Header>

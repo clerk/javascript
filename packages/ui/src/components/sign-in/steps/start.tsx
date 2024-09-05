@@ -47,8 +47,14 @@ export function SignInStart() {
           hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
         ];
         return (
-          <SignIn.Step name='start'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignIn.Step
+            asChild
+            name='start'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
@@ -161,7 +167,7 @@ export function SignInStart() {
                             <SignIn.Passkey asChild>
                               <LinkButton
                                 type='button'
-                                disabled={isGlobalLoading}
+                                disabled={isGlobalLoading || isSubmitting}
                               >
                                 {t('signIn.start.actionLink__use_passkey')}
                               </LinkButton>
