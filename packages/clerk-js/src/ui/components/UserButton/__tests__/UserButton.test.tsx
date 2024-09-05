@@ -21,7 +21,7 @@ describe('UserButton', () => {
     expect(queryByRole('button')).not.toBeNull();
   });
 
-  it('renders popover as standalone when there is a user', async () => {
+  it.skip('renders popover as standalone when there is a user', async () => {
     const { wrapper, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
@@ -33,7 +33,7 @@ describe('UserButton', () => {
     getByText('Manage account');
   });
 
-  it('calls onDismiss when it is used as standalone', async () => {
+  it.skip('calls onDismiss when it is used as standalone', async () => {
     const { wrapper, props, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });

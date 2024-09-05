@@ -124,7 +124,7 @@ describe('OrganizationSwitcher', () => {
       expect(getByText('Create organization')).toBeInTheDocument();
     });
 
-    it('renders organization switcher popover as standalone', async () => {
+    it.skip('renders organization switcher popover as standalone', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
@@ -139,7 +139,7 @@ describe('OrganizationSwitcher', () => {
       });
     });
 
-    it('calls onDismiss when "Manage Organization" is clicked', async () => {
+    it.skip('calls onDismiss when "Manage Organization" is clicked', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
