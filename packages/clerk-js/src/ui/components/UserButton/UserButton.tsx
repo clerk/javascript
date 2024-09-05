@@ -51,11 +51,6 @@ const _UserButton = () => {
       flow='userButton'
       sx={{ display: 'inline-flex' }}
     >
-      {/*{__experimental_standalone ? (*/}
-      {/*    __experimental_open ? (*/}
-      {/*      <UserButtonPopover close={__experimental_onOpenChanged} />*/}
-      {/*    ) : null*/}
-      {/*  )*/}
       {__experimental_asStandalone ? (
         __experimental_asStandalone.open ? (
           <UserButtonPopover close={__experimental_asStandalone.onOpenChanged} />

@@ -45,7 +45,7 @@ const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactE
 });
 
 const _OrganizationSwitcher = () => {
-  const { __experimental_standalone, __experimental_onDismiss } = useOrganizationSwitcherContext();
+  const { __experimental_asStandalone } = useOrganizationSwitcherContext();
 
   return (
     <Flow.Root
@@ -53,8 +53,10 @@ const _OrganizationSwitcher = () => {
       sx={{ display: 'inline-flex' }}
     >
       <AcceptedInvitationsProvider>
-        {__experimental_standalone ? (
-          <OrganizationSwitcherPopover close={__experimental_onDismiss} />
+        {__experimental_asStandalone ? (
+          __experimental_asStandalone.open ? (
+            <OrganizationSwitcherPopover close={__experimental_asStandalone.onOpenChanged} />
+          ) : null
         ) : (
           <OrganizationSwitcherWithFloatingTree>
             <OrganizationSwitcherPopover />

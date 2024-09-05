@@ -21,12 +21,14 @@ import { useRouter } from '../../router';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
-type OrganizationSwitcherPopoverProps = { close?: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
+type OrganizationSwitcherPopoverProps = {
+  close?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+} & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
   (props, ref) => {
     const { close: undefinedClose, ...rest } = props;
-    const close = () => undefinedClose?.();
+    const close = () => undefinedClose?.(false);
     const card = useCardState();
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();
