@@ -44,16 +44,21 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
 });
 
 const _UserButton = () => {
-  const { __experimental_standalone, __experimental_onDismiss, __experimental_open } = useUserButtonContext();
+  const { __experimental_asStandalone } = useUserButtonContext();
 
   return (
     <Flow.Root
       flow='userButton'
       sx={{ display: 'inline-flex' }}
     >
-      {__experimental_standalone ? (
-        __experimental_open ? (
-          <UserButtonPopover close={__experimental_onDismiss} />
+      {/*{__experimental_standalone ? (*/}
+      {/*    __experimental_open ? (*/}
+      {/*      <UserButtonPopover close={__experimental_onOpenChanged} />*/}
+      {/*    ) : null*/}
+      {/*  )*/}
+      {__experimental_asStandalone ? (
+        __experimental_asStandalone.open ? (
+          <UserButtonPopover close={__experimental_asStandalone.onOpenChanged} />
         ) : null
       ) : (
         <UserButtonWithFloatingTree>

@@ -10,7 +10,7 @@ import {
   UserProfileLink,
   UserProfilePage,
 } from '../components/uiComponents';
-import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors/messages';
+import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
 import type { UserProfilePageProps } from '../types';
 import { isThatComponent } from './componentValidation';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
@@ -67,7 +67,7 @@ const useCustomPages = ({
       !isThatComponent(child, MenuItemsComponent)
     ) {
       if (child) {
-        logErrorInDevMode(customPagesIgnoredComponent(componentName));
+        // logErrorInDevMode(customPagesIgnoredComponent(componentName));
       }
       return;
     }

@@ -14,7 +14,7 @@ import type {
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { createElement } from 'react';
+import React, { createContext, createElement, useContext } from 'react';
 
 import {
   organizationProfileLinkRenderedError,
@@ -50,6 +50,7 @@ type UserButtonExportType = typeof _UserButton & {
   MenuItems: typeof MenuItems;
   Action: typeof MenuAction;
   Link: typeof MenuLink;
+  Body: () => React.JSX.Element;
 };
 
 type UserButtonPropsWithoutCustomPages = Without<UserButtonProps, 'userProfileProps'> & {
@@ -107,11 +108,25 @@ const isOpenProps = (props: any): props is OpenProps => {
   return 'open' in props;
 };
 
-class Portal extends React.PureComponent<MountProps | OpenProps> {
+const CustomPortalsRenderer = (props: MountProps) => {
+  if (!isMountProps(props)) {
+    return null;
+  }
+
+  return (
+    <>
+      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+    </>
+  );
+};
+
+class Portal extends React.PureComponent<
+  PropsWithChildren<(MountProps | OpenProps) & { renderHtmlElement?: boolean }>
+> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
-    console.log('-----Did update');
     if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
       return;
     }
@@ -127,14 +142,19 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
 
     console.log(prevProps, newProps, isDeeplyEqual(prevProps, newProps));
     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
-      console.log('update');
-      this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+      // if (!this.props.props.withOutlet) {
+      if (this.portalRef.current) {
+        this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+      }
+      // }
     }
   }
 
   componentDidMount() {
+    // if (this.props.props.withOutlet) {
+    //   return;
+    // }
     if (this.portalRef.current) {
-      console.log('---- props on mount', this.props.props);
       if (isMountProps(this.props)) {
         this.props.mount(this.portalRef.current, this.props.props);
       }
@@ -146,6 +166,9 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   }
 
   componentWillUnmount() {
+    // if (this.props.props.withOutlet) {
+    //   return;
+    // }
     if (this.portalRef.current) {
       if (isMountProps(this.props)) {
         this.props.unmount(this.portalRef.current);
@@ -157,17 +180,91 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   }
 
   render() {
+    const { renderHtmlElement = true } = this.props;
     return (
       <>
-        <div ref={this.portalRef} />
-        {isMountProps(this.props) &&
-          this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-        {isMountProps(this.props) &&
-          this.props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+        {/*{!this.props.props.withOutlet && <div ref={this.portalRef} />}*/}
+        {renderHtmlElement && <div ref={this.portalRef} />}
+        {/*{isMountProps(this.props) &&*/}
+        {/*  this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}*/}
+        {/*{isMountProps(this.props) &&*/}
+        {/*  this.props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}*/}
+
+        {this.props.children}
+
+        {/*{this.props.props.withOutlet*/}
+        {/*  ? React.Children.map(this.props.props.children, (child, index) => {*/}
+        {/*      return child;*/}
+        {/*      // Clone each child and pass additional props*/}
+        {/*      return React.cloneElement(child, {*/}
+        {/*        key: index, // always set a unique key when mapping*/}
+        {/*        // additionalProp: `Value ${index + 1}`, // adding new props or modifying existing ones*/}
+        {/*        ...this.props,*/}
+        {/*      });*/}
+        {/*    })*/}
+        {/*  : null}*/}
       </>
     );
   }
 }
+
+// class Portal2 extends React.PureComponent<MountProps | OpenProps> {
+//   private portalRef = React.createRef<HTMLDivElement>();
+//
+//   componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
+//     if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
+//       return;
+//     }
+//     console.log('portal2 update');
+//
+//     // Remove children and customPages from props before comparing
+//     // children might hold circular references which deepEqual can't handle
+//     // and the implementation of customPages or customMenuItems relies on props getting new references
+//     const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
+//     const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
+//     // instead, we simply use the length of customPages to determine if it changed or not
+//     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
+//     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
+//
+//     console.log(prevProps, newProps, isDeeplyEqual(prevProps, newProps));
+//     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
+//       this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+//     }
+//   }
+//
+//   componentDidMount() {
+//     console.log('portal2 mounted');
+//     if (this.portalRef.current) {
+//       if (isMountProps(this.props)) {
+//         this.props.mount(this.portalRef.current, this.props.props);
+//       }
+//
+//       if (isOpenProps(this.props)) {
+//         this.props.open(this.props.props);
+//       }
+//     }
+//   }
+//
+//   componentWillUnmount() {
+//     console.log('portal2 unmounted');
+//     if (this.portalRef.current) {
+//       if (isMountProps(this.props)) {
+//         this.props.unmount(this.portalRef.current);
+//       }
+//       if (isOpenProps(this.props)) {
+//         this.props.close();
+//       }
+//     }
+//   }
+//
+//   render() {
+//     return (
+//       <>
+//         <div ref={this.portalRef} />
+//       </>
+//     );
+//   }
+// }
 
 export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
   return (
@@ -191,14 +288,14 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
   );
 }, 'SignUp');
 
-export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
+export function UserProfilePage(_: PropsWithChildren<UserProfilePageProps>) {
   logErrorInDevMode(userProfilePageRenderedError);
-  return <>{children}</>;
+  return null;
 }
 
-export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkProps>) {
+export function UserProfileLink(_: PropsWithChildren<UserProfileLinkProps>) {
   logErrorInDevMode(userProfileLinkRenderedError);
-  return <>{children}</>;
+  return null;
 }
 
 const _UserProfile = withClerk(
@@ -222,41 +319,64 @@ export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
   Link: UserProfileLink,
 });
 
+// @ts-ignore
+const UserButtonContext = createContext<MountProps>({});
+
 const _UserButton = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages>>) => {
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
 
-    console.log('---- _UserButton', props, userProfileProps);
+    const passableProps = {
+      mount: clerk.mountUserButton,
+      unmount: clerk.unmountUserButton,
+      updateProps: (clerk as any).__unstable__updateProps,
+      props: { ...props, userProfileProps, customMenuItems },
+      customPagesPortals: customPagesPortals,
+      customMenuItemsPortals: customMenuItemsPortals,
+    };
 
     return (
-      <Portal
-        mount={clerk.mountUserButton}
-        unmount={clerk.unmountUserButton}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, userProfileProps, customMenuItems }}
-        customPagesPortals={customPagesPortals}
-        customMenuItemsPortals={customMenuItemsPortals}
-      />
+      <UserButtonContext.Provider
+        value={{
+          mount: clerk.mountUserButton,
+          unmount: clerk.unmountUserButton,
+          updateProps: (clerk as any).__unstable__updateProps,
+          props: { ...props, userProfileProps, customMenuItems },
+        }}
+      >
+        <Portal
+          {...passableProps}
+          renderHtmlElement={!props.__experimental_asStandalone}
+        >
+          {props.children}
+          <CustomPortalsRenderer {...passableProps} />
+        </Portal>
+      </UserButtonContext.Provider>
     );
   },
   'UserButton',
 );
 
-export function MenuItems({ children }: PropsWithChildren) {
+export function MenuItems(_: PropsWithChildren) {
   logErrorInDevMode(userButtonMenuItemsRenderedError);
-  return <>{children}</>;
+  return null;
 }
 
-export function MenuAction({ children }: PropsWithChildren<UserButtonActionProps>) {
+export function MenuAction(_: PropsWithChildren<UserButtonActionProps>) {
   logErrorInDevMode(userButtonMenuActionRenderedError);
-  return <>{children}</>;
+  return null;
 }
 
-export function MenuLink({ children }: PropsWithChildren<UserButtonLinkProps>) {
+export function MenuLink(_: PropsWithChildren<UserButtonLinkProps>) {
   logErrorInDevMode(userButtonMenuLinkRenderedError);
-  return <>{children}</>;
+  return null;
+}
+
+export function UserButtonOutlet() {
+  const props = useContext(UserButtonContext);
+  return <Portal {...props} />;
 }
 
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
@@ -265,6 +385,7 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   MenuItems,
   Action: MenuAction,
   Link: MenuLink,
+  Body: UserButtonOutlet as () => React.JSX.Element,
 });
 
 export const __experimental_UserVerification = withClerk(

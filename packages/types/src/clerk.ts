@@ -983,6 +983,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
 
+  __experimental_asStandalone?: {
+    open: boolean;
+    onOpenChanged: (open: boolean | ((prevState: boolean) => boolean)) => void;
+  };
+
   /**
    * If true the UserButton will only render the popover.
    * Enables developers to implement a custom dialog.
@@ -999,9 +1004,21 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   __experimental_onDismiss?: () => void;
 
-  __experimental_open?: boolean;
-
-  __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+  // /**
+  //  * The controlled open state of the popover. When defined the trigger will not be
+  //  * Should be used in conjunction with `__experimental_open`.
+  //  * @experimental This API is experimental and may change at any moment.
+  //  * @default undefined
+  //  */
+  // __experimental_open?: boolean;
+  //
+  // /**
+  //  * Event handler called when the open state of the dialog changes.
+  //  * It only fires when used in conjunction with `__experimental_open`.
+  //  * @experimental This API is experimental and may change at any moment.
+  //  * @default undefined
+  //  */
+  // __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
 
   /**
    * Full URL or path to navigate after sign out is complete
