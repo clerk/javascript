@@ -129,7 +129,7 @@ export class Session extends BaseResource implements SessionResource {
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
   // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-  #getCacheId(template?: string, organizationId?: string) {
+  #getCacheId(template?: string, organizationId?: string | null) {
     const resolvedOrganizationId =
       typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
     return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
@@ -263,7 +263,7 @@ export class Session extends BaseResource implements SessionResource {
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
     const organizationId =
-      typeof options?.organizationId === 'undefined' ? Session.clerk.organization?.id : options?.organizationId;
+      typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
@@ -273,7 +273,7 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
-    const shouldDispatchTokenUpdate = !template && organizationId === Session.clerk.organization?.id;
+    const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
