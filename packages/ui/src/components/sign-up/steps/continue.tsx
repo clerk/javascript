@@ -31,8 +31,14 @@ export function SignUpContinue() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='continue'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='continue'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />

@@ -45,7 +45,10 @@ export function SignInChooseStrategy() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='choose-strategy'>
+          <SignIn.Step
+            asChild
+            name='choose-strategy'
+          >
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>

@@ -164,7 +164,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/custom-pages');
+    await u.page.goToRelative('/custom-pages/user-profile');
     await u.po.userProfile.waitForMounted();
 
     // Check if custom pages and links are visible
@@ -176,7 +176,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
     // Check reordered default label. Security tab is now the last item.
-    await u.page.locator('.cl-navbarButton').nth(3).click();
+    await u.page.locator('.cl-navbarButton').last().click();
     await expect(u.page.getByRole('heading', { name: 'Security' })).toBeVisible();
 
     // Click custom link and check navigation
@@ -252,7 +252,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await fakeAdmin.deleteIfExists();
   });
 
-  test('test updateClerkOptions by changing localization on the fly', async ({ page, context }) => {
+  test('updateClerkOptions by changing localization on the fly', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -266,6 +266,70 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await selectElement.selectOption({ label: 'French' });
 
     await expect(u.page.getByText('pour continuer vers')).toBeVisible();
+  });
+
+  test('render organization profile with custom pages and links in dedicated page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=true');
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. General tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
+  test('render organization profile with custom pages and links inside organization switcher', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=false');
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Open organization profile inside organization switcher
+    await u.po.organizationSwitcher.toggleTrigger();
+    await u.page.waitForSelector('.cl-organizationSwitcherPopoverCard', { state: 'visible' });
+    await u.page.locator('.cl-button__manageOrganization').click();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. Members tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'Members' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
   });
 
   // ---- react/protect

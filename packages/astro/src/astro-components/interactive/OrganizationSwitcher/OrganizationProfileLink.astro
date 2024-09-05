@@ -9,6 +9,6 @@ interface Props {
 const { url, label } = Astro.props
 ---
 
-<CustomProfilePageRenderer label={label} url={url} type="link" component="user-profile">
+<CustomProfilePageRenderer label={label} url={url} type="link" component="organization-switcher">
     <slot name="label-icon" slot="label-icon" />
 </CustomProfilePageRenderer>
