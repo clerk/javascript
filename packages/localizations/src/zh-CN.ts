@@ -61,7 +61,7 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: '',
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationSlug: '我的组织',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
@@ -196,7 +196,7 @@ export const zhCN: LocalizationResource = {
         subtitle: '允许用户根据已验证的电子邮件域名自动加入组织或请求加入。',
         title: '已验证域名',
       },
-      successMessage: '组织已更新。',
+      successMessage: '组织信息已更新。',
       title: '组织简介',
     },
     removeDomainPage: {
@@ -371,7 +371,7 @@ export const zhCN: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: '验证码',
       resendButton: '重新发送验证码',
-      subtitle: '',
+      subtitle: '请继续输入发送到您手机的验证码。',
       title: '检查手机短信',
     },
     resetPassword: {
@@ -396,7 +396,7 @@ export const zhCN: LocalizationResource = {
     },
     totpMfa: {
       formTitle: '验证码',
-      subtitle: '',
+      subtitle: '请继续输入由您的身份验证应用生成的验证码。',
       title: '两步验证',
     },
   },
@@ -458,7 +458,7 @@ export const zhCN: LocalizationResource = {
   unstable__errors: {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable:
-      'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+      '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: undefined,
@@ -466,11 +466,11 @@ export const zhCN: LocalizationResource = {
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
-    form_param_format_invalid__email_address: 'Email address must be a valid email address.',
-    form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
-    form_param_max_length_exceeded__first_name: 'First name should not exceed 256 characters.',
-    form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
-    form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
+    form_param_format_invalid__email_address: '邮箱地址必须是有效的邮箱格式。',
+    form_param_format_invalid__phone_number: '电话号码必须符合有效的国际格式。',
+    form_param_max_length_exceeded__first_name: '名字长度不得超过256个字符。',
+    form_param_max_length_exceeded__last_name: '姓氏长度不得超过256个字符。',
+    form_param_max_length_exceeded__name: '姓名长度不得超过256个字符。',
     form_param_nil: '',
     form_password_incorrect: '',
     form_password_length_too_short: '',
@@ -481,7 +481,7 @@ export const zhCN: LocalizationResource = {
     form_password_validation_failed: '密码错误',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
-    identification_deletion_failed: 'You cannot delete your last identification.',
+    identification_deletion_failed: '您无法删除最后一个身份标识。',
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
@@ -497,7 +497,7 @@ export const zhCN: LocalizationResource = {
       requireUppercase: '一个大写字母',
       sentencePrefix: '您的密码必须包含',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',
@@ -575,9 +575,9 @@ export const zhCN: LocalizationResource = {
     deletePage: {
       actionDescription: '在下方输入 "Delete account" 以继续。',
       confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+      messageLine1: '您确定要删除您的账户吗？',
+      messageLine2: '此操作是永久且不可逆的。',
+      title: '删除账户',
     },
     emailAddressPage: {
       emailCode: {
@@ -614,7 +614,7 @@ export const zhCN: LocalizationResource = {
       title: '添加两步验证',
     },
     mfaPhoneCodePage: {
-      backButton: 'Use existing number',
+      backButton: '使用现有号码',
       primaryButton__addPhoneNumber: '添加电话号码',
       removeResource: {
         messageLine1: '{{identifier}} 将不再在登录时接收验证代码。',
@@ -625,10 +625,10 @@ export const zhCN: LocalizationResource = {
       subtitle__availablePhoneNumbers: '选择一个电话号码来注册短信验证码两步验证。',
       subtitle__unavailablePhoneNumbers: '没有可用的电话号码来注册短信验证码两步验证。',
       successMessage1:
-        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        '登录时，您需要输入发送到此电话号码的验证码作为额外的步骤。',
       successMessage2:
-        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-      successTitle: 'SMS code verification enabled',
+        '请保存这些备份代码并将其妥善存放。如果您无法访问身份验证设备，可以使用备份代码进行登录。',
+      successTitle: '短信验证码验证已启用',
       title: '添加短信验证码验证',
     },
     mfaTOTPPage: {
@@ -668,8 +668,8 @@ export const zhCN: LocalizationResource = {
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
-      readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        '建议您从所有可能使用过旧密码的其他设备上退出登录。',
+      readonly: '由于您只能通过企业连接登录，当前无法编辑您的密码。',
       successMessage__set: '您的密码已设置。',
       successMessage__signOutOfOtherSessions: '所有其他设备已退出。',
       successMessage__update: '您的密码已更新。',
@@ -686,15 +686,15 @@ export const zhCN: LocalizationResource = {
       },
       successMessage: '{{identifier}} 已被添加到您的账户。',
       title: '添加电话号码',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: '请输入发送至 {{identifier}} 的验证码',
+      verifyTitle: '验证电话号码',
     },
     profilePage: {
       fileDropAreaHint: '上传小于10MB的JPG, PNG, GIF, 或WEBP格式的图片',
       imageFormDestructiveActionSubtitle: '移除图片',
       imageFormSubtitle: '上传图片',
       imageFormTitle: '个人资料图片',
-      readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
+      readonly: '您的个人信息由企业连接提供，无法进行编辑。',
       successMessage: '您的个人资料已更新。',
       title: '更新个人资料',
     },
@@ -710,12 +710,12 @@ export const zhCN: LocalizationResource = {
         primaryButton: '连接账户',
         subtitle__disconnected: undefined,
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          '“所需的权限范围已更新，您可能会遇到功能受限的问题。请重新授权此应用程序，以避免出现任何问题。”',
         title: '已连接的账户',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
+        deleteAccountButton: '删除账户',
+        title: '终止账户',
       },
       emailAddressesSection: {
         destructiveAction: '移除电子邮件地址',
