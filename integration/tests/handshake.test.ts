@@ -930,6 +930,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
         signInUrl: req.headers.get("x-sign-in-url"),
         organizationSync: {      // <--- CRITICAL
           organizationPattern: "/organizations-by-id/:id",
+          personalWorkspacePattern: "/personal-workspace",
         }
       })(req, evt)
     };
@@ -950,14 +951,13 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('expired session token - with organization mismatch - dev', async () => {
-
+  test('expired session token - with organization id mismatch - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
     // Create a new map with an org_id key
     const { token, claims } = config.generateToken({
-      state: 'expired',
+      state: 'expired', // <-- Critical
       extraClaims: new Map<string, string>([
         // Start the test with org A active
         ['org_id', 'org_a']
@@ -980,6 +980,70 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
       )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
+    );
+  });
+
+  test('valid session token - with organization id mismatch - dev', async () => {
+    const config = generateConfig({
+      mode: 'test',
+    });
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'active', // <-- Critical
+      extraClaims: new Map<string, string>([
+        // Start the test with org A active
+        ['org_id', 'org_a']
+      ]),
+    });
+    const clientUat = claims.iat;
+    const res = await fetch(app.serverUrl +
+      '/organizations-by-id/org_b', // But attempt to visit org B
+      {
+        headers: new Headers({
+          Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          'Sec-Fetch-Dest': 'document',
+        }),
+        redirect: 'manual',
+      });
+    expect(res.status).toBe(307);
+    expect(res.headers.get('location')).toBe(
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
+      )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
+    );
+  });
+
+  test('expired session token - with personal workspace mismatch - dev', async () => {
+    const config = generateConfig({
+      mode: 'test',
+    });
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'expired', // <-- Critical
+      extraClaims: new Map<string, string>([
+        // Start the test with org A active
+        ['org_id', 'org_a']
+      ]),
+    });
+    const clientUat = claims.iat;
+    const res = await fetch(app.serverUrl +
+      '/personal-workspace', // But attempt to visit the personal workspace
+      {
+        headers: new Headers({
+          Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          'Sec-Fetch-Dest': 'document',
+        }),
+        redirect: 'manual',
+      });
+    expect(res.status).toBe(307);
+    expect(res.headers.get('location')).toBe(
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/personal-workspace`, // Redirects to the personal workspace (normal)
+      )}&suffixed_cookies=false${devBrowserQuery}&organization_id=`, // Should attempt to activate the personal workspace with a blank query param
     );
   });
 });
