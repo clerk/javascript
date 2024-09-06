@@ -269,6 +269,14 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               'bg-white': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
             })}
+            style={
+              appearance === 'light'
+                ? ({ '--cl-light': 'initial', '--cl-dark': ' ' } as React.CSSProperties)
+                : ({
+                    '--cl-light': ' ',
+                    '--cl-dark': 'initial',
+                  } as React.CSSProperties)
+            }
           >
             <div
               className={cx(
