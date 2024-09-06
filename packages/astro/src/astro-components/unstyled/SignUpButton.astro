@@ -1,7 +1,13 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignUpProps } from "@clerk/types";
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignUpProps & { as: Tag; mode?: 'redirect' | 'modal' }>
+import type { SignUpProps } from '@clerk/types'
+import { addUnstyledAttributeToFirstTag } from './utils'
+
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignUpProps & {
+  as: Tag;
+  asChild?: boolean;
+  mode?: 'redirect' | 'modal'
+}>
 
 import { generateSafeId } from '@clerk/astro/internal';
 
@@ -9,6 +15,7 @@ const safeId = generateSafeId();
 
 const {
   as: Tag = 'button',
+  asChild,
   fallbackRedirectUrl,
   forceRedirectUrl,
   signInFallbackRedirectUrl,
@@ -25,11 +32,24 @@ const signUpOptions = {
   signInForceRedirectUrl,
   unsafeMetadata,
 }
+
+let htmlElement = ''
+
+if (asChild) {
+  htmlElement = await Astro.slots.render('default')
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId)
+}
 ---
 
-<Tag {...elementProps} data-clerk-unstyled-id={safeId}>
-  <slot>Sign up</slot>
-</Tag >
+{
+  asChild ? (
+    <Fragment set:html={htmlElement} />
+  ) : (
+    <Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+      <slot>Sign up</slot>
+    </Tag >
+  )
+}
 
 <script is:inline define:vars={{ signUpOptions, mode, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
