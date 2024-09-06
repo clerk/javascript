@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useTransition } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
+import { removeBasePath } from '../../utils/removeBasePath';
 
 declare global {
   interface Window {
@@ -55,7 +56,7 @@ export const useInternalNavFun = (props: {
             // If the navigation is external (usually when navigating away from the component but still within the app),
             // we should use the Next.js router to navigate as it will handle updating the URL and also
             // fetching the new page if necessary.
-            routerNav(to);
+            routerNav(removeBasePath(to));
           }
         });
       });
