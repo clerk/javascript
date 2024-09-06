@@ -12,11 +12,11 @@ import { generateColors, getPreviewStyles } from './generate-colors';
 import { useAppearanceStore } from './stores/appearance-store';
 import { ThemeDialog } from './theme-dialog';
 
-const lightAccentDefault = '#6C47FF';
+const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
 
-const darkAccentDefault = '#6C47FF';
+const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
@@ -265,10 +265,13 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </aside>
 
           <figure
-            className={cx('relative isolate grid items-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]', {
-              'bg-white': appearance === 'light',
-              'dark bg-neutral-950': appearance === 'dark',
-            })}
+            className={cx(
+              'relative isolate grid items-center justify-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]',
+              {
+                'bg-white': appearance === 'light',
+                'dark bg-neutral-950': appearance === 'dark',
+              },
+            )}
             style={
               appearance === 'light'
                 ? ({ '--cl-light': 'initial', '--cl-dark': ' ' } as React.CSSProperties)

@@ -31,6 +31,8 @@ export function OTPField({
               <Common.Input
                 type='otp'
                 autoSubmit
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
                 className='flex justify-center gap-2'
                 passwordManagerOffset={24}
                 render={({ value, status }) => (
