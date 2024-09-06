@@ -115,7 +115,7 @@ const config = {
     },
   },
   plugins: [
-    plugin(function ({ addBase, theme }) {
+    plugin(function ({ addBase, addVariant, theme }) {
       /**
        * Extends Tailwind's built-in `addBase` function by scoping styles to
        * only affect components within the `@clerk/ui` package.
@@ -182,6 +182,11 @@ const config = {
       addScopedBase({
         '*:not(svg, svg *), use': {
           all: 'revert',
+        },
+        ':root': {
+          '--cl-light': 'initial',
+          '--cl-dark': ' ',
+          colorScheme: 'light dark',
         },
       });
 
@@ -469,6 +474,11 @@ const config = {
           fontFamily: 'var(--cl-font-family)',
         },
       });
+
+      /**
+       * Conditionally apply CSS to ios devices
+       */
+      addVariant('supports-ios', '@supports (-webkit-touch-callout: none)');
     }),
   ],
 } satisfies Config;
