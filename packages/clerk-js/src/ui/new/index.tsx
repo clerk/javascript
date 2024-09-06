@@ -10,35 +10,13 @@ import type { ComponentDefinition } from './types';
 
 type $TODO = any;
 
-function createObservablePromise() {
-  let status = 'pending';
-
-  const deferred = createDeferredPromise();
-  const resolve = () => {
-    deferred.resolve();
-    status = 'resolved';
-  };
-
-  const reject = () => {
-    deferred.reject();
-    status = 'rejected';
-  };
-
-  return {
-    status,
-    resolve,
-    reject,
-    promise: deferred.promise,
-  };
-}
-
 export class UI {
   router: ClerkHostRouter;
   clerk: LoadedClerk;
   options: ClerkOptions;
   componentRegistry = new Map<string, ComponentDefinition>();
 
-  #rendererPromise?: ReturnType<typeof createObservablePromise>;
+  #rendererPromise?: ReturnType<typeof createDeferredPromise>;
   #renderer?: ReturnType<typeof init>;
   #wrapper: ComponentType<{ children: ReactNode }>;
 
@@ -103,7 +81,7 @@ export class UI {
       return this.#rendererPromise.promise;
     }
 
-    this.#rendererPromise = createObservablePromise();
+    this.#rendererPromise = createDeferredPromise();
 
     import('./renderer').then(({ init }) => {
       this.#renderer = init({
