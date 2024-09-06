@@ -1,3 +1,4 @@
+import type { MetamaskError } from '@clerk/shared';
 import type { ClerkAPIError } from '@clerk/types';
 
 export abstract class ClerkElementsErrorBase extends Error {
@@ -21,8 +22,12 @@ export abstract class ClerkElementsErrorBase extends Error {
 }
 
 export class ClerkElementsError extends ClerkElementsErrorBase {
-  static fromAPIError(error: ClerkAPIError) {
-    return new ClerkElementsError(error.code, error.longMessage || error.message);
+  static fromAPIError(error: ClerkAPIError | MetamaskError) {
+    return new ClerkElementsError(
+      error.code.toString(),
+      // @ts-expect-error - Expected that longMessage isn't a property of MetamaskError
+      error.longMessage || error.message,
+    );
   }
 
   constructor(code: string, message: string) {
