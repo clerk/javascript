@@ -184,6 +184,8 @@ const config = {
           all: 'revert',
         },
         ':root': {
+          '--cl-light': 'initial',
+          '--cl-dark': ' ',
           colorScheme: 'light dark',
         },
       });
