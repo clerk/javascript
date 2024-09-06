@@ -120,7 +120,7 @@ export function signedInAuthObject(
     orgPermissions,
     __experimental_factorVerificationAge,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -180,33 +180,69 @@ const createGetToken: CreateGetToken = params => {
   };
 };
 
+const stringsToNumbers: { [key in '1m' | '10m' | '1h' | '4h' | '1d' | '1w']: number } = {
+  '1m': 1,
+  '10m': 10,
+  '1h': 60,
+  '4h': 240, //4 * 60,
+  '1d': 1440, //24 * 60,
+  '1w': 10080, //7 * 24 * 60,
+};
+
 const createHasAuthorization = (options: {
   userId: string;
   orgId: string | undefined;
   orgRole: string | undefined;
   orgPermissions: string[] | undefined;
+  __experimental_factorVerificationAge: [number | null, number | null] | undefined;
 }): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions } = options;
+  const { orgId, orgRole, userId, orgPermissions, __experimental_factorVerificationAge } = options;
 
   return params => {
-    if (!params?.permission && !params?.role) {
-      throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-      );
-    }
+    // if (!params?.permission && !params?.role) {
+    //   throw new Error(
+    //     'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
+    //   );
+    // }
 
-    if (!orgId || !userId || !orgRole || !orgPermissions) {
+    let orgAuthorization = null;
+    let stepUpAuthorization = null;
+
+    if (!userId) {
       return false;
     }
 
-    if (params.permission) {
-      return orgPermissions.includes(params.permission);
+    if (params.role || params.permission) {
+      const missingOrgs = !orgId || !orgRole || !orgPermissions;
+
+      if (params.permission && !missingOrgs) {
+        orgAuthorization = orgPermissions.includes(params.permission);
+      }
+
+      if (params.role && !missingOrgs) {
+        orgAuthorization = orgRole === params.role;
+      }
     }
 
-    if (params.role) {
-      return orgRole === params.role;
+    if (params.__experimental_assurance && __experimental_factorVerificationAge) {
+      const hasValidFactorOne =
+        __experimental_factorVerificationAge[0] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[0]
+          : false;
+      const hasValidFactorTwo =
+        __experimental_factorVerificationAge[1] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[1]
+          : false;
+
+      if (params.__experimental_assurance.level === 'firstFactor') {
+        stepUpAuthorization = hasValidFactorOne;
+      } else if (params.__experimental_assurance.level === 'secondFactor') {
+        stepUpAuthorization = hasValidFactorTwo;
+      } else {
+        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
+      }
     }
 
-    return false;
+    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
   };
 };

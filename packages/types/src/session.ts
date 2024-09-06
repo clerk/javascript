@@ -28,7 +28,7 @@ export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boole
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
-export type CheckAuthorizationParamsWithCustomPermissions =
+export type CheckAuthorizationParamsWithCustomPermissions = (
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -36,11 +36,18 @@ export type CheckAuthorizationParamsWithCustomPermissions =
   | {
       role?: never;
       permission: OrganizationCustomPermissionKey;
-    };
+    }
+  | { role?: never; permission?: never }
+) & {
+  __experimental_assurance?: {
+    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
+    maxAge: '1m' | '10m' | '1h' | '4h' | '1d' | '1w';
+  };
+};
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
-type CheckAuthorizationParams =
+type CheckAuthorizationParams = (
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -48,7 +55,17 @@ type CheckAuthorizationParams =
   | {
       role?: never;
       permission: OrganizationPermissionKey;
-    };
+    }
+  | {
+      role?: never;
+      permission?: never;
+    }
+) & {
+  __experimental_assurance?: {
+    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
+    maxAge: '1m' | '10m' | '1h' | '4h' | '1d' | '1w';
+  };
+};
 
 export interface SessionResource extends ClerkResource {
   id: string;

@@ -28,6 +28,15 @@ import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
+const stringsToNumbers: { [key in '1m' | '10m' | '1h' | '4h' | '1d' | '1w']: number } = {
+  '1m': 1,
+  '10m': 10,
+  '1h': 60,
+  '4h': 240, //4 * 60,
+  '1d': 1440, //24 * 60,
+  '1w': 10080, //7 * 24 * 60,
+};
+
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
 
@@ -88,31 +97,51 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    // if there is no active organization user can not be authorized
-    if (!this.lastActiveOrganizationId || !this.user) {
+    let orgAuthorization = null;
+    let stepUpAuthorization = null;
+    if (!this.user) {
       return false;
     }
 
-    // loop through organizationMemberships from client piggybacking
-    const orgMemberships = this.user.organizationMemberships || [];
-    const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+    if (params.role || params.permission) {
+      // loop through organizationMemberships from client piggybacking
+      const orgMemberships = this.user.organizationMemberships || [];
+      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
 
-    // Based on FAPI this should never happen, but we handle it anyway
-    if (!activeMembership) {
-      return false;
+      const activeOrganizationPermissions = activeMembership?.permissions;
+      const activeOrganizationRole = activeMembership?.role;
+
+      const missingOrgs = !activeMembership;
+
+      if (params.permission && !missingOrgs) {
+        orgAuthorization = activeOrganizationPermissions!.includes(params.permission);
+      }
+
+      if (params.role && !missingOrgs) {
+        orgAuthorization = activeOrganizationRole === params.role;
+      }
     }
 
-    const activeOrganizationPermissions = activeMembership.permissions;
-    const activeOrganizationRole = activeMembership.role;
+    if (params.__experimental_assurance && this.__experimental_factorVerificationAge) {
+      const hasValidFactorOne =
+        this.__experimental_factorVerificationAge[0] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[0]
+          : false;
+      const hasValidFactorTwo =
+        this.__experimental_factorVerificationAge[1] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[1]
+          : false;
 
-    if (params.permission) {
-      return activeOrganizationPermissions.includes(params.permission);
-    }
-    if (params.role) {
-      return activeOrganizationRole === params.role;
+      if (params.__experimental_assurance.level === 'firstFactor') {
+        stepUpAuthorization = hasValidFactorOne;
+      } else if (params.__experimental_assurance.level === 'secondFactor') {
+        stepUpAuthorization = hasValidFactorTwo;
+      } else {
+        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
+      }
     }
 
-    return false;
+    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
   };
 
   #hydrateCache = (token: TokenResource | null) => {
