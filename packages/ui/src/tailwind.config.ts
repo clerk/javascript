@@ -169,6 +169,11 @@ const config = {
           'from, to': { opacity: '1' },
           '50%': { opacity: '0' },
         },
+        ':root': {
+          '--cl-light': 'initial',
+          '--cl-dark': ' ',
+          colorScheme: 'light dark',
+        },
       });
 
       /**
@@ -182,11 +187,6 @@ const config = {
       addScopedBase({
         '*:not(svg, svg *), use': {
           all: 'revert',
-        },
-        ':root': {
-          '--cl-light': 'initial',
-          '--cl-dark': ' ',
-          colorScheme: 'light dark',
         },
       });
 
