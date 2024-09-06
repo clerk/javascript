@@ -24,6 +24,7 @@ export function init({ wrapper }: { wrapper: ElementType }) {
   const root = createRoot(rootElement);
 
   // (re-)renders the render wrapper, rendering any components present in the `renderedComponents` map.
+  // React's render function retains state, so it's safe to call multiple times as additional components are mounted and unmounted.
   function render() {
     root.render(
       createElement(
