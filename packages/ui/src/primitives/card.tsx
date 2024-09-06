@@ -28,7 +28,7 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
           '[--card-body-px:theme(spacing.10)]',
           '[--card-body-py:theme(spacing.8)]',
           '[--card-content-rounded-b:theme(borderRadius.lg)]',
-          'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] rounded-xl ring-1',
+          'bg-gray-2 ring-gray-a3 relative w-full max-w-[25rem] rounded-xl ring-1',
           banner
             ? [
                 'mt-[calc(var(--card-banner-height)/2)]',
