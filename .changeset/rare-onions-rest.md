@@ -11,7 +11,7 @@ Usage:
 import { SignInButton } from '@clerk/components/astro'
 ---
 
-<SignInButton>
+<SignInButton asChild>
   <button>Sign in with Clerk</button>
 </SignInButton>
 ```
