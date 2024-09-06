@@ -885,3 +885,101 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 });
+
+test.describe('Client handshake with organization activation (by ID) @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  let app: Application;
+  const jwksServer = http.createServer(function (req, res) {
+    const sk = req.headers.authorization?.replace('Bearer ', '');
+    if (!sk) {
+      console.log('No SK to', req.url, req.headers);
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.write(JSON.stringify(getJwksFromSecretKey(sk)));
+    res.end();
+  });
+  // Strip trailing slash
+  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
+  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
+
+  test.beforeAll('setup local Clerk API mock', async () => {
+    const env = appConfigs.envs.withEmailCodes
+      .clone()
+      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${PORT}`);
+
+    // Start the jwks server
+    await new Promise<void>(resolve => jwksServer.listen(4199, resolve));
+
+    app = await appConfigs.next.appRouter
+      .clone()
+      .addFile(
+        'src/middleware.ts',
+        () => `import { authMiddleware } from '@clerk/nextjs/server';
+    // Set the paths that don't require the user to be signed in
+    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+    export const middleware = (req, evt) => {
+      return authMiddleware({
+        publicRoutes: publicPaths,
+        publishableKey: req.headers.get("x-publishable-key"),
+        secretKey: req.headers.get("x-secret-key"),
+        proxyUrl: req.headers.get("x-proxy-url"),
+        domain: req.headers.get("x-domain"),
+        isSatellite: req.headers.get('x-satellite') === 'true',
+        signInUrl: req.headers.get("x-sign-in-url"),
+        organizationSync: {      // <--- CRITICAL
+          organizationPattern: "/organizations-by-id/:id",
+        }
+      })(req, evt)
+    };
+    export const config = {
+      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    };
+    `,
+      )
+      .commit();
+
+    await app.setup();
+    await app.withEnv(env);
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
+    await new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  });
+
+  test('expired session token - with organization mismatch - dev', async () => {
+
+    const config = generateConfig({
+      mode: 'test',
+    });
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'expired',
+      extraClaims: new Map<string, string>([
+        // Start the test with org A active
+        ['org_id', 'org_a']
+      ]),
+    });
+    const clientUat = claims.iat;
+    const res = await fetch(app.serverUrl +
+      '/organizations-by-id/org_b', // But attempt to visit org B
+      {
+      headers: new Headers({
+        Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    expect(res.status).toBe(307);
+    expect(res.headers.get('location')).toBe(
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
+      )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
+    );
+  });
+});
