@@ -395,6 +395,9 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'AUTHENTICATE.PASSKEY': {
+          actions: sendTo('firstFactor', ({ event }) => event),
+        },
         'RESET.STEP': {
           target: 'FirstFactor',
           reenter: true,
