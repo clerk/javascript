@@ -1,63 +1,74 @@
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
+import type { PolymorphicForwardRefExoticComponent, PolymorphicPropsWithoutRef } from '~/types/utils';
+
 import { ClerkLogo } from './clerk-logo';
 import { Image } from './image';
 
-export const Root = React.forwardRef(function CardRoot(
-  { banner, children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { banner?: React.ReactNode },
-  forwardedRef: React.ForwardedRef<HTMLDivElement>,
-) {
-  return (
-    <div
-      ref={forwardedRef}
-      data-card-root=''
-      {...props}
-      className={cx(
-        '[--card-banner-height:theme(size.4)]',
-        '[--card-body-px:theme(spacing.10)]',
-        '[--card-body-py:theme(spacing.8)]',
-        '[--card-content-rounded-b:theme(borderRadius.lg)]',
-        'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] rounded-xl ring-1',
-        banner
-          ? [
-              'mt-[calc(var(--card-banner-height)/2)]',
-              'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
-            ]
-          : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
-        className,
-      )}
-    >
-      {banner && (
-        <div
-          data-card-root-banner=''
-          className={cx(
-            'pointer-events-none absolute inset-x-0 -top-[calc(var(--card-banner-height)/2)] isolate z-[500] flex justify-center',
-            className,
-          )}
-        >
-          <p
+const RootDefaultElement = 'div';
+type RootOwnProps = {
+  children?: React.ReactNode;
+  banner?: React.ReactNode;
+};
+
+export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof RootDefaultElement> = React.forwardRef(
+  function CardRoot<T extends React.ElementType = typeof RootDefaultElement>(
+    { as, banner, children, className, ...props }: PolymorphicPropsWithoutRef<RootOwnProps, T>,
+    forwardedRef: React.ForwardedRef<Element>,
+  ) {
+    const Element: React.ElementType = as || RootDefaultElement;
+    return (
+      <Element
+        ref={forwardedRef}
+        data-card-root=''
+        {...props}
+        className={cx(
+          '[--card-banner-height:theme(size.4)]',
+          '[--card-body-px:theme(spacing.10)]',
+          '[--card-body-py:theme(spacing.8)]',
+          '[--card-content-rounded-b:theme(borderRadius.lg)]',
+          'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] rounded-xl ring-1',
+          banner
+            ? [
+                'mt-[calc(var(--card-banner-height)/2)]',
+                'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+              ]
+            : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+          className,
+        )}
+      >
+        {banner && (
+          <div
+            data-card-root-banner=''
             className={cx(
-              'bg-warning pointer-events-auto inline-flex h-[--card-banner-height] items-center rounded-full px-2 text-[0.6875rem] font-medium tracking-[2%] text-white',
+              'pointer-events-none absolute inset-x-0 -top-[calc(var(--card-banner-height)/2)] isolate z-[500] flex justify-center',
               className,
             )}
-            {...props}
           >
-            {banner}
-          </p>
-        </div>
-      )}
-      {children && (
-        <div
-          data-card-root-inner=''
-          className={cx('overflow-hidden rounded-[inherit]', className)}
-        >
-          {children}
-        </div>
-      )}
-    </div>
-  );
-});
+            <p
+              className={cx(
+                'bg-warning pointer-events-auto inline-flex h-[--card-banner-height] items-center rounded-full px-2 text-[0.6875rem] font-medium tracking-[2%] text-white',
+                className,
+              )}
+              {...props}
+            >
+              {banner}
+            </p>
+          </div>
+        )}
+        {children && (
+          <div
+            data-card-root-inner=''
+            className={cx('overflow-hidden rounded-[inherit]', className)}
+          >
+            {children}
+          </div>
+        )}
+      </Element>
+    );
+  },
+);
 
 export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardContent(
   { children, className, ...props },

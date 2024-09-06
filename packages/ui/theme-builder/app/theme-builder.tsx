@@ -151,7 +151,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          <aside className='relative isolate flex h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4'>
+          <aside className='relative isolate hidden h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4 sm:flex'>
             <div className='space-y-4'>
               <AppearanceOptions />
               {appearance === 'light' ? (
@@ -265,10 +265,18 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </aside>
 
           <figure
-            className={cx('relative isolate grid items-center overflow-y-auto p-8', {
+            className={cx('relative isolate grid items-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]', {
               'bg-white': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
             })}
+            style={
+              appearance === 'light'
+                ? ({ '--cl-light': 'initial', '--cl-dark': ' ' } as React.CSSProperties)
+                : ({
+                    '--cl-light': ' ',
+                    '--cl-dark': 'initial',
+                  } as React.CSSProperties)
+            }
           >
             <div
               className={cx(
