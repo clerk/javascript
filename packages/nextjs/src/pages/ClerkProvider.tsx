@@ -10,6 +10,7 @@ import type { NextClerkProviderProps } from '../types';
 import { ClerkJSScript } from '../utils/clerk-js-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
+import { removeBasePath } from '../utils/removeBasePath';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
@@ -34,8 +35,8 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
     };
   }, []);
 
-  const navigate = (to: string) => push(to);
-  const replaceNavigate = (to: string) => replace(to);
+  const navigate = (to: string) => push(removeBasePath(to));
+  const replaceNavigate = (to: string) => replace(removeBasePath(to));
   const mergedProps = mergeNextClerkPropsWithEnv({ ...props, routerPush: navigate, routerReplace: replaceNavigate });
   // ClerkProvider automatically injects __clerk_ssr_state
   // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
