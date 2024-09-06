@@ -1,6 +1,12 @@
 import { createDeferredPromise } from '@clerk/shared';
-import { ClerkHostRouter } from '@clerk/shared/router';
-import { ClerkOptions, LoadedClerk } from '@clerk/types';
+import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
+import type { ClerkHostRouter } from '@clerk/shared/router';
+import { ClerkHostRouterContext } from '@clerk/shared/router';
+import type { ClerkOptions, LoadedClerk } from '@clerk/types';
+import type { ComponentType, ReactNode } from 'react';
+
+import type { init } from './renderer';
+import type { ComponentDefinition } from './types';
 
 type $TODO = any;
 
@@ -30,10 +36,11 @@ export class UI {
   router: ClerkHostRouter;
   clerk: LoadedClerk;
   options: ClerkOptions;
-  componentRegistry = new Map();
+  componentRegistry = new Map<string, ComponentDefinition>();
 
-  #rendererPromise: ReturnType<typeof createObservablePromise>;
-  #renderer: ReturnType<(typeof import('./renderer'))['init']>;
+  #rendererPromise?: ReturnType<typeof createObservablePromise>;
+  #renderer?: ReturnType<typeof init>;
+  #wrapper: ComponentType<{ children: ReactNode }>;
 
   constructor({ router, clerk, options }: { router: ClerkHostRouter; clerk: LoadedClerk; options: ClerkOptions }) {
     this.router = router;
@@ -42,9 +49,25 @@ export class UI {
 
     // register components
     this.register('SignIn', {
+      type: 'component',
       load: () =>
         import(/* webpackChunkName: "sign-in-new" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({ default: SignIn })),
     });
+    this.register('SignUp', {
+      type: 'component',
+      load: () =>
+        import(/* webpackChunkName: "sign-up-new" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({ default: SignUp })),
+    });
+
+    this.#wrapper = ({ children }) => {
+      return (
+        <ClerkInstanceContext.Provider value={{ value: this.clerk }}>
+          <OptionsContext.Provider value={this.options}>
+            <ClerkHostRouterContext.Provider value={this.router}>{children}</ClerkHostRouterContext.Provider>
+          </OptionsContext.Provider>
+        </ClerkInstanceContext.Provider>
+      );
+    };
   }
 
   // Mount a component from the registry
@@ -57,17 +80,21 @@ export class UI {
     // immediately start loading the component
     component.load();
 
-    this.renderer().then(() => {
-      this.#renderer.mount(this.#renderer.createElementFromComponentDefinition(component), props, node);
-    });
+    this.renderer()
+      .then(() => {
+        this.#renderer?.mount(this.#renderer.createElementFromComponentDefinition(component), props, node);
+      })
+      .catch(err => {
+        console.error(`clerk/ui: Error mounting component ${componentName}:`, err);
+      });
   }
 
   unmount(node: HTMLElement) {
-    this.#renderer.unmount(node);
+    this.#renderer?.unmount(node);
   }
 
   // Registers a component for rendering later
-  register(componentName: string, componentDefinition: $TODO) {
+  register(componentName: string, componentDefinition: ComponentDefinition) {
     this.componentRegistry.set(componentName, componentDefinition);
   }
 
@@ -79,8 +106,10 @@ export class UI {
     this.#rendererPromise = createObservablePromise();
 
     import('./renderer').then(({ init }) => {
-      this.#renderer = init({ router: this.router, clerk: this.clerk, options: this.options });
-      this.#rendererPromise.resolve();
+      this.#renderer = init({
+        wrapper: this.#wrapper,
+      });
+      this.#rendererPromise?.resolve();
     });
 
     return this.#rendererPromise.promise;

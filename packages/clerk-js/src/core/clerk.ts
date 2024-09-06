@@ -15,6 +15,7 @@ import {
   stripScheme,
 } from '@clerk/shared';
 import { logger } from '@clerk/shared/logger';
+import type { ClerkHostRouter } from '@clerk/shared/router';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
@@ -65,6 +66,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { UI } from '../ui/new';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -120,9 +122,6 @@ import {
   Organization,
 } from './resources/internal';
 import { warnings } from './warnings';
-
-import { UI } from '../ui/new';
-import { ClerkHostRouter } from '@clerk/shared/router';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -565,15 +564,19 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
-      controls.mountComponent({
-        name: 'SignUp',
-        appearanceKey: 'signUp',
-        node,
-        props,
-      }),
-    );
+    if (props.experimental?.newComponents) {
+      this.ui.mount('SignUp', node, props);
+    } else {
+      this.assertComponentsReady(this.#componentControls);
+      void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+        controls.mountComponent({
+          name: 'SignUp',
+          appearanceKey: 'signUp',
+          node,
+          props,
+        }),
+      );
+    }
     this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 

@@ -1,28 +1,19 @@
-import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
-import { ClerkHostRouter, ClerkHostRouterContext } from '@clerk/shared/router';
-import { ClerkOptions, LoadedClerk } from '@clerk/types';
-import { ElementType, createElement, lazy } from 'react';
-import { createPortal } from 'react-dom';
-import { Root, createRoot } from 'react-dom/client';
-
 // TODO: don't import here
 import '@clerk/ui/styles.css';
+
+import type { ElementType } from 'react';
+import { createElement, lazy } from 'react';
+import { createPortal } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
+import type { ComponentDefinition } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components-new';
 
 // Initializes the react renderer
-export function init({
-  router,
-  clerk,
-  options,
-}: {
-  router: ClerkHostRouter;
-  clerk: LoadedClerk;
-  options: ClerkOptions;
-}) {
-  let renderedComponents = new Map<HTMLElement, [ElementType, Record<string, any>]>();
+export function init({ wrapper }: { wrapper: ElementType }) {
+  const renderedComponents = new Map<HTMLElement, [ElementType, Record<string, any>]>();
   let rootElement = document.getElementById(ROOT_ELEMENT_ID);
-  let root: Root;
 
   if (!rootElement) {
     rootElement = document.createElement('div');
@@ -30,24 +21,19 @@ export function init({
     document.body.appendChild(rootElement);
   }
 
-  root = createRoot(rootElement);
+  const root = createRoot(rootElement);
 
-  function ClerkComponentContainer() {
-    return (
-      <ClerkInstanceContext.Provider value={{ value: clerk }}>
-        <OptionsContext.Provider value={options}>
-          <ClerkHostRouterContext.Provider value={router}>
-            {Array.from(renderedComponents.entries()).map(([node, [element, props]]) =>
-              createPortal(createElement(element, props), node),
-            )}
-          </ClerkHostRouterContext.Provider>
-        </OptionsContext.Provider>
-      </ClerkInstanceContext.Provider>
-    );
-  }
-
+  // (re-)renders the render wrapper, rendering any components present in the `renderedComponents` map.
   function render() {
-    root.render(<ClerkComponentContainer />);
+    root.render(
+      createElement(
+        wrapper,
+        null,
+        Array.from(renderedComponents.entries()).map(([node, [element, props]]) =>
+          createPortal(createElement(element, props), node),
+        ),
+      ),
+    );
   }
 
   function mount(element: ElementType, props: any, node: HTMLElement) {
@@ -64,7 +50,7 @@ export function init({
     render();
   }
 
-  function createElementFromComponentDefinition(componentDefinition: any) {
+  function createElementFromComponentDefinition(componentDefinition: ComponentDefinition) {
     return lazy(componentDefinition.load);
   }
 

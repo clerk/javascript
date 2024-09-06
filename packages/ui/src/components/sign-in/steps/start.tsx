@@ -43,7 +43,10 @@ export function SignInStart() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         const connectionsWithSeperator = [
-          <Connections disabled={isGlobalLoading} />,
+          <Connections
+            disabled={isGlobalLoading}
+            key='connections'
+          />,
           hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
         ];
         return (
@@ -156,7 +159,7 @@ export function SignInStart() {
                     // up the state based on `isSubmitting`
                     passkeyEnabled ? (
                       <Common.Loading scope='passkey'>
-                        {isSubmitting => {
+                        {() => {
                           return (
                             <SignIn.Passkey asChild>
                               <LinkButton
