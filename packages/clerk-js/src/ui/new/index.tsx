@@ -29,12 +29,16 @@ export class UI {
     this.register('SignIn', {
       type: 'component',
       load: () =>
-        import(/* webpackChunkName: "sign-in-new" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({ default: SignIn })),
+        import(/* webpackChunkName: "rebuild--sign-in" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({
+          default: SignIn,
+        })),
     });
     this.register('SignUp', {
       type: 'component',
       load: () =>
-        import(/* webpackChunkName: "sign-up-new" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({ default: SignUp })),
+        import(/* webpackChunkName: "rebuild--sign-up" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({
+          default: SignUp,
+        })),
     });
 
     this.#wrapper = ({ children }) => {

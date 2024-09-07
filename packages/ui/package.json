@@ -13,6 +13,7 @@
     "url": "git+https://github.com/clerk/javascript.git",
     "directory": "packages/ui"
   },
+  "sideEffects": false,
   "exports": {
     "./contexts": {
       "import": {

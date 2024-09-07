@@ -26,6 +26,7 @@ const variantToSourceFile = {
 
 /** @returns { import('webpack').Configuration } */
 const common = ({ mode }) => {
+  /** @type { import('webpack').Configuration } */
   return {
     mode,
     resolve: {
@@ -76,6 +77,21 @@ const common = ({ mode }) => {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             priority: -10,
+          },
+          commonNew: {
+            minChunks: 2,
+            name: 'common-new',
+            chunks(chunk) {
+              return chunk.name?.startsWith('rebuild--');
+            },
+            priority: 0,
+          },
+          react: {
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](react-dom|scheduler)[\\/]/,
+            name: 'framework',
+            priority: 40,
+            enforce: true,
           },
         },
       },
@@ -167,6 +183,8 @@ const commonForProd = () => {
           new TerserPlugin({
             terserOptions: {
               compress: {
+                unused: true,
+                dead_code: true,
                 passes: 2,
               },
               mangle: {
