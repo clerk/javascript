@@ -542,8 +542,8 @@ export const enUS: LocalizationResource = {
       },
     },
     organizations: {
-      organization_minimum_permissions_needed: 'There has to be at least one organization',
-      already_a_member_in_organization: '{{name}} is already a member of the organization.',
+      organization_minimum_permissions_needed:
+        'There has to be at least one organization member with the minimum required permissions.',
     },
   },
   userButton: {
