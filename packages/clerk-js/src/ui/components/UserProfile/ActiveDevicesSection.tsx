@@ -1,6 +1,7 @@
-import { useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 
+import { useProtect } from '../../common';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
 import { useFetch, useLoadingStatus } from '../../hooks';
@@ -48,12 +49,38 @@ export const ActiveDevicesSection = () => {
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
+  const { __experimental_openUserVerification } = useClerk();
+
+  const isVerified = useProtect({
+    __experimental_assurance: {
+      level: 'L2.secondFactor',
+      // maxAge: '1m', //'A1.10min',
+      maxAge: 'A1.10min',
+    },
+  });
+
   const revoke = async () => {
     if (isCurrent || !session) {
       return;
     }
     status.setLoading();
-    return session.revoke().finally(() => status.setIdle());
+    return (
+      session
+        .revoke()
+        // TODO-STEPUP: Properly handler the response with a setCardError
+        .catch(() => {})
+        .finally(() => status.setIdle())
+    );
+  };
+
+  // TODO-STEPUP: Find a better way
+  const safeRevoke = async () => {
+    if (!isVerified) {
+      return __experimental_openUserVerification({
+        afterVerification: revoke,
+      });
+    }
+    await revoke();
   };
 
   return (
@@ -69,7 +96,7 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       {!status.isLoading && (
         <>
           <DeviceInfo session={session} />
-          {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
+          {!isCurrent && <ActiveDeviceMenu revoke={safeRevoke} />}
         </>
       )}
     </ProfileSection.Item>

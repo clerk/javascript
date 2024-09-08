@@ -40,7 +40,7 @@ export type CheckAuthorizationParamsWithCustomPermissions =
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
-type CheckAuthorizationParams =
+type CheckAuthorizationParams = (
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -48,7 +48,17 @@ type CheckAuthorizationParams =
   | {
       role?: never;
       permission: OrganizationPermissionKey;
-    };
+    }
+  | {
+      role?: never;
+      permission?: never;
+    }
+) & {
+  __experimental_assurance?: {
+    level: __experimental_SessionVerificationLevel;
+    maxAge: __experimental_SessionVerificationMaxAge;
+  };
+};
 
 export interface SessionResource extends ClerkResource {
   id: string;

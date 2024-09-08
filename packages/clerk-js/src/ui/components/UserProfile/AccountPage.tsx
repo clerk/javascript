@@ -46,6 +46,8 @@ export const AccountPage = withCardStateProvider(() => {
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
         {showConnectedAccounts && <ConnectedAccountsSection />}
+
+        {/*TODO-STEP-UP: DO these 2*/}
         {showSamlAccounts && <EnterpriseAccountsSection />}
         {showWeb3 && <Web3Section />}
       </Col>

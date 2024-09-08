@@ -1,8 +1,8 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
-import { ProviderInitialIcon } from '../../common';
+import { ProviderInitialIcon, useProtect } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
@@ -16,6 +16,7 @@ export const AddConnectedAccount = () => {
   const { navigate } = useRouter();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
+  const { __experimental_openUserVerification } = useClerk();
   const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
@@ -23,6 +24,14 @@ export const AddConnectedAccount = () => {
 
   const unconnectedStrategies = enabledStrategies.filter(provider => {
     return !connectedStrategies.includes(provider);
+  });
+
+  const isVerified = useProtect({
+    __experimental_assurance: {
+      level: 'L2.secondFactor',
+      // maxAge: '1m', //'A1.10min',
+      maxAge: 'A1.10min',
+    },
   });
 
   const connect = (strategy: OAuthStrategy) => {
@@ -51,6 +60,15 @@ export const AddConnectedAccount = () => {
         handleError(err, [], card.setError);
         card.setIdle(strategy);
       });
+  };
+
+  const safeCreate = async (strategy: OAuthStrategy) => {
+    if (!isVerified) {
+      return __experimental_openUserVerification({
+        afterVerification: () => connect(strategy),
+      });
+    }
+    connect(strategy);
   };
 
   if (unconnectedStrategies.length === 0) {
@@ -86,7 +104,7 @@ export const AddConnectedAccount = () => {
           <ProfileSection.ActionMenuItem
             key={strategy}
             id={strategyToDisplayData[strategy].id}
-            onClick={() => connect(strategy)}
+            onClick={() => safeCreate(strategy)}
             isDisabled={card.isLoading}
             variant='ghost'
             isLoading={card.loadingMetadata === strategy}

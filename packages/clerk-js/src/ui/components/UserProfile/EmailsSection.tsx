@@ -80,7 +80,10 @@ export const EmailsSection = () => {
             </Action.Root>
           ))}
 
-          <Action.Trigger value='add'>
+          <Action.Trigger
+            value='add'
+            protect
+          >
             <ProfileSection.ArrowButton
               id='emailAddresses'
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
@@ -113,12 +116,14 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__primary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: () => open('verify'),
           }
         : null,
       !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__nonPrimary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: setPrimary,
           }
         : null,
@@ -131,7 +136,10 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       {
         label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () =>
+          open('remove', {
+            protect: true,
+          }),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

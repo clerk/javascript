@@ -85,7 +85,10 @@ export const PhoneSection = () => {
             </Action.Root>
           ))}
 
-          <Action.Trigger value='add'>
+          <Action.Trigger
+            value='add'
+            protect
+          >
             <ProfileSection.ArrowButton
               id='phoneNumbers'
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
@@ -123,12 +126,14 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
       isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: () => open('verify'),
           }
         : null,
       !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__nonPrimary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: setPrimary,
           }
         : null,
@@ -141,7 +146,10 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
       {
         label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () =>
+          open('remove', {
+            protect: true,
+          }),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

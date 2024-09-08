@@ -2,6 +2,7 @@ import { runWithExponentialBackOff } from '@clerk/shared';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   __experimental_SessionVerificationJSON,
+  __experimental_SessionVerificationMaxAge,
   __experimental_SessionVerificationResource,
   __experimental_SessionVerifyAttemptFirstFactorParams,
   __experimental_SessionVerifyAttemptSecondFactorParams,
@@ -27,6 +28,15 @@ import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+const stringsToNumbers: { [key in '1m' | __experimental_SessionVerificationMaxAge]: number } = {
+  '1m': 1,
+  'A1.10min': 10,
+  'A2.1hr': 60,
+  'A3.4hr': 240, //4 * 60,
+  'A4.1day': 1440, //24 * 60,
+  'A5.1wk': 10080, //7 * 24 * 60,
+};
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -88,31 +98,50 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    // if there is no active organization user can not be authorized
-    if (!this.lastActiveOrganizationId || !this.user) {
+    let orgAuthorization = null;
+    let stepUpAuthorization = null;
+    if (!this.user) {
       return false;
     }
 
-    // loop through organizationMemberships from client piggybacking
-    const orgMemberships = this.user.organizationMemberships || [];
-    const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+    if (params.role || params.permission) {
+      const orgMemberships = this.user.organizationMemberships || [];
+      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
 
-    // Based on FAPI this should never happen, but we handle it anyway
-    if (!activeMembership) {
-      return false;
+      const activeOrganizationPermissions = activeMembership?.permissions;
+      const activeOrganizationRole = activeMembership?.role;
+
+      const missingOrgs = !activeMembership;
+
+      if (params.permission && !missingOrgs) {
+        orgAuthorization = activeOrganizationPermissions!.includes(params.permission);
+      }
+
+      if (params.role && !missingOrgs) {
+        orgAuthorization = activeOrganizationRole === params.role;
+      }
     }
 
-    const activeOrganizationPermissions = activeMembership.permissions;
-    const activeOrganizationRole = activeMembership.role;
+    if (params.__experimental_assurance && this.__experimental_factorVerificationAge) {
+      const hasValidFactorOne =
+        this.__experimental_factorVerificationAge[0] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[0]
+          : false;
+      const hasValidFactorTwo =
+        this.__experimental_factorVerificationAge[1] !== null
+          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[1]
+          : false;
 
-    if (params.permission) {
-      return activeOrganizationPermissions.includes(params.permission);
-    }
-    if (params.role) {
-      return activeOrganizationRole === params.role;
+      if (params.__experimental_assurance.level === 'L1.firstFactor') {
+        stepUpAuthorization = hasValidFactorOne;
+      } else if (params.__experimental_assurance.level === 'L2.secondFactor') {
+        stepUpAuthorization = hasValidFactorTwo;
+      } else {
+        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
+      }
     }
 
-    return false;
+    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
   };
 
   #hydrateCache = (token: TokenResource | null) => {
@@ -139,6 +168,8 @@ export class Session extends BaseResource implements SessionResource {
     level,
     maxAge,
   }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
@@ -147,6 +178,7 @@ export class Session extends BaseResource implements SessionResource {
           level,
           maxAge,
         } as any,
+        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -156,6 +188,8 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_prepareFirstFactorVerification = async (
     factor: __experimental_SessionVerifyPrepareFirstFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('_clerk_session_id', this.id);
     let config;
     switch (factor.strategy) {
       case 'email_code':
@@ -179,6 +213,7 @@ export class Session extends BaseResource implements SessionResource {
           ...config,
           strategy: factor.strategy,
         } as any,
+        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -188,11 +223,14 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_attemptFirstFactorVerification = async (
     attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
         body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -202,11 +240,14 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_prepareSecondFactorVerification = async (
     params: __experimental_SessionVerifyPrepareSecondFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/prepare_second_factor`,
         body: params as any,
+        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -216,11 +257,14 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_attemptSecondFactorVerification = async (
     params: __experimental_SessionVerifyAttemptSecondFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
         body: params as any,
+        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 

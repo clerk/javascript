@@ -160,7 +160,10 @@ const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
       {
         label: localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () =>
+          open('remove', {
+            protect: true,
+          }),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
@@ -175,7 +178,10 @@ const MfaBackupCodeMenu = () => {
     [
       {
         label: localizationKeys('userProfile.start.mfaSection.backupCodes.actionLabel__regenerate'),
-        onClick: () => open('regenerate'),
+        onClick: () =>
+          open('regenerate', {
+            protect: true,
+          }),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
@@ -191,7 +197,10 @@ const MfaTOTPMenu = () => {
       {
         label: localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () =>
+          open('remove', {
+            protect: true,
+          }),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
@@ -256,7 +265,9 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
                     leftIcon={method.icon}
                     onClick={() => {
                       setSelectedStrategy(method.key);
-                      open('multi-factor');
+                      open('multi-factor', {
+                        protect: true,
+                      });
                     }}
                   />
                 ),

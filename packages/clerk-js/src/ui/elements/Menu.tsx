@@ -139,6 +139,7 @@ export const MenuList = (props: MenuListProps) => {
             animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
             boxShadow: t.shadows.$menuShadow,
+            // or remove this line
             zIndex: t.zIndices.$dropdown,
             gap: t.space.$0x5,
           }),

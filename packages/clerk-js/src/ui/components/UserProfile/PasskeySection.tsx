@@ -2,6 +2,7 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
+import { useProtect } from '../../common';
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import {
   Form,
@@ -179,7 +180,10 @@ const ActiveDeviceMenu = () => {
     {
       label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
       isDestructive: true,
-      onClick: () => open('remove'),
+      onClick: () =>
+        open('remove', {
+          protect: true,
+        }),
     },
   ] satisfies PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
@@ -189,8 +193,16 @@ const ActiveDeviceMenu = () => {
 // TODO-PASSKEYS: Should the error be scope to the section ?
 const AddPasskeyButton = () => {
   const card = useCardState();
-  const { isSatellite } = useClerk();
+  const { isSatellite, __experimental_openUserVerification } = useClerk();
   const { user } = useUser();
+
+  const isVerified = useProtect({
+    __experimental_assurance: {
+      level: 'L2.secondFactor',
+      // maxAge: '1m', //'A1.10min',
+      maxAge: 'A1.10min',
+    },
+  });
 
   const handleCreatePasskey = async () => {
     try {
@@ -198,6 +210,16 @@ const AddPasskeyButton = () => {
     } catch (e) {
       handleError(e, [], card.setError);
     }
+  };
+
+  // TODO-STEPUP: Find a better way
+  const safeCreate = async () => {
+    if (!isVerified) {
+      return __experimental_openUserVerification({
+        afterVerification: handleCreatePasskey,
+      });
+    }
+    await handleCreatePasskey();
   };
 
   if (isSatellite) {
@@ -208,7 +230,7 @@ const AddPasskeyButton = () => {
     <ProfileSection.ArrowButton
       id='passkeys'
       localizationKey={'Add a passkey'}
-      onClick={handleCreatePasskey}
+      onClick={safeCreate}
     />
   );
 };
