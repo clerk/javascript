@@ -1,5 +1,117 @@
 # @clerk/elements
 
+## 0.14.6
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+
+## 0.14.5
+
+### Patch Changes
+
+- Add support for sign in and sign up with Coinbase ([#4051](https://github.com/clerk/javascript/pull/4051)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+
+## 0.14.4
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Moves the common `ClerkRouter` interface into `@clerk/shared/router`. Elements has been refactored internally to import the router from the shared package. ([#4045](https://github.com/clerk/javascript/pull/4045)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/types@4.17.0
+
+## 0.14.3
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+
+## 0.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+
+## 0.14.1
+
+### Patch Changes
+
+- Fix `SignIn.SafeIdentifier` potentially outputting an incorrect identifier when using similar multi-session sign in strategies. ([#3974](https://github.com/clerk/javascript/pull/3974)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+
+## 0.14.0
+
+### Minor Changes
+
+- Introduce multi-session choose account step and associated actions/components. ([#3957](https://github.com/clerk/javascript/pull/3957)) by [@tmilewski](https://github.com/tmilewski)
+
+  Example:
+
+  ```tsx
+  <SignIn.Step name="choose-session">
+    <SignIn.SessionList>
+      <SignIn.SessionListItem>
+        {({ session }) => (
+          <>
+            {session.identifier} |{" "}
+            <SignIn.Action setActiveSession>Switch...</SignIn.Action>
+          </>
+        )}
+      </SignIn.SessionListItem>
+    </SignIn.SessionList>
+  </SignIn.Step>
+  ```
+
+### Patch Changes
+
+- Refactor form hooks and utils into separate files ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(elements): Add support for sign in with email_link via redirect_url ([#3926](https://github.com/clerk/javascript/pull/3926)) by [@dstaley](https://github.com/dstaley)
+
+- Preserve absolute URLs passed via `redirect_url` ([#3947](https://github.com/clerk/javascript/pull/3947)) by [@dstaley](https://github.com/dstaley)
+
+- Extract common Form components from single file ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add support for submit and passkey loading scopes ([#3927](https://github.com/clerk/javascript/pull/3927)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/types@4.14.0
+
+## 0.13.0
+
+### Minor Changes
+
+- Handle ticket-based invitation sign-up workflows ([#3910](https://github.com/clerk/javascript/pull/3910)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Refactor form hooks and utils into separate files ([#3931](https://github.com/clerk/javascript/pull/3931)) by [@tmilewski](https://github.com/tmilewski)
+
+- In certain situations the Frontend API response contains [`supported_first_factors`](https://clerk.com/docs/reference/frontend-api/tag/Sign-Ins#operation/createSignIn!c=200&path=response/supported_first_factors&t=response) with a `null` value while the current code always assumed to receive an array. `SignInResource['supportedFirstFactors']` has been updated to account for that and any code accessing this value has been made more resilient against `null` values. ([#3938](https://github.com/clerk/javascript/pull/3938)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/types@4.13.1
+
+## 0.12.4
+
+### Patch Changes
+
+- Add support for redirect_url URL parameter ([#3906](https://github.com/clerk/javascript/pull/3906)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`4e6c94e3f`](https://github.com/clerk/javascript/commit/4e6c94e3f4cc92cbba8bddcd2b90fcc9cfb83763)]:
+  - @clerk/types@4.13.0
+
 ## 0.12.3
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import type { SignUpResource, Web3Strategy } from '@clerk/types';
-import { assertEvent, fromPromise, not, sendTo, setup } from 'xstate';
+import { assertEvent, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
@@ -12,10 +12,13 @@ import { assertActorEventError } from '~/internals/machines/utils/assert';
 import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignUpStartSchema } from './start.types';
 
+const DISABLEABLE_FIELDS = ['emailAddress', 'phoneNumber'] as const;
+
 export type TSignUpStartMachine = typeof SignUpStartMachine;
 
 export const SignUpStartMachineId = 'SignUpStart';
 
+type AttemptParams = { strategy: 'ticket'; ticket: string } | { strategy?: never; ticket?: never };
 type PrefillFieldsKeys = keyof Pick<
   SignUpResource,
   'username' | 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber'
@@ -24,16 +27,20 @@ const PREFILL_FIELDS: PrefillFieldsKeys[] = ['firstName', 'lastName', 'emailAddr
 
 export const SignUpStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignUpResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
-      ({ input: { fields, parent } }) => {
-        const params = fieldsToSignUpParams(fields);
-        return parent.getSnapshot().context.clerk.client.signUp.create(params);
-      },
-    ),
+    attempt: fromPromise<
+      SignUpResource,
+      { parent: SignInRouterMachineActorRef; fields: FormFields; params?: AttemptParams }
+    >(({ input: { fields, parent, params } }) => {
+      const fieldParams = fieldsToSignUpParams(fields);
+      return parent.getSnapshot().context.clerk.client.signUp.create({ ...fieldParams, ...params });
+    }),
     attemptWeb3: fromPromise<SignUpResource, { parent: SignInRouterMachineActorRef; strategy: Web3Strategy }>(
       ({ input: { parent, strategy } }) => {
         if (strategy === 'web3_metamask_signature') {
           return parent.getSnapshot().context.clerk.client.signUp.authenticateWithMetamask();
+        }
+        if (strategy === 'web3_coinbase_wallet_signature') {
+          return parent.getSnapshot().context.clerk.client.signUp.authenticateWithCoinbaseWallet();
         }
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
@@ -43,6 +50,19 @@ export const SignUpStartMachine = setup({
   actions: {
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
+    setFormDisabledTicketFields: enqueueActions(({ context, enqueue }) => {
+      if (!context.ticket) {
+        return;
+      }
+
+      const currentFields = context.formRef.getSnapshot().context.fields;
+
+      for (const name of DISABLEABLE_FIELDS) {
+        if (currentFields.has(name)) {
+          enqueue.sendTo(context.formRef, { type: 'FIELD.DISABLE', field: { name } });
+        }
+      }
+    }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -70,6 +90,7 @@ export const SignUpStartMachine = setup({
     },
   },
   guards: {
+    hasTicket: ({ context }) => Boolean(context.ticket),
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
   },
   types: {} as SignUpStartSchema,
@@ -80,10 +101,24 @@ export const SignUpStartMachine = setup({
     formRef: input.formRef,
     parent: input.parent,
     loadingStep: 'start',
+    ticket: input.ticket,
   }),
   entry: 'setDefaultFormValues',
-  initial: 'Pending',
+  initial: 'Init',
   states: {
+    Init: {
+      description:
+        'Handle ticket, if present; Else, default to Pending state. Per tickets, `Attempting` makes a `signUp.create` request allowing for an incomplete sign up to contain progressively filled fields on the Start step.',
+      always: [
+        {
+          guard: 'hasTicket',
+          target: 'Attempting',
+        },
+        {
+          target: 'Pending',
+        },
+      ],
+    },
     Pending: {
       tags: ['state:pending'],
       description: 'Waiting for user input',
@@ -106,15 +141,28 @@ export const SignUpStartMachine = setup({
       invoke: {
         id: 'attemptCreate',
         src: 'attempt',
-        input: ({ context }) => ({
-          parent: context.parent,
-          fields: context.formRef.getSnapshot().context.fields,
-        }),
+        input: ({ context }) => {
+          // Standard fields
+          const defaultParams = {
+            fields: context.formRef.getSnapshot().context.fields,
+            parent: context.parent,
+          };
+
+          // Handle ticket-specific flows
+          const params: AttemptParams = context.ticket
+            ? {
+                strategy: 'ticket',
+                ticket: context.ticket,
+              }
+            : {};
+
+          return { ...defaultParams, params };
+        },
         onDone: {
-          actions: ['sendToNext', 'sendToLoading'],
+          actions: ['setFormDisabledTicketFields', 'sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: ['setFormErrors', 'sendToLoading'],
+          actions: ['setFormDisabledTicketFields', 'setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

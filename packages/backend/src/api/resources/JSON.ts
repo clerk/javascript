@@ -274,6 +274,7 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
   user_id?: string;
   message: string;
   status: string;
+  slug?: string | null;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
 }

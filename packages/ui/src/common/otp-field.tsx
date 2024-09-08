@@ -1,6 +1,7 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 
 export function OTPField({
@@ -30,6 +31,8 @@ export function OTPField({
               <Common.Input
                 type='otp'
                 autoSubmit
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
                 className='flex justify-center gap-2'
                 passwordManagerOffset={24}
                 render={({ value, status }) => (
@@ -66,18 +69,20 @@ export function OTPField({
             )}
           </Common.FieldState>
 
-          <Common.FieldError asChild>
-            {({ message }) => {
-              return (
-                <Field.Message
-                  justify='center'
-                  intent='error'
-                >
-                  {message}
-                </Field.Message>
-              );
-            }}
-          </Common.FieldError>
+          <Animated>
+            <Common.FieldError asChild>
+              {({ message }) => {
+                return (
+                  <Field.Message
+                    justify='center'
+                    intent='error'
+                  >
+                    {message}
+                  </Field.Message>
+                );
+              }}
+            </Common.FieldError>
+          </Animated>
         </Field.Root>
       </Common.Field>
       {resend && resend}

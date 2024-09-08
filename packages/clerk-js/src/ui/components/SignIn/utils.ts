@@ -103,7 +103,7 @@ function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier
 // The algorithm can be found at
 // https://www.notion.so/clerkdev/Implement-sign-in-alt-methods-e6e60ffb644645b3a0553b50556468ce
 export function determineStartingSignInFactor(
-  firstFactors: SignInFactor[],
+  firstFactors: SignInFactor[] | null,
   identifier: string | null,
   preferredSignInStrategy: PreferredSignInStrategy,
 ): SignInFactor | null | undefined {
@@ -124,7 +124,6 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-// @ts-ignore
 const localStrategies: SignInStrategy[] = ['passkey', 'email_code', 'password', 'phone_code', 'email_link'];
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {

@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/clerk-sdk-node</h1>
 </p>
-
-# @clerk/clerk-sdk-node
 
 <div align="center">
 
@@ -22,66 +21,37 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_sdk_node)
 
 </div>
 
----
+## Getting Started
 
-## Overview
-
-[Clerk](https://clerk.com?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding of the Clerk Backend API and SDK, refer to
-the <a href="https://clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_sdk_node" target="_blank">Node SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
-
-## Getting started
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node.js application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_sdk_node).
 
-## Installation
+### Installation
 
-```sh
-npm install @clerk/clerk-sdk-node
-```
-
-To build the package locally with the TypeScript compiler, run:
-
-```sh
-npm run build
-```
+The fastest way to get started with Clerk is by following the [Clerk Node.js Quickstart](https://clerk.com/docs/references/nodejs/overview?utm_source=github&utm_medium=clerk_sdk_node).
 
 ## Usage
 
-Retrieve your Backend API key from the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) screen in your Clerk dashboard and set it as an environment variable in a `.env` file:
-
-```sh
-CLERK_PUBLISHABLE_KEY=pk_*******
-CLERK_SECRET_KEY=sk_******
-```
-
-You will then be able to access all the available methods.
-
-```js
-import 'dotenv/config'; // To read CLERK_SECRET_KEY
-import clerk from '@clerk/clerk-sdk-node';
-
-const { data: userList } = await clerk.users.getUserList();
-```
-
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_sdk_node)._
+You can use all [available methods](https://clerk.com/docs/references/nodejs/available-methods?utm_source=github&utm_medium=clerk_sdk_node) from the Backend SDK.
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_sdk_node)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_sdk_node)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

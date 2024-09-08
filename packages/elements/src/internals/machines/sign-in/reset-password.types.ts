@@ -11,7 +11,7 @@ export type SignInResetPasswordTags = 'state:pending' | 'state:attempting' | 'st
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInResetPasswordSubmitEvent = { type: 'SUBMIT' };
+export type SignInResetPasswordSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 
 export type SignInResetPasswordEvents = ErrorActorEvent | SignInResetPasswordSubmitEvent;
 

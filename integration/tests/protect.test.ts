@@ -43,9 +43,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();
-    await u.po.organizationSwitcher.expectNoOrganizationSelected();
-    await u.po.organizationSwitcher.toggleTrigger();
-    await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     await u.page.goToRelative('/settings/rsc-protect');
@@ -104,9 +101,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();
-    await u.po.organizationSwitcher.expectNoOrganizationSelected();
-    await u.po.organizationSwitcher.toggleTrigger();
-    await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     await u.page.goToRelative('/settings/rsc-protect');
@@ -120,10 +114,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.page.goToRelative('/settings/auth-protect');
     await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
 
-    // route handler
-    await u.page.goToRelative('/api/settings/');
+    // Route Handler
+    await u.page.goToRelative('/api/settings/').catch(() => {});
 
     // Result of 404 response with empty body
-    expect(await u.page.content()).toEqual('<html><head></head><body></body></html>');
+    expect(await u.page.content()).toMatch(/^(<!DOCTYPE html>)/);
+    expect(await u.page.content()).toMatch(/(No webpage was found)/);
+    expect(await u.page.content()).toMatch(/(HTTP ERROR 404)/);
   });
 });

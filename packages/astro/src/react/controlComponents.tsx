@@ -1,14 +1,10 @@
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
 import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
+import type { ProtectProps as _ProtectProps } from '../types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
 import { withClerk } from './utils';
@@ -73,32 +69,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element
   return <>{children}</>;
 };
 
-export type ProtectProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-      }
-  ) & {
-    fallback?: React.ReactNode;
-  }
->;
+export type ProtectProps = React.PropsWithChildren<_ProtectProps & { fallback?: React.ReactNode }>;
 
 /**
  * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.

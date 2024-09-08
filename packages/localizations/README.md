@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/localizations</h1>
 </p>
-
-# @clerk/localizations
 
 <div align="center">
 
@@ -22,92 +21,37 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_localizations)
 
 </div>
 
----
+## Getting Started
 
-### ⚠️ Important Notice:
-
-**Clerk officially maintains only the `en-US` (English - United States) locale. All other language translations provided within this package are community contributions.**
-
-## Overview
-
-Clerk offers the ability to override the strings for all of the elements in each of the Clerk Components. This allows you to provide localization for your users or change the wording to suit your brand.
+When using Clerk's components you can override the strings for all of the elements. This allows you to provide localization for your users or change the wording to suit your brand.
 
 `@clerk/localizations` contains localized strings for applications using Clerk. If you found a typo, inaccuracies, or want to contribute a new language, please submit a PR and follow the [contributing guide](#contributing).
 
-## Getting Started
-
-### Prerequisites
-
-- Clerk
+> [!WARNING]
+> Clerk officially **only** maintains the `en-US` (English - United States) locale. All other language translations provided within this package are community contributions.
 
 ### Installation
 
-```shell
-npm install @clerk/localizations
-```
-
-### Build
-
-```shell
-npm run build
-```
+The fastest way to get started with `@clerk/localizations` is by following the [localization reference documentation](https://clerk.com/docs/customization/localization#usage?utm_source=github&utm_medium=clerk_localizations).
 
 ## Usage
 
-`@clerk/localizations` contains predefined localizations you can use:
-
-```javascript
-import React from 'react';
-import { ClerkProvider } from '@clerk/clerk-react';
-import { frFR } from '@clerk/localizations';
-
-function App() {
-  return (
-    <ClerkProvider localization={frFR}>
-      <div>Hello from clerk</div>
-    </ClerkProvider>
-  );
-}
-
-export default App;
-```
-
-You can also provide your own localization:
-
-```javascript
-import React from 'react';
-import { ClerkProvider } from '@clerk/clerk-react';
-
-const localization = {
-  socialButtonsBlockButton: 'Sign In with {{provider|titleize}}',
-};
-
-function App() {
-  return (
-    <ClerkProvider localization={localization}>
-      <div>Hello from clerk</div>
-    </ClerkProvider>
-  );
-}
-
-export default App;
-```
+Furthermore, you can learn how to [update a localization](https://clerk.com/docs/customization/localization#adding-or-updating-a-localization?utm_source=github&utm_medium=clerk_localizations) or [use a custom one](https://clerk.com/docs/customization/localization#custom-localizations?utm_source=github&utm_medium=clerk_localizations).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_localizations)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_localizations)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ### Adding a new localization key
 

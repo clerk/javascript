@@ -4,43 +4,35 @@ import * as SignIn from '@clerk/elements/sign-in';
 import { CheckboxField } from '~/common/checkbox-field';
 import { GlobalError } from '~/common/global-error';
 import { PasswordField } from '~/common/password-field';
-import { useAppearance } from '~/hooks/use-appearance';
-import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useCard } from '~/hooks/use-card';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import { LinkButton } from '~/primitives/link';
 
 export function SignInResetPassword() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
-  const isDev = isDevelopmentOrStaging();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const isDev = useDevModeWarning();
+  const { logoProps, footerProps } = useCard();
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='reset-password'>
-            <Card.Root>
+          <SignIn.Step
+            asChild
+            name='reset-password'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                 </Card.Header>
 
@@ -66,35 +58,34 @@ export function SignInResetPassword() {
                   </div>
                 </Card.Body>
 
-                <Common.Loading>
-                  {isSubmitting => {
-                    return (
-                      <Card.Actions>
+                <Card.Actions>
+                  <Common.Loading scope='submit'>
+                    {isSubmitting => {
+                      return (
                         <SignIn.Action
                           submit
                           asChild
                         >
                           <Button
                             busy={isSubmitting}
-                            disabled={isGlobalLoading || isSubmitting}
+                            disabled={isGlobalLoading}
                           >
                             {t('signIn.resetPassword.formButtonPrimary')}
                           </Button>
                         </SignIn.Action>
+                      );
+                    }}
+                  </Common.Loading>
 
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <LinkButton>{t('backButton')}</LinkButton>
-                        </SignIn.Action>
-                      </Card.Actions>
-                    );
-                  }}
-                </Common.Loading>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
+                  <SignIn.Action
+                    navigate='start'
+                    asChild
+                  >
+                    <LinkButton>{t('backButton')}</LinkButton>
+                  </SignIn.Action>
+                </Card.Actions>
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignIn.Step>
         );

@@ -4,7 +4,8 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -45,33 +46,27 @@ function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
 
 export function SignUpVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
-  const renderDevModeNotice = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const isDev = useDevModeWarning();
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='verifications'>
-            <Card.Root>
+          <SignUp.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -86,7 +81,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -119,10 +114,10 @@ export function SignUpVerifications() {
                       }
                     />
                   </Card.Body>
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignUp.Action
                             submit
                             asChild
@@ -135,21 +130,15 @@ export function SignUpVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 </SignUp.Strategy>
 
                 <SignUp.Strategy name='email_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -164,7 +153,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -197,10 +186,10 @@ export function SignUpVerifications() {
                       }
                     />
                   </Card.Body>
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignUp.Action
                             submit
                             asChild
@@ -213,21 +202,15 @@ export function SignUpVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 </SignUp.Strategy>
 
                 <SignUp.Strategy name='email_link'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
                     <Card.Description>
                       {t('signUp.emailLink.subtitle', {
@@ -246,7 +229,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -276,9 +259,8 @@ export function SignUpVerifications() {
                     </SignUp.Action>
                   </Card.Body>
                 </SignUp.Strategy>
-                {renderDevModeNotice ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignUp.Step>
         );

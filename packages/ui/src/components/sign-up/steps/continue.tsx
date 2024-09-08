@@ -8,10 +8,10 @@ import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -19,36 +19,29 @@ import * as Icon from '~/primitives/icon';
 
 export function SignUpContinue() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
-  const renderDevModeWarning = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const isDev = useDevModeWarning();
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='continue'>
-            <Card.Root>
+          <SignUp.Step
+            asChild
+            name='continue'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signUp.continue.title')}</Card.Title>
                   <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                 </Card.Header>
@@ -96,10 +89,10 @@ export function SignUpContinue() {
                     ) : null}
                   </div>
                 </Card.Body>
-                <Common.Loading scope='step:continue'>
-                  {isSubmitting => {
-                    return (
-                      <Card.Actions>
+                <Card.Actions>
+                  <Common.Loading scope='submit'>
+                    {isSubmitting => {
+                      return (
                         <SignUp.Action
                           submit
                           asChild
@@ -112,13 +105,12 @@ export function SignUpContinue() {
                             {t('formButtonPrimary')}
                           </Button>
                         </SignUp.Action>
-                      </Card.Actions>
-                    );
-                  }}
-                </Common.Loading>
-                {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
+                      );
+                    }}
+                  </Common.Loading>
+                </Card.Actions>
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.continue.actionText')}{' '}

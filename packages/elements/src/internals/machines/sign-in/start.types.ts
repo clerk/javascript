@@ -12,8 +12,8 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInStartSubmitEvent = { type: 'SUBMIT' };
-export type SignInStartPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
+export type SignInStartSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
+export type SignInStartPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY'; action: 'passkey' };
 export type SignInStartPasskeyAutofillEvent = { type: 'AUTHENTICATE.PASSKEY.AUTOFILL' };
 export type SignInStartWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
 

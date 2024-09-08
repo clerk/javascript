@@ -10,6 +10,7 @@ import type {
   SignUpTheme,
   UserButtonTheme,
   UserProfileTheme,
+  UserVerificationTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -32,14 +33,29 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { __experimental_SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
+/**
+ * Contains information about the SDK that the host application is using.
+ * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+ */
 export type SDKMetadata = {
+  /**
+   * The npm package name of the SDK
+   */
   name: string;
+  /**
+   * The npm package version of the SDK
+   */
   version: string;
+  /**
+   * Typically this will be the NODE_ENV that the SDK is currently running in
+   */
   environment?: string;
 };
 
@@ -141,6 +157,19 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
+   * Opens the Clerk UserVerification component in a modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
+
+  /**
+   * Closes the Clerk user verification modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   */
+  __experimental_closeUserVerification: () => void;
+
+  /**
    * Opens the Google One Tap component.
    * @param props Optional props that will be passed to the GoogleOneTap component.
    */
@@ -210,6 +239,27 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a user reverification flow component at the target element.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to mount the UserVerification component from.
+   * @param props user verification configuration parameters.
+   */
+  __experimental_mountUserVerification: (
+    targetNode: HTMLDivElement,
+    props?: __experimental_UserVerificationProps,
+  ) => void;
+
+  /**
+   * Unmount a user reverification flow component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to unmount the UserVerification component from.
+   */
+  __experimental_unmountUserVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
@@ -479,6 +529,16 @@ export interface Clerk {
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their Coinbase Smart Wallet and browser extension
+   */
+  authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using their Web3 Wallet browser extension
+   */
+  authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
+
+  /**
    * Authenticates user using a Google token generated from Google identity services.
    */
   authenticateWithGoogleOneTap: (
@@ -556,12 +616,24 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
  */
 type ClerkOptionsNavigation =
   | {
+      /**
+       * A function which takes the destination path as an argument and performs a "push" navigation.
+       */
       routerPush?: never;
-      routerDebug?: boolean;
+      /**
+       * A function which takes the destination path as an argument and performs a "replace" navigation.
+       */
       routerReplace?: never;
+      routerDebug?: boolean;
     }
   | {
+      /**
+       * A function which takes the destination path as an argument and performs a "push" navigation.
+       */
       routerPush: RouterFn;
+      /**
+       * A function which takes the destination path as an argument and performs a "replace" navigation.
+       */
       routerReplace: RouterFn;
       routerDebug?: boolean;
     };
@@ -574,30 +646,64 @@ export type ClerkOptions = ClerkOptionsNavigation &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
+    /**
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     appearance?: Appearance;
+    /**
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     localization?: LocalizationResource;
     polling?: boolean;
     selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
     /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
     standardBrowser?: boolean;
-    /** Optional support email for display in authentication screens */
+    /**
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     supportEmail?: string;
     touchSession?: boolean;
+    /**
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
+     */
     signInUrl?: string;
+    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     signUpUrl?: string;
+    /**
+     * Optional array of domains used to validate against the query param of an auth redirect. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning passed to the console.
+     */
     allowedRedirectOrigins?: Array<string | RegExp>;
+    /**
+     * This option defines that the application is a satellite application.
+     */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Telemetry options
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry)
      */
     telemetry?:
       | false
       | {
           disabled?: boolean;
+          /**
+           * Telemetry events are only logged to the console and not sent to Clerk
+           */
           debug?: boolean;
         };
 
+    /**
+     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
+     */
     sdkMetadata?: SDKMetadata;
+
+    /**
+     * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+     */
+    experimental?: Autocomplete<
+      {
+        persistClient: boolean;
+      },
+      Record<string, any>
+    >;
   };
 
 export interface NavigateOptions {
@@ -641,7 +747,10 @@ type NavigationType =
 
 type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
 
-type RouterFn = (to: string, metadata?: { __internal_metadata?: RouterMetadata }) => Promise<unknown> | unknown;
+type RouterFn = (
+  to: string,
+  metadata?: { __internal_metadata?: RouterMetadata; windowNavigate: (to: URL | string) => void },
+) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 
@@ -723,7 +832,7 @@ export type SignInProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignInTheme;
   /**
@@ -746,6 +855,32 @@ interface TransferableOption {
 }
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
+
+/**
+ * @experimantal
+ */
+export type __experimental_UserVerificationProps = RoutingOptions & {
+  // TODO(STEP-UP): Verify and write a description
+  afterVerification?: () => void;
+  // TODO(STEP-UP): Verify and write a description
+  afterVerificationUrl?: string;
+
+  /**
+   * Defines the steps of the verification flow.
+   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'L2.secondFactor'`
+   */
+  level?: __experimental_SessionVerificationLevel;
+
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: UserVerificationTheme;
+};
+
+export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
@@ -793,7 +928,7 @@ export type SignUpProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignUpTheme;
 
@@ -816,7 +951,7 @@ export type UserProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserProfileTheme;
   /*
@@ -846,7 +981,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
   /*
@@ -874,7 +1009,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
   /**
@@ -930,7 +1065,7 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserButtonTheme;
 
@@ -1020,7 +1155,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
-     * prop of ClerkProvided (if one is provided)
+     * prop of ClerkProvider(if one is provided)
      */
     appearance?: OrganizationSwitcherTheme;
     /*
@@ -1049,7 +1184,7 @@ export type OrganizationListProps = {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationListTheme;
   /**
@@ -1112,7 +1247,22 @@ export interface CreateOrganizationParams {
   slug?: string;
 }
 
+export interface ClerkAuthenticateWithWeb3Params {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  strategy: Web3Strategy;
+}
+
 export interface AuthenticateWithMetamaskParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithCoinbaseWalletParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;

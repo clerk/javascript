@@ -4,9 +4,9 @@ import * as SignIn from '@clerk/elements/sign-in';
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
-import { useAppearance } from '~/hooks/use-appearance';
-import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useCard } from '~/hooks/use-card';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -15,35 +15,27 @@ import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
 export function SignInForgotPassword() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
-  const isDev = isDevelopmentOrStaging();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const isDev = useDevModeWarning();
+  const { logoProps, footerProps } = useCard();
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='forgot-password'>
-            <Card.Root>
+          <SignIn.Step
+            asChild
+            name='forgot-password'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                 </Card.Header>
 
@@ -90,7 +82,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.Envelope />}
+                        iconStart={<Icon.EnvelopeSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -152,9 +144,8 @@ export function SignInForgotPassword() {
                     <LinkButton>{t('backButton')}</LinkButton>
                   </SignIn.Action>
                 </Card.Body>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.alternativeMethods.actionText')}{' '}

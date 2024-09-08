@@ -29,3 +29,10 @@ declare namespace App {
     runtime: { env: InternalEnv };
   }
 }
+
+declare module 'virtual:@clerk/astro/config' {
+  import type { AstroConfig } from 'astro';
+
+  export const astroConfig: AstroConfig;
+  export function isStaticOutput(forceStatic?: boolean): boolean;
+}

@@ -10,8 +10,8 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}'],
-    bundle: false,
+    entry: ['./src/index.ts', './src/background/index.ts', './src/internal/index.ts', './src/react/index.ts'],
+    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,

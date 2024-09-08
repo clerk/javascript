@@ -8,9 +8,9 @@
     "importHelpers": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": ["es2021.intl", "dom"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "lib": ["es6", "es2021.intl", "dom"],
+    "module": "es2020",
+    "moduleResolution": "Bundler",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -23,7 +23,7 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "typeRoots": ["../../node_modules/@types", "./src/types"]
+    "types": ["vitest/importMeta"]
   },
   "include": ["src"]
 }

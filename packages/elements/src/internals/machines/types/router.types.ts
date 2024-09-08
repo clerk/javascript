@@ -1,3 +1,4 @@
+import type { ClerkRouter } from '@clerk/shared/router';
 import type {
   ClerkResource,
   LoadedClerk,
@@ -10,7 +11,6 @@ import type { ActorRefFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import type { TFormMachine } from '~/internals/machines/form';
-import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
 
@@ -35,10 +35,12 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
   | {
       step: TSteps | undefined;
       strategy?: never;
+      action?: string;
     }
   | {
       step?: never;
       strategy: SignInStrategy | undefined;
+      action?: never;
     }
 ) & { type: 'LOADING'; isLoading: boolean };
 

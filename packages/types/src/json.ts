@@ -12,6 +12,10 @@ import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
+import type {
+  __experimental_SessionVerificationLevel,
+  __experimental_SessionVerificationStatus,
+} from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
@@ -100,6 +104,13 @@ export interface SessionJSON extends ClerkResourceJSON {
   object: 'session';
   id: string;
   status: SessionStatus;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  factor_verification_age: [number | null, number | null];
   expire_at: number;
   abandon_at: number;
   last_active_at: number;
@@ -110,6 +121,17 @@ export interface SessionJSON extends ClerkResourceJSON {
   public_user_data: PublicUserDataJSON;
   created_at: number;
   updated_at: number;
+}
+
+export interface __experimental_SessionVerificationJSON extends ClerkResourceJSON {
+  object: 'session_verification';
+  status: __experimental_SessionVerificationStatus;
+  first_factor_verification: VerificationJSON | null;
+  session: SessionJSON;
+  second_factor_verification: VerificationJSON | null;
+  level: __experimental_SessionVerificationLevel;
+  supported_first_factors: SignInFirstFactorJSON[] | null;
+  supported_second_factors: SignInSecondFactorJSON[] | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {

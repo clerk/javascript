@@ -10,11 +10,13 @@ import { GlobalError } from '~/common/global-error';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -24,40 +26,41 @@ import { Separator } from '~/primitives/separator';
 
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
-  const isDev = isDevelopmentOrStaging();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const isDev = useDevModeWarning();
+  const { layout } = useAppearance().parsedAppearance;
+  const { logoProps, footerProps } = useCard();
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
+        const connectionsWithSeperator = [
+          <Connections
+            key='connections'
+            disabled={isGlobalLoading}
+          />,
+          hasConnection && hasIdentifier ? <Separator key='separator'>{t('dividerText')}</Separator> : null,
+        ];
         return (
-          <SignIn.Step name='start'>
-            <Card.Root>
+          <SignIn.Step
+            asChild
+            name='start'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
                   <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                 </Card.Header>
@@ -65,9 +68,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  <Connections disabled={isGlobalLoading} />
-
-                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -134,9 +135,10 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
-                  <Common.Loading>
+                  <Common.Loading scope='submit'>
                     {isSubmitting => {
                       return (
                         <SignIn.Action
@@ -162,7 +164,7 @@ export function SignInStart() {
                     // setState on click, but we'll need to find a way to clean
                     // up the state based on `isSubmitting`
                     passkeyEnabled ? (
-                      <Common.Loading>
+                      <Common.Loading scope='passkey'>
                         {isSubmitting => {
                           return (
                             <SignIn.Passkey asChild>
@@ -179,10 +181,9 @@ export function SignInStart() {
                     ) : null
                   }
                 </Card.Actions>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
 
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.start.actionText')}{' '}

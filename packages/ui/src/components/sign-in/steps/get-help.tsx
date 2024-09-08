@@ -1,7 +1,8 @@
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useAppearance } from '~/contexts';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useSupportEmail } from '~/hooks/use-support-email';
 import { Button } from '~/primitives/button';
@@ -12,12 +13,16 @@ import { LinkButton } from '~/primitives/link';
 export function SignInGetHelp() {
   const { t } = useLocalizations();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
-  const { isDevelopmentOrStaging } = useEnvironment();
-  const { layout } = useAppearance();
-  const isDev = isDevelopmentOrStaging();
+  const { layout } = useAppearance().parsedAppearance;
+  const isDev = useDevModeWarning();
   const supportEmail = useSupportEmail();
   const { setShowHelp } = useGetHelp();
 
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -26,16 +31,10 @@ export function SignInGetHelp() {
   };
 
   return (
-    <Card.Root>
+    <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
       <Card.Content>
         <Card.Header>
-          {logoImageUrl ? (
-            <Card.Logo
-              href={homeUrl}
-              src={logoImageUrl}
-              alt={applicationName}
-            />
-          ) : null}
+          <Card.Logo {...cardLogoProps} />
           <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
           <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
         </Card.Header>
@@ -51,7 +50,6 @@ export function SignInGetHelp() {
 
           <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
         </Card.Actions>
-        {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
       </Card.Content>
       <Card.Footer {...cardFooterProps} />
     </Card.Root>

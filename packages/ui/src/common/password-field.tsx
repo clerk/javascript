@@ -3,6 +3,7 @@ import { cx } from 'cva';
 import React from 'react';
 
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { translatePasswordError } from '~/utils/make-localizable';
@@ -55,9 +56,13 @@ export function PasswordField({
                   <button
                     type='button'
                     className={cx(
-                      'text-icon-sm text-gray-11 start-auto m-[0.1875rem] inline-flex aspect-square h-6 items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                      // Note:
+                      // We set to `1.375rem` (22px) here for a hairline border
+                      // around the focus ring to keep it distinct from the
+                      // "surrounding" input
+                      'text-icon-sm text-gray-10 start-auto m-1 inline-flex aspect-square h-[1.375rem] items-center justify-center rounded-sm bg-white p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                       'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
-                      'focus-visible:rounded-[calc(var(--cl-radius)*0.5)] focus-visible:ring',
+                      'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring',
                     )}
                     onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
                     title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
@@ -71,45 +76,47 @@ export function PasswordField({
             );
           }}
         </Common.FieldState>
-        {props.validatePassword ? (
-          <Common.FieldState>
-            {({ state, codes }) => {
-              if (state === 'idle') {
-                return;
-              }
-              if (state === 'success') {
+        <Animated>
+          {props.validatePassword ? (
+            <Common.FieldState>
+              {({ state, codes }) => {
+                if (state === 'idle') {
+                  return;
+                }
+                if (state === 'success') {
+                  return (
+                    <Field.Message
+                      id={id}
+                      intent='success'
+                    >
+                      {t('unstable__errors.zxcvbn.goodPassword')}
+                    </Field.Message>
+                  );
+                }
+                // Note:
+                // If `codes` is `undefined`, the error is likely a native one
+                // (e.g. `required`)
+                if (typeof codes === 'undefined') {
+                  return;
+                }
                 return (
                   <Field.Message
                     id={id}
-                    intent='success'
+                    intent={state}
                   >
-                    {t('unstable__errors.zxcvbn.goodPassword')}
+                    {translatePasswordError({ codes, locale, t })}
                   </Field.Message>
                 );
-              }
-              // Note:
-              // If `codes` is `undefined`, the error is likely a native one
-              // (e.g. `required`)
-              if (typeof codes === 'undefined') {
-                return;
-              }
-              return (
-                <Field.Message
-                  id={id}
-                  intent={state}
-                >
-                  {translatePasswordError({ codes, locale, t })}
-                </Field.Message>
-              );
-            }}
-          </Common.FieldState>
-        ) : (
-          <Common.FieldError asChild>
-            {({ message }) => {
-              return <Field.Message intent='error'>{message}</Field.Message>;
-            }}
-          </Common.FieldError>
-        )}
+              }}
+            </Common.FieldState>
+          ) : (
+            <Common.FieldError asChild>
+              {({ message }) => {
+                return <Field.Message intent='error'>{message}</Field.Message>;
+              }}
+            </Common.FieldError>
+          )}
+        </Animated>
       </Field.Root>
     </Common.Field>
   );

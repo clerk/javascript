@@ -1,5 +1,6 @@
-import { isKnownError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
+import type { ClerkAPIError } from '@clerk/types';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
@@ -19,8 +20,10 @@ export interface FormMachineContext extends MachineContext {
 }
 
 export type FormMachineEvents =
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'type' | 'value' | 'checked'> }
+  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'type' | 'value' | 'checked' | 'disabled'> }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
+  | { type: 'FIELD.ENABLE'; field: Pick<FieldDetails, 'name'> }
+  | { type: 'FIELD.DISABLE'; field: Pick<FieldDetails, 'name'> }
   | {
       type: 'MARK_AS_PROGRESSIVE';
       defaultValues: FormDefaultValues;
@@ -35,7 +38,7 @@ export type FormMachineEvents =
   | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'name' | 'value' | 'checked'>;
+      field: Pick<FieldDetails, 'name' | 'value' | 'checked' | 'disabled'>;
     }
   | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
@@ -92,17 +95,22 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
+        const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
+
         if (isKnownError(event.error)) {
           const fields: Record<string, ClerkElementsFieldError[]> = {};
           const globalErrors: ClerkElementsError[] = [];
+          const errors = isClerkAPIResponseError(event.error) ? event.error?.errors : [event.error];
 
-          for (const error of event.error.errors || [event.error]) {
-            const name = snakeToCamel(error.meta?.paramName);
+          for (const error of errors) {
+            const name = isClerkAPIError(error) ? snakeToCamel(error.meta?.paramName) : null;
 
-            if (!name) {
+            if (!name || isMetamaskError(error)) {
               globalErrors.push(ClerkElementsError.fromAPIError(error));
               continue;
-            } else if (!fields[name]) {
+            }
+
+            if (!fields[name]) {
               fields[name] = [];
             }
 
@@ -157,11 +165,50 @@ export const FormMachine = setup({
             throw new Error('Field name is required');
           }
 
-          if (context.fields.has(event.field.name)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.name)!.value = event.field.value;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.name)!.checked = event.field.checked;
+          const field = context.fields.get(event.field.name);
+
+          if (field) {
+            field.checked = event.field.checked;
+            field.disabled = event.field.disabled || false;
+            field.value = event.field.value;
+
+            context.fields.set(event.field.name, field);
+          }
+
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.DISABLE': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
+
+          const field = context.fields.get(event.field.name);
+
+          if (field) {
+            field.disabled = true;
+            context.fields.set(event.field.name, field);
+          }
+
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.ENABLE': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
+
+          const field = context.fields.get(event.field.name);
+
+          if (field) {
+            field.disabled = false;
+            context.fields.set(event.field.name, field);
           }
 
           return context.fields;

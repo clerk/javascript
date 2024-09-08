@@ -5,7 +5,6 @@ import { $, echo } from 'zx';
 import { constants } from './common.mjs';
 
 const snapshot = `---
-'gatsby-plugin-clerk': patch
 '@clerk/chrome-extension': patch
 '@clerk/localizations': patch
 '@clerk/clerk-js': patch

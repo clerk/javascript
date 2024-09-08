@@ -5,9 +5,10 @@ import { BackupCodeField } from '~/common/backup-code-field';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useCard } from '~/hooks/use-card';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Button } from '~/primitives/button';
@@ -17,36 +18,29 @@ import { LinkButton } from '~/primitives/link';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInVerifications() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
-  const isDev = isDevelopmentOrStaging();
+  const isDev = useDevModeWarning();
   const isPasswordResetSupported = useResetPasswordFactor();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='verifications'>
-            <Card.Root>
+          <SignIn.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignIn.Strategy name='password'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.password.title')}</Card.Title>
                     <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                     <Card.Description>
@@ -61,7 +55,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -92,10 +86,10 @@ export function SignInVerifications() {
                     />
                   </Card.Body>
 
-                  <Common.Loading>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -108,30 +102,22 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
+                        );
+                      }}
+                    </Common.Loading>
 
-                          <SignIn.Action
-                            navigate='choose-strategy'
-                            asChild
-                          >
-                            <LinkButton disabled={isGlobalLoading || isSubmitting}>
-                              {t('signIn.password.actionLink')}
-                            </LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                    <SignIn.Action
+                      navigate='choose-strategy'
+                      asChild
+                    >
+                      <LinkButton disabled={isGlobalLoading}>{t('signIn.password.actionLink')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='passkey'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.passkey.title')}</Card.Title>
                     <Card.Description>{t('signIn.passkey.subtitle')}</Card.Description>
                     <Card.Description>
@@ -146,7 +132,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -155,22 +141,10 @@ export function SignInVerifications() {
 
                   <GlobalError />
 
-                  <Common.Loading>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
-                          {
-                            // Note:
-                            // 1. Currently this triggers the loading
-                            //    spinner for "Continue" which is a little
-                            //    confusing. We could use a manual setState
-                            //    on click, but we'll need to find a way to
-                            //    clean up the state based on `isSubmitting`
-                            // 2. This button doesn't currently work; it's
-                            //    being tracked here:
-                            //    https://linear.app/clerk/issue/SDKI-172
-                          }
-
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -183,30 +157,21 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
-
-                          <SignIn.Action
-                            navigate='choose-strategy'
-                            asChild
-                          >
-                            <LinkButton disabled={isGlobalLoading || isSubmitting}>
-                              {t('footerActionLink__useAnotherMethod')}
-                            </LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                    <SignIn.Action
+                      navigate='choose-strategy'
+                      asChild
+                    >
+                      <LinkButton disabled={isGlobalLoading}>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='backup_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.backupCodeMfa.title')}</Card.Title>
                     <Card.Description>{t('signIn.backupCodeMfa.subtitle')}</Card.Description>
                   </Card.Header>
@@ -217,10 +182,10 @@ export function SignInVerifications() {
                     <BackupCodeField />
                   </Card.Body>
 
-                  <Common.Loading>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -233,33 +198,26 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
-
-                          <SignIn.Action
-                            navigate='choose-strategy'
-                            asChild
-                          >
-                            <LinkButton
-                              disabled={isGlobalLoading || isSubmitting}
-                              type='button'
-                            >
-                              {t('footerActionLink__useAnotherMethod')}
-                            </LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                    <SignIn.Action
+                      navigate='choose-strategy'
+                      asChild
+                    >
+                      <LinkButton
+                        disabled={isGlobalLoading}
+                        type='button'
+                      >
+                        {t('footerActionLink__useAnotherMethod')}
+                      </LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='email_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signIn.emailCode.subtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -274,7 +232,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -307,10 +265,10 @@ export function SignInVerifications() {
                       }
                     />
                   </Card.Body>
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -323,28 +281,22 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
+                        );
+                      }}
+                    </Common.Loading>
 
-                          <SignIn.Action
-                            asChild
-                            navigate='choose-strategy'
-                          >
-                            <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                    <SignIn.Action
+                      asChild
+                      navigate='choose-strategy'
+                    >
+                      <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='phone_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -359,7 +311,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -393,10 +345,10 @@ export function SignInVerifications() {
                     />
                   </Card.Body>
 
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -409,28 +361,22 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
+                        );
+                      }}
+                    </Common.Loading>
 
-                          <SignIn.Action
-                            asChild
-                            navigate='choose-strategy'
-                          >
-                            <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                    <SignIn.Action
+                      asChild
+                      navigate='choose-strategy'
+                    >
+                      <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='email_link'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.emailLink.title')}</Card.Title>
                     <Card.Description>{t('signIn.emailLink.formSubtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -445,7 +391,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -517,10 +463,10 @@ export function SignInVerifications() {
                     />
                   </Card.Body>
 
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -533,21 +479,15 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 </SignIn.Strategy>
 
                 <SignIn.Strategy name='totp'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.totpMfa.formTitle')}</Card.Title>
                     <Card.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
@@ -561,10 +501,10 @@ export function SignInVerifications() {
                     />
                   </Card.Body>
 
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignIn.Action
                             submit
                             asChild
@@ -577,21 +517,19 @@ export function SignInVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignIn.Action>
-
-                          <SignIn.Action
-                            asChild
-                            navigate='choose-strategy'
-                          >
-                            <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                          </SignIn.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                    <SignIn.Action
+                      asChild
+                      navigate='choose-strategy'
+                    >
+                      <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Actions>
                 </SignIn.Strategy>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignIn.Step>
         );

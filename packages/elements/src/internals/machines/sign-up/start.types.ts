@@ -12,7 +12,7 @@ export type SignUpStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignUpStartSubmitEvent = { type: 'SUBMIT' };
+export type SignUpStartSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 
 // TODO: Consolidate with SignInStartMachine
 export type SignUpStartRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
@@ -32,6 +32,7 @@ export type SignUpStartInput = {
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  ticket?: string | undefined;
 };
 
 // ---------------------------------- Context ---------------------------------- //
@@ -39,9 +40,10 @@ export type SignUpStartInput = {
 export interface SignUpStartContext {
   basePath: string;
   error?: Error | ClerkAPIResponseError;
+  loadingStep: 'start';
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
-  loadingStep: 'start';
+  ticket?: string | undefined;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

@@ -8,6 +8,7 @@ export const subpathNames = [
   'cookie',
   'date',
   'deprecated',
+  'deriveState',
   'error',
   'file',
   'globs',
@@ -15,17 +16,20 @@ export const subpathNames = [
   'isomorphicAtob',
   'isomorphicBtoa',
   'keys',
+  'loadClerkJsScript',
   'loadScript',
   'localStorageBroadcastChannel',
   'poller',
   'proxy',
   'underscore',
   'url',
+  'versionSelector',
   'constants',
   'apiUrlFromPublishableKey',
   'telemetry',
   'logger',
   'webauthn',
+  'router',
 ];
 
 export const subpathFoldersBarrel = ['react'];

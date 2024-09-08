@@ -1,44 +1,38 @@
+import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/types';
 
+import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
-import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
+import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
-import { waitForClerkScript } from './utils/loadClerkJSScript';
 
 let initOptions: ClerkOptions | undefined;
 
-// TODO-SHARED: copied from `clerk-js`
-export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
-
-function windowNavigate(to: URL | string): void {
-  const toURL = new URL(to, window.location.href);
-  window.dispatchEvent(new CustomEvent(CLERK_BEFORE_UNLOAD_EVENT));
-  window.location.href = toURL.href;
-}
+setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 function createNavigationHandler(
   windowNav: typeof window.history.pushState | typeof window.history.replaceState,
 ): Exclude<ClerkOptions['routerPush'], undefined> | Exclude<ClerkOptions['routerReplace'], undefined> {
-  return (to, metadata) => {
-    if (metadata?.__internal_metadata?.navigationType === 'internal') {
+  return (to, opts) => {
+    if (opts?.__internal_metadata?.navigationType === 'internal') {
       windowNav(history.state, '', to);
     } else {
-      windowNavigate(to);
+      opts?.windowNavigate(to);
     }
   };
 }
 
 /**
- * Prevents firing clerk.load multiple times
+ * Prevents firing clerk.load() multiple times
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
+async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    await waitForClerkScript();
+    await loadClerkJsScript(options);
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
@@ -47,7 +41,6 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
   }
 
   if (!$clerk.get()) {
-    // @ts-ignore
     $clerk.set(clerkJSInstance);
   }
 
@@ -57,11 +50,15 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
   };
 
-  // TODO: Update Clerk type from @clerk/types to include this method
-  return (clerkJSInstance as any)
+  return clerkJSInstance
     .load(initOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);
+      // Notify subscribers that $clerkStore has been loaded.
+      // We're doing this because nanostores uses `===` for equality
+      // and just by setting the value to `window.Clerk` again won't trigger an update.
+      // We notify only once as this store is for advanced users.
+      $clerkStore.notify();
 
       mountAllClerkAstroJSComponents();
       invokeClerkAstroJSFunctions();
@@ -81,7 +78,7 @@ function updateClerkOptions(options: AstroClerkUpdateOptions) {
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  // TODO: Update Clerk type from @clerk/types to include this method
+  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
   void (clerk as any).__unstable__updateProps({
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },

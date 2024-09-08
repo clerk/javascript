@@ -1,28 +1,74 @@
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
-import { ClerkLogo } from './clerk-logo';
+import type { PolymorphicForwardRefExoticComponent, PolymorphicPropsWithoutRef } from '~/types/utils';
 
-export const Root = React.forwardRef(function CardRoot(
-  { children, className, ...props }: React.HTMLAttributes<HTMLDivElement>,
-  forwardedRef: React.ForwardedRef<HTMLDivElement>,
-) {
-  return (
-    <div
-      ref={forwardedRef}
-      data-card-root=''
-      {...props}
-      className={cx(
-        '[--card-body-padding:theme(spacing.10)]',
-        '[--card-content-rounded-b:theme(borderRadius.lg)]',
-        'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-});
+import { ClerkLogo } from './clerk-logo';
+import { Image } from './image';
+
+const RootDefaultElement = 'div';
+type RootOwnProps = {
+  children?: React.ReactNode;
+  banner?: React.ReactNode;
+};
+
+export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof RootDefaultElement> = React.forwardRef(
+  function CardRoot<T extends React.ElementType = typeof RootDefaultElement>(
+    { as, banner, children, className, ...props }: PolymorphicPropsWithoutRef<RootOwnProps, T>,
+    forwardedRef: React.ForwardedRef<Element>,
+  ) {
+    const Element: React.ElementType = as || RootDefaultElement;
+    return (
+      <Element
+        ref={forwardedRef}
+        data-card-root=''
+        {...props}
+        className={cx(
+          '[--card-banner-height:theme(size.4)]',
+          '[--card-body-px:theme(spacing.10)]',
+          '[--card-body-py:theme(spacing.8)]',
+          '[--card-content-rounded-b:theme(borderRadius.lg)]',
+          'bg-gray-2 ring-gray-a3 relative w-full max-w-[25rem] rounded-xl ring-1',
+          banner
+            ? [
+                'mt-[calc(var(--card-banner-height)/2)]',
+                'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+              ]
+            : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+          className,
+        )}
+      >
+        {banner && (
+          <div
+            data-card-root-banner=''
+            className={cx(
+              'pointer-events-none absolute inset-x-0 -top-[calc(var(--card-banner-height)/2)] isolate z-[500] flex justify-center',
+              className,
+            )}
+          >
+            <p
+              className={cx(
+                'bg-warning pointer-events-auto inline-flex h-[--card-banner-height] items-center rounded-full px-2 text-[0.6875rem] font-medium tracking-[2%] text-white',
+                className,
+              )}
+              {...props}
+            >
+              {banner}
+            </p>
+          </div>
+        )}
+        {children && (
+          <div
+            data-card-root-inner=''
+            className={cx('overflow-hidden rounded-[inherit]', className)}
+          >
+            {children}
+          </div>
+        )}
+      </Element>
+    );
+  },
+);
 
 export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardContent(
   { children, className, ...props },
@@ -34,7 +80,8 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       data-card-content=''
       {...props}
       className={cx(
-        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -m-px flex flex-col gap-8 rounded-[inherit] rounded-b-[--card-content-rounded-b] border p-[--card-body-padding] shadow-sm',
+        'bg-gray-surface relative flex flex-col gap-8 rounded-b-[--card-content-rounded-b] rounded-t-none px-[--card-body-px] py-[--card-body-py]',
+        'ring-gray-a3 shadow-[0px_0px_2px_0px_theme(colors.gray.a4),0px_1px_2px_0px_theme(colors.gray.a3)] ring-1',
         className,
       )}
     >
@@ -63,27 +110,33 @@ export const Logo = React.forwardRef(function CardLogo(
   {
     className,
     href,
+    src,
     ...props
   }: React.ImgHTMLAttributes<HTMLImageElement> & {
     href?: string;
   },
   forwardedRef: React.ForwardedRef<HTMLImageElement>,
 ) {
+  if (!src) {
+    return null;
+  }
+
   const img = (
-    <img
+    <Image
       ref={forwardedRef}
       data-card-logo=''
-      crossOrigin='anonymous'
+      src={src}
+      size={200}
       {...props}
       className={cx('size-full object-contain', className)}
     />
   );
   return (
-    <div className='z-1 mb-5 flex size-8 justify-center'>
+    <div className='z-1 mb-5 flex h-8 justify-center'>
       {href ? (
         <a
           href={href}
-          className='outline-none focus-visible:ring'
+          className='-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring'
         >
           {img}
         </a>
@@ -170,26 +223,15 @@ export const Banner = React.forwardRef(function CardBanner(
   return (
     <div
       data-card-banner=''
-      className={cx('absolute inset-0 isolate')}
+      className={cx('pointer-events-none absolute -top-2 isolate z-[500]', className)}
     >
-      <div
-        className={cx(
-          'pointer-events-none absolute inset-0 w-full',
-          // manually nudge the radius by `1px` for a snug fit
-          'rounded-b-[calc(var(--card-content-rounded-b)-1px)]',
-          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.50),theme(colors.orange.50)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
-          '[mask-image:linear-gradient(to_top,black,transparent_128px)]',
-        )}
-      />
-      <div className='absolute inset-x-0 bottom-0 z-10 flex h-[--card-body-padding] w-full items-center justify-center'>
-        <p
-          ref={forwardedRef}
-          className={cx('text-sm font-medium text-orange-500', className)}
-          {...props}
-        >
-          {children}
-        </p>
-      </div>
+      <p
+        ref={forwardedRef}
+        className={cx('pointer-events-auto text-sm font-medium text-orange-500', className)}
+        {...props}
+      >
+        {children}
+      </p>
     </div>
   );
 });
@@ -212,7 +254,11 @@ export const Footer = React.forwardRef(function CardFooter(
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
-  return branded || children ? (
+  const renderFooter = branded || hasPageLinks || children;
+  const renderSubFooter = branded || hasPageLinks;
+  const hasBrandingAndPageLinks = branded && hasPageLinks;
+
+  return renderFooter ? (
     <div
       ref={forwardedRef}
       data-card-footer=''
@@ -220,28 +266,29 @@ export const Footer = React.forwardRef(function CardFooter(
       className={cx('grid', className)}
     >
       {children}
-      {branded ? (
+
+      {renderSubFooter ? (
         <div
-          className={cx(
-            'flex items-center justify-center px-6 py-4',
-            hasPageLinks ? 'justify-between' : 'justify-center',
-          )}
+          className={cx('flex items-center px-6 py-4', hasBrandingAndPageLinks ? 'justify-between' : 'justify-center')}
         >
-          <p
-            // Note:
-            // We don't use `items-center` here for a more optical fit
-            className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
-          >
-            Secured by{' '}
-            <a
-              aria-label='Clerk logo'
-              href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
-              target='_blank'
-              rel='noopener'
+          {branded ? (
+            <p
+              // Note:
+              // We don't use `items-center` here for a more optical fit
+              className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
             >
-              <ClerkLogo />
-            </a>
-          </p>
+              Secured by{' '}
+              <a
+                aria-label='Clerk logo'
+                href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
+                target='_blank'
+                rel='noopener'
+                className='-m-0.5 inline-flex items-center rounded-sm p-0.5 outline-none focus-visible:ring'
+              >
+                <ClerkLogo />
+              </a>
+            </p>
+          ) : null}
 
           {hasPageLinks ? (
             <div className='flex gap-2'>
@@ -263,7 +310,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
         ref={forwardedRef}
         data-card-footer-action=''
         {...props}
-        className={cx('border-gray-a6 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
+        className={cx('border-gray-a3 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
       >
         {children}
       </div>
@@ -286,7 +333,9 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
-const footerActionButton = cva({ base: 'text-accent-a10 text-base font-medium hover:underline' });
+const footerActionButton = cva({
+  base: 'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
+});
 
 export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function CardFooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {

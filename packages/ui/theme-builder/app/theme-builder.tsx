@@ -1,18 +1,22 @@
 'use client';
+import { ClerkProvider } from '@clerk/nextjs';
+import { AppearanceProvider } from '@clerk/ui/contexts';
 import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
+import { AppearanceOptions } from './components/appearance-options';
+import { Logo } from './components/logo';
 import { generateColors, getPreviewStyles } from './generate-colors';
+import { useAppearanceStore } from './stores/appearance-store';
 import { ThemeDialog } from './theme-dialog';
-import { ToggleGroup } from './toggle-group';
 
-const lightAccentDefault = '#6C47FF';
+const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
 
-const darkAccentDefault = '#6C47FF';
+const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
@@ -23,8 +27,12 @@ const fontSizeDefault = '0.8125rem';
 export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [dir, setDir] = useState('ltr');
-  const [appearance, setAppearance] = useState('light');
+  const appearance = useAppearanceStore(state => state.appearance);
+  const direction = useAppearanceStore(state => state.direction);
+  const devMode = useAppearanceStore(state => state.devMode);
+  const animations = useAppearanceStore(state => state.animations);
+  const reset = useAppearanceStore(state => state.reset);
+
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
   const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
@@ -34,6 +42,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
+
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -44,7 +53,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     setRadius(radiusDefault);
     setSpacingUnit(spacingUnitDefault);
     setFontSize(fontSizeDefault);
+    reset();
   };
+
   const lightResult = generateColors({
     appearance: 'light',
     accent: lightAccent,
@@ -64,86 +75,85 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     spacingUnit,
     fontSize,
   });
+
+  // A unique key for the ClerkProvider to force a re-render when the appearance changes
+  const CLERK_PROVIDER_KEY = `${devMode}-${animations}`;
+
   useEffect(() => {
-    document.documentElement.dir = dir;
-  }, [dir]);
+    document.documentElement.dir = direction;
+  }, [direction]);
+
   return (
-    <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: css,
+    <ClerkProvider key={CLERK_PROVIDER_KEY}>
+      <AppearanceProvider
+        appearance={{
+          layout: {
+            unsafe_disableDevelopmentModeWarnings: devMode === 'off',
+            animations: animations === 'on' ? true : false,
+          },
         }}
-      />
-      <div className='flex h-dvh flex-col overflow-hidden'>
-        <header className='flex h-16 shrink-0 items-center justify-end border-b px-4'>
-          <div className='inline-flex items-center gap-x-2 text-xs'>
-            <label htmlFor='component'>Component</label>
-            <div className='relative'>
-              <select
-                name='component'
-                id='component'
-                value={pathname}
-                onChange={e => router.push(e.target.value)}
-                className='relative appearance-none rounded border bg-neutral-100 py-1 pl-1.5 pr-5 text-xs after:absolute after:right-1.5 after:top-1 after:size-2 after:bg-red-200'
-              >
-                <option
-                  value='/'
-                  disabled
+      >
+        <style
+          dangerouslySetInnerHTML={{
+            __html: css,
+          }}
+        />
+        <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100' />
+        <div
+          className={cx(
+            'm-1 mb-0 grid h-[calc(100dvh-theme(size.1))] grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden rounded-t-xl bg-white ring-1 ring-neutral-900/[0.075]',
+            'shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(32,42,54,0.04),0_24px_68px_rgba(47,48,56,0.15),0_2px_3px_rgba(0,0,0,0.09)]',
+          )}
+        >
+          <header className='col-span-full flex shrink-0 items-center justify-between border-b p-4'>
+            <h1 className='inline-flex items-center gap-3'>
+              <Logo className='h-4 text-neutral-950' />
+              <span className='mt-0.5 bg-gradient-to-r from-[#6C47FF] to-[#056D99] bg-clip-text text-sm font-medium text-transparent'>
+                Theme Builder
+              </span>
+            </h1>
+
+            <div className='inline-flex items-center gap-x-2 text-xs'>
+              <label htmlFor='component'>Component</label>
+              <div className='relative'>
+                <select
+                  name='component'
+                  id='component'
+                  value={pathname}
+                  onChange={e => router.push(e.target.value)}
+                  className='relative appearance-none rounded border bg-neutral-100 py-1 pl-1.5 pr-5 text-xs after:absolute after:right-1.5 after:top-1 after:size-2 after:bg-red-200'
                 >
-                  Select
-                </option>
-                <option value='/sign-in'>Sign In</option>
-                <option value='/sign-up'>Sign Up</option>
-              </select>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth='1.5'
-                stroke='currentColor'
-                className='user-select-none pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2'
-                aria-hidden
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='m19.5 8.25-7.5 7.5-7.5-7.5'
-                />
-              </svg>
+                  <option
+                    value='/'
+                    disabled
+                  >
+                    Select
+                  </option>
+                  <option value='/sign-in'>Sign In</option>
+                  <option value='/sign-up'>Sign Up</option>
+                </select>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth='1.5'
+                  stroke='currentColor'
+                  className='user-select-none pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2'
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='m19.5 8.25-7.5 7.5-7.5-7.5'
+                  />
+                </svg>
+              </div>
             </div>
-          </div>
-        </header>
-        <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col border-e bg-white p-4'>
+          </header>
+
+          <aside className='relative isolate hidden h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4 sm:flex'>
             <div className='space-y-4'>
-              <ToggleGroup
-                items={[
-                  {
-                    label: 'Light',
-                    value: 'light',
-                  },
-                  {
-                    label: 'Dark',
-                    value: 'dark',
-                  },
-                ]}
-                value={appearance}
-                onValueChange={setAppearance}
-              />
-              <ToggleGroup
-                items={[
-                  {
-                    label: 'LTR',
-                    value: 'ltr',
-                  },
-                  {
-                    label: 'RTL',
-                    value: 'rtl',
-                  },
-                ]}
-                value={dir}
-                onValueChange={setDir}
-              />
+              <AppearanceOptions />
               {appearance === 'light' ? (
                 <>
                   <ColorPicker
@@ -187,7 +197,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   />
                 </>
               )}
-              <div>
+              <div className='flex flex-col gap-1'>
                 <label
                   htmlFor='radius'
                   className='text-xs font-medium text-neutral-700'
@@ -201,7 +211,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   className='w-full rounded border p-2 text-xs'
                 />
               </div>
-              <div>
+              <div className='flex flex-col gap-1'>
                 <label
                   htmlFor='spacing-unit'
                   className='text-xs font-medium text-neutral-700'
@@ -215,7 +225,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   className='w-full rounded border p-2 text-xs'
                 />
               </div>
-              <div>
+              <div className='flex flex-col gap-1'>
                 <label
                   htmlFor='font-size'
                   className='text-xs font-medium text-neutral-700'
@@ -230,10 +240,11 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 />
               </div>
             </div>
-            <div className='mt-auto space-y-2'>
+
+            <div className='space-y-2'>
               <button
                 type='button'
-                className='w-full rounded border bg-white p-1.5 text-xs'
+                className='w-full rounded border bg-white p-1.5 text-xs font-medium hover:bg-neutral-50 active:bg-neutral-100'
                 onClick={handleReset}
               >
                 Reset
@@ -242,7 +253,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 trigger={
                   <button
                     type='button'
-                    className='w-full rounded border bg-white p-1.5 text-xs'
+                    className='w-full rounded border bg-white p-1.5 text-xs font-medium hover:bg-neutral-50 active:bg-neutral-100'
                   >
                     View CSS
                   </button>
@@ -252,15 +263,27 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               </ThemeDialog>
             </div>
           </aside>
+
           <figure
-            className={cx('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
-              'bg-neutral-50': appearance === 'light',
-              'dark bg-neutral-950': appearance === 'dark',
-            })}
+            className={cx(
+              'relative isolate grid items-center justify-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]',
+              {
+                'bg-white': appearance === 'light',
+                'dark bg-neutral-950': appearance === 'dark',
+              },
+            )}
+            style={
+              appearance === 'light'
+                ? ({ '--cl-light': 'initial', '--cl-dark': ' ' } as React.CSSProperties)
+                : ({
+                    '--cl-light': ' ',
+                    '--cl-dark': 'initial',
+                  } as React.CSSProperties)
+            }
           >
             <div
               className={cx(
-                'absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
+                'pointer-events-none absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
                 {
                   '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
                   '[--line-color:theme(colors.neutral.600)]': appearance === 'dark',
@@ -271,7 +294,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             {children}
           </figure>
         </div>
-      </div>
-    </>
+      </AppearanceProvider>
+    </ClerkProvider>
   );
 }

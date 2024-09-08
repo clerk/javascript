@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.0.9
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 1.0.8
 
 ### Patch Changes

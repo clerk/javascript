@@ -14,9 +14,13 @@ import type {
   Web3Attempt,
 } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
-import { assign, fromPromise, log, sendTo, setup } from 'xstate';
+import { assign, fromPromise, log, not, sendTo, setup } from 'xstate';
 
-import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
+import {
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  RESENDABLE_COUNTDOWN_DEFAULT,
+  SIGN_IN_DEFAULT_BASE_PATH,
+} from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import type { SignInStrategyName, WithParams } from '~/internals/machines/shared';
@@ -55,7 +59,7 @@ export type AttemptSecondFactorInput = {
   currentFactor: SignInSecondFactor | null;
 };
 
-const isNonPreperableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+const isNonPreparableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
   if (!strategy) {
     return false;
   }
@@ -76,6 +80,14 @@ const SignInVerificationMachine = setup({
     attempt: fromPromise<SignInResource, AttemptFirstFactorInput | AttemptSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `attempt` must be overridden')),
     ),
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
   },
   actions: {
     resendableTick: assign(({ context }) => ({
@@ -96,6 +108,7 @@ const SignInVerificationMachine = setup({
       // Only show these warnings in development!
       if (process.env.NODE_ENV === 'development') {
         if (
+          clerk.client.signIn.supportedFirstFactors &&
           !clerk.client.signIn.supportedFirstFactors.every(factor => context.registeredStrategies.has(factor.strategy))
         ) {
           console.warn(
@@ -121,7 +134,7 @@ const SignInVerificationMachine = setup({
         }
 
         const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
-          strategy => !clerk.client.signIn.supportedFirstFactors.some(supported => supported.strategy === strategy),
+          strategy => !clerk.client.signIn.supportedFirstFactors?.some(supported => supported.strategy === strategy),
         );
 
         if (strategiesUsedButNotActivated.length > 0) {
@@ -170,7 +183,7 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) => isNonPreperableStrategy(context.currentFactor?.strategy),
+    isNeverResendable: ({ context }) => isNonPreparableStrategy(context.currentFactor?.strategy),
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -178,6 +191,7 @@ const SignInVerificationMachine = setup({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
+    basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     formRef: input.formRef,
     loadingStep: 'verifications',
     parent: input.parent,
@@ -236,7 +250,10 @@ const SignInVerificationMachine = setup({
         input: ({ context }) => ({
           parent: context.parent,
           resendable: context.resendable,
-          params: context.currentFactor as PrepareFirstFactorParams,
+          params: {
+            ...context.currentFactor,
+            redirectUrl: `${window.location.origin}${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`,
+          } as PrepareFirstFactorParams,
         }),
         onDone: {
           actions: 'resendableReset',
@@ -252,6 +269,11 @@ const SignInVerificationMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
         'NAVIGATE.FORGOT_PASSWORD': 'ChooseStrategy',
         RETRY: 'Preparing',
@@ -346,6 +368,25 @@ const SignInVerificationMachine = setup({
         },
       },
     },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'discoverable',
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
     Hist: {
       type: 'history',
     },
@@ -366,6 +407,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
+      // `input` is a union of PrepareFirstFactor and PrepareSecondFactor. Since we're passing params to
+      // prepareFirstFactor, we need to assert that the input is a PrepareFirstFactor. For some reason, ESLint thinks
+      // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
+      // rule for the line.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
@@ -373,7 +419,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (isNonPreperableStrategy(params?.strategy) || !needsPrepare) {
+      if (isNonPreparableStrategy(params?.strategy) || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -439,6 +485,17 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
           break;
         }
+        case 'web3_coinbase_wallet_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
+
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
+
+          break;
+        }
         default:
           throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
       }
@@ -458,7 +515,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareSecondFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send

@@ -2,7 +2,7 @@ import * as Common from '@clerk/elements/common';
 import * as React from 'react';
 
 import { PROVIDERS } from '~/constants/providers';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { Button } from '~/primitives/button';
 import * as Icon from '~/primitives/icon';
@@ -58,7 +58,7 @@ export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,
 ) {
   const enabledConnections = useEnabledConnections();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const hasConnection = enabledConnections.length > 0;
   const textVisuallyHidden =
     typeof props?.textVisuallyHidden !== 'undefined'
@@ -79,7 +79,7 @@ export function Connections(
           return (
             <li
               key={c.provider}
-              className='w-[calc(100%/var(--cl-connection-columns))] p-[calc(var(--cl-connection-gap)/2)]'
+              className='w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]'
             >
               <Common.Loading scope={`provider:${c.provider}`}>
                 {isConnectionLoading => {

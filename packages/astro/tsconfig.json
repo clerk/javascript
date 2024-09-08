@@ -24,5 +24,12 @@
     "declarationDir": "dist/types",
     "noUncheckedIndexedAccess": true
   },
-  "exclude": ["dist", "build", "node_modules", "src/astro-components"]
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    // We're ignoring the files below because they are published as-is and is not processed/bundled with tsup.
+    // This cause TS to throw errors even though we're not bundling it.
+    "src/astro-components/**/*.ts"
+  ]
 }

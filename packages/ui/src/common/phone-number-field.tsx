@@ -7,6 +7,7 @@ import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
@@ -166,29 +167,30 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
               <div
                 ref={containerRef}
                 className={cx(
-                  '[--phone-number-field-border-width:1px]',
-                  '[--phone-number-field-py:calc(theme(spacing[1.5])-var(--phone-number-field-border-width))]',
-                  '[--phone-number-field-px:calc(theme(spacing.3)-var(--phone-number-field-border-width))]',
-                  'border-[length:--phone-number-field-border-width] border-[--cl-phone-number-field-border] bg-clip-padding',
+                  // Note:
+                  // - To create the overlapping border/shadow effect"
+                  //   - `ring` – "focus ring"
+                  //   - `ring-offset` - border
+                  'supports-ios:[--phone-number-field-py:theme(spacing.1)] [--phone-number-field-py:theme(spacing[1.5])]',
+                  '[--phone-number-field-px:theme(spacing.3)]',
+                  'ring ring-transparent ring-offset-1 ring-offset-[--cl-phone-number-field-border]',
                   'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
+                  'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
                   'has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
                   // hover
-                  'hover:has-[[data-field-input]:enabled]:border-[--cl-phone-number-field-border-active]',
+                  'hover:has-[[data-field-input]:enabled]:ring-offset-[--cl-phone-number-field-border-active]',
                   // focus
-                  'has-[[data-field-input]:focus-visible]:border-[--cl-phone-number-field-border-active]',
-                  'has-[[data-field-input]:focus-visible]:ring-[0.1875rem]',
-                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring]',
+                  'has-[[data-field-input]:focus-visible]:ring-offset-[--cl-phone-number-field-border-active]',
+                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(ringColor.light)]',
                   // intent
                   {
                     idle: [
-                      '[--cl-phone-number-field-border:theme(colors.gray.a6)]',
-                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                      '[--cl-phone-number-field-border:theme(colors.gray.a4)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a7)]',
                     ],
                     info: [
-                      '[--cl-phone-number-field-border:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                      '[--cl-phone-number-field-border:theme(colors.gray.a7)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a7)]',
                     ],
                     error: [
                       '[--cl-phone-number-field-border:theme(colors.danger.DEFAULT)]',
@@ -212,10 +214,10 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none'
+                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
-                    <Icon.ChevronUpDown className='text-gray-11 size-4' />
+                    <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
                   </Button>
                   <Popover
                     isOpen={isOpen}
@@ -235,7 +237,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                           <Command.Input
                             ref={commandInputRef}
                             placeholder='Search country or code'
-                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
+                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 supports-ios:py-1 supports-ios:text-[length:1rem] w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
                           />
                         </div>
                         <Command.List
@@ -257,7 +259,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
                               >
                                 <span className='grid w-3 shrink-0 place-content-center'>
-                                  {selectedCountry === countryOptions[index] && <Icon.Checkmark className='w-3' />}
+                                  {selectedCountry === countryOptions[index] && (
+                                    <Icon.CheckmarkSm className='text-[length:theme(size.4)]' />
+                                  )}
                                 </span>
                                 <span className='grow truncate'>{name}</span>
                                 <span className='text-gray-11 ms-auto'>+{code}</span>
@@ -273,7 +277,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   type='button'
                   // Prevent tab stop
                   tabIndex={-1}
-                  className='grid cursor-text place-content-center px-1 text-base'
+                  className='supports-ios:text-[length:1rem] grid cursor-text place-content-center bg-white px-1 text-base'
                   onClick={() => inputRef.current?.focus()}
                   disabled={props.disabled}
                 >
@@ -292,20 +296,22 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
                   {...props}
-                  className='w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
+                  className='supports-ios:text-[length:1rem] w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
                   data-field-input
                 />
               </div>
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message, code }) => {
-            return (
-              <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
-            );
-          }}
-        </Common.FieldError>
+        <Animated>
+          <Common.FieldError asChild>
+            {({ message, code }) => {
+              return (
+                <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
+              );
+            }}
+          </Common.FieldError>
+        </Animated>
       </Field.Root>
     </Common.Field>
   );

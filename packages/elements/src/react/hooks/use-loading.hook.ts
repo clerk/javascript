@@ -10,7 +10,7 @@ export type ActorSignUp = ActorRefFrom<TSignUpRouterMachine>;
 type LoadingContext<T> = T extends ActorSignIn ? SignInRouterLoadingContext : SignUpRouterLoadingContext;
 type UseLoadingReturn<T> = [
   isLoading: boolean,
-  { step: LoadingContext<T>['step']; strategy: LoadingContext<T>['strategy'] },
+  { step: LoadingContext<T>['step']; strategy: LoadingContext<T>['strategy']; action: LoadingContext<T>['action'] },
 ];
 
 const selectLoading = <T extends SnapshotFrom<TSignInRouterMachine> | SnapshotFrom<TSignUpRouterMachine>>(
@@ -33,8 +33,8 @@ export function useLoading<TActor extends ActorSignIn | ActorSignUp>(actor: TAct
   const loadingCtx = useSelector(actor, selectLoading, compareLoadingValue) as LoadingContext<TActor>;
 
   if (!loadingCtx) {
-    return [false, { step: undefined, strategy: undefined }];
+    return [false, { step: undefined, strategy: undefined, action: undefined }];
   }
 
-  return [loadingCtx.isLoading, { step: loadingCtx.step, strategy: loadingCtx.strategy }];
+  return [loadingCtx.isLoading, { step: loadingCtx.step, strategy: loadingCtx.strategy, action: loadingCtx.action }];
 }

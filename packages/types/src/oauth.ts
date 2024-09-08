@@ -36,6 +36,7 @@ export type SlackOauthProvider = 'slack';
 export type LinearOauthProvider = 'linear';
 export type XOauthProvider = 'x';
 export type EnstallOauthProvider = 'enstall';
+export type HuggingfaceOAuthProvider = 'huggingface';
 export type CustomOauthProvider = `custom_${string}`;
 
 export type OAuthProvider =
@@ -66,6 +67,7 @@ export type OAuthProvider =
   | LinearOauthProvider
   | XOauthProvider
   | EnstallOauthProvider
+  | HuggingfaceOAuthProvider
   | CustomOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
@@ -230,6 +232,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_enstall',
     name: 'Enstall',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/enstall',
+  },
+  {
+    provider: 'huggingface',
+    strategy: 'oauth_huggingface',
+    name: 'Hugging Face',
+    docsUrl: 'https://clerk.com/docs/authentication/social-connections/huggingface',
   },
 ];
 

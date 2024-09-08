@@ -72,7 +72,7 @@ export interface SignInResource extends ClerkResource {
    * @deprecated This attribute will be removed in the next major version
    */
   supportedIdentifiers: SignInIdentifier[];
-  supportedFirstFactors: SignInFirstFactor[];
+  supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
@@ -97,6 +97,8 @@ export interface SignInResource extends ClerkResource {
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
+
+  authenticateWithCoinbaseWallet: () => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 

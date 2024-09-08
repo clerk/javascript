@@ -21,9 +21,6 @@ expo:
 fastify:
   - packages/fastify/**
 
-gatsby:
-  - packages/gatsby-plugin-clerk/**
-
 localizations:
   - packages/localizations/**
 
@@ -56,3 +53,6 @@ actions:
 
 integration:
   - integration/**
+
+tanstack:
+  - packages/tanstack-start/**
