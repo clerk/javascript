@@ -904,7 +904,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
   const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
 
-  test.beforeAll('setup local Clerk API mock', async () => {
+  const start = async (): Promise<Application> => {
     const env = appConfigs.envs.withEmailCodes
       .clone()
       .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${PORT}`);
@@ -947,12 +947,13 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     await app.setup();
     await app.withEnv(env);
     await app.dev();
-  });
+    return app
+  }
 
-  test.afterAll(async () => {
+  const end = async (app: Application): Promise<void> => {
     await app.teardown();
-    await new Promise<void>(resolve => jwksServer.close(() => resolve()));
-  });
+    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  }
 
   type testCase = {
     name: string;
@@ -985,6 +986,8 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
   for (const testCase of testCases) {
     test(`organization activation by ID - ${testCase.name} - dev`, async () => {
+      const app = await start();
+
       const config = generateConfig({
         mode: 'test',
       });
@@ -1014,10 +1017,12 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
           `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
         )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
       );
+
+      await end(app);
     });
   }
 
-  
+
   // TODO(izaak): refactor into table-driven test?
   // test('expired session token - with organization id mismatch - dev', async () => {
   //   const config = generateConfig({
