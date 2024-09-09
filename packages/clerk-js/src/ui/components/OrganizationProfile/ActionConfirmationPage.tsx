@@ -1,10 +1,9 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 
-import { isClerkAPIResponseError } from '../../../../../shared';
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import {
   Form,
@@ -63,18 +62,6 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
       successMessage={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
       )}
-      getErrorMessage={err => {
-        if (!isClerkAPIResponseError(err)) {
-          return err;
-        }
-
-        switch (err.errors[0].code) {
-          case 'organization_minimum_permissions_needed':
-            return localizationKeys('unstable__errors.organizations.minimum_permissions_needed');
-          default:
-            return err.errors[0].longMessage;
-        }
-      }}
       onConfirmation={leaveOrg}
       {...props}
     />
@@ -121,7 +108,6 @@ type ActionConfirmationPageProps = FormProps & {
   submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
   colorScheme?: 'danger' | 'primary';
-  getErrorMessage?: (err: any) => string;
 };
 
 const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationPageProps) => {
@@ -137,10 +123,10 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     onReset,
     onConfirmation,
     colorScheme = 'danger',
-    getErrorMessage,
   } = props;
   const wizard = useWizard();
   const card = useCardState();
+  const { translateError } = useLocalizations();
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
@@ -160,7 +146,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     try {
       await onConfirmation().then(() => wizard.nextStep());
     } catch (e) {
-      handleError(e, [], e => card.setError(getErrorMessage ? getErrorMessage(e) : e));
+      handleError(e, [], e => card.setError(translateError(e)));
     }
   };
 

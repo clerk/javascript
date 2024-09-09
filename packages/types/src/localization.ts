@@ -865,7 +865,6 @@ type UnstableErrors = WithParamName<{
     };
   };
   form_param_max_length_exceeded: LocalizationValue;
-  organizations: {
-    organization_minimum_permissions_needed: LocalizationValue;
-  };
+  organization_minimum_permissions_needed: LocalizationValue;
+  already_a_member_in_organization: LocalizationValue;
 }>;

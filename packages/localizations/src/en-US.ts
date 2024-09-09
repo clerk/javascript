@@ -541,10 +541,9 @@ export const enUS: LocalizationResource = {
         wordByItself: 'Single words are easy to guess.',
       },
     },
-    organizations: {
-      organization_minimum_permissions_needed:
-        'There has to be at least one organization member with the minimum required permissions.',
-    },
+    organization_minimum_permissions_needed:
+      'There has to be at least one organization member with the minimum required permissions.',
+    already_a_member_in_organization: '{{email}} is already a member of the organization.',
   },
   userButton: {
     action__addAccount: 'Add account',

@@ -85,24 +85,33 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         return onSuccess?.();
       })
       .catch(err => {
-        if (isClerkAPIResponseError(err)) {
-          removeInvalidEmails(err.errors[0]);
+        const errorCode = err.errors?.[0]?.code;
+
+        if (!isClerkAPIResponseError(err) || !errorCode) {
+          handleError(err, [], card.setError);
+          return;
         }
 
-        if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'duplicate_record') {
-          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
-          card.setError(
-            t(
-              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
-                // Create a localized list of email addresses
-                email_addresses: createListFormat(unlocalizedEmailsList, locale),
-              }),
-            ),
-          );
-        } else if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_param_format_invalid') {
-          card.setError(translateError(err.errors[0]));
-        } else {
-          handleError(err, [], card.setError);
+        removeInvalidEmails(err.errors[0]);
+
+        switch (errorCode) {
+          case 'duplicate_record': {
+            const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
+            card.setError(
+              t(
+                localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+                  // Create a localized list of email addresses
+                  email_addresses: createListFormat(unlocalizedEmailsList, locale),
+                }),
+              ),
+            );
+            break;
+          }
+          case 'already_a_member_in_organization':
+          case 'form_param_format_invalid': {
+            card.setError(translateError(err.errors[0]));
+            break;
+          }
         }
       });
   };

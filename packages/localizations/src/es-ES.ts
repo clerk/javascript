@@ -551,6 +551,9 @@ export const esES: LocalizationResource = {
         wordByItself: 'Palabras únicas son fáciles de adivinar.',
       },
     },
+    organization_minimum_permissions_needed:
+      'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
+    already_a_member_in_organization: '{{email}} já é membro da organização.',
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
