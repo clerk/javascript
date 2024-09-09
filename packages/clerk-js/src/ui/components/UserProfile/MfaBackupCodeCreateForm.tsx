@@ -28,7 +28,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
       return;
     }
 
-    void handleAssurance(() => user.createBackupCode())
+    void handleAssurance(user.createBackupCode)
       .then((backupCode: BackupCodeResource) => setBackupCode(backupCode))
       .catch(err => handleError(err, [], card.setError));
   }, []);

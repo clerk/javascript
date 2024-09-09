@@ -38,7 +38,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
       return;
     }
 
-    void handleAssurance(() => user.createTOTP())
+    void handleAssurance(user.createTOTP)
       .then((totp: TOTPResource) => setTOTP(totp))
       .catch(err => handleError(err, [], card.setError));
   }, []);

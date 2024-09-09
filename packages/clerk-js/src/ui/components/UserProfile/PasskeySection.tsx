@@ -199,7 +199,7 @@ const AddPasskeyButton = () => {
       return;
     }
     try {
-      await handleAssurance(() => user.createPasskey());
+      await handleAssurance(user.createPasskey);
     } catch (e) {
       handleError(e, [], card.setError);
     }

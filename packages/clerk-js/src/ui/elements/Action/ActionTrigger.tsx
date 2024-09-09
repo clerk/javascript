@@ -24,7 +24,7 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onClick: async () => {
       await validChildren.props.onClick?.();
-      return open(value);
+      open(value);
     },
   });
 };
