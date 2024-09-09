@@ -2,13 +2,17 @@
 import type { HTMLTag, Polymorphic } from 'astro/types'
 import type { SignOutOptions, Without } from '@clerk/types'
 import type { ButtonProps } from '../../types';
-import { addUnstyledAttributeToFirstTag } from './utils'
+import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
 
 type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & Without<ButtonProps<Tag>, 'mode'>>
 
 import { generateSafeId } from '@clerk/astro/internal'
 
 const safeId = generateSafeId();
+
+if ('as' in Astro.props) {
+  logAsPropUsageDeprecation()
+}
 
 const {
   as: Tag = 'button',
