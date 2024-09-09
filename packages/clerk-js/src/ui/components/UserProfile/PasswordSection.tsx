@@ -43,10 +43,7 @@ export const PasswordSection = () => {
           >
             {passwordEnabled && <Text variant='h2'>••••••••••</Text>}
 
-            <Action.Trigger
-              value='edit'
-              protect
-            >
+            <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='password'
                 localizationKey={

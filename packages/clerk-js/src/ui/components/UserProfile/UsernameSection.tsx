@@ -47,10 +47,7 @@ export const UsernameSection = () => {
               </Text>
             )}
 
-            <Action.Trigger
-              value='edit'
-              protect
-            >
+            <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='username'
                 localizationKey={

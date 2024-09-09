@@ -23,10 +23,12 @@ const useAfterVerification = () => {
        * else if `afterVerificationUrl` redirect there,
        * else If modal close it,
        */
-      __experimental_closeUserVerification();
       // wait for session id to have been updated
       setTimeout(() => {
+        // This fires on success
         afterVerification?.();
+        // This fires on cancel
+        __experimental_closeUserVerification();
       }, 0);
     } else {
       if (afterVerificationUrl) {

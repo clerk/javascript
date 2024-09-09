@@ -1,14 +1,15 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
-import { ProviderInitialIcon, useProtect } from '../../common';
+import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useAssurance } from '../../hooks/useAssurance';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
@@ -87,7 +88,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { navigate } = useRouter();
   const { user } = useUser();
   const card = useCardState();
-  const { __experimental_openUserVerification } = useClerk();
+  const { handleAssurance } = useAssurance();
 
   if (!user) {
     return null;
@@ -106,14 +107,6 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     ? localizationKeys(`userProfile.start.connectedAccountsSection.subtitle__disconnected`)
     : fallbackErrorMessage;
 
-  const isVerified = useProtect({
-    __experimental_assurance: {
-      level: 'L2.secondFactor',
-      // maxAge: '1m', //'A1.10min',
-      maxAge: 'A1.10min',
-    },
-  });
-
   const reconnect = async () => {
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
 
@@ -122,26 +115,19 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
-        response = await user.createExternalAccount({
-          strategy: account.verification!.strategy as OAuthStrategy,
-          redirectUrl,
-          additionalScopes,
-        });
+        response = await handleAssurance(() =>
+          user.createExternalAccount({
+            strategy: account.verification!.strategy as OAuthStrategy,
+            redirectUrl,
+            additionalScopes,
+          }),
+        );
       }
 
       await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
     } catch (err) {
       handleError(err, [], card.setError);
     }
-  };
-
-  const safeReconnect = async () => {
-    if (!isVerified) {
-      return __experimental_openUserVerification({
-        afterVerification: reconnect,
-      });
-    }
-    reconnect();
   };
 
   const ImageOrInitial = () =>
@@ -205,7 +191,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
             sx={{
               display: 'inline-block',
             }}
-            onClick={safeReconnect}
+            onClick={reconnect}
             variant='link'
             localizationKey={localizationKeys(
               'userProfile.start.connectedAccountsSection.actionLabel__connectionFailed',
@@ -242,10 +228,7 @@ const ConnectedAccountMenu = () => {
       {
         label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
         isDestructive: true,
-        onClick: () =>
-          open('remove', {
-            protect: true,
-          }),
+        onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

@@ -14,6 +14,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { handleError } from '../../utils';
 
 type AddAuthenticatorAppProps = FormProps & {
@@ -26,14 +27,18 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   const { title, onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
+  const { handleAssurance } = useAssurance();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
 
   // TODO: React18
   // Non-idempotent useEffect
   React.useEffect(() => {
-    void user
-      ?.createTOTP()
+    if (!user) {
+      return;
+    }
+
+    void handleAssurance(() => user.createTOTP())
       .then((totp: TOTPResource) => setTOTP(totp))
       .catch(err => handleError(err, [], card.setError));
   }, []);

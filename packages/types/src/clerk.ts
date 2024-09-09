@@ -862,6 +862,7 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
 export type __experimental_UserVerificationProps = RoutingOptions & {
   // TODO(STEP-UP): Verify and write a description
   afterVerification?: () => void;
+  onVerificationCancel?: () => void;
   // TODO(STEP-UP): Verify and write a description
   afterVerificationUrl?: string;
 

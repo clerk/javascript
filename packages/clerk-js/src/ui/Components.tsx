@@ -247,7 +247,15 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.closeModal = name => {
       clearUrlStateParam();
-      setState(s => ({ ...s, [name + 'Modal']: null }));
+      setState(s => {
+        // @ts-ignore
+        const modal = s[name + 'Modal'] || {};
+        if ('onVerificationCancel' in modal) {
+          modal.onVerificationCancel?.();
+        }
+
+        return { ...s, [name + 'Modal']: null };
+      });
     };
 
     componentsControls.openModal = (name, props) => {

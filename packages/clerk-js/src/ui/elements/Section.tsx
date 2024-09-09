@@ -7,7 +7,7 @@ import type { ElementDescriptor, ElementId } from '../customizables/elementDescr
 import { Plus } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
-import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger, useMenuState } from '.';
+import { Animated, ArrowBlockButton, Menu, MenuItem, MenuList, MenuTrigger } from '.';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
@@ -220,10 +220,6 @@ export const ProfileSectionActionMenuItem = (props: ProfileSectionActionMenuItem
 
   const isIconElement = isValidElement(leftIcon);
 
-  const {
-    popoverCtx: { close },
-  } = useMenuState();
-
   return (
     <MenuItem
       sx={[
@@ -234,11 +230,6 @@ export const ProfileSectionActionMenuItem = (props: ProfileSectionActionMenuItem
       ]}
       isLoading={isLoading}
       {...rest}
-      onClick={e => {
-        // have a conditional for this
-        close();
-        return rest.onClick?.(e);
-      }}
     >
       {(isLoading || leftIcon) && (
         <Flex

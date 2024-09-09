@@ -85,10 +85,7 @@ export const PhoneSection = () => {
             </Action.Root>
           ))}
 
-          <Action.Trigger
-            value='add'
-            protect
-          >
+          <Action.Trigger value='add'>
             <ProfileSection.ArrowButton
               id='phoneNumbers'
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
@@ -146,10 +143,7 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
       {
         label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
         isDestructive: true,
-        onClick: () =>
-          open('remove', {
-            protect: true,
-          }),
+        onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

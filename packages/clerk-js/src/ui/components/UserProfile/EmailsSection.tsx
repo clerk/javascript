@@ -80,10 +80,7 @@ export const EmailsSection = () => {
             </Action.Root>
           ))}
 
-          <Action.Trigger
-            value='add'
-            protect
-          >
+          <Action.Trigger value='add'>
             <ProfileSection.ArrowButton
               id='emailAddresses'
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
@@ -136,10 +133,7 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       {
         label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
         isDestructive: true,
-        onClick: () =>
-          open('remove', {
-            protect: true,
-          }),
+        onClick: () => open('remove'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

@@ -28,10 +28,7 @@ export const DeleteSection = () => {
             id='danger'
             sx={t => ({ paddingLeft: t.space.$1 })}
           >
-            <Action.Trigger
-              value='delete'
-              protect
-            >
+            <Action.Trigger value='delete'>
               <ProfileSection.Button
                 id='danger'
                 variant='ghost'

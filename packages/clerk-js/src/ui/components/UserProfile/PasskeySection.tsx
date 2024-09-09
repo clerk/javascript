@@ -2,7 +2,6 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
-import { useProtect } from '../../common';
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import {
   Form,
@@ -16,6 +15,7 @@ import {
 } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { useAssurance } from '../../hooks/useAssurance';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { getRelativeToNowDateKey, handleError, useFormControl } from '../../utils';
@@ -180,10 +180,7 @@ const ActiveDeviceMenu = () => {
     {
       label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
       isDestructive: true,
-      onClick: () =>
-        open('remove', {
-          protect: true,
-        }),
+      onClick: () => open('remove'),
     },
   ] satisfies PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
@@ -193,33 +190,19 @@ const ActiveDeviceMenu = () => {
 // TODO-PASSKEYS: Should the error be scope to the section ?
 const AddPasskeyButton = () => {
   const card = useCardState();
-  const { isSatellite, __experimental_openUserVerification } = useClerk();
+  const { isSatellite } = useClerk();
   const { user } = useUser();
-
-  const isVerified = useProtect({
-    __experimental_assurance: {
-      level: 'L2.secondFactor',
-      // maxAge: '1m', //'A1.10min',
-      maxAge: 'A1.10min',
-    },
-  });
+  const { handleAssurance } = useAssurance();
 
   const handleCreatePasskey = async () => {
+    if (!user) {
+      return;
+    }
     try {
-      await user?.createPasskey();
+      await handleAssurance(() => user.createPasskey());
     } catch (e) {
       handleError(e, [], card.setError);
     }
-  };
-
-  // TODO-STEPUP: Find a better way
-  const safeCreate = async () => {
-    if (!isVerified) {
-      return __experimental_openUserVerification({
-        afterVerification: handleCreatePasskey,
-      });
-    }
-    await handleCreatePasskey();
   };
 
   if (isSatellite) {
@@ -230,7 +213,7 @@ const AddPasskeyButton = () => {
     <ProfileSection.ArrowButton
       id='passkeys'
       localizationKey={'Add a passkey'}
-      onClick={safeCreate}
+      onClick={handleCreatePasskey}
     />
   );
 };
