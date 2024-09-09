@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
+import { OrganizationSyncOptions } from '../../packages/backend/src/tokens/types';
 
 const PORT = 4199;
 
@@ -912,17 +913,12 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  const start = async (): Promise<Application> => {
+  const start = async (orgSyncOptions: OrganizationSyncOptions): Promise<Application> => {
     const env = appConfigs.envs.withEmailCodes
       .clone()
       .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${jwksServer.address().port}`);
 
-
-    const app = await appConfigs.next.appRouter
-      .clone()
-      .addFile(
-        'src/middleware.ts',
-        () => `import { authMiddleware } from '@clerk/nextjs/server';
+    const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
     // Set the paths that don't require the user to be signed in
     const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
     export const middleware = (req, evt) => {
@@ -936,17 +932,20 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
         signInUrl: req.headers.get("x-sign-in-url"),
 
         // Critical
-        organizationSync: {
-          organizationPattern: "/organizations-by-id/:id",
-          personalWorkspacePattern: "/personal-workspace",
-        }
+        organizationSync: ${JSON.stringify(orgSyncOptions)}
 
       })(req, evt)
     };
     export const config = {
       matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
     };
-    `,
+    `
+
+    const app = await appConfigs.next.appRouter
+      .clone()
+      .addFile(
+        'src/middleware.ts',
+        () => middlewareFile,
       )
       .commit();
 
@@ -962,51 +961,66 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
   type testCase = {
     name: string;
-    state: 'active' | 'expired' | 'early';
+    // With this initial state...
+    initialAuthState: 'active' | 'expired' | 'early';
+    initialSessionClaims: Map<string, string>;
+
+    // When the customer app specifies these orgSyncOptions to middleware...
+    orgSyncOptions: OrganizationSyncOptions;
+
+    // And a request arrives to the app at this path...
     appRequestPath: string;
-    initialClaims: Map<string, string>;
-    fapiOrganizationIdParamValue: string;
+
+    // The middleware should redirect to fapi with this query param value:
+    fapiOrganizationIdParamValue: string | null;
   }
 
   const testCases: testCase[] = [
     {
-      name: 'When org A is active but org B is requested, attempts to activate org B (expired)',
-      state: 'expired',
-      appRequestPath: '/organizations-by-id/org_b',
-      initialClaims: new Map<string, string>([
+      name: 'When org A is active but org B is requested by ID, attempts to activate org B (expired)',
+      initialAuthState: 'expired',
+      initialSessionClaims: new Map<string, string>([
         ['org_id', 'org_a']
       ]),
-      fapiOrganizationIdParamValue: 'org_b',
+
+      appRequestPath: '/organizations-by-id/org_b',
+      fapiOrganizationIdParamValue: 'org_b' || null,
+      orgSyncOptions: {
+        organizationPattern: "/organizations-by-id/:id",
+        personalWorkspacePattern: "/personal-workspace",
+      }
     },
     {
-      name: 'When org A is active but org B is requested, attempts to activate org B (active)',
-      state: 'active',
+      name: 'When org A is active but org B is requested by ID, attempts to activate org B (active)',
+      initialAuthState: 'active',
       appRequestPath: '/organizations-by-id/org_b',
-      initialClaims: new Map<string, string>([
+      initialSessionClaims: new Map<string, string>([
         ['org_id', 'org_a']
       ]),
       fapiOrganizationIdParamValue: 'org_b',
+      orgSyncOptions: {
+        organizationPattern: "/organizations-by-id/:id",
+        personalWorkspacePattern: "/personal-workspace",
+      }
     },
   ];
 
   for (const testCase of testCases) {
     test(`organization activation by ID - ${testCase.name} - dev`, async () => {
-      const app = await start();
+      const app = await start(testCase.orgSyncOptions);
 
       const config = generateConfig({
         mode: 'test',
       });
       // Create a new map with an org_id key
       const { token, claims } = config.generateToken({
-        state: testCase.state, // <-- Critical
-        extraClaims: new Map<string, string>([
-          // Start the test with org A active
-          ['org_id', 'org_a']
-        ]),
+        state: testCase.initialAuthState, // <-- Critical
+        extraClaims: testCase.initialSessionClaims,
       });
+
       const clientUat = claims.iat;
       const res = await fetch(app.serverUrl +
-        '/organizations-by-id/org_b', // But attempt to visit org B
+        testCase.appRequestPath, // But attempt to visit org B
         {
           headers: new Headers({
             Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
@@ -1017,145 +1031,19 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
           redirect: 'manual',
         });
       expect(res.status).toBe(307);
+
+      let expectedUrlSuffix = "";
+      if (testCase.fapiOrganizationIdParamValue) {
+        expectedUrlSuffix += `&organization_id=${testCase.fapiOrganizationIdParamValue}`;
+      }
+
       expect(res.headers.get('location')).toBe(
         `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-          `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
-        )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
+          `${app.serverUrl}${testCase.appRequestPath}`, // Redirects to the app's original request path
+        )}&suffixed_cookies=false${devBrowserQuery}${expectedUrlSuffix}`,
       );
 
       await end(app);
     });
   }
-
-
-  // TODO(izaak): refactor into table-driven test?
-  // test('expired session token - with organization id mismatch - dev', async () => {
-  //   const config = generateConfig({
-  //     mode: 'test',
-  //   });
-  //   // Create a new map with an org_id key
-  //   const { token, claims } = config.generateToken({
-  //     state: 'expired', // <-- Critical
-  //     extraClaims: new Map<string, string>([
-  //       // Start the test with org A active
-  //       ['org_id', 'org_a']
-  //     ]),
-  //   });
-  //   const clientUat = claims.iat;
-  //   const res = await fetch(app.serverUrl +
-  //     '/organizations-by-id/org_b', // But attempt to visit org B
-  //     {
-  //     headers: new Headers({
-  //       Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-  //       'X-Publishable-Key': config.pk,
-  //       'X-Secret-Key': config.sk,
-  //       'Sec-Fetch-Dest': 'document',
-  //     }),
-  //     redirect: 'manual',
-  //   });
-  //   expect(res.status).toBe(307);
-  //   expect(res.headers.get('location')).toBe(
-  //     `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-  //       `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
-  //     )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
-  //   );
-  // });
-  //
-  // test('valid session token - with organization id mismatch - dev', async () => {
-  //   const config = generateConfig({
-  //     mode: 'test',
-  //   });
-  //   // Create a new map with an org_id key
-  //   const { token, claims } = config.generateToken({
-  //     state: 'active', // <-- Critical
-  //     extraClaims: new Map<string, string>([
-  //       // Start the test with org A active
-  //       ['org_id', 'org_a']
-  //     ]),
-  //   });
-  //   const clientUat = claims.iat;
-  //   const res = await fetch(app.serverUrl +
-  //     '/organizations-by-id/org_b', // But attempt to visit org B
-  //     {
-  //       headers: new Headers({
-  //         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-  //         'X-Publishable-Key': config.pk,
-  //         'X-Secret-Key': config.sk,
-  //         'Sec-Fetch-Dest': 'document',
-  //       }),
-  //       redirect: 'manual',
-  //     });
-  //   expect(res.status).toBe(307);
-  //   expect(res.headers.get('location')).toBe(
-  //     `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-  //       `${app.serverUrl}/organizations-by-id/org_b`, // Redirects to org_b's path (normal)
-  //     )}&suffixed_cookies=false${devBrowserQuery}&organization_id=org_b`, // Should attempt to activate org B in the redirect
-  //   );
-  // });
-  //
-  // test('expired session token - with personal workspace mismatch - dev', async () => {
-  //   const config = generateConfig({
-  //     mode: 'test',
-  //   });
-  //   // Create a new map with an org_id key
-  //   const { token, claims } = config.generateToken({
-  //     state: 'expired', // <-- Critical
-  //     extraClaims: new Map<string, string>([
-  //       // Start the test with org A active
-  //       ['org_id', 'org_a']
-  //     ]),
-  //   });
-  //   const clientUat = claims.iat;
-  //   const res = await fetch(app.serverUrl +
-  //     '/personal-workspace', // But attempt to visit the personal workspace
-  //     {
-  //       headers: new Headers({
-  //         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-  //         'X-Publishable-Key': config.pk,
-  //         'X-Secret-Key': config.sk,
-  //         'Sec-Fetch-Dest': 'document',
-  //       }),
-  //       redirect: 'manual',
-  //     });
-  //   expect(res.status).toBe(307);
-  //   expect(res.headers.get('location')).toBe(
-  //     `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-  //       `${app.serverUrl}/personal-workspace`, // Redirects to the personal workspace (normal)
-  //     )}&suffixed_cookies=false${devBrowserQuery}&organization_id=`, // Should attempt to activate the personal workspace with a blank query param
-  //   );
-  // });
-  //
-  // test('valid session token - with personal workspace mismatch - dev', async () => {
-  //   const config = generateConfig({
-  //     mode: 'test',
-  //   });
-  //   // Create a new map with an org_id key
-  //   const { token, claims } = config.generateToken({
-  //     state: 'active', // <-- Critical
-  //     extraClaims: new Map<string, string>([
-  //       // Start the test with org A active
-  //       ['org_id', 'org_a']
-  //     ]),
-  //   });
-  //   const clientUat = claims.iat;
-  //   const res = await fetch(app.serverUrl +
-  //     '/personal-workspace', // But attempt to visit the personal workspace
-  //     {
-  //       headers: new Headers({
-  //         Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-  //         'X-Publishable-Key': config.pk,
-  //         'X-Secret-Key': config.sk,
-  //         'Sec-Fetch-Dest': 'document',
-  //       }),
-  //       redirect: 'manual',
-  //     });
-  //   expect(res.status).toBe(307);
-  //   expect(res.headers.get('location')).toBe(
-  //     `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-  //       `${app.serverUrl}/personal-workspace`, // Redirects to the personal workspace (normal)
-  //     )}&suffixed_cookies=false${devBrowserQuery}&organization_id=`, // Should attempt to activate the personal workspace with a blank query param
-  //   );
-  // });
-
-  // TODO(izaak): test from personal workspace to org transition
 });
