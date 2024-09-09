@@ -364,7 +364,7 @@ ${error.getFullMessage()}`,
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      const requestState = await signedIn(
+      const signedInRequestState = await signedIn(
         authenticateContext,
         data,
         undefined,
@@ -372,11 +372,11 @@ ${error.getFullMessage()}`,
       );
 
       // Org sync if necessary
-      // TODO(izaak): Also apply for auth in header scenario? Likely move to a standalone helper.
+      // TODO(izaak): Also apply for auth in header scenario? Likely move to a standalone helper. Maybe "handleMaybeOrganizationSyncHandshake"
       if (options.organizationSync) {
         const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
         if (toActivate) {
-          const auth = requestState.toAuth();
+          const auth = signedInRequestState.toAuth();
           if (auth) {
             let mustActivate = false;
             if (toActivate.organizationSlug && auth.orgSlug && toActivate.organizationSlug !== auth.orgSlug) {
@@ -386,11 +386,23 @@ ${error.getFullMessage()}`,
               mustActivate = true;
             }
             if (mustActivate) {
-              return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
+              console.log("GOT HERE - MUST ACTIVATE A THINGER!", authenticateContext.handshakeRedirectLoopCounter)
+              if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+                // We have an organization that needs to be activated, but this isn't our first time redirecting.
+                // This is because we attempted to activate the organization previously, but the organization
+                // must not have been valid (either not found, or not valid for this user), and gave us back
+                // a null organization. We won't re-try the handshake, and leave it to the server component to handle
+                console.log("Nothing to worry about - we won't handshake again. Just going to return signedInRequestState")
+                return signedInRequestState;
+              } else {
+                return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
+              }
             }
           }
         }
       }
+      // No organization sync was necessary
+      return signedInRequestState;
     } catch (err) {
       return handleError(err, 'cookie');
     }
