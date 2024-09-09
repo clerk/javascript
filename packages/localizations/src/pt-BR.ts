@@ -553,6 +553,10 @@ export const ptBR: LocalizationResource = {
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access: 'Acesso não permitido.',
+    organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
+    organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
+    organization_membership_quota_exceeded:
+      'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
     organization_minimum_permissions_needed:
       'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',

@@ -553,6 +553,9 @@ export const esES: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'No puedes eliminar tu última identificación.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed:
       'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
     passkey_already_exists: undefined,

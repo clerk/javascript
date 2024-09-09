@@ -92,20 +92,41 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
         removeInvalidEmails(err.errors[0]);
 
-        if (err.errors?.[0]?.code === 'duplicate_record') {
-          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
-          card.setError(
-            t(
-              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
-                // Create a localized list of email addresses
-                email_addresses: createListFormat(unlocalizedEmailsList, locale),
-              }),
-            ),
-          );
-          return;
-        }
+        switch (err.errors?.[0]?.code) {
+          case 'duplicate_record': {
+            const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
+            card.setError(
+              t(
+                localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+                  // Create a localized list of email addresses
+                  email_addresses: createListFormat(unlocalizedEmailsList, locale),
+                }),
+              ),
+            );
+            break;
+          }
+          case 'already_a_member_in_organization': {
+            const longMessage = err.errors[0].longMessage ?? '';
+            const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
 
-        card.setError(translateError(err.errors[0]));
+            if (!email) {
+              card.setError(translateError(err.errors[0]));
+            }
+
+            card.setError(
+              t(
+                localizationKeys('unstable__errors.already_a_member_in_organization', {
+                  email,
+                }),
+              ),
+            );
+
+            break;
+          }
+          default: {
+            card.setError(translateError(err.errors[0]));
+          }
+        }
       });
   };
 
