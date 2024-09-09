@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-sdk-node",
-  "version": "5.0.35",
+  "version": "5.0.36",
   "description": "Clerk server SDK for usage with node",
   "keywords": [
     "clerk",
@@ -53,9 +53,9 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "1.9.2",
-    "@clerk/shared": "2.6.2",
-    "@clerk/types": "4.19.0",
+    "@clerk/backend": "1.10.0",
+    "@clerk/shared": "2.7.0",
+    "@clerk/types": "4.20.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {

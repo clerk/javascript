@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 0.1.9
+
+### Patch Changes
+
+- Add initial support for the `appearance` prop ([#3976](https://github.com/clerk/javascript/pull/3976)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f0b02ee48`](https://github.com/clerk/javascript/commit/f0b02ee48710b3b939cc885123088e3919d9c233), [`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`75d575ac5`](https://github.com/clerk/javascript/commit/75d575ac5af7c6da2f0c6aaac2a33f98386bb141), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf), [`2aaf91d81`](https://github.com/clerk/javascript/commit/2aaf91d81bf1e7b8fdc2662c253a26048c787994)]:
+  - @clerk/elements@0.15.0
+  - @clerk/clerk-react@5.8.0
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+
 ## 0.1.8
 
 ### Patch Changes

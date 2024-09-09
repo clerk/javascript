@@ -1,5 +1,36 @@
 # Change Log
 
+## 4.20.0
+
+### Minor Changes
+
+- Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups. ([#4061](https://github.com/clerk/javascript/pull/4061)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Server side
+
+  This can be applied to any helper that returns the auth object
+
+  **Nextjs example**
+
+  ```ts
+  auth().__experimental_factorVerificationAge;
+  ```
+
+  ### Client side
+
+  **React example**
+
+  ```ts
+  const { session } = useSession();
+  session?.__experimental_factorVerificationAge;
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments coverage on `<ClerkProvider>` properties ([#4098](https://github.com/clerk/javascript/pull/4098)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.19.0
 
 ### Minor Changes

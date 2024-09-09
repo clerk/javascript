@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+- Remove `@clerk/elements` reliance on `next` and `@clerk/clerk-react` directly. The host router is now provided by `@clerk/nextjs`. ([#4064](https://github.com/clerk/javascript/pull/4064)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fixes issue where errors were incorrectly being returned as an `any` type. ([#4119](https://github.com/clerk/javascript/pull/4119)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa)]:
+  - @clerk/types@4.20.0
+
 ## 2.6.2
 
 ### Patch Changes
