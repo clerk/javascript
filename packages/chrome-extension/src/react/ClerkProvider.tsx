@@ -6,22 +6,24 @@ import React from 'react';
 import { createClerkClient } from '../internal/clerk';
 import type { StorageCache } from '../internal/utils/storage';
 
+type SyncHost = `${'http' | 'https'}://${string}`;
 type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
   storageCache?: StorageCache;
+  syncHost?: SyncHost;
   syncSessionWithTab?: boolean;
 };
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { children, storageCache, syncSessionWithTab, ...rest } = props;
+  const { children, storageCache, syncHost, syncSessionWithTab, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
 
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await createClerkClient({ publishableKey, storageCache, syncSessionWithTab }));
+      setClerkInstance(await createClerkClient({ publishableKey, storageCache, syncHost, syncSessionWithTab }));
     })();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [publishableKey, storageCache, syncHost, syncSessionWithTab]);
 
   if (!clerkInstance) {
     return null;

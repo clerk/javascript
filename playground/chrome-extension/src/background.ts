@@ -7,7 +7,10 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 async function getToken() {
-  const clerk = await __unstable__createClerkClient({ publishableKey, syncSessionWithTab: true });
+  const clerk = await __unstable__createClerkClient({
+    publishableKey,
+    syncSessionWithTab: true,
+  });
   return await clerk.session?.getToken();
 }
 
