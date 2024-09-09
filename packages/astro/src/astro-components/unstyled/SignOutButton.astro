@@ -1,20 +1,10 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignOutOptions } from '@clerk/types'
+import type { SignOutOptions, Without } from '@clerk/types'
+import type { ButtonProps } from '../../types';
 import { addUnstyledAttributeToFirstTag } from './utils'
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & {
-  /**
-   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
-   * Use the default slot with the 'asChild' prop instead.
-   * @example
-   * <SignInButton asChild>
-   *   <button>Sign in</button>
-   * </SignInButton>
-   */
-  as: Tag;
-  asChild?: boolean;
-}>
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & Without<ButtonProps<Tag>, 'mode'>>
 
 import { generateSafeId } from '@clerk/astro/internal'
 
