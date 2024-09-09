@@ -887,9 +887,11 @@ test.describe('Client handshake @generic', () => {
 });
 
 test.describe('Client handshake with organization activation (by ID) @nextjs', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'parallel' });
 
-  let app: Application;
+  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
+  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
+
   const jwksServer = http.createServer(function (req, res) {
     const sk = req.headers.authorization?.replace('Bearer ', '');
     if (!sk) {
@@ -900,19 +902,23 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     res.write(JSON.stringify(getJwksFromSecretKey(sk)));
     res.end();
   });
-  // Strip trailing slash
-  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
-  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
+
+  test.beforeAll('setup local jwks server', async () => {
+    // Start the jwks server
+    await new Promise<void>(resolve => jwksServer.listen(0, resolve));
+  });
+
+  test.afterAll('setup local Clerk API mock', async () => {
+    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  });
 
   const start = async (): Promise<Application> => {
     const env = appConfigs.envs.withEmailCodes
       .clone()
-      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${PORT}`);
+      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${jwksServer.address().port}`);
 
-    // Start the jwks server
-    await new Promise<void>(resolve => jwksServer.listen(4199, resolve));
 
-    app = await appConfigs.next.appRouter
+    const app = await appConfigs.next.appRouter
       .clone()
       .addFile(
         'src/middleware.ts',
@@ -952,7 +958,6 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
   const end = async (app: Application): Promise<void> => {
     await app.teardown();
-    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   }
 
   type testCase = {
