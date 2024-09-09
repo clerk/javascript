@@ -8,6 +8,8 @@ import { CurrentUser } from '@/components/CurrentUser';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
+console.log('VITE_CLERK_SYNC_HOST', import.meta.env.VITE_CLERK_SYNC_HOST);
+
 export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncSessionWithTab'> & {
   className?: string;
 };
@@ -28,10 +30,8 @@ export function SharedApp({ className, ...rest }: SharedAppProps) {
       publishableKey={publishableKey}
       routerPush={to => navigate(to)}
       routerReplace={to => navigate(to, { replace: true })}
-      extensionFeatures={{
-        sync: true,
-      }}
       {...rest}
+      // syncSessionWithTab
     >
       <div className='container'>
         <header>

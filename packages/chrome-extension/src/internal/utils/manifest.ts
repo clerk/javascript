@@ -2,58 +2,45 @@ import type { SetRequired } from 'type-fest';
 import type { Manifest } from 'webextension-polyfill';
 
 import type { ClerkClientExtensionFeatures } from '../../types';
-import { VALID_HOST_PERMISSION_REGEX } from '../constants';
-import { errorThrower, missingManifestKeyError, missingValidManifestHostPermission } from './errors';
+import { errorThrower, missingManifestKeyError } from './errors';
 
 export type ValidatedManifest = SetRequired<Manifest.WebExtensionManifest, 'permissions' | 'host_permissions'>;
+export type ManifestKeys = keyof Manifest.WebExtensionManifest;
+
+function validateRootManifestKey(manifest: Manifest.WebExtensionManifest, key: ManifestKeys): void {
+  if (!manifest[key]) {
+    errorThrower.throw(missingManifestKeyError(key));
+  }
+}
+
+function validateManifestPermission(manifest: Manifest.WebExtensionManifest, key: Manifest.Permission): void {
+  if (!manifest.permissions?.includes(key)) {
+    errorThrower.throw(missingManifestKeyError(`permissions.${key}`));
+  }
+}
+
+function hasAdditionalFeatures(features: ClerkClientExtensionFeatures): boolean {
+  return Boolean(features) && Object.keys(features).length > 0;
+}
 
 export function validateManifest(
   manifest: Manifest.WebExtensionManifest,
   features: ClerkClientExtensionFeatures,
 ): asserts manifest is ValidatedManifest {
-  const hasFeatures = Boolean(features) && Object.keys(features).length > 0;
+  validateRootManifestKey(manifest, 'permissions');
+  validateManifestPermission(manifest, 'storage');
 
-  if (!manifest.permissions) {
-    return errorThrower.throw(missingManifestKeyError('permissions'));
-  }
-
-  if (!manifest.permissions.includes('storage')) {
-    return errorThrower.throw(missingManifestKeyError('permissions.storage'));
-  }
-
-  if (!hasFeatures) {
+  // If no additional features are provided, we can return success early
+  if (!hasAdditionalFeatures(features)) {
     return;
   }
 
-  if (features.background && !manifest.background) {
-    return errorThrower.throw(missingManifestKeyError('background'));
+  if (features.background) {
+    validateRootManifestKey(manifest, 'background');
   }
 
-  if (features.sync && !manifest.permissions.includes('cookies')) {
-    return errorThrower.throw(missingManifestKeyError('permissions.cookies'));
+  if (features.sync) {
+    validateManifestPermission(manifest, 'cookies');
+    validateRootManifestKey(manifest, 'host_permissions');
   }
-
-  if (features.sync && !manifest.host_permissions) {
-    return errorThrower.throw(missingManifestKeyError('host_permissions'));
-  }
-}
-
-export function validateHostPermissionExistence(hostPermissions: string[], hostHint: string): void {
-  if (!hostPermissions?.length) {
-    errorThrower.throw(missingValidManifestHostPermission(hostHint));
-  }
-}
-
-export function getValidPossibleManifestHosts(manifest: ValidatedManifest): string[] {
-  const uniqueHosts = new Set<string>();
-
-  for (const host of manifest.host_permissions) {
-    const res = host.match(VALID_HOST_PERMISSION_REGEX)?.[1];
-
-    if (res) {
-      uniqueHosts.add(res);
-    }
-  }
-
-  return [...uniqueHosts];
 }

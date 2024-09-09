@@ -5,10 +5,9 @@ import browser from 'webextension-polyfill';
 
 import { SCOPE, type Scope } from '../types';
 import { AUTH_HEADER, CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
-import type { GetClientCookieParams } from './utils/cookies';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
-import { getValidPossibleManifestHosts, validateHostPermissionExistence, validateManifest } from './utils/manifest';
+import { validateManifest } from './utils/manifest';
 import { BrowserStorageCache, type StorageCache } from './utils/storage';
 
 export let clerk: Clerk;
@@ -22,6 +21,7 @@ export type CreateClerkClientOptions = {
   publishableKey: string;
   scope?: Scope;
   storageCache?: StorageCache;
+  syncHost?: string;
   syncSessionWithTab?: boolean;
 };
 
@@ -29,6 +29,7 @@ export async function createClerkClient({
   publishableKey,
   scope,
   storageCache = BrowserStorageCache,
+  syncHost = process.env.CLERK_SYNC_HOST,
   syncSessionWithTab = false,
 }: CreateClerkClientOptions): Promise<Clerk> {
   if (clerk) {
@@ -37,6 +38,8 @@ export async function createClerkClient({
 
   // Parse publishableKey and assert it's present/valid, throw if not
   const key = parsePublishableKey(publishableKey);
+
+  console.log('KEY', key, key?.instanceType, key?.frontendApi);
   assertPublishableKey(key);
 
   const isProd = key.instanceType === 'production';
@@ -44,39 +47,17 @@ export async function createClerkClient({
 
   // Will throw if manifest is invalid
   validateManifest(manifest, {
-    sync: syncSessionWithTab,
     background: scope === SCOPE.background,
+    sync: syncSessionWithTab,
   });
 
-  let jwt: JWTHandler | undefined;
-
-  if (syncSessionWithTab) {
-    const hostHint = isProd ? key.frontendApi : DEFAULT_LOCAL_HOST_PERMISSION;
-    const validHosts = getValidPossibleManifestHosts(manifest);
-
-    // Will throw if manifest host_permissions doesn't contain a valid host
-    validateHostPermissionExistence(validHosts, hostHint);
-
-    // Set up cookie params based on environment
-    const getClientCookieParams: GetClientCookieParams = isProd
-      ? {
-          urls: `https://${key.frontendApi}`,
-          name: CLIENT_JWT_KEY,
-        }
-      : {
-          urls: validHosts,
-          name: DEV_BROWSER_JWT_KEY,
-        };
-
-    // Set up JWT handler and attempt to get JWT from storage on initialization
-    jwt = JWTHandler(storageCache, { ...getClientCookieParams, frontendApi: key.frontendApi, sync: true });
-  } else {
-    jwt = JWTHandler(storageCache, { frontendApi: key.frontendApi, sync: false });
-  }
-
-  if (!jwt) {
-    throw new Error('StorageCache could not be initialized.'); // TODO: Update error
-  }
+  // Set up JWT handler and attempt to get JWT from storage on initialization
+  const jwt = JWTHandler(storageCache, {
+    frontendApi: key.frontendApi,
+    name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_JWT_KEY,
+    sync: syncSessionWithTab,
+    url: syncHost || isProd ? `https://${key.frontendApi}` : DEFAULT_LOCAL_HOST_PERMISSION,
+  });
 
   // Create Clerk instance
   clerk = new Clerk(publishableKey);

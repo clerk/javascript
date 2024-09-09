@@ -35,71 +35,14 @@ describe('Cookies', () => {
   }
 
   describe('getClientCookie', () => {
-    describe('Single Host', () => {
-      test('returns cookie value from browser.cookies if is set for url', async () => {
-        const url = urls[0];
+    test('returns cookie value from browser.cookies if is set for url', async () => {
+      const url = urls[0];
 
-        getMock.mockResolvedValue(cookie);
+      getMock.mockResolvedValue(cookie);
 
-        expect(await getClientCookie({ urls: url, name })).toBe(cookie);
+      expect(await getClientCookie({ url, name })).toBe(cookie);
 
-        expectMockCalls(getMock, name, [url]);
-      });
-    });
-
-    describe('Multiple Hosts', () => {
-      test('with valid urls', async () => {
-        getMock.mockResolvedValueOnce(cookie).mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-
-        expect(await getClientCookie({ urls, name })).toBe(cookie);
-
-        expectMockCalls(getMock, name, urls);
-      });
-
-      test('with invalid urls', async () => {
-        const urls = ['foo'];
-
-        getMock.mockResolvedValue(null);
-        expect(await getClientCookie({ urls, name })).toBe(null);
-
-        expectMockCalls(getMock, name, urls);
-      });
-
-      test('with single result', async () => {
-        getMock.mockResolvedValueOnce(cookie).mockResolvedValueOnce(null);
-
-        expect(await getClientCookie({ urls, name })).toBe(cookie);
-
-        expectMockCalls(getMock, name, urls);
-      });
-
-      test('with multiple results - should pick first result', async () => {
-        const cookie2 = createCookie({ name, value: 'result2', domain });
-
-        getMock.mockResolvedValueOnce(cookie).mockResolvedValueOnce(cookie2);
-
-        expect(await getClientCookie({ urls, name })).toBe(cookie);
-
-        expectMockCalls(getMock, name, urls);
-      });
-
-      test('with rejected result', async () => {
-        const urls = [`https://${domain}`, 'https://foo.com'];
-
-        getMock.mockResolvedValueOnce(cookie).mockRejectedValueOnce(null);
-
-        expect(await getClientCookie({ urls, name })).toBe(cookie);
-
-        expectMockCalls(getMock, name, urls);
-      });
-
-      test('with empty result', async () => {
-        getMock.mockResolvedValueOnce(null).mockRejectedValueOnce(null);
-
-        expect(await getClientCookie({ urls, name })).toBe(null);
-
-        expectMockCalls(getMock, name, urls);
-      });
+      expectMockCalls(getMock, name, [url]);
     });
   });
 });
