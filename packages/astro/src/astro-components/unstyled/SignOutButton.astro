@@ -4,7 +4,14 @@ import type { SignOutOptions } from '@clerk/types'
 import { addUnstyledAttributeToFirstTag } from './utils'
 
 type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & {
-  /** @deprecated Use the default slot instead of the 'as' prop */
+  /**
+   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
+   * Use the default slot with the 'asChild' prop instead.
+   * @example
+   * <SignInButton asChild>
+   *   <button>Sign in</button>
+   * </SignInButton>
+   */
   as: Tag;
   asChild?: boolean;
 }>
