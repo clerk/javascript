@@ -16,7 +16,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { createGetToken, createSignOut } from './utils';
 
 type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
