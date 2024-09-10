@@ -61,7 +61,7 @@ export interface SessionResource extends ClerkResource {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number | null, number | null];
+  __experimental_factorVerificationAge: [number, number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;

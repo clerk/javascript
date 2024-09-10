@@ -51,10 +51,12 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
 }
 
 function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolean {
-  return (
-    prev.__experimental_factorVerificationAge[0] !== next.__experimental_factorVerificationAge[0] ||
-    prev.__experimental_factorVerificationAge[1] !== next.__experimental_factorVerificationAge[1]
-  );
+  const prevFVA = prev.__experimental_factorVerificationAge;
+  const nextFVA = next.__experimental_factorVerificationAge;
+  if (prevFVA !== null && nextFVA !== null) {
+    return prevFVA[0] !== nextFVA[0] || prevFVA[1] !== nextFVA[1];
+  }
+  return prevFVA !== nextFVA;
 }
 
 function sessionUserMembershipPermissionsChanged(prev: SessionResource, next: SessionResource): boolean {

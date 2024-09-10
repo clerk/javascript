@@ -107,7 +107,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  fva: [number | null, number | null];
+  fva?: [number, number];
 
   /**
    * Any other JWT Claim Set member.
