@@ -20,6 +20,13 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
         return resolvedVirtualModuleId;
       }
     },
+    config(config) {
+      // While Astro processes <script> tags by default, our control components
+      // which uses <script> tags and imports nanostores will not be processed by Astro.
+      // This ensures @clerk/astro/client is properly processed and bundled,
+      // resolving runtime import issues in these components.
+      config.optimizeDeps?.include?.push('@clerk/astro/client');
+    },
     load(id) {
       if (id === resolvedVirtualModuleId) {
         return `
