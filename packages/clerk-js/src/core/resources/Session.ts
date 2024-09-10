@@ -1,4 +1,5 @@
 import { runWithExponentialBackOff } from '@clerk/shared';
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   __experimental_SessionVerificationJSON,
@@ -27,15 +28,6 @@ import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
-
-const stringsToNumbers: { [key in '1m' | '10m' | '1h' | '4h' | '1d' | '1w']: number } = {
-  '1m': 1,
-  '10m': 10,
-  '1h': 60,
-  '4h': 240, //4 * 60,
-  '1d': 1440, //24 * 60,
-  '1w': 10080, //7 * 24 * 60,
-};
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -97,51 +89,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    let orgAuthorization = null;
-    let stepUpAuthorization = null;
-    if (!this.user) {
-      return false;
-    }
-
-    if (params.role || params.permission) {
-      // loop through organizationMemberships from client piggybacking
-      const orgMemberships = this.user.organizationMemberships || [];
-      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
-
-      const activeOrganizationPermissions = activeMembership?.permissions;
-      const activeOrganizationRole = activeMembership?.role;
-
-      const missingOrgs = !activeMembership;
-
-      if (params.permission && !missingOrgs) {
-        orgAuthorization = activeOrganizationPermissions!.includes(params.permission);
-      }
-
-      if (params.role && !missingOrgs) {
-        orgAuthorization = activeOrganizationRole === params.role;
-      }
-    }
-
-    if (params.__experimental_assurance && this.__experimental_factorVerificationAge) {
-      const hasValidFactorOne =
-        this.__experimental_factorVerificationAge[0] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[0]
-          : false;
-      const hasValidFactorTwo =
-        this.__experimental_factorVerificationAge[1] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[1]
-          : false;
-
-      if (params.__experimental_assurance.level === 'firstFactor') {
-        stepUpAuthorization = hasValidFactorOne;
-      } else if (params.__experimental_assurance.level === 'secondFactor') {
-        stepUpAuthorization = hasValidFactorTwo;
-      } else {
-        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
-      }
-    }
-
-    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
+    const orgMemberships = this.user?.organizationMemberships || [];
+    const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+    return createCheckAuthorization({
+      userId: this.user?.id,
+      __experimental_factorVerificationAge: this.__experimental_factorVerificationAge,
+      orgId: activeMembership?.id,
+      orgRole: activeMembership?.role,
+      orgPermissions: activeMembership?.permissions,
+    })(params);
   };
 
   #hydrateCache = (token: TokenResource | null) => {

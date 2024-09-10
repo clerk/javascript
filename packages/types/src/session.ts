@@ -40,8 +40,8 @@ export type CheckAuthorizationParamsWithCustomPermissions = (
   | { role?: never; permission?: never }
 ) & {
   __experimental_assurance?: {
-    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
-    maxAge: '1m' | '10m' | '1h' | '4h' | '1d' | '1w';
+    level: __experimental_SessionVerificationLevel;
+    maxAge: __experimental_SessionVerificationMaxAge;
   };
 };
 
@@ -62,8 +62,8 @@ type CheckAuthorizationParams = (
     }
 ) & {
   __experimental_assurance?: {
-    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
-    maxAge: '1m' | '10m' | '1h' | '4h' | '1d' | '1w';
+    level: __experimental_SessionVerificationLevel;
+    maxAge: __experimental_SessionVerificationMaxAge;
   };
 };
 

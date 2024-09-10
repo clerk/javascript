@@ -1,3 +1,4 @@
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -40,7 +41,7 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number, number];
+  __experimental_factorVerificationAge: [number, number] | null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -100,7 +101,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
-    fva: __experimental_factorVerificationAge,
+    fva,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -108,6 +109,9 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
+
+  // fva can be undefined for instances that have not opt-in
+  const __experimental_factorVerificationAge = fva ?? null;
 
   return {
     actor,
@@ -118,9 +122,9 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_factorVerificationAge: __experimental_factorVerificationAge ?? null,
+    __experimental_factorVerificationAge,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
+    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -177,72 +181,5 @@ const createGetToken: CreateGetToken = params => {
     }
 
     return sessionToken;
-  };
-};
-
-const stringsToNumbers: { [key in '1m' | '10m' | '1h' | '4h' | '1d' | '1w']: number } = {
-  '1m': 1,
-  '10m': 10,
-  '1h': 60,
-  '4h': 240, //4 * 60,
-  '1d': 1440, //24 * 60,
-  '1w': 10080, //7 * 24 * 60,
-};
-
-const createHasAuthorization = (options: {
-  userId: string;
-  orgId: string | undefined;
-  orgRole: string | undefined;
-  orgPermissions: string[] | undefined;
-  __experimental_factorVerificationAge: [number | null, number | null] | undefined;
-}): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions, __experimental_factorVerificationAge } = options;
-
-  return params => {
-    // if (!params?.permission && !params?.role) {
-    //   throw new Error(
-    //     'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-    //   );
-    // }
-
-    let orgAuthorization = null;
-    let stepUpAuthorization = null;
-
-    if (!userId) {
-      return false;
-    }
-
-    if (params.role || params.permission) {
-      const missingOrgs = !orgId || !orgRole || !orgPermissions;
-
-      if (params.permission && !missingOrgs) {
-        orgAuthorization = orgPermissions.includes(params.permission);
-      }
-
-      if (params.role && !missingOrgs) {
-        orgAuthorization = orgRole === params.role;
-      }
-    }
-
-    if (params.__experimental_assurance && __experimental_factorVerificationAge) {
-      const hasValidFactorOne =
-        __experimental_factorVerificationAge[0] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[0]
-          : false;
-      const hasValidFactorTwo =
-        __experimental_factorVerificationAge[1] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[1]
-          : false;
-
-      if (params.__experimental_assurance.level === 'firstFactor') {
-        stepUpAuthorization = hasValidFactorOne;
-      } else if (params.__experimental_assurance.level === 'secondFactor') {
-        stepUpAuthorization = hasValidFactorTwo;
-      } else {
-        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
-      }
-    }
-
-    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
   };
 };
