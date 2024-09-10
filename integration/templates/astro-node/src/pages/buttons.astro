@@ -6,10 +6,13 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Welcome to Astro.">
   <SignInButton
+    asChild
     mode="modal"
     fallbackRedirectUrl="/user"
   >
-    Sign in
+    <button>
+      Sign in
+    </button>
   </SignInButton>
 
   <SignUpButton
