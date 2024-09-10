@@ -31,7 +31,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     },
   });
   const card = useCardState();
-  const { t, locale, translateError } = useLocalizations();
+  const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
@@ -106,25 +106,31 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             break;
           }
           case 'already_a_member_in_organization': {
+            /**
+             * Extracts email from the error message since it's not provided in the error response
+             */
             const longMessage = err.errors[0].longMessage ?? '';
             const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
 
-            if (!email) {
-              card.setError(translateError(err.errors[0]));
-            }
-
-            card.setError(
-              t(
-                localizationKeys('unstable__errors.already_a_member_in_organization', {
-                  email,
-                }),
-              ),
+            handleError(err, [], err =>
+              email
+                ? /**
+                   * Fallbacks to original error message in case the email cannot be extracted
+                   */
+                  card.setError(
+                    t(
+                      localizationKeys('unstable__errors.already_a_member_in_organization', {
+                        email,
+                      }),
+                    ),
+                  )
+                : card.setError(err),
             );
 
             break;
           }
           default: {
-            card.setError(translateError(err.errors[0]));
+            handleError(err, [], card.setError);
           }
         }
       });

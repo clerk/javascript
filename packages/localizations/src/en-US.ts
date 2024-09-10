@@ -512,7 +512,7 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} é hehe already a member of the organization.',
+    already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
