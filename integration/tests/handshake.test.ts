@@ -987,7 +987,6 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       fapiOrganizationIdParamValue: 'org_b' || null,
       orgSyncOptions: {
         organizationPattern: "/organizations-by-id/:id",
-        personalWorkspacePattern: "/personal-workspace",
       }
     },
     {
@@ -1000,8 +999,47 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       fapiOrganizationIdParamValue: 'org_b',
       orgSyncOptions: {
         organizationPattern: "/organizations-by-id/:id",
-        personalWorkspacePattern: "/personal-workspace",
+        personalWorkspacePattern: "/personal-workspace", // <-- Unnecessary
       }
+    },
+    {
+      name: 'When the personal workspace is active but org A is requested by ID, attempts to activate org A',
+      initialAuthState: 'active',
+      appRequestPath: '/organizations-by-id/org_b',
+      initialSessionClaims: new Map<string, string>([
+        // Intentionally no org claims - means personal workspace
+      ]),
+      fapiOrganizationIdParamValue: 'org_a',
+      orgSyncOptions: {
+        organizationPattern: "/organizations-by-id/:id",
+        personalWorkspacePattern: "/personal-workspace",
+      },
+    },
+    {
+      name: 'When org A is active but the personal workspace is requested, attempt to activate the personal workspace',
+      initialAuthState: 'active',
+      appRequestPath: '/personal-workspace',
+      initialSessionClaims: new Map<string, string>([
+        ['org_id', 'org_a']
+      ]),
+      fapiOrganizationIdParamValue: '',
+      orgSyncOptions: {
+        organizationPattern: "/organizations-by-id/:id",
+        personalWorkspacePattern: "/personal-workspace",
+      },
+    },
+    {
+      name: 'Activates nothing with a broken path pattern',
+      initialAuthState: 'expired', // Tricky to test the non-expired case, because it won't handshake at all
+      appRequestPath: '/personal-workspace',
+      initialSessionClaims: new Map<string, string>([
+        ['org_id', 'org_a']
+      ]),
+      fapiOrganizationIdParamValue: null,
+      orgSyncOptions: {
+        organizationPattern: "i am not a valid path pattern",
+        personalWorkspacePattern: "And neither am I!",
+      },
     },
   ];
 
