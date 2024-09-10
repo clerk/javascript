@@ -522,7 +522,7 @@ export const esES: LocalizationResource = {
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} já é membro da organização.',
+    already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
       'Registro fallido debido a validaciones de seguridad fallidas. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     captcha_unavailable:
@@ -553,11 +553,12 @@ export const esES: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'No puedes eliminar tu última identificación.',
     not_allowed_access: '',
-    organization_domain_blocked: undefined,
-    organization_domain_common: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_domain_blocked: 'Este es un dominio bloqueado, por favor usa otro.',
+    organization_domain_common: 'Este es un dominio común, por favor usa otro.',
+    organization_membership_quota_exceeded:
+      'Has alcanzado tu límite de miembros de la organización, incluyendo invitaciones pendientes.',
     organization_minimum_permissions_needed:
-      'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
+      'Es necesario que haya al menos un miembro de la organización con los permisos mínimos necesarios.',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
