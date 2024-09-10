@@ -1,4 +1,4 @@
-import { match } from 'path-to-regexp';
+import { match, MatchFunction, MatchResult } from 'path-to-regexp';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -370,7 +370,6 @@ ${error.getFullMessage()}`,
         undefined,
         authenticateContext.sessionTokenInCookie!,
       );
-
       // Org sync if necessary
       // TODO(izaak): Also apply for auth in header scenario? Likely move to a standalone helper. Maybe "handleMaybeOrganizationSyncHandshake"
       if (options.organizationSync) {
@@ -379,20 +378,24 @@ ${error.getFullMessage()}`,
           const auth = signedInRequestState.toAuth();
           if (auth) {
             let mustActivate = false;
-            if (toActivate.organizationSlug && auth.orgSlug && toActivate.organizationSlug !== auth.orgSlug) {
+            // Activate an org by slug?
+            if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
               mustActivate = true;
             }
-            if (toActivate.organizationId && auth.orgId && toActivate.organizationId !== auth.orgId) {
+            // Activate an org by ID?
+            if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
+              mustActivate = true;
+            }
+            // Activate the personal workspace?
+            if (toActivate.type === 'personalWorkspace' && auth.orgId) {
               mustActivate = true;
             }
             if (mustActivate) {
-              console.log("GOT HERE - MUST ACTIVATE A THINGER!", authenticateContext.handshakeRedirectLoopCounter)
               if (authenticateContext.handshakeRedirectLoopCounter > 0) {
                 // We have an organization that needs to be activated, but this isn't our first time redirecting.
                 // This is because we attempted to activate the organization previously, but the organization
                 // must not have been valid (either not found, or not valid for this user), and gave us back
                 // a null organization. We won't re-try the handshake, and leave it to the server component to handle
-                console.log("Nothing to worry about - we won't handshake again. Just going to return signedInRequestState")
                 return signedInRequestState;
               } else {
                 return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
@@ -404,6 +407,7 @@ ${error.getFullMessage()}`,
       // No organization sync was necessary
       return signedInRequestState;
     } catch (err) {
+      console.log('Huh, got an error:', err.stack);
       return handleError(err, 'cookie');
     }
 
@@ -447,16 +451,48 @@ export const debugRequestState = (params: RequestState) => {
 
 function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
   // Check for personal workspace activation
-  if (options.personalWorkspacePattern) {
-    const personalResult = match(options.personalWorkspacePattern)(url.pathname);
+  if (options.personalWorkspacePatterns) {
+    let matcher: MatchFunction<object>
+    try {
+      matcher = match(options.personalWorkspacePatterns)
+    } catch (e) {
+      console.error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`);
+      return null;
+    }
+
+    let personalResult: boolean | MatchResult<object>;
+    try {
+      personalResult = matcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Failed to apply personal workspace pattern "${options.personalWorkspacePatterns}" to a path`, e);
+      return null;
+    }
+
     if (personalResult) {
       return { type: 'personalWorkspace' };
     }
   }
 
   // Check for organization activation
-  if (options.organizationPattern) {
-    const orgResult = match(options.organizationPattern)(url.pathname);
+  if (options.organizationPatterns) {
+    let matcher: MatchFunction<object>
+    try {
+      matcher = match(options.organizationPatterns)
+    } catch (e) {
+      console.error(`Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`);
+      return null;
+    }
+
+    let orgResult: boolean | MatchResult<object>;
+    try {
+      orgResult = matcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Failed to apply organization pattern "${options.organizationPatterns}" to a path`, e);
+      return null;
+    }
+
     if (orgResult) {
       const { slug = '', id = '' } = orgResult.params as { slug?: string; id?: string };
       if (id) {

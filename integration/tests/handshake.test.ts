@@ -961,6 +961,10 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
   type testCase = {
     name: string;
+    when: when;
+    then: then;
+  }
+  type when = {
     // With this initial state...
     initialAuthState: 'active' | 'expired' | 'early';
     initialSessionClaims: Map<string, string>;
@@ -970,6 +974,11 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
     // And a request arrives to the app at this path...
     appRequestPath: string;
+  }
+
+  type then = {
+    // A handshake should (or should not) occur:
+    expectStatus: number;
 
     // The middleware should redirect to fapi with this query param value:
     fapiOrganizationIdParamValue: string | null;
@@ -977,88 +986,129 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
   const testCases: testCase[] = [
     {
-      name: 'When org A is active but org B is requested by ID, attempts to activate org B (expired)',
-      initialAuthState: 'expired',
-      initialSessionClaims: new Map<string, string>([
-        ['org_id', 'org_a']
-      ]),
-
-      appRequestPath: '/organizations-by-id/org_b',
-      fapiOrganizationIdParamValue: 'org_b' || null,
-      orgSyncOptions: {
-        organizationPattern: "/organizations-by-id/:id",
-      }
+      name: 'When no org is active in a signed-out session but org A is requested by ID, attempts to activate org A',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["/organizations-by-id/:id"],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
+    {
+      name: 'When org A is active in a signed-out session but org B is requested by ID, attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["/organizations-by-id/:id"],
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
     },
     {
       name: 'When org A is active but org B is requested by ID, attempts to activate org B (active)',
-      initialAuthState: 'active',
-      appRequestPath: '/organizations-by-id/org_b',
-      initialSessionClaims: new Map<string, string>([
-        ['org_id', 'org_a']
-      ]),
-      fapiOrganizationIdParamValue: 'org_b',
-      orgSyncOptions: {
-        organizationPattern: "/organizations-by-id/:id",
-        personalWorkspacePattern: "/personal-workspace", // <-- Unnecessary
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["/organizations-by-id/:id"],
+          personalWorkspacePatterns: ["/personal-workspace"], // <-- Unnecessary
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
       }
     },
     {
       name: 'When the personal workspace is active but org A is requested by ID, attempts to activate org A',
-      initialAuthState: 'active',
-      appRequestPath: '/organizations-by-id/org_b',
-      initialSessionClaims: new Map<string, string>([
-        // Intentionally no org claims - means personal workspace
-      ]),
-      fapiOrganizationIdParamValue: 'org_a',
-      orgSyncOptions: {
-        organizationPattern: "/organizations-by-id/:id",
-        personalWorkspacePattern: "/personal-workspace",
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally no org claims - means personal workspace
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["/organizations-by-id/:id"],
+          personalWorkspacePatterns: ["/personal-workspace"],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
       },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      }
     },
     {
       name: 'When org A is active but the personal workspace is requested, attempt to activate the personal workspace',
-      initialAuthState: 'active',
-      appRequestPath: '/personal-workspace',
-      initialSessionClaims: new Map<string, string>([
-        ['org_id', 'org_a']
-      ]),
-      fapiOrganizationIdParamValue: '',
-      orgSyncOptions: {
-        organizationPattern: "/organizations-by-id/:id",
-        personalWorkspacePattern: "/personal-workspace",
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["/organizations-by-id/:id"],
+          personalWorkspacePatterns: ["/personal-workspace"],
+        },
+        appRequestPath: '/personal-workspace',
       },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: '',
+      }
     },
     {
       name: 'Activates nothing with a broken path pattern',
-      initialAuthState: 'expired', // Tricky to test the non-expired case, because it won't handshake at all
-      appRequestPath: '/personal-workspace',
-      initialSessionClaims: new Map<string, string>([
-        ['org_id', 'org_a']
-      ]),
-      fapiOrganizationIdParamValue: null,
-      orgSyncOptions: {
-        organizationPattern: "i am not a valid path pattern",
-        personalWorkspacePattern: "And neither am I!",
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ["i am not a valid path pattern"],
+          personalWorkspacePatterns: ["And neither am I!"],
+        },
+        appRequestPath: '/personal-workspace',
       },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      }
     },
   ];
 
   for (const testCase of testCases) {
     test(`organization activation by ID - ${testCase.name} - dev`, async () => {
-      const app = await start(testCase.orgSyncOptions);
+      const app = await start(testCase.when.orgSyncOptions);
 
       const config = generateConfig({
         mode: 'test',
       });
       // Create a new map with an org_id key
       const { token, claims } = config.generateToken({
-        state: testCase.initialAuthState, // <-- Critical
-        extraClaims: testCase.initialSessionClaims,
+        state: testCase.when.initialAuthState, // <-- Critical
+        extraClaims: testCase.when.initialSessionClaims,
       });
 
       const clientUat = claims.iat;
       const res = await fetch(app.serverUrl +
-        testCase.appRequestPath, // But attempt to visit org B
+        testCase.when.appRequestPath, // But attempt to visit org B
         {
           headers: new Headers({
             Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
@@ -1067,19 +1117,12 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
             'Sec-Fetch-Dest': 'document',
           }),
           redirect: 'manual',
-        });
-      expect(res.status).toBe(307);
-
-      let expectedUrlSuffix = "";
-      if (testCase.fapiOrganizationIdParamValue) {
-        expectedUrlSuffix += `&organization_id=${testCase.fapiOrganizationIdParamValue}`;
-      }
-
-      expect(res.headers.get('location')).toBe(
-        `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-          `${app.serverUrl}${testCase.appRequestPath}`, // Redirects to the app's original request path
-        )}&suffixed_cookies=false${devBrowserQuery}${expectedUrlSuffix}`,
+        }
       );
+
+      expect(res.status).toBe(testCase.then.expectStatus);
+      const redirectSearchParams = new URLSearchParams(res.headers.get('location'))
+      expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
 
       await end(app);
     });

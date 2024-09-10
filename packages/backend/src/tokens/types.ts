@@ -15,7 +15,7 @@ export type AuthenticateRequestOptions = {
 // OrganizationSyncOptions define the options for syncing an organization
 // or personal workspace state from the URL to the clerk session
 export type OrganizationSyncOptions = {
-  // organizationPattern defines the URL pattern that is organization-specific and contains
+  // organizationPattern defines the URL patterns that are organization-specific and contains
   // an organization ID or slug as a path token. If a request arrives to the application at
   // a URL matching this path, the organization identifier will be extracted and activated
   // before rendering.
@@ -28,16 +28,16 @@ export type OrganizationSyncOptions = {
   //
   // Must have a group named either ":id", which matches to a clerk organization id,
   //                             or ":slug", which matches to a clerk organization slug.
-  // Examples: "/orgs/:slug", "/orgs/:id"
-  organizationPattern?: Pattern,
+  // Examples: "/orgs/:slug+*", "/orgs/:id+*"
+  organizationPatterns?: Array<Pattern>,
 
   // personalWorkspacePattern defines the URL pattern for resources that exist in the context
   // of a clerk personal workspace (user-specific, outside any other organization).
   // If the route also matches with the organizationPattern, this takes precedence
-  personalWorkspacePattern?: Pattern,
+  personalWorkspacePatterns?: Array<Pattern>,
 }
 
-// Pattern is a URL Pattern API style matcher
-// Syntax: https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#pattern_syntax
+// Pattern is a path-to-regexp style matcher
+// Syntax: https://www.npmjs.com/package/path-to-regexp
 // Examples: "/orgs/:slug", "/orgs/:id", "/personal-workspace"
 type Pattern = string;
