@@ -1,6 +1,23 @@
 import { joinURL } from '@clerk/shared/url';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
-import type { LoadedClerk, SignInResource, SignInStatus, SignInStrategy, Web3Strategy } from '@clerk/types';
+import type {
+  AttemptFirstFactorParams,
+  EmailCodeAttempt,
+  LoadedClerk,
+  PasswordAttempt,
+  PhoneCodeAttempt,
+  PrepareFirstFactorParams,
+  PrepareSecondFactorParams,
+  ResetPasswordEmailCodeAttempt,
+  ResetPasswordPhoneCodeAttempt,
+  SignInFirstFactor,
+  SignInResource,
+  SignInSecondFactor,
+  SignInStatus,
+  SignInStrategy,
+  Web3Attempt,
+  Web3Strategy,
+} from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 
@@ -16,7 +33,7 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { type FormFields, FormMachine } from '~/internals/machines/form';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
-import { assertActorEventError } from '~/internals/machines/utils/assert';
+import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 import type {
@@ -26,7 +43,7 @@ import type {
   SignInRouterSchema,
   SignInRouterSessionSetActiveEvent,
 } from './router.types';
-import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
+import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './utils/starting-factors';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -43,56 +60,265 @@ const needsStatus =
 
 export const SignInRouterMachineId = 'SignInRouter';
 
+export type PrepareFirstFactorInput = {
+  clerk: LoadedClerk;
+  params: PrepareFirstFactorParams;
+  resendable: boolean;
+};
+export type PrepareSecondFactorInput = {
+  clerk: LoadedClerk;
+  params: PrepareSecondFactorParams;
+  resendable: boolean;
+};
+
+export type AttemptFirstFactorInput = {
+  clerk: LoadedClerk;
+  currentFactor: SignInFirstFactor | null;
+  fields: FormFields;
+};
+
+export type AttemptSecondFactorInput = {
+  clerk: LoadedClerk;
+  currentFactor: SignInSecondFactor | null;
+  fields: FormFields;
+};
+
+export type ResetPasswordAttemptInput = { clerk: LoadedClerk; fields: FormFields };
+export type ClerkInput = { clerk: LoadedClerk };
+
+export type AttemptPasskeyInput = { clerk: LoadedClerk; flow: 'autofill' | 'discoverable' | undefined };
+export type AttemptWeb3Input = { clerk: LoadedClerk; strategy: Web3Strategy };
+export type StartAttemptInput = { clerk: LoadedClerk; fields: FormFields };
+
+const isNonPreparableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+  if (!strategy) {
+    return false;
+  }
+
+  return ['passkey', 'password'].includes(strategy);
+};
+
 export const SignInRouterMachine = setup({
   actors: {
-    attemptPasskey: fromPromise<SignInResource, { clerk: LoadedClerk; flow: 'autofill' | 'discoverable' | undefined }>(
-      ({ input: { clerk, flow } }) => {
-        return clerk.client.signIn.authenticateWithPasskey({
-          flow,
-        });
-      },
-    ),
-    attemptWeb3: fromPromise<SignInResource, { clerk: LoadedClerk; strategy: Web3Strategy }>(
-      ({ input: { clerk, strategy } }) => {
-        if (strategy === 'web3_metamask_signature') {
-          return clerk.client.signIn.authenticateWithMetamask();
+    // ----------------
+    // Global
+    // ----------------
+
+    attemptPasskey: fromPromise<SignInResource, AttemptPasskeyInput>(({ input }) => {
+      const { clerk, flow } = input;
+
+      return clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
+
+    attemptWeb3: fromPromise<SignInResource, AttemptWeb3Input>(({ input }) => {
+      const { clerk, strategy } = input;
+
+      if (strategy === 'web3_metamask_signature') {
+        return clerk.client.signIn.authenticateWithMetamask();
+      }
+
+      if (strategy === 'web3_coinbase_wallet_signature') {
+        return clerk.client.signIn.authenticateWithCoinbaseWallet();
+      }
+
+      throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
+    }),
+
+    // ----------------
+    // Start
+    // ----------------
+
+    startAttempt: fromPromise<SignInResource, StartAttemptInput>(({ input }) => {
+      const { clerk, fields } = input;
+
+      const password = fields.get('password');
+      const identifier = fields.get('identifier');
+
+      const passwordParams = password?.value
+        ? {
+            password: password.value,
+            strategy: 'password',
+          }
+        : {};
+
+      return clerk.client.signIn.create({
+        identifier: (identifier?.value as string) || '',
+        ...passwordParams,
+      });
+    }),
+
+    // ----------------
+    // First Factor
+    // ----------------
+
+    firstFactorAttempt: fromPromise<SignInResource, AttemptFirstFactorInput>(async ({ input }) => {
+      const { clerk, currentFactor, fields } = input;
+      assertIsDefined(currentFactor, 'Current factor');
+
+      let attemptParams: AttemptFirstFactorParams;
+
+      const strategy = currentFactor.strategy;
+      const code = fields.get('code')?.value as string | undefined;
+      const password = fields.get('password')?.value as string | undefined;
+
+      switch (strategy) {
+        case 'passkey': {
+          return await clerk.client.signIn.authenticateWithPasskey();
         }
-        if (strategy === 'web3_coinbase_wallet_signature') {
-          return clerk.client.signIn.authenticateWithCoinbaseWallet();
+        case 'password': {
+          assertIsDefined(password, 'Password');
+
+          attemptParams = {
+            strategy,
+            password,
+          } satisfies PasswordAttempt;
+
+          break;
         }
-        throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
-      },
-    ),
-    resetPasswordAttempt: fromPromise<SignInResource, { clerk: LoadedClerk; fields: FormFields }>(
-      ({ input: { clerk, fields } }) => {
-        const password = (fields.get('password')?.value as string) || '';
-        const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked || false;
-        return clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
-      },
-    ),
-    startAttempt: fromPromise<SignInResource, { clerk: LoadedClerk; fields: FormFields }>(
-      ({ input: { clerk, fields } }) => {
-        const password = fields.get('password');
-        const identifier = fields.get('identifier');
+        case 'reset_password_phone_code':
+        case 'reset_password_email_code': {
+          assertIsDefined(code, 'Code for resetting phone/email');
 
-        const passwordParams = password?.value
-          ? {
-              password: password.value,
-              strategy: 'password',
-            }
-          : {};
+          attemptParams = {
+            strategy,
+            code,
+            password,
+          } satisfies ResetPasswordPhoneCodeAttempt | ResetPasswordEmailCodeAttempt;
 
-        return clerk.client.signIn.create({
-          identifier: (identifier?.value as string) || '',
-          ...passwordParams,
-        });
-      },
+          break;
+        }
+        case 'phone_code':
+        case 'email_code': {
+          assertIsDefined(code, 'Code for phone/email');
+
+          attemptParams = {
+            strategy,
+            code,
+          } satisfies PhoneCodeAttempt | EmailCodeAttempt;
+
+          break;
+        }
+        case 'web3_metamask_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature, 'Web3 Metamask signature');
+
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
+
+          break;
+        }
+        case 'web3_coinbase_wallet_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
+
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
+
+          break;
+        }
+        default:
+          throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
+      }
+
+      return await clerk.client.signIn.attemptFirstFactor(attemptParams);
+    }),
+
+    firstFactorDetermineStartingFactor: fromPromise<SignInFirstFactor | null, ClerkInput>(async ({ input }) => {
+      return Promise.resolve(
+        determineStartingSignInFactor(
+          input.clerk.client.signIn.supportedFirstFactors,
+          input.clerk.client.signIn.identifier,
+          input.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
+        ),
+      );
+    }),
+
+    firstFactorPrepare: fromPromise<SignInResource, PrepareFirstFactorInput>(async ({ input }) => {
+      const { clerk, params, resendable } = input;
+
+      // If a prepare call has already been fired recently, don't re-send
+      const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
+      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
+
+      if (isNonPreparableStrategy(params?.strategy) || !needsPrepare) {
+        return Promise.resolve(clerk.client.signIn);
+      }
+
+      assertIsDefined(params, 'First factor params');
+      return await clerk.client.signIn.prepareFirstFactor(params);
+    }),
+
+    // ----------------
+    // Second Factor
+    // ----------------
+
+    secondFactorAttempt: fromPromise<SignInResource, AttemptSecondFactorInput>(async ({ input }) => {
+      const { clerk, fields, currentFactor } = input;
+
+      const code = fields.get('code')?.value as string;
+
+      assertIsDefined(currentFactor, 'Current factor');
+      assertIsDefined(code, 'Code');
+
+      return await clerk.client.signIn.attemptSecondFactor({
+        strategy: currentFactor.strategy,
+        code,
+      });
+    }),
+
+    secondFactorDetermineStartingFactor: fromPromise<SignInSecondFactor | null, ClerkInput>(async ({ input }) =>
+      Promise.resolve(determineStartingSignInSecondFactor(input.clerk.client.signIn.supportedSecondFactors)),
     ),
 
-    firstFactorMachine: SignInFirstFactorMachine,
+    secondFactorPrepare: fromPromise<SignInResource, PrepareSecondFactorInput>(async ({ input }) => {
+      const { clerk, params, resendable } = input;
+
+      // If a prepare call has already been fired recently, don't re-send
+      const currentVerificationExpiration = clerk.client.signIn.secondFactorVerification.expireAt;
+      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
+
+      assertIsDefined(params, 'Second factor params');
+
+      if (params.strategy !== 'phone_code' || !needsPrepare) {
+        return Promise.resolve(clerk.client.signIn);
+      }
+
+      return await clerk.client.signIn.prepareSecondFactor({
+        strategy: params.strategy,
+        phoneNumberId: params.phoneNumberId,
+      });
+    }),
+
+    // ----------------
+    // Reset Password
+    // ----------------
+
+    resetPasswordAttempt: fromPromise<SignInResource, ResetPasswordAttemptInput>(({ input }) => {
+      const { clerk, fields } = input;
+
+      const password = (fields.get('password')?.value as string) || '';
+      const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked || false;
+
+      return clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
+    }),
+
+    // ----------------
+    // Shared Machines
+    // ----------------
+
     formMachine: FormMachine,
-    secondFactorMachine: SignInSecondFactorMachine,
     thirdPartyMachine: ThirdPartyMachine,
+
+    // ----------------
+    // Other
+    // ----------------
+
     webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
   },
   actions: {
