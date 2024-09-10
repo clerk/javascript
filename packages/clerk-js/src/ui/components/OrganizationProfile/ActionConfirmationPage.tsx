@@ -3,7 +3,7 @@ import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/rea
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import {
   Form,
@@ -126,7 +126,6 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
   } = props;
   const wizard = useWizard();
   const card = useCardState();
-  const { translateError } = useLocalizations();
 
   const confirmationField = useFormControl('deleteOrganizationConfirmation', '', {
     type: 'text',
@@ -146,7 +145,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     try {
       await onConfirmation().then(() => wizard.nextStep());
     } catch (e) {
-      handleError(e, [], e => card.setError(translateError(e)));
+      handleError(e, [], card.setError);
     }
   };
 

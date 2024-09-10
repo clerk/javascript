@@ -512,7 +512,7 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    already_a_member_in_organization: '{{email}} é hehe already a member of the organization.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -546,7 +546,8 @@ export const enUS: LocalizationResource = {
     not_allowed_access: '',
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
-    organization_membership_quota_exceeded: 'You have reached your limit of domains per organization.',
+    organization_membership_quota_exceeded:
+      'You have reached your limit of organization memberships, including outstanding invitations.',
     organization_minimum_permissions_needed:
       'There has to be at least one organization member with the minimum required permissions.',
     passkey_already_exists: 'A passkey is already registered with this device.',
