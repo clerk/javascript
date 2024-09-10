@@ -476,6 +476,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withInviteOnlyEnabled = () => {
+    us.sign_up.invite_only_enabled = true;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -493,5 +497,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withAuthenticatorApp,
     withPasskey,
     withPasskeySettings,
+    withInviteOnlyEnabled,
   };
 };
