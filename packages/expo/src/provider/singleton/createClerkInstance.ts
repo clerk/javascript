@@ -4,6 +4,7 @@ import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
+import { isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
 const KEY = '__clerk_client_jwt';
@@ -42,10 +43,17 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
         requestInit.credentials = 'omit';
 
+        // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
         const jwt = await getToken(KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
+
+        // Instructs the backend that the request is from a mobile device.
+        // Some iOS devices have an empty user-agent, so we can't rely on that.
+        if (isNative()) {
+          (requestInit.headers as Headers).set('x-mobile', '1');
+        }
       });
 
       // @ts-expect-error - This is an internal API
