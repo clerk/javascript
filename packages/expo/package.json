@@ -70,6 +70,7 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "expo-auth-session": "^5.4.0",
+    "expo-constants": "^16.0.2",
     "expo-local-authentication": "^13.5.0",
     "expo-secure-store": "^12.4.0",
     "expo-web-browser": "^12.8.2",
@@ -78,6 +79,7 @@
   },
   "peerDependencies": {
     "expo-auth-session": ">=5",
+    "expo-constants": ">=15",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",

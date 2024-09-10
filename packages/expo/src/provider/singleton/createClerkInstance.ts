@@ -1,9 +1,11 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
 import type { Clerk } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import Constants from 'expo-constants';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
+import { isIOS } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
 const KEY = '__clerk_client_jwt';
@@ -46,6 +48,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
         const jwt = await getToken(KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
+
+        // iOS user-agent is undefined, causing backend to incorrectly classify as non-mobile.
+        // Manually setting user-agent to fix mobile detection for iOS sessions.
+        if (isIOS()) {
+          const userAgent = await Constants.getWebViewUserAgentAsync();
+          (requestInit.headers as Headers).set('user-agent', userAgent || '');
+        }
       });
 
       // @ts-expect-error - This is an internal API

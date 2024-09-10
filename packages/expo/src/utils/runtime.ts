@@ -16,3 +16,7 @@ export function isHermes() {
 export function reactNativeVersion() {
   return Platform.constants.reactNativeVersion;
 }
+
+export function isIOS() {
+  return Platform.OS === 'ios';
+}
