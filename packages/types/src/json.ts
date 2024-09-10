@@ -110,7 +110,7 @@ export interface SessionJSON extends ClerkResourceJSON {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  factor_verification_age: [number | null, number | null];
+  factor_verification_age: [number, number] | null;
   expire_at: number;
   abandon_at: number;
   last_active_at: number;

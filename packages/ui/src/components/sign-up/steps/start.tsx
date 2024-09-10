@@ -49,10 +49,10 @@ export function SignUpStart() {
       {isGlobalLoading => {
         const connectionsWithSeperator = [
           <Connections
-            disabled={isGlobalLoading}
             key='connections'
+            disabled={isGlobalLoading}
           />,
-          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+          hasConnection && hasIdentifier ? <Separator key='separator'>{t('dividerText')}</Separator> : null,
         ];
         return (
           <SignUp.Step

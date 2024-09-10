@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -53,9 +53,9 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "^1.9.2",
-    "@clerk/shared": "^2.6.2",
-    "@clerk/types": "4.19.0",
+    "@clerk/backend": "^1.10.0",
+    "@clerk/shared": "^2.7.0",
+    "@clerk/types": "4.20.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
