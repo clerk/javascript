@@ -512,7 +512,7 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} já é membro da organização.',
+    already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -544,11 +544,11 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
-    organization_domain_blocked: '',
-    organization_domain_common: 'Esse é um domínio comum, por favor use um diferente.',
-    organization_membership_quota_exceeded: '',
+    organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
+    organization_domain_common: 'This is a common email provider domain. Please use a different one.',
+    organization_membership_quota_exceeded: 'You have reached your limit of domains per organization.',
     organization_minimum_permissions_needed:
-      'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
+      'There has to be at least one organization member with the minimum required permissions.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
