@@ -1,11 +1,6 @@
 import type { SignInStrategy } from '@clerk/types';
 
-import type {
-  SignInResetPasswordContext,
-  SignInResetPasswordEvents,
-  SignInVerificationContext,
-  SignInVerificationEvents,
-} from '~/internals/machines/sign-in';
+import type { SignInVerificationContext, SignInVerificationEvents } from '~/internals/machines/sign-in';
 import type {
   SignUpContinueContext,
   SignUpContinueEvents,
@@ -20,14 +15,12 @@ import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 type SendToLoadingProps = {
   context:
     | SignInVerificationContext
-    | SignInResetPasswordContext
     | ThirdPartyMachineContext
     | SignUpStartContext
     | SignUpContinueContext
     | SignUpVerificationContext;
   event:
     | SignInVerificationEvents
-    | SignInResetPasswordEvents
     | ThirdPartyMachineEvent
     | SignUpStartRedirectEvent
     | SignUpContinueEvents
@@ -73,18 +66,6 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
     step = 'continue';
     strategy = undefined;
     action = 'action' in event ? event.action : undefined;
-    context.parent.send({
-      type: 'LOADING',
-      isLoading: true,
-      step,
-      strategy,
-      action,
-    });
-  } else if (context.loadingStep === 'reset-password') {
-    step = 'reset-password';
-    strategy = undefined;
-    action = 'action' in event ? event.action : undefined;
-
     context.parent.send({
       type: 'LOADING',
       isLoading: true,
