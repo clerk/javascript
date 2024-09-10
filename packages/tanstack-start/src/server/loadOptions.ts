@@ -3,30 +3,34 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
-import { isTruthy } from '@clerk/shared/underscore';
 
 import { errorThrower } from '../utils';
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
+import {
+  CLERK_JWT_KEY,
+  DOMAIN,
+  IS_SATELLITE,
+  PROXY_URL,
+  PUBLISHABLE_KEY,
+  SECRET_KEY,
+  SIGN_IN_URL,
+  SIGN_UP_URL,
+} from './constants';
 import type { LoaderOptions } from './types';
 import { patchRequest } from './utils';
 
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
   const clerkRequest = createClerkRequest(patchRequest(request));
 
-  const secretKey = overrides.secretKey || overrides.secretKey || getEnvVariable('CLERK_SECRET_KEY');
-  const publishableKey = overrides.publishableKey || getPublicEnvVariables().publishableKey;
-  const jwtKey = overrides.jwtKey || getEnvVariable('CLERK_JWT_KEY');
+  const secretKey = overrides.secretKey || SECRET_KEY;
+  const publishableKey = overrides.publishableKey || PUBLISHABLE_KEY;
+  const jwtKey = overrides.jwtKey || CLERK_JWT_KEY;
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
-  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || getPublicEnvVariables().domain;
-  const isSatellite =
-    handleValueOrFn(overrides.isSatellite, new URL(request.url)) || isTruthy(getPublicEnvVariables().isSatellite);
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(
-    overrides?.proxyUrl,
-    clerkRequest.clerkUrl,
-    getPublicEnvVariables().proxyUrl,
-  );
-  const signInUrl = overrides.signInUrl || getPublicEnvVariables().signInUrl;
-  const signUpUrl = overrides.signUpUrl || getPublicEnvVariables().signUpUrl;
+  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || DOMAIN;
+  const isSatellite = handleValueOrFn(overrides.isSatellite, new URL(request.url)) || IS_SATELLITE;
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
+  const signInUrl = overrides.signInUrl || SIGN_IN_URL;
+  const signUpUrl = overrides.signUpUrl || SIGN_UP_URL;
   const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
   const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl;
 
