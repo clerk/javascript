@@ -1,8 +1,8 @@
 import { joinURL } from '@clerk/shared/url';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
-import type { SignInStatus } from '@clerk/types';
+import type { LoadedClerk, SignInResource, SignInStatus, SignInStrategy, Web3Strategy } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   CHOOSE_SESSION_PATH_ROUTE,
@@ -13,10 +13,12 @@ import {
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import { type FormFields, FormMachine } from '~/internals/machines/form';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
+import type { BaseRouterLoadingStep } from '~/internals/machines/types';
+import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
-import { FormMachine } from '../form';
 import { SignInResetPasswordMachine } from './reset-password.machine';
 import type {
   SignInRouterContext,
@@ -25,7 +27,6 @@ import type {
   SignInRouterSchema,
   SignInRouterSessionSetActiveEvent,
 } from './router.types';
-import { SignInStartMachine } from './start.machine';
 import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
@@ -45,16 +46,54 @@ export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
   actors: {
+    attemptPasskey: fromPromise<SignInResource, { clerk: LoadedClerk; flow: 'autofill' | 'discoverable' | undefined }>(
+      ({ input: { clerk, flow } }) => {
+        return clerk.client.signIn.authenticateWithPasskey({
+          flow,
+        });
+      },
+    ),
+    attemptWeb3: fromPromise<SignInResource, { clerk: LoadedClerk; strategy: Web3Strategy }>(
+      ({ input: { clerk, strategy } }) => {
+        if (strategy === 'web3_metamask_signature') {
+          return clerk.client.signIn.authenticateWithMetamask();
+        }
+        if (strategy === 'web3_coinbase_wallet_signature') {
+          return clerk.client.signIn.authenticateWithCoinbaseWallet();
+        }
+        throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
+      },
+    ),
+    startAttempt: fromPromise<SignInResource, { clerk: LoadedClerk; fields: FormFields }>(
+      ({ input: { clerk, fields } }) => {
+        const password = fields.get('password');
+        const identifier = fields.get('identifier');
+
+        const passwordParams = password?.value
+          ? {
+              password: password.value,
+              strategy: 'password',
+            }
+          : {};
+
+        return clerk.client.signIn.create({
+          identifier: (identifier?.value as string) || '',
+          ...passwordParams,
+        });
+      },
+    ),
+
     firstFactorMachine: SignInFirstFactorMachine,
     formMachine: FormMachine,
     resetPasswordMachine: SignInResetPasswordMachine,
-    startMachine: SignInStartMachine,
     secondFactorMachine: SignInSecondFactorMachine,
     thirdPartyMachine: ThirdPartyMachine,
     webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
+    // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
+    goToNextStep: raise(({ event }) => ({ type: 'NEXT', resource: event?.output || event?.data })),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) {
         return;
@@ -75,6 +114,30 @@ export const SignInRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
+    loadingBegin: enqueueActions(
+      (
+        { enqueue },
+        params: { step: BaseRouterLoadingStep; strategy?: SignInStrategy; action?: 'passkey' | 'submit' },
+      ) => {
+        const { step, strategy, action } = params;
+        enqueue.assign({
+          loading: {
+            action,
+            isLoading: true,
+            step,
+            strategy,
+          },
+        });
+      },
+    ),
+    loadingEnd: assign({
+      loading: {
+        action: undefined,
+        isLoading: false,
+        step: undefined,
+        strategy: undefined,
+      },
+    }),
     setActive: enqueueActions(({ enqueue, check, context, event }) => {
       if (check('isExampleMode')) {
         return;
@@ -101,11 +164,16 @@ export const SignInRouterMachine = setup({
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
-    setFormErrors: ({ context }, params: { error: Error }) =>
-      sendTo(context.formRef, {
-        type: 'ERRORS.SET',
-        error: params.error,
-      }),
+    setFormErrors: sendTo(
+      ({ context }) => context.formRef,
+      ({ event }) => {
+        assertActorEventError(event);
+        return {
+          type: 'ERRORS.SET',
+          error: event.error,
+        };
+      },
+    ),
     setFormOAuthErrors: ({ context }) => {
       const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
 
@@ -147,7 +215,7 @@ export const SignInRouterMachine = setup({
     hasOAuthError: ({ context }) => Boolean(context.clerk?.client?.signIn?.firstFactorVerification?.error),
     hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
 
-    isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
+    isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', 'isntExampleMode']),
     isActivePathRoot: isCurrentPath('/'),
     isComplete: ({ context, event }) => {
       const resource = (event as SignInRouterNextEvent)?.resource;
@@ -161,6 +229,7 @@ export const SignInRouterMachine = setup({
     isLoggedIn: ({ context }) => Boolean(context.clerk?.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
+    isntExampleMode: ({ context }) => !context.exampleMode,
 
     needsStart: or([not('hasResource'), 'statusNeedsIdentifier', isCurrentPath('/')]),
     needsFirstFactor: and(['statusNeedsFirstFactor', isCurrentPath('/continue')]),
@@ -226,6 +295,7 @@ export const SignInRouterMachine = setup({
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
     LOADING: {
+      // TODO: Remove when no longer needed
       actions: assign(({ event }) => ({
         loading: {
           isLoading: event.isLoading,
@@ -331,32 +401,7 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: ['step:start'],
       exit: 'clearFormErrors',
-      invoke: {
-        id: 'start',
-        src: 'startMachine',
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath,
-          formRef: context.formRef,
-          parent: self,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
       on: {
-        'RESET.STEP': {
-          target: 'Start',
-          reenter: true,
-        },
-        'AUTHENTICATE.PASSKEY': {
-          actions: sendTo('start', ({ event }) => event),
-        },
-        'AUTHENTICATE.PASSKEY.AUTOFILL': {
-          actions: sendTo('start', ({ event }) => event),
-        },
-        'AUTHENTICATE.WEB3': {
-          actions: sendTo('start', ({ event }) => event),
-        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -378,6 +423,135 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
+      },
+      initial: 'Pending',
+      states: {
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            SUBMIT: {
+              guard: 'isntExampleMode',
+              target: 'Attempting',
+              reenter: true,
+            },
+            'AUTHENTICATE.PASSKEY': {
+              guard: 'isntExampleMode',
+              target: 'AttemptingPasskey',
+              reenter: true,
+            },
+            'AUTHENTICATE.PASSKEY.AUTOFILL': {
+              guard: 'isntExampleMode',
+              target: 'AttemptingPasskeyAutoFill',
+              reenter: false,
+            },
+            'AUTHENTICATE.WEB3': {
+              guard: 'isntExampleMode',
+              target: 'AttemptingWeb3',
+              reenter: true,
+            },
+          },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'start',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'startAttempt',
+            src: 'startAttempt',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              fields: context.formRef.getSnapshot().context.fields,
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        AttemptingPasskey: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              action: 'passkey',
+              step: 'start',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'attemptPasskey',
+            src: 'attemptPasskey',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              flow: 'discoverable',
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        AttemptingPasskeyAutoFill: {
+          invoke: {
+            id: 'attemptPasskeyAutofill',
+            src: 'attemptPasskey',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              flow: 'autofill',
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        AttemptingWeb3: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'start',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'attemptWeb3',
+            src: 'attemptWeb3',
+            input: ({ context, event }) => {
+              assertEvent(event, 'AUTHENTICATE.WEB3');
+              return {
+                clerk: context.clerk,
+                strategy: event.strategy,
+              };
+            },
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
       },
     },
     FirstFactor: {

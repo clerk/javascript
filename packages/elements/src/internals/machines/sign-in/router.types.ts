@@ -1,5 +1,5 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom, MachineSnapshot, StateMachine } from 'xstate';
+import type { ActorRefFrom, ErrorActorEvent, MachineSnapshot, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
 import type {
@@ -22,6 +22,12 @@ import type { SignInVerificationFactorUpdateEvent } from './verification.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 
+export const SignInRouterStates = {
+  attempting: 'state:attempting',
+  loading: 'state:loading',
+  pending: 'state:pending',
+} as const;
+
 export const SignInRouterSteps = {
   start: 'step:start',
   verifications: 'step:verifications',
@@ -35,8 +41,12 @@ export const SignInRouterSteps = {
   chooseStrategy: 'step:choose-strategy',
 } as const;
 
+export type SignInRouterStates = keyof typeof SignInRouterStates;
 export type SignInRouterSteps = keyof typeof SignInRouterSteps;
-export type SignInRouterTags = (typeof SignInRouterSteps)[keyof typeof SignInRouterSteps];
+
+export type SignInRouterTags =
+  | (typeof SignInRouterSteps)[keyof typeof SignInRouterSteps]
+  | (typeof SignInRouterStates)[keyof typeof SignInRouterStates];
 
 // ---------------------------------- Children ---------------------------------- //
 
@@ -63,7 +73,7 @@ export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignInRouterResetEvent = BaseRouterResetEvent;
 export type SignInRouterResetStepEvent = BaseRouterResetStepEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<
-  'start' | 'verifications' | 'reset-password' | 'forgot-password' | 'choose-strategy'
+  'start' | 'verifications' | 'reset-password' | 'forgot-password' | 'choose-strategy' | 'error' | 'continue'
 >;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
@@ -86,6 +96,7 @@ export type SignInRouterNavigationEvents =
   | SignInRouterPrevEvent;
 
 export type SignInRouterEvents =
+  | ErrorActorEvent
   | SignInRouterFormAttachEvent
   | SignInRouterInitEvent
   | SignInRouterNextEvent

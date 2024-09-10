@@ -3,8 +3,6 @@ import type { SignInStrategy } from '@clerk/types';
 import type {
   SignInResetPasswordContext,
   SignInResetPasswordEvents,
-  SignInStartContext,
-  SignInStartEvents,
   SignInVerificationContext,
   SignInVerificationEvents,
 } from '~/internals/machines/sign-in';
@@ -21,7 +19,6 @@ import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 
 type SendToLoadingProps = {
   context:
-    | SignInStartContext
     | SignInVerificationContext
     | SignInResetPasswordContext
     | ThirdPartyMachineContext
@@ -29,7 +26,6 @@ type SendToLoadingProps = {
     | SignUpContinueContext
     | SignUpVerificationContext;
   event:
-    | SignInStartEvents
     | SignInVerificationEvents
     | SignInResetPasswordEvents
     | ThirdPartyMachineEvent
@@ -48,12 +44,14 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
   // Only if these events are received, the loading state is set to `false`
   // Early return here to avoid unnecessary checks
   if (event.type.startsWith('xstate.done.') || event.type.startsWith('xstate.error.')) {
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: false,
       step: undefined,
       strategy: undefined,
     });
+
+    return;
   }
 
   // `context.loadingStep: "strategy"` is not a valid BaseRouterLoadingStep (on purpose) so needs to be handled here. This context should be used when `step` should be undefined and `strategy` be defined instead
@@ -65,7 +63,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
       strategy = event.params.strategy;
     }
 
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: true,
       step,
@@ -75,8 +73,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
     step = 'continue';
     strategy = undefined;
     action = 'action' in event ? event.action : undefined;
-
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: true,
       step,
@@ -88,7 +85,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
     strategy = undefined;
     action = 'action' in event ? event.action : undefined;
 
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: true,
       step,
@@ -100,7 +97,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
     strategy = undefined;
     action = 'action' in event ? event.action : undefined;
 
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: true,
       step,
@@ -112,7 +109,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
     strategy = undefined;
     action = 'action' in event ? event.action : undefined;
 
-    return context.parent.send({
+    context.parent.send({
       type: 'LOADING',
       isLoading: true,
       step,

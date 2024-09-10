@@ -10,6 +10,7 @@ import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
 
 function CustomSamlConnection({ children }: { children: string }) {
+  return null; // Remove this line to enable SAML sign in
   return (
     <Clerk.Loading scope='provider:saml'>
       {isLoading => (
