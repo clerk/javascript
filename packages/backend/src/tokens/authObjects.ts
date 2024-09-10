@@ -40,7 +40,7 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number | null, number | null];
+  __experimental_factorVerificationAge: [number, number];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -64,7 +64,7 @@ export type SignedOutAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [null, null];
+  __experimental_factorVerificationAge: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -118,7 +118,7 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    __experimental_factorVerificationAge: __experimental_factorVerificationAge ?? null,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
@@ -138,7 +138,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    __experimental_factorVerificationAge: [null, null],
+    __experimental_factorVerificationAge: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
