@@ -11,7 +11,7 @@ export default function Home({ params }): {} {
 
   return (
     <>
-      <p>Org-specific home</p>
+      <p>Org-specific settings</p>
       <p>From auth(), I know your org slug is: {orgSlug}</p>
     </>
   );

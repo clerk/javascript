@@ -407,7 +407,6 @@ ${error.getFullMessage()}`,
       // No organization sync was necessary
       return signedInRequestState;
     } catch (err) {
-      console.log('Huh, got an error:', err.stack);
       return handleError(err, 'cookie');
     }
 

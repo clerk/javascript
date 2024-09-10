@@ -1010,13 +1010,80 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
           ['org_id', 'org_a']
         ]),
         orgSyncOptions: {
-          organizationPatterns: ["/organizations-by-id/:id"],
+          organizationPatterns: [
+            "/organizations-by-id/:id",
+            "/organizations-by-id/:id/",
+            "/organizations-by-id/:id/*splat",
+          ],
         },
         appRequestPath: '/organizations-by-id/org_b',
       },
       then: {
         expectStatus: 307,
         fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'When org A is active in a signed-out session but an org B is requested by ID (with a trailing slash), attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            "/organizations-by-id/:id",
+            "/organizations-by-id/:id/",
+            "/organizations-by-id/:id/*splat",
+          ],
+        },
+        appRequestPath: '/organizations-by-id/org_b/',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'When org A is active in a signed-out session but an org B sub-resource is requested by ID, attempts to activate org B',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            "/organizations-by-id/:id",
+            "/organizations-by-id/:id/",
+            "/organizations-by-id/:id/*splat",
+          ],
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'When org A is active in an expired session and an org-agnostic resource is selected, no handshake param is added',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          ['org_id', 'org_a']
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            "/organizations-by-id/:id",
+            "/organizations-by-id/:id/",
+            "/organizations-by-id/:id/*splat",
+          ],
+        },
+        appRequestPath: '/',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: null,
       },
     },
     {
