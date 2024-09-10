@@ -40,7 +40,7 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number, number];
+  __experimental_factorVerificationAge: [number, number] | null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -100,7 +100,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
-    fva: __experimental_factorVerificationAge,
+    fva,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -108,6 +108,9 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
+
+  // fva can be undefined for instances that have not opt-in
+  const __experimental_factorVerificationAge = fva ?? null;
 
   return {
     actor,
@@ -118,7 +121,7 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_factorVerificationAge: __experimental_factorVerificationAge ?? null,
+    __experimental_factorVerificationAge,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
