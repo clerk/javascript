@@ -17,6 +17,7 @@ import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -27,6 +28,7 @@ import { Separator } from '~/primitives/separator';
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
+  const { userSettings } = useEnvironment();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -184,12 +186,14 @@ export function SignInStart() {
               </Card.Content>
 
               <Card.Footer {...footerProps}>
-                <Card.FooterAction>
-                  <Card.FooterActionText>
-                    {t('signIn.start.actionText')}{' '}
-                    <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
-                  </Card.FooterActionText>
-                </Card.FooterAction>
+                {!userSettings.signUp.invite_only_enabled ? (
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.start.actionText')}{' '}
+                      <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                ) : null}
               </Card.Footer>
             </Card.Root>
           </SignIn.Step>

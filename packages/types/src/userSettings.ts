@@ -51,6 +51,7 @@ export type SignUpData = {
   allowlist_only: boolean;
   progressive: boolean;
   captcha_enabled: boolean;
+  invite_only_enabled: boolean;
 };
 
 export type PasswordSettingsData = {

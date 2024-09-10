@@ -410,13 +410,15 @@ export function _SignInStart(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
-          <Card.Action elementId='signIn'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
-            />
-          </Card.Action>
+          {!userSettings.signUp.invite_only_enabled && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink')}
+                to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Card.Action>
+          )}
         </Card.Footer>
       </Card.Root>
     </Flow.Part>
