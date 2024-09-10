@@ -4,10 +4,12 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
 import { SCOPE, type Scope } from '../types';
-import { AUTH_HEADER, CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
+import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
 import { validateManifest } from './utils/manifest';
+import { requestHandler } from './utils/request-handler';
+import { responseHandler } from './utils/response-handler';
 import { BrowserStorageCache, type StorageCache } from './utils/storage';
 
 export let clerk: Clerk;
@@ -38,8 +40,6 @@ export async function createClerkClient({
 
   // Parse publishableKey and assert it's present/valid, throw if not
   const key = parsePublishableKey(publishableKey);
-
-  console.log('KEY', key, key?.instanceType, key?.frontendApi);
   assertPublishableKey(key);
 
   const isProd = key.instanceType === 'production';
@@ -61,43 +61,8 @@ export async function createClerkClient({
 
   // Create Clerk instance
   clerk = new Clerk(publishableKey);
-
-  // Append appropriate query params to all Clerk requests
-  clerk.__unstable__onBeforeRequest(async requestInit => {
-    requestInit.credentials = 'omit';
-
-    const currentJWT = await jwt.get();
-
-    if (!currentJWT) {
-      requestInit.url?.searchParams.append('_is_native', '1');
-      return;
-    }
-
-    if (isProd) {
-      requestInit.url?.searchParams.append('_is_native', '1');
-      (requestInit.headers as Headers).set('authorization', `Bearer ${currentJWT}`);
-    } else {
-      requestInit.url?.searchParams.append('__clerk_db_jwt', currentJWT);
-    }
-  });
-
-  // Store updated JWT in StorageCache on Clerk responses
-  clerk.__unstable__onAfterResponse(async (_, response) => {
-    const authHeaderkey = isProd ? AUTH_HEADER.production : AUTH_HEADER.development;
-    const authHeader = response?.headers.get(authHeaderkey);
-
-    if (authHeader?.startsWith('Bearer')) {
-      const newJWT = authHeader.split(' ')[1] || undefined;
-
-      if (newJWT) {
-        await jwt.set(newJWT);
-      } else {
-        await jwt.remove();
-      }
-    } else if (authHeader) {
-      await jwt.set(authHeader);
-    }
-  });
+  clerk.__unstable__onAfterResponse(requestHandler(jwt));
+  clerk.__unstable__onAfterResponse(responseHandler(jwt));
 
   return clerk;
 }
