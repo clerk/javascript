@@ -168,8 +168,6 @@ export class Session extends BaseResource implements SessionResource {
     level,
     maxAge,
   }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
-    const searchParams = new URLSearchParams();
-    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
@@ -178,7 +176,6 @@ export class Session extends BaseResource implements SessionResource {
           level,
           maxAge,
         } as any,
-        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -188,8 +185,8 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_prepareFirstFactorVerification = async (
     factor: __experimental_SessionVerifyPrepareFirstFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
-    const searchParams = new URLSearchParams();
-    searchParams.append('_clerk_session_id', this.id);
+    // const searchParams = new URLSearchParams();
+    // searchParams.append('_clerk_session_id', this.id);
     let config;
     switch (factor.strategy) {
       case 'email_code':
@@ -213,7 +210,7 @@ export class Session extends BaseResource implements SessionResource {
           ...config,
           strategy: factor.strategy,
         } as any,
-        search: searchParams,
+        // search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -223,14 +220,11 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_attemptFirstFactorVerification = async (
     attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
-    const searchParams = new URLSearchParams();
-    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
         body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
-        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -240,14 +234,11 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_prepareSecondFactorVerification = async (
     params: __experimental_SessionVerifyPrepareSecondFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
-    const searchParams = new URLSearchParams();
-    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/prepare_second_factor`,
         body: params as any,
-        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
@@ -257,14 +248,11 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_attemptSecondFactorVerification = async (
     params: __experimental_SessionVerifyAttemptSecondFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
-    const searchParams = new URLSearchParams();
-    searchParams.append('_clerk_session_id', this.id);
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
         body: params as any,
-        search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 
