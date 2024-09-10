@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys, useLocalizations } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -26,7 +26,6 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
   const card = useCardState();
   const { organization } = useOrganization();
-  const { translateError } = useLocalizations();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -54,7 +53,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
         wizard.nextStep();
       })
       .catch(err => {
-        handleError(err, [nameField], err => card.setError(translateError(err)));
+        handleError(err, [nameField], card.setError);
       });
   };
 
