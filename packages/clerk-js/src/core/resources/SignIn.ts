@@ -27,11 +27,18 @@ import type {
   SignInStartEmailLinkFlowParams,
   SignInStatus,
   VerificationResource,
+  Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  generateSignatureWithCoinbaseWallet,
+  generateSignatureWithMetamask,
+  getCoinbaseWalletIdentifier,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from '../../utils';
 import {
   ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
@@ -105,6 +112,9 @@ export class SignIn extends BaseResource implements SignInResource {
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
+        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        break;
+      case 'web3_coinbase_wallet_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
@@ -223,16 +233,16 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    const { identifier, generateSignature } = params || {};
+    const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
 
     await this.create({ identifier });
 
-    const web3FirstFactor = this.supportedFirstFactors?.find(
-      f => f.strategy === 'web3_metamask_signature',
-    ) as Web3SignatureFactor;
+    const web3FirstFactor = this.supportedFirstFactors?.find(f => f.strategy === strategy) as Web3SignatureFactor;
 
     if (!web3FirstFactor) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
@@ -241,14 +251,19 @@ export class SignIn extends BaseResource implements SignInResource {
     await this.prepareFirstFactor(web3FirstFactor);
 
     const { nonce } = this.firstFactorVerification;
+    if (!nonce) {
+      clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
+    }
+
     const signature = await generateSignature({
       identifier: this.identifier!,
-      nonce: nonce!,
+      nonce: nonce,
+      provider,
     });
 
     return this.attemptFirstFactor({
       signature,
-      strategy: 'web3_metamask_signature',
+      strategy,
     });
   };
 
@@ -257,6 +272,16 @@ export class SignIn extends BaseResource implements SignInResource {
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
+      strategy: 'web3_metamask_signature',
+    });
+  };
+
+  public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
+    const identifier = await getCoinbaseWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithCoinbaseWallet,
+      strategy: 'web3_coinbase_wallet_signature',
     });
   };
 
@@ -326,7 +351,7 @@ export class SignIn extends BaseResource implements SignInResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings as any),
+        ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }

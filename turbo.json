@@ -15,7 +15,6 @@
   ],
   "globalEnv": [
     "CLERK_*",
-    "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
     "PUBLIC_CLERK_*",
     "NODE_ENV",
@@ -202,6 +201,18 @@
     },
     "//#test:integration:expo-web": {
       "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/clerk-expo#build", "^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:tanstack-start": {
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/tanstack-start#build", "^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:tanstack-router": {
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/tanstack-start#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"

@@ -29,14 +29,14 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(
-    shouldUseDefaults ? defaultValues.initialPage : params?.initialPage ?? defaultValues.initialPage,
+    shouldUseDefaults ? defaultValues.initialPage : (params?.initialPage ?? defaultValues.initialPage),
   );
-  const pageSizeRef = useRef(shouldUseDefaults ? defaultValues.pageSize : params?.pageSize ?? defaultValues.pageSize);
+  const pageSizeRef = useRef(shouldUseDefaults ? defaultValues.pageSize : (params?.pageSize ?? defaultValues.pageSize));
 
   const newObj: Record<string, unknown> = {};
   for (const key of Object.keys(defaultValues)) {
     // @ts-ignore
-    newObj[key] = shouldUseDefaults ? defaultValues[key] : params?.[key] ?? defaultValues[key];
+    newObj[key] = shouldUseDefaults ? defaultValues[key] : (params?.[key] ?? defaultValues[key]);
   }
 
   return {

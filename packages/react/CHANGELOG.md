@@ -1,5 +1,104 @@
 # Change Log
 
+## 5.8.0
+
+### Minor Changes
+
+- Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups. ([#4061](https://github.com/clerk/javascript/pull/4061)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Server side
+
+  This can be applied to any helper that returns the auth object
+
+  **Nextjs example**
+
+  ```ts
+  auth().__experimental_factorVerificationAge;
+  ```
+
+  ### Client side
+
+  **React example**
+
+  ```ts
+  const { session } = useSession();
+  session?.__experimental_factorVerificationAge;
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments coverage on `<ClerkProvider>` properties ([#4098](https://github.com/clerk/javascript/pull/4098)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf)]:
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+
+## 5.7.0
+
+### Minor Changes
+
+- Add support for the Coinbase Wallet web3 provider and authentication strategy. The Coinbase Wallet provider handles both Coinbase Wallet extension and Smart Wallet ([#4082](https://github.com/clerk/javascript/pull/4082)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+  - @clerk/shared@2.6.2
+
+## 5.6.0
+
+### Minor Changes
+
+- Add `<__experimental_UserVerification />` component. This is an experimental feature and breaking changes can occur until it's marked as stable. ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+  - @clerk/shared@2.6.1
+
+## 5.5.0
+
+### Minor Changes
+
+- Add support for Coinbase Wallet strategy during sign in/up flows. Users can now authenticate using their Coinbase Wallet browser extension in the same way as MetaMask ([#4052](https://github.com/clerk/javascript/pull/4052)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/types@4.17.0
+  - @clerk/shared@2.6.0
+
+## 5.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+  - @clerk/shared@2.5.5
+
+## 5.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/shared@2.5.4
+
+## 5.4.3
+
+### Patch Changes
+
+- Fix multiple `addListener` method calls ([#4010](https://github.com/clerk/javascript/pull/4010)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/shared@2.5.3
+
 ## 5.4.2
 
 ### Patch Changes

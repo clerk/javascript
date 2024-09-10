@@ -19,7 +19,6 @@ export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSe
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
     process.env.VITE_CLERK_PUBLISHABLE_KEY ||
     process.env.CLERK_PUBLISHABLE_KEY ||
-    process.env.GATSBY_CLERK_PUBLISHABLE_KEY ||
     process.env.REACT_APP_CLERK_PUBLISHABLE_KEY ||
     process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 

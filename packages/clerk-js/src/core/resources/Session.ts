@@ -1,10 +1,19 @@
 import { runWithExponentialBackOff } from '@clerk/shared';
 import { is4xxError } from '@clerk/shared/error';
 import type {
+  __experimental_SessionVerificationJSON,
+  __experimental_SessionVerificationResource,
+  __experimental_SessionVerifyAttemptFirstFactorParams,
+  __experimental_SessionVerifyAttemptSecondFactorParams,
+  __experimental_SessionVerifyCreateParams,
+  __experimental_SessionVerifyPrepareFirstFactorParams,
+  __experimental_SessionVerifyPrepareSecondFactorParams,
   ActJWTClaim,
   CheckAuthorization,
+  EmailCodeConfig,
   GetToken,
   GetTokenOptions,
+  PhoneCodeConfig,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -13,9 +22,11 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
+import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -28,6 +39,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
+  __experimental_factorVerificationAge: [number | null, number | null] = [null, null];
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -117,9 +129,103 @@ export class Session extends BaseResource implements SessionResource {
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
   // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-  #getCacheId(template?: string, organizationId?: string) {
-    return [this.id, template, organizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
+  #getCacheId(template?: string, organizationId?: string | null) {
+    const resolvedOrganizationId =
+      typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
+    return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
   }
+
+  __experimental_startVerification = async ({
+    level,
+    maxAge,
+  }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify`,
+        body: {
+          level,
+          maxAge,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_prepareFirstFactorVerification = async (
+    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    let config;
+    switch (factor.strategy) {
+      case 'email_code':
+        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        break;
+      case 'phone_code':
+        config = {
+          phoneNumberId: factor.phoneNumberId,
+          default: factor.default,
+        } as PhoneCodeConfig;
+        break;
+      default:
+        clerkInvalidStrategy('Session.prepareFirstFactorVerification', (factor as any).strategy);
+    }
+
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/prepare_first_factor`,
+        body: {
+          ...config,
+          strategy: factor.strategy,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_attemptFirstFactorVerification = async (
+    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
+        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_prepareSecondFactorVerification = async (
+    params: __experimental_SessionVerifyPrepareSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/prepare_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_attemptSecondFactorVerification = async (
+    params: __experimental_SessionVerifyAttemptSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
 
   protected fromJSON(data: SessionJSON | null): this {
     if (!data) {
@@ -130,6 +236,7 @@ export class Session extends BaseResource implements SessionResource {
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.__experimental_factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
@@ -151,12 +258,12 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const {
-      leewayInSeconds,
-      template,
-      skipCache = false,
-      organizationId = Session.clerk.organization?.id,
-    } = options || {};
+    const { leewayInSeconds, template, skipCache = false } = options || {};
+
+    // If no organization ID is provided, default to the selected organization in memory
+    // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
+    const organizationId =
+      typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
@@ -166,7 +273,7 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
-    const shouldDispatchTokenUpdate = !template && options?.organizationId === Session.clerk.organization?.id;
+    const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
@@ -178,7 +285,7 @@ export class Session extends BaseResource implements SessionResource {
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params = template ? {} : { ...(organizationId && { organizationId }) };
+    const params = template ? {} : { organizationId };
     const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {

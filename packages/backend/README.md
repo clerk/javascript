@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/backend</h1>
 </p>
-
-# @clerk/backend
 
 <div align="center">
 
@@ -22,187 +21,39 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_backend)
 
 </div>
 
----
+## Getting Started
 
-## Overview
+[Clerk's](https://clerk.com/?utm_source=github&utm_medium=clerk_backend) JavaScript Backend SDK exposes [Clerk's Backend API](https://clerk.com/docs/reference/backend-api) resources and low-level authentication utilities **for JavaScript environments**.
 
-This package provides Clerk Backend API resources and low-level authentication utilities for JavaScript environments. It is mostly used as the base for other Clerk SDKs but it can be also used on its own.
+### Prerequisites
 
-### Features
+- Node.js `>=18.17.0` (or later) or any V8 isolates runtime
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_backend).
 
-- Built for V8 isolates (Cloudflare Workers, Vercel Edge Runtime, etc...).
-- Make it isomorphic to work across all modern JS runtimes.
-- Use options injection for all keys and settings.
-- Support multiple `CLERK_SECRET_KEY` for multiple instance REST access.
-- Align JWT key resolution algorithm across all environments (Function param > Environment variable > JWKS from API).
-- Tested automatically across different runtimes (Node, CF Workers, Vercel Edge middleware.)
-- Refactor the Rest Client API to return `{data, errors}` instead of throwing errors.
-- Export a generic verifyToken for Clerk JWTs verification.
-- Align AuthData interface for SSR.
-- Export CJS and ESM.
+### Installation
 
-## How to use
+The fastest way to get started with `@clerk/backend` is by following the [JavaScript Backend SDK reference documentation](https://clerk.com/docs/references/backend/overview?utm_source=github&utm_medium=clerk_backend).
 
-Works on Node.js `>=18.17.0` (or later) or on any V8 Isolates runtimes (eg Cloudflare Workers).
+You'll learn how to install `@clerk/backend` and how to use `createClerkClient()`.
 
-```sh
-npm install @clerk/backend
-```
+## Usage
 
-```
-import { createClerkClient } from '@clerk/backend';
-
-const clerk = createClerkClient({ secretKey: '...' });
-
-await clerk.users.getUser("user_...");
-```
-
-### API
-
-#### createClerkClient(options: ClerkOptions)
-
-Create Clerk SDK that includes an HTTP Rest client for the Backend API and session verification helpers. The clerk object contains the following APIs and methods:
-
-```js
-import { createClerkClient } from '@clerk/backend';
-
-const clerk = createClerkClient({ secretKey: '...' });
-
-await clerk.users.getUser('user_...');
-
-// Available APIs
-clerk.allowlistIdentifiers;
-clerk.clients;
-clerk.emailAddresses;
-clerk.emails;
-clerk.invitations;
-clerk.organizations;
-clerk.phoneNumbers;
-clerk.redirectUrls;
-clerk.sessions;
-clerk.signInTokens;
-clerk.users;
-
-// These functions should be used by framework-specific libraries, such as @clerk/nextjs or @clerk/remix.
-
-// Compute the authentication state given the request parameters.
-clerk.authenticateRequest(options);
-
-// Build debug payload of the request state.
-clerk.debugRequestState(requestState);
-```
-
-#### verifyToken(token: string, options: VerifyTokenOptions)
-
-Verifies a Clerk generated JWT (i.e. Clerk Session JWT and Clerk JWT templates). The key resolution via JWKS or local values is handled automatically.
-
-```js
-import { verifyToken } from '@clerk/backend';
-
-const { result, error } = await verifyToken(token, {
-  issuer: '...',
-  authorizedParties: '...',
-});
-```
-
-#### verifyJwt(token: string, options: VerifyJwtOptions)
-
-Verifies a Clerk generated JWT (i.e. Clerk Session JWT and Clerk JWT templates). The key needs to be provided in the options.
-
-```js
-import { verifyJwt } from '@clerk/backend/jwt';
-
-const { result, error } = verifyJwt(token, {
-  key: JsonWebKey | string,
-  authorizedParties: '...',
-});
-```
-
-#### decodeJwt(token: string)
-
-Decodes a JWT.
-
-```js
-import { decodeJwt } from '@clerk/backend/jwt';
-
-const { result, error } = decodeJwt(token);
-```
-
-#### hasValidSignature(jwt: Jwt, key: JsonWebKey | string)
-
-Verifies that the JWT has a valid signature. The key needs to be provided.
-
-```js
-import { hasValidSignature } from '@clerk/backend/jwt';
-
-const { result, error } = await hasValidSignature(token, jwk);
-```
-
-#### debugRequestState(requestState)
-
-Generates a debug payload for the request state
-
-```js
-import { debugRequestState } from '@clerk/backend/internal';
-
-debugRequestState(requestState);
-```
-
-#### signedInAuthObject(sessionClaims, options)
-
-Builds the AuthObject when the user is signed in.
-
-```js
-import { signedInAuthObject } from '@clerk/backend/internal';
-
-signedInAuthObject(jwtPayload, options);
-```
-
-#### signedOutAuthObject()
-
-Builds the empty AuthObject when the user is signed out.
-
-```js
-import { signedOutAuthObject } from '@clerk/backend/internal';
-
-signedOutAuthObject();
-```
-
-#### sanitizeAuthObject(authObject)
-
-Removes sensitive private metadata from user and organization resources in the AuthObject
-
-```js
-import { sanitizeAuthObject } from '@clerk/backend/internal';
-
-sanitizeAuthObject(authObject);
-```
-
-#### prunePrivateMetadata(obj)
-
-Removes any `private_metadata` and `privateMetadata` attributes from the object to avoid leaking sensitive information to the browser during SSR.
-
-```js
-import { prunePrivateMetadata } from '@clerk/backend/internal';
-
-prunePrivateMetadata(obj);
-```
+For further information, guides, and examples visit the [JavaScript Backend SDK reference documentation](https://clerk.com/docs/references/backend/overview?utm_source=github&utm_medium=clerk_backend). It lists all the available APIs and methods.
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_backend)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_backend)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

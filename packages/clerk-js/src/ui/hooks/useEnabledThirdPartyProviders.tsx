@@ -51,7 +51,15 @@ export const useEnabledThirdPartyProviders = () => {
     s => !oauthStrategies.includes(s) && s.startsWith('oauth_custom_'),
   );
 
-  customSocialProviderStrategies.forEach(s => {
+  // Get all custom OAuth providers
+  const allCustomOAuthProviders = Object.keys(social).filter(s => s.startsWith('oauth_custom_')) as OAuthStrategy[];
+
+  // Get all active custom social providers
+  const activeCustomSocialStrategies = socialProviderStrategies.filter(
+    s => !oauthStrategies.includes(s) || s.startsWith('oauth_custom_'),
+  );
+
+  allCustomOAuthProviders.forEach(s => {
     const providerName = s.replace('oauth_', '') as OAuthProvider;
     providerToDisplayData[providerName] = {
       strategy: s,
@@ -60,7 +68,7 @@ export const useEnabledThirdPartyProviders = () => {
     };
   });
 
-  customAuthenticatableSocialStrategies.forEach(s => {
+  activeCustomSocialStrategies.forEach(s => {
     const providerId = s.replace('oauth_', '') as OAuthProvider;
     strategyToDisplayData[s] = {
       id: providerId,
