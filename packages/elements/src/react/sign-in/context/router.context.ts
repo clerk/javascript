@@ -5,7 +5,6 @@ import type {
   TSignInResetPasswordMachine,
   TSignInRouterMachine,
   TSignInSecondFactorMachine,
-  TSignInStartMachine,
 } from '~/internals/machines/sign-in';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
@@ -17,7 +16,6 @@ function useSignInStep<M extends AnyStateMachine, T = ActorRefFrom<M>>(name: str
   return SignInRouterCtx.useSelector(state => state.children[name] as AnyActorRef) as T;
 }
 
-export const useSignInStartStep = () => useSignInStep<TSignInStartMachine>('start');
 export const useSignInFirstFactorStep = () => useSignInStep<TSignInFirstFactorMachine>('firstFactor');
 export const useSignInSecondFactorStep = () => useSignInStep<TSignInSecondFactorMachine>('secondFactor');
 export const useSignInResetPasswordStep = () => useSignInStep<TSignInResetPasswordMachine>('resetPassword');
