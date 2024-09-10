@@ -42,7 +42,8 @@ export const getPublicEnvVariables = () => {
     clerkJsVersion: getEnvVariable('VITE_CLERK_JS_VERSION') || getEnvVariable('CLERK_JS_VERSION'),
     telemetryDisabled:
       isTruthy(getEnvVariable('VITE_CLERK_TELEMETRY_DISABLED')) || isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
-    telemetryDebug: getEnvVariable('VITE_CLERK_TELEMETRY_DEBUG') || getEnvVariable('CLERK_TELEMETRY_DEBUG'),
+    telemetryDebug:
+      isTruthy(getEnvVariable('VITE_CLERK_TELEMETRY_DEBUG')) || isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),
     afterSignInUrl: getEnvVariable('VITE_CLERK_AFTER_SIGN_IN_URL') || getEnvVariable('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getEnvVariable('VITE_CLERK_AFTER_SIGN_UP_URL') || getEnvVariable('CLERK_AFTER_SIGN_UP_URL'),
   };
