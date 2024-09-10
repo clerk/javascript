@@ -165,7 +165,7 @@ export function SignInStart() {
                     // up the state based on `isSubmitting`
                     passkeyEnabled ? (
                       <Common.Loading scope='passkey'>
-                        {() => {
+                        {isSubmitting => {
                           return (
                             <SignIn.Passkey asChild>
                               <LinkButton
