@@ -19,7 +19,6 @@ import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
-import { SignInResetPasswordMachine } from './reset-password.machine';
 import type {
   SignInRouterContext,
   SignInRouterEvents,
@@ -64,6 +63,13 @@ export const SignInRouterMachine = setup({
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),
+    resetPasswordAttempt: fromPromise<SignInResource, { clerk: LoadedClerk; fields: FormFields }>(
+      ({ input: { clerk, fields } }) => {
+        const password = (fields.get('password')?.value as string) || '';
+        const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked || false;
+        return clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
+      },
+    ),
     startAttempt: fromPromise<SignInResource, { clerk: LoadedClerk; fields: FormFields }>(
       ({ input: { clerk, fields } }) => {
         const password = fields.get('password');
@@ -85,7 +91,6 @@ export const SignInRouterMachine = setup({
 
     firstFactorMachine: SignInFirstFactorMachine,
     formMachine: FormMachine,
-    resetPasswordMachine: SignInResetPasswordMachine,
     secondFactorMachine: SignInSecondFactorMachine,
     thirdPartyMachine: ThirdPartyMachine,
     webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
@@ -692,17 +697,7 @@ export const SignInRouterMachine = setup({
     },
     ResetPassword: {
       tags: ['step:reset-password'],
-      invoke: {
-        id: 'resetPassword',
-        src: 'resetPasswordMachine',
-        input: ({ context, self }) => ({
-          formRef: context.formRef,
-          parent: self,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
+      exit: 'clearFormErrors',
       on: {
         'RESET.STEP': {
           target: 'ResetPassword',
@@ -724,6 +719,43 @@ export const SignInRouterMachine = setup({
             target: 'SecondFactor',
           },
         ],
+      },
+      initial: 'Pending',
+      states: {
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
+          },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'reset-password',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            src: 'resetPasswordAttempt',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              fields: context.formRef.getSnapshot().context.fields,
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
       },
     },
     Callback: {
