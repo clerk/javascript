@@ -43,13 +43,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
         requestInit.credentials = 'omit';
 
+        // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
         const jwt = await getToken(KEY);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
-        // Adding 'x-mobile' header for native mobile requests.
-        // This signals the backend that the request is from a mobile device.
+        // Instructs the backend that the request is from a mobile device.
         // Some iOS devices have an empty user-agent, so we can't rely on that.
         if (isNative()) {
           (requestInit.headers as Headers).set('x-mobile', '1');
