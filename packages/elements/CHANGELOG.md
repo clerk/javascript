@@ -1,5 +1,26 @@
 # @clerk/elements
 
+## 0.15.0
+
+### Minor Changes
+
+- Remove `@clerk/elements` reliance on `next` and `@clerk/clerk-react` directly. The host router is now provided by `@clerk/nextjs`. ([#4064](https://github.com/clerk/javascript/pull/4064)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Add support for Coinbase Wallet Web3 provider ([#4103](https://github.com/clerk/javascript/pull/4103)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Adds support for `asChild` prop within `choose-strategy` and `choose-session` sign-in steps. ([#4094](https://github.com/clerk/javascript/pull/4094)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Fixes issue where errors were incorrectly being returned as an `any` type. ([#4119](https://github.com/clerk/javascript/pull/4119)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Allow for passkey triggers in the verification steps ([#4093](https://github.com/clerk/javascript/pull/4093)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa)]:
+  - @clerk/types@4.20.0
+
 ## 0.14.6
 
 ### Patch Changes

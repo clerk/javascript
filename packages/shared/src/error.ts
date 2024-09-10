@@ -31,7 +31,7 @@ export interface MetamaskError extends Error {
   data?: unknown;
 }
 
-export function isKnownError(error: any) {
+export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
 }
 

@@ -43,8 +43,11 @@ export function SignInStart() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         const connectionsWithSeperator = [
-          <Connections disabled={isGlobalLoading} />,
-          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+          <Connections
+            key='connections'
+            disabled={isGlobalLoading}
+          />,
+          hasConnection && hasIdentifier ? <Separator key='separator'>{t('dividerText')}</Separator> : null,
         ];
         return (
           <SignIn.Step

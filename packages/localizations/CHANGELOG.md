@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- Update Simplified Chinese based on en US version ([#4107](https://github.com/clerk/javascript/pull/4107)) by [@youyou-sudo](https://github.com/youyou-sudo)
+
+### Patch Changes
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa)]:
+  - @clerk/types@4.20.0
+
 ## 2.8.1
 
 ### Patch Changes
