@@ -8,6 +8,7 @@ import Coinbase from './coinbase';
 import CoinbaseWallet from './coinbase-wallet';
 import Discord from './discord';
 import Dropbox from './dropbox';
+import Enstall from './enstall';
 import Facebook from './facebook';
 import Github from './github';
 import Gitlab from './gitlab';
@@ -38,7 +39,7 @@ export const PROVIDERS: Record<OAuthProvider | Web3Provider, React.ReactElement>
   coinbase: <Coinbase />,
   discord: <Discord />,
   dropbox: <Dropbox />,
-  enstall: <span />,
+  enstall: <Enstall />,
   facebook: <Facebook />,
   github: <Github />,
   gitlab: <Gitlab />,
