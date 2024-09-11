@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.5.2
+
+### Patch Changes
+
+- Vendor path-to-regexp ([#4145](https://github.com/clerk/javascript/pull/4145)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+  - @clerk/backend@1.11.1
+  - @clerk/clerk-react@5.8.2
+
 ## 5.5.1
 
 ### Patch Changes
