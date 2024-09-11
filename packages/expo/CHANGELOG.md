@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.2.9
+
+### Patch Changes
+
+- Fixes an issue where iOS session activities were incorrectly classified as non-mobile ([#4137](https://github.com/clerk/javascript/pull/4137)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/clerk-js@5.21.1
+  - @clerk/clerk-react@5.8.1
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
 ## 2.2.8
 
 ### Patch Changes
