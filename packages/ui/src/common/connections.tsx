@@ -1,11 +1,10 @@
 import * as Common from '@clerk/elements/common';
 import * as React from 'react';
 
-import { PROVIDERS } from '~/constants/providers';
 import { useAppearance } from '~/contexts';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { Button } from '~/primitives/button';
-import * as Icon from '~/primitives/icon';
+import { PROVIDERS } from '~/primitives/icons/providers';
 
 /**
  * Calculates the number of columns given the total number of items and the maximum columns allowed per row.
@@ -73,9 +72,6 @@ export function Connections(
         style={{ '--cl-connection-columns': columns } as React.CSSProperties}
       >
         {enabledConnections.map(c => {
-          const connection = PROVIDERS.find(provider => provider.id === c.provider);
-          const iconKey = connection?.icon;
-          const IconComponent = iconKey ? Icon[iconKey] : null;
           return (
             <li
               key={c.provider}
@@ -92,10 +88,10 @@ export function Connections(
                         intent='connection'
                         busy={isConnectionLoading}
                         disabled={props?.disabled || isConnectionLoading}
-                        iconStart={IconComponent ? <IconComponent /> : null}
+                        iconStart={PROVIDERS[c.provider] || null}
                         textVisuallyHidden={textVisuallyHidden}
                       >
-                        {connection?.name || c.provider}
+                        {c.name}
                       </Button>
                     </Common.Connection>
                   );
