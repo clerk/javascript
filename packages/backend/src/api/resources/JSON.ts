@@ -399,3 +399,7 @@ export interface PermissionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface CookiesJSON {
+  cookies: string[];
+}

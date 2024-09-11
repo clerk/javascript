@@ -1,3 +1,4 @@
+import type { ApiClient } from '../api';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
@@ -6,7 +7,7 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
-import type { RequestState } from './authStatus';
+import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
@@ -39,6 +40,12 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
   }
 }
 
+function assertApiClient(apiClient: ApiClient | undefined): asserts apiClient is ApiClient {
+  if (!apiClient) {
+    throw new Error(`Missing apiClient. An apiClient is needed to perform token refresh.`);
+  }
+}
+
 /**
  * Currently, a request is only eligible for a handshake if we can say it's *probably* a request for a document, not a fetch or some other exotic request.
  * This heuristic should give us a reliable enough signal for browsers that support `Sec-Fetch-Dest` and for those that don't.
@@ -53,6 +60,16 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
   }
 
   if (!secFetchDest && accept?.startsWith('text/html')) {
+    return true;
+  }
+
+  return false;
+}
+
+function isRequestEligibleForRefresh(authenticateContext: { refreshTokenInCookie?: string }) {
+  const { refreshTokenInCookie } = authenticateContext;
+
+  if (refreshTokenInCookie) {
     return true;
   }
 
@@ -165,12 +182,71 @@ ${error.getFullMessage()}`,
     throw error;
   }
 
-  function handleMaybeHandshakeStatus(
+  async function refreshToken(
+    authenticateContext: AuthenticateContext,
+  ): Promise<{ sessionToken: string; headers: Headers }> {
+    // To perform a token refresh, apiClient must be defined.
+    assertApiClient(options.apiClient);
+    const {
+      refreshTokenInCookie: refresh_token,
+      sessionToken: expired_token,
+      origin: request_origin,
+    } = authenticateContext;
+    // The token refresh endpoint requires a sessionId, so we decode that from the expired token.
+    const { data: decodeResult } = decodeJwt(expired_token!);
+    // Perform the actual token refresh.
+    const cookies = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
+      expired_token,
+      refresh_token,
+      request_origin,
+      // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
+      request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
+    });
+
+    const headers = new Headers({
+      'Access-Control-Allow-Origin': 'null',
+      'Access-Control-Allow-Credentials': 'true',
+    });
+
+    let sessionToken = '';
+    cookies.cookies.forEach((x: string) => {
+      headers.append('Set-Cookie', x);
+      if (getCookieName(x).startsWith(constants.Cookies.Session)) {
+        sessionToken = getCookieValue(x);
+      }
+    });
+
+    return { sessionToken, headers };
+  }
+
+  async function attemptRefresh(authenticateContext: AuthenticateContext) {
+    const { sessionToken, headers } = await refreshToken(authenticateContext);
+    // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
+    const { data } = await verifyToken(sessionToken, authenticateContext);
+    return { data, headers, sessionToken };
+  }
+
+  async function handleMaybeHandshakeStatus(
     authenticateContext: AuthenticateContext,
     reason: AuthErrorReason,
     message: string,
     headers?: Headers,
-  ) {
+  ): Promise<SignedInState | SignedOutState | HandshakeState> {
+    if (isRequestEligibleForRefresh(authenticateContext)) {
+      try {
+        const refreshResponse = await attemptRefresh(authenticateContext);
+        return signedIn(
+          authenticateContext,
+          refreshResponse.data!,
+          refreshResponse.headers,
+          refreshResponse.sessionToken,
+        );
+      } catch (error) {
+        // If there's any error, simply fallback to the handshake flow.
+        console.error('Clerk: unable to refresh token:', error);
+      }
+    }
+
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
@@ -191,8 +267,10 @@ ${error.getFullMessage()}`,
         console.log(msg);
         return signedOut(authenticateContext, reason, message);
       }
+
       return handshake(authenticateContext, reason, message, handshakeHeaders);
     }
+
     return signedOut(authenticateContext, reason, message);
   }
 
@@ -368,7 +446,10 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
-  function handleError(err: unknown, tokenCarrier: TokenCarrier) {
+  async function handleError(
+    err: unknown,
+    tokenCarrier: TokenCarrier,
+  ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (err instanceof TokenVerificationError) {
       err.tokenCarrier = tokenCarrier;
 
@@ -378,12 +459,13 @@ ${error.getFullMessage()}`,
       ].includes(err.reason);
 
       if (reasonToHandshake) {
-        return handleMaybeHandshakeStatus(
+        return await handleMaybeHandshakeStatus(
           authenticateContext,
           AuthErrorReason.SessionTokenOutdated,
           err.getFullMessage(),
         );
       }
+
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
 
@@ -393,6 +475,7 @@ ${error.getFullMessage()}`,
   if (authenticateContext.sessionTokenInHeader) {
     return authenticateRequestWithTokenInHeader();
   }
+
   return authenticateRequestWithTokenInCookie();
 }
 
