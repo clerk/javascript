@@ -186,7 +186,7 @@ export const daDK: LocalizationResource = {
       action__invite: 'Inviter',
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: 'Deltaget',
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruger',
@@ -436,7 +436,7 @@ export const daDK: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Bekræftelseskode',
       resendButton: 'Send kode igen',
-      subtitle: '',
+      subtitle: undefined,
       title: 'Tjek din telefon',
     },
     resetPassword: {
@@ -461,7 +461,7 @@ export const daDK: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',
-      subtitle: '',
+      subtitle: undefined,
       title: 'Totrinsbekræftelse',
     },
   },
