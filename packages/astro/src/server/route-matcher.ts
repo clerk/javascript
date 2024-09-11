@@ -1,5 +1,5 @@
+import { pathToRegexp } from '@clerk/shared/pathToRegexp';
 import type { Autocomplete } from '@clerk/types';
-import { pathToRegexp } from 'path-to-regexp';
 
 type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 
@@ -23,17 +23,5 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
 };
 
 const precomputePathRegex = (patterns: Array<string | RegExp>) => {
-  return patterns.map(pattern => (pattern instanceof RegExp ? pattern : paths.toRegexp(pattern)));
-};
-
-export const paths = {
-  toRegexp: (path: string) => {
-    try {
-      return pathToRegexp(path);
-    } catch (e: any) {
-      throw new Error(
-        `Invalid path: ${path}.\nConsult the documentation of path-to-regexp here: https://github.com/pillarjs/path-to-regexp\n${e.message}`,
-      );
-    }
-  },
+  return patterns.map(pattern => (pattern instanceof RegExp ? pattern : pathToRegexp(pattern)));
 };

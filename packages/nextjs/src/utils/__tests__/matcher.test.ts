@@ -1,4 +1,4 @@
-import { pathToRegexp } from 'path-to-regexp';
+import { pathToRegexp } from '@clerk/shared/pathToRegexp';
 
 const createMatcher = (config: { matcher: string[] }) => (path: string) => {
   return config.matcher.some(matcher => {

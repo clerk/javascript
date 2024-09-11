@@ -28,7 +28,8 @@ jest.mock('../clerkClient', () => {
   };
 });
 
-import { paths } from '../../utils';
+import { pathToRegexp } from '@clerk/shared/pathToRegexp';
+
 import { authMiddleware, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from '../authMiddleware';
 // used to assert the mock
 import { clerkClient } from '../clerkClient';
@@ -143,7 +144,7 @@ const invalidRoutes = [
 describe('default config matcher', () => {
   it('compiles to regex using path-to-regex', () => {
     [DEFAULT_CONFIG_MATCHER].flat().forEach(path => {
-      expect(paths.toRegexp(path)).toBeInstanceOf(RegExp);
+      expect(pathToRegexp(path)).toBeInstanceOf(RegExp);
     });
   });
 
@@ -165,7 +166,7 @@ describe('default config matcher', () => {
 describe('default ignored routes matcher', () => {
   it('compiles to regex using path-to-regex', () => {
     [DEFAULT_IGNORED_ROUTES].flat().forEach(path => {
-      expect(paths.toRegexp(path)).toBeInstanceOf(RegExp);
+      expect(pathToRegexp(path)).toBeInstanceOf(RegExp);
     });
   });
 
