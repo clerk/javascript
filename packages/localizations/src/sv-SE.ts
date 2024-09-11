@@ -539,6 +539,7 @@ export const svSE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Efternamnet får inte överskrida 256 tecken.',
     form_param_max_length_exceeded__name: 'Namnet får inte överskrida 256 tecken.',
     form_param_nil: 'Parametern får inte vara tom.',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
     form_password_length_too_short: 'Lösenordet är för kort.',
     form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
