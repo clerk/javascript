@@ -10,6 +10,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps & { children: Reac
       ref,
       width: '1em',
       height: '1em',
+      fill: 'none',
       focusable: 'false',
       'aria-label': ariaLabel,
       'aria-hidden': ariaLabel ? ariaHidden || undefined : true,
