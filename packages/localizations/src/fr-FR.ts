@@ -543,6 +543,7 @@ export const frFR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Le nom ne doit pas dépasser 256 caractères.',
     form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'Mot de passe incorrect',
     form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",

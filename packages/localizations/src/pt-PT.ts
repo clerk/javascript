@@ -538,6 +538,7 @@ export const ptPT: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'O apelido não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__name: 'O nome não deve exceder 256 caracteres.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',

@@ -546,6 +546,7 @@ export const deDE: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Der Nachname sollte nicht mehr als 256 Zeichen umfassen.',
     form_param_max_length_exceeded__name: 'Der Name sollte nicht länger als 256 Zeichen sein.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passwort nicht stark genug',

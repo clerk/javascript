@@ -541,6 +541,7 @@ export const fiFI: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Sukunimi saa olla enintään 256 merkkiä pitkä.',
     form_param_max_length_exceeded__name: 'Nimi saa olla enintään 256 merkkiä pitkä.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
