@@ -187,7 +187,7 @@ export const mnMN: LocalizationResource = {
       action__invite: 'Урих',
       activeMembersTab: {
         menuAction__remove: 'Гишүүнийг хасах',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: 'Нэгдсэн',
         tableHeader__role: 'Үүрэг',
         tableHeader__user: 'Хэрэглэгч',
