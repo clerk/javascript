@@ -21,6 +21,7 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
+import Apple from '~/primitives/icons/apple';
 import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
@@ -61,6 +62,11 @@ export function SignInStart() {
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
+                  <Apple
+                    aria-label='Apple'
+                    className='size-11'
+                  />
+                  <Apple />
                   <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
                   <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                 </Card.Header>
