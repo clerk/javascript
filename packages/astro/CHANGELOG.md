@@ -1,5 +1,30 @@
 # @clerk/astro
 
+## 1.3.1
+
+### Patch Changes
+
+- Allow child elements in unstyled Astro components. ([#4122](https://github.com/clerk/javascript/pull/4122)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```astro
+  ---
+  import { SignInButton } from '@clerk/components/astro'
+  ---
+
+  <SignInButton asChild>
+    <button>Sign in with Clerk</button>
+  </SignInButton>
+  ```
+
+- Fixes an issue where control components in client-side rendered apps are always hidden. ([#4131](https://github.com/clerk/javascript/pull/4131)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b97b2c1ca`](https://github.com/clerk/javascript/commit/b97b2c1cae5cb1e569708a8745c13d203beb81d9), [`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/backend@1.11.0
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
 ## 1.3.0
 
 ### Minor Changes

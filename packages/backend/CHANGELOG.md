@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.11.0
+
+### Minor Changes
+
+- Bug fix: Introducing missing `deleteSelfEnabled` from User. ([#4139](https://github.com/clerk/javascript/pull/4139)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
 ## 1.10.0
 
 ### Minor Changes

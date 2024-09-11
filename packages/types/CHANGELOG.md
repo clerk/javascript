@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.20.1
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.20.0
 
 ### Minor Changes
