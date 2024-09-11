@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.2.20",
+  "version": "1.2.21",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -62,8 +62,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/backend": "1.11.0",
-    "@clerk/shared": "2.7.1",
+    "@clerk/backend": "1.11.1",
+    "@clerk/shared": "2.7.2",
     "@clerk/types": "4.20.1",
     "dotenv": "16.4.5"
   },
