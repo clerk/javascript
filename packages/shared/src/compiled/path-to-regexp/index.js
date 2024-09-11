@@ -1,3 +1,5 @@
+/* eslint-disable no-redeclare */
+
 function _(r) {
   for (var n = [], e = 0; e < r.length; ) {
     var t = r[e];
