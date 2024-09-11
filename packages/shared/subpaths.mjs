@@ -30,6 +30,7 @@ export const subpathNames = [
   'logger',
   'webauthn',
   'router',
+  'pathToRegexp',
 ];
 
 export const subpathFoldersBarrel = ['react'];
