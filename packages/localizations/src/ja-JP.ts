@@ -186,7 +186,7 @@ export const jaJP: LocalizationResource = {
       action__invite: '招待',
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: '参加日時',
         tableHeader__role: '役割',
         tableHeader__user: 'ユーザー',
@@ -270,7 +270,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
@@ -436,7 +436,7 @@ export const jaJP: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
-      subtitle: '',
+      subtitle: undefined,
       title: '電話を確認してください',
     },
     resetPassword: {
@@ -462,7 +462,7 @@ export const jaJP: LocalizationResource = {
     },
     totpMfa: {
       formTitle: '検証コード',
-      subtitle: '',
+      subtitle: undefined,
       title: '二段階認証',
     },
   },
@@ -847,7 +847,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: 'プロフィール',
       },
       usernameSection: {
