@@ -271,7 +271,7 @@ export const esES: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Miembros',
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil de la Organización',
         uploadAction__title: 'Logo',
       },
