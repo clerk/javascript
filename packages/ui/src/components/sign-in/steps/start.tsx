@@ -20,8 +20,7 @@ import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
-import Apple from '~/primitives/icons/apple';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
@@ -62,11 +61,6 @@ export function SignInStart() {
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
-                  <Apple
-                    aria-label='Apple'
-                    className='size-11'
-                  />
-                  <Apple />
                   <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
                   <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                 </Card.Header>
@@ -154,7 +148,7 @@ export function SignInStart() {
                           <Button
                             busy={isSubmitting}
                             disabled={isGlobalLoading}
-                            iconEnd={<Icon.CaretRightLegacy />}
+                            iconEnd={<CaretRightLegacySm />}
                           >
                             {t('formButtonPrimary')}
                           </Button>
