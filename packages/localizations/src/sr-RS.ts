@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Nazad',
   badge__default: 'Podrazumevano',
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
@@ -466,6 +521,7 @@ export const srRS: LocalizationResource = {
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:
@@ -497,6 +553,10 @@ export const srRS: LocalizationResource = {
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
     not_allowed_access: 'Pristup nije dozvoljen.',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Ključ za prolaz je već registrovan sa ovim uređajem.',
     passkey_not_supported: 'Ključevi za prolaz nisu podržani na ovom uređaju.',
     passkey_pa_not_supported: 'Registracija zahteva platformski autentifikator, ali uređaj to ne podržava.',
@@ -821,6 +881,7 @@ export const srRS: LocalizationResource = {
       subtitle__unavailableWallets: 'Nema dostupnih web3 novčanika.',
       successMessage: 'Novčanik je dodat na tvoj nalog.',
       title: 'Dodaj web3 novčanik',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

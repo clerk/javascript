@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Retour',
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
@@ -470,6 +525,7 @@ export const frFR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
@@ -500,6 +556,10 @@ export const frFR: LocalizationResource = {
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access: 'Accès non autorisé',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -828,6 +888,7 @@ export const frFR: LocalizationResource = {
       subtitle__unavailableWallets: "Il n'y a pas de portefeuilles Web3 disponibles.",
       successMessage: 'Le portefeuille a été ajouté à votre compte.',
       title: 'Ajouter un portefeuille Web3',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

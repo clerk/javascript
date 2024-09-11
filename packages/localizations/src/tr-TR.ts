@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Geri',
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Diğer taklitçi cihaz',
@@ -468,6 +523,7 @@ export const trTR: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Başarısız güvenlik doğrulamaları nedeniyle kayıt başarısız. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibine ulaşın.',
     captcha_unavailable:
@@ -499,6 +555,10 @@ export const trTR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Son kimlik bilgilerinizi silemezsiniz.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Bu cihaza zaten bir geçiş anahtarı kaydedilmiş.',
     passkey_not_supported: 'Geçiş anahtarları bu cihazda desteklenmiyor.',
     passkey_pa_not_supported: 'Kayıt için bir platform doğrulayıcısı gerekiyor ancak cihaz bunu desteklemiyor.',
@@ -823,6 +883,7 @@ export const trTR: LocalizationResource = {
       subtitle__unavailableWallets: 'Kullanılabilir bir web3 cüzdanı yok.',
       successMessage: 'Web3 cüzdanınız hesabınıza eklendi.',
       title: 'Web3 cüzdanı ekle',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

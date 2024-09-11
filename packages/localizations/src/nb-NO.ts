@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tilbake',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annen imitators enhet',
@@ -467,6 +522,7 @@ export const nbNO: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
@@ -497,6 +553,10 @@ export const nbNO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -822,6 +882,7 @@ export const nbNO: LocalizationResource = {
       subtitle__unavailableWallets: 'Det er ingen tilgjengelige web3-lommebøker.',
       successMessage: 'Lommeboken har blitt lagt til kontoen din.',
       title: 'Legg til web3-lommebok',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

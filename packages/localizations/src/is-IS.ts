@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Til baka',
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
@@ -470,6 +525,7 @@ export const isIS: LocalizationResource = {
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:
@@ -501,6 +557,10 @@ export const isIS: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Þú getur ekki eytt síðasta auðkenni þínu.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Lykill er þegar skráður með þessu tæki.',
     passkey_not_supported: 'Lyklar eru ekki studdir á þessu tæki.',
     passkey_pa_not_supported: 'Skráning krefst vettvangs auðkennis en tækið styður það ekki.',
@@ -828,6 +888,7 @@ export const isIS: LocalizationResource = {
       subtitle__unavailableWallets: 'Engin tiltæk web3 veski.',
       successMessage: 'Veskið hefur verið bætt við reikninginn þinn.',
       title: 'Bæta við web3 veski',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

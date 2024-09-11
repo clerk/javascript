@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Zurück',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
@@ -473,6 +528,7 @@ export const deDE: LocalizationResource = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:
@@ -504,6 +560,10 @@ export const deDE: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:
@@ -834,6 +894,7 @@ export const deDE: LocalizationResource = {
       subtitle__unavailableWallets: 'Es sind keine Web3-Wallets verfügbar.',
       successMessage: 'Die Brieftasche wurde Ihrem Konto hinzugefügt.',
       title: 'Web3-Wallet hinzufügen',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

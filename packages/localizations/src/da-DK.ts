@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tilbage',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
@@ -466,6 +521,7 @@ export const daDK: LocalizationResource = {
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Vælg en metode til at fortsætte',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:
@@ -495,6 +551,10 @@ export const daDK: LocalizationResource = {
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access: 'Adgang ikke tilladt.',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Adgangsnøgle findes allerede.',
     passkey_not_supported: 'Adgangsnøgler understøttes ikke på denne enhed.',
     passkey_pa_not_supported: 'Adgangsnøgler understøttes ikke på dette styresystem.',
@@ -820,6 +880,7 @@ export const daDK: LocalizationResource = {
       subtitle__unavailableWallets: 'Der er ingen tilgængelige web3-tegnebøger.',
       successMessage: 'Tegnebogen er blevet tilføjet til din konto.',
       title: 'Tilføj web3-tegnebog',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

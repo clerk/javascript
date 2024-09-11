@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: '돌아가기',
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
@@ -462,6 +517,7 @@ export const koKR: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -491,6 +547,10 @@ export const koKR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -808,6 +868,7 @@ export const koKR: LocalizationResource = {
       subtitle__unavailableWallets: '사용 가능한 web3 지갑이 없습니다.',
       successMessage: '지갑이 계정에 추가되었습니다ß.',
       title: 'web3 지갑 추가',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

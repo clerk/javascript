@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'الرجوع',
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
@@ -466,6 +521,7 @@ export const arSA: LocalizationResource = {
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:
@@ -495,6 +551,10 @@ export const arSA: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'تم تسجيل مفتاح المرور مسبقاً مع هذا الجهاز',
     passkey_not_supported: 'مفاتيح المرور غير مدعومة على هذا الجهاز',
     passkey_pa_not_supported: 'يتطلب التسجيل أداة مصادقة النظام الأساسي ولكن الجهاز لا يدعمها',
@@ -815,6 +875,7 @@ export const arSA: LocalizationResource = {
       subtitle__unavailableWallets: 'لا توجد اي محفظة web3 متاحة',
       successMessage: 'تمت إضافة المحفظة الى حسابك.',
       title: 'إضافة محفظة web3',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Powrót',
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
@@ -465,6 +520,7 @@ export const plPL: LocalizationResource = {
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -494,6 +550,10 @@ export const plPL: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -820,6 +880,7 @@ export const plPL: LocalizationResource = {
       subtitle__unavailableWallets: 'Nie ma dostępnych portfeli web3.',
       successMessage: 'Portfel został dodany do Twojego konta.',
       title: 'Dodaj portfel web3',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Înapoi',
   badge__default: 'Implicit',
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
@@ -469,6 +524,7 @@ export const roRO: LocalizationResource = {
   socialButtonsBlockButton: 'Continuați cu {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Înscrierea a eșuat din cauza unor validări de securitate nereușite. Vă rugăm să reîmprospătați pagina pentru a încerca din nou sau contactați serviciul de asistență pentru mai multă asistență.',
     captcha_unavailable:
@@ -499,6 +555,10 @@ export const roRO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Nu vă puteți șterge ultima identificare.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -830,6 +890,7 @@ export const roRO: LocalizationResource = {
       subtitle__unavailableWallets: 'Nu există portofele web3 disponibile.',
       successMessage: 'Portofelul a fost adăugat în contul dumneavoastră.',
       title: 'Adăugați portofelul web3',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tillbaka',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
@@ -466,6 +521,7 @@ export const svSE: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
@@ -495,6 +551,10 @@ export const svSE: LocalizationResource = {
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access: 'Åtkomst nekad.',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Passnyckeln finns redan.',
     passkey_not_supported: 'Passnyckel stöds inte.',
     passkey_pa_not_supported: 'Passnyckel PA stöds inte.',
@@ -819,6 +879,7 @@ export const svSE: LocalizationResource = {
       subtitle__unavailableWallets: 'Det finns inga tillgängliga web3-plånböcker.',
       successMessage: 'Plånboken har lagts till i ditt konto.',
       title: 'Lägg till web3-plånbok',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

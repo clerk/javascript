@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Πίσω',
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
@@ -467,6 +522,7 @@ export const elGR: LocalizationResource = {
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
     captcha_unavailable:
@@ -497,6 +553,10 @@ export const elGR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -828,6 +888,7 @@ export const elGR: LocalizationResource = {
       subtitle__unavailableWallets: 'Δεν υπάρχουν διαθέσιμα web3 πορτοφόλια.',
       successMessage: 'Το πορτοφόλι έχει προστεθεί στον λογαριασμό σας.',
       title: 'Προσθήκη web3 πορτοφολιού',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;
