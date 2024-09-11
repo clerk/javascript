@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Назад',
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
@@ -467,6 +522,7 @@ export const bgBG: LocalizationResource = {
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Регистрацията неуспешна поради неуспешни проверки за сигурност. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
     captcha_unavailable:
@@ -496,6 +552,10 @@ export const bgBG: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -822,6 +882,7 @@ export const bgBG: LocalizationResource = {
       subtitle__unavailableWallets: 'Няма налични web3 портфейли.',
       successMessage: 'Портфейлът беше добавен към вашия профил.',
       title: 'Добави web3 портфейл',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

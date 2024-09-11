@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Voltar',
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
@@ -468,6 +523,7 @@ export const ptBR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: '{{email}} já é membro da organização.',
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
@@ -497,6 +553,12 @@ export const ptBR: LocalizationResource = {
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access: 'Acesso não permitido.',
+    organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
+    organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
+    organization_membership_quota_exceeded:
+      'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
+    organization_minimum_permissions_needed:
+      'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
@@ -824,6 +886,7 @@ export const ptBR: LocalizationResource = {
       subtitle__unavailableWallets: 'Não há carteiras Web3 disponíveis.',
       successMessage: 'A carteira foi adicionada à sua conta.',
       title: 'Adicionar carteira Web3',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

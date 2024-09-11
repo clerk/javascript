@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Takaisin',
   badge__default: 'Oletus',
   badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
@@ -468,6 +523,7 @@ export const fiFI: LocalizationResource = {
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
@@ -497,6 +553,10 @@ export const fiFI: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access: '',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Pääsyavain on jo rekisteröity tähän laitteeseen.',
     passkey_not_supported: 'Pääsyavain ei ole tuettu tällä laitteella.',
     passkey_pa_not_supported: 'Rekisteröinti vaatii alustan autentikaattorin, mutta laite ei tue sitä.',
@@ -824,6 +884,7 @@ export const fiFI: LocalizationResource = {
       subtitle__unavailableWallets: 'Ei ole käytettävissä olevia web3-lompakoita yhdistääksesi tilisi.',
       successMessage: 'Web3-lompakko on lisätty tilillesi.',
       title: 'Lisää web3-lompakko',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;
