@@ -540,6 +540,7 @@ export const huHU: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'A vezetéknév nem lehet hosszabb, mint 256 karakter.',
     form_param_max_length_exceeded__name: 'A név nem lehet hosszabb mint 256 karakter.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',

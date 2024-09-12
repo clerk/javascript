@@ -527,6 +527,7 @@ export const zhCN: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓氏长度不得超过256个字符。',
     form_param_max_length_exceeded__name: '姓名长度不得超过256个字符。',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密码强度不够。',

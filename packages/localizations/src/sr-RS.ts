@@ -539,6 +539,7 @@ export const srRS: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Prezime ne sme premašiti 256 karaktera.',
     form_param_max_length_exceeded__name: 'Naziv ne sme premašiti 256 karaktera.',
     form_param_nil: 'Parametar ne može biti prazan.',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
     form_password_length_too_short: 'Lozinka je prekratka.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',

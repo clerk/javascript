@@ -12,12 +12,12 @@ export const fastDeepMergeAndReplace = (
   }
 
   for (const key in source) {
-    if (source[key] !== null && typeof source[key] === `object`) {
+    if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndReplace(source[key], target[key]);
-    } else {
+    } else if (Object.prototype.hasOwnProperty.call(source, key)) {
       target[key] = source[key];
     }
   }
@@ -32,12 +32,12 @@ export const fastDeepMergeAndKeep = (
   }
 
   for (const key in source) {
-    if (source[key] !== null && typeof source[key] === `object`) {
+    if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndKeep(source[key], target[key]);
-    } else if (target[key] === undefined) {
+    } else if (Object.prototype.hasOwnProperty.call(source, key) && target[key] === undefined) {
       target[key] = source[key];
     }
   }
