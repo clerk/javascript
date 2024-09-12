@@ -67,13 +67,7 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
 }
 
 function isRequestEligibleForRefresh(authenticateContext: { refreshTokenInCookie?: string }) {
-  const { refreshTokenInCookie } = authenticateContext;
-
-  if (refreshTokenInCookie) {
-    return true;
-  }
-
-  return false;
+  return !!authenticateContext.refreshTokenInCookie;
 }
 
 export async function authenticateRequest(
@@ -187,18 +181,19 @@ ${error.getFullMessage()}`,
   ): Promise<{ sessionToken: string; headers: Headers }> {
     // To perform a token refresh, apiClient must be defined.
     assertApiClient(options.apiClient);
-    const {
-      refreshTokenInCookie: refresh_token,
-      sessionToken: expired_token,
-      origin: request_origin,
-    } = authenticateContext;
+    const { sessionToken: expiredSessionToken, refreshTokenInCookie: refreshToken } = authenticateContext;
     // The token refresh endpoint requires a sessionId, so we decode that from the expired token.
-    const { data: decodeResult } = decodeJwt(expired_token!);
-    // Perform the actual token refresh.
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(expiredSessionToken!);
+
+    if (decodedErrors) {
+      // TODO: handle error properly
+      return { sessionToken: '', headers: new Headers() };
+    }
+
     const cookies = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
-      expired_token,
-      refresh_token,
-      request_origin,
+      expired_token: expiredSessionToken || '',
+      refresh_token: refreshToken || '',
+      request_origin: authenticateContext.clerkUrl.origin,
       // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
       request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
     });
