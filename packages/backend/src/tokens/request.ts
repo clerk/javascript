@@ -77,6 +77,8 @@ export async function authenticateRequest(
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
+  authenticateContext.suffixedCookies;
+
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
     if (authenticateContext.signInUrl && authenticateContext.origin) {
@@ -176,9 +178,7 @@ ${error.getFullMessage()}`,
     throw error;
   }
 
-  async function refreshToken(
-    authenticateContext: AuthenticateContext,
-  ): Promise<{ sessionToken: string; headers: Headers }> {
+  async function refreshToken(authenticateContext: AuthenticateContext): Promise<string> {
     // To perform a token refresh, apiClient must be defined.
     assertApiClient(options.apiClient);
     const { sessionToken: expiredSessionToken, refreshTokenInCookie: refreshToken } = authenticateContext;
@@ -199,24 +199,17 @@ ${error.getFullMessage()}`,
       request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
     });
 
-    const headers = new Headers();
-
-    const sessionToken = tokenResponse.jwt;
-    // TODO: what options need to be set on the session cookie?
-    headers.append('Set-Cookie', `${constants.Cookies.Session}=${sessionToken}`);
-    // TODO: handle suffixed cookies
-
-    return { sessionToken, headers };
+    return tokenResponse.jwt;
   }
 
   async function attemptRefresh(authenticateContext: AuthenticateContext) {
-    const { sessionToken, headers } = await refreshToken(authenticateContext);
+    const sessionToken = await refreshToken(authenticateContext);
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
     const { data, errors } = await verifyToken(sessionToken, authenticateContext);
     if (errors) {
       throw new Error(`Clerk: unable to verify refreshed session token.`);
     }
-    return { data, headers, sessionToken };
+    return { data, sessionToken };
   }
 
   async function handleMaybeHandshakeStatus(
@@ -228,12 +221,7 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForRefresh(authenticateContext)) {
       try {
         const refreshResponse = await attemptRefresh(authenticateContext);
-        return signedIn(
-          authenticateContext,
-          refreshResponse.data,
-          refreshResponse.headers,
-          refreshResponse.sessionToken,
-        );
+        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
       } catch (error) {
         // If there's any error, simply fallback to the handshake flow.
         console.error('Clerk: unable to refresh token:', error);
