@@ -540,6 +540,7 @@ export const elGR: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
     form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',

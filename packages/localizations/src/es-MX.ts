@@ -544,6 +544,7 @@ export const esMX: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'El apellido debe tener menos de 256 caracteres.',
     form_param_max_length_exceeded__name: 'El nombre debe tener menos de 256 caracteres.',
     form_param_nil: 'Campo vacío.',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'Contraseña incorrecta.',
     form_password_length_too_short: 'La contraseña es muy corta.',
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',

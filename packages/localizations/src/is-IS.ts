@@ -543,6 +543,7 @@ export const isIS: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Eftirnafn má ekki vera lengra en 256 stafir.',
     form_param_max_length_exceeded__name: 'Nafn má ekki vera lengra en 256 stafir.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',

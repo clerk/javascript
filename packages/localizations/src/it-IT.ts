@@ -540,6 +540,7 @@ export const itIT: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Il cognome non deve superare i 256 caratteri.',
     form_param_max_length_exceeded__name: 'Il nome non deve superare i 256 caratteri.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',

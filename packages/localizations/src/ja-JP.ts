@@ -540,6 +540,7 @@ export const jaJP: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓は256文字を超えることはできません。',
     form_param_max_length_exceeded__name: '名前は256文字を超えることはできません。',
     form_param_nil: 'パラメータが存在しません。',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'パスワードが正しくありません。',
     form_password_length_too_short: 'パスワードの長さが短すぎます。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
