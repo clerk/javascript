@@ -117,7 +117,9 @@ export const Button = React.forwardRef(function Button(
               </span>
             )
           ) : null}
-          {children ? <span className={cx('truncate', textVisuallyHidden && 'sr-only')}>{children}</span> : null}
+          {children ? (
+            <span className={cx('truncate leading-4', textVisuallyHidden && 'sr-only')}>{children}</span>
+          ) : null}
           {iconEnd ? (
             <span
               data-button-icon=''
