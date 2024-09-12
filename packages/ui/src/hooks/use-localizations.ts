@@ -1,8 +1,8 @@
 import { enUS } from '@clerk/localizations';
+import { fastDeepMergeAndReplace } from '@clerk/shared';
 import type { DeepPartial, DeepRequired, LocalizationResource } from '@clerk/types';
 import { dequal as deepEqual } from 'dequal';
 
-import { fastDeepMergeAndReplace } from '~/utils/fast-deep-merge';
 import { makeLocalizeable } from '~/utils/make-localizable';
 
 import { useOptions } from './use-options';
