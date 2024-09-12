@@ -22,7 +22,6 @@ const parseLocalizationResource = (
     fastDeepMergeAndReplace(base, res);
     fastDeepMergeAndReplace(userDefined, res);
     cache = res;
-    return cache;
   }
   return cache;
 };
