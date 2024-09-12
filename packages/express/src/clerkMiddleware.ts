@@ -23,6 +23,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, options] = parseHandlerAndOptions(args);
 
   const clerkClient = options.clerkClient || defaultClerkClient;
+  const enableHandshake = options.enableHandshake || false;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
@@ -33,12 +34,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         options,
       });
 
-      const err = setResponseHeaders(requestState, response);
-      if (err || response.writableEnded) {
-        if (err) {
-          next(err);
+      if (enableHandshake) {
+        const err = setResponseHeaders(requestState, response);
+        if (err || response.writableEnded) {
+          if (err) {
+            next(err);
+          }
+          return;
         }
-        return;
       }
 
       Object.assign(request, { auth: requestState.toAuth() });
