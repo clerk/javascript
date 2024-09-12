@@ -1,4 +1,8 @@
-import type { __experimental_SessionVerificationMaxAge, CheckAuthorizationWithCustomPermissions } from '@clerk/types';
+import type {
+  __experimental_SessionVerificationLevel,
+  __experimental_SessionVerificationMaxAge,
+  CheckAuthorizationWithCustomPermissions,
+} from '@clerk/types';
 
 const maxAgeToMinutes: { [key in __experimental_SessionVerificationMaxAge]: number } = {
   'A1.10min': 10,
@@ -7,6 +11,14 @@ const maxAgeToMinutes: { [key in __experimental_SessionVerificationMaxAge]: numb
   'A4.1day': 1440, //24 * 60,
   'A5.1wk': 10080, //7 * 24 * 60,
 };
+
+const allowedMaxAges = new Set(Object.keys(maxAgeToMinutes) as __experimental_SessionVerificationMaxAge[]);
+
+const allowedLevels = new Set<__experimental_SessionVerificationLevel>([
+  'L1.firstFactor',
+  'L2.secondFactor',
+  'L3.multiFactor',
+]);
 
 export const createCheckAuthorization = (options: {
   userId: string | null | undefined;
@@ -37,25 +49,42 @@ export const createCheckAuthorization = (options: {
       }
     }
 
-    if (params.__experimental_assurance && __experimental_factorVerificationAge) {
+    if (
+      params.__experimental_assurance &&
+      __experimental_factorVerificationAge &&
+      allowedLevels.has(params.__experimental_assurance.level) &&
+      allowedMaxAges.has(params.__experimental_assurance.maxAge)
+    ) {
       const hasValidFactorOne =
-        __experimental_factorVerificationAge[0] === -1
+        __experimental_factorVerificationAge[0] !== -1
           ? maxAgeToMinutes[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[0]
-          : false;
+          : null;
       const hasValidFactorTwo =
-        __experimental_factorVerificationAge[1] === -1
+        __experimental_factorVerificationAge[1] !== -1
           ? maxAgeToMinutes[params.__experimental_assurance.maxAge] > __experimental_factorVerificationAge[1]
-          : false;
+          : null;
 
       if (params.__experimental_assurance.level === 'L1.firstFactor') {
         stepUpAuthorization = hasValidFactorOne;
       } else if (params.__experimental_assurance.level === 'L2.secondFactor') {
-        stepUpAuthorization = hasValidFactorTwo;
+        if (__experimental_factorVerificationAge[1] !== -1) {
+          stepUpAuthorization = hasValidFactorTwo;
+        } else {
+          stepUpAuthorization = hasValidFactorOne;
+        }
       } else {
-        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
+        if (__experimental_factorVerificationAge[1] === -1) {
+          stepUpAuthorization = hasValidFactorOne;
+        } else {
+          stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
+        }
       }
     }
 
-    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
+    if ([orgAuthorization, stepUpAuthorization].some(a => a === null)) {
+      return [orgAuthorization, stepUpAuthorization].some(a => a === true);
+    }
+
+    return [orgAuthorization, stepUpAuthorization].every(a => a === true);
   };
 };
