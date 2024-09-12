@@ -48,9 +48,9 @@ const deriveFromClientSideState = (state: Resources) => {
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
-  const __experimental_factorVerificationAge: [number | null, number | null] = state.session
+  const __experimental_factorVerificationAge: [number, number] | null = state.session
     ? state.session.__experimental_factorVerificationAge
-    : [null, null];
+    : null;
   const actor = session?.actor;
   const organization = state.organization;
   const orgId: string | null | undefined = state.organization ? state.organization.id : state.organization;

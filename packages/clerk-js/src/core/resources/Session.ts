@@ -39,7 +39,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
-  __experimental_factorVerificationAge: [number | null, number | null] = [null, null];
+  __experimental_factorVerificationAge: [number, number] | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
