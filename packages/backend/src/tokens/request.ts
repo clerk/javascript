@@ -182,14 +182,15 @@ ${error.getFullMessage()}`,
     // To perform a token refresh, apiClient must be defined.
     assertApiClient(options.apiClient);
     const { sessionToken: expiredSessionToken, refreshTokenInCookie: refreshToken } = authenticateContext;
-    // The token refresh endpoint requires a sessionId, so we decode that from the expired token.
-    const { data: decodeResult, errors: decodedErrors } = decodeJwt(expiredSessionToken!);
-
-    if (decodedErrors) {
-      // TODO: handle error properly
-      return { sessionToken: '', headers: new Headers() };
+    if (!expiredSessionToken || !refreshToken) {
+      throw new Error('Clerk: refreshTokenInCookie and sessionToken must be provided.');
     }
-
+    // The token refresh endpoint requires a sessionId, so we decode that from the expired token.
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(expiredSessionToken);
+    if (!decodeResult || decodedErrors) {
+      throw new Error(`Clerk: unable to decode session token.`);
+    }
+    // Perform the actual token refresh.
     const cookies = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
       expired_token: expiredSessionToken || '',
       refresh_token: refreshToken || '',
@@ -217,7 +218,10 @@ ${error.getFullMessage()}`,
   async function attemptRefresh(authenticateContext: AuthenticateContext) {
     const { sessionToken, headers } = await refreshToken(authenticateContext);
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
-    const { data } = await verifyToken(sessionToken, authenticateContext);
+    const { data, errors } = await verifyToken(sessionToken, authenticateContext);
+    if (errors) {
+      throw new Error(`Clerk: unable to verify refreshed session token.`);
+    }
     return { data, headers, sessionToken };
   }
 
@@ -232,7 +236,7 @@ ${error.getFullMessage()}`,
         const refreshResponse = await attemptRefresh(authenticateContext);
         return signedIn(
           authenticateContext,
-          refreshResponse.data!,
+          refreshResponse.data,
           refreshResponse.headers,
           refreshResponse.sessionToken,
         );

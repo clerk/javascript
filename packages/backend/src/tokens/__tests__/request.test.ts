@@ -2,7 +2,14 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { TokenVerificationErrorReason } from '../../errors';
-import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../../fixtures';
+import {
+  mockExpiredJwt,
+  mockInvalidSignatureJwt,
+  mockJwks,
+  mockJwt,
+  mockJwtPayload,
+  mockMalformedJwt,
+} from '../../fixtures';
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
@@ -559,6 +566,31 @@ export default (QUnit: QUnit) => {
           { __client_uat: `12345`, __session: mockJwt },
         ),
         mockOptions({ secretKey: 'test_deadbeef', publishableKey: PK_LIVE }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+    });
+
+    test('refreshToken: returns signed in with valid refresh token cookie', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        cookies: [`__session=${mockJwt}`],
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __session: mockExpiredJwt, __refresh: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
       );
 
       assertSignedIn(assert, requestState);
