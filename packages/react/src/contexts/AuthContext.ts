@@ -9,5 +9,5 @@ export const [AuthContext, useAuthContext] = createContextAndHook<{
   orgRole: OrganizationCustomRoleKey | null | undefined;
   orgSlug: string | null | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
-  __experimental_factorVerificationAge: [number | null, number | null];
+  __experimental_factorVerificationAge: [number, number] | null;
 }>('AuthContext');
