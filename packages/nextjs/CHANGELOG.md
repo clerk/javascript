@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.31.5
+
+### Patch Changes
+
+- Vendor path-to-regexp ([#4155](https://github.com/clerk/javascript/pull/4155)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.31.4
 
 ### Patch Changes
