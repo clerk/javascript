@@ -1,5 +1,75 @@
 # Change Log
 
+## 1.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+
+## 1.11.0
+
+### Minor Changes
+
+- Bug fix: Introducing missing `deleteSelfEnabled` from User. ([#4139](https://github.com/clerk/javascript/pull/4139)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
+## 1.10.0
+
+### Minor Changes
+
+- Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups. ([#4061](https://github.com/clerk/javascript/pull/4061)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Server side
+
+  This can be applied to any helper that returns the auth object
+
+  **Nextjs example**
+
+  ```ts
+  auth().__experimental_factorVerificationAge;
+  ```
+
+  ### Client side
+
+  **React example**
+
+  ```ts
+  const { session } = useSession();
+  session?.__experimental_factorVerificationAge;
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf)]:
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+
+## 1.9.2
+
+### Patch Changes
+
+- Add url property to the Invitation object ([#4076](https://github.com/clerk/javascript/pull/4076)) by [@issuedat](https://github.com/issuedat)
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+  - @clerk/shared@2.6.2
+
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+  - @clerk/shared@2.6.1
+
 ## 1.9.0
 
 ### Minor Changes

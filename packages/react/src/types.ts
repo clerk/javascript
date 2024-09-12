@@ -7,7 +7,6 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   RedirectUrlProp,
-  SDKMetadata,
   SignInProps,
   SignInRedirectOptions,
   SignUpProps,
@@ -26,11 +25,27 @@ declare global {
 
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
+  /**
+   * Define the URL that `@clerk/clerk-js` should be hot-loaded from
+   */
   clerkJSUrl?: string;
+  /**
+   * If your web application only uses Control components, you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   */
   clerkJSVariant?: 'headless' | '';
+  /**
+   * Define the npm version for `@clerk/clerk-js`
+   */
   clerkJSVersion?: string;
-  sdkMetadata?: SDKMetadata;
+  /**
+   * The Clerk publishable key for your instance
+   * @note This can be found in your Clerk Dashboard on the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) page
+   */
   publishableKey: string;
+  /**
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag.
+   * @note You can use this to implement [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp)
+   */
   nonce?: string;
 } & MultiDomainAndOrProxy;
 

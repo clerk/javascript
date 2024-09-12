@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Atrás',
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
@@ -52,21 +107,21 @@ export const esMX: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
-  formFieldInputPlaceholder__backupCode: '',
+  formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
-  formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddress_username: '',
+  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
     'Ingrese o pegue una o más direcciones de correo electrónico, separadas por espacios o comas',
-  formFieldInputPlaceholder__firstName: '',
-  formFieldInputPlaceholder__lastName: '',
-  formFieldInputPlaceholder__organizationDomain: '',
-  formFieldInputPlaceholder__organizationDomainEmailAddress: '',
-  formFieldInputPlaceholder__organizationName: '',
-  formFieldInputPlaceholder__organizationSlug: '',
-  formFieldInputPlaceholder__password: '',
-  formFieldInputPlaceholder__phoneNumber: '',
-  formFieldInputPlaceholder__username: '',
+  formFieldInputPlaceholder__firstName: undefined,
+  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__organizationDomain: undefined,
+  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
+  formFieldInputPlaceholder__organizationName: undefined,
+  formFieldInputPlaceholder__organizationSlug: undefined,
+  formFieldInputPlaceholder__password: undefined,
+  formFieldInputPlaceholder__phoneNumber: undefined,
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automaticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmarción',
@@ -133,7 +188,7 @@ export const esMX: LocalizationResource = {
       action__invite: 'Invitar',
       activeMembersTab: {
         menuAction__remove: 'Eliminar miembro',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: 'Se unió',
         tableHeader__role: 'Rol',
         tableHeader__user: 'Usuario',
@@ -471,6 +526,7 @@ export const esMX: LocalizationResource = {
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recargue la página o contáctenos para obtener más asistencia.',
     captcha_unavailable:
@@ -501,6 +557,10 @@ export const esMX: LocalizationResource = {
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
     not_allowed_access: 'No tienes permiso para acceder a este recurso.',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Ya se ha registrado una llave de acceso en este dispositivo.',
     passkey_not_supported: 'Las llaves de acceso no son compatibles con este dispositivo.',
     passkey_pa_not_supported: 'El registro requiere un autenticador de plataforma, pero el dispositivo no lo admite.',
@@ -798,7 +858,7 @@ export const esMX: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: 'Perfil',
       },
       usernameSection: {
@@ -828,6 +888,7 @@ export const esMX: LocalizationResource = {
       subtitle__unavailableWallets: 'No hay billetera web3 disponibles.',
       successMessage: 'La billetera ha sido agregada a su cuenta.',
       title: 'Añadir web3 billetera',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

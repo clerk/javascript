@@ -171,7 +171,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   // - To create the overlapping border/shadow effect"
                   //   - `ring` – "focus ring"
                   //   - `ring-offset` - border
-                  '[--phone-number-field-py:theme(spacing[1.5])]',
+                  'supports-ios:[--phone-number-field-py:theme(spacing.1)] [--phone-number-field-py:theme(spacing[1.5])]',
                   '[--phone-number-field-px:theme(spacing.3)]',
                   'ring ring-transparent ring-offset-1 ring-offset-[--cl-phone-number-field-border]',
                   'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
@@ -214,7 +214,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
+                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
@@ -237,7 +237,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                           <Command.Input
                             ref={commandInputRef}
                             placeholder='Search country or code'
-                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
+                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 supports-ios:py-1 supports-ios:text-[length:1rem] w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
                           />
                         </div>
                         <Command.List
@@ -277,7 +277,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   type='button'
                   // Prevent tab stop
                   tabIndex={-1}
-                  className='grid cursor-text place-content-center px-1 text-base'
+                  className='supports-ios:text-[length:1rem] grid cursor-text place-content-center bg-white px-1 text-base'
                   onClick={() => inputRef.current?.focus()}
                   disabled={props.disabled}
                 >
@@ -296,7 +296,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
                   {...props}
-                  className='w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
+                  className='supports-ios:text-[length:1rem] w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
                   data-field-input
                 />
               </div>

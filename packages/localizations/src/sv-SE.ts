@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tillbaka',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
@@ -51,21 +106,21 @@ export const svSE: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',
   formFieldHintText__optional: 'Valfritt',
   formFieldHintText__slug: 'En slug är ett läsbart ID som måste vara unikt. Det används ofta i URL:er.',
-  formFieldInputPlaceholder__backupCode: '',
+  formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Radera konto',
-  formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddress_username: '',
+  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
     'Ange eller klistra in en eller flera e-postadresser, separerade med mellanslag eller kommatecken',
-  formFieldInputPlaceholder__firstName: '',
-  formFieldInputPlaceholder__lastName: '',
-  formFieldInputPlaceholder__organizationDomain: '',
-  formFieldInputPlaceholder__organizationDomainEmailAddress: '',
-  formFieldInputPlaceholder__organizationName: '',
-  formFieldInputPlaceholder__organizationSlug: '',
-  formFieldInputPlaceholder__password: '',
-  formFieldInputPlaceholder__phoneNumber: '',
-  formFieldInputPlaceholder__username: '',
+  formFieldInputPlaceholder__firstName: undefined,
+  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__organizationDomain: undefined,
+  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
+  formFieldInputPlaceholder__organizationName: undefined,
+  formFieldInputPlaceholder__organizationSlug: undefined,
+  formFieldInputPlaceholder__password: undefined,
+  formFieldInputPlaceholder__phoneNumber: undefined,
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -131,7 +186,7 @@ export const svSE: LocalizationResource = {
       action__invite: 'Bjud in',
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: 'Gick med',
         tableHeader__role: 'Roll',
         tableHeader__user: 'Användare',
@@ -215,7 +270,7 @@ export const svSE: LocalizationResource = {
       headerTitle__general: 'Allmänna inställningar',
       headerTitle__members: 'Medlemmar',
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: 'Organisationsprofil',
         uploadAction__title: 'Logo',
       },
@@ -381,7 +436,7 @@ export const svSE: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Verifieringskod',
       resendButton: 'Skicka koden igen',
-      subtitle: '',
+      subtitle: undefined,
       title: 'Kolla din telefon',
     },
     resetPassword: {
@@ -406,7 +461,7 @@ export const svSE: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Verifieringskod',
-      subtitle: '',
+      subtitle: undefined,
       title: 'Tvåstegsverifiering',
     },
   },
@@ -466,6 +521,7 @@ export const svSE: LocalizationResource = {
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
@@ -495,6 +551,10 @@ export const svSE: LocalizationResource = {
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access: 'Åtkomst nekad.',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Passnyckeln finns redan.',
     passkey_not_supported: 'Passnyckel stöds inte.',
     passkey_pa_not_supported: 'Passnyckel PA stöds inte.',
@@ -789,7 +849,7 @@ export const svSE: LocalizationResource = {
         title: 'Telefonnummer',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: 'Profil',
       },
       usernameSection: {
@@ -819,6 +879,7 @@ export const svSE: LocalizationResource = {
       subtitle__unavailableWallets: 'Det finns inga tillgängliga web3-plånböcker.',
       successMessage: 'Plånboken har lagts till i ditt konto.',
       title: 'Lägg till web3-plånbok',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

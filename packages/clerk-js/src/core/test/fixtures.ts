@@ -128,10 +128,10 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
   } as ExternalAccountJSON;
 };
 
-export const createUser = (params: WithUserParams): UserJSON => {
+export const createUser = (params?: WithUserParams): UserJSON => {
   const res = {
     object: 'user',
-    id: params.id,
+    id: params?.id || 'user_123',
     primary_email_address_id: '',
     primary_phone_number_id: '',
     primary_web3_wallet_id: '',
@@ -152,16 +152,16 @@ export const createUser = (params: WithUserParams): UserJSON => {
     updated_at: new Date().getTime(),
     created_at: new Date().getTime(),
     ...params,
-    email_addresses: (params.email_addresses || []).map(e =>
+    email_addresses: (params?.email_addresses || []).map(e =>
       typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(e),
     ),
-    phone_numbers: (params.phone_numbers || []).map(n =>
+    phone_numbers: (params?.phone_numbers || []).map(n =>
       typeof n === 'string' ? createPhoneNumber({ phone_number: n }) : createPhoneNumber(n),
     ),
-    external_accounts: (params.external_accounts || []).map(p =>
+    external_accounts: (params?.external_accounts || []).map(p =>
       typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(p),
     ),
-    organization_memberships: (params.organization_memberships || []).map(o =>
+    organization_memberships: (params?.organization_memberships || []).map(o =>
       typeof o === 'string' ? createOrganizationMembership({ name: o }) : createOrganizationMembership(o),
     ),
   } as UserJSON;
