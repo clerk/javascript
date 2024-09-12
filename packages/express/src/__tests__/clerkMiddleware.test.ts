@@ -19,13 +19,13 @@ describe('clerkMiddleware', () => {
     });
 
     it('throws error if secretKey is not passed as parameter', async () => {
-      const response = await runMiddleware(clerkMiddleware()).expect(500);
+      const response = await runMiddleware(clerkMiddleware({ enableHandshake: true })).expect(500);
 
       assertNoDebugHeaders(response);
     });
 
     it('works if secretKey is passed as parameter', async () => {
-      const options = { secretKey: 'sk_test_....' };
+      const options = { secretKey: 'sk_test_....', enableHandshake: true };
 
       const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
         200,
@@ -55,7 +55,7 @@ describe('clerkMiddleware', () => {
     });
 
     it('works if publishableKey is passed as parameter', async () => {
-      const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
+      const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k', enableHandshake: true };
 
       const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
         200,
@@ -69,16 +69,14 @@ describe('clerkMiddleware', () => {
   it.todo('supports usage without invocation: app.use(clerkMiddleware)');
 
   it('supports usage without parameters: app.use(clerkMiddleware())', async () => {
-    const response = await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
-      200,
-      'Hello world!',
-    );
+    await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(200, 'Hello world!');
 
-    assertSignedOutDebugHeaders(response);
+    // TODO: Observability headers are not added by default
+    // assertSignedOutDebugHeaders(response);
   });
 
   it('supports usage with parameters: app.use(clerkMiddleware(options))', async () => {
-    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
+    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k', enableHandshake: true };
 
     const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
       200,
@@ -94,10 +92,9 @@ describe('clerkMiddleware', () => {
       return next();
     };
 
-    const response = await runMiddleware(clerkMiddleware(handler), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
-      200,
-      'Hello world!',
-    );
+    const response = await runMiddleware(clerkMiddleware(handler, { enableHandshake: true }), {
+      Cookie: '__clerk_db_jwt=deadbeef;',
+    }).expect(200, 'Hello world!');
 
     expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
     assertSignedOutDebugHeaders(response);
@@ -108,7 +105,7 @@ describe('clerkMiddleware', () => {
       res.setHeader('x-clerk-auth-custom', 'custom-value');
       return next();
     };
-    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
+    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k', enableHandshake: true };
 
     const response = await runMiddleware(clerkMiddleware(handler, options), {
       Cookie: '__clerk_db_jwt=deadbeef;',
@@ -144,7 +141,7 @@ describe('clerkMiddleware', () => {
   });
 
   it('supports handshake flow', async () => {
-    const response = await runMiddleware(clerkMiddleware(), {
+    const response = await runMiddleware(clerkMiddleware({ enableHandshake: true }), {
       Cookie: '__client_uat=1711618859;',
       'Sec-Fetch-Dest': 'document',
     }).expect(307);
