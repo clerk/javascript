@@ -66,8 +66,8 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
   return false;
 }
 
-function isRequestEligibleForRefresh(authenticateContext: { refreshTokenInCookie?: string }) {
-  return !!authenticateContext.refreshTokenInCookie;
+function isRequestEligibleForRefresh(authenticateContext: { refreshTokenInCookie?: string }, request: Request) {
+  return !!authenticateContext.refreshTokenInCookie && request.method === 'GET';
 }
 
 export async function authenticateRequest(
@@ -218,7 +218,7 @@ ${error.getFullMessage()}`,
     message: string,
     headers?: Headers,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
-    if (isRequestEligibleForRefresh(authenticateContext)) {
+    if (isRequestEligibleForRefresh(authenticateContext, request)) {
       try {
         const refreshResponse = await attemptRefresh(authenticateContext);
         return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
