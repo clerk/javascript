@@ -76,7 +76,7 @@ export const addClerkCommands = ({ Cypress, cy }: AddClerkCommandsParams) => {
         expect(window.Clerk.loaded).to.eq(true);
       })
       .then(async window => {
-        await signInHelper(window, signInParams);
+        await signInHelper({ windowObject: window, signInParams });
         cy.log(`Clerk: Finished signing in.`);
       });
   });

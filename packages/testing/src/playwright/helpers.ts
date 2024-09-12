@@ -1,8 +1,8 @@
-import type { Clerk, EmailCodeFactor, PhoneCodeFactor, SignInFirstFactor, SignOutOptions } from '@clerk/types';
+import type { Clerk, SignOutOptions } from '@clerk/types';
 import type { Page } from '@playwright/test';
 
 import type { ClerkSignInParams, SetupClerkTestingTokenOptions } from '../common';
-import { CLERK_TEST_CODE } from '../common';
+import { signInHelper } from '../common';
 import { setupClerkTestingToken } from './setupClerkTestingToken';
 
 declare global {
@@ -13,6 +13,63 @@ declare global {
 
 type PlaywrightClerkLoadedParams = {
   page: Page;
+};
+
+type ClerkHelperParams = {
+  /**
+   * Signs in a user using Clerk. This custom command supports only password, phone_code and email_code first factor strategies.
+   * Multi-factor is not supported.
+   * This helper is using the `setupClerkTestingToken` internally.
+   * It is required to call `page.goto` before calling this command, and navigate to a not protected page that loads Clerk.
+   *
+   * If the strategy is password, the command will sign in the user using the provided password and identifier.
+   * If the strategy is phone_code, you are required to have a user with a test phone number as an identifier (e.g. +15555550100).
+   * If the strategy is email_code, you are required to have a user with a test email as an identifier (e.g. your_email+clerk_test@example.com).
+   *
+   * @param opts.signInParams.strategy - The sign in strategy. Supported strategies are 'password', 'phone_code' and 'email_code'.
+   * @param opts.signInParams.identifier - The user's identifier. Could be a username, a phone number or an email.
+   * @param opts.signInParams.password - The user's password. Required only if the strategy is 'password'.
+   * @param opts.page - The Playwright page object.
+   * @param opts.setupClerkTestingTokenOptions - The options for the `setupClerkTestingToken` function. Optional.
+   *
+   * @example
+   *  test("sign in", async ({ page }) => {
+   *     await page.goto("/");
+   *     await clerk.signIn({
+   *       page,
+   *       signInParams: { strategy: 'phone_code', identifier: '+15555550100' },
+   *     });
+   *     await page.goto("/protected");
+   *   });
+   */
+  signIn: (opts: PlaywrightClerkSignInParams) => Promise<void>;
+  /**
+   * Signs out the current user using Clerk.
+   * It is required to call `page.goto` before calling this command, and navigate to a page that loads Clerk.
+   * @param opts.signOutOptions - A SignOutOptions object.
+   * @param opts.page - The Playwright page object.
+   *
+   * @example
+   *  test("sign out", async ({ page }) => {
+   *     await page.goto("/");
+   *     await clerk.signIn({
+   *       page,
+   *       signInParams: { strategy: 'phone_code', identifier: '+15555550100' },
+   *     });
+   *     await page.goto("/protected");
+   *     await clerk.signOut({ page });
+   *     await page.goto("/protected");
+   *     // should redirect to sign in page
+   *   });
+   */
+  signOut: (opts: PlaywrightClerkSignOutParams) => Promise<void>;
+  /**
+   * Asserts that Clerk has been loaded.
+   * It is required to call `page.goto` before calling this command, and navigate to a page that loads Clerk.
+   *
+   * @param opts.page - The Playwright page object.
+   */
+  loaded: (opts: PlaywrightClerkLoadedParams) => Promise<void>;
 };
 
 const loaded = async ({ page }: PlaywrightClerkLoadedParams) => {
@@ -30,71 +87,7 @@ const signIn = async ({ page, signInParams, setupClerkTestingTokenOptions }: Pla
   await setupClerkTestingToken({ page, options: setupClerkTestingTokenOptions });
   await loaded({ page });
 
-  await page.evaluate(
-    async ({ signInParams }) => {
-      try {
-        if (!window.Clerk.client) {
-          return;
-        }
-        const signIn = window.Clerk.client.signIn;
-        if (signInParams.strategy === 'password') {
-          const res = await signIn.create(signInParams);
-          await window.Clerk.setActive({
-            session: res.createdSessionId,
-          });
-        } else {
-          // assertIdentifierRequirement
-          if (signInParams.strategy === 'phone_code' && !signInParams.identifier.includes('+155555501')) {
-            throw new Error(
-              `Phone number should be a test phone number.\n
-       Example: +15555550100.\n
-       Learn more here: https://clerk.com/docs/testing/test-emails-and-phones#phone-numbers`,
-            );
-          }
-          if (signInParams.strategy === 'email_code' && !signInParams.identifier.includes('+clerk_test')) {
-            throw new Error(
-              `Email should be a test email.\n
-       Any email with the +clerk_test subaddress is a test email address.\n
-       Learn more here: https://clerk.com/docs/testing/test-emails-and-phones#email-addresses`,
-            );
-          }
-
-          // signInWithCode
-          const { supportedFirstFactors } = await signIn.create({
-            identifier: signInParams.identifier,
-          });
-          const codeFactorFn =
-            signInParams.strategy === 'phone_code'
-              ? (factor: SignInFirstFactor): factor is PhoneCodeFactor => factor.strategy === 'phone_code'
-              : (factor: SignInFirstFactor): factor is EmailCodeFactor => factor.strategy === 'email_code';
-          const codeFactor = supportedFirstFactors?.find(codeFactorFn);
-          if (codeFactor) {
-            const prepareParams =
-              signInParams.strategy === 'phone_code'
-                ? { strategy: signInParams.strategy, phoneNumberId: (codeFactor as PhoneCodeFactor).phoneNumberId }
-                : { strategy: signInParams.strategy, emailAddressId: (codeFactor as EmailCodeFactor).emailAddressId };
-
-            await signIn.prepareFirstFactor(prepareParams);
-            const signInAttempt = await signIn.attemptFirstFactor({
-              strategy: signInParams.strategy,
-              code: CLERK_TEST_CODE,
-            });
-
-            if (signInAttempt.status === 'complete') {
-              await window.Clerk.setActive({ session: signInAttempt.createdSessionId });
-            } else {
-              throw new Error(`Status is ${signInAttempt.status}`);
-            }
-          } else {
-            throw new Error(`${signInParams.strategy} is not enabled.`);
-          }
-        }
-      } catch (err: any) {
-        throw new Error(`Clerk: Failed to sign in: ${err?.message}`);
-      }
-    },
-    { signInParams },
-  );
+  await page.evaluate(signInHelper, { signInParams });
 };
 
 type PlaywrightClerkSignOutParams = {
@@ -110,7 +103,7 @@ const signOut = async ({ page, signOutOptions }: PlaywrightClerkSignOutParams) =
   }, signOutOptions);
 };
 
-export const clerk = {
+export const clerk: ClerkHelperParams = {
   signIn,
   signOut,
   loaded,

@@ -45,3 +45,8 @@ export type ClerkSignInParams =
       strategy: 'phone_code' | 'email_code';
       identifier: string;
     };
+
+export type SignInHelperParams = {
+  signInParams: ClerkSignInParams;
+  windowObject?: Window;
+};
