@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Addtranslation keys for organization name validation errors
+Add empty translation keys for organization name validation errors
