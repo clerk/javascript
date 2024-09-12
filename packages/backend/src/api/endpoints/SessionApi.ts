@@ -69,7 +69,7 @@ export class SessionAPI extends AbstractAPI {
     this.requireId(sessionId);
     return this.request<Cookies>({
       method: 'POST',
-      path: joinPaths(basePath, sessionId, 'tokens'),
+      path: joinPaths(basePath, sessionId, 'refresh'),
       bodyParams: params,
     });
   }
