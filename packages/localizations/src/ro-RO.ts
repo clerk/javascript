@@ -542,6 +542,7 @@ export const roRO: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Numele de familie nu trebuie să depășească 256 de caractere.',
     form_param_max_length_exceeded__name: 'Numele nu trebuie să depășească 256 de caractere.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Parola dvs. nu este suficient de puternică.',

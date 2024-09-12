@@ -531,6 +531,7 @@ export const heIL: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'שם משפחה לא צריך לעלות על 256 תווים.',
     form_param_max_length_exceeded__name: 'שם לא צריך לעלות על 256 תווים.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',

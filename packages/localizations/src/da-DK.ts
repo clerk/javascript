@@ -539,6 +539,7 @@ export const daDK: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Efternavnet må ikke overstige 256 tegn.',
     form_param_max_length_exceeded__name: 'Navnet må ikke overstige 256 tegn.',
     form_param_nil: 'Dette felt kan ikke være tomt.',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',

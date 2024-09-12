@@ -540,6 +540,7 @@ export const bgBG: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Фамилията не трябва да надвишава 256 символа.',
     form_param_max_length_exceeded__name: 'Името не трябва да надвишава 256 символа.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Вашата парола не е достатъчно сигурна.',

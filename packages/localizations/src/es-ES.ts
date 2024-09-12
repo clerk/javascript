@@ -541,6 +541,7 @@ export const esES: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'El apellido no debe exceder los 256 caracteres.',
     form_param_max_length_exceeded__name: 'El nombre no debe exceder los 256 caracteres.',
     form_param_nil: undefined,
+    form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Tu contraseña no es lo suficientemente fuerte.',
