@@ -92,7 +92,6 @@
     "@clerk/clerk-sdk-node": "4.13.21",
     "@clerk/shared": "1.4.1",
     "@clerk/types": "3.65.3",
-    "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {

@@ -1,8 +1,9 @@
-import { pathToRegexp } from 'path-to-regexp';
+import { pathToRegexp } from './pathToRegexp';
 
 export const paths = {
   toRegexp: (path: string) => {
     try {
+      // @ts-ignore precompiled package - no types available
       return pathToRegexp(path);
     } catch (e: any) {
       throw new Error(
