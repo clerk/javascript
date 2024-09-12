@@ -575,7 +575,8 @@ export default (QUnit: QUnit) => {
     test('refreshToken: returns signed in with valid refresh token cookie', async assert => {
       // return cookies from endpoint
       const refreshSession = sinon.fake.resolves({
-        cookies: [`__session=${mockJwt}`],
+        object: 'token',
+        jwt: mockJwt,
       });
 
       const requestState = await authenticateRequest(

@@ -191,7 +191,7 @@ ${error.getFullMessage()}`,
       throw new Error(`Clerk: unable to decode session token.`);
     }
     // Perform the actual token refresh.
-    const cookies = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
+    const tokenResponse = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
       expired_token: expiredSessionToken || '',
       refresh_token: refreshToken || '',
       request_origin: authenticateContext.clerkUrl.origin,
@@ -199,18 +199,12 @@ ${error.getFullMessage()}`,
       request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
     });
 
-    const headers = new Headers({
-      'Access-Control-Allow-Origin': 'null',
-      'Access-Control-Allow-Credentials': 'true',
-    });
+    const headers = new Headers();
 
-    let sessionToken = '';
-    cookies.cookies.forEach((x: string) => {
-      headers.append('Set-Cookie', x);
-      if (getCookieName(x).startsWith(constants.Cookies.Session)) {
-        sessionToken = getCookieValue(x);
-      }
-    });
+    const sessionToken = tokenResponse.jwt;
+    // TODO: what options need to be set on the session cookie?
+    headers.append('Set-Cookie', `${constants.Cookies.Session}=${sessionToken}`);
+    // TODO: handle suffixed cookies
 
     return { sessionToken, headers };
   }

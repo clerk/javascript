@@ -1,7 +1,6 @@
 import type { ClerkPaginationRequest, SessionStatus } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
-import type { Cookies } from '../resources/Cookies';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Session } from '../resources/Session';
 import type { Token } from '../resources/Token';
@@ -67,7 +66,7 @@ export class SessionAPI extends AbstractAPI {
 
   public async refreshSession(sessionId: string, params: RefreshTokenParams) {
     this.requireId(sessionId);
-    return this.request<Cookies>({
+    return this.request<Token>({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'refresh'),
       bodyParams: params,
