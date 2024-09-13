@@ -84,12 +84,12 @@ app.use(clerkMiddleware(handler, options));
 
 ### `requireAuth`
 
-`requireAuth` is a middleware function that you can use to protect routes in your Express.js application. This function checks if the user is authenticated, and returns a 401 status code if they are not.
+`requireAuth` is a middleware function that you can use to protect routes in your Express.js application. This function checks if the user is authenticated, and passes an `UnauthorizedError` to the next middleware if they are not.
 
 `clerkMiddleware()` is required to be set in the middleware chain before this util is used.
 
 ```js
-import { clerkMiddleware, requireAuth } from '@clerk/express';
+import { clerkMiddleware, requireAuth, UnauthorizedError } from '@clerk/express';
 import express from 'express';
 
 const app = express();
@@ -104,6 +104,14 @@ app.get('/protected', requireAuth, (req, res) => {
   res.send('This is a protected route');
 });
 
+app.use((err, req, res, next) => {
+  if (err instanceof UnauthorizedError) {
+    res.status(401).send('Unauthorized');
+  } else {
+    next(err);
+  }
+});
+
 // Start the server and listen on the specified port
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -115,7 +123,7 @@ app.listen(port, () => {
 The `getAuth()` helper retrieves authentication state from the request object. See the [Next.js reference documentation](https://clerk.com/docs/references/nextjs/get-auth) for more information on how to use it.
 
 ```js
-import { clerkMiddleware, getAuth } from '@clerk/express';
+import { clerkMiddleware, getAuth, ForbiddenError } from '@clerk/express';
 import express from 'express';
 
 const app = express();
@@ -130,8 +138,8 @@ hasPermission = (request, response, next) => {
 
   // Handle if the user is not authorized
   if (!auth.has({ permission: 'org:admin:testpermission' })) {
-    response.status(403).send('Forbidden');
-    return;
+    // Catch this inside an error-handling middleware
+    return next(new ForbiddenError());
   }
 
   return next();
