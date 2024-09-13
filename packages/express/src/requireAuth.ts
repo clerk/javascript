@@ -20,8 +20,11 @@ export class UnauthorizedError extends Error {
  * // Basic usage
  * import { requireAuth, UnauthorizedError } from '@clerk/express'
  *
- * router.get(requireAuth)
- * app.use((err, req, res, next) => {
+ * router.get('/path', requireAuth, getHandler)
+ * //or
+ * router.use(requireAuth)
+ *
+ * router.use((err, req, res, next) => {
  *   if (err instanceof UnauthorizedError) {
  *     res.status(401).send('Unauthorized')
  *   } else {
