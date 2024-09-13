@@ -226,20 +226,31 @@ describe('clerkMiddleware(params)', () => {
     expect(decryptedData).toEqual(options);
   });
 
-  it('allows to access the request object to dynamically define options', async () => {
+  it('allows access to request object to dynamically define options', async () => {
+    const options = {
+      secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+      publishableKey: 'pk_test_xxxxxxxxxxxxx',
+      signInUrl: '/foo',
+      signUpUrl: '/bar',
+    };
     const resp = await clerkMiddleware(
       () => {
         return NextResponse.next();
       },
-      req => {
-        console.log({ req });
-
-        return {
-          domain: req.nextUrl.host,
-        };
-      },
+      req => ({
+        ...options,
+        domain: req.nextUrl.host,
+      }),
     )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
     expect(resp?.status).toEqual(200);
+
+    const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+    assert.ok(requestData);
+
+    const decryptedData = decryptClerkRequestData(requestData);
+
+    expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+    expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
   });
 
   describe('auth().redirectToSignIn()', () => {

@@ -75,24 +75,34 @@ export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<Aut
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
-  const [handler, params] = parseHandlerAndOptions(args, request);
+  const [handler, params] = parseHandlerAndOptions(args);
 
-  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
-    errorThrower.throwMissingPublishableKeyError(),
-  );
-  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
-  const signInUrl = params.signInUrl || SIGN_IN_URL;
-  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
+  // Starts the store with an empty context and transitions once request data is available
+  clerkMiddlewareRequestDataStore.enterWith({});
 
-  const options = {
-    ...params,
-    publishableKey,
-    secretKey,
-    signInUrl,
-    signUpUrl,
-  };
+  const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    // Handles the case where `options` is a callback function to dynamically access `Request`
+    const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-  return clerkMiddlewareRequestDataStore.run(options, () => {
+    const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
+      errorThrower.throwMissingPublishableKeyError(),
+    );
+    const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+      errorThrower.throwMissingSecretKeyError(),
+    );
+    const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
+    const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
+
+    const options = {
+      publishableKey,
+      secretKey,
+      signInUrl,
+      signUpUrl,
+      ...resolvedParams,
+    };
+
+    clerkMiddlewareRequestDataStore.enterWith(options);
+
     clerkClient().telemetry.record(
       eventMethodCalled('clerkMiddleware', {
         handler: Boolean(handler),
@@ -101,81 +111,79 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       }),
     );
 
-    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
-      if (params.debug) {
-        logger.enable();
-      }
-      const clerkRequest = createClerkRequest(request);
-      logger.debug('options', options);
-      logger.debug('url', () => clerkRequest.toJSON());
+    if (resolvedParams.debug) {
+      logger.enable();
+    }
+    const clerkRequest = createClerkRequest(request);
+    logger.debug('options', options);
+    logger.debug('url', () => clerkRequest.toJSON());
 
-      const requestState = await clerkClient().authenticateRequest(
-        clerkRequest,
-        createAuthenticateRequestOptions(clerkRequest, options),
-      );
+    const requestState = await clerkClient().authenticateRequest(
+      clerkRequest,
+      createAuthenticateRequestOptions(clerkRequest, options),
+    );
 
-      logger.debug('requestState', () => ({
-        status: requestState.status,
-        headers: JSON.stringify(Object.fromEntries(requestState.headers)),
-        reason: requestState.reason,
-      }));
+    logger.debug('requestState', () => ({
+      status: requestState.status,
+      headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+      reason: requestState.reason,
+    }));
 
-      const locationHeader = requestState.headers.get(constants.Headers.Location);
-      if (locationHeader) {
-        return new Response(null, { status: 307, headers: requestState.headers });
-      } else if (requestState.status === AuthStatus.Handshake) {
-        throw new Error('Clerk: handshake status without redirect');
-      }
-
-      const authObject = requestState.toAuth();
-      logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
-
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
-
-      let handlerResult: Response = NextResponse.next();
-      try {
-        const userHandlerResult = await clerkMiddlewareRequestDataStore.run(options, async () =>
-          handler?.(() => authObjWithMethods, request, event),
-        );
-        handlerResult = userHandlerResult || handlerResult;
-      } catch (e: any) {
-        handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
-      }
-
-      // TODO @nikos: we need to make this more generic
-      // and move the logic in clerk/backend
-      if (requestState.headers) {
-        requestState.headers.forEach((value, key) => {
-          handlerResult.headers.append(key, value);
-        });
-      }
-
-      if (isRedirect(handlerResult)) {
-        logger.debug('handlerResult is redirect');
-        return serverRedirectWithAuth(clerkRequest, handlerResult, options);
-      }
-
-      if (options.debug) {
-        setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
-      }
-
-      decorateRequest(clerkRequest, handlerResult, requestState, params);
-
-      return handlerResult;
-    });
-
-    // If we have a request and event, we're being called as a middleware directly
-    // eg, export default clerkMiddleware;
-    if (request && event) {
-      return nextMiddleware(request, event);
+    const locationHeader = requestState.headers.get(constants.Headers.Location);
+    if (locationHeader) {
+      return new Response(null, { status: 307, headers: requestState.headers });
+    } else if (requestState.status === AuthStatus.Handshake) {
+      throw new Error('Clerk: handshake status without redirect');
     }
 
-    // Otherwise, return a middleware that can be called with a request and event
-    // eg, export default clerkMiddleware(auth => { ... });
-    return nextMiddleware;
+    const authObject = requestState.toAuth();
+    logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
+
+    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+    const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
+
+    let handlerResult: Response = NextResponse.next();
+    try {
+      const userHandlerResult = await clerkMiddlewareRequestDataStore.run(options, async () =>
+        handler?.(() => authObjWithMethods, request, event),
+      );
+      handlerResult = userHandlerResult || handlerResult;
+    } catch (e: any) {
+      handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
+    }
+
+    // TODO @nikos: we need to make this more generic
+    // and move the logic in clerk/backend
+    if (requestState.headers) {
+      requestState.headers.forEach((value, key) => {
+        handlerResult.headers.append(key, value);
+      });
+    }
+
+    if (isRedirect(handlerResult)) {
+      logger.debug('handlerResult is redirect');
+      return serverRedirectWithAuth(clerkRequest, handlerResult, options);
+    }
+
+    if (options.debug) {
+      setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
+    }
+
+    decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams);
+
+    return handlerResult;
   });
+
+  // If we have a request and event, we're being called as a middleware directly
+  // eg, export default clerkMiddleware;
+  if (request && event) {
+    return nextMiddleware(request, event);
+  }
+
+  // Otherwise, return a middleware that can be called with a request and event
+  // eg, export default clerkMiddleware(auth => { ... });
+  return nextMiddleware;
 };
 
 const parseRequestAndEvent = (args: unknown[]) => {
@@ -185,20 +193,11 @@ const parseRequestAndEvent = (args: unknown[]) => {
   ];
 };
 
-const parseHandlerAndOptions = (args: unknown[], request: NextRequest | undefined) => {
-  let options = (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {};
-  const handler = typeof args[0] === 'function' ? args[0] : undefined;
-
-  const hasHandlerAndOptions = args.length === 2;
-  if (hasHandlerAndOptions) {
-    /**
-     * Provides the `request` object if options is being called as a callback
-     * @example `clerkMiddleware((auth) => { ... }, (req) => ({ domain: req.nextUrl.host }))`
-     */
-    options = typeof args[1] === 'function' ? args[1](request) : args[1];
-  }
-
-  return [handler, options] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
+const parseHandlerAndOptions = (args: unknown[]) => {
+  return [
+    typeof args[0] === 'function' ? args[0] : undefined,
+    (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
+  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ((req?: NextRequest) => ClerkMiddlewareOptions)];
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
