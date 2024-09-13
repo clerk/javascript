@@ -173,6 +173,8 @@ export default (QUnit: QUnit) => {
       fakeClock = sinon.useFakeTimers(new Date(mockJwtPayload.iat * 1000).getTime());
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      // the refresh token flow calls verify twice, so we need to support two calls
+      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
     });
 
     hooks.afterEach(() => {
