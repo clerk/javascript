@@ -250,6 +250,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
         const pendingDialog = u.page.waitForEvent('dialog');
         await action.click();
+        await u.po.userButton.waitForPopoverClosed();
         await pendingDialog;
       });
     });
