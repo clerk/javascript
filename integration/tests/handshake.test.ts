@@ -2,10 +2,10 @@ import * as http from 'node:http';
 
 import { expect, test } from '@playwright/test';
 
+import type { OrganizationSyncOptions } from '../../packages/backend/src/tokens/types';
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
-import { OrganizationSyncOptions } from '../../packages/backend/src/tokens/types';
 
 const PORT = 4199;
 
@@ -73,7 +73,7 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('Test standard signed-in - dev', async () => {
+  test('standard signed-in - dev', async () => {
     const config = generateConfig({ mode: 'test' });
     const { token, claims } = config.generateToken({ state: 'active' });
     const clientUat = claims.iat;
@@ -89,7 +89,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - dev', async () => {
+  test('standard signed-in - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -108,7 +108,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - prod', async () => {
+  test('standard signed-in - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -126,7 +126,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - prod', async () => {
+  test('standard signed-in - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -144,7 +144,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test expired session token - dev', async () => {
+  test('expired session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -167,7 +167,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test expired session token - prod', async () => {
+  test('expired session token - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -190,7 +190,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test expired session token - authorization header - prod', async () => {
+  test('expired session token - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -214,7 +214,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test early session token - dev', async () => {
+  test('early session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -237,7 +237,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test early session token - authorization header - dev', async () => {
+  test('early session token - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -261,7 +261,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test proxyUrl - dev', async () => {
+  test('proxyUrl - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -285,7 +285,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test proxyUrl - prod', async () => {
+  test('proxyUrl - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -309,7 +309,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test domain - dev', async () => {
+  test('domain - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -333,7 +333,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test domain - prod', async () => {
+  test('domain - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -357,7 +357,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test missing session token, positive uat - dev', async () => {
+  test('missing session token, positive uat - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -378,7 +378,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test missing session token, positive uat - prod', async () => {
+  test('missing session token, positive uat - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -399,7 +399,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - dev', async () => {
+  test('missing session token, 0 uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -415,7 +415,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - prod', async () => {
+  test('missing session token, 0 uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -431,7 +431,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - dev', async () => {
+  test('missing session token, missing uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -447,7 +447,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - prod', async () => {
+  test('missing session token, missing uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -462,7 +462,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite no sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite no sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -478,7 +478,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite with sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite with sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -500,7 +500,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test signed out satellite - dev', async () => {
+  test('signed out satellite - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -517,7 +517,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
+  test('missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -537,7 +537,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - path and qs - dev', async () => {
+  test('redirect url - path and qs - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -560,7 +560,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - path and qs - prod', async () => {
+  test('redirect url - path and qs - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -583,7 +583,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - proxy - dev', async () => {
+  test('redirect url - proxy - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -606,7 +606,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - proxy - prod', async () => {
+  test('redirect url - proxy - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -629,7 +629,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - proxy with port - dev', async () => {
+  test('redirect url - proxy with port - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -652,7 +652,7 @@ test.describe('Client handshake @generic', () => {
     );
   });
 
-  test('Test redirect url - proxy with port - prod', async () => {
+  test('redirect url - proxy with port - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -891,7 +891,6 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
   test.describe.configure({ mode: 'parallel' });
 
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
-  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
 
   const jwksServer = http.createServer(function (req, res) {
     const sk = req.headers.authorization?.replace('Bearer ', '');
@@ -939,31 +938,28 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     export const config = {
       matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
     };
-    `
+    `;
 
     const app = await appConfigs.next.appRouter
       .clone()
-      .addFile(
-        'src/middleware.ts',
-        () => middlewareFile,
-      )
+      .addFile('src/middleware.ts', () => middlewareFile)
       .commit();
 
     await app.setup();
     await app.withEnv(env);
     await app.dev();
-    return app
-  }
+    return app;
+  };
 
   const end = async (app: Application): Promise<void> => {
     await app.teardown();
-  }
+  };
 
   type testCase = {
     name: string;
     when: when;
     then: then;
-  }
+  };
   type when = {
     // With this initial state...
     initialAuthState: 'active' | 'expired' | 'early';
@@ -974,7 +970,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
     // And a request arrives to the app at this path...
     appRequestPath: string;
-  }
+  };
 
   type then = {
     // A handshake should (or should not) occur:
@@ -982,7 +978,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
 
     // The middleware should redirect to fapi with this query param value:
     fapiOrganizationIdParamValue: string | null;
-  }
+  };
 
   const testCases: testCase[] = [
     {
@@ -993,7 +989,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
           // Intentionally empty
         ]),
         orgSyncOptions: {
-          organizationPatterns: ["/organizations-by-id/:id"],
+          organizationPatterns: ['/organizations-by-id/:id'],
         },
         appRequestPath: '/organizations-by-id/org_a',
       },
@@ -1006,15 +1002,9 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       name: 'When org A is active in a signed-out session but org B is requested by ID, attempts to activate org B',
       when: {
         initialAuthState: 'expired',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: [
-            "/organizations-by-id/:id",
-            "/organizations-by-id/:id/",
-            "/organizations-by-id/:id/*splat",
-          ],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_b',
       },
@@ -1024,39 +1014,29 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       },
     },
     {
-      name: 'When org A is active in a signed-out session but an org B is requested by ID (with a trailing slash), attempts to activate org B',
+      // This case ensures that, for the prototypical nextjs app, we permanent redirect before attempting the handshake logic.
+      // If this wasn't the case, we'd need to recommend adding an additional pattern with a trailing slash to our docs.
+      name: 'When org A is active in a signed-out session but an org B is requested by ID with a trailing slash, permanent redirects to the non-slash route without error.',
       when: {
         initialAuthState: 'expired',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: [
-            "/organizations-by-id/:id",
-            "/organizations-by-id/:id/",
-            "/organizations-by-id/:id/*splat",
-          ],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_b/',
       },
       then: {
-        expectStatus: 307,
-        fapiOrganizationIdParamValue: 'org_b',
+        expectStatus: 308, // Handshake never 308's - this points to `/organizations-by-id/org_b` (no trailing slash)
+        fapiOrganizationIdParamValue: null,
       },
     },
     {
       name: 'When org A is active in a signed-out session but an org B sub-resource is requested by ID, attempts to activate org B',
       when: {
         initialAuthState: 'expired',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: [
-            "/organizations-by-id/:id",
-            "/organizations-by-id/:id/",
-            "/organizations-by-id/:id/*splat",
-          ],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_b',
       },
@@ -1069,15 +1049,9 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       name: 'When org A is active in an expired session and an org-agnostic resource is selected, no handshake param is added',
       when: {
         initialAuthState: 'expired',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: [
-            "/organizations-by-id/:id",
-            "/organizations-by-id/:id/",
-            "/organizations-by-id/:id/*splat",
-          ],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/',
       },
@@ -1090,19 +1064,17 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       name: 'When org A is active but org B is requested by ID, attempts to activate org B (active)',
       when: {
         initialAuthState: 'active',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ["/organizations-by-id/:id"],
-          personalWorkspacePatterns: ["/personal-workspace"], // <-- Unnecessary
+          organizationPatterns: ['/organizations-by-id/:id'],
+          personalWorkspacePatterns: ['/personal-workspace'], // <-- Unnecessary
         },
         appRequestPath: '/organizations-by-id/org_b',
       },
       then: {
         expectStatus: 307,
         fapiOrganizationIdParamValue: 'org_b',
-      }
+      },
     },
     {
       name: 'When the personal workspace is active but org A is requested by ID, attempts to activate org A',
@@ -1112,56 +1084,52 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
           // Intentionally no org claims - means personal workspace
         ]),
         orgSyncOptions: {
-          organizationPatterns: ["/organizations-by-id/:id"],
-          personalWorkspacePatterns: ["/personal-workspace"],
+          organizationPatterns: ['/organizations-by-id/:id'],
+          personalWorkspacePatterns: ['/personal-workspace'],
         },
         appRequestPath: '/organizations-by-id/org_a',
       },
       then: {
         expectStatus: 307,
         fapiOrganizationIdParamValue: 'org_a',
-      }
+      },
     },
     {
       name: 'When org A is active but the personal workspace is requested, attempt to activate the personal workspace',
       when: {
         initialAuthState: 'active',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ["/organizations-by-id/:id"],
-          personalWorkspacePatterns: ["/personal-workspace"],
+          organizationPatterns: ['/organizations-by-id/:id'],
+          personalWorkspacePatterns: ['/personal-workspace'],
         },
         appRequestPath: '/personal-workspace',
       },
       then: {
         expectStatus: 307,
         fapiOrganizationIdParamValue: '',
-      }
+      },
     },
     {
       name: 'Activates nothing with a broken path pattern',
       when: {
         initialAuthState: 'active',
-        initialSessionClaims: new Map<string, string>([
-          ['org_id', 'org_a']
-        ]),
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ["i am not a valid path pattern"],
-          personalWorkspacePatterns: ["And neither am I!"],
+          organizationPatterns: ['i am not a valid path pattern'],
+          personalWorkspacePatterns: ['And neither am I!'],
         },
         appRequestPath: '/personal-workspace',
       },
       then: {
         expectStatus: 200,
         fapiOrganizationIdParamValue: null,
-      }
+      },
     },
   ];
 
   for (const testCase of testCases) {
-    test(`organization activation by ID - ${testCase.name} - dev`, async () => {
+    test(`${testCase.name}`, async () => {
       const app = await start(testCase.when.orgSyncOptions);
 
       const config = generateConfig({
@@ -1174,8 +1142,8 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       });
 
       const clientUat = claims.iat;
-      const res = await fetch(app.serverUrl +
-        testCase.when.appRequestPath, // But attempt to visit org B
+      const res = await fetch(
+        app.serverUrl + testCase.when.appRequestPath, // But attempt to visit org B
         {
           headers: new Headers({
             Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
@@ -1184,11 +1152,11 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
             'Sec-Fetch-Dest': 'document',
           }),
           redirect: 'manual',
-        }
+        },
       );
 
       expect(res.status).toBe(testCase.then.expectStatus);
-      const redirectSearchParams = new URLSearchParams(res.headers.get('location'))
+      const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
       expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
 
       await end(app);
