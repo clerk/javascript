@@ -4,7 +4,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { NextMiddleware } from 'next/server';
+import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
@@ -56,6 +56,11 @@ interface ClerkMiddleware {
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptions): NextMiddleware;
   /**
    * @example
+   * export default clerkMiddleware((auth, request, event) => { ... }, (req) => options);
+   */
+  (handler: ClerkMiddlewareHandler, options?: (req: NextRequest) => ClerkMiddlewareOptions): NextMiddleware;
+  /**
+   * @example
    * export default clerkMiddleware(options);
    */
   (options?: ClerkMiddlewareOptions): NextMiddleware;
@@ -70,7 +75,7 @@ export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<Aut
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
-  const [handler, params] = parseHandlerAndOptions(args);
+  const [handler, params] = parseHandlerAndOptions(args, request);
 
   const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
     errorThrower.throwMissingPublishableKeyError(),
@@ -180,11 +185,20 @@ const parseRequestAndEvent = (args: unknown[]) => {
   ];
 };
 
-const parseHandlerAndOptions = (args: unknown[]) => {
-  return [
-    typeof args[0] === 'function' ? args[0] : undefined,
-    (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
-  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
+const parseHandlerAndOptions = (args: unknown[], request: NextRequest | undefined) => {
+  let options = (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {};
+  const handler = typeof args[0] === 'function' ? args[0] : undefined;
+
+  const hasHandlerAndOptions = args.length === 2;
+  if (hasHandlerAndOptions) {
+    /**
+     * Provides the `request` object if options is being called as a callback
+     * @example `clerkMiddleware((auth) => { ... }, (req) => ({ domain: req.nextUrl.host }))`
+     */
+    options = typeof args[1] === 'function' ? args[1](request) : args[1];
+  }
+
+  return [handler, options] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];

@@ -226,6 +226,22 @@ describe('clerkMiddleware(params)', () => {
     expect(decryptedData).toEqual(options);
   });
 
+  it('allows to access the request object to dynamically define options', async () => {
+    const resp = await clerkMiddleware(
+      () => {
+        return NextResponse.next();
+      },
+      req => {
+        console.log({ req });
+
+        return {
+          domain: req.nextUrl.host,
+        };
+      },
+    )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+    expect(resp?.status).toEqual(200);
+  });
+
   describe('auth().redirectToSignIn()', () => {
     it('redirects to sign-in url when redirectToSignIn is called and the request is a page request', async () => {
       const req = mockRequest({
