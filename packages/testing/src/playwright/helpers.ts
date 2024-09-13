@@ -17,12 +17,12 @@ type PlaywrightClerkLoadedParams = {
 
 type ClerkHelperParams = {
   /**
-   * Signs in a user using Clerk. This custom command supports only password, phone_code and email_code first factor strategies.
+   * Signs in a user using Clerk. This helper supports only password, phone_code and email_code first factor strategies.
    * Multi-factor is not supported.
    * This helper is using the `setupClerkTestingToken` internally.
-   * It is required to call `page.goto` before calling this command, and navigate to a not protected page that loads Clerk.
+   * It is required to call `page.goto` before calling this helper, and navigate to a not protected page that loads Clerk.
    *
-   * If the strategy is password, the command will sign in the user using the provided password and identifier.
+   * If the strategy is password, the helper will sign in the user using the provided password and identifier.
    * If the strategy is phone_code, you are required to have a user with a test phone number as an identifier (e.g. +15555550100).
    * If the strategy is email_code, you are required to have a user with a test email as an identifier (e.g. your_email+clerk_test@example.com).
    *
@@ -33,6 +33,8 @@ type ClerkHelperParams = {
    * @param opts.setupClerkTestingTokenOptions - The options for the `setupClerkTestingToken` function. Optional.
    *
    * @example
+   * import { clerk } from "@clerk/testing/playwright";
+   *
    *  test("sign in", async ({ page }) => {
    *     await page.goto("/");
    *     await clerk.signIn({
@@ -45,11 +47,13 @@ type ClerkHelperParams = {
   signIn: (opts: PlaywrightClerkSignInParams) => Promise<void>;
   /**
    * Signs out the current user using Clerk.
-   * It is required to call `page.goto` before calling this command, and navigate to a page that loads Clerk.
+   * It is required to call `page.goto` before calling this helper, and navigate to a page that loads Clerk.
    * @param opts.signOutOptions - A SignOutOptions object.
    * @param opts.page - The Playwright page object.
    *
    * @example
+   * import { clerk } from "@clerk/testing/playwright";
+   *
    *  test("sign out", async ({ page }) => {
    *     await page.goto("/");
    *     await clerk.signIn({
@@ -65,7 +69,7 @@ type ClerkHelperParams = {
   signOut: (opts: PlaywrightClerkSignOutParams) => Promise<void>;
   /**
    * Asserts that Clerk has been loaded.
-   * It is required to call `page.goto` before calling this command, and navigate to a page that loads Clerk.
+   * It is required to call `page.goto` before calling this helper, and navigate to a page that loads Clerk.
    *
    * @param opts.page - The Playwright page object.
    */
