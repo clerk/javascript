@@ -588,7 +588,7 @@ export default (QUnit: QUnit) => {
             ...defaultHeaders,
             origin: 'https://example.com',
           },
-          { __client_uat: `12345`, __session: mockExpiredJwt, __refresh: 'can_be_anything' },
+          { __client_uat: `12345`, __session: mockExpiredJwt, __refresh_MqCvchyS: 'can_be_anything' },
         ),
         mockOptions({
           secretKey: 'test_deadbeef',
@@ -640,7 +640,7 @@ export default (QUnit: QUnit) => {
             origin: 'https://example.com',
           },
           // client_uat is missing, need to handshake not to refresh
-          { __session: mockJwt, __refresh: 'can_be_anything' },
+          { __session: mockJwt, __refresh_MqCvchyS: 'can_be_anything' },
         ),
         mockOptions({
           secretKey: 'test_deadbeef',
@@ -650,6 +650,38 @@ export default (QUnit: QUnit) => {
       );
 
       assert.false(refreshSession.called);
+    });
+
+    test('refreshToken: uses suffixed refresh cookie even if un-suffixed is present', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          {
+            __client_uat: `12345`,
+            __session: mockExpiredJwt,
+            __refresh_MqCvchyS: 'can_be_anything',
+            __refresh: 'should_not_be_used',
+          },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+      assert.equal(refreshSession.getCall(0).args[1].refresh_token, 'can_be_anything');
     });
   });
 };
