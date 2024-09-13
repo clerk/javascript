@@ -5,8 +5,6 @@ import { getAuth } from './getAuth';
 import { requestHasAuthObject } from './utils';
 
 /**
- * Represents an error for unauthenticated requests.
- *
  * This error is typically thrown by the `requireAuth` middleware when
  * a request is made to a protected route without proper authentication.
  *
@@ -27,6 +25,40 @@ export class UnauthorizedError extends Error {
   constructor() {
     super('Unauthorized');
     this.name = 'UnauthorizedError';
+  }
+}
+
+/**
+ * This error is typically used when a user is authenticated but lacks the necessary permissions
+ * to access a resource or perform an action.
+ *
+ * @class
+ * @extends Error
+ *
+ * @example
+ * // This error can be used in custom authorization middleware
+ * const checkPermission = (req, res, next) => {
+ *   const auth = getAuth(req)
+ *   if (!auth.has({ permission: 'permission' })) {
+ *     return next(new ForbiddenError());
+ *   }
+ *   next();
+ * };
+ *
+ * @example
+ * // This error is usually handled in an Express error handling middleware
+ * app.use((err, req, res, next) => {
+ *   if (err instanceof ForbiddenError) {
+ *     res.status(403).send('Forbidden');
+ *   } else {
+ *     next(err);
+ *   }
+ * });
+ */
+export class ForbiddenError extends Error {
+  constructor() {
+    super('Forbidden');
+    this.name = 'ForbiddenError';
   }
 }
 
@@ -53,10 +85,10 @@ export class UnauthorizedError extends Error {
  *
  * @example
  * // Combining with permission check
- * const hasPermission = (request, response, next) => {
- *    const auth = getAuth(request)
+ * const hasPermission = (req, res, next) => {
+ *    const auth = getAuth(req)
  *    if (!auth.has({ permission: 'permission' })) {
- *      response.status(403).send('Forbidden')
+ *      res.status(403).send('Forbidden')
  *      return
  *    }
  *    return next()
