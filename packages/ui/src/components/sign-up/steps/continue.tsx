@@ -15,7 +15,7 @@ import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 
 export function SignUpContinue() {
   const { t } = useLocalizations();
@@ -100,7 +100,7 @@ export function SignUpContinue() {
                           <Button
                             busy={isSubmitting}
                             disabled={isGlobalLoading}
-                            iconEnd={<Icon.CaretRightLegacy />}
+                            iconEnd={<CaretRightLegacySm />}
                           >
                             {t('formButtonPrimary')}
                           </Button>

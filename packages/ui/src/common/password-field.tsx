@@ -5,7 +5,8 @@ import React from 'react';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
-import * as Icon from '~/primitives/icon';
+import EyeSlashSm from '~/primitives/icons/eye-slash-sm';
+import EyeSm from '~/primitives/icons/eye-sm';
 import { translatePasswordError } from '~/utils/make-localizable';
 
 export function PasswordField({
@@ -69,7 +70,7 @@ export function PasswordField({
                     disabled={props.disabled}
                   >
                     <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
-                    {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
+                    {type === 'password' ? <EyeSlashSm /> : <EyeSm />}
                   </button>
                 </Field.InputGroupEnd>
               </Field.InputGroup>

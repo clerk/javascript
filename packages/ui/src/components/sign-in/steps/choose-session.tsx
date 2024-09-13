@@ -8,7 +8,7 @@ import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import RightArrowSm from '~/primitives/icons/right-arrow-sm';
 
 function getInitials({
   firstName,
@@ -110,7 +110,7 @@ export function SignInChooseSession() {
                               ) : null}
                             </span>
                             <span className='text-gray-11 w-4 shrink-0 opacity-[--session-icon-opacity] transition-opacity'>
-                              <Icon.RightArrowSm />
+                              <RightArrowSm />
                             </span>
                           </Button>
                         </SignIn.Action>
