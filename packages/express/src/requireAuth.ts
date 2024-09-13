@@ -85,11 +85,12 @@ export class ForbiddenError extends Error {
  *
  * @example
  * // Combining with permission check
+ * import { requireAuth, ForbiddenError } from '@clerk/express'
+ *
  * const hasPermission = (req, res, next) => {
  *    const auth = getAuth(req)
  *    if (!auth.has({ permission: 'permission' })) {
- *      res.status(403).send('Forbidden')
- *      return
+ *      return next(new ForbiddenError())
  *    }
  *    return next()
  * }
