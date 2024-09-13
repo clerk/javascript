@@ -30,10 +30,10 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
     load(id) {
       if (id === resolvedVirtualModuleId) {
         return `
-          export const astroConfig = ${JSON.stringify(astroConfig)};
+          const configOutput = '${astroConfig.output}';
 
           export function isStaticOutput(forceStatic) {
-            if (astroConfig.output === 'hybrid' && forceStatic === undefined) {
+            if (configOutput === 'hybrid' && forceStatic === undefined) {
               // Default page is prerendered in hybrid mode
               return true;
             }
@@ -42,7 +42,7 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
               return forceStatic;
             }
 
-            return astroConfig.output === 'static';
+            return configOutput === 'static';
           }
         `;
       }
