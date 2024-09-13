@@ -77,7 +77,6 @@ class AuthenticateContext {
       domain: options.domain,
     });
     this.instanceType = pk.instanceType;
-
     this.frontendApi = pk.frontendApi;
   }
 

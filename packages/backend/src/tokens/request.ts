@@ -103,7 +103,7 @@ export async function authenticateRequest(
     if (options.organizationSync) {
       const toActivate = getActivationEntity(requestURL, options.organizationSync);
       if (toActivate) {
-        const params = getActivationParam(toActivate);
+        const params = getHandshakeActivationParam(toActivate);
 
         params.forEach((value, key) => {
           url.searchParams.append(key, value);
@@ -203,6 +203,9 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message);
   }
 
+  // handleMaybeOrganizationSyncHandshake determines if a handshake must occur to resolve a mismatch between
+  // the organization as specified by the URL (according to the options) and the actual active organization
+  // on the session.
   // NOTE(izaak): I don't love that null return implies signed-in...
   function handleMaybeOrganizationSyncHandshake(
     authenticateContext: AuthenticateContext,
@@ -483,6 +486,7 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
+// getActivationEntity determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
 function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
   // Check for personal workspace activation
   if (options.personalWorkspacePatterns) {
@@ -539,20 +543,24 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
       if (slug) {
         return { type: 'organization', organizationSlug: slug };
       }
-      // TODO(izaak): Consider console warning if there's a pattern given (e.g. :orgSlug) that isn't :id or :slug
+      console.warn(
+        'Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
+      );
     }
   }
   return null;
 }
 
+// ActivatibleEntity is an entity that can be activated by the handshake API.
 type ActivatibleEntity = {
   type: 'personalWorkspace' | 'organization' | 'none';
   organizationId?: string;
   organizationSlug?: string;
 };
 
-// TODO(izaak): Find a better spot for this?
-function getActivationParam(toActivate: ActivatibleEntity): Map<string, string> {
+// getHandshakeActivationParam takes an activatibatle entity (organization or personal workspace)
+// and generates the query parameters that FAPI expects on the handshake API to activate that entity.
+function getHandshakeActivationParam(toActivate: ActivatibleEntity): Map<string, string> {
   const ret = new Map();
   if (toActivate.type === 'personalWorkspace') {
     ret.set('organization_id', '');
