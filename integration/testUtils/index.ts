@@ -55,7 +55,7 @@ const createClerkUtils = ({ page }: TestArgs) => {
   };
 };
 
-type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
+export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
 export const createTestUtils = <
   Params extends { app: Application } & Partial<CreateAppPageObjectArgs>,

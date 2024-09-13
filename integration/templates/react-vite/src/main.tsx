@@ -8,6 +8,8 @@ import Protected from './protected';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 import UserProfile from './user';
+import UserProfileCustom from './custom-user-profile';
+import UserButtonCustom from './custom-user-button';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -51,6 +53,14 @@ const router = createBrowserRouter([
       {
         path: '/protected',
         element: <Protected />,
+      },
+      {
+        path: '/custom-user-profile/*',
+        element: <UserProfileCustom />,
+      },
+      {
+        path: '/custom-user-button',
+        element: <UserButtonCustom />,
       },
     ],
   },
