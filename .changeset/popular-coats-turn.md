@@ -1,5 +1,5 @@
 ---
-"@clerk/express": patch
+"@clerk/express": minor
 ---
 
 Make `requireAuth` middleware more flexible
