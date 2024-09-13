@@ -4,6 +4,25 @@ import { middlewareRequired } from './errors';
 import { getAuth } from './getAuth';
 import { requestHasAuthObject } from './utils';
 
+/**
+ * Represents an error for unauthenticated requests.
+ *
+ * This error is typically thrown by the `requireAuth` middleware when
+ * a request is made to a protected route without proper authentication.
+ *
+ * @class
+ * @extends Error
+ *
+ * @example
+ * // This error is usually handled in an Express error handling middleware
+ * app.use((err, req, res, next) => {
+ *   if (err instanceof UnauthorizedError) {
+ *     res.status(401).send('Unauthorized');
+ *   } else {
+ *     next(err);
+ *   }
+ * });
+ */
 export class UnauthorizedError extends Error {
   constructor() {
     super('Unauthorized');
