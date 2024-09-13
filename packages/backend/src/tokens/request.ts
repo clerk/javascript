@@ -1,4 +1,5 @@
-import { match, MatchFunction, MatchResult } from 'path-to-regexp';
+import type { MatchFunction, MatchResult } from 'path-to-regexp';
+import { match } from 'path-to-regexp';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -8,7 +9,8 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
-import type { RequestState } from './authStatus';
+import type { SignedInAuthObject } from './authObjects';
+import type { HandshakeState, RequestState, SignedOutState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
@@ -201,6 +203,53 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message);
   }
 
+  // NOTE(izaak): I don't love that null return implies signed-in...
+  function handleMaybeOrganizationSyncHandshake(
+    authenticateContext: AuthenticateContext,
+    auth: SignedInAuthObject,
+  ): HandshakeState | SignedOutState | null {
+    if (!options.organizationSync) {
+      return null;
+    }
+    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
+    if (!toActivate) {
+      return null;
+    }
+    let mustActivate = false;
+    // Activate an org by slug?
+    if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
+      mustActivate = true;
+    }
+    // Activate an org by ID?
+    if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
+      mustActivate = true;
+    }
+    // Activate the personal workspace?
+    if (toActivate.type === 'personalWorkspace' && auth.orgId) {
+      mustActivate = true;
+    }
+    if (!mustActivate) {
+      return null;
+    }
+    if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+      // We have an organization that needs to be activated, but this isn't our first time redirecting.
+      // This is because we attempted to activate the organization previously, but the organization
+      // must not have been valid (either not found, or not valid for this user), and gave us back
+      // a null organization. We won't re-try the handshake, and leave it to the server component to handle.
+      return null;
+    }
+    const handshakeState = handleMaybeHandshakeStatus(
+      authenticateContext,
+      AuthErrorReason.ActiveOrganizationMismatch,
+      '',
+    );
+    if (handshakeState.status !== 'handshake') {
+      // Currently, this is only possible if we're in a redirect loop, but the above check should guard against that.
+      return null;
+    }
+    return handshakeState;
+  }
+
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
 
@@ -210,7 +259,16 @@ ${error.getFullMessage()}`,
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      const signedInRequestState = await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      // Org sync if necessary
+      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
+        authenticateContext,
+        signedInRequestState.toAuth(),
+      );
+      if (handshakeRequestState) {
+        return handshakeRequestState;
+      }
+      return signedInRequestState;
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -372,41 +430,16 @@ ${error.getFullMessage()}`,
         undefined,
         authenticateContext.sessionTokenInCookie!,
       );
+
       // Org sync if necessary
-      // TODO(izaak): Also apply for auth in header scenario? Likely move to a standalone helper. Maybe "handleMaybeOrganizationSyncHandshake"
-      if (options.organizationSync) {
-        const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
-        if (toActivate) {
-          const auth = signedInRequestState.toAuth();
-          if (auth) {
-            let mustActivate = false;
-            // Activate an org by slug?
-            if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
-              mustActivate = true;
-            }
-            // Activate an org by ID?
-            if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
-              mustActivate = true;
-            }
-            // Activate the personal workspace?
-            if (toActivate.type === 'personalWorkspace' && auth.orgId) {
-              mustActivate = true;
-            }
-            if (mustActivate) {
-              if (authenticateContext.handshakeRedirectLoopCounter > 0) {
-                // We have an organization that needs to be activated, but this isn't our first time redirecting.
-                // This is because we attempted to activate the organization previously, but the organization
-                // must not have been valid (either not found, or not valid for this user), and gave us back
-                // a null organization. We won't re-try the handshake, and leave it to the server component to handle
-                return signedInRequestState;
-              } else {
-                return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
-              }
-            }
-          }
-        }
+      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
+        authenticateContext,
+        signedInRequestState.toAuth(),
+      );
+      if (handshakeRequestState) {
+        return handshakeRequestState;
       }
-      // No organization sync was necessary
+
       return signedInRequestState;
     } catch (err) {
       return handleError(err, 'cookie');
@@ -453,11 +486,13 @@ export const debugRequestState = (params: RequestState) => {
 function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
   // Check for personal workspace activation
   if (options.personalWorkspacePatterns) {
-    let matcher: MatchFunction<object>
+    let matcher: MatchFunction<object>;
     try {
-      matcher = match(options.personalWorkspacePatterns)
+      matcher = match(options.personalWorkspacePatterns);
     } catch (e) {
-      console.error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`);
+      console.error(
+        `Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
+      );
       return null;
     }
 
@@ -477,11 +512,13 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
 
   // Check for organization activation
   if (options.organizationPatterns) {
-    let matcher: MatchFunction<object>
+    let matcher: MatchFunction<object>;
     try {
-      matcher = match(options.organizationPatterns)
+      matcher = match(options.organizationPatterns);
     } catch (e) {
-      console.error(`Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`);
+      console.error(
+        `Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
+      );
       return null;
     }
 

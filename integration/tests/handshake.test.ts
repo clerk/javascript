@@ -980,7 +980,7 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     fapiOrganizationIdParamValue: string | null;
   };
 
-  const testCases: testCase[] = [
+  const cookieAuthCases: testCase[] = [
     {
       name: 'When no org is active in a signed-out session but org A is requested by ID, attempts to activate org A',
       when: {
@@ -1128,38 +1128,48 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
     },
   ];
 
-  for (const testCase of testCases) {
-    test(`${testCase.name}`, async () => {
-      const app = await start(testCase.when.orgSyncOptions);
+  for (const testCase of cookieAuthCases) {
+    ['Cookie', 'Authorization'].forEach(authHeader => {
+      test(`${authHeader} auth: ${testCase.name}`, async () => {
+        const app = await start(testCase.when.orgSyncOptions);
 
-      const config = generateConfig({
-        mode: 'test',
+        const config = generateConfig({
+          mode: 'test',
+        });
+        // Create a new map with an org_id key
+        const { token, claims } = config.generateToken({
+          state: testCase.when.initialAuthState, // <-- Critical
+          extraClaims: testCase.when.initialSessionClaims,
+        });
+
+        const headers = new Headers({
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          'Sec-Fetch-Dest': 'document',
+        });
+        switch (authHeader) {
+          case 'Cookie':
+            headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
+            break;
+          case 'Authorization':
+            headers.set('Authorization', `Bearer ${token}`);
+            break;
+        }
+
+        const res = await fetch(
+          app.serverUrl + testCase.when.appRequestPath, // But attempt to visit org B
+          {
+            headers: headers,
+            redirect: 'manual',
+          },
+        );
+
+        expect(res.status).toBe(testCase.then.expectStatus);
+        const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+        expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
+
+        await end(app);
       });
-      // Create a new map with an org_id key
-      const { token, claims } = config.generateToken({
-        state: testCase.when.initialAuthState, // <-- Critical
-        extraClaims: testCase.when.initialSessionClaims,
-      });
-
-      const clientUat = claims.iat;
-      const res = await fetch(
-        app.serverUrl + testCase.when.appRequestPath, // But attempt to visit org B
-        {
-          headers: new Headers({
-            Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-            'X-Publishable-Key': config.pk,
-            'X-Secret-Key': config.sk,
-            'Sec-Fetch-Dest': 'document',
-          }),
-          redirect: 'manual',
-        },
-      );
-
-      expect(res.status).toBe(testCase.then.expectStatus);
-      const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
-      expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
-
-      await end(app);
     });
   }
 });
