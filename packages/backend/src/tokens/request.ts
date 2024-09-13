@@ -66,8 +66,16 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
   return false;
 }
 
-function isRequestEligibleForRefresh(authenticateContext: { refreshTokenInCookie?: string }, request: Request) {
-  return !!authenticateContext.refreshTokenInCookie && request.method === 'GET';
+function isRequestEligibleForRefresh(
+  err: TokenVerificationError,
+  authenticateContext: { refreshTokenInCookie?: string },
+  request: Request,
+) {
+  return (
+    err.reason === TokenVerificationErrorReason.TokenExpired &&
+    !!authenticateContext.refreshTokenInCookie &&
+    request.method === 'GET'
+  );
 }
 
 export async function authenticateRequest(
@@ -76,8 +84,6 @@ export async function authenticateRequest(
 ): Promise<RequestState> {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
-
-  authenticateContext.suffixedCookies;
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -212,22 +218,12 @@ ${error.getFullMessage()}`,
     return { data, sessionToken };
   }
 
-  async function handleMaybeHandshakeStatus(
+  function handleMaybeHandshakeStatus(
     authenticateContext: AuthenticateContext,
     reason: AuthErrorReason,
     message: string,
     headers?: Headers,
-  ): Promise<SignedInState | SignedOutState | HandshakeState> {
-    if (isRequestEligibleForRefresh(authenticateContext, request)) {
-      try {
-        const refreshResponse = await attemptRefresh(authenticateContext);
-        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
-      } catch (error) {
-        // If there's any error, simply fallback to the handshake flow.
-        console.error('Clerk: unable to refresh token:', error);
-      }
-    }
-
+  ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
@@ -264,7 +260,7 @@ ${error.getFullMessage()}`,
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -406,6 +402,7 @@ ${error.getFullMessage()}`,
     }
 
     const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
+
     if (decodedErrors) {
       return handleError(decodedErrors[0], 'cookie');
     }
@@ -431,26 +428,36 @@ ${error.getFullMessage()}`,
     err: unknown,
     tokenCarrier: TokenCarrier,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
-    if (err instanceof TokenVerificationError) {
-      err.tokenCarrier = tokenCarrier;
-
-      const reasonToHandshake = [
-        TokenVerificationErrorReason.TokenExpired,
-        TokenVerificationErrorReason.TokenNotActiveYet,
-      ].includes(err.reason);
-
-      if (reasonToHandshake) {
-        return await handleMaybeHandshakeStatus(
-          authenticateContext,
-          AuthErrorReason.SessionTokenOutdated,
-          err.getFullMessage(),
-        );
-      }
-
-      return signedOut(authenticateContext, err.reason, err.getFullMessage());
+    if (!(err instanceof TokenVerificationError)) {
+      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+    if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
+      try {
+        const refreshResponse = await attemptRefresh(authenticateContext);
+        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
+      } catch (error) {
+        // If there's any error, simply fallback to the handshake flow.
+        console.error('Clerk: unable to refresh token:', error);
+      }
+    }
+
+    err.tokenCarrier = tokenCarrier;
+
+    const reasonToHandshake = [
+      TokenVerificationErrorReason.TokenExpired,
+      TokenVerificationErrorReason.TokenNotActiveYet,
+    ].includes(err.reason);
+
+    if (reasonToHandshake) {
+      return handleMaybeHandshakeStatus(
+        authenticateContext,
+        AuthErrorReason.SessionTokenOutdated,
+        err.getFullMessage(),
+      );
+    }
+
+    return signedOut(authenticateContext, err.reason, err.getFullMessage());
   }
 
   if (authenticateContext.sessionTokenInHeader) {
