@@ -22,6 +22,7 @@ import type {
   StartEmailLinkFlowParams,
   Web3Provider,
 } from '@clerk/types';
+import { getWeb3ProviderData } from '@clerk/types';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -192,7 +193,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ): Promise<SignUpResource> => {
     const { generateSignature, identifier, unsafeMetadata, strategy = 'web3_metamask_signature' } = params || {};
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const provider = getWeb3ProviderData({ strategy })?.provider as Web3Provider;
 
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');

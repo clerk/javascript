@@ -31,6 +31,7 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+import { getWeb3ProviderData } from '@clerk/types';
 
 import {
   generateSignatureWithCoinbaseWallet,
@@ -234,7 +235,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
     const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const provider = getWeb3ProviderData({ strategy })?.provider as Web3Provider;
 
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');

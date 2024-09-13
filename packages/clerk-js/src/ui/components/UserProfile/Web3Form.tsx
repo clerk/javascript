@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/types';
+import { getWeb3ProviderData } from '@clerk/types';
 
 import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
 import { descriptors, Image, localizationKeys } from '../../customizables';
@@ -19,7 +20,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
   });
 
   const connect = async (strategy: Web3Strategy) => {
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const provider = getWeb3ProviderData({ strategy })?.provider as Web3Provider;
 
     try {
       card.setLoading(strategy);

@@ -63,6 +63,7 @@ import type {
   UserResource,
   Web3Provider,
 } from '@clerk/types';
+import { getWeb3ProviderData } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
@@ -1418,7 +1419,7 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.environment) {
       return;
     }
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const provider = getWeb3ProviderData({ strategy })?.provider as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
       provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
