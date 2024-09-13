@@ -2,6 +2,7 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Links } from '@/common/Links';
+import { Providers } from './Providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -11,15 +12,17 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // console.log(auth());
+
   return (
-    <ClerkProvider clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}>
+    <ClerkProvider clerkJSUrl={'http://localhost:4000/npm/clerk.browser.js'}>
       <html lang='en'>
         <body className={inter.className}>
           <Links />
           <div style={{ margin: '1rem', padding: '1rem', border: '1px solid green' }}>
             <h2>Root layout</h2>
-            {children}
+            <Providers>
+              {children}
+            </Providers>
           </div>
         </body>
       </html>
