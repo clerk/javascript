@@ -1,4 +1,13 @@
-import type { Clerk, ClerkOptions, ClientResource, MultiDomainAndOrProxyPrimitives, Without } from '@clerk/types';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  Clerk,
+  ClerkOptions,
+  ClientResource,
+  MultiDomainAndOrProxyPrimitives,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+  Without,
+} from '@clerk/types';
 
 type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
@@ -38,4 +47,40 @@ declare global {
   }
 }
 
-export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams };
+type ProtectProps =
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+    };
+
+export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
+
+export type ButtonProps<Tag> = {
+  /**
+   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
+   * Use the default slot with the 'asChild' prop instead.
+   * @example
+   * <SignInButton asChild>
+   *   <button>Sign in</button>
+   * </SignInButton>
+   */
+  as: Tag;
+  asChild?: boolean;
+  mode?: 'redirect' | 'modal';
+};

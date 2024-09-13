@@ -95,6 +95,7 @@ type UpdateUserParams = {
   backupCodes?: string[];
   externalId?: string;
   createdAt?: Date;
+  deleteSelfEnabled?: boolean;
   createOrganizationEnabled?: boolean;
   createOrganizationsLimit?: number;
 } & UserMetadataParams &
@@ -275,6 +276,14 @@ export class UserAPI extends AbstractAPI {
     return this.request<User>({
       method: 'POST',
       path: joinPaths(basePath, userId, 'unlock'),
+    });
+  }
+
+  public async deleteUserProfileImage(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'DELETE',
+      path: joinPaths(basePath, userId, 'profile_image'),
     });
   }
 }

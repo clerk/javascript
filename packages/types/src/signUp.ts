@@ -23,7 +23,11 @@ import type {
 } from './strategies';
 import type { SnakeToCamel } from './utils';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
-import type { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
+import type {
+  AttemptWeb3WalletVerificationParams,
+  AuthenticateWithWeb3Params,
+  PrepareWeb3WalletVerificationParams,
+} from './web3Wallet';
 
 declare global {
   /**
@@ -72,7 +76,7 @@ export interface SignUpResource extends ClerkResource {
 
   attemptPhoneNumberVerification: (params: AttemptPhoneNumberVerificationParams) => Promise<SignUpResource>;
 
-  prepareWeb3WalletVerification: () => Promise<SignUpResource>;
+  prepareWeb3WalletVerification: (params?: PrepareWeb3WalletVerificationParams) => Promise<SignUpResource>;
 
   attemptWeb3WalletVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<SignUpResource>;
 
@@ -88,7 +92,8 @@ export interface SignUpResource extends ClerkResource {
     params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<SignUpResource>;
 
-  authenticateWithMetamask: (params?: SignUpAuthenticateWithMetamaskParams) => Promise<SignUpResource>;
+  authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -161,7 +166,12 @@ export type SignUpCreateParams = Partial<
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
-export type SignUpAuthenticateWithMetamaskParams = {
+/**
+ * @deprecated use `SignUpAuthenticateWithWeb3Params` instead
+ */
+export type SignUpAuthenticateWithMetamaskParams = SignUpAuthenticateWithWeb3Params;
+
+export type SignUpAuthenticateWithWeb3Params = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 

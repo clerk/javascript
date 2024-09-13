@@ -18,6 +18,9 @@ const Root = () => {
       clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
+      experimental={{
+        persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true',
+      }}
     >
       <Outlet />
     </ClerkProvider>

@@ -7,7 +7,6 @@ node $SCRIPT_DIR/backend/index.js
 node $SCRIPT_DIR/chrome-extension/index.js
 node $SCRIPT_DIR/expo/index.js
 node $SCRIPT_DIR/fastify/index.js
-node $SCRIPT_DIR/gatsby/index.js
 node $SCRIPT_DIR/js/index.js
 node $SCRIPT_DIR/nextjs/index.js
 node $SCRIPT_DIR/node/index.js

@@ -154,21 +154,21 @@ describe('Clerk singleton', () => {
       remove: jest.fn(),
       status: 'active',
       user: {},
-      touch: jest.fn(),
+      touch: jest.fn(() => Promise.resolve()),
       getToken: jest.fn(),
       lastActiveToken: { getRawString: () => 'mocked-token' },
     };
-    let evenBusSpy;
+    let eventBusSpy;
 
     beforeEach(() => {
-      evenBusSpy = jest.spyOn(eventBus, 'dispatch');
+      eventBusSpy = jest.spyOn(eventBus, 'dispatch');
     });
 
     afterEach(() => {
       mockSession.remove.mockReset();
       mockSession.touch.mockReset();
 
-      evenBusSpy?.mockRestore();
+      eventBusSpy?.mockRestore();
       // cleanup global window pollution
       (window as any).__unstable__onBeforeSetActive = null;
       (window as any).__unstable__onAfterSetActive = null;
@@ -183,12 +183,12 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: null });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: null });
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
       });
     });
 
     it('calls session.touch by default', async () => {
-      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockSession.touch.mockReturnValue(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
       const sut = new Clerk(productionPublishableKey);
@@ -225,31 +225,12 @@ describe('Clerk singleton', () => {
       expect(mockSession.touch).toHaveBeenCalled();
     });
 
-    /**
-     * The __session cookie needs to be cleared before calling __unstable__onBeforeSetActive
-     * as the callback may rely on the absence of the cookie to determine the user is logged out or not
-     * For example, for NextJS integration, calling __unstable__onBeforeSetActive before clearing the cookie
-     * would result in hitting the middleware with a valid session cookie (until it expires), even if the session no longer exists
-     */
-    it('clears __session cookie before calling __unstable__onBeforeSetActive', async () => {
-      mockSession.touch.mockReturnValueOnce(Promise.resolve());
-      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
-
-      (window as any).__unstable__onBeforeSetActive = () => {
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: null });
-      };
-
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load();
-      await sut.setActive({ session: null });
-    });
-
     it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
       (window as any).__unstable__onBeforeSetActive = () => {
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
       };
 
       const sut = new Clerk(productionPublishableKey);

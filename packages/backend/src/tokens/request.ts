@@ -274,6 +274,8 @@ ${error.getFullMessage()}`,
         // Check the handleHandshakeTokenVerificationErrorInDevelopment function for the development case.
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
           handleHandshakeTokenVerificationErrorInDevelopment(error);
+        } else {
+          console.error('Clerk: unable to resolve handshake:', error);
         }
       }
     }

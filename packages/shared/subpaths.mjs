@@ -2,6 +2,7 @@
 // We have to polyfill our "exports" subpaths :cry:
 
 export const subpathNames = [
+  'authorization',
   'browser',
   'callWithRetry',
   'color',
@@ -29,6 +30,8 @@ export const subpathNames = [
   'telemetry',
   'logger',
   'webauthn',
+  'router',
+  'pathToRegexp',
 ];
 
 export const subpathFoldersBarrel = ['react'];

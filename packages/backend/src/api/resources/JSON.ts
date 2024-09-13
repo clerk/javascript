@@ -32,6 +32,8 @@ export const ObjectType = {
   Token: 'token',
   TotalCount: 'total_count',
   TestingToken: 'testing_token',
+  Role: 'role',
+  Permission: 'permission',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -272,6 +274,7 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
   user_id?: string;
   message: string;
   status: string;
+  slug?: string | null;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
 }
@@ -311,6 +314,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_active_at: number | null;
   create_organization_enabled: boolean;
   create_organizations_limit: number | null;
+  delete_self_enabled: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -374,4 +378,24 @@ export interface TestingTokenJSON {
   object: typeof ObjectType.TestingToken;
   token: string;
   expires_at: number;
+}
+
+export interface RoleJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Role;
+  key: string;
+  name: string;
+  description: string;
+  permissions: PermissionJSON[];
+  is_creator_eligible: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Permission;
+  key: string;
+  name: string;
+  description: string;
+  created_at: number;
+  updated_at: number;
 }

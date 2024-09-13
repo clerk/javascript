@@ -7,14 +7,20 @@ export interface Web3ProviderData {
 }
 
 export type MetamaskWeb3Provider = 'metamask';
+export type CoinbaseWalletWeb3Provider = 'coinbase_wallet';
 
-export type Web3Provider = MetamaskWeb3Provider;
+export type Web3Provider = MetamaskWeb3Provider | CoinbaseWalletWeb3Provider;
 
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
     provider: 'metamask',
     strategy: 'web3_metamask_signature',
     name: 'MetaMask',
+  },
+  {
+    provider: 'coinbase_wallet',
+    strategy: 'web3_coinbase_wallet_signature',
+    name: 'Coinbase Wallet',
   },
 ];
 

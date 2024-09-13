@@ -15,6 +15,7 @@ import { replaceVariableScope } from './replace-variable-scope';
 type StyleCache = Map<string, string>;
 
 const clRegex = /^cl-[a-z0-9]{8}$/;
+const clTestRegex = /^cl-test/;
 
 function isBinaryExpression(node: recast.types.namedTypes.BinaryExpression) {
   return recast.types.namedTypes.BinaryExpression.check(node);
@@ -45,6 +46,9 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }, 
       if (clRegex.test(path.node.value)) {
         return false;
       }
+      if (clTestRegex.test(path.node.value)) {
+        return false;
+      }
       if (isBinaryExpression(path.parentPath.node)) {
         return false;
       }
@@ -52,6 +56,9 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }, 
         return false;
       }
       if (path.parentPath.node.type === 'ObjectProperty' && path.parentPath.node.key === path.node) {
+        return false;
+      }
+      if (path.node.value === '') {
         return false;
       }
       const cn = generateHashedClassName(path.node.value);
@@ -129,12 +136,12 @@ export async function generateStylesheet(
     /**
      * Global CSS to be included in the generated stylesheet
      */
-    globalCss: string;
+    globalCss?: string;
   },
 ) {
   let stylesheet = '@tailwind base;\n';
 
-  stylesheet += ctx.globalCss || '';
+  stylesheet += ctx?.globalCss || '';
 
   for (const [cn, value] of styleCache) {
     stylesheet += `.${cn} { @apply ${value} }\n`;

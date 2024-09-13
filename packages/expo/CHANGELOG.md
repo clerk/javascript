@@ -1,5 +1,128 @@
 # Change Log
 
+## 2.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+  - @clerk/clerk-js@5.21.2
+  - @clerk/clerk-react@5.8.2
+
+## 2.2.9
+
+### Patch Changes
+
+- Fixes an issue where iOS session activities were incorrectly classified as non-mobile ([#4137](https://github.com/clerk/javascript/pull/4137)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/clerk-js@5.21.1
+  - @clerk/clerk-react@5.8.1
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
+## 2.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`793405547`](https://github.com/clerk/javascript/commit/793405547cc0fa2d9a0190059961d55a60e95506), [`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`f928e4cd3`](https://github.com/clerk/javascript/commit/f928e4cd3c07ef195452649ce823959ffed89ac1), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf), [`bc9c40ee7`](https://github.com/clerk/javascript/commit/bc9c40ee7423e2f334b3b9d52259a3522af2357e)]:
+  - @clerk/clerk-js@5.21.0
+  - @clerk/clerk-react@5.8.0
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+
+## 2.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/clerk-js@5.20.0
+  - @clerk/clerk-react@5.7.0
+  - @clerk/types@4.19.0
+  - @clerk/shared@2.6.2
+
+## 2.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`0ab7c7328`](https://github.com/clerk/javascript/commit/0ab7c73282a04aabd16294ebee8fb5c3027ded48), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`367df086e`](https://github.com/clerk/javascript/commit/367df086ed372e31c39fbd280c8854fc8fb045ed), [`6553c265c`](https://github.com/clerk/javascript/commit/6553c265c855adb316965a4b90402f36854c8c62)]:
+  - @clerk/clerk-react@5.6.0
+  - @clerk/clerk-js@5.19.0
+  - @clerk/types@4.18.0
+  - @clerk/shared@2.6.1
+
+## 2.2.5
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/clerk-js@5.18.0
+  - @clerk/clerk-react@5.5.0
+  - @clerk/types@4.17.0
+  - @clerk/shared@2.6.0
+
+## 2.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845), [`79a05e0bf`](https://github.com/clerk/javascript/commit/79a05e0bf48a3e844bd77ac4bb87e739db981884)]:
+  - @clerk/clerk-js@5.17.0
+  - @clerk/types@4.16.0
+  - @clerk/clerk-react@5.4.5
+  - @clerk/shared@2.5.5
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`c3adac036`](https://github.com/clerk/javascript/commit/c3adac03659dfe94b403696260616528d47e1faf), [`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`0d87140be`](https://github.com/clerk/javascript/commit/0d87140beb20d099f19667d0183a1001096b9d4d), [`3d6f992a0`](https://github.com/clerk/javascript/commit/3d6f992a0f8efa6f35b182807ce51ccfc8a2d540), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/clerk-js@5.16.1
+  - @clerk/types@4.15.1
+  - @clerk/clerk-react@5.4.4
+  - @clerk/shared@2.5.4
+
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`bc301a6db`](https://github.com/clerk/javascript/commit/bc301a6db253c46423f5370d2b6bbcc601bd9997), [`96234ce3d`](https://github.com/clerk/javascript/commit/96234ce3d44ec6f262c07cc7416171f4cb82e07b), [`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6), [`edbb1d469`](https://github.com/clerk/javascript/commit/edbb1d4696a58f4321e50c15d311ca925e81b840), [`5dfbe6d72`](https://github.com/clerk/javascript/commit/5dfbe6d720a782e5119e4cf7e203ba4287ee71c8)]:
+  - @clerk/clerk-js@5.16.0
+  - @clerk/clerk-react@5.4.3
+  - @clerk/types@4.15.0
+  - @clerk/shared@2.5.3
+
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`e81d9a524`](https://github.com/clerk/javascript/commit/e81d9a524105ad456d9a6d88d651c2325348192e)]:
+  - @clerk/clerk-js@5.15.1
+
+## 2.2.0
+
+### Minor Changes
+
+- Change the export of `useLocalCredentials` hook from `@clerk/clerk-expo` to `@clerk/clerk-expo/local-credentials`. ([#3954](https://github.com/clerk/javascript/pull/3954)) by [@panteliselef](https://github.com/panteliselef)
+
+  In `@clerk/clerk-expo@2.1.0` a new hook called `useLocalCredentials` was introduced ([PR 3663](https://github.com/clerk/javascript/pull/3663)). This hook is optional, but Expo's bundler has problems tree-shaking this codepath so users were still required to install its peer dependencies even if they didn't use that hook.
+
+  For this **breaking** change, update your import as following:
+
+  ```diff
+  - import {  useLocalCredentials } from "@clerk/clerk-expo"
+  + import { useLocalCredentials } from "@clerk/clerk-expo/local-credentials"
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`d36b0e1b6`](https://github.com/clerk/javascript/commit/d36b0e1b6d8692e37f204aa813ccf80c9f27e94e), [`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/clerk-js@5.15.0
+  - @clerk/types@4.14.0
+  - @clerk/clerk-react@5.4.2
+  - @clerk/shared@2.5.2
+
 ## 2.1.1
 
 ### Patch Changes

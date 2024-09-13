@@ -30,6 +30,10 @@ export const loadApiEnv = () => {
       version: PACKAGE_VERSION,
       environment: process.env.NODE_ENV,
     },
+    telemetry: {
+      disabled: isTruthy(process.env.CLERK_TELEMETRY_DISABLED),
+      debug: isTruthy(process.env.CLERK_TELEMETRY_DEBUG),
+    },
   };
 };
 

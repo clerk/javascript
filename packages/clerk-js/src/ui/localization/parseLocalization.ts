@@ -1,8 +1,8 @@
+import { fastDeepMergeAndReplace } from '@clerk/shared';
 import type { DeepPartial, LocalizationResource } from '@clerk/types';
 import { dequal as deepEqual } from 'dequal';
 
 import { useOptions } from '../contexts';
-import { fastDeepMergeAndReplace } from '../utils';
 import { defaultResource } from './defaultEnglishResource';
 
 let cache: LocalizationResource | undefined;

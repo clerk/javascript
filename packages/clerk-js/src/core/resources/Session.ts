@@ -1,10 +1,20 @@
 import { runWithExponentialBackOff } from '@clerk/shared';
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
 import type {
+  __experimental_SessionVerificationJSON,
+  __experimental_SessionVerificationResource,
+  __experimental_SessionVerifyAttemptFirstFactorParams,
+  __experimental_SessionVerifyAttemptSecondFactorParams,
+  __experimental_SessionVerifyCreateParams,
+  __experimental_SessionVerifyPrepareFirstFactorParams,
+  __experimental_SessionVerifyPrepareSecondFactorParams,
   ActJWTClaim,
   CheckAuthorization,
+  EmailCodeConfig,
   GetToken,
   GetTokenOptions,
+  PhoneCodeConfig,
   SessionJSON,
   SessionResource,
   SessionStatus,
@@ -13,9 +23,11 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
+import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -28,6 +40,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
+  __experimental_factorVerificationAge: [number, number] | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -76,31 +89,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    // if there is no active organization user can not be authorized
-    if (!this.lastActiveOrganizationId || !this.user) {
-      return false;
-    }
-
-    // loop through organizationMemberships from client piggybacking
-    const orgMemberships = this.user.organizationMemberships || [];
+    const orgMemberships = this.user?.organizationMemberships || [];
     const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
-
-    // Based on FAPI this should never happen, but we handle it anyway
-    if (!activeMembership) {
-      return false;
-    }
-
-    const activeOrganizationPermissions = activeMembership.permissions;
-    const activeOrganizationRole = activeMembership.role;
-
-    if (params.permission) {
-      return activeOrganizationPermissions.includes(params.permission);
-    }
-    if (params.role) {
-      return activeOrganizationRole === params.role;
-    }
-
-    return false;
+    return createCheckAuthorization({
+      userId: this.user?.id,
+      __experimental_factorVerificationAge: this.__experimental_factorVerificationAge,
+      orgId: activeMembership?.id,
+      orgRole: activeMembership?.role,
+      orgPermissions: activeMembership?.permissions,
+    })(params);
   };
 
   #hydrateCache = (token: TokenResource | null) => {
@@ -117,9 +114,103 @@ export class Session extends BaseResource implements SessionResource {
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
   // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-  #getCacheId(template?: string) {
-    return `${template ? `${this.id}-${template}` : this.id}-${this.updatedAt.getTime()}`;
+  #getCacheId(template?: string, organizationId?: string | null) {
+    const resolvedOrganizationId =
+      typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
+    return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
   }
+
+  __experimental_startVerification = async ({
+    level,
+    maxAge,
+  }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify`,
+        body: {
+          level,
+          maxAge,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_prepareFirstFactorVerification = async (
+    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    let config;
+    switch (factor.strategy) {
+      case 'email_code':
+        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        break;
+      case 'phone_code':
+        config = {
+          phoneNumberId: factor.phoneNumberId,
+          default: factor.default,
+        } as PhoneCodeConfig;
+        break;
+      default:
+        clerkInvalidStrategy('Session.prepareFirstFactorVerification', (factor as any).strategy);
+    }
+
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/prepare_first_factor`,
+        body: {
+          ...config,
+          strategy: factor.strategy,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_attemptFirstFactorVerification = async (
+    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
+        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_prepareSecondFactorVerification = async (
+    params: __experimental_SessionVerifyPrepareSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/prepare_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_attemptSecondFactorVerification = async (
+    params: __experimental_SessionVerifyAttemptSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
 
   protected fromJSON(data: SessionJSON | null): this {
     if (!data) {
@@ -130,6 +221,7 @@ export class Session extends BaseResource implements SessionResource {
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.__experimental_factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
@@ -152,27 +244,37 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     const { leewayInSeconds, template, skipCache = false } = options || {};
+
+    // If no organization ID is provided, default to the selected organization in memory
+    // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
+    const organizationId =
+      typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
+
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
     }
 
-    const tokenId = this.#getCacheId(template);
+    const tokenId = this.#getCacheId(template, organizationId);
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+
+    // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
+    const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-    const tokenResolver = Token.create(path);
+    // TODO: update template endpoint to accept organizationId
+    const params = template ? {} : { organizationId };
+    const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
-      // Dispatch tokenUpdate only for __session tokens and not JWT templates
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token });
       }
       // Return null when raw string is empty to indicate that there it's signed-out

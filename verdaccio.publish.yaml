@@ -9,9 +9,6 @@ packages:
   '@clerk/*':
     access: $all
     publish: $all
-  'gatsby-plugin-clerk':
-    access: $all
-    publish: $all
   '**':
     access: $all
     publish: $all

@@ -1,5 +1,149 @@
 # @clerk/astro
 
+## 1.3.2
+
+### Patch Changes
+
+- Vendor path-to-regexp ([#4145](https://github.com/clerk/javascript/pull/4145)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+  - @clerk/backend@1.11.1
+
+## 1.3.1
+
+### Patch Changes
+
+- Allow child elements in unstyled Astro components. ([#4122](https://github.com/clerk/javascript/pull/4122)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```astro
+  ---
+  import { SignInButton } from '@clerk/components/astro'
+  ---
+
+  <SignInButton asChild>
+    <button>Sign in with Clerk</button>
+  </SignInButton>
+  ```
+
+- Fixes an issue where control components in client-side rendered apps are always hidden. ([#4131](https://github.com/clerk/javascript/pull/4131)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b97b2c1ca`](https://github.com/clerk/javascript/commit/b97b2c1cae5cb1e569708a8745c13d203beb81d9), [`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/backend@1.11.0
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
+## 1.3.0
+
+### Minor Changes
+
+- Add support for custom pages and links in the `<OrganizationProfile />` Astro component. ([#4096](https://github.com/clerk/javascript/pull/4096)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf)]:
+  - @clerk/backend@1.10.0
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0), [`1fe744328`](https://github.com/clerk/javascript/commit/1fe744328d126bc597e81770119796ac18e055ed)]:
+  - @clerk/types@4.19.0
+  - @clerk/backend@1.9.2
+  - @clerk/shared@2.6.2
+
+## 1.2.5
+
+### Patch Changes
+
+- Fixes an issue where not setting an element in an unstyled component causes a TypeScript error. ([#4057](https://github.com/clerk/javascript/pull/4057)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+  - @clerk/backend@1.9.1
+  - @clerk/shared@2.6.1
+
+## 1.2.4
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`c9ef59106`](https://github.com/clerk/javascript/commit/c9ef59106c4720af3012586f5656f7b54cf2e336), [`fece72014`](https://github.com/clerk/javascript/commit/fece72014e2d39c8343a7329ae677badcba56d15), [`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`9d0477781`](https://github.com/clerk/javascript/commit/9d04777814bf6d86d05506838b101e7cfc7c208d), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/backend@1.9.0
+  - @clerk/types@4.17.0
+  - @clerk/shared@2.6.0
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+  - @clerk/backend@1.8.3
+  - @clerk/shared@2.5.5
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/backend@1.8.2
+  - @clerk/shared@2.5.4
+
+## 1.2.1
+
+### Patch Changes
+
+- Fixes a bug where subscribing to the `$clerkStore` nanostore would give incorrect values. ([#4008](https://github.com/clerk/javascript/pull/4008)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/backend@1.8.1
+  - @clerk/shared@2.5.3
+
+## 1.2.0
+
+### Minor Changes
+
+- Add support for custom pages and links in the `<UserProfile />` Astro component. ([#3987](https://github.com/clerk/javascript/pull/3987)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add support for Astro `static` and `hybrid` outputs. ([#3911](https://github.com/clerk/javascript/pull/3911)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix incorrect authentication state when subscribing to client stores. ([#4000](https://github.com/clerk/javascript/pull/4000)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`ed7baa048`](https://github.com/clerk/javascript/commit/ed7baa0488df0ee4c48add2aac934ffb47e4a6d2)]:
+  - @clerk/backend@1.8.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Add support for custom menu items in the `<UserButton />` Astro component. ([#3969](https://github.com/clerk/javascript/pull/3969)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Inject `windowNavigate` through router functions. ([#3922](https://github.com/clerk/javascript/pull/3922)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Remove dependency `@clerk/clerk-js`. ([#3965](https://github.com/clerk/javascript/pull/3965)) by [@panteliselef](https://github.com/panteliselef)
+
+  Since clerk-js is being hotloaded it is unnecessary to keep the npm package as a dependency.
+
+- Remove duplicate headers set in Clerk middleware ([#3948](https://github.com/clerk/javascript/pull/3948)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c), [`dc94c0834`](https://github.com/clerk/javascript/commit/dc94c08341c883fa5bf891f880fb34c4569ea820)]:
+  - @clerk/types@4.14.0
+  - @clerk/backend@1.7.0
+  - @clerk/shared@2.5.2
+
 ## 1.0.12
 
 ### Patch Changes

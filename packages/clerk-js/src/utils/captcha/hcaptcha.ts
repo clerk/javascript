@@ -56,7 +56,9 @@ export const getHCaptchaToken = async (captchaOptions: {
             visibleDiv.style.display = 'block';
             widgetDiv = visibleDiv;
           } else {
-            console.error('Captcha DOM element not found. Using invisible captcha widget.');
+            console.error(
+              'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
+            );
             widgetDiv = createInvisibleDOMElement();
             isInvisibleWidget = true;
             hCaptchaSiteKey = invisibleSiteKey;

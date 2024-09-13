@@ -1,5 +1,123 @@
 # @clerk/elements
 
+## 0.15.2
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+
+## 0.15.0
+
+### Minor Changes
+
+- Remove `@clerk/elements` reliance on `next` and `@clerk/clerk-react` directly. The host router is now provided by `@clerk/nextjs`. ([#4064](https://github.com/clerk/javascript/pull/4064)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Add support for Coinbase Wallet Web3 provider ([#4103](https://github.com/clerk/javascript/pull/4103)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Adds support for `asChild` prop within `choose-strategy` and `choose-session` sign-in steps. ([#4094](https://github.com/clerk/javascript/pull/4094)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Fixes issue where errors were incorrectly being returned as an `any` type. ([#4119](https://github.com/clerk/javascript/pull/4119)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Allow for passkey triggers in the verification steps ([#4093](https://github.com/clerk/javascript/pull/4093)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa)]:
+  - @clerk/types@4.20.0
+
+## 0.14.6
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+
+## 0.14.5
+
+### Patch Changes
+
+- Add support for sign in and sign up with Coinbase ([#4051](https://github.com/clerk/javascript/pull/4051)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+
+## 0.14.4
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Moves the common `ClerkRouter` interface into `@clerk/shared/router`. Elements has been refactored internally to import the router from the shared package. ([#4045](https://github.com/clerk/javascript/pull/4045)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/types@4.17.0
+
+## 0.14.3
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+
+## 0.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+
+## 0.14.1
+
+### Patch Changes
+
+- Fix `SignIn.SafeIdentifier` potentially outputting an incorrect identifier when using similar multi-session sign in strategies. ([#3974](https://github.com/clerk/javascript/pull/3974)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+
+## 0.14.0
+
+### Minor Changes
+
+- Introduce multi-session choose account step and associated actions/components. ([#3957](https://github.com/clerk/javascript/pull/3957)) by [@tmilewski](https://github.com/tmilewski)
+
+  Example:
+
+  ```tsx
+  <SignIn.Step name="choose-session">
+    <SignIn.SessionList>
+      <SignIn.SessionListItem>
+        {({ session }) => (
+          <>
+            {session.identifier} |{" "}
+            <SignIn.Action setActiveSession>Switch...</SignIn.Action>
+          </>
+        )}
+      </SignIn.SessionListItem>
+    </SignIn.SessionList>
+  </SignIn.Step>
+  ```
+
+### Patch Changes
+
+- Refactor form hooks and utils into separate files ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(elements): Add support for sign in with email_link via redirect_url ([#3926](https://github.com/clerk/javascript/pull/3926)) by [@dstaley](https://github.com/dstaley)
+
+- Preserve absolute URLs passed via `redirect_url` ([#3947](https://github.com/clerk/javascript/pull/3947)) by [@dstaley](https://github.com/dstaley)
+
+- Extract common Form components from single file ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add support for submit and passkey loading scopes ([#3927](https://github.com/clerk/javascript/pull/3927)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/types@4.14.0
+
 ## 0.13.0
 
 ### Minor Changes

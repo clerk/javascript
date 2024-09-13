@@ -1,5 +1,226 @@
 # Change Log
 
+## 5.21.2
+
+### Patch Changes
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+
+## 5.21.1
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+  - @clerk/localizations@3.0.1
+  - @clerk/shared@2.7.1
+
+## 5.21.0
+
+### Minor Changes
+
+- Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups. ([#4061](https://github.com/clerk/javascript/pull/4061)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Server side
+
+  This can be applied to any helper that returns the auth object
+
+  **Nextjs example**
+
+  ```ts
+  auth().__experimental_factorVerificationAge;
+  ```
+
+  ### Client side
+
+  **React example**
+
+  ```ts
+  const { session } = useSession();
+  session?.__experimental_factorVerificationAge;
+  ```
+
+### Patch Changes
+
+- Fix bug where session.getToken() was reading a stale organization ID. ([#4112](https://github.com/clerk/javascript/pull/4112)) by [@BRKalow](https://github.com/BRKalow)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Ensure we don't access `window.addEventListener()` and `window.dispatchEvent` in non-browser environments. ([#4095](https://github.com/clerk/javascript/pull/4095)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Support `phone_code` as first factor for the experimental UserVerification component. ([#4085](https://github.com/clerk/javascript/pull/4085)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`95ac67a14`](https://github.com/clerk/javascript/commit/95ac67a143c263bef0c1f589728566ab8f95768d), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa), [`746b4ed5e`](https://github.com/clerk/javascript/commit/746b4ed5e2007505d5850a2a728484809474d7bf), [`feb9e14d4`](https://github.com/clerk/javascript/commit/feb9e14d4ae7d4dd197f23cdb9dd1fea3ec4856f)]:
+  - @clerk/types@4.20.0
+  - @clerk/shared@2.7.0
+  - @clerk/localizations@3.0.0
+
+## 5.20.0
+
+### Minor Changes
+
+- Add support for the Coinbase Wallet web3 provider and authentication strategy. The Coinbase Wallet provider handles both Coinbase Wallet extension and Smart Wallet ([#4082](https://github.com/clerk/javascript/pull/4082)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- **Experimental:** Persist the Clerk client after signing out a user. ([#3941](https://github.com/clerk/javascript/pull/3941)) by [@panteliselef](https://github.com/panteliselef)
+
+  This allows for matching a user's device with a client. To try out this new feature, enable it in your `<ClerkProvider />` or `clerk.load()` call.
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: true }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: true } });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+  - @clerk/localizations@2.8.1
+  - @clerk/shared@2.6.2
+
+## 5.19.0
+
+### Minor Changes
+
+- Add new `UserVerification` component (experimental feature). This UI component allows for a user to "re-enter" their credentials (first factor and/or second factor) which results in them being re-verified. ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+  New methods have been added:
+
+  - `__experimental_openUserVerification()`
+  - `__experimental_closeUserVerification()`
+  - `__experimental_mountUserVerification(targetNode: HTMLDivElement)`
+  - `__experimental_unmountUserVerification(targetNode: HTMLDivElement)`
+
+- Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
+  - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
+  - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
+  - `user.__experimental_verifySessionPrepareSecondFactor` -> `session.__experimental_prepareSecondFactorVerification`
+  - `user.__experimental_verifySessionAttemptSecondFactor` -> `session.__experimental_attemptSecondFactorVerification`
+
+### Patch Changes
+
+- Bug fix: Use the EIP-6963 standard to get a Web3 provider when more than one provider is injected. ([#4059](https://github.com/clerk/javascript/pull/4059)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- chore(clerk-js): Display shortened web3 wallet address on user profile ([#4074](https://github.com/clerk/javascript/pull/4074)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- chore(clerk-js): Add 'Unverified' or 'Primary' tag next to the Web3 wallet address on the user profile. ([#4077](https://github.com/clerk/javascript/pull/4077)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/localizations@2.8.0
+  - @clerk/types@4.18.0
+  - @clerk/shared@2.6.1
+
+## 5.18.0
+
+### Minor Changes
+
+- Add support for Coinbase Wallet strategy during sign in/up flows. Users can now authenticate using their Coinbase Wallet browser extension in the same way as MetaMask ([#4052](https://github.com/clerk/javascript/pull/4052)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/localizations@2.7.1
+  - @clerk/types@4.17.0
+  - @clerk/shared@2.6.0
+
+## 5.17.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Fix 404s after signing out in NextJS apps by keeping the session cookie while cache is being invalidated ([#4001](https://github.com/clerk/javascript/pull/4001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7ca43acae`](https://github.com/clerk/javascript/commit/7ca43acaeb8d0b5dc842d20f78c53dec554e4829), [`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/localizations@2.7.0
+  - @clerk/types@4.16.0
+  - @clerk/shared@2.5.5
+
+## 5.16.1
+
+### Patch Changes
+
+- Remove sessionId parameter from all **experimental** verify session methods. ([#4026](https://github.com/clerk/javascript/pull/4026)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce Coinbase Wallet Web3 provider types ([#4028](https://github.com/clerk/javascript/pull/4028)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Change the webpackChunkName of GoogleOneTap from `"oneTap"` to `"onetap"` for consistency. ([#4036](https://github.com/clerk/javascript/pull/4036)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes issue where `createFlexGapPropertyIosCompat` was incorrectly detecting a modern Chrome for iOS user agent. ([#4034](https://github.com/clerk/javascript/pull/4034)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce support for the Hugging Face OAuth Provider. ([#4021](https://github.com/clerk/javascript/pull/4021)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/localizations@2.6.3
+  - @clerk/shared@2.5.4
+
+## 5.16.0
+
+### Minor Changes
+
+- Expose `SessionVerification` as an experimental resource. ([#4011](https://github.com/clerk/javascript/pull/4011)) by [@panteliselef](https://github.com/panteliselef)
+
+  Update `UserResource` with 5 new experimental methods:
+
+  - `experimental_verifySession` for creating a new SessionVerification record and initiating a new flow.
+  - `experimental_verifySessionPrepareFirstFactor` for preparing a supported first factor like `phone_code`
+  - `experimental_verifySessionAttemptFirstFactor` for attempting a supported first factor like `password`
+  - `experimental_verifySessionPrepareSecondFactor` for preparing a supported second factor like `phone_code`
+  - `experimental_verifySessionAttemptSecondFactor` for attempting a supported second factor like `totp`
+
+- Fixes a bug where multiple tabs with different active organizations would not always respect the selected organization. Going forward, when a tab is focused the active organization will immediately be updated to the tab's last active organization. ([#3786](https://github.com/clerk/javascript/pull/3786)) by [@BRKalow](https://github.com/BRKalow)
+
+  Additionally, `Clerk.session.getToken()` now accepts an `organizationId` option. The provided organization ID will be used to set organization-related claims in the generated session token.
+
+### Patch Changes
+
+- - Fixes an issue in Connected Accounts menu that was related to Custom OAuth Providers: ([#4014](https://github.com/clerk/javascript/pull/4014)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Resolves undefined properties error that occurred when a Custom OAuth Provider was `enabled` but `authenticatable` was set to `false`.
+
+- Fix issue where MFA two-factor UI was incorrectly rendering set default action in SMS code when TOTP strategy was defined. ([#4003](https://github.com/clerk/javascript/pull/4003)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/localizations@2.6.2
+  - @clerk/shared@2.5.3
+
+## 5.15.1
+
+### Patch Changes
+
+- Improve the Smart CAPTCHA widget console error. ([#3989](https://github.com/clerk/javascript/pull/3989)) by [@agis](https://github.com/agis)
+
+- Updated dependencies [[`c81785972`](https://github.com/clerk/javascript/commit/c81785972c1b6fdf76b7765a4c48d1a4ca1a776b), [`05198fd17`](https://github.com/clerk/javascript/commit/05198fd1791f81b4fc36d0f7d4cec750205d8ab9), [`5818ca8bd`](https://github.com/clerk/javascript/commit/5818ca8bd0f24c29bac0876c2aa88b0fe919b418)]:
+  - @clerk/localizations@2.6.1
+
+## 5.15.0
+
+### Minor Changes
+
+- Inject `windowNavigate` through router functions. ([#3922](https://github.com/clerk/javascript/pull/3922)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue where the application logo would render smaller then intended ([#3959](https://github.com/clerk/javascript/pull/3959)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`77cdf7611`](https://github.com/clerk/javascript/commit/77cdf7611869c023ff5263a0198b926f37a8289c), [`3de0a1b7e`](https://github.com/clerk/javascript/commit/3de0a1b7e3d2ba7e90eea0492e56f29ab10a24a1), [`ec6bfb5b1`](https://github.com/clerk/javascript/commit/ec6bfb5b16581e3521ff11494b288d76c875974b), [`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c), [`e5491facc`](https://github.com/clerk/javascript/commit/e5491facc6a88c1bd9236a88e3b909f0b0b9d1d3), [`072667043`](https://github.com/clerk/javascript/commit/07266704348c3cafb19f81b7d7a28a03058e2ea1)]:
+  - @clerk/localizations@2.6.0
+  - @clerk/types@4.14.0
+  - @clerk/shared@2.5.2
+
 ## 5.14.1
 
 ### Patch Changes

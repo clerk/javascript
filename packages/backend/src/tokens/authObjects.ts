@@ -1,3 +1,4 @@
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -34,6 +35,13 @@ export type SignedInAuthObject = {
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_factorVerificationAge: [number, number] | null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -51,6 +59,13 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_factorVerificationAge: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -86,6 +101,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
+    fva,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -93,6 +109,9 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
+
+  // fva can be undefined for instances that have not opt-in
+  const __experimental_factorVerificationAge = fva ?? null;
 
   return {
     actor,
@@ -103,8 +122,9 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
+    __experimental_factorVerificationAge,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -122,6 +142,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
+    __experimental_factorVerificationAge: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
@@ -160,36 +181,5 @@ const createGetToken: CreateGetToken = params => {
     }
 
     return sessionToken;
-  };
-};
-
-const createHasAuthorization = (options: {
-  userId: string;
-  orgId: string | undefined;
-  orgRole: string | undefined;
-  orgPermissions: string[] | undefined;
-}): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions } = options;
-
-  return params => {
-    if (!params?.permission && !params?.role) {
-      throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-      );
-    }
-
-    if (!orgId || !userId || !orgRole || !orgPermissions) {
-      return false;
-    }
-
-    if (params.permission) {
-      return orgPermissions.includes(params.permission);
-    }
-
-    if (params.role) {
-      return orgRole === params.role;
-    }
-
-    return false;
   };
 };

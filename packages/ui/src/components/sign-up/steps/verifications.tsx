@@ -5,13 +5,14 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
+import PenSm from '~/primitives/icons/pen-sm';
 import { LinkButton } from '~/primitives/link';
 import type { RequireExactlyOne } from '~/types/utils';
 import { parsePhoneString } from '~/utils/phone-number';
@@ -46,33 +47,27 @@ function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
 
 export function SignUpVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='verifications'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -87,7 +82,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -131,7 +126,7 @@ export function SignUpVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -144,13 +139,7 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -165,7 +154,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -209,7 +198,7 @@ export function SignUpVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -222,13 +211,7 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_link'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
                     <Card.Description>
                       {t('signUp.emailLink.subtitle', {
@@ -247,7 +230,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -278,7 +261,7 @@ export function SignUpVerifications() {
                   </Card.Body>
                 </SignUp.Strategy>
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignUp.Step>
         );

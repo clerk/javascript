@@ -5,45 +5,41 @@ import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import EnvelopeSm from '~/primitives/icons/envelope-sm';
+import FingerprintSm from '~/primitives/icons/fingerprint-sm';
+import LinkSm from '~/primitives/icons/link-sm';
+import LockSm from '~/primitives/icons/lock-sm';
+import SmsSm from '~/primitives/icons/sms-sm';
 import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
 export function SignInForgotPassword() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='forgot-password'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignIn.Step
+            asChild
+            name='forgot-password'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                 </Card.Header>
 
@@ -72,7 +68,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.LinkSm />}
+                        iconStart={<LinkSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -90,7 +86,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.EnvelopeSm />}
+                        iconStart={<EnvelopeSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -108,7 +104,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.SMSSm />}
+                        iconStart={<SmsSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -126,7 +122,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.FingerprintSm />}
+                        iconStart={<FingerprintSm />}
                       >
                         {t('signIn.alternativeMethods.blockButton__passkey')}
                       </Button>
@@ -138,7 +134,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.LockSm />}
+                        iconStart={<LockSm />}
                       >
                         {t('signIn.alternativeMethods.blockButton__password')}
                       </Button>
@@ -153,7 +149,7 @@ export function SignInForgotPassword() {
                   </SignIn.Action>
                 </Card.Body>
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.alternativeMethods.actionText')}{' '}

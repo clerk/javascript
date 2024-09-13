@@ -50,7 +50,14 @@ const incomingMessageToRequest = (req: IncomingMessage): Request => {
   // req extends IncomingMessage in a useful way. No guarantee
   // it'll work.
   const protocol = req.connection?.encrypted ? 'https' : 'http';
-  const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  let dummyOriginReqUrl: URL;
+
+  try {
+    dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  } catch (e) {
+    throw new Error(`Invalid request URL: ${req.url}`);
+  }
+
   return new Request(dummyOriginReqUrl, {
     method: req.method,
     headers: new Headers(headers),

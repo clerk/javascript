@@ -6,47 +6,42 @@ import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
+import PenSm from '~/primitives/icons/pen-sm';
 import { LinkButton } from '~/primitives/link';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const isDev = useDevModeWarning();
   const isPasswordResetSupported = useResetPasswordFactor();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='verifications'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignIn.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignIn.Strategy name='password'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.password.title')}</Card.Title>
                     <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                     <Card.Description>
@@ -61,7 +56,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -103,7 +98,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -123,13 +118,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='passkey'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.passkey.title')}</Card.Title>
                     <Card.Description>{t('signIn.passkey.subtitle')}</Card.Description>
                     <Card.Description>
@@ -144,7 +133,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -164,7 +153,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -183,13 +172,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='backup_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.backupCodeMfa.title')}</Card.Title>
                     <Card.Description>{t('signIn.backupCodeMfa.subtitle')}</Card.Description>
                   </Card.Header>
@@ -211,7 +194,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -235,13 +218,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='email_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signIn.emailCode.subtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -256,7 +233,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -300,7 +277,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -320,13 +297,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='phone_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -341,7 +312,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -386,7 +357,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -406,13 +377,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='email_link'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.emailLink.title')}</Card.Title>
                     <Card.Description>{t('signIn.emailLink.formSubtitle', { applicationName })}</Card.Description>
                     <Card.Description>
@@ -427,7 +392,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -510,7 +475,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -523,13 +488,7 @@ export function SignInVerifications() {
 
                 <SignIn.Strategy name='totp'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signIn.totpMfa.formTitle')}</Card.Title>
                     <Card.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
@@ -554,7 +513,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -571,7 +530,7 @@ export function SignInVerifications() {
                   </Card.Actions>
                 </SignIn.Strategy>
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignIn.Step>
         );

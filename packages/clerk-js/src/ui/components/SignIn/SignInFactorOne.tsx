@@ -1,4 +1,4 @@
-import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToAfterSignIn } from '../../common';
@@ -37,6 +37,7 @@ export function _SignInFactorOne(): JSX.Element {
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
+  const { supportedFirstFactors } = useCoreSignIn();
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -49,6 +50,7 @@ export function _SignInFactorOne(): JSX.Element {
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
+    supportedFirstFactors,
   });
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
@@ -123,7 +125,6 @@ export function _SignInFactorOne(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
-    // @ts-ignore
     case 'passkey':
       return (
         <SignInFactorOnePasskey
@@ -134,15 +135,6 @@ export function _SignInFactorOne(): JSX.Element {
     case 'password':
       return (
         <SignInFactorOnePasswordCard
-          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
-            handleFactorPrepare();
-            setFactor(prev => ({
-              currentFactor: {
-                ...factor,
-              },
-              prevCurrentFactor: prev.currentFactor,
-            }));
-          }}
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
           onPasswordPwned={() => {

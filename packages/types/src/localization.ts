@@ -283,6 +283,61 @@ type _LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
   };
+  __experimental_userVerification: {
+    password: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+    };
+    emailCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    phoneCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    phoneCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    totpMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+    };
+    backupCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    alternativeMethods: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      blockButton__emailCode: LocalizationValue;
+      blockButton__phoneCode: LocalizationValue;
+      blockButton__password: LocalizationValue;
+      blockButton__totp: LocalizationValue;
+      blockButton__backupCode: LocalizationValue;
+      getHelp: {
+        title: LocalizationValue;
+        content: LocalizationValue;
+        blockButton__emailSupport: LocalizationValue;
+      };
+    };
+    noAvailableMethods: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      message: LocalizationValue;
+    };
+  };
   userProfile: {
     mobileButton__menu: LocalizationValue;
     formButtonPrimary__continue: LocalizationValue;
@@ -461,6 +516,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle__availableWallets: LocalizationValue;
       subtitle__unavailableWallets: LocalizationValue;
+      web3WalletButtonsBlockButton: LocalizationValue;
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
@@ -760,6 +816,7 @@ type UnstableErrors = WithParamName<{
   form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
+  form_param_value_invalid: LocalizationValue;
   passwordComplexity: {
     sentencePrefix: LocalizationValue;
     minimumLength: LocalizationValue;
@@ -809,4 +866,9 @@ type UnstableErrors = WithParamName<{
     };
   };
   form_param_max_length_exceeded: LocalizationValue;
+  organization_minimum_permissions_needed: LocalizationValue;
+  already_a_member_in_organization: LocalizationValue;
+  organization_domain_common: LocalizationValue;
+  organization_domain_blocked: LocalizationValue;
+  organization_membership_quota_exceeded: LocalizationValue;
 }>;
