@@ -13,7 +13,8 @@ export class UnauthorizedError extends Error {
 
 /**
  * Middleware to require authentication for user requests.
- * Throws an UnauthorizedError for unauthenticated requests, which should be handled by an error middleware.
+ * Passes an UnauthorizedError to the next middleware for unauthenticated requests,
+ * which should be handled by an error middleware.
  *
  * @example
  * // Basic usage
@@ -41,7 +42,6 @@ export class UnauthorizedError extends Error {
  * router.get('/path', requireAuth, hasPermission, getHandler)
  *
  * @throws {Error} If `clerkMiddleware` is not set in the middleware chain before this util is used.
- * @throws {UnauthorizedError} If the request is not authenticated.
  */
 export const requireAuth: RequestHandler = (request, _response, next) => {
   if (!requestHasAuthObject(request)) {
