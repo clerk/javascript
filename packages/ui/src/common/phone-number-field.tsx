@@ -215,7 +215,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
+                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 relative flex items-center gap-x-1 rounded-l-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <ChevronUpDownSm className='text-gray-9 size-4' />
