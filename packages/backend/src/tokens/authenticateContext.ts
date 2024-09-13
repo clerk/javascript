@@ -61,7 +61,7 @@ class AuthenticateContext {
     // as part of getMultipleAppsCookie
     this.initPublishableKeyValues(options);
     this.initHeaderValues();
-    // initCookieValues should be used before initHandshakeValues because the it depends on suffixedCookies
+    // initCookieValues should be used before initHandshakeValues because it depends on suffixedCookies
     this.initCookieValues();
     this.initHandshakeValues();
     Object.assign(this, options);
@@ -98,7 +98,7 @@ class AuthenticateContext {
     // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
     this.suffixedCookies = this.shouldUseSuffixed();
     this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
-    this.refreshTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Refresh);
+    this.refreshTokenInCookie = this.getSuffixedCookie(constants.Cookies.Refresh);
     this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
   }
 
