@@ -37,7 +37,7 @@ export class UnauthorizedError extends Error {
  * const hasPermission = (request, response, next) => {
  *    const auth = getAuth(request)
  *    if (!auth.has({ permission: 'permission' })) {
- *      response.status(403).json({ error: 'Forbidden' })
+ *      response.status(403).send('Forbidden')
  *      return
  *    }
  *    return next()
