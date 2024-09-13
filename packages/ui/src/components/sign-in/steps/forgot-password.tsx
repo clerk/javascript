@@ -10,7 +10,11 @@ import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import EnvelopeSm from '~/primitives/icons/envelope-sm';
+import FingerprintSm from '~/primitives/icons/fingerprint-sm';
+import LinkSm from '~/primitives/icons/link-sm';
+import LockSm from '~/primitives/icons/lock-sm';
+import SmsSm from '~/primitives/icons/sms-sm';
 import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
@@ -64,7 +68,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.LinkSm />}
+                        iconStart={<LinkSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -82,7 +86,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.EnvelopeSm />}
+                        iconStart={<EnvelopeSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -100,7 +104,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.SMSSm />}
+                        iconStart={<SmsSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>
@@ -118,7 +122,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.FingerprintSm />}
+                        iconStart={<FingerprintSm />}
                       >
                         {t('signIn.alternativeMethods.blockButton__passkey')}
                       </Button>
@@ -130,7 +134,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.LockSm />}
+                        iconStart={<LockSm />}
                       >
                         {t('signIn.alternativeMethods.blockButton__password')}
                       </Button>

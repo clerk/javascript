@@ -2,7 +2,10 @@ import { Slot } from '@radix-ui/react-slot';
 import { cx } from 'cva';
 import * as React from 'react';
 
-import * as Icon from './icon';
+import CheckmarkCircleSm from './icons/checkmark-circle-sm';
+import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
+import ExclamationTriangleSm from './icons/exclamation-triangle-sm';
+import InformationCircleSm from './icons/information-circle-sm';
 
 type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
@@ -256,10 +259,10 @@ export const Message = React.forwardRef<
         <span className='text-icon-sm mt-px'>
           {
             {
-              error: <Icon.ExclamationOctagonSm />,
-              info: <Icon.InformationCircleSm />,
-              success: <Icon.CheckmarkCircleSm />,
-              warning: <Icon.ExclamationTriangleSm />,
+              error: <ExclamationOctagonSm />,
+              info: <InformationCircleSm />,
+              success: <CheckmarkCircleSm />,
+              warning: <ExclamationTriangleSm />,
             }[intent]
           }
         </span>

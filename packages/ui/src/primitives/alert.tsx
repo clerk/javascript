@@ -1,12 +1,14 @@
 import * as React from 'react';
 
 import {
-  useAppearance,
   mergeDescriptors,
-  type ParsedElementsFragment,
   type ParsedDescriptor,
+  type ParsedElementsFragment,
+  useAppearance,
 } from '~/contexts/AppearanceContext';
-import * as Icon from './icon';
+
+import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
+import ExclamationTriangleSm from './icons/exclamation-triangle-sm';
 
 export const layoutStyle = {
   alert: {
@@ -60,8 +62,8 @@ export const Alert = React.forwardRef<
         <span {...mergeDescriptors(elements.alertIcon)}>
           {
             {
-              error: <Icon.ExclamationOctagonSm />,
-              warning: <Icon.ExclamationTriangleSm />,
+              error: <ExclamationOctagonSm />,
+              warning: <ExclamationTriangleSm />,
             }[intent]
           }
         </span>
