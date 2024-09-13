@@ -4,35 +4,52 @@ import { middlewareRequired } from './errors';
 import { getAuth } from './getAuth';
 import { requestHasAuthObject } from './utils';
 
+export class UnauthorizedError extends Error {
+  constructor() {
+    super('Unauthorized');
+    this.name = 'UnauthorizedError';
+  }
+}
+
 /**
- * Middleware to require auth requests for user authenticated or authorized requests.
- * An HTTP 401 status code is returned for unauthenticated requests.
+ * Middleware to require authentication for user requests.
+ * Throws an UnauthorizedError for unauthenticated requests, which should be handled by an error middleware.
  *
  * @example
- * router.get('/path', requireAuth, getHandler)
- * //or
- * router.use(requireAuth)
+ * // Basic usage
+ * import { requireAuth, UnauthorizedError } from '@clerk/express'
+ *
+ * router.get(requireAuth)
+ * app.use((err, req, res, next) => {
+ *   if (err instanceof UnauthorizedError) {
+ *     res.status(401).send('Unauthorized')
+ *   } else {
+ *     next(err)
+ *   }
+ * })
+ *
  * @example
- * hasPermission = (request, response, next) => {
- *    const auth = getAuth(request);
+ * // Combining with permission check
+ * const hasPermission = (request, response, next) => {
+ *    const auth = getAuth(request)
  *    if (!auth.has({ permission: 'permission' })) {
- *      response.status(403).send('Forbidden');
- *      return;
+ *      response.status(403).json({ error: 'Forbidden' })
+ *      return
  *    }
- *    return next();
+ *    return next()
  * }
  * router.get('/path', requireAuth, hasPermission, getHandler)
  *
- * @throws {Error} `clerkMiddleware` is required to be set in the middleware chain before this util is used.
+ * @throws {Error} If `clerkMiddleware` is not set in the middleware chain before this util is used.
+ * @throws {UnauthorizedError} If the request is not authenticated.
  */
-export const requireAuth: RequestHandler = (request, response, next) => {
+export const requireAuth: RequestHandler = (request, _response, next) => {
   if (!requestHasAuthObject(request)) {
     throw new Error(middlewareRequired('requireAuth'));
   }
 
   if (!getAuth(request).userId) {
-    response.status(401).send('Unauthorized');
-    return;
+    return next(new UnauthorizedError());
   }
 
   return next();
