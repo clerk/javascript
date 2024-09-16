@@ -1,7 +1,7 @@
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { Clerk } from '@clerk/types';
-import { useState } from 'react';
+import { useMemo } from 'react';
 
 interface PromiseWithResolvers<T> {
   promise: Promise<T>;
@@ -27,6 +27,9 @@ async function resolveResult(result: Promise<unknown>) {
     });
 }
 
+/**
+ * Polyfill for Promise.withResolvers()
+ */
 function customPromiseWithResolves() {
   let resolve: PromiseWithResolvers<unknown>['resolve'];
   let reject: PromiseWithResolvers<unknown>['reject'];
@@ -60,15 +63,7 @@ type DeAssuredState<T> = Exclude<
   }
 >;
 
-function createAssuranceHandler(assurance: {
-  onPendingVerification?: (
-    res: PromiseWithResolvers<unknown>['resolve'],
-    rej: PromiseWithResolvers<unknown>['reject'],
-  ) => void;
-  onResume?: () => void;
-  onCancel?: () => void;
-  onOpenModal?: Clerk['__experimental_openUserVerification'];
-}) {
+function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
   async function assertAssurance<T extends AssuredState<unknown>>(
     fetcher: () => Promise<T>,
   ): Promise<DeAssuredState<T>> {
@@ -76,32 +71,36 @@ function createAssuranceHandler(assurance: {
 
     //@ts-ignore
     if ('clerk_error' in result && 'reason' in result) {
+      /**
+       * Create a promise
+       */
       const resolvers = customPromiseWithResolves();
 
-      if (assurance?.onPendingVerification) {
-        assurance.onPendingVerification(resolvers.resolve, resolvers.reject);
-        try {
-          await resolvers.promise;
-          assurance.onResume?.();
-        } catch {
-          assurance.onCancel?.();
-        }
-      } else {
-        assurance.onOpenModal?.({
-          afterVerification() {
-            resolvers.resolve(true);
-          },
-          onVerificationCancel() {
-            resolvers.reject(
-              new ClerkRuntimeError('User cancelled attempted verification', {
-                code: 'assurance_cancelled',
-              }),
-            );
-          },
-        });
-        await resolvers.promise;
-      }
+      /**
+       * On success resolve the pending promise
+       * On cancel reject the pending promise
+       */
+      params.onOpenModal?.({
+        afterVerification() {
+          resolvers.resolve(true);
+        },
+        afterVerificationCancelled() {
+          resolvers.reject(
+            new ClerkRuntimeError('User cancelled attempted verification', {
+              code: 'assurance_cancelled',
+            }),
+          );
+        },
+      });
 
+      /**
+       * Wait until the promise from above have been resolved or rejected
+       */
+      await resolvers.promise;
+
+      /**
+       * After the promise resolved successfully try the original request one more time
+       */
       result = (await resolveResult(fetcher())) as T;
     }
 
@@ -111,50 +110,19 @@ function createAssuranceHandler(assurance: {
   return assertAssurance;
 }
 
-const useAssurance = <T>(
-  params?: T,
-): T extends { mode: 'custom' }
-  ? {
-      handleAssurance: ReturnType<typeof createAssuranceHandler>;
-      resume: (() => void) | undefined;
-      cancel: (() => void) | undefined;
-      isPending: boolean;
-    }
-  : {
-      handleAssurance: ReturnType<typeof createAssuranceHandler>;
-    } => {
+const useAssurance = (): {
+  handleAssurance: ReturnType<typeof createAssuranceHandler>;
+} => {
   const { __experimental_openUserVerification } = useClerk();
-  const [promiseRes, setPromiseRes] = useState<PromiseWithResolvers<unknown>['resolve'] | undefined>(undefined);
-  const [promiseRej, setPromiseRej] = useState<PromiseWithResolvers<unknown>['reject'] | undefined>(undefined);
-
-  if ((params as any)?.mode !== 'custom') {
-    // @ts-ignore
-    return {
-      handleAssurance: createAssuranceHandler({
+  const handleAssurance = useMemo(
+    () =>
+      createAssuranceHandler({
         onOpenModal: __experimental_openUserVerification,
       }),
-    };
-  }
-
-  // @ts-ignore
+    [__experimental_openUserVerification],
+  );
   return {
-    handleAssurance: createAssuranceHandler({
-      onPendingVerification(res, rej) {
-        setPromiseRes(() => res);
-        setPromiseRej(() => rej);
-      },
-      onResume() {
-        setPromiseRej(undefined);
-        setPromiseRes(undefined);
-      },
-      onCancel() {
-        setPromiseRej(undefined);
-        setPromiseRes(undefined);
-      },
-    }),
-    resume: promiseRes ? () => promiseRes?.(true) : undefined,
-    cancel: promiseRej ? () => promiseRej?.() : undefined,
-    isPending: !!promiseRes,
+    handleAssurance,
   };
 };
 

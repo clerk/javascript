@@ -84,6 +84,9 @@ export type ComponentControls = {
       | 'organizationProfile'
       | 'createOrganization'
       | 'userVerification',
+    options?: {
+      notify?: boolean;
+    },
   ) => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
@@ -245,21 +248,54 @@ const Components = (props: ComponentsProps) => {
       setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
     };
 
-    componentsControls.closeModal = name => {
+    componentsControls.closeModal = (name, options = {}) => {
+      const { notify = true } = options;
       clearUrlStateParam();
       setState(s => {
-        // @ts-ignore
-        const modal = s[name + 'Modal'] || {};
-        if ('onVerificationCancel' in modal) {
-          modal.onVerificationCancel?.();
+        function handleCloseModalForExperimentalUserVerification() {
+          // @ts-ignore Expected value s['userVerificationModal']
+          const modal = s[name + 'Modal'] || {};
+          if ('afterVerificationCancelled' in modal && notify) {
+            modal.afterVerificationCancelled?.();
+          }
         }
+
+        /**
+         * We need this in order for `Clerk.__experimental_closeUserVerification()`
+         * to properly trigger the previously defined `afterVerificationCancelled` callback
+         */
+        handleCloseModalForExperimentalUserVerification();
 
         return { ...s, [name + 'Modal']: null };
       });
     };
 
     componentsControls.openModal = (name, props) => {
-      setState(s => ({ ...s, [name + 'Modal']: props }));
+      function handleCloseModalForExperimentalUserVerification() {
+        if (!('afterVerificationCancelled' in props)) {
+          return;
+        }
+
+        setState(s => ({
+          ...s,
+          [name + 'Modal']: {
+            ...props,
+            /**
+             * When a UserVerification flow is completed, we need to close the modal without trigger a cancellation callback
+             */
+            afterVerification() {
+              props.afterVerification?.();
+              componentsControls.closeModal(name, { notify: false });
+            },
+          },
+        }));
+      }
+
+      if ('afterVerificationCancelled' in props) {
+        handleCloseModalForExperimentalUserVerification();
+      } else {
+        setState(s => ({ ...s, [name + 'Modal']: props }));
+      }
     };
 
     componentsControls.mountImpersonationFab = () => {

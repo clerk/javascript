@@ -1,3 +1,4 @@
+import { isClerkRuntimeError } from '@clerk/shared';
 import { useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
@@ -14,6 +15,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useAssurance } from '../../hooks/useAssurance';
 import { handleError } from '../../utils';
 
@@ -28,6 +30,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   const { user } = useUser();
   const card = useCardState();
   const { handleAssurance } = useAssurance();
+  const { close } = useActionContext();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
 
@@ -40,7 +43,12 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
 
     void handleAssurance(user.createTOTP)
       .then((totp: TOTPResource) => setTOTP(totp))
-      .catch(err => handleError(err, [], card.setError));
+      .catch(err => {
+        if (isClerkRuntimeError(err) && err.code === 'assurance_cancelled') {
+          return close();
+        }
+        return handleError(err, [], card.setError);
+      });
   }, []);
 
   if (card.error) {
