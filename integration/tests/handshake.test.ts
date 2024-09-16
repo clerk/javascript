@@ -887,8 +887,7 @@ test.describe('Client handshake @generic', () => {
   });
 });
 
-// TODO(izaak): revert: test.describe('Client handshake with organization activation @nextjs', () => {
-test.describe('Client handshake with organization activation', () => {
+test.describe('Client handshake with organization activation @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
 
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
@@ -971,6 +970,9 @@ test.describe('Client handshake with organization activation', () => {
 
     // And a request arrives to the app at this path...
     appRequestPath: string;
+
+    // With a token specified in...
+    tokenAppearsIn: 'header' | 'cookie';
   };
 
   type then = {
@@ -996,6 +998,7 @@ test.describe('Client handshake with organization activation', () => {
           organizationPatterns: ['/organizations-by-id/:id'],
         },
         appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 307,
@@ -1013,6 +1016,29 @@ test.describe('Client handshake with organization activation', () => {
           organizationPatterns: ['/organizations-by-id/:id'],
         },
         appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
+
+    // ---------------- Header-based auth tests ----------------
+    // Note: it would be possible to run _every_ test with the token in the header or the cookies
+    //       and expect the same results, but we're avoiding that to save some test execution time.
+    {
+      name: 'Header-based auth, active session, no org in session, but org a requested by ID => attempts to activate org A',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'header',
       },
       then: {
         expectStatus: 307,
@@ -1030,6 +1056,7 @@ test.describe('Client handshake with organization activation', () => {
           organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_b',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 307,
@@ -1052,6 +1079,7 @@ test.describe('Client handshake with organization activation', () => {
           ],
         },
         appRequestPath: '/organizations-by-slug/bcorp',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 307,
@@ -1072,6 +1100,7 @@ test.describe('Client handshake with organization activation', () => {
           ],
         },
         appRequestPath: '/organizations-by-slug/bcorp/settings',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 307,
@@ -1089,6 +1118,7 @@ test.describe('Client handshake with organization activation', () => {
           organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_b/',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 308, // Handshake never 308's - this points to `/organizations-by-id/org_b` (no trailing slash)
@@ -1112,6 +1142,7 @@ test.describe('Client handshake with organization activation', () => {
           personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
         appRequestPath: '/personal-workspace',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 307,
@@ -1132,6 +1163,7 @@ test.describe('Client handshake with organization activation', () => {
           personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
         appRequestPath: '/personal-workspace',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 200,
@@ -1148,12 +1180,15 @@ test.describe('Client handshake with organization activation', () => {
           personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 200,
         fapiOrganizationIdParamValue: null,
       },
     },
+
+    // ---------------- Invalid permutation tests ----------------
     {
       // NOTE(izaak): Would we prefer 500ing in this case?
       name: 'Invalid config => ignore it and return 200',
@@ -1164,6 +1199,7 @@ test.describe('Client handshake with organization activation', () => {
           organizationPatterns: ['i am not valid config'],
         },
         appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 200,
@@ -1178,6 +1214,7 @@ test.describe('Client handshake with organization activation', () => {
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: null,
         appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
       },
       then: {
         expectStatus: 200,
@@ -1187,44 +1224,42 @@ test.describe('Client handshake with organization activation', () => {
   ];
 
   for (const testCase of cookieAuthCases) {
-    ['Cookie', 'Authorization'].forEach(authHeader => {
-      test(`${authHeader} auth: ${testCase.name}`, async () => {
-        const app = await start(testCase.when.orgSyncOptions);
+    test(`${testCase.name}`, async () => {
+      const app = await start(testCase.when.orgSyncOptions);
 
-        const config = generateConfig({
-          mode: 'test',
-        });
-        // Create a new map with an org_id key
-        const { token, claims } = config.generateToken({
-          state: testCase.when.initialAuthState, // <-- Critical
-          extraClaims: testCase.when.initialSessionClaims,
-        });
-
-        const headers = new Headers({
-          'X-Publishable-Key': config.pk,
-          'X-Secret-Key': config.sk,
-          'Sec-Fetch-Dest': 'document',
-        });
-        switch (authHeader) {
-          case 'Cookie':
-            headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
-            break;
-          case 'Authorization':
-            headers.set('Authorization', `Bearer ${token}`);
-            break;
-        }
-
-        const res = await fetch(app.serverUrl + testCase.when.appRequestPath, {
-          headers: headers,
-          redirect: 'manual',
-        });
-
-        expect(res.status).toBe(testCase.then.expectStatus);
-        const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
-        expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
-
-        await end(app);
+      const config = generateConfig({
+        mode: 'test',
       });
+      // Create a new map with an org_id key
+      const { token, claims } = config.generateToken({
+        state: testCase.when.initialAuthState, // <-- Critical
+        extraClaims: testCase.when.initialSessionClaims,
+      });
+
+      const headers = new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'Sec-Fetch-Dest': 'document',
+      });
+      switch (testCase.when.tokenAppearsIn) {
+        case 'cookie':
+          headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
+          break;
+        case 'header':
+          headers.set('Authorization', `Bearer ${token}`);
+          break;
+      }
+
+      const res = await fetch(app.serverUrl + testCase.when.appRequestPath, {
+        headers: headers,
+        redirect: 'manual',
+      });
+
+      expect(res.status).toBe(testCase.then.expectStatus);
+      const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+      expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
+
+      await end(app);
     });
   }
 });
