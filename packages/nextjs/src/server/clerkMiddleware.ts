@@ -79,9 +79,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  // Starts the store with an empty context and transitions once request data is available
-  clerkMiddlewareRequestDataStore.enterWith({});
-
   const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
     // Handles the case where `options` is a callback function to dynamically access `NextRequest`
     const resolvedParams = typeof params === 'function' ? params(request) : params;
@@ -103,7 +100,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       ...resolvedParams,
     };
 
+    console.log({
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      enterWith: clerkMiddlewareRequestDataStore.enterWith,
+      isDefined: !!clerkMiddlewareRequestDataStore.enterWith,
+    });
+
     clerkMiddlewareRequestDataStore.enterWith(options);
+
+    console.log('passed enterWith 🍋');
 
     clerkClient().telemetry.record(
       eventMethodCalled('clerkMiddleware', {
