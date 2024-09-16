@@ -536,7 +536,8 @@ export const heIL: LocalizationResource = {
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
-    form_password_pwned__sign_in: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, אנא בצע איתחול לסיסמה שלך.',
+    form_password_pwned__sign_in:
+      'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, אנא בצע איתחול לסיסמה שלך.',
     form_password_size_in_bytes_exceeded:
       'הסיסמה שלך חורגת ממספר הבייטים המרבי המותר, נסה לקצר אותה או להסיר כמה תווים מיוחדים.',
     form_password_validation_failed: 'סיסמה שגויה',
