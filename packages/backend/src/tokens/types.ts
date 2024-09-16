@@ -1,3 +1,4 @@
+import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -9,4 +10,5 @@ export type AuthenticateRequestOptions = {
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
+  apiClient?: ApiClient;
 } & VerifyTokenOptions;
