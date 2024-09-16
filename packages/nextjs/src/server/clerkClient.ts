@@ -61,14 +61,8 @@ const clerkClientForRequest = () => {
     }
   }
 
-  console.log('🍋 inside clerkClient', {
-    store: clerkMiddlewareRequestDataStore,
-    data: clerkMiddlewareRequestDataStore?.getStore(),
-  });
-
   // Fallbacks between options from middleware runtime and `NextRequest` from application server
   const options = clerkMiddlewareRequestDataStore.getStore() ?? requestData;
-
   if (options?.secretKey || options?.publishableKey) {
     return createClerkClientWithOptions(options);
   }
