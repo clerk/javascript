@@ -1,5 +1,31 @@
 # Change Log
 
+## 2.8.0
+
+### Minor Changes
+
+- Experimental support for `has()` with assurance. ([#4118](https://github.com/clerk/javascript/pull/4118)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage:
+
+  ```ts
+  has({
+    __experimental_assurance: {
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
+    },
+  });
+  ```
+
+  Created a shared utility called `createCheckAuthorization` exported from `@clerk/shared`
+
+### Patch Changes
+
+- Moves `fastDeepMerge` utils to `@clerk/shared` package. ([#4056](https://github.com/clerk/javascript/pull/4056)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d)]:
+  - @clerk/types@4.21.0
+
 ## 2.7.2
 
 ### Patch Changes

@@ -1,5 +1,34 @@
 # Change Log
 
+## 1.12.0
+
+### Minor Changes
+
+- Experimental support for `has()` with assurance. ([#4118](https://github.com/clerk/javascript/pull/4118)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage:
+
+  ```ts
+  has({
+    __experimental_assurance: {
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
+    },
+  });
+  ```
+
+  Created a shared utility called `createCheckAuthorization` exported from `@clerk/shared`
+
+### Patch Changes
+
+- Add webhook event types for roles and permissions ([#4153](https://github.com/clerk/javascript/pull/4153)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix Chrome caching 307 redirects when a handshake is triggered. ([#4171](https://github.com/clerk/javascript/pull/4171)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`ba19be354`](https://github.com/clerk/javascript/commit/ba19be35461f0e5c76a58d11e4252a16781322c6), [`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d)]:
+  - @clerk/shared@2.8.0
+  - @clerk/types@4.21.0
+
 ## 1.11.1
 
 ### Patch Changes
