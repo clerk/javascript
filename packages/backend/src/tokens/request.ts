@@ -239,6 +239,9 @@ ${error.getFullMessage()}`,
       // This is because we attempted to activate the organization previously, but the organization
       // must not have been valid (either not found, or not valid for this user), and gave us back
       // a null organization. We won't re-try the handshake, and leave it to the server component to handle.
+      console.warn(
+        'Clerk: Organization activation handshake loop detected. This is likely due to an invalid organization ID or slug. Skipping organization activation.',
+      );
       return null;
     }
     const handshakeState = handleMaybeHandshakeStatus(
@@ -521,7 +524,7 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
       matcher = match(options.organizationPatterns);
     } catch (e) {
       console.error(
-        `Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
+        `Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
       );
       return null;
     }
@@ -531,7 +534,7 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
       orgResult = matcher(url.pathname);
     } catch (e) {
       // Intentionally not logging the path to avoid potentially leaking anything sensitive
-      console.error(`Failed to apply organization pattern "${options.organizationPatterns}" to a path`, e);
+      console.error(`Clerk: Failed to apply organization pattern "${options.organizationPatterns}" to a path`, e);
       return null;
     }
 
@@ -544,7 +547,7 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
         return { type: 'organization', organizationSlug: slug };
       }
       console.warn(
-        'Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
+        'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
       );
     }
   }

@@ -887,7 +887,8 @@ test.describe('Client handshake @generic', () => {
   });
 });
 
-test.describe('Client handshake with organization activation (by ID) @nextjs', () => {
+// TODO(izaak): revert: test.describe('Client handshake with organization activation @nextjs', () => {
+test.describe('Client handshake with organization activation', () => {
   test.describe.configure({ mode: 'parallel' });
 
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
@@ -1213,13 +1214,10 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
             break;
         }
 
-        const res = await fetch(
-          app.serverUrl + testCase.when.appRequestPath, // But attempt to visit org B
-          {
-            headers: headers,
-            redirect: 'manual',
-          },
-        );
+        const res = await fetch(app.serverUrl + testCase.when.appRequestPath, {
+          headers: headers,
+          redirect: 'manual',
+        });
 
         expect(res.status).toBe(testCase.then.expectStatus);
         const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
@@ -1229,4 +1227,148 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       });
     });
   }
+});
+
+test.describe('Client handshake with an organization activation avoids infinite loops @nextjs', () => {
+  test.describe.configure({ mode: 'parallel' });
+
+  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
+
+  const jwksServer = http.createServer(function (req, res) {
+    const sk = req.headers.authorization?.replace('Bearer ', '');
+    if (!sk) {
+      console.log('No SK to', req.url, req.headers);
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.write(JSON.stringify(getJwksFromSecretKey(sk)));
+    res.end();
+  });
+
+  // define app as an application
+  let thisApp: Application;
+
+  test.beforeAll('setup local jwks server', async () => {
+    // Start the jwks server
+    await new Promise<void>(resolve => jwksServer.listen(0, resolve));
+
+    thisApp = await start({
+      organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+      personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
+    });
+  });
+
+  test.afterAll('setup local Clerk API mock', async () => {
+    await end(thisApp);
+    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  });
+
+  const start = async (orgSyncOptions: OrganizationSyncOptions): Promise<Application> => {
+    const env = appConfigs.envs.withEmailCodes
+      .clone()
+      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${jwksServer.address().port}`);
+
+    const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
+    // Set the paths that don't require the user to be signed in
+    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+    export const middleware = (req, evt) => {
+      return authMiddleware({
+        publicRoutes: publicPaths,
+        publishableKey: req.headers.get("x-publishable-key"),
+        secretKey: req.headers.get("x-secret-key"),
+        proxyUrl: req.headers.get("x-proxy-url"),
+        domain: req.headers.get("x-domain"),
+        isSatellite: req.headers.get('x-satellite') === 'true',
+        signInUrl: req.headers.get("x-sign-in-url"),
+
+        // Critical
+        organizationSync: ${JSON.stringify(orgSyncOptions)}
+
+      })(req, evt)
+    };
+    export const config = {
+      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    };
+    `;
+
+    const app = await appConfigs.next.appRouter
+      .clone()
+      .addFile('src/middleware.ts', () => middlewareFile)
+      .commit();
+
+    await app.setup();
+    await app.withEnv(env);
+    await app.dev();
+    return app;
+  };
+
+  const end = async (app: Application): Promise<void> => {
+    await app.teardown();
+  };
+
+  // -------------- Test begin ------------
+
+  const config = generateConfig({
+    mode: 'test',
+  });
+
+  test('Sets the redirect loop tracking cookie', async () => {
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'active',
+      extraClaims: new Map<string, string>([]),
+    });
+
+    const headers = new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'Sec-Fetch-Dest': 'document',
+    });
+    headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
+
+    const res = await fetch(thisApp.serverUrl + '/organizations-by-id/org_a', {
+      headers: headers,
+      redirect: 'manual',
+    });
+
+    expect(res.status).toBe(307);
+    const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+    expect(redirectSearchParams.get('organization_id')).toBe('org_a');
+
+    // read the set-cookie directives
+    const setCookie = res.headers.get('set-cookie');
+
+    expect(setCookie).toContain(`__clerk_redirect_count=1`); // <-- Critical
+  });
+
+  test('Ignores organization config when being redirected to', async () => {
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'active', // Must be active - handshake logic only runs once session is determined to be active
+      extraClaims: new Map<string, string>([]),
+    });
+
+    const headers = new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'Sec-Fetch-Dest': 'document',
+    });
+
+    // Critical cookie: __clerk_redirect_count
+    headers.set(
+      'Cookie',
+      `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}; __clerk_redirect_count=1`,
+    );
+
+    const res = await fetch(thisApp.serverUrl + '/organizations-by-id/org_a', {
+      headers: headers,
+      redirect: 'manual',
+    });
+
+    expect(res.status).toBe(200);
+    const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+    expect(redirectSearchParams.get('organization_id')).toBe(null);
+
+    expect(res.headers.get('set-cookie')).toBe(null);
+  });
 });
