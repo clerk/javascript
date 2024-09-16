@@ -1,27 +1,9 @@
 /// <reference types="cypress" />
-import type {
-  Clerk,
-  EmailCodeFactor,
-  PhoneCodeFactor,
-  SignInFirstFactor,
-  SignInResource,
-  SignOutOptions,
-} from '@clerk/types';
+import type { Clerk, SignOutOptions } from '@clerk/types';
 
+import type { ClerkSignInParams } from '../common';
+import { signInHelper } from '../common';
 import { setupClerkTestingToken } from './setupClerkTestingToken';
-
-const CLERK_TEST_CODE = '424242';
-
-type CypressClerkSignInParams =
-  | {
-      strategy: 'password';
-      password: string;
-      identifier: string;
-    }
-  | {
-      strategy: 'phone_code' | 'email_code';
-      identifier: string;
-    };
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -49,7 +31,7 @@ declare global {
        *     cy.visit('/protected');
        *  });
        */
-      clerkSignIn(signInParams: CypressClerkSignInParams): Chainable<void>;
+      clerkSignIn(signInParams: ClerkSignInParams): Chainable<void>;
 
       /**
        * Signs out the current user using Clerk.
@@ -86,7 +68,7 @@ type AddClerkCommandsParams = {
 export const addClerkCommands = ({ Cypress, cy }: AddClerkCommandsParams) => {
   Cypress.Commands.add(`clerkSignIn`, signInParams => {
     setupClerkTestingToken();
-    cy.log(`Signing in.`);
+    cy.log(`Clerk: Signing in...`);
 
     cy.window()
       .should(window => {
@@ -94,31 +76,13 @@ export const addClerkCommands = ({ Cypress, cy }: AddClerkCommandsParams) => {
         expect(window.Clerk.loaded).to.eq(true);
       })
       .then(async window => {
-        if (!window.Clerk.client) {
-          return;
-        }
-        const signIn = window.Clerk.client.signIn;
-        try {
-          if (signInParams.strategy === 'password') {
-            const res = await signIn.create(signInParams);
-            await window.Clerk.setActive({
-              session: res.createdSessionId,
-            });
-          } else {
-            assertIdentifierRequirement(signInParams.identifier, signInParams.strategy);
-            await signInWithCode(signIn, window.Clerk.setActive, signInParams.identifier, signInParams.strategy);
-          }
-        } catch (err: any) {
-          cy.log(`Clerk: Failed to sign in: ${err?.message}`);
-          throw new Error(`Clerk: Failed to sign in: ${err?.message}`);
-        }
-
-        cy.log(`Finished signing in.`);
+        await signInHelper({ windowObject: window, signInParams });
+        cy.log(`Clerk: Finished signing in.`);
       });
   });
 
   Cypress.Commands.add(`clerkSignOut`, signOutOptions => {
-    cy.log(`Signing out.`);
+    cy.log(`Clerk: Signing out...`);
 
     cy.window()
       .should(window => {
@@ -127,8 +91,7 @@ export const addClerkCommands = ({ Cypress, cy }: AddClerkCommandsParams) => {
       })
       .then(async window => {
         await window.Clerk.signOut(signOutOptions);
-
-        cy.log(`Finished signing out.`);
+        cy.log(`Clerk: Finished signing out.`);
       });
   });
 
@@ -138,62 +101,4 @@ export const addClerkCommands = ({ Cypress, cy }: AddClerkCommandsParams) => {
       expect(window.Clerk.loaded).to.eq(true);
     });
   });
-};
-
-const isPhoneCodeFactor = (factor: SignInFirstFactor): factor is PhoneCodeFactor => {
-  return factor.strategy === 'phone_code';
-};
-
-const isEmailCodeFactor = (factor: SignInFirstFactor): factor is EmailCodeFactor => {
-  return factor.strategy === 'email_code';
-};
-
-const signInWithCode = async (
-  signIn: SignInResource,
-  setActive: any,
-  identifier: string,
-  strategy: 'phone_code' | 'email_code',
-) => {
-  const { supportedFirstFactors } = await signIn.create({
-    identifier,
-  });
-  const codeFactorFn = strategy === 'phone_code' ? isPhoneCodeFactor : isEmailCodeFactor;
-  const codeFactor = supportedFirstFactors?.find(codeFactorFn);
-  if (codeFactor) {
-    const prepareParams =
-      strategy === 'phone_code'
-        ? { strategy, phoneNumberId: (codeFactor as PhoneCodeFactor).phoneNumberId }
-        : { strategy, emailAddressId: (codeFactor as EmailCodeFactor).emailAddressId };
-
-    await signIn.prepareFirstFactor(prepareParams);
-    const signInAttempt = await signIn.attemptFirstFactor({
-      strategy,
-      code: CLERK_TEST_CODE,
-    });
-
-    if (signInAttempt.status === 'complete') {
-      await setActive({ session: signInAttempt.createdSessionId });
-    } else {
-      throw new Error(`Failed to sign in. Status is ${signInAttempt.status}`);
-    }
-  } else {
-    throw new Error(`${strategy} is not enabled.`);
-  }
-};
-
-const assertIdentifierRequirement = (identifier: string, strategy: string) => {
-  if (strategy === 'phone_code' && !identifier.includes('+155555501')) {
-    throw new Error(
-      `Clerk: Phone number should be a test phone number.\n
-       Example: +15555550100.\n
-       Learn more here: https://clerk.com/docs/testing/test-emails-and-phones#phone-numbers`,
-    );
-  }
-  if (strategy === 'email_code' && !identifier.includes('+clerk_test')) {
-    throw new Error(
-      `Clerk: Email should be a test email.\n
-       Any email with the +clerk_test subaddress is a test email address.\n
-       Learn more here: https://clerk.com/docs/testing/test-emails-and-phones#email-addresses`,
-    );
-  }
 };
