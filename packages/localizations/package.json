@@ -87,7 +87,8 @@
     "bg-BG",
     "th-TH",
     "hu-HU",
-    "sr-RS"
+    "sr-RS",
+    "hr-HR",
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
