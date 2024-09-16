@@ -4,10 +4,13 @@ import React from 'react';
 
 import { fullTheme } from '~/themes';
 
+type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
+type SeparatorDescriptorIdentifier = 'separator';
+
 /**
  * Union of all valid descriptors used throughout the components.
  */
-export type DescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
+export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
