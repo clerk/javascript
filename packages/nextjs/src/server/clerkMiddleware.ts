@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -187,7 +187,12 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
-export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
+type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
+
+export const createAuthenticateRequestOptions = (
+  clerkRequest: ClerkRequest,
+  options: ClerkMiddlewareOptions,
+): Parameters<AuthenticateRequest>[1] => {
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),

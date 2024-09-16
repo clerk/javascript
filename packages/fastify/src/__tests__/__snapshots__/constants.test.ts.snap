@@ -9,6 +9,7 @@ exports[`constants from environment variables 1`] = `
     "DevBrowser": "__clerk_db_jwt",
     "Handshake": "__clerk_handshake",
     "RedirectCount": "__clerk_redirect_count",
+    "Refresh": "__refresh",
     "Session": "__session",
   },
   "Headers": {
