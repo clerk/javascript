@@ -20,19 +20,19 @@ export const visualStyle = {
 } satisfies ParsedElementsFragment;
 
 export const Separator = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement> & {
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
     descriptors?: ParsedDescriptor[];
   }
 >(function Separator({ children, descriptors, ...props }, forwardedRef) {
   const { elements } = useAppearance().parsedAppearance;
   return (
-    <p
+    <div
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.separator, ...(descriptors ?? []))}
     >
       {children}
-    </p>
+    </div>
   );
 });
