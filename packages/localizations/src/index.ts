@@ -32,3 +32,4 @@ export { thTH } from './th-TH';
 export { caES } from './ca-ES';
 export { huHU } from './hu-HU';
 export { isIS } from './is-IS';
+export { hrHR } from './hr-HR';

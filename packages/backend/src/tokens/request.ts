@@ -96,7 +96,7 @@ export async function authenticateRequest(
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
-    return new Headers({ location: url.href });
+    return new Headers({ [constants.Headers.Location]: url.href });
   }
 
   async function resolveHandshake() {
@@ -120,7 +120,8 @@ export async function authenticateRequest(
       const newUrl = new URL(authenticateContext.clerkUrl);
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
-      headers.append('Location', newUrl.toString());
+      headers.append(constants.Headers.Location, newUrl.toString());
+      headers.set(constants.Headers.CacheControl, 'no-store');
     }
 
     if (sessionToken === '') {
@@ -174,6 +175,13 @@ ${error.getFullMessage()}`,
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
       const handshakeHeaders = headers ?? buildRedirectToHandshake();
+
+      // Chrome aggressively caches inactive tabs. If we don't set the header here,
+      // all 307 redirects will be cached and the handshake will end up in an infinite loop.
+      if (handshakeHeaders.get(constants.Headers.Location)) {
+        handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
+      }
+
       // Introduce the mechanism to protect for infinite handshake redirect loops
       // using a cookie and returning true if it's infinite redirect loop or false if we can
       // proceed with triggering handshake.
@@ -294,7 +302,7 @@ ${error.getFullMessage()}`,
         authenticateContext.clerkUrl.toString(),
       );
 
-      const headers = new Headers({ location: redirectURL.toString() });
+      const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
@@ -314,7 +322,7 @@ ${error.getFullMessage()}`,
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
 
-      const headers = new Headers({ location: redirectBackToSatelliteUrl.toString() });
+      const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
     /**
