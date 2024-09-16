@@ -14,6 +14,14 @@ type SessionListParams = ClerkPaginationRequest<{
   status?: SessionStatus;
 }>;
 
+type RefreshTokenParams = {
+  expired_token: string;
+  refresh_token: string;
+  request_origin: string;
+  request_originating_ip?: string;
+  request_headers?: Record<string, string[]>;
+};
+
 export class SessionAPI extends AbstractAPI {
   public async getSessionList(params: SessionListParams = {}) {
     return this.request<PaginatedResourceResponse<Session[]>>({
@@ -53,6 +61,15 @@ export class SessionAPI extends AbstractAPI {
     return this.request<Token>({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'tokens', template || ''),
+    });
+  }
+
+  public async refreshSession(sessionId: string, params: RefreshTokenParams) {
+    this.requireId(sessionId);
+    return this.request<Token>({
+      method: 'POST',
+      path: joinPaths(basePath, sessionId, 'refresh'),
+      bodyParams: params,
     });
   }
 }

@@ -2,7 +2,14 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { TokenVerificationErrorReason } from '../../errors';
-import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../../fixtures';
+import {
+  mockExpiredJwt,
+  mockInvalidSignatureJwt,
+  mockJwks,
+  mockJwt,
+  mockJwtPayload,
+  mockMalformedJwt,
+} from '../../fixtures';
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
@@ -128,8 +135,8 @@ export default (QUnit: QUnit) => {
   };
 
   /* An otherwise bare state on a request. */
-  const mockOptions = (options?) =>
-    ({
+  const mockOptions = (options?) => {
+    return {
       secretKey: 'deadbeef',
       apiUrl: 'https://api.clerk.test',
       apiVersion: 'v1',
@@ -143,7 +150,8 @@ export default (QUnit: QUnit) => {
       afterSignUpUrl: '',
       domain: '',
       ...options,
-    }) satisfies AuthenticateRequestOptions;
+    } satisfies AuthenticateRequestOptions;
+  };
 
   const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
     return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
@@ -165,6 +173,8 @@ export default (QUnit: QUnit) => {
       fakeClock = sinon.useFakeTimers(new Date(mockJwtPayload.iat * 1000).getTime());
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      // the refresh token flow calls verify twice, so we need to support two calls
+      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
     });
 
     hooks.afterEach(() => {
@@ -563,6 +573,115 @@ export default (QUnit: QUnit) => {
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
+    });
+
+    test('refreshToken: returns signed in with valid refresh token cookie if token is expired and refresh token exists', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+    });
+
+    test('refreshToken: does not try to refresh if refresh token does not exist', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assert.false(refreshSession.called);
+    });
+
+    test('refreshToken: does not try to refresh if refresh exists but token is not expired', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          // client_uat is missing, need to handshake not to refresh
+          { __session: mockJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assert.false(refreshSession.called);
+    });
+
+    test('refreshToken: uses suffixed refresh cookie even if un-suffixed is present', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          {
+            __client_uat: `12345`,
+            __session: mockExpiredJwt,
+            __refresh_MqCvchyS: 'can_be_anything',
+            __refresh: 'should_not_be_used',
+          },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+      assert.equal(refreshSession.getCall(0).args[1].refresh_token, 'can_be_anything');
     });
   });
 };

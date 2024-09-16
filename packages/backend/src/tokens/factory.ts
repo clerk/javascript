@@ -44,6 +44,7 @@ export type CreateAuthenticateRequestOptions = {
  */
 export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
+  const apiClient = params.apiClient;
 
   const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
     const { apiUrl, apiVersion } = buildTimeOptions;
@@ -55,6 +56,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       // to avoid runtime options override them.
       apiUrl,
       apiVersion,
+      apiClient,
     });
   };
 
