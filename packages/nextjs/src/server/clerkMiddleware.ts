@@ -44,6 +44,8 @@ type ClerkMiddlewareHandler = (
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
 
+type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
+
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
  * For more details, please refer to the docs: https://clerk.com/docs/references/nextjs/clerk-middleware
@@ -58,7 +60,7 @@ interface ClerkMiddleware {
    * @example
    * export default clerkMiddleware((auth, request, event) => { ... }, (req) => options);
    */
-  (handler: ClerkMiddlewareHandler, options?: (req: NextRequest) => ClerkMiddlewareOptions): NextMiddleware;
+  (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptionsCallback): NextMiddleware;
   /**
    * @example
    * export default clerkMiddleware(options);
@@ -81,7 +83,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   clerkMiddlewareRequestDataStore.enterWith({});
 
   const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
-    // Handles the case where `options` is a callback function to dynamically access `Request`
+    // Handles the case where `options` is a callback function to dynamically access `NextRequest`
     const resolvedParams = typeof params === 'function' ? params(request) : params;
 
     const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
@@ -197,7 +199,7 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   return [
     typeof args[0] === 'function' ? args[0] : undefined,
     (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
-  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ((req?: NextRequest) => ClerkMiddlewareOptions)];
+  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback];
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
