@@ -121,7 +121,7 @@ export async function authenticateRequest(
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       headers.append(constants.Headers.Location, newUrl.toString());
-      headers.append(constants.Headers.CacheControl, 'no-store');
+      headers.set(constants.Headers.CacheControl, 'no-store');
     }
 
     if (sessionToken === '') {
@@ -179,7 +179,7 @@ ${error.getFullMessage()}`,
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
       if (handshakeHeaders.get(constants.Headers.Location)) {
-        handshakeHeaders.append(constants.Headers.CacheControl, 'no-store');
+        handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
       }
 
       // Introduce the mechanism to protect for infinite handshake redirect loops
