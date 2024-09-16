@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.13.0
+
+### Minor Changes
+
+- Add new refresh token flow to reduce errors arising from too many redirects ([#4154](https://github.com/clerk/javascript/pull/4154)) by [@dstaley](https://github.com/dstaley)
+
 ## 1.12.0
 
 ### Minor Changes

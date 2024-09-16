@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.2.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.22.1
+
 ## 2.2.11
 
 ### Patch Changes

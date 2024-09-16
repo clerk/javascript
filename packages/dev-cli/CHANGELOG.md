@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.8
+
+### Patch Changes
+
+- Update dependencies (`concurrently@9.0.1`) ([#4175](https://github.com/clerk/javascript/pull/4175)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.7
 
 ### Patch Changes

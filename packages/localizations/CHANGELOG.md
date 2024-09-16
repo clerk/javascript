@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.0.3
+
+### Patch Changes
+
+- Update he-IL ([#4169](https://github.com/clerk/javascript/pull/4169)) by [@develad](https://github.com/develad)
+
+- Added Croatian localization (hr-HR) ([#4168](https://github.com/clerk/javascript/pull/4168)) by [@psiho](https://github.com/psiho)
+
 ## 3.0.2
 
 ### Patch Changes
