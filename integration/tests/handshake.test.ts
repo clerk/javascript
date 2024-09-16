@@ -981,8 +981,11 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
   };
 
   const cookieAuthCases: testCase[] = [
+    // ---------------- Session active vs expired tests ----------------
+    // Note: it would be possible to run _every_ test with both active and expired initial states
+    //       and expect the same results, but we're avoiding that to save some test execution time.
     {
-      name: 'When no org is active in a signed-out session but org A is requested by ID, attempts to activate org A',
+      name: 'Expired session, no org in session, but org a requested by ID => attempts to activate org A',
       when: {
         initialAuthState: 'expired',
         initialSessionClaims: new Map<string, string>([
@@ -999,9 +1002,28 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       },
     },
     {
-      name: 'When org A is active in a signed-out session but org B is requested by ID, attempts to activate org B',
+      name: 'Active session, no org in session, but org a requested by ID => attempts to activate org A',
       when: {
-        initialAuthState: 'expired',
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
+
+    // ---------------- Existing session active org tests ----------------
+    {
+      name: 'Active session, org A active in session, but org B is requested by ID => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
           organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
@@ -1011,6 +1033,48 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
       then: {
         expectStatus: 307,
         fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'Active session, no active org in session, but org B is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/*splat',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/*splat',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      name: 'Active session, org a in session, but *an org B subresource* is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/*splat',
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/*splat',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp/settings',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
       },
     },
     {
@@ -1030,96 +1094,89 @@ test.describe('Client handshake with organization activation (by ID) @nextjs', (
         fapiOrganizationIdParamValue: null,
       },
     },
+
+    // ---------------- Personal workspace tests ----------------
     {
-      name: 'When org A is active in a signed-out session but an org B sub-resource is requested by ID, attempts to activate org B',
+      name: 'Active session, org a in session, but *the personal workspace* is requested => attempts to activate PWS',
       when: {
-        initialAuthState: 'expired',
+        initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/*splat',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/*splat',
+          ],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
-        appRequestPath: '/organizations-by-id/org_b',
+        appRequestPath: '/personal-workspace',
       },
       then: {
         expectStatus: 307,
-        fapiOrganizationIdParamValue: 'org_b',
+        fapiOrganizationIdParamValue: '', // <-- Empty string indicates personal workspace
       },
     },
+
+    // ---------------- No activation required tests ----------------
     {
-      name: 'When org A is active in an expired session and an org-agnostic resource is selected, no handshake param is added',
+      name: 'Active session, nothing session, and the personal workspace is requested => nothing to activate!',
       when: {
-        initialAuthState: 'expired',
-        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+          organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/*splat'],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
-        appRequestPath: '/',
+        appRequestPath: '/personal-workspace',
       },
       then: {
-        expectStatus: 307,
+        expectStatus: 200,
         fapiOrganizationIdParamValue: null,
       },
     },
     {
-      name: 'When org A is active but org B is requested by ID, attempts to activate org B (active)',
+      name: 'Active session, org a active in session, and org a is requested => nothing to activate!',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id'],
-          personalWorkspacePatterns: ['/personal-workspace'], // <-- Unnecessary
-        },
-        appRequestPath: '/organizations-by-id/org_b',
-      },
-      then: {
-        expectStatus: 307,
-        fapiOrganizationIdParamValue: 'org_b',
-      },
-    },
-    {
-      name: 'When the personal workspace is active but org A is requested by ID, attempts to activate org A',
-      when: {
-        initialAuthState: 'active',
-        initialSessionClaims: new Map<string, string>([
-          // Intentionally no org claims - means personal workspace
-        ]),
-        orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id'],
-          personalWorkspacePatterns: ['/personal-workspace'],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
         },
         appRequestPath: '/organizations-by-id/org_a',
       },
       then: {
-        expectStatus: 307,
-        fapiOrganizationIdParamValue: 'org_a',
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
       },
     },
     {
-      name: 'When org A is active but the personal workspace is requested, attempt to activate the personal workspace',
+      // NOTE(izaak): Would we prefer 500ing in this case?
+      name: 'Invalid config => ignore it and return 200',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id'],
-          personalWorkspacePatterns: ['/personal-workspace'],
+          organizationPatterns: ['i am not valid config'],
         },
-        appRequestPath: '/personal-workspace',
+        appRequestPath: '/organizations-by-id/org_a',
       },
       then: {
-        expectStatus: 307,
-        fapiOrganizationIdParamValue: '',
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
       },
     },
     {
-      name: 'Activates nothing with a broken path pattern',
+      // NOTE(izaak): Would we prefer 500ing in this case?
+      name: 'No config => nothing to activate, return 200',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
-        orgSyncOptions: {
-          organizationPatterns: ['i am not a valid path pattern'],
-          personalWorkspacePatterns: ['And neither am I!'],
-        },
-        appRequestPath: '/personal-workspace',
+        orgSyncOptions: null,
+        appRequestPath: '/organizations-by-id/org_a',
       },
       then: {
         expectStatus: 200,
