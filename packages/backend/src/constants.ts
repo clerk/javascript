@@ -55,6 +55,7 @@ const Headers = {
   ContentType: 'content-type',
   SecFetchDest: 'sec-fetch-dest',
   Location: 'location',
+  CacheControl: 'cache-control',
 } as const;
 
 const ContentTypes = {

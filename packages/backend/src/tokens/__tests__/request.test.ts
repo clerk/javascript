@@ -62,6 +62,7 @@ function assertHandshake(
     signInUrl?: string;
   },
 ) {
+  assert.true(!!requestState.headers.get('cache-control'));
   assert.propContains(requestState, {
     proxyUrl: '',
     status: AuthStatus.Handshake,
