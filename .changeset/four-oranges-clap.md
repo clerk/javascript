@@ -1,6 +1,6 @@
 ---
-"@clerk/clerk-js": major
-"@clerk/types": major
+"@clerk/clerk-js": minor
+"@clerk/types": minor
 ---
 
 Trigger UserVerification within UserProfile
