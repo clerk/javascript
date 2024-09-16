@@ -73,14 +73,14 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<AuthenticateRequestOptions>>();
+const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
+export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  // TODO - Move the store context to a class instance in memory in order to update options
-  return clerkMiddlewareRequestDataStore.run({}, () => {
+  return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
@@ -101,6 +101,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
         signUpUrl,
         ...resolvedParams,
       };
+
+      // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
+      clerkMiddlewareRequestDataStore.set('requestData', options);
 
       clerkClient().telemetry.record(
         eventMethodCalled('clerkMiddleware', {
@@ -144,8 +147,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
       let handlerResult: Response = NextResponse.next();
       try {
-        const userHandlerResult = await clerkMiddlewareRequestDataStore.run(options, async () =>
-          handler?.(() => authObjWithMethods, request, event),
+        const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
+          clerkMiddlewareRequestDataStore,
+          async () => handler?.(() => authObjWithMethods, request, event),
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
