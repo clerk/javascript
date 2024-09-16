@@ -9,22 +9,44 @@ interface PromiseWithResolvers<T> {
   reject: (reason?: any) => void;
 }
 
-async function resolveResult(result: Promise<unknown>) {
-  return result
-    .then(r => {
-      if (r instanceof Response) {
-        return r.json();
-      }
-      return r;
-    })
-    .catch(e => {
-      if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return { clerk_error: 'forbidden', reason: 'assurance' };
-      }
+type AssuranceHint = {
+  clerk_error: {
+    type: 'forbidden';
+    reason: 'assurance';
+  };
+};
 
-      // rethrow
-      throw e;
-    });
+function generateAssuranceHint<Metadata extends Record<string, string>>(metadata?: Metadata): AssuranceHint;
+function generateAssuranceHint<Metadata extends Record<string, string>>(metadata: Metadata, as: 'response'): Response;
+function generateAssuranceHint<Metadata extends Record<string, string>>(
+  metadata?: Metadata,
+  as?: 'response',
+): AssuranceHint | Response {
+  const obj = {
+    clerk_error: {
+      type: 'forbidden',
+      reason: 'assurance',
+      metadata,
+    },
+  } as AssuranceHint;
+
+  if (as === 'response') {
+    return new Response(JSON.stringify(obj), { status: 403 });
+  }
+
+  return obj;
+}
+
+async function resolveResult<T>(result: Promise<T>): Promise<T | AssuranceHint> {
+  return result.catch(e => {
+    // Treat fapi assurance as an assurance hint
+    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
+      return generateAssuranceHint();
+    }
+
+    // rethrow
+    throw e;
+  });
 }
 
 /**
@@ -48,29 +70,23 @@ function customPromiseWithResolves() {
   };
 }
 
-type AssuredState<T> =
-  | T
-  | {
-      clerk_error: 'forbidden';
-      reason: 'assurance';
-    };
+type WithoutAssuranceHint<T> = Exclude<T, AssuranceHint>;
 
-type DeAssuredState<T> = Exclude<
-  T,
-  {
-    clerk_error: 'forbidden';
-    reason: 'assurance';
-  }
->;
+const isAssuranceHint = (result: any): result is AssuranceHint => {
+  return (
+    result &&
+    typeof result === 'object' &&
+    'clerk_error' in result &&
+    result.clerk_error?.type === 'forbidden' &&
+    result.clerk_error?.reason === 'assurance'
+  );
+};
 
 function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
-  async function assertAssurance<T extends AssuredState<unknown>>(
-    fetcher: () => Promise<T>,
-  ): Promise<DeAssuredState<T>> {
-    let result = ((await resolveResult(fetcher())) || {}) as T;
+  async function assertAssurance<T>(fetcher: () => Promise<T>): Promise<T> {
+    let result = await resolveResult(fetcher());
 
-    //@ts-ignore
-    if ('clerk_error' in result && 'reason' in result) {
+    if (isAssuranceHint(result)) {
       /**
        * Create a promise
        */
@@ -101,10 +117,10 @@ function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_ope
       /**
        * After the promise resolved successfully try the original request one more time
        */
-      result = (await resolveResult(fetcher())) as T;
+      result = await resolveResult(fetcher());
     }
 
-    return result as DeAssuredState<T>;
+    return result as WithoutAssuranceHint<T>;
   }
 
   return assertAssurance;
