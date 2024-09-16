@@ -7,7 +7,7 @@ import { fullTheme } from '~/themes';
 /**
  * Union of all valid descriptors used throughout the components.
  */
-export type DescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
+export type DescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
