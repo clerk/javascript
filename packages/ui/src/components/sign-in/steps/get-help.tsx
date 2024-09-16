@@ -7,7 +7,7 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import { useSupportEmail } from '~/hooks/use-support-email';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 import { LinkButton } from '~/primitives/link';
 
 export function SignInGetHelp() {
@@ -43,7 +43,7 @@ export function SignInGetHelp() {
             onClick={() => {
               window.location.href = `mailto:${supportEmail}`;
             }}
-            iconEnd={<Icon.CaretRightLegacy />}
+            iconEnd={<CaretRightLegacySm />}
           >
             Email support
           </Button>

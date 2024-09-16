@@ -1,3 +1,4 @@
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -123,7 +124,7 @@ export function signedInAuthObject(
     orgPermissions,
     __experimental_factorVerificationAge,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -180,36 +181,5 @@ const createGetToken: CreateGetToken = params => {
     }
 
     return sessionToken;
-  };
-};
-
-const createHasAuthorization = (options: {
-  userId: string;
-  orgId: string | undefined;
-  orgRole: string | undefined;
-  orgPermissions: string[] | undefined;
-}): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions } = options;
-
-  return params => {
-    if (!params?.permission && !params?.role) {
-      throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-      );
-    }
-
-    if (!orgId || !userId || !orgRole || !orgPermissions) {
-      return false;
-    }
-
-    if (params.permission) {
-      return orgPermissions.includes(params.permission);
-    }
-
-    if (params.role) {
-      return orgRole === params.role;
-    }
-
-    return false;
   };
 };

@@ -268,7 +268,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
+      const isAuthorized = session.checkAuthorization({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(true);
     });
@@ -288,9 +288,553 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
+      const isAuthorized = session.checkAuthorization({ permission: 'org:sys_profile:delete' });
 
       expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor stale and with permission to delete the organization should NOT be able to delete the organization ', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          organization_memberships: [{ name: 'Org1', id: 'org1' }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 11],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        permission: 'org:sys_profile:delete',
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor verified and without permission to delete the organization should NOT be able to delete the organization ', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          organization_memberships: [{ name: 'Org1', id: 'org1', permissions: [] }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        permission: 'org:sys_profile:delete',
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor verified should be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with second factor stale should NOT be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 10],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with first factor stale should NOT be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [10, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L1.firstFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with first factor verified should be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L1.firstFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with second factor not enrolled should be downgraded to first factor and be considered authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, -1],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with second factor not enrolled should be downgraded to first factor and be considered unauthorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [11, -1],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor not enrolled and first factor verified should be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, -1],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with second factor not enrolled and first factor stale should be NOT authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [11, -1],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor verified and first factor verified should be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
+    });
+
+    it('user with second factor stale and first factor verified should NOT be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 10],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with second factor stale and first factor stale should NOT be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [10, 10],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with missing factor_verification_age should NOT be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: null,
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with missing factor_verification_age should NOT be authorized for fistFactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: null,
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L1.firstFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with missing factor_verification_age should NOT be authorized for secondFactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: null,
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    /**
+     * Test for invalid input
+     */
+    it('incorrect params for __experimental_assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          //@ts-expect-error
+          level: 'any level',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('incorrect params for __experimental_assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          //@ts-expect-error
+          level: 'any level',
+          //@ts-expect-error
+          maxAge: 'som-value',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('incorrect params for __experimental_assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L1.firstFactor',
+          //@ts-expect-error
+          maxAge: 100,
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    /**
+     * Not possible state but still nice to know they work
+     */
+    it('first factor not enrolled should NOT be authorized for multifactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [-1, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L3.multiFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('first factor not enrolled should NOT be authorized for firstFactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [-1, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L1.firstFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('first factor not enrolled should be authorized for secondFactor assurance', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [-1, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_assurance: {
+          level: 'L2.secondFactor',
+          maxAge: 'A1.10min',
+        },
+      });
+
+      expect(isAuthorized).toBe(true);
     });
   });
 });

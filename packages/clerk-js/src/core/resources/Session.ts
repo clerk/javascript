@@ -1,8 +1,8 @@
 import { runWithExponentialBackOff } from '@clerk/shared';
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   __experimental_SessionVerificationJSON,
-  __experimental_SessionVerificationMaxAge,
   __experimental_SessionVerificationResource,
   __experimental_SessionVerifyAttemptFirstFactorParams,
   __experimental_SessionVerifyAttemptSecondFactorParams,
@@ -28,15 +28,6 @@ import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
-
-const stringsToNumbers: { [key in '1m' | __experimental_SessionVerificationMaxAge]: number } = {
-  '1m': 1,
-  'A1.10min': 10,
-  'A2.1hr': 60,
-  'A3.4hr': 240, //4 * 60,
-  'A4.1day': 1440, //24 * 60,
-  'A5.1wk': 10080, //7 * 24 * 60,
-};
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -98,50 +89,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    let orgAuthorization = null;
-    let stepUpAuthorization = null;
-    if (!this.user) {
-      return false;
-    }
-
-    if (params.role || params.permission) {
-      const orgMemberships = this.user.organizationMemberships || [];
-      const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
-
-      const activeOrganizationPermissions = activeMembership?.permissions;
-      const activeOrganizationRole = activeMembership?.role;
-
-      const missingOrgs = !activeMembership;
-
-      if (params.permission && !missingOrgs) {
-        orgAuthorization = activeOrganizationPermissions!.includes(params.permission);
-      }
-
-      if (params.role && !missingOrgs) {
-        orgAuthorization = activeOrganizationRole === params.role;
-      }
-    }
-
-    if (params.__experimental_assurance && this.__experimental_factorVerificationAge) {
-      const hasValidFactorOne =
-        this.__experimental_factorVerificationAge[0] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[0]
-          : false;
-      const hasValidFactorTwo =
-        this.__experimental_factorVerificationAge[1] !== null
-          ? stringsToNumbers[params.__experimental_assurance.maxAge] > this.__experimental_factorVerificationAge[1]
-          : false;
-
-      if (params.__experimental_assurance.level === 'L1.firstFactor') {
-        stepUpAuthorization = hasValidFactorOne;
-      } else if (params.__experimental_assurance.level === 'L2.secondFactor') {
-        stepUpAuthorization = hasValidFactorTwo;
-      } else {
-        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
-      }
-    }
-
-    return [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
+    const orgMemberships = this.user?.organizationMemberships || [];
+    const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
+    return createCheckAuthorization({
+      userId: this.user?.id,
+      __experimental_factorVerificationAge: this.__experimental_factorVerificationAge,
+      orgId: activeMembership?.id,
+      orgRole: activeMembership?.role,
+      orgPermissions: activeMembership?.permissions,
+    })(params);
   };
 
   #hydrateCache = (token: TokenResource | null) => {
@@ -185,8 +141,6 @@ export class Session extends BaseResource implements SessionResource {
   __experimental_prepareFirstFactorVerification = async (
     factor: __experimental_SessionVerifyPrepareFirstFactorParams,
   ): Promise<__experimental_SessionVerificationResource> => {
-    // const searchParams = new URLSearchParams();
-    // searchParams.append('_clerk_session_id', this.id);
     let config;
     switch (factor.strategy) {
       case 'email_code':
@@ -210,7 +164,6 @@ export class Session extends BaseResource implements SessionResource {
           ...config,
           strategy: factor.strategy,
         } as any,
-        // search: searchParams,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
 

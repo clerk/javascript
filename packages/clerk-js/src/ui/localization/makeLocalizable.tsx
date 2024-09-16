@@ -71,6 +71,14 @@ export const useLocalizations = () => {
     return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
   };
 
+  /**
+   * Translates a Clerk error message based on its code.
+   *
+   * @remarks
+   * - For `ClerkRuntimeError`, it attempts to find a localized message using the error code.
+   * - For `ClerkAPIError`, it tries to find a localized message using the error code and parameter name.
+   * - If no localized message is found, it falls back to the original error message.
+   */
   const translateError = (error: ClerkRuntimeError | ClerkAPIError | string | undefined) => {
     if (!error || typeof error === 'string') {
       return t(error);
