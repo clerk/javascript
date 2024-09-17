@@ -44,8 +44,9 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "authorization",
     "dist",
+    "scripts",
+    "authorization",
     "browser",
     "callWithRetry",
     "color",
@@ -71,7 +72,6 @@
     "react",
     "constants",
     "apiUrlFromPublishableKey",
-    "scripts",
     "telemetry",
     "logger",
     "webauthn",

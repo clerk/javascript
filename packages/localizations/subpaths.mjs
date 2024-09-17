@@ -1,45 +1,13 @@
-// This file is a helper for the "subpath-workaround.mjs" script
-// We have to polyfill our "exports" subpaths :cry:
+import packageJson from './package.json' with { type: 'json' };
 
-export const subpathNames = [
-  'ar-SA',
-  'cs-CZ',
-  'da-DK',
-  'de-DE',
-  'el-GR',
-  'en-US',
-  'es-ES',
-  'fr-FR',
-  'fi-FI',
-  'he-IL',
-  'is-IS',
-  'it-IT',
-  'ja-JP',
-  'ko-KR',
-  'mn-MN',
-  'nb-NO',
-  'nl-NL',
-  'nl-BE',
-  'pl-PL',
-  'pt-BR',
-  'pt-PT',
-  'ro-RO',
-  'ru-RU',
-  'sk-SK',
-  'sv-SE',
-  'tr-TR',
-  'uk-UA',
-  'vi-VN',
-  'zh-CN',
-  'zh-TW',
-  'es-MX',
-  'bg-BG',
-  'th-TH',
-  'ca-ES',
-  'hu-HU',
-  'sr-RS',
-  'hr-HR',
-];
+/**
+ * This file is a helper for the "subpath-workaround.mjs" script.
+ * Add your new subpath to package.json#files.
+ *
+ * When you add an entry to the package.json "files" field, a subfolder will be automatically created with a package.json pointing to that file
+ */
+
+export const subpathNames = packageJson.files.filter(k => k !== 'dist');
 
 export const subpathFoldersBarrel = [];
 
