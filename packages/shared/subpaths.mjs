@@ -1,5 +1,5 @@
 // This file is a helper for the "subpath-workaround.mjs" script
-// We have to polyfill our "exports" subpaths :cry:
+// When adding an entry to "subpathNames" also add it to "files" in package.json
 
 export const subpathNames = [
   'authorization',

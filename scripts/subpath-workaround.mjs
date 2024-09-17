@@ -30,6 +30,11 @@ async function run() {
     ...subpathHelperFile.ignoredFolders,
     'dist',
   ];
+
+  if (pkgFile.files.length !== allFilesNames.length) {
+    throw new Error('The package.json "files" array length does not match the subpaths.mjs');
+  }
+
   const hasAllSubpathsInFiles = pkgFile.files.every(name => allFilesNames.includes(name));
 
   if (!hasAllSubpathsInFiles) {

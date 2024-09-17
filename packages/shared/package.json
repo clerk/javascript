@@ -44,6 +44,7 @@
   },
   "main": "./dist/index.js",
   "files": [
+    "authorization",
     "dist",
     "browser",
     "callWithRetry",
@@ -73,7 +74,9 @@
     "scripts",
     "telemetry",
     "logger",
-    "webauthn"
+    "webauthn",
+    "router",
+    "pathToRegexp"
   ],
   "scripts": {
     "build": "tsup",
