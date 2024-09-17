@@ -4,7 +4,7 @@ import { constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 
 import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
-import { clerkMiddlewareRequestDataStore } from './clerkMiddleware';
+import { clerkMiddlewareRequestDataStorage } from './clerkMiddleware';
 import {
   API_URL,
   API_VERSION,
@@ -62,7 +62,7 @@ const clerkClientForRequest = () => {
   }
 
   // Fallbacks between options from middleware runtime and `NextRequest` from application server
-  const options = clerkMiddlewareRequestDataStore.getStore() ?? requestData;
+  const options = clerkMiddlewareRequestDataStorage.getStore()?.get('requestData') ?? requestData;
   if (options?.secretKey || options?.publishableKey) {
     return createClerkClientWithOptions(options);
   }
