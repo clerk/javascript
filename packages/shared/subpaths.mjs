@@ -1,38 +1,13 @@
-// This file is a helper for the "subpath-workaround.mjs" script
-// When adding an entry to "subpathNames" also add it to "files" in package.json
+import packageJson from './package.json' with { type: 'json' };
 
-export const subpathNames = [
-  'authorization',
-  'browser',
-  'callWithRetry',
-  'color',
-  'cookie',
-  'date',
-  'deprecated',
-  'deriveState',
-  'error',
-  'file',
-  'globs',
-  'handleValueOrFn',
-  'isomorphicAtob',
-  'isomorphicBtoa',
-  'keys',
-  'loadClerkJsScript',
-  'loadScript',
-  'localStorageBroadcastChannel',
-  'poller',
-  'proxy',
-  'underscore',
-  'url',
-  'versionSelector',
-  'constants',
-  'apiUrlFromPublishableKey',
-  'telemetry',
-  'logger',
-  'webauthn',
-  'router',
-  'pathToRegexp',
-];
+/**
+ * This file is a helper for the "subpath-workaround.mjs" script.
+ * Add your new subpath to package.json#files.
+ *
+ * When you add an entry to the package.json "files" field, a subfolder will be automatically created with a package.json pointing to that file
+ */
+
+export const subpathNames = packageJson.files.filter(k => !['dist', 'scripts', 'react'].includes(k));
 
 export const subpathFoldersBarrel = ['react'];
 
