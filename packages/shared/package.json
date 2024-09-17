@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -44,8 +44,9 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "authorization",
     "dist",
+    "scripts",
+    "authorization",
     "browser",
     "callWithRetry",
     "color",
@@ -71,7 +72,6 @@
     "react",
     "constants",
     "apiUrlFromPublishableKey",
-    "scripts",
     "telemetry",
     "logger",
     "webauthn",
