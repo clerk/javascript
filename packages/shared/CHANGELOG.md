@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.8.1
+
+### Patch Changes
+
+- Set correct "files" property in package.json ([#4172](https://github.com/clerk/javascript/pull/4172)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 2.8.0
 
 ### Minor Changes
