@@ -39,6 +39,7 @@ const Headers = {
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',
+  AuthRefresh: 'x-clerk-auth-refresh',
   ClerkUrl: 'x-clerk-clerk-url',
   EnableDebug: 'x-clerk-debug',
   ClerkRequestData: 'x-clerk-request-data',

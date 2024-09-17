@@ -435,7 +435,10 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       try {
         const refreshResponse = await attemptRefresh(authenticateContext);
-        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
+        const refreshHeader = new Headers({
+          [constants.Headers.AuthRefresh]: '1',
+        });
+        return signedIn(authenticateContext, refreshResponse.data, refreshHeader, refreshResponse.sessionToken);
       } catch (error) {
         // If there's any error, simply fallback to the handshake flow.
         console.error('Clerk: unable to refresh token:', error);
