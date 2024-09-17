@@ -46,7 +46,6 @@ export async function watch({ js }) {
   };
 
   if (js) {
-    //@ts-expect-error The TypeScript types for the ESM version of concurrently are wrong. https://github.com/open-cli-tools/concurrently/issues/494
     const { result } = concurrently([clerkJsCommand], { prefixColors: 'auto' });
     return result;
   }
@@ -57,7 +56,6 @@ export async function watch({ js }) {
     commands.push(clerkJsCommand);
   }
 
-  //@ts-expect-error The TypeScript types for the ESM version of concurrently are wrong. https://github.com/open-cli-tools/concurrently/issues/494
   const { result } = concurrently(commands, { prefixColors: 'auto' });
   return result;
 }

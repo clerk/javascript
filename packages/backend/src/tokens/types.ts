@@ -1,3 +1,4 @@
+import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -10,6 +11,7 @@ export type AuthenticateRequestOptions = {
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
   organizationSync?: OrganizationSyncOptions;
+  apiClient?: ApiClient;
 } & VerifyTokenOptions;
 
 // OrganizationSyncOptions define the options for syncing an organization

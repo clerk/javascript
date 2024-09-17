@@ -1,10 +1,10 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import type { AuthObject } from '@clerk/backend';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions, ClerkRequest, RedirectFun, RequestState} from '@clerk/backend/internal';
+import type { AuthObject, ClerkClient } from '@clerk/backend';
+import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { NextMiddleware } from 'next/server';
+import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
@@ -44,6 +44,8 @@ type ClerkMiddlewareHandler = (
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
 
+type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
+
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
  * For more details, please refer to the docs: https://clerk.com/docs/references/nextjs/clerk-middleware
@@ -56,6 +58,11 @@ interface ClerkMiddleware {
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptions): NextMiddleware;
   /**
    * @example
+   * export default clerkMiddleware((auth, request, event) => { ... }, (req) => options);
+   */
+  (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptionsCallback): NextMiddleware;
+  /**
+   * @example
    * export default clerkMiddleware(options);
    */
   (options?: ClerkMiddlewareOptions): NextMiddleware;
@@ -66,38 +73,47 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<AuthenticateRequestOptions>>();
+const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
+export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
-    errorThrower.throwMissingPublishableKeyError(),
-  );
-  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
-  const signInUrl = params.signInUrl || SIGN_IN_URL;
-  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
-
-  const options = {
-    ...params,
-    publishableKey,
-    secretKey,
-    signInUrl,
-    signUpUrl,
-  };
-
-  return clerkMiddlewareRequestDataStore.run(options, () => {
-    clerkClient().telemetry.record(
-      eventMethodCalled('clerkMiddleware', {
-        handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
-      }),
-    );
-
+  return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
-      if (params.debug) {
+      // Handles the case where `options` is a callback function to dynamically access `NextRequest`
+      const resolvedParams = typeof params === 'function' ? params(request) : params;
+
+      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
+        errorThrower.throwMissingPublishableKeyError(),
+      );
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+        errorThrower.throwMissingSecretKeyError(),
+      );
+      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
+      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
+
+      const options = {
+        publishableKey,
+        secretKey,
+        signInUrl,
+        signUpUrl,
+        ...resolvedParams,
+      };
+
+      // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
+      clerkMiddlewareRequestDataStore.set('requestData', options);
+
+      clerkClient().telemetry.record(
+        eventMethodCalled('clerkMiddleware', {
+          handler: Boolean(handler),
+          satellite: Boolean(options.isSatellite),
+          proxy: Boolean(options.proxyUrl),
+        }),
+      );
+
+      if (options.debug) {
         logger.enable();
       }
       const clerkRequest = createClerkRequest(request);
@@ -131,8 +147,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
       let handlerResult: Response = NextResponse.next();
       try {
-        const userHandlerResult = await clerkMiddlewareRequestDataStore.run(options, async () =>
-          handler?.(() => authObjWithMethods, request, event),
+        const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
+          clerkMiddlewareRequestDataStore,
+          async () => handler?.(() => authObjWithMethods, request, event),
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
@@ -156,7 +173,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, params);
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams);
 
       return handlerResult;
     });
@@ -184,38 +201,16 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   return [
     typeof args[0] === 'function' ? args[0] : undefined,
     (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
-  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
+  ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback];
 };
 
-export const createAuthenticateRequestOptions: (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
-  /* TODO(izaak): I get this error unless I specify the type explicitly:
-  ```
-    error TS2742: The inferred type of  'createAuthenticateRequestOptions' cannot be named without a reference to
-    '../../../../node_modules/@clerk/backend/dist/tokens/types'. This is likely not portable. A type annotation is necessary.
-  ```
-  It looks like it's because i've added OrganizationSyncOptions to AuthenticateRequestOptions (types.ts). Not sure
-  what the best workaround is, but it's likely not this.
-  */
-  publishableKey?: string;
-  audience?: string | string[];
-  debug?: boolean;
-  secretKey?: string;
-  signInUrl: string;
-  signUpUrl?: string;
-  proxyUrl: any;
-  afterSignUpUrl?: string;
-  clockSkewInMs?: number;
-  isSatellite: boolean;
-  organizationSync?: OrganizationSyncOptions;
-  apiVersion?: string;
-  apiUrl?: string;
-  domain: string;
-  afterSignInUrl?: string;
-  authorizedParties?: string[];
-  skipJwksCache?: boolean;
-  jwksCacheTtlInMs?: number;
-  jwtKey?: string
-} = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
+type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
+
+export const createAuthenticateRequestOptions = (
+  clerkRequest: ClerkRequest,
+  options: ClerkMiddlewareOptions,
+): Parameters<AuthenticateRequest>[1] => {
+// >>>>>>> main
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
