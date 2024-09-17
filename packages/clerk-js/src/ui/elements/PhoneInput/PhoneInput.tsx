@@ -222,6 +222,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
           width: '100%',
           gap: theme.space.$2,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
+          color: theme.colors.$colorText,
         }),
         sx,
       ]}
