@@ -32,6 +32,7 @@ const QueryParameters = {
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
   HandshakeReason: '__clerk_hs_reason',
+  RefreshTokenError: '__clerk_refresh',
 } as const;
 
 const Headers = {

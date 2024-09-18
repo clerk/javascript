@@ -103,14 +103,23 @@ export async function authenticateRequest(
     return updatedURL;
   }
 
-  function buildRedirectToHandshake(reason: AuthErrorReason) {
+  function buildRedirectToHandshake({
+    handshakeReason,
+    refreshError,
+  }: {
+    handshakeReason: AuthErrorReason;
+    refreshError?: string;
+  }) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
-    url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
+    url.searchParams.append(constants.QueryParameters.HandshakeReason, handshakeReason);
+    if (refreshError) {
+      url.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshError);
+    }
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -210,11 +219,26 @@ ${error.getFullMessage()}`,
   }
 
   async function attemptRefresh(authenticateContext: AuthenticateContext) {
-    const sessionToken = await refreshToken(authenticateContext);
+    let sessionToken: string;
+    try {
+      sessionToken = await refreshToken(authenticateContext);
+    } catch (err: any) {
+      if (!!err?.errors && err.errors?.length > 0) {
+        throw {
+          message: `Clerk: unable to refresh session token.`,
+          cause: { reason: err.errors[0].code, errors: err.errors },
+        };
+      } else {
+        throw err;
+      }
+    }
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
     const { data, errors } = await verifyToken(sessionToken, authenticateContext);
     if (errors) {
-      throw new Error(`Clerk: unable to verify refreshed session token.`);
+      throw {
+        message: `Clerk: unable to verify refreshed session token.`,
+        cause: { reason: 'invalid-session-token', errors },
+      };
     }
     return { data, sessionToken };
   }
@@ -224,11 +248,12 @@ ${error.getFullMessage()}`,
     reason: AuthErrorReason,
     message: string,
     headers?: Headers,
+    refreshError?: string,
   ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake(reason);
+      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError });
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -437,13 +462,21 @@ ${error.getFullMessage()}`,
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
+    let refreshError: string = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       try {
         const refreshResponse = await attemptRefresh(authenticateContext);
         return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
-      } catch (error) {
+      } catch (error: any) {
         // If there's any error, simply fallback to the handshake flow.
-        console.error('Clerk: unable to refresh token:', error);
+        console.error('Clerk: unable to refresh token:', error?.message || error);
+
+        if (error?.cause?.reason) {
+          refreshError = error.cause.reason;
+        } else {
+          refreshError = 'unexpected-refresh-error';
+        }
       }
     }
 
@@ -459,6 +492,8 @@ ${error.getFullMessage()}`,
         authenticateContext,
         AuthErrorReason.SessionTokenOutdated,
         err.getFullMessage(),
+        undefined,
+        refreshError,
       );
     }
 
