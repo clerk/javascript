@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.22.3
+
+### Patch Changes
+
+- Restore behavior of MetaMask compatible Web3 wallets. Before, even if a user didn't use the MetaMask browser extension but a compatible one, such as Rabby Wallet, it was possible to use it as they share the same API to authenticate themselves. This behavior stopped working when we added support for EIP6963 regarding handling multiple injected providers. This commit restores the previous behavior by using the existing injected provider if there is a single one ([#4185](https://github.com/clerk/javascript/pull/4185)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`5dde18f6b`](https://github.com/clerk/javascript/commit/5dde18f6b55ed4d5c2a6a5246ee3b3ba0d077df3)]:
+  - @clerk/localizations@3.0.4
+
 ## 5.22.2
 
 ### Patch Changes
