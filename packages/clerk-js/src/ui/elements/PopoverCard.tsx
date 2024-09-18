@@ -19,7 +19,7 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
         sx={t => ({
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
-          zIndex: t.zIndices.$modal,
+          // zIndex: t.zIndices.$modal,
           borderRadius: t.radii.$xl,
           animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
           outline: 'none',
@@ -41,7 +41,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           backgroundColor: t.colors.$colorBackground,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
-          zIndex: t.zIndices.$card,
+          // zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
           borderColor: t.colors.$neutralAlpha50,

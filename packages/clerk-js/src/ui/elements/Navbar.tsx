@@ -215,7 +215,9 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           top: 0,
           bottom: 0,
           width: '100%',
-          zIndex: t.zIndices.$navbar,
+          // z-index is mandatory in order to display the mobile menu over any other sibling with position="relative"
+          zIndex: t.zIndices.$forceAgainstRelativeSiblings,
+          // zIndex: t.zIndices.$navbar,
           overflow: 'hidden',
           color: t.colors.$colorText,
         })}
