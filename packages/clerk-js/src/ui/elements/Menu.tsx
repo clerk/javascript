@@ -86,7 +86,7 @@ type MenuListProps = PropsOfComponent<typeof Col> & {
 };
 
 export const MenuList = (props: MenuListProps) => {
-  const { sx, asPortal = false, ...rest } = props;
+  const { sx, asPortal, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -139,6 +139,7 @@ export const MenuList = (props: MenuListProps) => {
             animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
             boxShadow: t.shadows.$menuShadow,
+            // or remove this line
             zIndex: t.zIndices.$dropdown,
             gap: t.space.$0x5,
           }),

@@ -295,6 +295,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
           />
         </MenuTrigger>
         <MenuList
+          asPortal={false}
           sx={t => ({
             width: '100%',
             padding: t.space.$1,
