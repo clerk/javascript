@@ -18,7 +18,7 @@ export const STAGING_API_URL = 'https://api.clerkstage.dev';
 export const PROD_API_URL = 'https://api.clerk.com';
 
 /**
- * Returns the URL for a static SVG image
+ * Returns the URL for a static image
  * using the new img.clerk.com service
  */
 export function iconImageUrl(id: string, format: 'svg' | 'jpeg' = 'svg'): string {
