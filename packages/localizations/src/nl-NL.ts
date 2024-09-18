@@ -874,6 +874,7 @@ export const nlNL: LocalizationResource = {
       subtitle__unavailableWallets: 'Er zijn geen beschikbare web3 portefeuilles.',
       successMessage: 'De portefeuille is toegevoegd aan dit account.',
       title: 'Web3 portefeuille toevoegen.',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;
