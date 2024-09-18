@@ -2,4 +2,4 @@
 "@clerk/shared": patch
 ---
 
-Expose match from `path-to-regexp`.
+Exports `match` utility from the `path-to-regexp` lib.
