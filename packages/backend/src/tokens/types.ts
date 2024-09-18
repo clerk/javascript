@@ -10,7 +10,7 @@ export type AuthenticateRequestOptions = {
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
-  organizationSync?: OrganizationSyncOptions;
+  organizationSyncOptions?: OrganizationSyncOptions;
   apiClient?: ApiClient;
 } & VerifyTokenOptions;
 
