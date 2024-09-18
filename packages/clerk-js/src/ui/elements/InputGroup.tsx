@@ -40,6 +40,7 @@ export const InputGroup = forwardRef<
       hasError={rest.hasError}
       sx={theme => ({
         position: 'relative',
+        // TOOD: Test this one
         zIndex: 1,
         ...common.borderVariants(theme).normal,
         ':focus-within': {

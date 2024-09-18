@@ -38,10 +38,10 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
       direction='col'
       sx={[
         t => ({
+          isolation: 'isolate',
           backgroundColor: t.colors.$colorBackground,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
-          // zIndex: t.zIndices.$card,
           borderWidth: t.borderWidths.$normal,
           borderStyle: t.borderStyles.$solid,
           borderColor: t.colors.$neutralAlpha50,

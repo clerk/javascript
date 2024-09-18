@@ -76,7 +76,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         ...common.borderVariants(theme, { hasError: rest.hasError }).normal,
         position: 'relative',
         borderRadius: theme.radii.$md,
-        zIndex: 1,
+        // zIndex: 1,
         '&:focus-within': {
           ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
         },
@@ -119,11 +119,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             borderTopRightRadius: '0',
             paddingRight: t.space.$2,
             ':focus': {
-              zIndex: 2,
+              // zIndex: 2,
               boxShadow: 'none',
             },
             ':active': {
-              zIndex: 2,
+              // zIndex: 2,
             },
           })}
           hoverAsFocus

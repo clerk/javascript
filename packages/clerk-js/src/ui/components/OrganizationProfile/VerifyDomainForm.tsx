@@ -131,6 +131,7 @@ export const VerifyDomainForm = withCardStateProvider((props: VerifyDomainFormPr
       >
         <Form.Root onSubmit={onSubmitPrepare}>
           <Form.ControlRow elementId={emailField.id}>
+            {/**/}
             <Form.InputGroup
               {...emailField.props}
               autoFocus
