@@ -3,6 +3,5 @@ export const zIndices = Object.freeze({
   navbar: '100',
   fab: '9000',
   modal: '10000',
-  // either do this
-  dropdown: '9900',
+  dropdown: '11000',
 } as const);
