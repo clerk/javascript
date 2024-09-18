@@ -26,7 +26,7 @@ interface EIP6963ProviderDetail {
   provider: EIP1193Provider;
 }
 
-type EIP6963AnnounceProviderEvent = CustomEvent;
+type EIP6963AnnounceProviderEvent = CustomEvent<EIP6963ProviderDetail>;
 type InjectedWeb3Provider = MetamaskWeb3Provider;
 
 class InjectedWeb3Providers {
@@ -52,6 +52,12 @@ class InjectedWeb3Providers {
   }
 
   get = (provider: InjectedWeb3Provider) => {
+    // In case there is a single injected provider, use that directly.
+    // This is needed in order to support other compatible Web3 Wallets (e.g. Rabby Wallet)
+    // and maintain the previous behavior
+    if (this.#providers.length === 1) {
+      return this.#providers[0].provider;
+    }
     return this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
   };
 
