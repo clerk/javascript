@@ -31,7 +31,6 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
         ref={ref}
         sx={[
           t => ({
-            isolation: 'isolate',
             maxWidth: `calc(100vw - ${t.sizes.$10})`,
             width: t.sizes.$100,
             borderWidth: t.borderWidths.$normal,

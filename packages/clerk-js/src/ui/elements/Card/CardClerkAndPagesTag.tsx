@@ -46,8 +46,7 @@ export const CardClerkAndPagesTag = React.memo(
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
-            // remove this
-            // zIndex: 1,
+            zIndex: 1,
             position: 'relative',
           })}
         >
