@@ -55,12 +55,12 @@ function _(r) {
     }
     if (a === '(') {
       var o = 1,
-        h = '',
+        m = '',
         t = e + 1;
       if (r[t] === '?') throw new TypeError('Pattern cannot start with "?" at '.concat(t));
       for (; t < r.length; ) {
         if (r[t] === '\\') {
-          h += r[t++] + r[t++];
+          m += r[t++] + r[t++];
           continue;
         }
         if (r[t] === ')') {
@@ -70,14 +70,14 @@ function _(r) {
           }
         } else if (r[t] === '(' && (o++, r[t + 1] !== '?'))
           throw new TypeError('Capturing groups are not allowed at '.concat(t));
-        h += r[t++];
+        m += r[t++];
       }
       if (o) throw new TypeError('Unbalanced pattern at '.concat(e));
-      if (!h) throw new TypeError('Missing pattern at '.concat(e));
+      if (!m) throw new TypeError('Missing pattern at '.concat(e));
       n.push({
         type: 'PATTERN',
         index: e,
-        value: h,
+        value: m,
       }),
         (e = t);
       continue;
@@ -107,28 +107,28 @@ function F(r, n) {
       t = n.delimiter,
       c = t === void 0 ? '/#?' : t,
       o = [],
-      h = 0,
       m = 0,
-      d = '',
+      h = 0,
+      p = '',
       f = function (l) {
-        if (m < e.length && e[m].type === l) return e[m++].value;
+        if (h < e.length && e[h].type === l) return e[h++].value;
       },
       w = function (l) {
         var v = f(l);
         if (v !== void 0) return v;
-        var E = e[m],
-          P = E.type,
+        var E = e[h],
+          N = E.type,
           S = E.index;
-        throw new TypeError('Unexpected '.concat(P, ' at ').concat(S, ', expected ').concat(l));
+        throw new TypeError('Unexpected '.concat(N, ' at ').concat(S, ', expected ').concat(l));
       },
-      p = function () {
+      d = function () {
         for (var l = '', v; (v = f('CHAR') || f('ESCAPED_CHAR')); ) l += v;
         return l;
       },
-      O = function (l) {
+      M = function (l) {
         for (var v = 0, E = c; v < E.length; v++) {
-          var P = E[v];
-          if (l.indexOf(P) > -1) return !0;
+          var N = E[v];
+          if (l.indexOf(N) > -1) return !0;
         }
         return !1;
       },
@@ -137,9 +137,9 @@ function F(r, n) {
           E = l || (v && typeof v == 'string' ? v : '');
         if (v && !E)
           throw new TypeError('Must have text between two parameters, missing text after "'.concat(v.name, '"'));
-        return !E || O(E) ? '[^'.concat(s(c), ']+?') : '(?:(?!'.concat(s(E), ')[^').concat(s(c), '])+?');
+        return !E || M(E) ? '[^'.concat(s(c), ']+?') : '(?:(?!'.concat(s(E), ')[^').concat(s(c), '])+?');
       };
-    m < e.length;
+    h < e.length;
 
   ) {
     var T = f('CHAR'),
@@ -147,10 +147,10 @@ function F(r, n) {
       C = f('PATTERN');
     if (x || C) {
       var g = T || '';
-      u.indexOf(g) === -1 && ((d += g), (g = '')),
-        d && (o.push(d), (d = '')),
+      u.indexOf(g) === -1 && ((p += g), (g = '')),
+        p && (o.push(p), (p = '')),
         o.push({
-          name: x || h++,
+          name: x || m++,
           prefix: g,
           suffix: '',
           pattern: C || A(g),
@@ -160,20 +160,20 @@ function F(r, n) {
     }
     var i = T || f('ESCAPED_CHAR');
     if (i) {
-      d += i;
+      p += i;
       continue;
     }
-    d && (o.push(d), (d = ''));
+    p && (o.push(p), (p = ''));
     var R = f('OPEN');
     if (R) {
-      var g = p(),
+      var g = d(),
         y = f('NAME') || '',
-        N = f('PATTERN') || '',
-        b = p();
+        O = f('PATTERN') || '',
+        b = d();
       w('CLOSE'),
         o.push({
-          name: y || (N ? h++ : ''),
-          pattern: y && !N ? A(g) : N,
+          name: y || (O ? m++ : ''),
+          pattern: y && !O ? A(g) : O,
           prefix: g,
           suffix: b,
           modifier: f('MODIFIER') || '',
@@ -187,7 +187,7 @@ function F(r, n) {
 
 function H(r, n) {
   var e = [],
-    a = M(r, e, n);
+    a = P(r, e, n);
   return I(a, e, n);
 }
 
@@ -205,26 +205,26 @@ function I(r, n, e) {
     if (!c) return !1;
     for (
       var o = c[0],
-        h = c.index,
-        m = Object.create(null),
-        d = function (w) {
+        m = c.index,
+        h = Object.create(null),
+        p = function (w) {
           if (c[w] === void 0) return 'continue';
-          var p = n[w - 1];
-          p.modifier === '*' || p.modifier === '+'
-            ? (m[p.name] = c[w].split(p.prefix + p.suffix).map(function (O) {
-                return u(O, p);
+          var d = n[w - 1];
+          d.modifier === '*' || d.modifier === '+'
+            ? (h[d.name] = c[w].split(d.prefix + d.suffix).map(function (M) {
+                return u(M, d);
               }))
-            : (m[p.name] = u(c[w], p));
+            : (h[d.name] = u(c[w], d));
         },
         f = 1;
       f < c.length;
       f++
     )
-      d(f);
+      p(f);
     return {
       path: o,
-      index: h,
-      params: m,
+      index: m,
+      params: h,
     };
   };
 }
@@ -253,7 +253,7 @@ function $(r, n) {
 
 function W(r, n, e) {
   var a = r.map(function (u) {
-    return M(u, n, e).source;
+    return P(u, n, e).source;
   });
   return new RegExp('(?:'.concat(a.join('|'), ')'), D(e));
 }
@@ -270,19 +270,19 @@ function U(r, n, e) {
       t = e.start,
       c = t === void 0 ? !0 : t,
       o = e.end,
-      h = o === void 0 ? !0 : o,
-      m = e.encode,
-      d =
-        m === void 0
+      m = o === void 0 ? !0 : o,
+      h = e.encode,
+      p =
+        h === void 0
           ? function (v) {
               return v;
             }
-          : m,
+          : h,
       f = e.delimiter,
       w = f === void 0 ? '/#?' : f,
-      p = e.endsWith,
-      O = p === void 0 ? '' : p,
-      A = '['.concat(s(O), ']|$'),
+      d = e.endsWith,
+      M = d === void 0 ? '' : d,
+      A = '['.concat(s(M), ']|$'),
       T = '['.concat(s(w), ']'),
       x = c ? '^' : '',
       C = 0,
@@ -291,14 +291,14 @@ function U(r, n, e) {
     C++
   ) {
     var i = g[C];
-    if (typeof i == 'string') x += s(d(i));
+    if (typeof i == 'string') x += s(p(i));
     else {
-      var R = s(d(i.prefix)),
-        y = s(d(i.suffix));
+      var R = s(p(i.prefix)),
+        y = s(p(i.suffix));
       if (i.pattern)
         if ((n && n.push(i), R || y))
           if (i.modifier === '+' || i.modifier === '*') {
-            var N = i.modifier === '*' ? '?' : '';
+            var O = i.modifier === '*' ? '?' : '';
             x += '(?:'
               .concat(R, '((?:')
               .concat(i.pattern, ')(?:')
@@ -306,7 +306,7 @@ function U(r, n, e) {
               .concat(R, '(?:')
               .concat(i.pattern, '))*)')
               .concat(y, ')')
-              .concat(N);
+              .concat(O);
           } else x += '(?:'.concat(R, '(').concat(i.pattern, ')').concat(y, ')').concat(i.modifier);
         else {
           if (i.modifier === '+' || i.modifier === '*')
@@ -316,7 +316,7 @@ function U(r, n, e) {
       else x += '(?:'.concat(R).concat(y, ')').concat(i.modifier);
     }
   }
-  if (h) u || (x += ''.concat(T, '?')), (x += e.endsWith ? '(?='.concat(A, ')') : '$');
+  if (m) u || (x += ''.concat(T, '?')), (x += e.endsWith ? '(?='.concat(A, ')') : '$');
   else {
     var b = r[r.length - 1],
       l = typeof b == 'string' ? T.indexOf(b[b.length - 1]) > -1 : b === void 0;
@@ -325,7 +325,7 @@ function U(r, n, e) {
   return new RegExp(x, D(e));
 }
 
-function M(r, n, e) {
+function P(r, n, e) {
   return r instanceof RegExp ? $(r, n) : Array.isArray(r) ? W(r, n, e) : L(r, n, e);
 }
-export { H as match, M as pathToRegexp };
+export { H as match, P as pathToRegexp };
