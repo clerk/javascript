@@ -221,7 +221,7 @@ ${error.getFullMessage()}`,
     try {
       sessionToken = await refreshToken(authenticateContext);
     } catch (err: any) {
-      if (!!err?.errors?.length) {
+      if (err?.errors?.length) {
         throw {
           message: `Clerk: unable to refresh session token.`,
           cause: { reason: err.errors[0].code, errors: err.errors },
@@ -250,15 +250,11 @@ ${error.getFullMessage()}`,
   ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // If a refresh error is not passed in, we default to 'no-cookie' or 'non-eligible'.
-      let explicitRefreshError = refreshError;
-      if (!explicitRefreshError) {
-        explicitRefreshError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
-      }
+      refreshError = refreshError || (authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie');
 
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders =
-        headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError: explicitRefreshError });
+      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError });
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
