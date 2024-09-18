@@ -121,7 +121,7 @@ export async function authenticateRequest(
 
     const toActivate = getActivationEntity(requestURL, options.organizationSync);
     if (toActivate) {
-      const params = getHandshakeActivationParam(toActivate);
+      const params = getOrganizationSyncQueryParams(toActivate);
 
       params.forEach((value, key) => {
         url.searchParams.append(key, value);
@@ -329,10 +329,7 @@ ${error.getFullMessage()}`,
         authenticateContext,
         signedInRequestState.toAuth(),
       );
-      if (handshakeRequestState) {
-        return handshakeRequestState;
-      }
-      return signedInRequestState;
+      return handshakeRequestState || signedInRequestState;
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -641,9 +638,9 @@ type ActivatibleEntity = {
   organizationSlug?: string;
 };
 
-// getHandshakeActivationParam takes an activatibatle entity (organization or personal workspace)
+// getOrganizationSyncQueryParams takes an activatibatle entity (organization or personal workspace)
 // and generates the query parameters that FAPI expects on the handshake API to activate that entity.
-function getHandshakeActivationParam(toActivate: ActivatibleEntity): Map<string, string> {
+function getOrganizationSyncQueryParams(toActivate: ActivatibleEntity): Map<string, string> {
   const ret = new Map();
   if (toActivate.type === 'personalWorkspace') {
     ret.set('organization_id', '');
