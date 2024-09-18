@@ -1,3 +1,5 @@
+import type { JwtPayload } from '@clerk/types';
+
 import type { ApiClient } from '../api';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -103,13 +105,21 @@ export async function authenticateRequest(
     return updatedURL;
   }
 
-  function buildRedirectToHandshake() {
+  function buildRedirectToHandshake({
+    handshakeReason,
+    refreshError,
+  }: {
+    handshakeReason: AuthErrorReason;
+    refreshError: string;
+  }) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
+    url.searchParams.append(constants.QueryParameters.HandshakeReason, handshakeReason);
+    url.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshError);
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -208,14 +218,40 @@ ${error.getFullMessage()}`,
     return tokenResponse.jwt;
   }
 
-  async function attemptRefresh(authenticateContext: AuthenticateContext) {
-    const sessionToken = await refreshToken(authenticateContext);
-    // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
-    const { data, errors } = await verifyToken(sessionToken, authenticateContext);
-    if (errors) {
-      throw new Error(`Clerk: unable to verify refreshed session token.`);
+  async function attemptRefresh(
+    authenticateContext: AuthenticateContext,
+  ): Promise<{ data: { jwtPayload: JwtPayload; sessionToken: string }; error: null } | { data: null; error: any }> {
+    let sessionToken: string;
+    try {
+      sessionToken = await refreshToken(authenticateContext);
+    } catch (err: any) {
+      if (err?.errors?.length) {
+        return {
+          data: null,
+          error: {
+            message: `Clerk: unable to refresh session token.`,
+            cause: { reason: err.errors[0].code, errors: err.errors },
+          },
+        };
+      } else {
+        return {
+          data: null,
+          error: err,
+        };
+      }
     }
-    return { data, sessionToken };
+    // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
+    const { data: jwtPayload, errors } = await verifyToken(sessionToken, authenticateContext);
+    if (errors) {
+      return {
+        data: null,
+        error: {
+          message: `Clerk: unable to verify refreshed session token.`,
+          cause: { reason: 'invalid-session-token', errors },
+        },
+      };
+    }
+    return { data: { jwtPayload, sessionToken }, error: null };
   }
 
   function handleMaybeHandshakeStatus(
@@ -223,11 +259,15 @@ ${error.getFullMessage()}`,
     reason: AuthErrorReason,
     message: string,
     headers?: Headers,
+    refreshError?: string,
   ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
+      // If a refresh error is not passed in, we default to 'no-cookie' or 'non-eligible'.
+      refreshError = refreshError || (authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie');
+
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake();
+      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError });
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -356,9 +396,13 @@ ${error.getFullMessage()}`,
         constants.QueryParameters.ClerkRedirectUrl,
         authenticateContext.clerkUrl.toString(),
       );
+      const authErrReason = AuthErrorReason.SatelliteCookieNeedsSyncing;
+      redirectURL.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
+      const refreshTokenError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+      redirectURL.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
     }
 
     // Multi-domain development sync flow
@@ -376,9 +420,13 @@ ${error.getFullMessage()}`,
         );
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
+      const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
+      const refreshTokenError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
     }
     /**
      * End multi-domain sync flows
@@ -432,13 +480,20 @@ ${error.getFullMessage()}`,
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
+    let refreshError: string = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
-      try {
-        const refreshResponse = await attemptRefresh(authenticateContext);
-        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
-      } catch (error) {
-        // If there's any error, simply fallback to the handshake flow.
-        console.error('Clerk: unable to refresh token:', error);
+      const { data, error } = await attemptRefresh(authenticateContext);
+      if (!error) {
+        return signedIn(authenticateContext, data!.jwtPayload, undefined, data!.sessionToken);
+      }
+
+      // If there's any error, simply fallback to the handshake flow.
+      console.error('Clerk: unable to refresh token:', error?.message || error);
+      if (error?.cause?.reason) {
+        refreshError = error.cause.reason;
+      } else {
+        refreshError = 'unexpected-refresh-error';
       }
     }
 
@@ -454,6 +509,8 @@ ${error.getFullMessage()}`,
         authenticateContext,
         AuthErrorReason.SessionTokenOutdated,
         err.getFullMessage(),
+        undefined,
+        refreshError,
       );
     }
 
