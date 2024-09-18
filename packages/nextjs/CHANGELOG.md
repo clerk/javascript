@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.6.0
+
+### Minor Changes
+
+- Allows access to request object to dynamically define `clerkMiddleware` options ([#4160](https://github.com/clerk/javascript/pull/4160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`02babaccb`](https://github.com/clerk/javascript/commit/02babaccb648fa4e22f38cc0f572d44f82b09f78)]:
+  - @clerk/backend@1.13.2
+
 ## 5.5.5
 
 ### Patch Changes
