@@ -11,7 +11,7 @@ import { match as matchBase, pathToRegexp as pathToRegexpBase } from './compiled
 export const pathToRegexp = (path: string) => {
   try {
     // @ts-ignore no types exists for the pre-compiled package
-    return pathToRegexpBase(path);
+    return pathToRegexpBase(path) as RegExp;
   } catch (e: any) {
     throw new Error(
       `Invalid path: ${path}.\nConsult the documentation of path-to-regexp here: https://github.com/pillarjs/path-to-regexp/tree/6.x\n${e.message}`,
@@ -25,7 +25,7 @@ export function match<P extends object = object>(
 ): MatchFunction<P> {
   try {
     // @ts-ignore no types exists for the pre-compiled package
-    return matchBase(str, options);
+    return matchBase(str, options) as MatchFunction<P>;
   } catch (e: any) {
     throw new Error(
       `Invalid path and options: Consult the documentation of path-to-regexp here: https://github.com/pillarjs/path-to-regexp/tree/6.x\n${e.message}`,
