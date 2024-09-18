@@ -323,7 +323,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
             boxShadow: theme.shadows.$menuShadow,
-            // zIndex: theme.zIndices.$dropdown,
+            zIndex: theme.zIndices.$dropdown,
           }),
           sx,
         ]}

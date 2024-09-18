@@ -83,7 +83,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
       })}
     >
       <Select
-        portal
         elementId='countryCode'
         value={selectedCountryOption.value}
         options={countryOptions}

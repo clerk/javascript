@@ -40,9 +40,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
               top: t.space.$none,
               right: t.space.$none,
             },
-            // z-index is mandatory in order to display the mobile menu over any other sibling with position="relative"
-            zIndex: t.zIndices.$forceAgainstRelativeSiblings,
-            // zIndex: 1, // t.zIndices.$modal
+            zIndex: t.zIndices.$modal,
             position: 'absolute',
             top: t.space.$2,
             right: t.space.$2,
