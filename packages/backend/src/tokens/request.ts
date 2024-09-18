@@ -119,15 +119,13 @@ export async function authenticateRequest(
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
-    if (options.organizationSync) {
-      const toActivate = getActivationEntity(requestURL, options.organizationSync);
-      if (toActivate) {
-        const params = getHandshakeActivationParam(toActivate);
+    const toActivate = getActivationEntity(requestURL, options.organizationSync);
+    if (toActivate) {
+      const params = getHandshakeActivationParam(toActivate);
 
-        params.forEach((value, key) => {
-          url.searchParams.append(key, value);
-        });
-      }
+      params.forEach((value, key) => {
+        url.searchParams.append(key, value);
+      });
     }
 
     return new Headers({ [constants.Headers.Location]: url.href });
@@ -274,9 +272,6 @@ ${error.getFullMessage()}`,
     authenticateContext: AuthenticateContext,
     auth: SignedInAuthObject,
   ): HandshakeState | SignedOutState | null {
-    if (!options.organizationSync) {
-      return null;
-    }
     const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
     if (!toActivate) {
       return null;
@@ -574,9 +569,12 @@ export const debugRequestState = (params: RequestState) => {
  * Determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
  * @example test
  */
-export function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
+export function getActivationEntity(url: URL, options: OrganizationSyncOptions | undefined): ActivatibleEntity | null {
+  if (!options) {
+    return null;
+  }
+
   // Check for personal workspace activation
-  console.log('THis too izaak');
   if (options.personalWorkspacePatterns) {
     let matcher: MatchFunction<Partial<Record<string, string | string[]>>>;
     try {
