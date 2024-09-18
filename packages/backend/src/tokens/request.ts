@@ -221,7 +221,7 @@ ${error.getFullMessage()}`,
     try {
       sessionToken = await refreshToken(authenticateContext);
     } catch (err: any) {
-      if (!!err?.errors && err.errors?.length > 0) {
+      if (!!err?.errors?.length) {
         throw {
           message: `Clerk: unable to refresh session token.`,
           cause: { reason: err.errors[0].code, errors: err.errors },
