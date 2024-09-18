@@ -108,7 +108,7 @@ export async function authenticateRequest(
     refreshError,
   }: {
     handshakeReason: AuthErrorReason;
-    refreshError?: string;
+    refreshError: string;
   }) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
@@ -117,9 +117,7 @@ export async function authenticateRequest(
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
     url.searchParams.append(constants.QueryParameters.HandshakeReason, handshakeReason);
-    if (refreshError) {
-      url.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshError);
-    }
+    url.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshError);
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -251,9 +249,16 @@ ${error.getFullMessage()}`,
     refreshError?: string,
   ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
+      // If a refresh error is not passed in, we default to 'no-cookie' or 'non-eligible'.
+      let explicitRefreshError = refreshError;
+      if (!explicitRefreshError) {
+        explicitRefreshError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+      }
+
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError });
+      const handshakeHeaders =
+        headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError: explicitRefreshError });
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -384,6 +389,8 @@ ${error.getFullMessage()}`,
       );
       const authErrReason = AuthErrorReason.SatelliteCookieNeedsSyncing;
       redirectURL.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
+      const refreshTokenError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+      redirectURL.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
@@ -406,6 +413,8 @@ ${error.getFullMessage()}`,
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
       const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
+      const refreshTokenError = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
