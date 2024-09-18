@@ -13,7 +13,7 @@ import {
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest } from '../request';
+import { authenticateRequest, getActivationEntity } from '../request';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -164,6 +164,18 @@ export default (QUnit: QUnit) => {
 
     return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
   };
+
+  module('tokens.getActivationEntity(url,options)', _ => {
+    test('does anything', async assert => {
+      const path = new URL('http://localhost:3000/orgs/foo');
+      const toActivate = getActivationEntity(path, {
+        organizationPatterns: ['/orgs/:id'],
+      });
+      console.log('Here izaak', toActivate);
+
+      assert.equal(toActivate?.organizationId, 'foo');
+    });
+  });
 
   module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;

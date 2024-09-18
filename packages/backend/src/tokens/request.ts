@@ -1,5 +1,5 @@
-import type { MatchFunction, MatchResult } from 'path-to-regexp';
-import { match } from 'path-to-regexp';
+import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
+import { match } from '@clerk/shared/pathToRegexp';
 
 import type { ApiClient } from '../api';
 import { constants } from '../constants';
@@ -569,21 +569,24 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
-// getActivationEntity determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
-function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
+// TODO(izaak): Convert all to this style (jsdoc) comment
+/*
+ * Determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
+ * @example test
+ */
+export function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
   // Check for personal workspace activation
+  console.log('THis too izaak');
   if (options.personalWorkspacePatterns) {
-    let matcher: MatchFunction<object>;
+    let matcher: MatchFunction<Partial<Record<string, string | string[]>>>;
     try {
       matcher = match(options.personalWorkspacePatterns);
     } catch (e) {
-      console.error(
-        `Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
-      );
+      console.error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}"`);
       return null;
     }
 
-    let personalResult: boolean | MatchResult<object>;
+    let personalResult: Match<Partial<Record<string, string | string[]>>>;
     try {
       personalResult = matcher(url.pathname);
     } catch (e) {
@@ -599,17 +602,16 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
 
   // Check for organization activation
   if (options.organizationPatterns) {
-    let matcher: MatchFunction<object>;
+    let matcher: MatchFunction<Partial<Record<string, string | string[]>>>;
     try {
       matcher = match(options.organizationPatterns);
+      console.log('Izaak: This matcher', matcher);
     } catch (e) {
-      console.error(
-        `Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}". See https://www.npmjs.com/package/path-to-regexp`,
-      );
+      console.error(`Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}"`);
       return null;
     }
 
-    let orgResult: boolean | MatchResult<object>;
+    let orgResult: Match<Partial<Record<string, string | string[]>>>;
     try {
       orgResult = matcher(url.pathname);
     } catch (e) {
