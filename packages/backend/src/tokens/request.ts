@@ -1,3 +1,5 @@
+import type { JwtPayload } from '@clerk/types';
+
 import type { ApiClient } from '../api';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -216,29 +218,40 @@ ${error.getFullMessage()}`,
     return tokenResponse.jwt;
   }
 
-  async function attemptRefresh(authenticateContext: AuthenticateContext) {
+  async function attemptRefresh(
+    authenticateContext: AuthenticateContext,
+  ): Promise<{ data: { jwtPayload: JwtPayload; sessionToken: string }; error: null } | { data: null; error: any }> {
     let sessionToken: string;
     try {
       sessionToken = await refreshToken(authenticateContext);
     } catch (err: any) {
       if (err?.errors?.length) {
-        throw {
-          message: `Clerk: unable to refresh session token.`,
-          cause: { reason: err.errors[0].code, errors: err.errors },
+        return {
+          data: null,
+          error: {
+            message: `Clerk: unable to refresh session token.`,
+            cause: { reason: err.errors[0].code, errors: err.errors },
+          },
         };
       } else {
-        throw err;
+        return {
+          data: null,
+          error: err,
+        };
       }
     }
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
-    const { data, errors } = await verifyToken(sessionToken, authenticateContext);
+    const { data: jwtPayload, errors } = await verifyToken(sessionToken, authenticateContext);
     if (errors) {
-      throw {
-        message: `Clerk: unable to verify refreshed session token.`,
-        cause: { reason: 'invalid-session-token', errors },
+      return {
+        data: null,
+        error: {
+          message: `Clerk: unable to verify refreshed session token.`,
+          cause: { reason: 'invalid-session-token', errors },
+        },
       };
     }
-    return { data, sessionToken };
+    return { data: { jwtPayload, sessionToken }, error: null };
   }
 
   function handleMaybeHandshakeStatus(
@@ -470,18 +483,17 @@ ${error.getFullMessage()}`,
     let refreshError: string = authenticateContext.refreshTokenInCookie ? 'non-eligible' : 'no-cookie';
 
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
-      try {
-        const refreshResponse = await attemptRefresh(authenticateContext);
-        return signedIn(authenticateContext, refreshResponse.data, undefined, refreshResponse.sessionToken);
-      } catch (error: any) {
-        // If there's any error, simply fallback to the handshake flow.
-        console.error('Clerk: unable to refresh token:', error?.message || error);
+      const { data, error } = await attemptRefresh(authenticateContext);
+      if (!error) {
+        return signedIn(authenticateContext, data!.jwtPayload, undefined, data!.sessionToken);
+      }
 
-        if (error?.cause?.reason) {
-          refreshError = error.cause.reason;
-        } else {
-          refreshError = 'unexpected-refresh-error';
-        }
+      // If there's any error, simply fallback to the handshake flow.
+      console.error('Clerk: unable to refresh token:', error?.message || error);
+      if (error?.cause?.reason) {
+        refreshError = error.cause.reason;
+      } else {
+        refreshError = 'unexpected-refresh-error';
       }
     }
 
