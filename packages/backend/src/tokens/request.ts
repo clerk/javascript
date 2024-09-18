@@ -103,13 +103,14 @@ export async function authenticateRequest(
     return updatedURL;
   }
 
-  function buildRedirectToHandshake() {
+  function buildRedirectToHandshake(reason: AuthErrorReason) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
+    url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -227,7 +228,7 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake();
+      const handshakeHeaders = headers ?? buildRedirectToHandshake(reason);
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -356,9 +357,11 @@ ${error.getFullMessage()}`,
         constants.QueryParameters.ClerkRedirectUrl,
         authenticateContext.clerkUrl.toString(),
       );
+      const authErrReason = AuthErrorReason.SatelliteCookieNeedsSyncing;
+      redirectURL.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
     }
 
     // Multi-domain development sync flow
@@ -376,9 +379,11 @@ ${error.getFullMessage()}`,
         );
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
+      const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
+      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
     }
     /**
      * End multi-domain sync flows
