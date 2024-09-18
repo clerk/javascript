@@ -119,7 +119,7 @@ export async function authenticateRequest(
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
-    const toActivate = getActivationEntity(requestURL, options.organizationSync);
+    const toActivate = getActivationEntity(requestURL, options.organizationSyncOptions);
     if (toActivate) {
       const params = getOrganizationSyncQueryParams(toActivate);
 
@@ -272,18 +272,20 @@ ${error.getFullMessage()}`,
     authenticateContext: AuthenticateContext,
     auth: SignedInAuthObject,
   ): HandshakeState | SignedOutState | null {
-    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
+    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSyncOptions);
     if (!toActivate) {
       return null;
     }
     let mustActivate = false;
-    // Activate an org by slug?
-    if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
-      mustActivate = true;
-    }
-    // Activate an org by ID?
-    if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
-      mustActivate = true;
+    if (toActivate.type === 'organization') {
+      // Activate an org by slug?
+      if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
+        mustActivate = true;
+      }
+      // Activate an org by ID?
+      if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
+        mustActivate = true;
+      }
     }
     // Activate the personal workspace?
     if (toActivate.type === 'personalWorkspace' && auth.orgId) {
@@ -561,12 +563,14 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
-// TODO(izaak): Convert all to this style (jsdoc) comment
 /*
  * Determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
  * @example test
  */
-export function getActivationEntity(url: URL, options: OrganizationSyncOptions | undefined): ActivatibleEntity | null {
+export function getActivationEntity(
+  url: URL,
+  options: OrganizationSyncOptions | undefined,
+): OrganizationSyncTarget | null {
   if (!options) {
     return null;
   }
@@ -600,7 +604,6 @@ export function getActivationEntity(url: URL, options: OrganizationSyncOptions |
     let matcher: MatchFunction<Partial<Record<string, string | string[]>>>;
     try {
       matcher = match(options.organizationPatterns);
-      console.log('Izaak: This matcher', matcher);
     } catch (e) {
       console.error(`Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}"`);
       return null;
@@ -631,16 +634,14 @@ export function getActivationEntity(url: URL, options: OrganizationSyncOptions |
   return null;
 }
 
-// ActivatibleEntity is an entity that can be activated by the handshake API.
-type ActivatibleEntity = {
-  type: 'personalWorkspace' | 'organization' | 'none';
-  organizationId?: string;
-  organizationSlug?: string;
-};
+// OrganizationSyncTarget is an entity that can be activated by the handshake API.
+export type OrganizationSyncTarget =
+  | { type: 'personalWorkspace' }
+  | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
 // getOrganizationSyncQueryParams takes an activatibatle entity (organization or personal workspace)
 // and generates the query parameters that FAPI expects on the handshake API to activate that entity.
-function getOrganizationSyncQueryParams(toActivate: ActivatibleEntity): Map<string, string> {
+function getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
   const ret = new Map();
   if (toActivate.type === 'personalWorkspace') {
     ret.set('organization_id', '');

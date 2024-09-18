@@ -1317,7 +1317,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
         signInUrl: req.headers.get("x-sign-in-url"),
 
         // Critical
-        organizationSync: ${JSON.stringify(orgSyncOptions)}
+        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
 
       })(req, evt)
     };
