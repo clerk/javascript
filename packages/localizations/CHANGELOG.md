@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.0.4
+
+### Patch Changes
+
+- nl-NL localization updates ([#4181](https://github.com/clerk/javascript/pull/4181)) by [@guustgoossens](https://github.com/guustgoossens)
+
 ## 3.0.3
 
 ### Patch Changes

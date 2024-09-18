@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.13.2
+
+### Patch Changes
+
+- Add the handshake reason as a query param for observability. ([#4184](https://github.com/clerk/javascript/pull/4184)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.13.1
 
 ### Patch Changes
