@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.22.2
+
+### Patch Changes
+
+- Add color to phone input select options to fix rendering within dark and shadesOfPurple themes. ([#4176](https://github.com/clerk/javascript/pull/4176)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`3743eb911`](https://github.com/clerk/javascript/commit/3743eb9114733f20ed56a863ab98fa9c363b6723)]:
+  - @clerk/shared@2.8.1
+
+## 5.22.1
+
+### Patch Changes
+
+- Updated dependencies [[`2d8e6e9d0`](https://github.com/clerk/javascript/commit/2d8e6e9d00ce3568bceb4cb79421eb61c0cf8715), [`bcc5eba39`](https://github.com/clerk/javascript/commit/bcc5eba39260ec1f99c0e0bd95e8ea13ce73e921)]:
+  - @clerk/localizations@3.0.3
+
 ## 5.22.0
 
 ### Minor Changes

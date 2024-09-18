@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`3743eb911`](https://github.com/clerk/javascript/commit/3743eb9114733f20ed56a863ab98fa9c363b6723)]:
+  - @clerk/shared@2.8.1
+
+## 1.13.0
+
+### Minor Changes
+
+- Add new refresh token flow to reduce errors arising from too many redirects ([#4154](https://github.com/clerk/javascript/pull/4154)) by [@dstaley](https://github.com/dstaley)
+
 ## 1.12.0
 
 ### Minor Changes
