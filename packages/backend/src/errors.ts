@@ -23,6 +23,18 @@ export const TokenVerificationErrorReason = {
   JWKKidMismatch: 'jwk-kid-mismatch',
 };
 
+export const RefreshTokenErrorReason = {
+  NoCookie: 'no-cookie',
+  NonEligible: 'non-eligible',
+  InvalidSessionToken: 'invalid-session-token',
+  MissingApiClient: 'missing-api-client',
+  MissingSessionToken: 'missing-session-token',
+  MissingRefreshToken: 'missing-refresh-token',
+  SessionTokenDecodeFailed: 'session-token-decode-failed',
+  FetchNetworkError: 'fetch-network-error',
+  UnexpectedRefreshError: 'unexpected-refresh-error',
+} as const;
+
 export type TokenVerificationErrorReason =
   (typeof TokenVerificationErrorReason)[keyof typeof TokenVerificationErrorReason];
 
