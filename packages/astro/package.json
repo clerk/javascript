@@ -20,7 +20,8 @@
     "astro-integration",
     "clerk",
     "typescript",
-    "passwordless"
+    "passwordless",
+    "withastro"
   ],
   "sideEffects": false,
   "bugs": {
