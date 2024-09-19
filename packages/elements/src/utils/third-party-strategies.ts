@@ -1,5 +1,6 @@
 // c.f. vendor/clerk-js/src/ui/hooks/useEnabledThirdPartyProviders.tsx [Modified]
 
+import { iconImageUrl } from '@clerk/shared/constants';
 import type {
   EnvironmentResource,
   OAuthProvider,
@@ -10,7 +11,7 @@ import type {
 } from '@clerk/types';
 import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types'; // TODO: This import shouldn't be part of @clerk/types
 
-import { fromEntries, iconImageUrl } from './clerk-js';
+import { fromEntries } from './clerk-js';
 
 export type ThirdPartyStrategy =
   | {
