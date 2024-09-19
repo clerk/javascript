@@ -6,7 +6,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import React from 'react';
 
 import { auth } from './auth';
@@ -304,18 +304,28 @@ function protect<T extends ProtectParams>(params: T) {
         ...args: InferParameters<H>
       ):
         | InferReturnType<H>
-        | Promise<{
-            // a: InferStrictTypeParams<T>;
-            clerk_error: {
-              type: 'forbidden';
-              reason: 'assurance';
-              metadata: InferStrictTypeParams<T>;
-              //   {
-              //   level: __experimental_SessionVerificationLevel;
-              //   maxAge: __experimental_SessionVerificationMaxAge;
-              // };
-            };
-          }> => {
+        | Promise<
+            InferStrictTypeParams<T> extends { assurance: any }
+              ? {
+                  // a: InferStrictTypeParams<T>;
+                  clerk_error: {
+                    type: 'forbidden';
+                    reason: 'assurance';
+                    metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+                    //   {
+                    //   level: __experimental_SessionVerificationLevel;
+                    //   maxAge: __experimental_SessionVerificationMaxAge;
+                    // };
+                  };
+                }
+              : {
+                  clerk_error: {
+                    type: 'something';
+                    reason: 'something';
+                    metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+                  };
+                }
+          > => {
         const { has } = auth();
         const failedItem = findFailedItem(configs, has) as any;
 
@@ -335,9 +345,20 @@ function protect<T extends ProtectParams>(params: T) {
           return errorObj;
         }
 
-        if (failedItem) {
+        if (failedItem?.role || failedItem?.permission) {
           // What should we do here ?
-          return notFound();
+          return {
+            //@ts-ignore
+            clerk_error: {
+              type: 'something',
+              reason: 'something',
+              metadata: failedItem as Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>,
+            },
+          };
+        }
+
+        if (failedItem) {
+          auth().redirectToSignIn();
         }
 
         return handler(...args);
