@@ -31,6 +31,7 @@ type CheckStepUpAuthorization = (
 ) => boolean | null;
 
 const MAX_AGE_TO_MINUTES: MaxAgeMap = {
+  'A0.1min': 1,
   'A1.10min': 10,
   'A2.1hr': 60,
   'A3.4hr': 240, //4 * 60
