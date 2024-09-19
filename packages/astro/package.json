@@ -21,6 +21,7 @@
     "clerk",
     "typescript",
     "passwordless",
+    "astro-component",
     "withastro"
   ],
   "sideEffects": false,
