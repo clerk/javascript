@@ -4,4 +4,4 @@
 "@clerk/shared": patch
 ---
 
-Move `iconImageUrl` util to `shared` package.
+Internal change to move `iconImageUrl` util to `shared` package.
