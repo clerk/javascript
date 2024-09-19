@@ -70,9 +70,6 @@ describe('clerkMiddleware', () => {
 
   it('supports usage without parameters: app.use(clerkMiddleware())', async () => {
     await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(200, 'Hello world!');
-
-    // TODO: Observability headers are not added by default
-    // assertSignedOutDebugHeaders(response);
   });
 
   it('supports usage with parameters: app.use(clerkMiddleware(options))', async () => {
@@ -138,6 +135,15 @@ describe('clerkMiddleware', () => {
 
     assertNoDebugHeaders(response);
     expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
+  });
+
+  it('disabled handshake flow by default', async () => {
+    const response = await runMiddleware(clerkMiddleware(), {
+      Cookie: '__client_uat=1711618859;',
+      'Sec-Fetch-Dest': 'document',
+    }).expect(200);
+
+    assertNoDebugHeaders(response);
   });
 
   it('supports handshake flow', async () => {
