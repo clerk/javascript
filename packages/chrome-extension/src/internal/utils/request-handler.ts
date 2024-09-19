@@ -19,6 +19,9 @@ export function requestHandler(jwtHandler: JWTHandler) {
 
     requestInit.url?.searchParams.append('_is_native', '1');
     (requestInit.headers as Headers).set(AUTH_HEADER, `Bearer ${currentJWT}`);
+
+    console.log('requestHandler (searchParams):', requestInit.url?.searchParams.toString());
+    console.log('requestHandler (authHeader):', AUTH_HEADER, `Bearer ${currentJWT}`);
   };
 
   return handler;

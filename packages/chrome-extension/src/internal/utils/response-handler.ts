@@ -10,6 +10,8 @@ export function responseHandler(jwtHandler: JWTHandler) {
   const handler: Handler = async (_, response) => {
     const authHeader = response?.headers.get(AUTH_HEADER);
 
+    console.log('responseHandler (authHeader):', authHeader);
+
     if (authHeader?.startsWith('Bearer')) {
       const newJWT = authHeader.split(' ')[1] || undefined;
 
