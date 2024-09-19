@@ -70,9 +70,6 @@ describe('clerkMiddleware', () => {
 
   it('supports usage without parameters: app.use(clerkMiddleware())', async () => {
     await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(200, 'Hello world!');
-
-    // TODO: Observability headers are not added by default
-    // assertSignedOutDebugHeaders(response);
   });
 
   it('supports usage with parameters: app.use(clerkMiddleware(options))', async () => {
@@ -140,6 +137,15 @@ describe('clerkMiddleware', () => {
     expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
   });
 
+  it('disables handshake flow by default', async () => {
+    const response = await runMiddleware(clerkMiddleware(), {
+      Cookie: '__client_uat=1711618859;',
+      'Sec-Fetch-Dest': 'document',
+    }).expect(200);
+
+    assertNoDebugHeaders(response);
+  });
+
   it('supports handshake flow', async () => {
     const response = await runMiddleware(clerkMiddleware({ enableHandshake: true }), {
       Cookie: '__client_uat=1711618859;',
@@ -150,7 +156,7 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
-  it('it calls next with an error when request URL is invalid', async () => {
+  it('calls next with an error when request URL is invalid', () => {
     const req = {
       url: '//',
       cookies: {},
@@ -159,7 +165,7 @@ describe('clerkMiddleware', () => {
     const res = {} as Response;
     const mockNext = jest.fn();
 
-    await clerkMiddleware()[0](req, res, mockNext);
+    clerkMiddleware()[0](req, res, mockNext);
 
     expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
 
