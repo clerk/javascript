@@ -256,7 +256,13 @@ const findFailedItem = (
   return failedItem;
 };
 
-function protect(params: ProtectParams) {
+type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
+type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// Helper to infer the strict type of the result
+type InferStrictTypeParams<T extends ProtectParams> = T;
+
+function protect<T extends ProtectParams>(params: T) {
   // We will accumulate permissions here
   const configs: ProtectParams[] = [params];
 
@@ -287,29 +293,55 @@ function protect(params: ProtectParams) {
     };
   };
 
+  // Maybe this should return the correct types instead of hiding them
   const action =
-    <H extends (...args: any) => any>(handler: H) =>
-    (...args: any) => {
-      const { has } = auth();
-      const failedItem = findFailedItem(configs, has) as any;
+    // <H extends (...args: InferParameters<H>) => InferReturnType<H>>(handler: H) =>
+    // (...args: InferParameters<H>): InferReturnType<H> => {
 
-      if (failedItem?.assurance) {
-        const errorObj = {
-          clerk_error: 'forbidden',
-          reason: 'assurance',
-          assurance: failedItem.assurance,
-        };
 
-        return errorObj;
-      }
+      <H extends (...args: InferParameters<H>) => InferReturnType<H>>(handler: H) =>
+      (
+        ...args: InferParameters<H>
+      ):
+        | InferReturnType<H>
+        | Promise<{
+            // a: InferStrictTypeParams<T>;
+            clerk_error: {
+              type: 'forbidden';
+              reason: 'assurance';
+              metadata: InferStrictTypeParams<T>;
+              //   {
+              //   level: __experimental_SessionVerificationLevel;
+              //   maxAge: __experimental_SessionVerificationMaxAge;
+              // };
+            };
+          }> => {
+        const { has } = auth();
+        const failedItem = findFailedItem(configs, has) as any;
 
-      if (failedItem) {
-        // What should we do here ?
-        return notFound();
-      }
+        if (failedItem?.assurance) {
+          const errorObj = {
+            clerk_error: {
+              type: 'forbidden',
+              reason: 'assurance',
+              metadata: failedItem.assurance as {
+                level: __experimental_SessionVerificationLevel;
+                maxAge: __experimental_SessionVerificationMaxAge;
+              },
+            },
+          } as const;
 
-      return handler(...args);
-    };
+          //@ts-ignore
+          return errorObj;
+        }
+
+        if (failedItem) {
+          // What should we do here ?
+          return notFound();
+        }
+
+        return handler(...args);
+      };
 
   const route =
     <H extends (req: Request) => Response | Promise<Response>>(handler: H) =>
@@ -319,9 +351,11 @@ function protect(params: ProtectParams) {
 
       if (failedItem?.assurance) {
         const errorObj = {
-          clerk_error: 'forbidden',
-          reason: 'assurance',
-          assurance: failedItem.assurance,
+          clerk_error: {
+            type: 'forbidden',
+            reason: 'assurance',
+            metadata: failedItem.assurance,
+          },
         };
         return new Response(JSON.stringify(errorObj), {
           status: 403,
