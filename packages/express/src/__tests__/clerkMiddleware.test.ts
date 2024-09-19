@@ -156,7 +156,7 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
-  it('it calls next with an error when request URL is invalid', () => {
+  it('calls next with an error when request URL is invalid', () => {
     const req = {
       url: '//',
       cookies: {},
