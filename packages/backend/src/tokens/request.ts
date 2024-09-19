@@ -3,7 +3,7 @@ import type { JwtPayload } from '@clerk/types';
 import type { ApiClient } from '../api';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
-import { RefreshTokenErrorReason, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
+import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
@@ -16,6 +16,18 @@ import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
+
+const RefreshTokenErrorReason = {
+  NoCookie: 'no-cookie',
+  NonEligible: 'non-eligible',
+  InvalidSessionToken: 'invalid-session-token',
+  MissingApiClient: 'missing-api-client',
+  MissingSessionToken: 'missing-session-token',
+  MissingRefreshToken: 'missing-refresh-token',
+  SessionTokenDecodeFailed: 'session-token-decode-failed',
+  FetchNetworkError: 'fetch-network-error',
+  UnexpectedRefreshError: 'unexpected-refresh-error',
+} as const;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
