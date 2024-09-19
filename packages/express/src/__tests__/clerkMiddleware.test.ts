@@ -156,7 +156,7 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
-  it('it calls next with an error when request URL is invalid', async () => {
+  it('it calls next with an error when request URL is invalid', () => {
     const req = {
       url: '//',
       cookies: {},
@@ -165,7 +165,7 @@ describe('clerkMiddleware', () => {
     const res = {} as Response;
     const mockNext = jest.fn();
 
-    await clerkMiddleware()[0](req, res, mockNext);
+    clerkMiddleware()[0](req, res, mockNext);
 
     expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
 
