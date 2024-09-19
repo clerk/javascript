@@ -20,9 +20,11 @@ const useAfterVerification = () => {
       /**
        * Moves the code below into the task queue and ensures that client and fva has been updated correctly before triggering the events
        */
-      setTimeout(() => {
-        afterVerification?.();
-      }, 0);
+      // setTimeout(() => {
+      console.log(afterVerification);
+      console.log('firing');
+      afterVerification?.();
+      // }, 0);
     } else {
       throw 'afterVerification is only triggered in modals';
     }
@@ -37,9 +39,15 @@ const useAfterVerification = () => {
         error: null,
         cachedAt: Date.now(),
       });
+      console.log('done', sessionVerification);
       switch (sessionVerification.status) {
         case 'complete':
-          return setActive({ session: sessionVerification.session.id, beforeEmit });
+          console.log('calling setActive');
+          afterVerification?.();
+          return setActive({
+            session: sessionVerification.session.id,
+            // beforeEmit,
+          });
         case 'needs_second_factor':
           return navigate('./factor-two');
         default:
