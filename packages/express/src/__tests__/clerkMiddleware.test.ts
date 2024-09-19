@@ -137,7 +137,7 @@ describe('clerkMiddleware', () => {
     expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
   });
 
-  it('disabled handshake flow by default', async () => {
+  it('disables handshake flow by default', async () => {
     const response = await runMiddleware(clerkMiddleware(), {
       Cookie: '__client_uat=1711618859;',
       'Sec-Fetch-Dest': 'document',
