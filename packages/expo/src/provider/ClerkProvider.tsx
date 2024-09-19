@@ -8,6 +8,10 @@ import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 
 export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
+  /**
+   * The token cache is used to persist the active user's session token. Clerk stores this token in memory by default, however it is recommended to use a token cache for production applications.
+   * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
+   */
   tokenCache?: TokenCache;
 };
 
