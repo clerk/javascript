@@ -135,6 +135,14 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     return router.shallowPush(destinationUrl);
   }
 
+  function pathname() {
+    return router.pathname();
+  }
+
+  function searchParams() {
+    return router.searchParams();
+  }
+
   return {
     child,
     match,
@@ -143,8 +151,8 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     push,
     replace,
     shallowPush,
-    pathname: router.pathname,
-    searchParams: router.searchParams,
+    pathname,
+    searchParams,
     basePath: normalizedBasePath,
   };
 }
