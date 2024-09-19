@@ -72,7 +72,7 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('Test standard signed-in - dev', async () => {
+  test('standard signed-in - dev', async () => {
     const config = generateConfig({ mode: 'test' });
     const { token, claims } = config.generateToken({ state: 'active' });
     const clientUat = claims.iat;
@@ -88,7 +88,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - dev', async () => {
+  test('standard signed-in - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -107,7 +107,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - prod', async () => {
+  test('standard signed-in - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -125,7 +125,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - prod', async () => {
+  test('standard signed-in - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -143,7 +143,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test expired session token - dev', async () => {
+  test('expired session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -162,11 +162,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test expired session token - prod', async () => {
+  test('expired session token - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -185,11 +185,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test expired session token - authorization header - prod', async () => {
+  test('expired session token - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -209,11 +209,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test early session token - dev', async () => {
+  test('early session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -232,11 +232,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test early session token - authorization header - dev', async () => {
+  test('early session token - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -256,11 +256,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test proxyUrl - dev', async () => {
+  test('proxyUrl - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -280,11 +280,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test proxyUrl - prod', async () => {
+  test('proxyUrl - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -304,11 +304,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test domain - dev', async () => {
+  test('domain - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -328,11 +328,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test domain - prod', async () => {
+  test('domain - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -352,11 +352,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test missing session token, positive uat - dev', async () => {
+  test('missing session token, positive uat - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -373,11 +373,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test missing session token, positive uat - prod', async () => {
+  test('missing session token, positive uat - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -394,11 +394,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - dev', async () => {
+  test('missing session token, 0 uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -414,7 +414,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - prod', async () => {
+  test('missing session token, 0 uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -430,7 +430,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - dev', async () => {
+  test('missing session token, missing uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -446,7 +446,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - prod', async () => {
+  test('missing session token, missing uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -461,7 +461,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite no sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite no sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -477,7 +477,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite with sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite with sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -495,11 +495,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         app.serverUrl + '/',
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=satellite-needs-syncing&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test signed out satellite - dev', async () => {
+  test('signed out satellite - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -516,7 +516,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
+  test('missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -532,11 +532,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-missing&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test redirect url - path and qs - dev', async () => {
+  test('redirect url - path and qs - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -555,11 +555,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - path and qs - prod', async () => {
+  test('redirect url - path and qs - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -578,11 +578,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test redirect url - proxy - dev', async () => {
+  test('redirect url - proxy - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -601,11 +601,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - proxy - prod', async () => {
+  test('redirect url - proxy - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -624,11 +624,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
-  test('Test redirect url - proxy with port - dev', async () => {
+  test('redirect url - proxy with port - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -647,11 +647,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - proxy with port - prod', async () => {
+  test('redirect url - proxy with port - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -670,7 +670,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
     );
   });
 
@@ -799,7 +799,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_db_jwt=asdf`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-sync&__clerk_refresh=no-cookie&__clerk_db_jwt=asdf`,
     );
   });
 
