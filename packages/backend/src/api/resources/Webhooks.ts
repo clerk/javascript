@@ -4,6 +4,8 @@ import type {
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
+  PermissionJSON,
+  RoleJSON,
   SessionJSON,
   SMSMessageJSON,
   UserJSON,
@@ -38,6 +40,13 @@ export type OrganizationInvitationWebhookEvent = Webhook<
   OrganizationInvitationJSON
 >;
 
+export type RoleWebhookEvent = Webhook<'role.created' | 'role.updated' | 'role.deleted', RoleJSON>;
+
+export type PermissionWebhookEvent = Webhook<
+  'permission.created' | 'permission.updated' | 'permission.deleted',
+  PermissionJSON
+>;
+
 export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
@@ -45,6 +54,8 @@ export type WebhookEvent =
   | SMSWebhookEvent
   | OrganizationWebhookEvent
   | OrganizationMembershipWebhookEvent
-  | OrganizationInvitationWebhookEvent;
+  | OrganizationInvitationWebhookEvent
+  | RoleWebhookEvent
+  | PermissionWebhookEvent;
 
 export type WebhookEventType = WebhookEvent['type'];

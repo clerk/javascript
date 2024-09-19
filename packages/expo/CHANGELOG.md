@@ -1,5 +1,59 @@
 # Change Log
 
+## 2.2.14
+
+### Patch Changes
+
+- Updated dependencies [[`7a298bed5`](https://github.com/clerk/javascript/commit/7a298bed566b71043ac4b8bf3cf132ef3006cf36)]:
+  - @clerk/clerk-js@5.22.3
+
+## 2.2.13
+
+### Patch Changes
+
+- Updated dependencies [[`3743eb911`](https://github.com/clerk/javascript/commit/3743eb9114733f20ed56a863ab98fa9c363b6723), [`cca3ee371`](https://github.com/clerk/javascript/commit/cca3ee37171de22c9feb9d5985d1829a4ff2fe13)]:
+  - @clerk/shared@2.8.1
+  - @clerk/clerk-js@5.22.2
+  - @clerk/clerk-react@5.9.1
+
+## 2.2.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.22.1
+
+## 2.2.11
+
+### Patch Changes
+
+- Updated dependencies [[`ba19be354`](https://github.com/clerk/javascript/commit/ba19be35461f0e5c76a58d11e4252a16781322c6), [`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d)]:
+  - @clerk/clerk-js@5.22.0
+  - @clerk/shared@2.8.0
+  - @clerk/clerk-react@5.9.0
+  - @clerk/types@4.21.0
+
+## 2.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+  - @clerk/clerk-js@5.21.2
+  - @clerk/clerk-react@5.8.2
+
+## 2.2.9
+
+### Patch Changes
+
+- Fixes an issue where iOS session activities were incorrectly classified as non-mobile ([#4137](https://github.com/clerk/javascript/pull/4137)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/clerk-js@5.21.1
+  - @clerk/clerk-react@5.8.1
+  - @clerk/types@4.20.1
+  - @clerk/shared@2.7.1
+
 ## 2.2.8
 
 ### Patch Changes

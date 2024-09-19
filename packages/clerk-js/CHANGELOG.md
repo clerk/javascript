@@ -1,5 +1,78 @@
 # Change Log
 
+## 5.22.3
+
+### Patch Changes
+
+- Restore behavior of MetaMask compatible Web3 wallets. Before, even if a user didn't use the MetaMask browser extension but a compatible one, such as Rabby Wallet, it was possible to use it as they share the same API to authenticate themselves. This behavior stopped working when we added support for EIP6963 regarding handling multiple injected providers. This commit restores the previous behavior by using the existing injected provider if there is a single one ([#4185](https://github.com/clerk/javascript/pull/4185)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`5dde18f6b`](https://github.com/clerk/javascript/commit/5dde18f6b55ed4d5c2a6a5246ee3b3ba0d077df3)]:
+  - @clerk/localizations@3.0.4
+
+## 5.22.2
+
+### Patch Changes
+
+- Add color to phone input select options to fix rendering within dark and shadesOfPurple themes. ([#4176](https://github.com/clerk/javascript/pull/4176)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`3743eb911`](https://github.com/clerk/javascript/commit/3743eb9114733f20ed56a863ab98fa9c363b6723)]:
+  - @clerk/shared@2.8.1
+
+## 5.22.1
+
+### Patch Changes
+
+- Updated dependencies [[`2d8e6e9d0`](https://github.com/clerk/javascript/commit/2d8e6e9d00ce3568bceb4cb79421eb61c0cf8715), [`bcc5eba39`](https://github.com/clerk/javascript/commit/bcc5eba39260ec1f99c0e0bd95e8ea13ce73e921)]:
+  - @clerk/localizations@3.0.3
+
+## 5.22.0
+
+### Minor Changes
+
+- Experimental support for `has()` with assurance. ([#4118](https://github.com/clerk/javascript/pull/4118)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage:
+
+  ```ts
+  has({
+    __experimental_assurance: {
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
+    },
+  });
+  ```
+
+  Created a shared utility called `createCheckAuthorization` exported from `@clerk/shared`
+
+### Patch Changes
+
+- Moves `fastDeepMerge` utils to `@clerk/shared` package. ([#4056](https://github.com/clerk/javascript/pull/4056)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds translation keys for error messages from the [organizations API](https://clerk.com/docs/references/api/organizations#errors). ([#4123](https://github.com/clerk/javascript/pull/4123)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`23b850f5f`](https://github.com/clerk/javascript/commit/23b850f5f8a8316ab5cadbefffedf6ca88eaa6fe), [`ace56babd`](https://github.com/clerk/javascript/commit/ace56babdc3739e4c34497a44a324709a7ea688f), [`ba19be354`](https://github.com/clerk/javascript/commit/ba19be35461f0e5c76a58d11e4252a16781322c6), [`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d), [`de1ba10b4`](https://github.com/clerk/javascript/commit/de1ba10b4deabd2f8b21a54908e2b054f1cfd71c)]:
+  - @clerk/localizations@3.0.2
+  - @clerk/shared@2.8.0
+  - @clerk/types@4.21.0
+
+## 5.21.2
+
+### Patch Changes
+
+- Updated dependencies [[`be3b119f8`](https://github.com/clerk/javascript/commit/be3b119f840d2ae74f4b75d717711d53ac0e5f54)]:
+  - @clerk/shared@2.7.2
+
+## 5.21.1
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+  - @clerk/localizations@3.0.1
+  - @clerk/shared@2.7.1
+
 ## 5.21.0
 
 ### Minor Changes

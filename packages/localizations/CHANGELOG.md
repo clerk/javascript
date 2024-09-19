@@ -1,5 +1,41 @@
 # Change Log
 
+## 3.0.4
+
+### Patch Changes
+
+- nl-NL localization updates ([#4181](https://github.com/clerk/javascript/pull/4181)) by [@guustgoossens](https://github.com/guustgoossens)
+
+## 3.0.3
+
+### Patch Changes
+
+- Update he-IL ([#4169](https://github.com/clerk/javascript/pull/4169)) by [@develad](https://github.com/develad)
+
+- Added Croatian localization (hr-HR) ([#4168](https://github.com/clerk/javascript/pull/4168)) by [@psiho](https://github.com/psiho)
+
+## 3.0.2
+
+### Patch Changes
+
+- Add empty translation keys for organization name validation errors ([#4152](https://github.com/clerk/javascript/pull/4152)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Replace empty strings with undefined to ensure localizations fallback to `en-US` properly. ([#4151](https://github.com/clerk/javascript/pull/4151)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds translation keys for error messages from the [organizations API](https://clerk.com/docs/references/api/organizations#errors). ([#4123](https://github.com/clerk/javascript/pull/4123)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Adding missing localisation for es-ES on update profile button ([#4148](https://github.com/clerk/javascript/pull/4148)) by [@kduprey](https://github.com/kduprey)
+
+- Updated dependencies [[`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d)]:
+  - @clerk/types@4.21.0
+
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+
 ## 3.0.0
 
 ### Major Changes

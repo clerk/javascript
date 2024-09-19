@@ -1,5 +1,34 @@
 # Change Log
 
+## 4.21.0
+
+### Minor Changes
+
+- Experimental support for `has()` with assurance. ([#4118](https://github.com/clerk/javascript/pull/4118)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage:
+
+  ```ts
+  has({
+    __experimental_assurance: {
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
+    },
+  });
+  ```
+
+  Created a shared utility called `createCheckAuthorization` exported from `@clerk/shared`
+
+### Patch Changes
+
+- Adds translation keys for error messages from the [organizations API](https://clerk.com/docs/references/api/organizations#errors). ([#4123](https://github.com/clerk/javascript/pull/4123)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.20.1
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.20.0
 
 ### Minor Changes

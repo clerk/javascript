@@ -22,7 +22,7 @@ import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 import { Separator } from '~/primitives/separator';
 
 export function SignUpStart() {
@@ -147,7 +147,7 @@ export function SignUpStart() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
