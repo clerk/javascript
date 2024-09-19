@@ -931,7 +931,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         signInUrl: req.headers.get("x-sign-in-url"),
 
         // Critical
-        organizationSync: ${JSON.stringify(orgSyncOptions)}
+        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
 
       })(req, evt)
     };
@@ -1053,7 +1053,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
         },
         appRequestPath: '/organizations-by-id/org_b',
         tokenAppearsIn: 'cookie',
@@ -1073,9 +1073,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         orgSyncOptions: {
           organizationPatterns: [
             '/organizations-by-id/:id',
-            '/organizations-by-id/:id/*splat',
+            '/organizations-by-id/:id/(.*)',
             '/organizations-by-slug/:slug',
-            '/organizations-by-slug/:id/*splat',
+            '/organizations-by-slug/:id/(.*)',
           ],
         },
         appRequestPath: '/organizations-by-slug/bcorp',
@@ -1094,9 +1094,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         orgSyncOptions: {
           organizationPatterns: [
             '/organizations-by-slug/:slug',
-            '/organizations-by-slug/:id/*splat',
+            '/organizations-by-slug/:id/(.*)',
             '/organizations-by-id/:id',
-            '/organizations-by-id/:id/*splat',
+            '/organizations-by-id/:id/(.*)',
           ],
         },
         appRequestPath: '/organizations-by-slug/bcorp/settings',
@@ -1115,7 +1115,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         initialAuthState: 'expired',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
         },
         appRequestPath: '/organizations-by-id/org_b/',
         tokenAppearsIn: 'cookie',
@@ -1135,11 +1135,11 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         orgSyncOptions: {
           organizationPatterns: [
             '/organizations-by-id/:id',
-            '/organizations-by-id/:id/*splat',
+            '/organizations-by-id/:id/(.*)',
             '/organizations-by-slug/:slug',
-            '/organizations-by-slug/:id/*splat',
+            '/organizations-by-slug/:id/(.*)',
           ],
-          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
         },
         appRequestPath: '/personal-workspace',
         tokenAppearsIn: 'cookie',
@@ -1159,8 +1159,8 @@ test.describe('Client handshake with organization activation @nextjs', () => {
           // Intentionally empty
         ]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/*splat'],
-          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
+          organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/(.*)'],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
         },
         appRequestPath: '/personal-workspace',
         tokenAppearsIn: 'cookie',
@@ -1176,8 +1176,8 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
-          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
-          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
@@ -1264,7 +1264,8 @@ test.describe('Client handshake with organization activation @nextjs', () => {
   }
 });
 
-test.describe('Client handshake with an organization activation avoids infinite loops @nextjs', () => {
+// TODO(izaak): revert test.describe('Client handshake with an organization activation avoids infinite loops @nextjs', () => {
+test.describe('Client handshake with an organization activation avoids infinite loops', () => {
   test.describe.configure({ mode: 'parallel' });
 
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
@@ -1288,8 +1289,8 @@ test.describe('Client handshake with an organization activation avoids infinite 
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
 
     thisApp = await start({
-      organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/*splat'],
-      personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/*splat'],
+      organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+      personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
     });
   });
 

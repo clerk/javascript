@@ -119,7 +119,7 @@ export async function authenticateRequest(
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
-    const toActivate = getActivationEntity(requestURL, options.organizationSyncOptions);
+    const toActivate = getOrganizationSyncTarget(requestURL, options.organizationSyncOptions);
     if (toActivate) {
       const params = getOrganizationSyncQueryParams(toActivate);
 
@@ -272,7 +272,7 @@ ${error.getFullMessage()}`,
     authenticateContext: AuthenticateContext,
     auth: SignedInAuthObject,
   ): HandshakeState | SignedOutState | null {
-    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSyncOptions);
+    const toActivate = getOrganizationSyncTarget(authenticateContext.clerkUrl, options.organizationSyncOptions);
     if (!toActivate) {
       return null;
     }
@@ -565,9 +565,9 @@ export const debugRequestState = (params: RequestState) => {
 
 /*
  * Determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
- * @example test
+ * @example todo(izaak)
  */
-export function getActivationEntity(
+export function getOrganizationSyncTarget(
   url: URL,
   options: OrganizationSyncOptions | undefined,
 ): OrganizationSyncTarget | null {
