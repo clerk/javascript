@@ -51,6 +51,9 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
 
 export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
+  /**
+   * Provide an initial state of the Clerk client during server-side rendering (SSR)
+   */
   initialState?: InitialState;
 };
 

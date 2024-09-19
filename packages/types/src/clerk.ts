@@ -655,13 +655,21 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     localization?: LocalizationResource;
     polling?: boolean;
+    /**
+     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     */
     selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-    /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
+    /**
+     * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
+     */
     standardBrowser?: boolean;
     /**
      * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
      */
     supportEmail?: string;
+    /**
+     * By default, the [FAPI `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     */
     touchSession?: boolean;
     /**
      * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
