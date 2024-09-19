@@ -40,6 +40,7 @@ export {
  */
 export {
   useAuth,
+  useAssurance,
   useClerk,
   useEmailLink,
   useOrganization,
