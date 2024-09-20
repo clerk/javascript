@@ -1,6 +1,5 @@
 import type { JwtPayload } from '@clerk/types';
 
-import type { ApiClient } from '../api';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
@@ -51,12 +50,6 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 
   if (signInUrl.origin === origin) {
     throw new Error(`The signInUrl needs to be on a different origin than your satellite application.`);
-  }
-}
-
-function assertApiClient(apiClient: ApiClient | undefined): asserts apiClient is ApiClient {
-  if (!apiClient) {
-    throw new Error(`Missing apiClient. An apiClient is needed to perform token refresh.`);
   }
 }
 
@@ -206,56 +199,60 @@ ${error.getFullMessage()}`,
     throw error;
   }
 
-  async function refreshToken(authenticateContext: AuthenticateContext): Promise<string> {
-    try {
-      // To perform a token refresh, apiClient must be defined.
-      assertApiClient(options.apiClient);
-    } catch (err: any) {
-      throw { errors: [{ code: RefreshTokenErrorReason.MissingApiClient, message: err?.message || '' }] };
+  async function refreshToken(
+    authenticateContext: AuthenticateContext,
+  ): Promise<{ data: string; error: null } | { data: null; error: any }> {
+    // To perform a token refresh, apiClient must be defined.
+    if (!options.apiClient) {
+      return {
+        data: null,
+        error: {
+          message: 'An apiClient is needed to perform token refresh.',
+          cause: { reason: RefreshTokenErrorReason.MissingApiClient },
+        },
+      };
     }
     const { sessionToken: expiredSessionToken, refreshTokenInCookie: refreshToken } = authenticateContext;
     if (!expiredSessionToken) {
-      throw {
-        errors: [
-          {
-            code: RefreshTokenErrorReason.MissingSessionToken,
-            message: 'Session token must be provided.',
-          },
-        ],
+      return {
+        data: null,
+        error: {
+          message: 'Session token must be provided.',
+          cause: { reason: RefreshTokenErrorReason.MissingSessionToken },
+        },
       };
     }
     if (!refreshToken) {
-      throw {
-        errors: [{ code: RefreshTokenErrorReason.MissingRefreshToken, message: 'Refresh token must be provided.' }],
+      return {
+        data: null,
+        error: {
+          message: 'Refresh token must be provided.',
+          cause: { reason: RefreshTokenErrorReason.MissingRefreshToken },
+        },
       };
     }
     // The token refresh endpoint requires a sessionId, so we decode that from the expired token.
     const { data: decodeResult, errors: decodedErrors } = decodeJwt(expiredSessionToken);
     if (!decodeResult || decodedErrors) {
-      throw {
-        errors: [
-          { code: RefreshTokenErrorReason.SessionTokenDecodeFailed, message: 'Unable to decode session token.' },
-        ],
+      return {
+        data: null,
+        error: {
+          message: 'Unable to decode session token.',
+          cause: { reason: RefreshTokenErrorReason.SessionTokenDecodeFailed, errors: decodedErrors },
+        },
       };
     }
-    // Perform the actual token refresh.
-    const tokenResponse = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
-      expired_token: expiredSessionToken || '',
-      refresh_token: refreshToken || '',
-      request_origin: authenticateContext.clerkUrl.origin,
-      // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
-      request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
-    });
 
-    return tokenResponse.jwt;
-  }
-
-  async function attemptRefresh(
-    authenticateContext: AuthenticateContext,
-  ): Promise<{ data: { jwtPayload: JwtPayload; sessionToken: string }; error: null } | { data: null; error: any }> {
-    let sessionToken: string;
     try {
-      sessionToken = await refreshToken(authenticateContext);
+      // Perform the actual token refresh.
+      const tokenResponse = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
+        expired_token: expiredSessionToken || '',
+        refresh_token: refreshToken || '',
+        request_origin: authenticateContext.clerkUrl.origin,
+        // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
+        request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
+      });
+      return { data: tokenResponse.jwt, error: null };
     } catch (err: any) {
       if (err?.errors?.length) {
         if (err.errors[0].code === 'unexpected_error') {
@@ -281,6 +278,16 @@ ${error.getFullMessage()}`,
         };
       }
     }
+  }
+
+  async function attemptRefresh(
+    authenticateContext: AuthenticateContext,
+  ): Promise<{ data: { jwtPayload: JwtPayload; sessionToken: string }; error: null } | { data: null; error: any }> {
+    const { data: sessionToken, error } = await refreshToken(authenticateContext);
+    if (!sessionToken) {
+      return { data: null, error };
+    }
+
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
     const { data: jwtPayload, errors } = await verifyToken(sessionToken, authenticateContext);
     if (errors) {
@@ -535,8 +542,8 @@ ${error.getFullMessage()}`,
 
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       const { data, error } = await attemptRefresh(authenticateContext);
-      if (!error) {
-        return signedIn(authenticateContext, data!.jwtPayload, undefined, data!.sessionToken);
+      if (data) {
+        return signedIn(authenticateContext, data.jwtPayload, undefined, data.sessionToken);
       }
 
       // If there's any error, simply fallback to the handshake flow.
