@@ -210,7 +210,6 @@ export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
-// >>>>>>> main
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
