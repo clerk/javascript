@@ -256,7 +256,11 @@ const findFailedItem = (
   return failedItem;
 };
 
-type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
+type MyAuth = ReturnType<typeof auth>;
+
+// type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
+type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
+
 type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 // type NonNullable<T> = T extends null | undefined ? never : T;
 
@@ -267,8 +271,6 @@ type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
 };
-
-type MyAuth = ReturnType<typeof auth>;
 
 function protect<T extends ProtectParams>(params: T) {
   // We will accumulate permissions here
@@ -316,74 +318,80 @@ function protect<T extends ProtectParams>(params: T) {
 
   // Maybe this should return the correct types instead of hiding them
   const action =
-    // <H extends (...args: InferParameters<H>) => InferReturnType<H>>(handler: H) =>
-    // (...args: InferParameters<H>): InferReturnType<H> => {
+    <
+      H extends (
+        _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+          : NonNullableRecord<MyAuth, 'userId'>,
+        ...args: InferParameters2<H>
+      ) => InferReturnType<H>,
+    >(
+      handler: H,
+    ) =>
+    (
+      ...args: InferParameters2<H>
+    ):
+      | InferReturnType<H>
+      | Promise<
+          InferStrictTypeParams<T> extends { assurance: any }
+            ? {
+                // a: InferStrictTypeParams<T>;
+                clerk_error: {
+                  type: 'forbidden';
+                  reason: 'assurance';
+                  metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+                  //   {
+                  //   level: __experimental_SessionVerificationLevel;
+                  //   maxAge: __experimental_SessionVerificationMaxAge;
+                  // };
+                };
+              }
+            : {
+                clerk_error: {
+                  type: 'something';
+                  reason: 'something';
+                  metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+                };
+              }
+        > => {
+      const { has } = auth();
+      const failedItem = findFailedItem(configs, has) as any;
 
-
-      <H extends (...args: InferParameters<H>) => InferReturnType<H>>(handler: H) =>
-      (
-        ...args: InferParameters<H>
-      ):
-        | InferReturnType<H>
-        | Promise<
-            InferStrictTypeParams<T> extends { assurance: any }
-              ? {
-                  // a: InferStrictTypeParams<T>;
-                  clerk_error: {
-                    type: 'forbidden';
-                    reason: 'assurance';
-                    metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
-                    //   {
-                    //   level: __experimental_SessionVerificationLevel;
-                    //   maxAge: __experimental_SessionVerificationMaxAge;
-                    // };
-                  };
-                }
-              : {
-                  clerk_error: {
-                    type: 'something';
-                    reason: 'something';
-                    metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
-                  };
-                }
-          > => {
-        const { has } = auth();
-        const failedItem = findFailedItem(configs, has) as any;
-
-        if (failedItem?.assurance) {
-          const errorObj = {
-            clerk_error: {
-              type: 'forbidden',
-              reason: 'assurance',
-              metadata: failedItem.assurance as {
-                level: __experimental_SessionVerificationLevel;
-                maxAge: __experimental_SessionVerificationMaxAge;
-              },
+      if (failedItem?.assurance) {
+        const errorObj = {
+          clerk_error: {
+            type: 'forbidden',
+            reason: 'assurance',
+            metadata: failedItem.assurance as {
+              level: __experimental_SessionVerificationLevel;
+              maxAge: __experimental_SessionVerificationMaxAge;
             },
-          } as const;
+          },
+        } as const;
 
+        //@ts-ignore
+        return errorObj;
+      }
+
+      if (failedItem?.role || failedItem?.permission) {
+        // What should we do here ?
+        return {
           //@ts-ignore
-          return errorObj;
-        }
+          clerk_error: {
+            type: 'something',
+            reason: 'something',
+            metadata: failedItem as Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>,
+          },
+        };
+      }
 
-        if (failedItem?.role || failedItem?.permission) {
-          // What should we do here ?
-          return {
-            //@ts-ignore
-            clerk_error: {
-              type: 'something',
-              reason: 'something',
-              metadata: failedItem as Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>,
-            },
-          };
-        }
+      if (failedItem) {
+        auth().redirectToSignIn();
+      }
 
-        if (failedItem) {
-          auth().redirectToSignIn();
-        }
-
-        return handler(...args);
-      };
+      // @ts-ignore not sure why this errors
+      return handler(auth(), ...args);
+    };
 
   const route =
     <H extends (req: Request) => Response | Promise<Response>>(handler: H) =>
