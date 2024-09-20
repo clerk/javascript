@@ -1187,17 +1187,13 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         fapiOrganizationIdParamValue: null,
       },
     },
-
-    // ---------------- Invalid permutation tests ----------------
     {
       // NOTE(izaak): Would we prefer 500ing in this case?
-      name: 'Invalid config => ignore it and return 200',
+      name: 'No config => nothing to activate, return 200',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
-        orgSyncOptions: {
-          organizationPatterns: ['i am not valid config'],
-        },
+        orgSyncOptions: null,
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
       },
@@ -1206,13 +1202,16 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         fapiOrganizationIdParamValue: null,
       },
     },
+
+    // ---------------- Invalid permutation tests ----------------
     {
-      // NOTE(izaak): Would we prefer 500ing in this case?
-      name: 'No config => nothing to activate, return 200',
+      name: 'Invalid config => ignore it and return 200',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
-        orgSyncOptions: null,
+        orgSyncOptions: {
+          organizationPatterns: ['i am not valid config'],
+        },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
       },

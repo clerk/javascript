@@ -129,8 +129,10 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     }
 
     // Merge claims with extraClaims
-    for (const [key, value] of extraClaims) {
-      claims[key] = value;
+    if (extraClaims) {
+      for (const [key, value] of extraClaims) {
+        claims[key] = value;
+      }
     }
 
     return {
