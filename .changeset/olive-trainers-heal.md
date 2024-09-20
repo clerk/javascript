@@ -2,4 +2,4 @@
 "@clerk/nextjs": patch
 ---
 
-New nextjs middleware option `OrganizationSyncOptions`, which syncs an active organization or personal workspace from a URL to the clerk session.
+Introduces `organizationSyncOptions` option to `clerkMiddleware`, which syncs an active organization or personal workspace from a URL to the Clerk session.
