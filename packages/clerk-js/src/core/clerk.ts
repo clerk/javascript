@@ -969,7 +969,7 @@ export class Clerk implements ClerkInterface {
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
-      return this.buildAfterSignOutUrl();
+      return this.environment ? `${this.environment.displayConfig.signInUrl}/choose` : this.buildAfterSignOutUrl();
     }
 
     return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);

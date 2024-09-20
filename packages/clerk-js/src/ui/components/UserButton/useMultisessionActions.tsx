@@ -27,11 +27,8 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     if (otherSessions.length === 0) {
       return signOut(opts.navigateAfterSignOut);
     }
-    return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(
-      () =>
-        void navigate(`${opts.signInUrl}/choose`).finally(() => {
-          card.setIdle();
-        }),
+    return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(() =>
+      card.setIdle(),
     );
   };
 
