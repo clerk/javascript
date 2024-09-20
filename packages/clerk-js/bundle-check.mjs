@@ -151,7 +151,7 @@ const byteFormatter = Intl.NumberFormat('en', {
   unitDisplay: 'narrow',
 });
 /**
- * Format bytes into kilobytes
+ * Format bytes into a human-readable string with appropriate units
  * @param {number} bytes
  */
 function formatFileSize(bytes) {
