@@ -376,8 +376,7 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      // use `await` to force this try/catch handle the signedIn invocation
-      const signedInRequestState = await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      const signedInRequestState = signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
       // Org sync if necessary
       const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
         authenticateContext,
@@ -547,8 +546,7 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      // use `await` to force this try/catch handle the signedIn invocation
-      const signedInRequestState = await signedIn(
+      const signedInRequestState = signedIn(
         authenticateContext,
         data,
         undefined,
