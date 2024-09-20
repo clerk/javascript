@@ -1,4 +1,4 @@
-/* eslint-disable no-redeclare, curly, no-cond-assign */
+/* eslint-disable no-redeclare, curly */
 
 function _(r) {
   for (var n = [], e = 0; e < r.length; ) {

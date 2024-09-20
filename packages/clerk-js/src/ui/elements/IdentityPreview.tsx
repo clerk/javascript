@@ -1,3 +1,4 @@
+import { iconImageUrl } from '@clerk/shared/constants';
 import React from 'react';
 
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
@@ -12,7 +13,7 @@ type IdentityPreviewProps = {
 } & PropsOfComponent<typeof Flex>;
 
 export const IdentityPreview = (props: IdentityPreviewProps) => {
-  const { avatarUrl = 'https://img.clerk.com/static/avatar_placeholder.jpeg', identifier, onClick, ...rest } = props;
+  const { avatarUrl = iconImageUrl('avatar_placeholder', 'jpeg'), identifier, onClick, ...rest } = props;
   const refs = React.useRef({ avatarUrl, identifier: formatSafeIdentifier(identifier) });
 
   const edit = onClick && (
