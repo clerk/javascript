@@ -165,9 +165,9 @@ export default (QUnit: QUnit) => {
     return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
   };
 
-  // Tests both getActivationEntity and the organizationSyncOptions usage patterns
+  // Tests both getOrganizationSyncTarget and the organizationSyncOptions usage patterns
   // that are recommended for typical use.
-  module('tokens.getActivationEntity(url,options)', _ => {
+  module('tokens.getOrganizationSyncTarget(url,options)', _ => {
     type testCase = {
       name: string;
       // When the customer app specifies these orgSyncOptions to middleware...
