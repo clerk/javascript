@@ -653,8 +653,8 @@ export function getOrganizationSyncTarget(
     try {
       matcher = match(options.personalWorkspacePatterns);
     } catch (e) {
-      console.error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}"`);
-      return null;
+      // Likely to be encountered during development, so throwing the error is more prudent than logging
+      throw new Error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}"`);
     }
 
     let personalResult: Match<Partial<Record<string, string | string[]>>>;
@@ -677,8 +677,8 @@ export function getOrganizationSyncTarget(
     try {
       matcher = match(options.organizationPatterns);
     } catch (e) {
-      console.error(`Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}"`);
-      return null;
+      // Likely to be encountered during development, so throwing the error is more prudent than logging
+      throw new Error(`Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}"`);
     }
 
     let orgResult: Match<Partial<Record<string, string | string[]>>>;
