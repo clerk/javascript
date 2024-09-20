@@ -258,9 +258,17 @@ const findFailedItem = (
 
 type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
 type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+// type NonNullable<T> = T extends null | undefined ? never : T;
 
 // Helper to infer the strict type of the result
 type InferStrictTypeParams<T extends ProtectParams> = T;
+
+type NonNullable<T> = T extends null | undefined ? never : T;
+type NonNullableRecord<T, K extends keyof T> = {
+  [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
+};
+
+type MyAuth = ReturnType<typeof auth>;
 
 function protect<T extends ProtectParams>(params: T) {
   // We will accumulate permissions here
@@ -273,9 +281,18 @@ function protect<T extends ProtectParams>(params: T) {
     return { protect: protectNext, component, action, route };
   }
 
-  const component = <P,>(Component: React.ComponentType<P>) => {
+  const component = <P,>(
+    Component: React.ComponentType<
+      P & {
+        auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+          : NonNullableRecord<MyAuth, 'userId'>;
+      }
+    >,
+  ) => {
     return (props: P) => {
-      const { has } = auth();
+      const _auth = auth();
+      const { has } = _auth;
 
       const failedItem = findFailedItem(configs, has) as any;
 
@@ -288,8 +305,12 @@ function protect<T extends ProtectParams>(params: T) {
         redirect(failedItem.redirectUrl);
       }
 
+      if (failedItem) {
+        return null;
+      }
+
       // @ts-ignore not sure why this errors
-      return <Component {...props} />;
+      return <Component {...(props, { auth: _auth })} />;
     };
   };
 
