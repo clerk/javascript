@@ -227,11 +227,33 @@ export default (QUnit: QUnit) => {
         },
       },
       {
-        name: 'Can activate an org by ID with trailing path components',
+        name: 'Can activate an org by ID with a trailing path component',
         whenOrgSyncOptions: {
           organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
         },
         whenAppRequestPath: '/orgs/org_foo/nested-resource',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with many trailing path component',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/nested-resource/and/more/deeply/nested/resources',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with an unrelated path token in the prefix',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/unknown-thing/:any/orgs/:id'],
+        },
+        whenAppRequestPath: '/unknown-thing/thing/orgs/org_foo',
         thenExpectActivationEntity: {
           type: 'organization',
           organizationId: 'org_foo',
@@ -276,6 +298,16 @@ export default (QUnit: QUnit) => {
           personalWorkspacePatterns: ['/personal-workspace'],
         },
         whenAppRequestPath: '/personal-workspace',
+        thenExpectActivationEntity: {
+          type: 'personalWorkspace',
+        },
+      },
+      {
+        name: 'personal workspace may contain path tokens',
+        whenOrgSyncOptions: {
+          personalWorkspacePatterns: ['/user/:any', '/user/:any/(.*)'],
+        },
+        whenAppRequestPath: '/user/123/home',
         thenExpectActivationEntity: {
           type: 'personalWorkspace',
         },

@@ -14,32 +14,56 @@ export type AuthenticateRequestOptions = {
   apiClient?: ApiClient;
 } & VerifyTokenOptions;
 
-// OrganizationSyncOptions define the options for syncing an organization
-// or personal workspace state from the URL to the clerk session
+/**
+ * Defines the options for syncing an organization or personal workspace state from the URL to the clerk session.
+ * Useful if the application requires the inclusion of a URL that indicates that a given clerk organization
+ * (or personal workspace) must be active on the clerk session.
+ *
+ * If a mismatch between the active organization on the session and the organization as indicated by the URL is
+ * detected, an attempt to activate the given organization will be made.
+ *
+ * WARNING: If the activation cannot be performed, either because an organization does not exist or the user lacks
+ * access, then the active organization on the session will not be changed (and a warning will be logged). It is
+ * ultimately the responsibility of the page to verify that the resources are appropriate to render given the URL,
+ * and handle mismatches appropriately (e.g. by returning a 404).
+ */
 export type OrganizationSyncOptions = {
-  // organizationPattern defines the URL patterns that are organization-specific and contains
-  // an organization ID or slug as a path token. If a request arrives to the application at
-  // a URL matching this path, the organization identifier will be extracted and activated
-  // before rendering.
-  // If no organization with the given identifier can be activated,
-  // either because it does not exist or the user does not have access to it, organization-related
-  // fields will be set to null, and the server component must detect this case and respond with
-  // an appropriate error (e.g. notFound()).
-  // If the route also matches with the personalWorkspacePattern, the personalWorkspacePattern
-  // takes precedence.
-  //
-  // Must have a group named either ":id", which matches to a clerk organization id,
-  //                             or ":slug", which matches to a clerk organization slug.
-  // Examples: "/orgs/:slug+*", "/orgs/:id+*"
-  organizationPatterns?: Array<Pattern>,
+  /**
+   * URL patterns that are organization-specific and contain an organization ID or slug as a path token.
+   * If a request matches this path, the organization identifier will be extracted and activated before rendering.
+   *
+   * WARNING: If the organization cannot be activated either because it does not exist or the user lacks access,
+   * organization-related fields will be set to null. The server component must detect this and respond
+   * with an appropriate error (e.g., notFound()).
+   *
+   * If the route also matches the personalWorkspacePatterns, the personalWorkspacePattern takes precedence.
+   *
+   * Must have a path token named either ":id" (matches a clerk organization ID) or ":slug" (matches a clerk
+   * organization slug).
+   *
+   * Common examples:
+   * - ["/orgs/:slug", "/orgs/:slug/(.*)"]
+   * - ["/orgs/:id", "/orgs/:id/(.*)"]
+   * - ["/app/:any/orgs/:slug", "/app/:any/orgs/:slug/(.*)"]
+   */
+  organizationPatterns?: Array<Pattern>;
 
-  // personalWorkspacePattern defines the URL pattern for resources that exist in the context
-  // of a clerk personal workspace (user-specific, outside any other organization).
-  // If the route also matches with the organizationPattern, this takes precedence
-  personalWorkspacePatterns?: Array<Pattern>,
-}
+  /**
+   * URL patterns for resources in the context of a clerk personal workspace (user-specific, outside any organization).
+   * If the route also matches the organizationPattern, this takes precedence.
+   *
+   * Common examples:
+   * - ["/user", "/user/(.*)"]
+   * - ["/user/:any", "/user/:any/(.*)"]
+   */
+  personalWorkspacePatterns?: Array<Pattern>;
+};
 
-// Pattern is a path-to-regexp style matcher
-// Syntax: https://www.npmjs.com/package/path-to-regexp
-// Examples: "/orgs/:slug", "/orgs/:id", "/personal-workspace"
+/**
+ * A pattern representing the structure of a URL path.
+ * In addition to a valid URL, may include:
+ * - Named path tokens prefixed with a colon (e.g., ":id", ":slug", ":any")
+ * - Wildcard token (e.g., ".(*)"), which will match the remainder of the path
+ * Examples: "/orgs/:slug", "/app/:any/orgs/:id", "/personal-workspace/(.*)"
+ */
 type Pattern = string;

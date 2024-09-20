@@ -264,10 +264,15 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message);
   }
 
-  // handleMaybeOrganizationSyncHandshake determines if a handshake must occur to resolve a mismatch between
-  // the organization as specified by the URL (according to the options) and the actual active organization
-  // on the session.
-  // NOTE(izaak): I don't love that null return implies signed-in...
+  /**
+   * Determines if a handshake must occur to resolve a mismatch between the organization as specified
+   * by the URL (according to the options) and the actual active organization on the session.
+   *
+   * @returns {HandshakeState | SignedOutState | null} - The function can return the following:
+   *   - {HandshakeState}: If a handshake is needed to resolve the mismatched organization.
+   *   - {SignedOutState}: If a handshake is required but cannot be performed.
+   *   - {null}:           If no action is required.
+   */
   function handleMaybeOrganizationSyncHandshake(
     authenticateContext: AuthenticateContext,
     auth: SignedInAuthObject,
@@ -563,9 +568,12 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
-/*
- * Determines if the given URL and settings indicate a desire to activate a specific organization or personal workspace.
- * @example todo(izaak)
+/**
+ * Determines if the given URL and settings indicate a desire to activate a specific
+ * organization or personal workspace.
+ *
+ * @returns {OrganizationSyncTarget | null} - The function can return the following:
+ *  - {OrganizationSyncTarget}: If the URL and settings indicate a desire to activate an organization or personal workspace.
  */
 export function getOrganizationSyncTarget(
   url: URL,
@@ -634,13 +642,18 @@ export function getOrganizationSyncTarget(
   return null;
 }
 
-// OrganizationSyncTarget is an entity that can be activated by the handshake API.
+/**
+ * Represents an organization or a personal workspace - e.g. an
+ * entity that can be activated by the handshake API.
+ */
 export type OrganizationSyncTarget =
   | { type: 'personalWorkspace' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
-// getOrganizationSyncQueryParams takes an activatibatle entity (organization or personal workspace)
-// and generates the query parameters that FAPI expects on the handshake API to activate that entity.
+/**
+ * Generates the query parameters to activate an organization or personal workspace
+ * via the FAPI handshake api.
+ */
 function getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
   const ret = new Map();
   if (toActivate.type === 'personalWorkspace') {
