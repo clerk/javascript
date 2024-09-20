@@ -690,13 +690,14 @@ export function getOrganizationSyncTarget(
       return null;
     }
 
-    if (orgResult) {
-      const { slug = '', id = '' } = orgResult.params as { slug?: string; id?: string };
-      if (id) {
-        return { type: 'organization', organizationId: id };
+    if (orgResult && 'params' in orgResult) {
+      const params = orgResult.params;
+
+      if ('id' in params && typeof params.id === 'string') {
+        return { type: 'organization', organizationId: params.id };
       }
-      if (slug) {
-        return { type: 'organization', organizationSlug: slug };
+      if ('slug' in params && typeof params.slug === 'string') {
+        return { type: 'organization', organizationSlug: params.slug };
       }
       console.warn(
         'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
