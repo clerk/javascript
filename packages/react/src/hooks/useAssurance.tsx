@@ -51,15 +51,22 @@ function generateAssuranceHint<Metadata extends Record<string, string>>(
 }
 
 async function resolveResult<T>(result: Promise<T>): Promise<T | AssuranceHint> {
-  return result.catch(e => {
-    // Treat fapi assurance as an assurance hint
-    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-      return generateAssuranceHint();
-    }
+  return result
+    .then(r => {
+      if (r instanceof Response) {
+        return r.json();
+      }
+      return r;
+    })
+    .catch(e => {
+      // Treat fapi assurance as an assurance hint
+      if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
+        return generateAssuranceHint();
+      }
 
-    // rethrow
-    throw e;
-  });
+      // rethrow
+      throw e;
+    });
 }
 
 /**
