@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useFocusInput } from '~/hooks/use-focus-input';
 import { link } from '~/primitives/link';
 
 import { EmailOrUsernameField } from './email-or-username-field';
@@ -26,18 +27,14 @@ export function EmailOrUsernameOrPhoneNumberField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [inputRef, setInputFocus] = useFocusInput();
 
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={isSelected => {
         setShowPhoneNumberField(isSelected);
-        setTimeout(() => {
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
-        }, 0);
+        setInputFocus();
       }}
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
