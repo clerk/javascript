@@ -20,11 +20,11 @@ import * as React from 'react';
 export function useFocusInput(): [React.RefObject<HTMLInputElement>, () => void] {
   const ref = React.useRef<HTMLInputElement>(null);
   const setFocus = () => {
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       if (ref.current) {
         ref.current.focus();
       }
-    }, 0);
+    });
   };
   return [ref, setFocus];
 }
