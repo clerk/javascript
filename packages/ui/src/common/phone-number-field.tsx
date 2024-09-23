@@ -255,6 +255,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 onSelect={() => {
                                   setIso(iso);
                                   setOpen(false);
+                                  setTimeout(() => {
+                                    inputRef.current?.focus();
+                                  }, 0);
                                 }}
                                 data-checked={selectedCountry === countryOptions[index]}
                                 className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
