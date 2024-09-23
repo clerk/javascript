@@ -101,11 +101,3 @@ export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
 export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {
   return WEB3_PROVIDERS[name];
 }
-
-/**
- * Returns the URL for a static SVG image
- * using the new img.clerk.com service
- */
-export function iconImageUrl(id: string): string {
-  return `https://img.clerk.com/static/${id}.svg`;
-}
