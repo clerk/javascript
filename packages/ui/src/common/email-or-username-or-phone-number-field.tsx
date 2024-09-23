@@ -26,10 +26,19 @@ export function EmailOrUsernameOrPhoneNumberField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
-      onChange={setShowPhoneNumberField}
+      onChange={isSelected => {
+        setShowPhoneNumberField(isSelected);
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 0);
+      }}
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{LOCALIZATION_NEEDED.formFieldAccessibleLabel__emailOrUsernameOrPhone}</span>
@@ -42,12 +51,14 @@ export function EmailOrUsernameOrPhoneNumberField({
       name={name}
       alternativeFieldTrigger={toggle}
       {...props}
+      ref={inputRef}
     />
   ) : (
     <EmailOrUsernameField
       {...props}
       name={name}
       alternativeFieldTrigger={toggle}
+      ref={inputRef}
     />
   );
 }
