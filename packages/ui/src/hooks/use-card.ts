@@ -27,11 +27,14 @@ export function useCard() {
   const { layout } = useAppearance().parsedAppearance;
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
-  const logoProps = {
-    href: layout?.logoLinkUrl || homeUrl,
-    src: layout?.logoImageUrl || logoImageUrl,
-    alt: applicationName,
-  };
+  const logoProps =
+    layout?.logoVisibility === 'visible'
+      ? {
+          href: layout?.logoLinkUrl || homeUrl,
+          src: layout?.logoImageUrl || logoImageUrl,
+          alt: applicationName,
+        }
+      : null;
 
   const footerProps = {
     branded,

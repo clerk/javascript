@@ -37,7 +37,11 @@ export type ParsedElementsFragment = Partial<PartialTheme>;
  * the main type interacted with within components.
  */
 export type ParsedElements = Record<DescriptorIdentifier, ParsedDescriptor>;
-export type ParsedLayout = Required<Layout>;
+export type ParsedLayout = Required<
+  Omit<Layout, 'logoPlacement'> & {
+    logoVisibility: 'visible' | 'hidden';
+  }
+>;
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
@@ -224,7 +228,7 @@ export const defaultAppearance: ParsedAppearance = {
   theme: fullTheme,
   elements: fullTheme,
   layout: {
-    logoPlacement: 'inside',
+    logoVisibility: 'visible',
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'auto',
     logoImageUrl: '',
