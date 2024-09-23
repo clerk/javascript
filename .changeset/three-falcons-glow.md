@@ -1,5 +1,5 @@
 ---
-"@clerk/express": patch
+"@clerk/express": major
 ---
 
 Add support for Express 5
