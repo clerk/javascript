@@ -2,6 +2,7 @@ import type { ProtectProps } from '@clerk/clerk-react';
 import type {
   __experimental_SessionVerificationLevel,
   __experimental_SessionVerificationMaxAge,
+  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -143,7 +144,7 @@ type ProtectParams =
       role?: never;
       permission: OrganizationCustomPermissionKey;
       assurance?: never;
-      redirectUrl?: string;
+      redirectUrl?: Autocomplete<'sign-in'>;
       fallback?: never;
     }
   | {
@@ -260,6 +261,7 @@ type MyAuth = ReturnType<typeof auth>;
 
 // type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
 type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
+type InferParameters3<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
 
 type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 // type NonNullable<T> = T extends null | undefined ? never : T;
@@ -271,6 +273,10 @@ type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
 };
+
+function defineProtectParams<T extends ProtectParams>(params: T) {
+  return params;
+}
 
 function protect<T extends ProtectParams>(params: T) {
   // We will accumulate permissions here
@@ -294,13 +300,17 @@ function protect<T extends ProtectParams>(params: T) {
   ) => {
     return (props: P) => {
       const _auth = auth();
-      const { has } = _auth;
+      const { has, redirectToSignIn } = _auth;
 
       const failedItem = findFailedItem(configs, has) as any;
 
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
         return <Fallback />;
+      }
+
+      if (failedItem?.redirectUrl === 'sign-in') {
+        redirectToSignIn();
       }
 
       if (failedItem?.redirectUrl) {
@@ -311,8 +321,13 @@ function protect<T extends ProtectParams>(params: T) {
         return null;
       }
 
-      // @ts-ignore not sure why this errors
-      return <Component {...(props, { auth: _auth })} />;
+      return (
+        // @ts-ignore not sure why this errors
+        <Component
+          {...props}
+          auth={_auth}
+        />
+      );
     };
   };
 
@@ -394,8 +409,18 @@ function protect<T extends ProtectParams>(params: T) {
     };
 
   const route =
-    <H extends (req: Request) => Response | Promise<Response>>(handler: H) =>
-    (req: Request) => {
+    <
+      H extends (
+        _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+          : NonNullableRecord<MyAuth, 'userId'>,
+        req: Request,
+        ...args: InferParameters3<H>
+      ) => Response | Promise<Response>,
+    >(
+      handler: H,
+    ) =>
+    (req: Request, ...args: InferParameters3<H>) => {
       const { has } = auth();
       const failedItem = findFailedItem(configs, has) as any;
 
@@ -404,9 +429,13 @@ function protect<T extends ProtectParams>(params: T) {
           clerk_error: {
             type: 'forbidden',
             reason: 'assurance',
-            metadata: failedItem.assurance,
+            metadata: failedItem.assurance as {
+              level: __experimental_SessionVerificationLevel;
+              maxAge: __experimental_SessionVerificationMaxAge;
+            },
           },
         };
+
         return new Response(JSON.stringify(errorObj), {
           status: 403,
         });
@@ -424,11 +453,12 @@ function protect<T extends ProtectParams>(params: T) {
         });
       }
 
-      return handler(req);
+      // @ts-ignore auth does not match exactly
+      return handler(auth(), req, ...args);
     };
 
   // Return the protect method and the component method to enable chaining
   return { protect: protectNext, component, action, route };
 }
 
-export { protect };
+export { protect, defineProtectParams };

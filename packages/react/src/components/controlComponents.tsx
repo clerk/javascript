@@ -283,7 +283,16 @@ const findFailedItem = (configs: ProtectParams[], auth: ReturnType<typeof useAut
   return failedItem;
 };
 
-function protect(params: ProtectParams) {
+type MyAuth = ReturnType<typeof useAuth>;
+
+type InferStrictTypeParams<T extends ProtectParams> = T;
+
+type NonNullable<T> = T extends null | undefined ? never : T;
+type NonNullableRecord<T, K extends keyof T> = {
+  [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
+};
+
+function protect<T extends ProtectParams>(params: T) {
   // We will accumulate permissions here
   const configs: ProtectParams[] = [params];
 
@@ -294,7 +303,15 @@ function protect(params: ProtectParams) {
     return { protect: protectNext, component };
   }
 
-  const component = <P,>(Component: React.ComponentType<P>) => {
+  const component = <P,>(
+    Component: React.ComponentType<
+      P & {
+        auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
+          : NonNullableRecord<MyAuth, 'userId'>;
+      }
+    >,
+  ) => {
     return (props: P) => {
       const auth = useAuth();
 
@@ -309,8 +326,17 @@ function protect(params: ProtectParams) {
         throw 'Redirect is not support for client components';
       }
 
-      // @ts-ignore not sure why this errors
-      return <Component {...props} />;
+      if (failedItem) {
+        return null;
+      }
+
+      return (
+        // @ts-ignore not sure why this errors
+        <Component
+          {...props}
+          auth={auth}
+        />
+      );
     };
   };
 
