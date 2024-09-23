@@ -1,7 +1,8 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignInFactor, SignInResource } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent, MachineSnapshot, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
+import type { SignInStrategyName } from '~/internals/machines/shared';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -18,14 +19,15 @@ import type {
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
 
-import type { SignInVerificationFactorUpdateEvent } from './verification.types';
-
 // ---------------------------------- Tags ---------------------------------- //
 
 export const SignInRouterStates = {
   attempting: 'state:attempting',
   loading: 'state:loading',
   pending: 'state:pending',
+  chooseStrategy: 'state:choose-strategy', // TODO: Replace with 'step:choose-strategy'
+  forgotPassword: 'state:forgot-password', // TODO: Replace with 'step:reset-password'
+  preparing: 'state:preparing',
 } as const;
 
 export const SignInRouterSteps = {
@@ -83,6 +85,12 @@ export type SignInRouterPasskeyAutofillEvent = {
 };
 export type SignInRouterSessionSetActiveEvent = { type: 'SESSION.SET_ACTIVE'; id: string };
 
+export type SignInVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
+export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
+export type SignInVerificationRetryEvent = { type: 'RETRY' };
+export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };
+export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInStrategyName };
+
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
   formRef: ActorRefFrom<TFormMachine>;
@@ -112,7 +120,13 @@ export type SignInRouterEvents =
   | SignInRouterSetClerkEvent
   | SignInRouterSubmitEvent
   | SignInRouterPasskeyEvent
-  | SignInRouterPasskeyAutofillEvent;
+  | SignInRouterPasskeyAutofillEvent
+  // Verifications
+  | SignInVerificationSubmitEvent
+  | SignInVerificationFactorUpdateEvent
+  | SignInVerificationRetryEvent
+  | SignInVerificationStrategyRegisterEvent
+  | SignInVerificationStrategyUnregisterEvent;
 
 // ---------------------------------- Context ---------------------------------- //
 
@@ -123,6 +137,12 @@ export interface SignInRouterContext extends BaseRouterContext {
   loading: SignInRouterLoadingContext;
   signUpPath: string;
   webAuthnAutofillSupport: boolean;
+
+  // Verifications
+  verificationCurrentFactor: SignInFactor | null;
+  registeredStrategies: Set<SignInStrategyName>;
+  resendable: boolean;
+  resendableAfter: number;
 }
 
 // ---------------------------------- Input ---------------------------------- //
@@ -130,6 +150,14 @@ export interface SignInRouterContext extends BaseRouterContext {
 export interface SignInRouterInput {
   // NOTE: Set in INIT event
 }
+
+// ---------------------------------- Delays ---------------------------------- //
+
+export const SignInRouterDelays = {
+  resendableTimeout: 1_000, // 1 second
+} as const;
+
+export type SignInRouterDelays = keyof typeof SignInRouterDelays;
 
 // ---------------------------------- Schema ---------------------------------- //
 
@@ -164,7 +192,7 @@ export type TSignInRouterParentMachine = StateMachine<
   any, // actor
   any, // action
   any, // guard
-  any, // delay
+  SignInRouterDelays, // delay
   any, // state value
   string, // tag
   any, // input

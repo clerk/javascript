@@ -1,49 +1,47 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { joinURL } from '@clerk/shared/url';
-import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
-import type {
-  AttemptFirstFactorParams,
-  EmailCodeAttempt,
-  LoadedClerk,
-  PasswordAttempt,
-  PhoneCodeAttempt,
-  PrepareFirstFactorParams,
-  PrepareSecondFactorParams,
-  ResetPasswordEmailCodeAttempt,
-  ResetPasswordPhoneCodeAttempt,
-  SignInFirstFactor,
-  SignInResource,
-  SignInSecondFactor,
-  SignInStatus,
-  SignInStrategy,
-  Web3Attempt,
-  Web3Strategy,
-} from '@clerk/types';
+import type { PrepareFirstFactorParams, SignInFirstFactor, SignInStatus, SignInStrategy } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assertEvent, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   CHOOSE_SESSION_PATH_ROUTE,
   ERROR_CODES,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  RESENDABLE_COUNTDOWN_DEFAULT,
   ROUTING,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
-import { type FormFields, FormMachine } from '~/internals/machines/form';
+import { FormMachine } from '~/internals/machines/form';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
-import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
+import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
-import type {
-  SignInRouterContext,
-  SignInRouterEvents,
-  SignInRouterNextEvent,
-  SignInRouterSchema,
-  SignInRouterSessionSetActiveEvent,
+import {
+  attemptPasskey,
+  attemptWeb3,
+  firstFactorAttempt,
+  firstFactorDetermineStartingFactor,
+  firstFactorPrepare,
+  resetPasswordAttempt,
+  secondFactorAttempt,
+  secondFactorDetermineStartingFactor,
+  secondFactorPrepare,
+  startAttempt,
+  webAuthnAutofillSupport,
+} from './actors';
+import {
+  type SignInRouterContext,
+  SignInRouterDelays,
+  type SignInRouterEvents,
+  type SignInRouterNextEvent,
+  type SignInRouterSchema,
+  type SignInRouterSessionSetActiveEvent,
 } from './router.types';
-import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from './utils/starting-factors';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -60,269 +58,38 @@ const needsStatus =
 
 export const SignInRouterMachineId = 'SignInRouter';
 
-export type PrepareFirstFactorInput = {
-  clerk: LoadedClerk;
-  params: PrepareFirstFactorParams;
-  resendable: boolean;
-};
-export type PrepareSecondFactorInput = {
-  clerk: LoadedClerk;
-  params: PrepareSecondFactorParams;
-  resendable: boolean;
-};
-
-export type AttemptFirstFactorInput = {
-  clerk: LoadedClerk;
-  currentFactor: SignInFirstFactor | null;
-  fields: FormFields;
-};
-
-export type AttemptSecondFactorInput = {
-  clerk: LoadedClerk;
-  currentFactor: SignInSecondFactor | null;
-  fields: FormFields;
-};
-
-export type ResetPasswordAttemptInput = { clerk: LoadedClerk; fields: FormFields };
-export type ClerkInput = { clerk: LoadedClerk };
-
-export type AttemptPasskeyInput = { clerk: LoadedClerk; flow: 'autofill' | 'discoverable' | undefined };
-export type AttemptWeb3Input = { clerk: LoadedClerk; strategy: Web3Strategy };
-export type StartAttemptInput = { clerk: LoadedClerk; fields: FormFields };
-
-const isNonPreparableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
-  if (!strategy) {
-    return false;
-  }
-
-  return ['passkey', 'password'].includes(strategy);
-};
-
 export const SignInRouterMachine = setup({
   actors: {
-    // ----------------
     // Global
-    // ----------------
+    attemptPasskey,
+    attemptWeb3,
 
-    attemptPasskey: fromPromise<SignInResource, AttemptPasskeyInput>(({ input }) => {
-      const { clerk, flow } = input;
-
-      return clerk.client.signIn.authenticateWithPasskey({
-        flow,
-      });
-    }),
-
-    attemptWeb3: fromPromise<SignInResource, AttemptWeb3Input>(({ input }) => {
-      const { clerk, strategy } = input;
-
-      if (strategy === 'web3_metamask_signature') {
-        return clerk.client.signIn.authenticateWithMetamask();
-      }
-
-      if (strategy === 'web3_coinbase_wallet_signature') {
-        return clerk.client.signIn.authenticateWithCoinbaseWallet();
-      }
-
-      throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
-    }),
-
-    // ----------------
     // Start
-    // ----------------
+    startAttempt,
 
-    startAttempt: fromPromise<SignInResource, StartAttemptInput>(({ input }) => {
-      const { clerk, fields } = input;
-
-      const password = fields.get('password');
-      const identifier = fields.get('identifier');
-
-      const passwordParams = password?.value
-        ? {
-            password: password.value,
-            strategy: 'password',
-          }
-        : {};
-
-      return clerk.client.signIn.create({
-        identifier: (identifier?.value as string) || '',
-        ...passwordParams,
-      });
-    }),
-
-    // ----------------
     // First Factor
-    // ----------------
+    firstFactorAttempt,
+    firstFactorDetermineStartingFactor,
+    firstFactorPrepare,
 
-    firstFactorAttempt: fromPromise<SignInResource, AttemptFirstFactorInput>(async ({ input }) => {
-      const { clerk, currentFactor, fields } = input;
-      assertIsDefined(currentFactor, 'Current factor');
-
-      let attemptParams: AttemptFirstFactorParams;
-
-      const strategy = currentFactor.strategy;
-      const code = fields.get('code')?.value as string | undefined;
-      const password = fields.get('password')?.value as string | undefined;
-
-      switch (strategy) {
-        case 'passkey': {
-          return await clerk.client.signIn.authenticateWithPasskey();
-        }
-        case 'password': {
-          assertIsDefined(password, 'Password');
-
-          attemptParams = {
-            strategy,
-            password,
-          } satisfies PasswordAttempt;
-
-          break;
-        }
-        case 'reset_password_phone_code':
-        case 'reset_password_email_code': {
-          assertIsDefined(code, 'Code for resetting phone/email');
-
-          attemptParams = {
-            strategy,
-            code,
-            password,
-          } satisfies ResetPasswordPhoneCodeAttempt | ResetPasswordEmailCodeAttempt;
-
-          break;
-        }
-        case 'phone_code':
-        case 'email_code': {
-          assertIsDefined(code, 'Code for phone/email');
-
-          attemptParams = {
-            strategy,
-            code,
-          } satisfies PhoneCodeAttempt | EmailCodeAttempt;
-
-          break;
-        }
-        case 'web3_metamask_signature': {
-          const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature, 'Web3 Metamask signature');
-
-          attemptParams = {
-            strategy,
-            signature,
-          } satisfies Web3Attempt;
-
-          break;
-        }
-        case 'web3_coinbase_wallet_signature': {
-          const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
-
-          attemptParams = {
-            strategy,
-            signature,
-          } satisfies Web3Attempt;
-
-          break;
-        }
-        default:
-          throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
-      }
-
-      return await clerk.client.signIn.attemptFirstFactor(attemptParams);
-    }),
-
-    firstFactorDetermineStartingFactor: fromPromise<SignInFirstFactor | null, ClerkInput>(async ({ input }) => {
-      return Promise.resolve(
-        determineStartingSignInFactor(
-          input.clerk.client.signIn.supportedFirstFactors,
-          input.clerk.client.signIn.identifier,
-          input.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
-        ),
-      );
-    }),
-
-    firstFactorPrepare: fromPromise<SignInResource, PrepareFirstFactorInput>(async ({ input }) => {
-      const { clerk, params, resendable } = input;
-
-      // If a prepare call has already been fired recently, don't re-send
-      const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
-      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
-
-      if (isNonPreparableStrategy(params?.strategy) || !needsPrepare) {
-        return Promise.resolve(clerk.client.signIn);
-      }
-
-      assertIsDefined(params, 'First factor params');
-      return await clerk.client.signIn.prepareFirstFactor(params);
-    }),
-
-    // ----------------
     // Second Factor
-    // ----------------
+    secondFactorAttempt,
+    secondFactorDetermineStartingFactor,
+    secondFactorPrepare,
 
-    secondFactorAttempt: fromPromise<SignInResource, AttemptSecondFactorInput>(async ({ input }) => {
-      const { clerk, fields, currentFactor } = input;
-
-      const code = fields.get('code')?.value as string;
-
-      assertIsDefined(currentFactor, 'Current factor');
-      assertIsDefined(code, 'Code');
-
-      return await clerk.client.signIn.attemptSecondFactor({
-        strategy: currentFactor.strategy,
-        code,
-      });
-    }),
-
-    secondFactorDetermineStartingFactor: fromPromise<SignInSecondFactor | null, ClerkInput>(async ({ input }) =>
-      Promise.resolve(determineStartingSignInSecondFactor(input.clerk.client.signIn.supportedSecondFactors)),
-    ),
-
-    secondFactorPrepare: fromPromise<SignInResource, PrepareSecondFactorInput>(async ({ input }) => {
-      const { clerk, params, resendable } = input;
-
-      // If a prepare call has already been fired recently, don't re-send
-      const currentVerificationExpiration = clerk.client.signIn.secondFactorVerification.expireAt;
-      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
-
-      assertIsDefined(params, 'Second factor params');
-
-      if (params.strategy !== 'phone_code' || !needsPrepare) {
-        return Promise.resolve(clerk.client.signIn);
-      }
-
-      return await clerk.client.signIn.prepareSecondFactor({
-        strategy: params.strategy,
-        phoneNumberId: params.phoneNumberId,
-      });
-    }),
-
-    // ----------------
     // Reset Password
-    // ----------------
+    resetPasswordAttempt,
 
-    resetPasswordAttempt: fromPromise<SignInResource, ResetPasswordAttemptInput>(({ input }) => {
-      const { clerk, fields } = input;
-
-      const password = (fields.get('password')?.value as string) || '';
-      const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked || false;
-
-      return clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
-    }),
-
-    // ----------------
     // Shared Machines
-    // ----------------
-
     formMachine: FormMachine,
     thirdPartyMachine: ThirdPartyMachine,
 
-    // ----------------
     // Other
-    // ----------------
-
-    webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
+    webAuthnAutofillSupport,
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
+    clearRegisteredStrategies: assign({ registeredStrategies: new Set() }),
     // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
     goToNextStep: raise(({ event }) => ({ type: 'NEXT', resource: event?.output || event?.data })),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
@@ -344,7 +111,6 @@ export const SignInRouterMachine = setup({
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    raiseNext: raise({ type: 'NEXT' }),
     loadingBegin: enqueueActions(
       (
         { enqueue },
@@ -369,6 +135,14 @@ export const SignInRouterMachine = setup({
         strategy: undefined,
       },
     }),
+    resendableTick: assign(({ context }) => ({
+      resendable: context.resendableAfter === 0,
+      resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
+    })),
+    resendableReset: assign({
+      resendable: false,
+      resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
+    }),
     setActive: enqueueActions(({ enqueue, check, context, event }) => {
       if (check('isExampleMode')) {
         return;
@@ -383,10 +157,24 @@ export const SignInRouterMachine = setup({
 
       const beforeEmit = () =>
         context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
-      void context.clerk.setActive({ session, beforeEmit });
 
-      enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
+      void context.clerk.setActive({ session, beforeEmit }).then(() => {
+        enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
+      });
     }),
+    setConsoleError: ({ event }) => {
+      if (process.env.NODE_ENV !== 'development') {
+        return;
+      }
+
+      assertActorEventError(event);
+
+      const error = isClerkAPIResponseError(event.error) ? event.error.errors[0].longMessage : event.error.message;
+
+      console.error(`Unable to fulfill the prepare or attempt request for the sign-in verification.
+      Error: ${error}
+      Please open an issue if you continue to run into this issue.`);
+    },
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
         if (error) {
@@ -435,11 +223,88 @@ export const SignInRouterMachine = setup({
         error,
       });
     },
+    setInitialContext: assign(({ event }) => {
+      assertEvent(event, 'INIT');
+      return {
+        clerk: event.clerk,
+        exampleMode: event.exampleMode || false,
+        formRef: event.formRef,
+        loading: {
+          isLoading: false,
+        },
+        registeredStrategies: new Set(),
+        router: event.router,
+        signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
+      };
+    }),
+    setValidationStrategy: assign({
+      verificationCurrentFactor: ({ event }) => {
+        assertEvent(event, 'STRATEGY.UPDATE');
+        return event.factor || null;
+      },
+    }),
+    setWebAuthnAutofillSupport: assign({ webAuthnAutofillSupport: (_, params: boolean) => params }),
     transfer: ({ context }) => {
       const searchParams = new URLSearchParams({ __clerk_transfer: '1' });
       context.router?.push(`${context.signUpPath}?${searchParams}`);
     },
+    validateRegisteredStrategies: ({ context }) => {
+      const { clerk, verificationCurrentFactor, registeredStrategies } = context;
+
+      // Only show these warnings in development!
+      if (process.env.NODE_ENV !== 'development' || clerk.__unstable__environment?.isProduction()) {
+        return;
+      }
+
+      const supportedFirstFactors = clerk.client.signIn.supportedFirstFactors;
+      const supportedSecondFactors = clerk.client.signIn.supportedSecondFactors;
+      const registeredStrategiesArr = Array.from(registeredStrategies);
+
+      // Ensure all configured strategies are rendered
+      if (supportedFirstFactors && !supportedFirstFactors.every(f => registeredStrategies.has(f.strategy))) {
+        const supportedFactorsStr = supportedFirstFactors.map(f => f.strategy).join(', ');
+        const registeredFactorsStr = registeredStrategiesArr.join(', ');
+
+        console.warn(
+          `Clerk: Your instance is configured to support these strategies: ${supportedFactorsStr}, but the rendered strategies are: ${registeredFactorsStr}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      // Ensure all rendered second factor strategies are supported
+      if (supportedSecondFactors && !supportedSecondFactors.every(f => registeredStrategies.has(f.strategy))) {
+        const supportedFactorsStr = supportedSecondFactors.map(f => f.strategy).join(', ');
+        const registeredFactorsStr = registeredStrategiesArr.join(', ');
+
+        console.warn(
+          `Clerk: Your instance is configured to support these 2FA strategies: ${supportedFactorsStr}, but the rendered strategies are: ${registeredFactorsStr}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      // Ensure all rendered first factor strategies are supported
+      const strategiesUsedButNotActivated = registeredStrategiesArr.filter(
+        strategy => !supportedFirstFactors?.some(supported => supported.strategy === strategy),
+      );
+
+      if (strategiesUsedButNotActivated.length > 0) {
+        console.warn(
+          `Clerk: These rendered strategies are not configured for your instance: ${strategiesUsedButNotActivated.join(', ')}. If this is unexpected, make sure to enable them in your Clerk dashboard: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username`,
+        );
+      }
+
+      if (verificationCurrentFactor?.strategy && !registeredStrategies.has(verificationCurrentFactor?.strategy)) {
+        throw new ClerkElementsRuntimeError(
+          `Your sign-in attempt is missing a ${verificationCurrentFactor?.strategy} strategy. Make sure <Strategy name="${verificationCurrentFactor?.strategy}"> is rendered in your flow. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      if (!verificationCurrentFactor?.strategy) {
+        throw new ClerkElementsRuntimeError(
+          'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username',
+        );
+      }
+    },
   },
+  delays: SignInRouterDelays,
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
@@ -461,6 +326,14 @@ export const SignInRouterMachine = setup({
     isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isntExampleMode: ({ context }) => !context.exampleMode,
+    isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
+    isNeverResendable: ({ context }) => {
+      if (!context.verificationCurrentFactor?.strategy) {
+        return false;
+      }
+
+      return ['passkey', 'password'].includes(context.verificationCurrentFactor.strategy);
+    },
 
     needsStart: or([not('hasResource'), 'statusNeedsIdentifier', isCurrentPath('/')]),
     needsFirstFactor: and(['statusNeedsFirstFactor', isCurrentPath('/continue')]),
@@ -544,21 +417,15 @@ export const SignInRouterMachine = setup({
         id: 'webAuthnAutofill',
         src: 'webAuthnAutofillSupport',
         onDone: {
-          actions: assign({ webAuthnAutofillSupport: ({ event }) => event.output }),
+          actions: {
+            type: 'setWebAuthnAutofillSupport',
+            params: ({ event }) => event.output,
+          },
         },
       },
       on: {
         INIT: {
-          actions: assign(({ event }) => ({
-            clerk: event.clerk,
-            exampleMode: event.exampleMode || false,
-            formRef: event.formRef,
-            loading: {
-              isLoading: false,
-            },
-            router: event.router,
-            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
-          })),
+          actions: 'setInitialContext',
           target: 'Init',
         },
       },
@@ -787,26 +654,9 @@ export const SignInRouterMachine = setup({
     },
     FirstFactor: {
       tags: ['step:first-factor', 'step:verifications'],
-      invoke: {
-        id: 'firstFactor',
-        src: 'firstFactorMachine',
-        input: ({ context, self }) => ({
-          formRef: context.formRef,
-          parent: self,
-          basePath: context.router?.basePath,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
+      // exit: 'clearRegisteredStrategies', // TODO
       on: {
-        'AUTHENTICATE.PASSKEY': {
-          actions: sendTo('firstFactor', ({ event }) => event),
-        },
-        'RESET.STEP': {
-          target: 'FirstFactor',
-          reenter: true,
-        },
+        'NAVIGATE.PREVIOUS': '.Hist',
         NEXT: [
           {
             guard: 'isComplete',
@@ -823,59 +673,236 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
-        'STRATEGY.UPDATE': {
-          description: 'Send event to verification machine to update the current strategy.',
-          actions: sendTo('firstFactor', ({ event }) => event),
-          target: '.Idle',
+        'RESET.STEP': {
+          target: 'FirstFactor',
+          reenter: true,
+        },
+        'STRATEGY.REGISTER': {
+          actions: assign({
+            registeredStrategies: ({ context, event }) => context.registeredStrategies.add(event.factor),
+          }),
+        },
+        'STRATEGY.UNREGISTER': {
+          actions: assign({
+            registeredStrategies: ({ context, event }) => {
+              context.registeredStrategies.delete(event.factor);
+              return context.registeredStrategies;
+            },
+          }),
         },
       },
-      initial: 'Idle',
+      initial: 'Init',
       states: {
-        Idle: {
-          on: {
-            'NAVIGATE.FORGOT_PASSWORD': {
-              description: 'Navigate to forgot password screen.',
-              actions: sendTo('firstFactor', ({ event }) => event),
-              target: 'ForgotPassword',
+        Init: {
+          tags: ['state:preparing', 'state:loading'],
+          invoke: {
+            id: 'firstFactorDetermineStartingFactor',
+            src: 'firstFactorDetermineStartingFactor',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+            }),
+            onDone: {
+              target: 'Preparing',
+              actions: assign({
+                verificationCurrentFactor: ({ event }) => event.output,
+              }),
             },
-            'NAVIGATE.CHOOSE_STRATEGY': {
-              description: 'Navigate to choose strategy screen.',
-              actions: sendTo('firstFactor', ({ event }) => event),
-              target: 'ChoosingStrategy',
+            onError: {
+              target: 'Preparing',
+              actions: [
+                log('Clerk [Sign In Verification]: Error determining starting factor'),
+                assign({
+                  verificationCurrentFactor: { strategy: 'password' },
+                }),
+              ],
             },
           },
         },
-        ChoosingStrategy: {
+        Preparing: {
+          tags: ['state:preparing', 'state:loading'],
+          invoke: {
+            id: 'firstFactorPrepare',
+            src: 'firstFactorPrepare',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              resendable: context.resendable,
+              params: {
+                ...context.verificationCurrentFactor,
+                redirectUrl: `${window.location.origin}${context.router?.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`,
+              } as PrepareFirstFactorParams,
+            }),
+            onDone: {
+              actions: 'resendableReset',
+              target: 'Pending',
+            },
+            onError: {
+              actions: ['setFormErrors', 'setConsoleError'],
+              target: 'Pending',
+            },
+          },
+        },
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            'AUTHENTICATE.PASSKEY': {
+              guard: not('isExampleMode'),
+              target: 'AttemptingPasskey',
+              reenter: true,
+            },
+            'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
+            'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
+            RETRY: 'Preparing',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
+          },
+          initial: 'Init',
+          states: {
+            Init: {
+              description: 'Marks appropriate factors as never resendable.',
+              always: [
+                {
+                  guard: 'isNeverResendable',
+                  target: 'NeverResendable',
+                },
+                {
+                  target: 'NotResendable',
+                },
+              ],
+            },
+            Resendable: {
+              description: 'Waiting for user to retry',
+            },
+            NeverResendable: {
+              description: 'Handles never resendable',
+              on: {
+                RETRY: {
+                  actions: log('Never retriable'),
+                },
+              },
+            },
+            NotResendable: {
+              description: 'Handle countdowns',
+              on: {
+                RETRY: {
+                  actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                },
+              },
+              after: {
+                resendableTimeout: [
+                  {
+                    description: 'Set as retriable if countdown is 0',
+                    guard: 'isResendable',
+                    actions: 'resendableTick',
+                    target: 'Resendable',
+                  },
+                  {
+                    description: 'Continue countdown if not retriable',
+                    actions: 'resendableTick',
+                    target: 'NotResendable',
+                    reenter: true,
+                  },
+                ],
+              },
+            },
+          },
+          after: {
+            3000: {
+              actions: 'validateRegisteredStrategies',
+            },
+          },
+        },
+        ChooseStrategy: {
           tags: ['step:choose-strategy'],
           on: {
-            'NAVIGATE.PREVIOUS': {
-              description: 'Go to Idle, and also tell firstFactor to go to Pending',
-              target: 'Idle',
-              actions: sendTo('firstFactor', { type: 'NAVIGATE.PREVIOUS' }),
+            'NAVIGATE.PREVIOUS': 'Pending',
+            'STRATEGY.UPDATE': {
+              actions: 'setValidationStrategy',
+              target: 'Preparing',
             },
           },
         },
         ForgotPassword: {
           tags: ['step:forgot-password'],
           on: {
-            'NAVIGATE.PREVIOUS': 'Idle',
+            'NAVIGATE.PREVIOUS': 'Pending',
+            'STRATEGY.UPDATE': {
+              actions: 'setValidationStrategy',
+              target: 'Preparing',
+            },
           },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'verifications',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'firstFactorAttempt',
+            src: 'firstFactorAttempt',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              currentFactor: context.verificationCurrentFactor as SignInFirstFactor | null,
+              fields: context.formRef.getSnapshot().context.fields,
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        AttemptingPasskey: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'verifications',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'attemptPasskey',
+            src: 'attemptPasskey',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              flow: 'discoverable',
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        Hist: {
+          type: 'history',
         },
       },
     },
     SecondFactor: {
       tags: ['step:second-factor', 'step:verifications'],
-      invoke: {
-        id: 'secondFactor',
-        src: 'secondFactorMachine',
-        input: ({ context, self }) => ({
-          formRef: context.formRef,
-          parent: self,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
+      // invoke: {
+      //   id: 'secondFactor',
+      //   src: 'secondFactorMachine',
+      //   input: ({ context, self }) => ({
+      //     formRef: context.formRef,
+      //     parent: self,
+      //   }),
+      //   onDone: {
+      //     actions: 'raiseNext',
+      //   },
+      // },
       on: {
         'RESET.STEP': {
           target: 'SecondFactor',
@@ -968,6 +995,7 @@ export const SignInRouterMachine = setup({
           },
           exit: 'loadingEnd',
           invoke: {
+            id: 'resetPasswordAttempt',
             src: 'resetPasswordAttempt',
             input: ({ context }) => ({
               clerk: context.clerk,
@@ -1028,15 +1056,6 @@ export const SignInRouterMachine = setup({
             type: 'setActive',
             params: ({ event }) => ({ id: event.id }),
           },
-        },
-      },
-    },
-    Error: {
-      tags: ['step:error'],
-      on: {
-        NEXT: {
-          target: 'Start',
-          actions: 'clearFormErrors',
         },
       },
     },

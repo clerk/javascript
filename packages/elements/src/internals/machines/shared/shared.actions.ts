@@ -1,6 +1,5 @@
 import type { SignInStrategy } from '@clerk/types';
 
-import type { SignInVerificationContext, SignInVerificationEvents } from '~/internals/machines/sign-in';
 import type {
   SignUpContinueContext,
   SignUpContinueEvents,
@@ -13,18 +12,8 @@ import type { ThirdPartyMachineContext, ThirdPartyMachineEvent } from '~/interna
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 
 type SendToLoadingProps = {
-  context:
-    | SignInVerificationContext
-    | ThirdPartyMachineContext
-    | SignUpStartContext
-    | SignUpContinueContext
-    | SignUpVerificationContext;
-  event:
-    | SignInVerificationEvents
-    | ThirdPartyMachineEvent
-    | SignUpStartRedirectEvent
-    | SignUpContinueEvents
-    | SignUpVerificationEvents;
+  context: ThirdPartyMachineContext | SignUpStartContext | SignUpContinueContext | SignUpVerificationContext;
+  event: ThirdPartyMachineEvent | SignUpStartRedirectEvent | SignUpContinueEvents | SignUpVerificationEvents;
 };
 
 export function sendToLoading({ context, event }: SendToLoadingProps): void {

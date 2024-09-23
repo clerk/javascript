@@ -1,48 +1,29 @@
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
 import { useCallback, useEffect } from 'react';
-import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
 import type { SignInStrategyName } from '~/internals/machines/shared';
-import type { TSignInFirstFactorMachine, TSignInSecondFactorMachine } from '~/internals/machines/sign-in';
+import { SignInCurrentStrategy } from '~/internals/machines/sign-in/router.selectors';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
-import {
-  SignInRouterCtx,
-  SignInStrategyContext,
-  StrategiesContext,
-  useSignInFirstFactorStep,
-  useSignInSecondFactorStep,
-  useStrategy,
-} from '~/react/sign-in/context';
-import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
+import { SignInRouterCtx, SignInStrategyContext, StrategiesContext, useStrategy } from '~/react/sign-in/context';
 
 export type SignInVerificationsProps = { preferred?: ClerkSignInStrategy } & FormProps;
 
-export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
-export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
-
-const strategiesSelector = (state: SnapshotFrom<TSignInFirstFactorMachine | TSignInSecondFactorMachine>) =>
-  state.context.currentFactor?.strategy;
-
-function SignInStrategiesProvider({
-  children,
-  preferred,
-  actorRef,
-  ...props
-}: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine | TSignInSecondFactorMachine> }) {
+function SignInStrategiesProvider({ children, preferred, ...props }: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const current = useSelector(actorRef, strategiesSelector);
+  const current = useSelector(routerRef, SignInCurrentStrategy);
   const isChoosingAltStrategy = useActiveTags(routerRef, ['step:choose-strategy', 'step:forgot-password']);
+
   const isActive = useCallback((name: string) => (current ? matchStrategy(current, name) : false), [current]);
 
   return (
     <StrategiesContext.Provider value={{ current: current, preferred, isActive }}>
       {isChoosingAltStrategy.active ? null : (
         <Form
-          flowActor={actorRef}
+          flowActor={routerRef}
           {...props}
         >
           {children}
@@ -53,13 +34,6 @@ function SignInStrategiesProvider({
 }
 
 export type SignInStrategyProps = { name: SignInStrategyName; children: React.ReactNode };
-
-function useFactorCtx() {
-  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
-  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
-
-  return firstFactorRef || secondFactorRef;
-}
 
 /**
  * Generic component to handle both first and second factor verifications.
@@ -73,19 +47,15 @@ function useFactorCtx() {
  */
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
-  const factorCtx = useFactorCtx();
+  const routerRef = SignInRouterCtx.useActorRef();
 
   useEffect(() => {
-    if (factorCtx) {
-      factorCtx.send({ type: 'STRATEGY.REGISTER', factor: name });
-    }
+    routerRef.send({ type: 'STRATEGY.REGISTER', factor: name });
 
     return () => {
-      if (factorCtx?.getSnapshot().status === 'active') {
-        factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name });
-      }
+      routerRef.send({ type: 'STRATEGY.UNREGISTER', factor: name });
     };
-  }, [factorCtx, name]);
+  }, [routerRef, name]);
 
   return active ? (
     <SignInStrategyContext.Provider value={{ strategy: name }}>{children}</SignInStrategyContext.Provider>
@@ -100,17 +70,9 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
  */
 export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const { activeTags: activeRoutes } = useActiveTags(routerRef, ['step:first-factor', 'step:second-factor']);
+  const activeState = useActiveTags(routerRef, 'step:verifications');
 
-  if (activeRoutes.has('step:first-factor')) {
-    return <SignInFirstFactorInner {...props} />;
-  }
-
-  if (activeRoutes.has('step:second-factor')) {
-    return <SignInSecondFactorInner {...props} />;
-  }
-
-  return null;
+  return activeState ? <SignInStrategiesProvider {...props} /> : null;
 }
 
 /**
@@ -124,7 +86,7 @@ export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'step:first-factor');
 
-  return activeState ? <SignInFirstFactorInner {...props} /> : null;
+  return activeState ? <SignInStrategiesProvider {...props} /> : null;
 }
 
 /**
@@ -138,41 +100,7 @@ export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'step:second-factor');
 
-  return activeState ? <SignInSecondFactorInner {...props} /> : null;
-}
-
-export function SignInFirstFactorInner(props: SignInVerificationsProps) {
-  const ref = useSignInFirstFactorStep();
-
-  if (!ref) {
-    return null;
-  }
-
-  return ref ? (
-    <SignInFirstFactorCtx.Provider actorRef={ref}>
-      <SignInStrategiesProvider
-        actorRef={ref}
-        {...props}
-      />
-    </SignInFirstFactorCtx.Provider>
-  ) : null;
-}
-
-export function SignInSecondFactorInner(props: SignInVerificationsProps) {
-  const ref = useSignInSecondFactorStep();
-
-  if (!ref) {
-    return null;
-  }
-
-  return ref ? (
-    <SignInSecondFactorCtx.Provider actorRef={ref}>
-      <SignInStrategiesProvider
-        actorRef={ref}
-        {...props}
-      />
-    </SignInSecondFactorCtx.Provider>
-  ) : null;
+  return activeState ? <SignInStrategiesProvider {...props} /> : null;
 }
 
 export type SignInVerificationResendableRenderProps = {

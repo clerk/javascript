@@ -2,7 +2,9 @@ import { Slot } from '@radix-ui/react-slot';
 import { useSelector } from '@xstate/react';
 import * as React from 'react';
 
-import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '../verifications';
+import { useActiveTags } from '~/react/hooks';
+
+import { SignInRouterCtx } from '../context';
 
 export type SignInResendElement = React.ElementRef<'button'>;
 export type SignInResendFallbackProps = {
@@ -33,16 +35,15 @@ const SIGN_IN_RESEND_NAME = 'SignInResend';
  */
 export const SignInResend = React.forwardRef<SignInResendElement, SignInResendProps>(
   ({ asChild, fallback, ...rest }, forwardedRef) => {
-    const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
-    const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
-    const actorRef = firstFactorRef || secondFactorRef;
+    const ref = SignInRouterCtx.useActorRef();
+    const activeState = useActiveTags(ref, ['step:first-factor', 'step:second-factor']);
 
-    if (!actorRef) {
+    if (!activeState) {
       throw new Error('The resend action must be used within <SignIn.Step name="verifications">.');
     }
 
     const fallbackProps: SignInResendFallbackProps = useSelector(
-      actorRef,
+      ref,
       state => ({
         resendable: state.context.resendable,
         resendableAfter: state.context.resendableAfter,
@@ -62,7 +63,7 @@ export const SignInResend = React.forwardRef<SignInResendElement, SignInResendPr
         {...defaultProps}
         {...rest}
         disabled={!fallbackProps.resendable}
-        onClick={() => actorRef.send({ type: 'RETRY' })}
+        onClick={() => ref.send({ type: 'RETRY' })}
         ref={forwardedRef}
       />
     );

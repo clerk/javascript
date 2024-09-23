@@ -42,6 +42,7 @@ function CustomProvider({
   children: string;
   provider: ComponentProps<typeof Clerk.Connection>['name'];
 }) {
+  return null; // Remove this line to enable custom provider
   return (
     <Clerk.Loading scope={`provider:${provider}`}>
       {isLoading => (
@@ -258,6 +259,7 @@ export default function SignInPage() {
             </section>
           </SignIn.SessionList>
         </SignIn.Step>
+
         <SignIn.Step
           name='choose-strategy'
           className='flex w-96 flex-col items-center gap-6'

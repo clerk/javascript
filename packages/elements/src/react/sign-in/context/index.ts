@@ -1,4 +1,4 @@
-export { SignInRouterCtx, useSignInFirstFactorStep, useSignInSecondFactorStep } from './router.context';
+export { SignInRouterCtx } from './router.context';
 export { SignInStrategyContext, useSignInStrategy } from './sign-in-strategy.context';
 export { StrategiesContext, useStrategy } from './strategies.context';
 
