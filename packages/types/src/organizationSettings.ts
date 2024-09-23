@@ -25,5 +25,6 @@ export interface OrganizationSettingsResource extends ClerkResource {
   domains: {
     enabled: boolean;
     enrollmentModes: OrganizationEnrollmentMode[];
+    default_role: string | null;
   };
 }
