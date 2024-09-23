@@ -66,7 +66,9 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
           )}
         </PopoverCard.Content>
         <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter}>
-          {!authConfig.singleSessionMode && <SignOutAllActions handleSignOutAllClicked={handleSignOutAllClicked} />}
+          {!authConfig.singleSessionMode && otherSessions.length > 0 && (
+            <SignOutAllActions handleSignOutAllClicked={handleSignOutAllClicked} />
+          )}
         </PopoverCard.Footer>
       </PopoverCard.Root>
     </RootBox>
