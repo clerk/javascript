@@ -1,5 +1,5 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type { Appearance as CurrentAppearance, Layout } from '@clerk/types';
+import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
 import { fullTheme } from '~/themes';
@@ -37,17 +37,18 @@ export type ParsedElementsFragment = Partial<PartialTheme>;
  * the main type interacted with within components.
  */
 export type ParsedElements = Record<DescriptorIdentifier, ParsedDescriptor>;
-export type ParsedLayout = Required<
-  Omit<Layout, 'logoPlacement'> & {
+export type ParsedOptions = Required<
+  Omit<CurrentLayout, 'logoPlacement'> & {
     logoVisibility: 'visible' | 'hidden';
   }
 >;
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
-export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme'> & {
+export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme' | 'layout'> & {
   theme?: ParsedElements;
   elements?: Partial<Record<DescriptorIdentifier, ElementsAppearanceConfig>>;
+  options?: ParsedOptions;
 };
 
 export type AppearanceCascade = {
@@ -62,7 +63,7 @@ export type AppearanceCascade = {
 export type ParsedAppearance = {
   theme: ParsedElements;
   elements: ParsedElements;
-  layout: ParsedLayout;
+  options: ParsedOptions;
 };
 
 type AppearanceContextValue = {
@@ -72,8 +73,8 @@ type AppearanceContextValue = {
    * Example:
    * ```tsx
    * function Help() {
-   *   const { layout } = useAppearance().parsedAppearance;
-   *   return <p>{layout.helpPageUrl}</p>
+   *   const { options } = useAppearance().parsedAppearance;
+   *   return <p>{options.helpPageUrl}</p>
    * }
    * ```
    */
@@ -83,7 +84,7 @@ type AppearanceContextValue = {
 };
 
 /**
- * Used to merge full themes with ParsedElementsFragments. Allows you to combine layoutStyle with multiple visualStyle
+ * Used to merge full themes with ParsedElementsFragments. Allows you to combine optionsStyle with multiple visualStyle
  * elements.
  */
 export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment[]): ParsedElementsFragment {
@@ -168,7 +169,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     return a;
   }
 
-  const result = { ...a, layout: { ...a.layout, ...b.layout } };
+  const result = { ...a, options: { ...a.options, ...b.options } }; // Ensure options are merged
 
   if (b.theme) {
     result.theme = b.theme;
@@ -193,7 +194,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
 function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
   const baseTheme = theme ?? fullTheme;
   if (!appearance) {
-    return { theme: baseTheme, elements: structuredClone(baseTheme), layout: defaultAppearance.layout };
+    return { theme: baseTheme, elements: structuredClone(baseTheme), options: defaultAppearance.options };
   }
 
   const result = {
@@ -201,7 +202,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
     // because we're going to perform modifications to deeply nested objects, we need to create a structuredClone of
     // the theme or else subsequent usage of the baseTheme will contain our merged changes.
     elements: structuredClone(baseTheme),
-    layout: { ...defaultAppearance.layout, ...appearance.layout },
+    options: { ...defaultAppearance.options, ...appearance.options },
   };
 
   if (appearance.elements) {
@@ -227,7 +228,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 export const defaultAppearance: ParsedAppearance = {
   theme: fullTheme,
   elements: fullTheme,
-  layout: {
+  options: {
     logoVisibility: 'visible',
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'auto',
@@ -284,7 +285,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: 'cl-test-class-one' } };
       const b = { elements: { alertIcon: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: 'cl-test-class-one',
           alertIcon: 'cl-test-class-two',
@@ -298,7 +299,7 @@ if (import.meta.vitest) {
         elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         theme: a.theme,
         elements: {
           alert__warning: 'cl-test-class-one',
@@ -314,7 +315,7 @@ if (import.meta.vitest) {
         elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         theme: b.theme,
         elements: {
           alert__warning: 'cl-test-class-one',
@@ -327,7 +328,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: 'cl-test-class-one' } };
       const b = { elements: { alert__warning: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: 'cl-test-class-one cl-test-class-two',
         },
@@ -338,7 +339,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: { background: 'tomato' } } };
       const b = { elements: { alert__warning: { color: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: { color: 'red', background: 'tomato' },
         },
@@ -349,7 +350,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: { background: 'tomato' } } };
       const b = { elements: { alert__warning: { background: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: { background: 'red' },
         },
@@ -424,7 +425,7 @@ if (import.meta.vitest) {
       };
       expect(applyTheme(theme, appearance)).toStrictEqual({
         theme,
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: {
           ...fullTheme,
           alert__warning: {

@@ -57,12 +57,12 @@ export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,
 ) {
   const enabledConnections = useEnabledConnections();
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const hasConnection = enabledConnections.length > 0;
   const textVisuallyHidden =
     typeof props?.textVisuallyHidden !== 'undefined'
       ? props.textVisuallyHidden
-      : enabledConnections.length > 2 || layout?.socialButtonsVariant === 'iconButton';
+      : enabledConnections.length > 2 || options?.socialButtonsVariant === 'iconButton';
   const columns = getColumnCount({ length: enabledConnections.length, max: props?.columns || 6 });
 
   return hasConnection ? (
