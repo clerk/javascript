@@ -238,7 +238,7 @@ export default (QUnit: QUnit) => {
 
       const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenExpired });
       assert.strictEqual(requestState.toAuth(), null);
     });
 
@@ -487,7 +487,7 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -554,7 +554,7 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenExpired });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
