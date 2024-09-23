@@ -4,6 +4,7 @@ import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
+import { useEnvironment } from '../../contexts';
 import { Flex } from '../../customizables';
 import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
@@ -182,8 +183,20 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   );
 };
 
+/**
+ * Determines default role from the organization settings or fallsback to
+ * the only available role.
+ */
+const useDefaultRole = () => {
+  const { options } = useFetchRoles();
+  const { organizationSettings } = useEnvironment();
+
+  return organizationSettings.domains.default_role ?? options?.[0]?.value ?? undefined;
+};
+
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
   const { options, isLoading } = useFetchRoles();
+  const defaultRole = useDefaultRole();
 
   const { t } = useLocalizations();
 
@@ -195,6 +208,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       >
         <RoleSelect
           {...field.props}
+          value={field.props.value ?? defaultRole}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
