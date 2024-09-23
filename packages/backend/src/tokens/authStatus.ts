@@ -64,7 +64,10 @@ export const AuthErrorReason = {
   SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',
   SessionTokenAndUATMissing: 'session-token-and-uat-missing',
   SessionTokenMissing: 'session-token-missing',
-  SessionTokenOutdated: 'session-token-outdated',
+  SessionTokenExpired: 'session-token-expired',
+  SessionTokenIATBeforeClientUAT: 'session-token-iat-before-client-uat',
+  SessionTokenNotActiveYet: 'session-token-not-active-yet',
+  SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   UnexpectedError: 'unexpected-error',
 } as const;

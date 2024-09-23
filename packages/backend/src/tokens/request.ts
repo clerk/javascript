@@ -165,7 +165,8 @@ export async function authenticateRequest(
     if (
       authenticateContext.instanceType === 'development' &&
       (error?.reason === TokenVerificationErrorReason.TokenExpired ||
-        error?.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+        error?.reason === TokenVerificationErrorReason.TokenNotActiveYet ||
+        error?.reason === TokenVerificationErrorReason.TokenIatInTheFuture)
     ) {
       error.tokenCarrier = 'cookie';
       // This probably means we're dealing with clock skew
@@ -456,7 +457,7 @@ ${error.getFullMessage()}`,
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenOutdated, '');
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenIATBeforeClientUAT, '');
     }
 
     try {
@@ -502,12 +503,13 @@ ${error.getFullMessage()}`,
     const reasonToHandshake = [
       TokenVerificationErrorReason.TokenExpired,
       TokenVerificationErrorReason.TokenNotActiveYet,
+      TokenVerificationErrorReason.TokenIatInTheFuture,
     ].includes(err.reason);
 
     if (reasonToHandshake) {
       return handleMaybeHandshakeStatus(
         authenticateContext,
-        AuthErrorReason.SessionTokenOutdated,
+        convertTokenVerificationErrorReasonToAuthErrorReason(err.reason),
         err.getFullMessage(),
         undefined,
         refreshError,
@@ -530,4 +532,19 @@ ${error.getFullMessage()}`,
 export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
+};
+
+const convertTokenVerificationErrorReasonToAuthErrorReason = (
+  reason: TokenVerificationErrorReason,
+): AuthErrorReason => {
+  switch (reason) {
+    case TokenVerificationErrorReason.TokenExpired:
+      return AuthErrorReason.SessionTokenExpired;
+    case TokenVerificationErrorReason.TokenNotActiveYet:
+      return AuthErrorReason.SessionTokenNotActiveYet;
+    case TokenVerificationErrorReason.TokenIatInTheFuture:
+      return AuthErrorReason.SessionTokenIatInTheFuture;
+    default:
+      return AuthErrorReason.UnexpectedError;
+  }
 };

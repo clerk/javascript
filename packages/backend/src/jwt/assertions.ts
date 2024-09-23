@@ -162,7 +162,7 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
   const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkewInMs;
   if (postIssued) {
     throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenNotActiveYet,
+      reason: TokenVerificationErrorReason.TokenIatInTheFuture,
       message: `JWT issued at date claim (iat) is in the future. Issued at date: ${issuedAtDate.toUTCString()}; Current date: ${currentDate.toUTCString()};`,
     });
   }
