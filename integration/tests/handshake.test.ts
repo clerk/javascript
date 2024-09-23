@@ -973,6 +973,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
 
     // With a token specified in...
     tokenAppearsIn: 'header' | 'cookie';
+
+    // And the Sec-fetch-dest header is...
+    secFetchDestHeader: string | null;
   };
 
   type then = {
@@ -999,6 +1002,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1017,6 +1021,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1025,10 +1030,11 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     },
 
     // ---------------- Header-based auth tests ----------------
-    // Note: it would be possible to run _every_ test with the token in the header or the cookies
-    //       and expect the same results, but we're avoiding that to save some test execution time.
+    // Header-based auth requests come from non-browser actors, which don't have the __client cookie.
+    // Handshaking depends on a redirect that includes that __client cookie, so we should not handshake
+    // for this auth method, even if there's an org mismatch
     {
-      name: 'Header-based auth, active session, no org in session, but org a requested by ID => attempts to activate org A',
+      name: 'Header-based auth should not handshake with active auth',
       when: {
         initialAuthState: 'active',
         initialSessionClaims: new Map<string, string>([
@@ -1039,10 +1045,30 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'header',
+        secFetchDestHeader: null,
       },
       then: {
-        expectStatus: 307,
-        fapiOrganizationIdParamValue: 'org_a',
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Header-based auth should not handshake with expired auth',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'header',
+        secFetchDestHeader: null,
+      },
+      then: {
+        expectStatus: 307, // Should redirect to sign-in
+        fapiOrganizationIdParamValue: null,
       },
     },
 
@@ -1057,6 +1083,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_b',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1080,6 +1107,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-slug/bcorp',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1101,6 +1129,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-slug/bcorp/settings',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1119,6 +1148,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_b/',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 308, // Handshake never 308's - this points to `/organizations-by-id/org_b` (no trailing slash)
@@ -1143,6 +1173,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/personal-workspace',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 307,
@@ -1164,6 +1195,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/personal-workspace',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 200,
@@ -1181,6 +1213,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 200,
@@ -1196,6 +1229,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         orgSyncOptions: null,
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 200,
@@ -1214,6 +1248,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         },
         appRequestPath: '/organizations-by-id/org_a',
         tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
       },
       then: {
         expectStatus: 200,
@@ -1238,8 +1273,12 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       const headers = new Headers({
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
-        'Sec-Fetch-Dest': 'document',
       });
+
+      if (testCase.when.secFetchDestHeader) {
+        headers.set('Sec-Fetch-Dest', testCase.when.secFetchDestHeader);
+      }
+
       switch (testCase.when.tokenAppearsIn) {
         case 'cookie':
           headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);

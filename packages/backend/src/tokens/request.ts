@@ -376,13 +376,8 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      const signedInRequestState = signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
-      // Org sync if necessary
-      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
-        authenticateContext,
-        signedInRequestState.toAuth(),
-      );
-      return handshakeRequestState || signedInRequestState;
+      // use `await` to force this try/catch handle the signedIn invocation
+      return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
     }
