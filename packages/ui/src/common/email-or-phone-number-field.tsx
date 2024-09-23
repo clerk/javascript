@@ -25,10 +25,19 @@ export function EmailOrPhoneNumberField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
-      onChange={setShowPhoneNumberField}
+      onChange={isSelected => {
+        setShowPhoneNumberField(isSelected);
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 0);
+      }}
       className={link({ size: 'sm', disabled: props.disabled })}
     >
       {showPhoneNumberField ? toggleLabelEmail : toggleLabelPhoneNumber}
@@ -40,12 +49,14 @@ export function EmailOrPhoneNumberField({
       alternativeFieldTrigger={toggle}
       name={name}
       {...props}
+      ref={inputRef}
     />
   ) : (
     <EmailField
       {...props}
       name={name}
       alternativeFieldTrigger={toggle}
+      ref={inputRef}
     />
   );
 }
