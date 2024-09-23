@@ -184,14 +184,20 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 };
 
 /**
- * Determines default role from the organization settings or fallsback to
+ * Determines default role from the organization settings or fallback to
  * the only available role.
  */
 const useDefaultRole = () => {
   const { options } = useFetchRoles();
   const { organizationSettings } = useEnvironment();
 
-  return organizationSettings.domains.default_role ?? options?.[0]?.value ?? undefined;
+  let defaultRole = organizationSettings.domains.defaultRole;
+
+  if (!defaultRole && options?.length === 1) {
+    defaultRole = options[0].value;
+  }
+
+  return defaultRole;
 };
 
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
@@ -208,7 +214,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       >
         <RoleSelect
           {...field.props}
-          value={field.props.value ?? defaultRole}
+          value={field.props.value || (defaultRole ?? '')}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
