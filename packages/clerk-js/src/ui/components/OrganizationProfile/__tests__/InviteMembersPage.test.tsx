@@ -41,7 +41,94 @@ describe('InviteMembersPage', () => {
     getByText('Enter or paste one or more email addresses, separated by spaces or commas.');
   });
 
-  it.todo("automatically selects the organization's default role");
+  describe('with default role', () => {
+    it("initializes with the organization's default role", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, 'admin');
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await userEvent.click(getByRole('button', { name: /admin/i }));
+    });
+
+    it('initializes with the only available role', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, undefined);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 1,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await userEvent.click(getByRole('button', { name: /member/i }));
+    });
+  });
 
   describe('Submitting', () => {
     it('keeps the Send button disabled until a role is selected and one or more email has been entered', async () => {
