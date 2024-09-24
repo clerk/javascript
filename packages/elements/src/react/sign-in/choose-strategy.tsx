@@ -7,7 +7,6 @@ import { SignInCurrentStrategy, SignInFactors } from '~/internals/machines/sign-
 
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
-import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
 import { SignInRouterCtx, SignInStrategyContext } from './context';
 
 // --------------------------------- HELPERS ---------------------------------
@@ -41,18 +40,12 @@ export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
 };
 
-export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
-
 export function SignInChooseStrategy({ asChild, children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'step:choose-strategy');
   const Comp = asChild ? Slot : 'div';
 
-  return activeState ? (
-    <SignInChooseStrategyCtx.Provider>
-      <Comp {...props}>{children}</Comp>
-    </SignInChooseStrategyCtx.Provider>
-  ) : null;
+  return activeState ? <Comp {...props}>{children}</Comp> : null;
 }
 
 export function SignInForgotPassword({ asChild, children, ...props }: SignInForgotPasswordProps) {
@@ -64,11 +57,7 @@ export function SignInForgotPassword({ asChild, children, ...props }: SignInForg
   );
   const Comp = asChild ? Slot : 'div';
 
-  return activeState ? (
-    <SignInChooseStrategyCtx.Provider>
-      <Comp {...props}>{children}</Comp>
-    </SignInChooseStrategyCtx.Provider>
-  ) : null;
+  return activeState ? <Comp {...props}>{children}</Comp> : null;
 }
 
 const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';

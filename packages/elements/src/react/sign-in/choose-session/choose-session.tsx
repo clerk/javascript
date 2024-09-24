@@ -1,7 +1,6 @@
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
-import { createContextForDomValidation } from '~/react/utils/create-context-for-dom-validation';
 import { isValidComponentType } from '~/react/utils/is-valid-component-type';
 
 import {
@@ -26,21 +25,13 @@ export type SignInSessionListItemProps = Omit<React.HTMLAttributes<HTMLLIElement
   children: ({ session }: { session: SignInActiveSessionListItem }) => React.ReactNode;
 };
 
-// ---------------------------------- CONTEXT -----------------------------------
-
-export const SignInChooseSessionCtx = createContextForDomValidation('SignInChooseSessionCtx');
-
 // --------------------------------- COMPONENTS ---------------------------------
 
 export function SignInChooseSession({ asChild, children, ...props }: SignInChooseSessionProps) {
   const activeState = useSignInChooseSessionIsActive();
   const Comp = asChild ? Slot : 'div';
 
-  return activeState ? (
-    <SignInChooseSessionCtx.Provider>
-      <Comp {...props}>{children}</Comp>
-    </SignInChooseSessionCtx.Provider>
-  ) : null;
+  return activeState ? <Comp {...props}>{children}</Comp> : null;
 }
 
 export function SignInSessionList({ asChild, children, includeCurrentSession, ...props }: SignInSessionListProps) {

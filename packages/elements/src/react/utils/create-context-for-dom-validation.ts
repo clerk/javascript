@@ -19,7 +19,7 @@ export function createContextForDomValidation(displayName: string) {
 
   Provider.displayName = displayName;
 
-  function useContext(allowMissingContext: boolean = false) {
+  function useContext(allowMissingContext = false) {
     const context = React.useContext(ReactContext);
 
     if (!allowMissingContext && !context) {
