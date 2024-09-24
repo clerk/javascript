@@ -66,7 +66,7 @@ export const AuthErrorReason = {
   SessionTokenMissing: 'session-token-missing',
   SessionTokenExpired: 'session-token-expired',
   SessionTokenIATBeforeClientUAT: 'session-token-iat-before-client-uat',
-  SessionTokenNotActiveYet: 'session-token-not-active-yet',
+  SessionTokenNBF: 'session-token-nbf',
   SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   UnexpectedError: 'unexpected-error',

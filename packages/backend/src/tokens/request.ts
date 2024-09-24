@@ -16,16 +16,16 @@ import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
 
-const RefreshTokenErrorReason = {
-  NoCookie: 'no-cookie',
-  NonEligible: 'non-eligible',
+export const RefreshTokenErrorReason = {
+  NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
+  NonEligibleNonGet: 'non-eligible-non-get',
   InvalidSessionToken: 'invalid-session-token',
   MissingApiClient: 'missing-api-client',
   MissingSessionToken: 'missing-session-token',
   MissingRefreshToken: 'missing-refresh-token',
-  SessionTokenDecodeFailed: 'session-token-decode-failed',
-  FetchNetworkError: 'fetch-network-error',
-  UnexpectedRefreshError: 'unexpected-refresh-error',
+  ExpiredSessionTokenDecodeFailed: 'expired-session-token-decode-failed',
+  FetchError: 'fetch-error',
+  UnexpectedSDKError: 'unexpected-sdk-error',
 } as const;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -110,13 +110,7 @@ export async function authenticateRequest(
     return updatedURL;
   }
 
-  function buildRedirectToHandshake({
-    handshakeReason,
-    refreshError,
-  }: {
-    handshakeReason: AuthErrorReason;
-    refreshError: string;
-  }) {
+  function buildRedirectToHandshake({ handshakeReason }: { handshakeReason: string }) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
@@ -124,7 +118,6 @@ export async function authenticateRequest(
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
     url.searchParams.append(constants.QueryParameters.HandshakeReason, handshakeReason);
-    url.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshError);
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -238,8 +231,8 @@ ${error.getFullMessage()}`,
       return {
         data: null,
         error: {
-          message: 'Unable to decode session token.',
-          cause: { reason: RefreshTokenErrorReason.SessionTokenDecodeFailed, errors: decodedErrors },
+          message: 'Unable to decode the expired session token.',
+          cause: { reason: RefreshTokenErrorReason.ExpiredSessionTokenDecodeFailed, errors: decodedErrors },
         },
       };
     }
@@ -261,7 +254,7 @@ ${error.getFullMessage()}`,
             data: null,
             error: {
               message: `Fetch unexpected error`,
-              cause: { reason: RefreshTokenErrorReason.FetchNetworkError, errors: err.errors },
+              cause: { reason: RefreshTokenErrorReason.FetchError, errors: err.errors },
             },
           };
         }
@@ -305,22 +298,14 @@ ${error.getFullMessage()}`,
 
   function handleMaybeHandshakeStatus(
     authenticateContext: AuthenticateContext,
-    reason: AuthErrorReason,
+    reason: string,
     message: string,
     headers?: Headers,
-    refreshError?: string,
   ): SignedInState | SignedOutState | HandshakeState {
     if (isRequestEligibleForHandshake(authenticateContext)) {
-      // If a refresh error is not passed in, we default to 'no-cookie' or 'non-eligible'.
-      refreshError =
-        refreshError ||
-        (authenticateContext.refreshTokenInCookie
-          ? RefreshTokenErrorReason.NonEligible
-          : RefreshTokenErrorReason.NoCookie);
-
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason, refreshError });
+      const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason });
 
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
@@ -451,10 +436,6 @@ ${error.getFullMessage()}`,
       );
       const authErrReason = AuthErrorReason.SatelliteCookieNeedsSyncing;
       redirectURL.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
-      const refreshTokenError = authenticateContext.refreshTokenInCookie
-        ? RefreshTokenErrorReason.NonEligible
-        : RefreshTokenErrorReason.NoCookie;
-      redirectURL.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
@@ -477,10 +458,6 @@ ${error.getFullMessage()}`,
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
       const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
-      const refreshTokenError = authenticateContext.refreshTokenInCookie
-        ? RefreshTokenErrorReason.NonEligible
-        : RefreshTokenErrorReason.NoCookie;
-      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.RefreshTokenError, refreshTokenError);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
@@ -537,9 +514,7 @@ ${error.getFullMessage()}`,
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
-    let refreshError: string = authenticateContext.refreshTokenInCookie
-      ? RefreshTokenErrorReason.NonEligible
-      : RefreshTokenErrorReason.NoCookie;
+    let refreshError: string | null;
 
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       const { data, error } = await attemptRefresh(authenticateContext);
@@ -552,7 +527,16 @@ ${error.getFullMessage()}`,
       if (error?.cause?.reason) {
         refreshError = error.cause.reason;
       } else {
-        refreshError = RefreshTokenErrorReason.UnexpectedRefreshError;
+        refreshError = RefreshTokenErrorReason.UnexpectedSDKError;
+      }
+    } else {
+      if (request.method !== 'GET') {
+        refreshError = RefreshTokenErrorReason.NonEligibleNonGet;
+      } else if (!authenticateContext.refreshTokenInCookie) {
+        refreshError = RefreshTokenErrorReason.NonEligibleNoCookie;
+      } else {
+        //refresh error is not applicable if token verification error is not 'session-token-expired'
+        refreshError = null;
       }
     }
 
@@ -567,10 +551,8 @@ ${error.getFullMessage()}`,
     if (reasonToHandshake) {
       return handleMaybeHandshakeStatus(
         authenticateContext,
-        convertTokenVerificationErrorReasonToAuthErrorReason(err.reason),
+        convertTokenVerificationErrorReasonToAuthErrorReason({ tokenError: err.reason, refreshError }),
         err.getFullMessage(),
-        undefined,
-        refreshError,
       );
     }
 
@@ -592,14 +574,18 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
-const convertTokenVerificationErrorReasonToAuthErrorReason = (
-  reason: TokenVerificationErrorReason,
-): AuthErrorReason => {
-  switch (reason) {
+const convertTokenVerificationErrorReasonToAuthErrorReason = ({
+  tokenError,
+  refreshError,
+}: {
+  tokenError: TokenVerificationErrorReason;
+  refreshError: string | null;
+}): string => {
+  switch (tokenError) {
     case TokenVerificationErrorReason.TokenExpired:
-      return AuthErrorReason.SessionTokenExpired;
+      return `${AuthErrorReason.SessionTokenExpired}-refresh-${refreshError}`;
     case TokenVerificationErrorReason.TokenNotActiveYet:
-      return AuthErrorReason.SessionTokenNotActiveYet;
+      return AuthErrorReason.SessionTokenNBF;
     case TokenVerificationErrorReason.TokenIatInTheFuture:
       return AuthErrorReason.SessionTokenIatInTheFuture;
     default:
