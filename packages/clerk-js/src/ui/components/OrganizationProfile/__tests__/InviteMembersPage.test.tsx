@@ -41,6 +41,8 @@ describe('InviteMembersPage', () => {
     getByText('Enter or paste one or more email addresses, separated by spaces or commas.');
   });
 
+  it.todo("automatically selects the organization's default role");
+
   describe('Submitting', () => {
     it('keeps the Send button disabled until a role is selected and one or more email has been entered', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
