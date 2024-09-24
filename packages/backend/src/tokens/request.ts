@@ -16,7 +16,7 @@ import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
 
-const RefreshTokenErrorReason = {
+export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
   NonEligibleNonGet: 'non-eligible-non-get',
   InvalidSessionToken: 'invalid-session-token',
