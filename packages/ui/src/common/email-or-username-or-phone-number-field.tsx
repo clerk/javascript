@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useFocusInput } from '~/hooks/use-focus-input';
 import { link } from '~/primitives/link';
 
 import { EmailOrUsernameField } from './email-or-username-field';
@@ -26,10 +27,15 @@ export function EmailOrUsernameOrPhoneNumberField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
+  const [inputRef, setInputFocus] = useFocusInput();
+
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
-      onChange={setShowPhoneNumberField}
+      onChange={isSelected => {
+        setShowPhoneNumberField(isSelected);
+        setInputFocus();
+      }}
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{LOCALIZATION_NEEDED.formFieldAccessibleLabel__emailOrUsernameOrPhone}</span>
@@ -42,12 +48,14 @@ export function EmailOrUsernameOrPhoneNumberField({
       name={name}
       alternativeFieldTrigger={toggle}
       {...props}
+      ref={inputRef}
     />
   ) : (
     <EmailOrUsernameField
       {...props}
       name={name}
       alternativeFieldTrigger={toggle}
+      ref={inputRef}
     />
   );
 }

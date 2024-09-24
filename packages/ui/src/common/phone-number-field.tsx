@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
+import { useFocusInput } from '~/hooks/use-focus-input';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
@@ -99,10 +100,10 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
   const commandListRef = React.useRef<HTMLDivElement>(null);
   const commandInputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.getBoundingClientRect()?.width || 0;
+  const [inputRef, setInputFocus] = useFocusInput();
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode,
     locationBasedCountryIso,
@@ -255,6 +256,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 onSelect={() => {
                                   setIso(iso);
                                   setOpen(false);
+                                  setInputFocus();
                                 }}
                                 data-checked={selectedCountry === countryOptions[index]}
                                 className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
@@ -262,7 +264,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 <span className='grid w-3 shrink-0 place-content-center'>
                                   {selectedCountry === countryOptions[index] && <CheckmarkSm className='size-4' />}
                                 </span>
-                                <span className='grow truncate'>{name}</span>
+                                <span className='text-gray-12 grow truncate'>{name}</span>
                                 <span className='text-gray-11 ms-auto'>+{code}</span>
                               </Command.Item>
                             );
@@ -277,7 +279,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   // Prevent tab stop
                   tabIndex={-1}
                   className='supports-ios:text-[length:1rem] grid cursor-text place-content-center bg-white px-1 text-base'
-                  onClick={() => inputRef.current?.focus()}
+                  onClick={() => setInputFocus()}
                   disabled={props.disabled}
                 >
                   +{selectedCountry.code}
