@@ -1,9 +1,8 @@
 import * as React from 'react';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
 import ExclamationTrianglelg from '~/primitives/icons/exclamation-triangle-lg';
@@ -59,17 +58,9 @@ const statusIcon: Record<Status, React.ReactElement> = {
 
 export function SignInStatus() {
   const { t } = useLocalizations();
-  const { branded } = useDisplayConfig();
-  const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
   const [status] = React.useState<Status>('loading');
-
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { footerProps } = useCard();
 
   return (
     <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
@@ -85,7 +76,7 @@ export function SignInStatus() {
           </Card.Body>
         ) : null}
       </Card.Content>
-      <Card.Footer {...cardFooterProps} />
+      <Card.Footer {...footerProps} />
     </Card.Root>
   );
 }
