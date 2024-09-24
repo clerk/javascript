@@ -42,7 +42,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
-  const roleField = useFormControl('role', '', {
+  const defaultRole = useDefaultRole();
+
+  const roleField = useFormControl('role', defaultRole ?? '', {
     label: localizationKeys('formFieldLabel__role'),
   });
 
@@ -183,6 +185,31 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   );
 };
 
+const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
+  const { options, isLoading } = useFetchRoles();
+
+  const { t } = useLocalizations();
+
+  return (
+    <Form.ControlRow elementId={field.id}>
+      <Flex
+        direction='col'
+        gap={2}
+      >
+        <RoleSelect
+          {...field.props}
+          roles={options}
+          isDisabled={isLoading}
+          onChange={value => field.setValue(value)}
+          triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
+          optionListSx={t => ({ minWidth: t.sizes.$48 })}
+          prefixLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
+        />
+      </Flex>
+    </Form.ControlRow>
+  );
+};
+
 /**
  * Determines default role from the organization settings or fallback to
  * the only available role.
@@ -198,31 +225,4 @@ const useDefaultRole = () => {
   }
 
   return defaultRole;
-};
-
-const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
-  const { options, isLoading } = useFetchRoles();
-  const defaultRole = useDefaultRole();
-
-  const { t } = useLocalizations();
-
-  return (
-    <Form.ControlRow elementId={field.id}>
-      <Flex
-        direction='col'
-        gap={2}
-      >
-        <RoleSelect
-          {...field.props}
-          value={field.props.value || (defaultRole ?? '')}
-          roles={options}
-          isDisabled={isLoading}
-          onChange={value => field.setValue(value)}
-          triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
-          optionListSx={t => ({ minWidth: t.sizes.$48 })}
-          prefixLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
-        />
-      </Flex>
-    </Form.ControlRow>
-  );
 };
