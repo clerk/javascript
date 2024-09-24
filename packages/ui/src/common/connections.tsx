@@ -66,6 +66,8 @@ export function Connections(
       ? props.textVisuallyHidden
       : enabledConnections.length > 2 || options?.socialButtonsVariant === 'iconButton';
   const columns = getColumnCount({ length: enabledConnections.length, max: props?.columns || 6 });
+  const localizationKey =
+    enabledConnections.length === 1 ? 'socialButtonsBlockButton' : 'socialButtonsBlockButtonManyInView';
 
   return hasConnection ? (
     <ul
@@ -92,13 +94,9 @@ export function Connections(
                       iconStart={PROVIDERS[c.provider] || null}
                       textVisuallyHidden={textVisuallyHidden}
                     >
-                      {enabledConnections.length === 1
-                        ? t('socialButtonsBlockButton', {
-                            provider: c.name,
-                          })
-                        : t('socialButtonsBlockButtonManyInView', {
-                            provider: c.name,
-                          })}
+                      {t(localizationKey, {
+                        provider: c.name,
+                      })}
                     </Button>
                   </Common.Connection>
                 );
