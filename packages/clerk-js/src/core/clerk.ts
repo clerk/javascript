@@ -148,10 +148,8 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
-function assertClerkIsLoaded(clerk: ClerkInterface): asserts clerk is LoadedClerk {
-  if (!clerk.client) {
-    throw new Error(`Clerk: Failed to load client`);
-  }
+function clerkIsLoaded(clerk: ClerkInterface): clerk is LoadedClerk {
+  return !!clerk.client;
 }
 
 export class Clerk implements ClerkInterface {
@@ -327,13 +325,14 @@ export class Clerk implements ClerkInterface {
     } else {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
-    assertClerkIsLoaded(this);
 
-    this.__experimental_ui = new UI({
-      router: this.#options.__experimental_router,
-      clerk: this,
-      options: this.#options,
-    });
+    if (clerkIsLoaded(this)) {
+      this.__experimental_ui = new UI({
+        router: this.#options.__experimental_router,
+        clerk: this,
+        options: this.#options,
+      });
+    }
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
