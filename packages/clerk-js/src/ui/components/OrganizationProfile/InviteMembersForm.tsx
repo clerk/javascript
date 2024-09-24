@@ -42,9 +42,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
-  const defaultRole = useDefaultRole();
-
-  const roleField = useFormControl('role', defaultRole ?? '', {
+  const roleField = useFormControl('role', '', {
     label: localizationKeys('formFieldLabel__role'),
   });
 
@@ -190,6 +188,8 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
 
   const { t } = useLocalizations();
 
+  const defaultRole = useDefaultRole();
+
   return (
     <Form.ControlRow elementId={field.id}>
       <Flex
@@ -198,6 +198,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       >
         <RoleSelect
           {...field.props}
+          value={field.props.value || (defaultRole ?? '')}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
