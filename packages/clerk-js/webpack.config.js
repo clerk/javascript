@@ -271,6 +271,7 @@ const prodConfig = ({ mode }) => {
     output: {
       filename: '[name].js',
       libraryTarget: 'commonjs',
+      scriptType: 'text/javascript',
     },
   });
 
