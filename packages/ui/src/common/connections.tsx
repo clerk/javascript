@@ -68,47 +68,45 @@ export function Connections(
   const columns = getColumnCount({ length: enabledConnections.length, max: props?.columns || 6 });
 
   return hasConnection ? (
-    <div>
-      <ul
-        className='-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]'
-        style={{ '--cl-connection-columns': columns } as React.CSSProperties}
-      >
-        {enabledConnections.map(c => {
-          return (
-            <li
-              key={c.provider}
-              className='w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]'
-            >
-              <Common.Loading scope={`provider:${c.provider}`}>
-                {isConnectionLoading => {
-                  return (
-                    <Common.Connection
-                      name={c.provider}
-                      asChild
+    <ul
+      className='-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]'
+      style={{ '--cl-connection-columns': columns } as React.CSSProperties}
+    >
+      {enabledConnections.map(c => {
+        return (
+          <li
+            key={c.provider}
+            className='w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]'
+          >
+            <Common.Loading scope={`provider:${c.provider}`}>
+              {isConnectionLoading => {
+                return (
+                  <Common.Connection
+                    name={c.provider}
+                    asChild
+                  >
+                    <Button
+                      intent='connection'
+                      busy={isConnectionLoading}
+                      disabled={props?.disabled || isConnectionLoading}
+                      iconStart={PROVIDERS[c.provider] || null}
+                      textVisuallyHidden={textVisuallyHidden}
                     >
-                      <Button
-                        intent='connection'
-                        busy={isConnectionLoading}
-                        disabled={props?.disabled || isConnectionLoading}
-                        iconStart={PROVIDERS[c.provider] || null}
-                        textVisuallyHidden={textVisuallyHidden}
-                      >
-                        {enabledConnections.length === 1
-                          ? t('socialButtonsBlockButton', {
-                              provider: c.name,
-                            })
-                          : t('socialButtonsBlockButtonManyInView', {
-                              provider: c.name,
-                            })}
-                      </Button>
-                    </Common.Connection>
-                  );
-                }}
-              </Common.Loading>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+                      {enabledConnections.length === 1
+                        ? t('socialButtonsBlockButton', {
+                            provider: c.name,
+                          })
+                        : t('socialButtonsBlockButtonManyInView', {
+                            provider: c.name,
+                          })}
+                    </Button>
+                  </Common.Connection>
+                );
+              }}
+            </Common.Loading>
+          </li>
+        );
+      })}
+    </ul>
   ) : null;
 }
