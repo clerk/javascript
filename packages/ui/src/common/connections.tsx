@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { useAppearance } from '~/contexts';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import { PROVIDERS } from '~/primitives/icons/providers';
 
@@ -56,6 +57,7 @@ function getColumnCount({ length, max }: Record<'length' | 'max', number>): numb
 export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,
 ) {
+  const { t } = useLocalizations();
   const enabledConnections = useEnabledConnections();
   const { options } = useAppearance().parsedAppearance;
   const hasConnection = enabledConnections.length > 0;
@@ -91,7 +93,13 @@ export function Connections(
                         iconStart={PROVIDERS[c.provider] || null}
                         textVisuallyHidden={textVisuallyHidden}
                       >
-                        {c.name}
+                        {enabledConnections.length === 1
+                          ? t('socialButtonsBlockButton', {
+                              provider: c.name,
+                            })
+                          : t('socialButtonsBlockButtonManyInView', {
+                              provider: c.name,
+                            })}
                       </Button>
                     </Common.Connection>
                   );
