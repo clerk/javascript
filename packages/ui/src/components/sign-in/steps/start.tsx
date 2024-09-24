@@ -36,7 +36,7 @@ export function SignInStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
@@ -68,7 +68,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
+                  {options.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -135,7 +135,7 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
-                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
+                  {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
                   <Common.Loading scope='submit'>

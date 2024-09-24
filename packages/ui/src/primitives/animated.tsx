@@ -9,7 +9,7 @@ export const Animated = (props: AnimatedProps) => {
   const { children, asChild } = props;
   // TODO: Once https://github.com/clerk/javascript/pull/3976 has been merged read from parsedLayout
   // const { animations } = useAppearance().parsedLayout;
-  const { animations } = useAppearance().parsedAppearance.layout;
+  const { animations } = useAppearance().parsedAppearance.options;
   const [parent] = useAutoAnimate();
   const ref = animations !== false ? parent : null;
 
