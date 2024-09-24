@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.22.4
+
+### Patch Changes
+
+- Fix UserProfile and OrganizationProfile wrong padding on footer for small screens when Development notice is enabled ([#4191](https://github.com/clerk/javascript/pull/4191)) by [@octoper](https://github.com/octoper)
+
+- Internal change to move `iconImageUrl` util to `shared` package. ([#4188](https://github.com/clerk/javascript/pull/4188)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only render the Sign out of all accounts action within `<UserButton />` when there are multiple sessions. ([#4200](https://github.com/clerk/javascript/pull/4200)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cb32aaf59`](https://github.com/clerk/javascript/commit/cb32aaf59d38dcd12e959f542782f71a87adf9c1), [`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7), [`6275c242c`](https://github.com/clerk/javascript/commit/6275c242cd8bcb6f7766934059967e0fe775a0c1), [`f9faaf031`](https://github.com/clerk/javascript/commit/f9faaf03100baf679c78e6c24877fbf3b60be529)]:
+  - @clerk/shared@2.8.2
+  - @clerk/types@4.21.1
+  - @clerk/localizations@3.0.5
+
 ## 5.22.3
 
 ### Patch Changes
