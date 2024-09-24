@@ -34,7 +34,9 @@ type CreateParams = {
   maxAllowedMemberships?: number;
 } & MetadataParams;
 
-type GetOrganizationParams = { organizationId: string } | { slug: string };
+type GetOrganizationParams = ({ organizationId: string } | { slug: string }) & {
+  includeMembersCount?: boolean;
+};
 
 type UpdateParams = {
   name?: string;
@@ -115,12 +117,16 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async getOrganization(params: GetOrganizationParams) {
+    const { includeMembersCount } = params;
     const organizationIdOrSlug = 'organizationId' in params ? params.organizationId : params.slug;
     this.requireId(organizationIdOrSlug);
 
     return this.request<Organization>({
       method: 'GET',
       path: joinPaths(basePath, organizationIdOrSlug),
+      queryParams: {
+        includeMembersCount,
+      },
     });
   }
 
