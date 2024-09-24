@@ -1,6 +1,14 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { joinURL } from '@clerk/shared/url';
-import type { PrepareFirstFactorParams, SignInFirstFactor, SignInStatus, SignInStrategy } from '@clerk/types';
+import type {
+  PrepareFirstFactorParams,
+  PrepareSecondFactorParams,
+  SignInFirstFactor,
+  SignInResource,
+  SignInSecondFactor,
+  SignInStatus,
+  SignInStrategy,
+} from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
@@ -18,7 +26,7 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { FormMachine } from '~/internals/machines/form';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
-import { assertActorEventError } from '~/internals/machines/utils/assert';
+import { assertActorEventDone, assertActorEventError } from '~/internals/machines/utils/assert';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 import {
@@ -60,38 +68,57 @@ export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
   actors: {
-    // Global
+    // Global Actors
     attemptPasskey,
     attemptWeb3,
 
-    // Start
+    // Start Actors
     startAttempt,
 
-    // First Factor
+    // First Factor Actors
     firstFactorAttempt,
     firstFactorDetermineStartingFactor,
     firstFactorPrepare,
 
-    // Second Factor
+    // Second Factor Actors
     secondFactorAttempt,
     secondFactorDetermineStartingFactor,
     secondFactorPrepare,
 
-    // Reset Password
+    // Reset Password Actors
     resetPasswordAttempt,
 
     // Shared Machines
     formMachine: FormMachine,
     thirdPartyMachine: ThirdPartyMachine,
 
-    // Other
+    // Other Actors
     webAuthnAutofillSupport,
   },
   actions: {
+    // Clears all form errors
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
+    // Clears all registered strategies used within the validation step
     clearRegisteredStrategies: assign({ registeredStrategies: new Set() }),
-    // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
-    goToNextStep: raise(({ event }) => ({ type: 'NEXT', resource: event?.output || event?.data })),
+    // Returns the machine to the Init state after a delay
+    delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
+    // Continues to the next valid step in the sign-in flow
+    goToNextStep: raise(({ event }) => {
+      assertActorEventDone(event);
+      return { type: 'NEXT', resource: event?.output } as SignInRouterNextEvent;
+    }),
+    // goToNextStep: enqueueActions(({ context, enqueue, event }) => {
+    //   // {
+    //   //   type: 'setResource',
+    //   //   params: ({ event }) => ({ resource: event.output }),
+    //   // },
+    //   //
+    //   assertActorEventDone(event);
+
+    //   enqueue.assign({ resource: event?.output || context.clerk?.client.signIn });
+    //   enqueue.raise(({ event }) => ({ type: 'NEXT', resource: event?.output || event?.data }));
+    // }),
+
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) {
         return;
@@ -143,8 +170,8 @@ export const SignInRouterMachine = setup({
       resendable: false,
       resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
-    setActive: enqueueActions(({ enqueue, check, context, event }) => {
-      if (check('isExampleMode')) {
+    setActive: ({ context, event }) => {
+      if (context.exampleMode) {
         return;
       }
 
@@ -155,12 +182,24 @@ export const SignInRouterMachine = setup({
 
       const session = id || createdSessionId || lastActiveSessionId || null;
 
-      const beforeEmit = () =>
+      console.log('setActive', { id, lastActiveSessionId, createdSessionId, session });
+      const beforeEmit = async () => {
+        console.log('beforeEmit');
         context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
+        return Promise.resolve(true);
+      };
 
-      void context.clerk.setActive({ session, beforeEmit }).then(() => {
-        enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
-      });
+      console.log('Running setActive');
+      void context.clerk.setActive({ session, beforeEmit });
+    },
+
+    // setResource: enqueueActions(({ context, enqueue }) => {
+    //   const resource = context.clerk.client.signIn;
+    //   enqueue.send({ type: 'RESOURCE.SET', resource });
+    // }),
+    //
+    setResource: assign({
+      resource: (_, { resource }: { resource?: SignInResource }) => resource,
     }),
     setConsoleError: ({ event }) => {
       if (process.env.NODE_ENV !== 'development') {
@@ -456,7 +495,7 @@ export const SignInRouterMachine = setup({
         },
         {
           guard: 'isComplete',
-          actions: 'setActive',
+          actions: ['setActive', 'delayedReset'],
         },
         {
           guard: 'isLoggedInAndSingleSession',
@@ -503,7 +542,7 @@ export const SignInRouterMachine = setup({
         NEXT: [
           {
             guard: 'isComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -660,7 +699,7 @@ export const SignInRouterMachine = setup({
         NEXT: [
           {
             guard: 'isComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsSecondFactor',
@@ -746,7 +785,6 @@ export const SignInRouterMachine = setup({
           description: 'Waiting for user input',
           on: {
             'AUTHENTICATE.PASSKEY': {
-              guard: not('isExampleMode'),
               target: 'AttemptingPasskey',
               reenter: true,
             },
@@ -892,26 +930,13 @@ export const SignInRouterMachine = setup({
     },
     SecondFactor: {
       tags: ['step:second-factor', 'step:verifications'],
-      // invoke: {
-      //   id: 'secondFactor',
-      //   src: 'secondFactorMachine',
-      //   input: ({ context, self }) => ({
-      //     formRef: context.formRef,
-      //     parent: self,
-      //   }),
-      //   onDone: {
-      //     actions: 'raiseNext',
-      //   },
-      // },
+      // exit: 'clearRegisteredStrategies', // TODO
       on: {
-        'RESET.STEP': {
-          target: 'SecondFactor',
-          reenter: true,
-        },
+        'NAVIGATE.PREVIOUS': '.Hist',
         NEXT: [
           {
             guard: 'isComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsNewPassword',
@@ -919,32 +944,176 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
-        'STRATEGY.UPDATE': {
-          description: 'Send event to verification machine to update the current strategy.',
-          actions: sendTo('secondFactor', ({ event }) => event),
-          target: '.Idle',
+        'RESET.STEP': {
+          target: 'SecondFactor',
+          reenter: true,
+        },
+        'STRATEGY.REGISTER': {
+          actions: assign({
+            registeredStrategies: ({ context, event }) => context.registeredStrategies.add(event.factor),
+          }),
+        },
+        'STRATEGY.UNREGISTER': {
+          actions: assign({
+            registeredStrategies: ({ context, event }) => {
+              context.registeredStrategies.delete(event.factor);
+              return context.registeredStrategies;
+            },
+          }),
         },
       },
-      initial: 'Idle',
+      initial: 'Init',
       states: {
-        Idle: {
-          on: {
-            'NAVIGATE.CHOOSE_STRATEGY': {
-              description: 'Navigate to choose strategy screen.',
-              actions: sendTo('secondFactor', ({ event }) => event),
-              target: 'ChoosingStrategy',
+        Init: {
+          tags: ['state:preparing', 'state:loading'],
+          invoke: {
+            id: 'secondFactorDetermineStartingFactor',
+            src: 'secondFactorDetermineStartingFactor',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+            }),
+            onDone: {
+              target: 'Preparing',
+              actions: assign({
+                verificationCurrentFactor: ({ event }) => event.output,
+              }),
+            },
+            onError: {
+              target: 'Preparing',
+              actions: [
+                log('Clerk [Sign In Verification]: Error determining starting factor'),
+                assign({
+                  verificationCurrentFactor: { strategy: 'password' },
+                }),
+              ],
             },
           },
         },
-        ChoosingStrategy: {
-          tags: ['step:choose-strategy'],
-          on: {
-            'NAVIGATE.PREVIOUS': {
-              description: 'Go to Idle, and also tell firstFactor to go to Pending',
-              target: 'Idle',
-              actions: sendTo('secondFactor', { type: 'NAVIGATE.PREVIOUS' }),
+        Preparing: {
+          tags: ['state:preparing', 'state:loading'],
+          invoke: {
+            id: 'secondFactorPrepare',
+            src: 'secondFactorPrepare',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              resendable: context.resendable,
+              params: context.verificationCurrentFactor as PrepareSecondFactorParams,
+            }),
+            onDone: {
+              actions: 'resendableReset',
+              target: 'Pending',
+            },
+            onError: {
+              actions: ['setFormErrors', 'setConsoleError'],
+              target: 'Pending',
             },
           },
+        },
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
+            RETRY: 'Preparing',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
+          },
+          initial: 'Init',
+          states: {
+            Init: {
+              description: 'Marks appropriate factors as never resendable.',
+              always: [
+                {
+                  guard: 'isNeverResendable',
+                  target: 'NeverResendable',
+                },
+                {
+                  target: 'NotResendable',
+                },
+              ],
+            },
+            Resendable: {
+              description: 'Waiting for user to retry',
+            },
+            NeverResendable: {
+              description: 'Handles never resendable',
+              on: {
+                RETRY: {
+                  actions: log('Never retriable'),
+                },
+              },
+            },
+            NotResendable: {
+              description: 'Handle countdowns',
+              on: {
+                RETRY: {
+                  actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                },
+              },
+              after: {
+                resendableTimeout: [
+                  {
+                    description: 'Set as retriable if countdown is 0',
+                    guard: 'isResendable',
+                    actions: 'resendableTick',
+                    target: 'Resendable',
+                  },
+                  {
+                    description: 'Continue countdown if not retriable',
+                    actions: 'resendableTick',
+                    target: 'NotResendable',
+                    reenter: true,
+                  },
+                ],
+              },
+            },
+          },
+          after: {
+            3000: {
+              actions: 'validateRegisteredStrategies',
+            },
+          },
+        },
+        ChooseStrategy: {
+          tags: ['step:choose-strategy'],
+          on: {
+            'NAVIGATE.PREVIOUS': 'Pending',
+            'STRATEGY.UPDATE': {
+              actions: 'setValidationStrategy',
+              target: 'Preparing',
+            },
+          },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'verifications',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'secondFactorAttempt',
+            src: 'secondFactorAttempt',
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              currentFactor: context.verificationCurrentFactor as SignInSecondFactor | null,
+              fields: context.formRef.getSnapshot().context.fields,
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
+        Hist: {
+          type: 'history',
         },
       },
     },
@@ -959,7 +1128,7 @@ export const SignInRouterMachine = setup({
         NEXT: [
           {
             guard: 'isComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -1024,7 +1193,7 @@ export const SignInRouterMachine = setup({
           },
           {
             guard: or(['isLoggedIn', 'isComplete', 'hasAuthenticatedViaClerkJS']),
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsIdentifier',
@@ -1052,10 +1221,13 @@ export const SignInRouterMachine = setup({
       tags: ['step:choose-session'],
       on: {
         'SESSION.SET_ACTIVE': {
-          actions: {
-            type: 'setActive',
-            params: ({ event }) => ({ id: event.id }),
-          },
+          actions: [
+            {
+              type: 'setActive',
+              params: ({ event }) => ({ id: event.id }),
+            },
+            'delayedReset',
+          ],
         },
       },
     },

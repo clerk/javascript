@@ -42,7 +42,7 @@ function CustomProvider({
   children: string;
   provider: ComponentProps<typeof Clerk.Connection>['name'];
 }) {
-  return null; // Remove this line to enable custom provider
+  // return null; // Remove this line to enable custom providers
   return (
     <Clerk.Loading scope={`provider:${provider}`}>
       {isLoading => (

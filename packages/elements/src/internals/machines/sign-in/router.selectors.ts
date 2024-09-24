@@ -39,8 +39,8 @@ export function SignInSafeIdentifierSelectorForStrategy(
  * Returns a formatted salutation given the current sign-in context / identifiable information available.
  */
 export function SignInSalutationSelector(s: SignInRouterSnapshot): string {
+  // const signIn = s.context.resource || s.context.clerk?.client.signIn;
   const signIn = s.context.clerk?.client.signIn;
-
   return formatSalutation({
     firstName: signIn?.userData?.firstName,
     identifier: signIn?.identifier,

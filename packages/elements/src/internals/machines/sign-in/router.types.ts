@@ -67,8 +67,12 @@ export type SignInRouterFormAttachEvent = BaseRouterFormAttachEvent;
 export type SignInRouterNextEvent = BaseRouterNextEvent<SignInResource>;
 export type SignInRouterStartEvent = BaseRouterStartEvent;
 export type SignInRouterPrevEvent = BaseRouterPrevEvent;
-export type SignInRouterChooseStrategyEvent = { type: 'NAVIGATE.CHOOSE_STRATEGY' };
-export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD' };
+export type SignInRouterChooseStrategyEvent = {
+  type: 'NAVIGATE.CHOOSE_STRATEGY';
+};
+export type SignInRouterForgotPasswordEvent = {
+  type: 'NAVIGATE.FORGOT_PASSWORD';
+};
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
@@ -83,13 +87,28 @@ export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
 export type SignInRouterPasskeyAutofillEvent = {
   type: 'AUTHENTICATE.PASSKEY.AUTOFILL';
 };
-export type SignInRouterSessionSetActiveEvent = { type: 'SESSION.SET_ACTIVE'; id: string };
+export type SignInRouterSessionSetActiveEvent = {
+  type: 'SESSION.SET_ACTIVE';
+  id: string;
+};
 
-export type SignInVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
-export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
+export type SignInVerificationSubmitEvent = {
+  type: 'SUBMIT';
+  action: 'submit';
+};
+export type SignInVerificationFactorUpdateEvent = {
+  type: 'STRATEGY.UPDATE';
+  factor: SignInFactor | undefined;
+};
 export type SignInVerificationRetryEvent = { type: 'RETRY' };
-export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };
-export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInStrategyName };
+export type SignInVerificationStrategyRegisterEvent = {
+  type: 'STRATEGY.REGISTER';
+  factor: SignInStrategyName;
+};
+export type SignInVerificationStrategyUnregisterEvent = {
+  type: 'STRATEGY.UNREGISTER';
+  factor: SignInStrategyName;
+};
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -137,6 +156,7 @@ export interface SignInRouterContext extends BaseRouterContext {
   loading: SignInRouterLoadingContext;
   signUpPath: string;
   webAuthnAutofillSupport: boolean;
+  // resource?: SignInResource;
 
   // Verifications
   verificationCurrentFactor: SignInFactor | null;
@@ -169,9 +189,9 @@ export interface SignInRouterSchema {
 
 // ---------------------------------- Schema ---------------------------------- //
 
-export type SignInRouterChildren = any; // TODO: Update
-export type SignInRouterOuptut = any; // TODO: Update
-export type SignInRouterStateValue = any; // TODO: Update
+export type SignInRouterChildren = any; // eslint-expect-error @typescript-eslint/no-redundant-type-constituents
+export type SignInRouterOuptut = any; // eslint-expect-error @typescript-eslint/no-redundant-type-constituents
+export type SignInRouterStateValue = any; // eslint-expect-error @typescript-eslint/no-redundant-type-constituents
 
 export type SignInRouterSnapshot = MachineSnapshot<
   SignInRouterContext,
