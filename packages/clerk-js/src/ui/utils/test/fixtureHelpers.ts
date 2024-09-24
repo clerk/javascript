@@ -296,9 +296,10 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
     os.max_allowed_memberships = max;
   };
 
-  const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[]) => {
+  const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
+    os.domains.default_role = defaultRole ?? null;
   };
   return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
 };

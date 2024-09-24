@@ -11,6 +11,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   domains!: {
     enabled: boolean;
     enrollmentModes: OrganizationEnrollmentMode[];
+    defaultRole: string | null;
   };
 
   public constructor(data: OrganizationSettingsJSON) {
@@ -26,6 +27,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     this.domains = {
       enabled: domains?.enabled || false,
       enrollmentModes: domains?.enrollment_modes || [],
+      defaultRole: domains?.default_role || null,
     };
     return this;
   }
