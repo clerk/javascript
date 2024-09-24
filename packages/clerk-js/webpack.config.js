@@ -271,6 +271,7 @@ const prodConfig = ({ mode }) => {
     output: {
       filename: '[name].js',
       libraryTarget: 'commonjs',
+      chunkFormat: 'commonjs',
       scriptType: 'text/javascript',
     },
   });
