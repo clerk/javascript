@@ -17,7 +17,7 @@ import { extractDigits, formatPhoneNumber, parsePhoneString } from '~/utils/phon
 
 type UseFormattedPhoneNumberProps = {
   initPhoneWithCode: string;
-  locationBasedCountryIso?: CountryIso;
+  locationBasedCountryIso?: CountryIso | null;
 };
 
 const format = (str: string, iso: CountryIso) => {
@@ -93,8 +93,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
   const clerk = useClerk();
-  // TODO to fix IsomorphicClerk
-  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
+  const locationBasedCountryIso = clerk.__internal_country as UseFormattedPhoneNumberProps['locationBasedCountryIso'];
   const { t, translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);

@@ -13,7 +13,7 @@ describe('AppearanceContext', () => {
     const { result } = renderHook(useAppearance, { wrapper });
     expect(result.current).toStrictEqual({
       parsedAppearance: {
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: fullTheme,
         theme: fullTheme,
       },
@@ -30,7 +30,7 @@ describe('AppearanceContext', () => {
     const { result } = renderHook(useAppearance, { wrapper });
     expect(result.current).toStrictEqual({
       parsedAppearance: {
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: {
           ...fullTheme,
           alert__warning: {
@@ -60,7 +60,7 @@ describe('AppearanceContext', () => {
     const { result } = renderHook(useAppearance, { wrapper });
     expect(result.current).toStrictEqual({
       parsedAppearance: {
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: {
           ...fullTheme,
           alert__warning: {
@@ -76,7 +76,7 @@ describe('AppearanceContext', () => {
         elements: {
           alert__warning: 'class-two class-three',
         },
-        layout: {},
+        options: {},
       },
     });
   });
@@ -93,7 +93,7 @@ describe('AppearanceContext', () => {
     const { result } = renderHook(useAppearance, { wrapper });
     expect(result.current).toStrictEqual({
       parsedAppearance: {
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: {
           ...fullTheme,
           alert__warning: {
@@ -111,7 +111,7 @@ describe('AppearanceContext', () => {
             background: 'red',
           },
         },
-        layout: {},
+        options: {},
       },
     });
   });
