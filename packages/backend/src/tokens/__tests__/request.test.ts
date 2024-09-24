@@ -13,7 +13,7 @@ import {
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest } from '../request';
+import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -238,7 +238,9 @@ export default (QUnit: QUnit) => {
 
       const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenExpired });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.strictEqual(requestState.toAuth(), null);
     });
 
@@ -554,7 +556,9 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenExpired });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
