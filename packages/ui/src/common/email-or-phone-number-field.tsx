@@ -2,6 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
+import { useFocusInput } from '~/hooks/use-focus-input';
 import { link } from '~/primitives/link';
 
 import { EmailField } from './email-field';
@@ -25,10 +26,15 @@ export function EmailOrPhoneNumberField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
+  const [inputRef, setInputFocus] = useFocusInput();
+
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
-      onChange={setShowPhoneNumberField}
+      onChange={isSelected => {
+        setShowPhoneNumberField(isSelected);
+        setInputFocus();
+      }}
       className={link({ size: 'sm', disabled: props.disabled })}
     >
       {showPhoneNumberField ? toggleLabelEmail : toggleLabelPhoneNumber}
@@ -40,12 +46,14 @@ export function EmailOrPhoneNumberField({
       alternativeFieldTrigger={toggle}
       name={name}
       {...props}
+      ref={inputRef}
     />
   ) : (
     <EmailField
       {...props}
       name={name}
       alternativeFieldTrigger={toggle}
+      ref={inputRef}
     />
   );
 }

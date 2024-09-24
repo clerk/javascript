@@ -67,6 +67,8 @@ export function SignInVerifications() {
 
                   <Card.Body>
                     <PasswordField
+                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                      autoFocus
                       label={t('formFieldLabel__password')}
                       alternativeFieldTrigger={
                         isPasswordResetSupported ? (

@@ -8,16 +8,19 @@ import * as Field from '~/primitives/field';
 
 const DEFAULT_FIELD_NAME = 'emailAddress';
 
-export function EmailField({
-  alternativeFieldTrigger,
-  name = DEFAULT_FIELD_NAME,
-  enabled,
-  required,
-  ...props
-}: {
-  alternativeFieldTrigger?: React.ReactNode;
-  enabled?: boolean;
-} & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+export const EmailField = React.forwardRef(function EmailField(
+  {
+    alternativeFieldTrigger,
+    name = DEFAULT_FIELD_NAME,
+    enabled,
+    required,
+    ...props
+  }: {
+    alternativeFieldTrigger?: React.ReactNode;
+    enabled?: boolean;
+  } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
+) {
   const { t, translateError } = useLocalizations();
   const { enabled: attributeEnabled, required: attributeRequired } = useAttributes('email_address');
 
@@ -48,6 +51,7 @@ export function EmailField({
           {({ state }) => {
             return (
               <Common.Input
+                ref={forwardedRef}
                 type='email'
                 {...props}
                 required={isRequired}
@@ -70,4 +74,4 @@ export function EmailField({
       </Field.Root>
     </Common.Field>
   );
-}
+});
