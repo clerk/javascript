@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.21.1
+
+### Patch Changes
+
+- Improve JSDoc comments for some public API properties ([#4190](https://github.com/clerk/javascript/pull/4190)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.21.0
 
 ### Minor Changes

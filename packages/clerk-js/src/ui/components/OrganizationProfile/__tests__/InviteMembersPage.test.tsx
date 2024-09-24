@@ -1,6 +1,7 @@
 import type { OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
+import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
@@ -41,7 +42,156 @@ describe('InviteMembersPage', () => {
     getByText('Enter or paste one or more email addresses, separated by spaces or commas.');
   });
 
-  describe('Submitting', () => {
+  describe('with default role', () => {
+    it("initializes with the organization's default role", async () => {
+      const defaultRole = 'mydefaultrole';
+
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, defaultRole);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 2,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: defaultRole,
+            key: defaultRole,
+            name: defaultRole,
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await userEvent.click(getByRole('button', { name: /mydefaultrole/i }));
+    });
+
+    it("initializes if there's only one role available", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 1,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await waitFor(() => expect(getByRole('button', { name: /member/i })).toBeInTheDocument());
+    });
+
+    it("does not initialize if there's neither a default role nor a unique role", async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 1,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      fixtures.clerk.organization?.inviteMembers.mockResolvedValueOnce([{}] as OrganizationInvitationResource[]);
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      await waitFor(() => expect(getByRole('button', { name: /select role/i })).toBeInTheDocument());
+    });
+  });
+
+  describe('when submitting', () => {
     it('keeps the Send button disabled until a role is selected and one or more email has been entered', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -60,6 +210,17 @@ describe('InviteMembersPage', () => {
             id: 'member',
             key: 'member',
             name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
             description: '',
             permissions: [],
             createdAt: new Date(),
@@ -108,6 +269,17 @@ describe('InviteMembersPage', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
         ],
       });
 
@@ -149,6 +321,17 @@ describe('InviteMembersPage', () => {
             id: 'member',
             key: 'member',
             name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
             description: '',
             permissions: [],
             createdAt: new Date(),
@@ -259,6 +442,17 @@ describe('InviteMembersPage', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
         ],
       });
 
@@ -318,6 +512,17 @@ describe('InviteMembersPage', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
         ],
       });
 
@@ -368,6 +573,17 @@ describe('InviteMembersPage', () => {
             id: 'member',
             key: 'member',
             name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
             description: '',
             permissions: [],
             createdAt: new Date(),

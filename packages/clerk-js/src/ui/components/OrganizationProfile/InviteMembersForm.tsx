@@ -4,6 +4,7 @@ import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
+import { useEnvironment } from '../../contexts';
 import { Flex } from '../../customizables';
 import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
@@ -187,6 +188,8 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
 
   const { t } = useLocalizations();
 
+  const defaultRole = useDefaultRole();
+
   return (
     <Form.ControlRow elementId={field.id}>
       <Flex
@@ -195,6 +198,7 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       >
         <RoleSelect
           {...field.props}
+          value={field.props.value || (defaultRole ?? '')}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
@@ -205,4 +209,21 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       </Flex>
     </Form.ControlRow>
   );
+};
+
+/**
+ * Determines default role from the organization settings or fallback to
+ * the only available role.
+ */
+const useDefaultRole = () => {
+  const { options } = useFetchRoles();
+  const { organizationSettings } = useEnvironment();
+
+  let defaultRole = organizationSettings.domains.defaultRole;
+
+  if (!defaultRole && options?.length === 1) {
+    defaultRole = options[0].value;
+  }
+
+  return defaultRole;
 };

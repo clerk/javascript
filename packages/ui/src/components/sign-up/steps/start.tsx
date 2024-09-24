@@ -13,7 +13,7 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/contexts';
-import { useAttributes } from '~/hooks/use-attributes';
+import { useSignUpAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -30,12 +30,20 @@ export function SignUpStart() {
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
   const { t } = useLocalizations();
-  const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
-  const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
-  const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
-  const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
-  const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
-  const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
+  const { required: firstNameRequired, show: showFirstName } = useSignUpAttributes('first_name');
+  const { required: lastNameRequired, show: showLastName } = useSignUpAttributes('last_name');
+  const { enabled: usernameEnabled, required: usernameRequired, show: showUserName } = useSignUpAttributes('username');
+  const {
+    enabled: phoneNumberEnabled,
+    required: phoneNumberRequired,
+    show: showPhoneNumber,
+  } = useSignUpAttributes('phone_number');
+  const {
+    enabled: emailAddressEnabled,
+    required: emailAddressRequired,
+    show: showEmailAddress,
+  } = useSignUpAttributes('email_address');
+  const { required: passwordRequired, show: showPassword } = useSignUpAttributes('password');
   const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
@@ -81,7 +89,7 @@ export function SignUpStart() {
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
-                      {firstNameEnabled && lastNameEnabled ? (
+                      {showFirstName && showLastName ? (
                         <div className='flex gap-4'>
                           <FirstNameField
                             required={firstNameRequired}
@@ -94,7 +102,7 @@ export function SignUpStart() {
                         </div>
                       ) : null}
 
-                      {usernameEnabled ? (
+                      {showUserName ? (
                         <UsernameField
                           required={usernameRequired}
                           disabled={isGlobalLoading}
@@ -108,9 +116,9 @@ export function SignUpStart() {
                         />
                       ) : (
                         <>
-                          <EmailField disabled={isGlobalLoading} />
+                          {showEmailAddress ? <EmailField disabled={isGlobalLoading} /> : null}
 
-                          {phoneNumberEnabled ? (
+                          {showPhoneNumber ? (
                             <PhoneNumberField
                               required={phoneNumberRequired}
                               disabled={isGlobalLoading}
@@ -120,7 +128,7 @@ export function SignUpStart() {
                         </>
                       )}
 
-                      {passwordEnabled && passwordRequired ? (
+                      {showPassword ? (
                         <PasswordField
                           validatePassword
                           label={t('formFieldLabel__password')}
