@@ -15,7 +15,6 @@ import {
   stripScheme,
 } from '@clerk/shared';
 import { logger } from '@clerk/shared/logger';
-import type { ClerkHostRouter } from '@clerk/shared/router';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
@@ -39,6 +38,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
+  LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -148,9 +148,14 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
+function assertClerkIsLoaded(clerk: ClerkInterface): asserts clerk is LoadedClerk {
+  if (!clerk.client) {
+    throw new Error(`Clerk: Failed to load client`);
+  }
+}
+
 export class Clerk implements ClerkInterface {
-  // @ts-expect-error -- TODO: ensure defined
-  public ui: UI;
+  public __experimental_ui?: UI;
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -186,7 +191,6 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #router: ClerkHostRouter;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -313,11 +317,6 @@ export class Clerk implements ClerkInterface {
       });
     }
 
-    // @ts-expect-error -- TODO: type
-    this.#router = this.#options.router;
-    // @ts-expect-error -- TODO: type
-    this.ui = new UI({ router: this.#options.router, clerk: this, options: this.#options });
-
     this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
       this.#options.allowedRedirectOrigins,
       this.frontendApi,
@@ -328,6 +327,13 @@ export class Clerk implements ClerkInterface {
     } else {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
+    assertClerkIsLoaded(this);
+
+    this.__experimental_ui = new UI({
+      router: this.#options.__experimental_router,
+      clerk: this,
+      options: this.#options,
+    });
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -506,8 +512,8 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    if (props.experimental?.newComponents) {
-      this.ui.mount('SignIn', node, props);
+    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+      this.__experimental_ui.mount('SignIn', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
       void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
@@ -564,8 +570,8 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    if (props.experimental?.newComponents) {
-      this.ui.mount('SignUp', node, props);
+    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+      this.__experimental_ui.mount('SignUp', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
       void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>

@@ -10,8 +10,14 @@ import type { ComponentDefinition } from './types';
 
 type $TODO = any;
 
+function assertRouter(router: ClerkHostRouter | undefined): asserts router is ClerkHostRouter {
+  if (!router) {
+    throw new Error(`Clerk: Attempted to use functionality that requires the "router" option to be provided to Clerk.`);
+  }
+}
+
 export class UI {
-  router: ClerkHostRouter;
+  router?: ClerkHostRouter;
   clerk: LoadedClerk;
   options: ClerkOptions;
   componentRegistry = new Map<string, ComponentDefinition>();
@@ -20,7 +26,15 @@ export class UI {
   #renderer?: ReturnType<typeof init>;
   #wrapper: ComponentType<{ children: ReactNode }>;
 
-  constructor({ router, clerk, options }: { router: ClerkHostRouter; clerk: LoadedClerk; options: ClerkOptions }) {
+  constructor({
+    router,
+    clerk,
+    options,
+  }: {
+    router: ClerkHostRouter | undefined;
+    clerk: LoadedClerk;
+    options: ClerkOptions;
+  }) {
     this.router = router;
     this.clerk = clerk;
     this.options = options;
@@ -42,6 +56,7 @@ export class UI {
     });
 
     this.#wrapper = ({ children }) => {
+      assertRouter(this.router);
       return (
         <ClerkInstanceContext.Provider value={{ value: this.clerk }}>
           <OptionsContext.Provider value={this.options}>
