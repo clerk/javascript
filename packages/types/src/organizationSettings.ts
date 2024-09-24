@@ -13,6 +13,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   domains: {
     enabled: boolean;
     enrollment_modes: OrganizationEnrollmentMode[];
+    default_role: string | null;
   };
 }
 
@@ -25,5 +26,6 @@ export interface OrganizationSettingsResource extends ClerkResource {
   domains: {
     enabled: boolean;
     enrollmentModes: OrganizationEnrollmentMode[];
+    defaultRole: string | null;
   };
 }
