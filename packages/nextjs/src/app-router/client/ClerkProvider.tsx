@@ -110,8 +110,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    // @ts-expect-error -- TODO: type
-    router: clerkRouter,
+    __experimental_router: clerkRouter,
     routerPush: push,
     routerReplace: replace,
   });
