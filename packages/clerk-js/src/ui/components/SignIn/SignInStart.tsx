@@ -3,7 +3,7 @@ import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/
 import type { ClerkAPIError, SignInCreateParams, SignInResource } from '@clerk/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { ERROR_CODES } from '../../../core/constants';
+import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
@@ -410,13 +410,15 @@ export function _SignInStart(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
-          <Card.Action elementId='signIn'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
-            />
-          </Card.Action>
+          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink')}
+                to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Card.Action>
+          )}
         </Card.Footer>
       </Card.Root>
     </Flow.Part>
