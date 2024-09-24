@@ -109,11 +109,9 @@ export async function authenticateRequest(
   }
 
   function buildRedirectToHandshake({
-    requestURL,
     handshakeReason,
     refreshError,
   }: {
-    requestURL: URL;
     handshakeReason: AuthErrorReason;
     refreshError: string;
   }) {
@@ -130,7 +128,7 @@ export async function authenticateRequest(
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
-    const toActivate = getOrganizationSyncTarget(requestURL, options.organizationSyncOptions);
+    const toActivate = getOrganizationSyncTarget(authenticateContext.clerkUrl, options.organizationSyncOptions);
     if (toActivate) {
       const params = getOrganizationSyncQueryParams(toActivate);
 
@@ -284,7 +282,6 @@ ${error.getFullMessage()}`,
       const handshakeHeaders =
         headers ??
         buildRedirectToHandshake({
-          requestURL: authenticateContext.clerkUrl,
           handshakeReason: reason,
           refreshError,
         });
