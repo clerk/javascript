@@ -337,18 +337,14 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async updateOrganizationDomain(params: UpdateOrganizationDomainParams) {
-    const { organizationId, domainId, enrollmentMode, name, verified } = params;
+    const { organizationId, domainId, ...bodyParams } = params;
     this.requireId(organizationId);
     this.requireId(domainId);
 
     return this.request<OrganizationDomain>({
       method: 'PATCH',
       path: joinPaths(basePath, organizationId, 'domains', domainId),
-      bodyParams: {
-        ...(enrollmentMode && { enrollment_mode: enrollmentMode }),
-        ...(name && { name }),
-        ...(verified !== undefined && { verified }),
-      },
+      bodyParams,
     });
   }
 
