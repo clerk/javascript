@@ -24,20 +24,23 @@ import { useDisplayConfig } from './use-display-config';
  */
 
 export function useCard() {
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
-  const logoProps = {
-    href: layout?.logoLinkUrl || homeUrl,
-    src: layout?.logoImageUrl || logoImageUrl,
-    alt: applicationName,
-  };
+  const logoProps =
+    options?.logoVisibility === 'visible'
+      ? {
+          href: options?.logoLinkUrl || homeUrl,
+          src: options?.logoImageUrl || logoImageUrl,
+          alt: applicationName,
+        }
+      : null;
 
   const footerProps = {
     branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
+    helpPageUrl: options?.helpPageUrl,
+    privacyPageUrl: options?.privacyPageUrl,
+    termsPageUrl: options?.termsPageUrl,
   };
 
   return {

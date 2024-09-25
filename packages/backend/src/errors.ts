@@ -13,6 +13,7 @@ export const TokenVerificationErrorReason = {
   TokenInvalidAuthorizedParties: 'token-invalid-authorized-parties',
   TokenInvalidSignature: 'token-invalid-signature',
   TokenNotActiveYet: 'token-not-active-yet',
+  TokenIatInTheFuture: 'token-iat-in-the-future',
   TokenVerificationFailed: 'token-verification-failed',
   InvalidSecretKey: 'secret-key-invalid',
   LocalJWKMissing: 'jwk-local-missing',

@@ -199,6 +199,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   verification?: VerificationJSON;
+  saml_connection?: SamlAccountConnectionJSON;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -511,4 +512,18 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   rpId: string;
   timeout: number;
   userVerification: 'discouraged' | 'preferred' | 'required';
+}
+
+export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  domain: string;
+  active: boolean;
+  provider: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }

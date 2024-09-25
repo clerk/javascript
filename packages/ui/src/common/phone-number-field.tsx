@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
+import { useFocusInput } from '~/hooks/use-focus-input';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
@@ -16,7 +17,7 @@ import { extractDigits, formatPhoneNumber, parsePhoneString } from '~/utils/phon
 
 type UseFormattedPhoneNumberProps = {
   initPhoneWithCode: string;
-  locationBasedCountryIso?: CountryIso;
+  locationBasedCountryIso?: CountryIso | null;
 };
 
 const format = (str: string, iso: CountryIso) => {
@@ -92,17 +93,16 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
   const clerk = useClerk();
-  // TODO to fix IsomorphicClerk
-  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
+  const locationBasedCountryIso = clerk.__internal_country as UseFormattedPhoneNumberProps['locationBasedCountryIso'];
   const { t, translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
   const commandListRef = React.useRef<HTMLDivElement>(null);
   const commandInputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.getBoundingClientRect()?.width || 0;
+  const [inputRef, setInputFocus] = useFocusInput();
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode,
     locationBasedCountryIso,
@@ -243,7 +243,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                         </div>
                         <Command.List
                           ref={commandListRef}
-                          className='max-h-80 overflow-y-auto overflow-x-hidden'
+                          className='max-h-[18vh] overflow-y-auto overflow-x-hidden'
                         >
                           <Command.Empty className='text-gray-11 leading-small px-4 py-1.5 text-center text-base'>
                             No countries found
@@ -255,6 +255,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 onSelect={() => {
                                   setIso(iso);
                                   setOpen(false);
+                                  setInputFocus();
                                 }}
                                 data-checked={selectedCountry === countryOptions[index]}
                                 className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
@@ -262,7 +263,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 <span className='grid w-3 shrink-0 place-content-center'>
                                   {selectedCountry === countryOptions[index] && <CheckmarkSm className='size-4' />}
                                 </span>
-                                <span className='grow truncate'>{name}</span>
+                                <span className='text-gray-12 grow truncate'>{name}</span>
                                 <span className='text-gray-11 ms-auto'>+{code}</span>
                               </Command.Item>
                             );
@@ -277,7 +278,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   // Prevent tab stop
                   tabIndex={-1}
                   className='supports-ios:text-[length:1rem] grid cursor-text place-content-center bg-white px-1 text-base'
-                  onClick={() => inputRef.current?.focus()}
+                  onClick={() => setInputFocus()}
                   disabled={props.disabled}
                 >
                   +{selectedCountry.code}

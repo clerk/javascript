@@ -24,8 +24,8 @@ type SignUpAttributeData = AttributeData & {
  */
 export function useSignUpAttributes(attribute: Attribute): SignUpAttributeData {
   const attr = useAttributes(attribute);
-  const { layout } = useAppearance().parsedAppearance;
-  const { showOptionalFields } = layout;
+  const { options } = useAppearance().parsedAppearance;
+  const { showOptionalFields } = options;
 
   return {
     ...attr,

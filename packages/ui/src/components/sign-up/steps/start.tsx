@@ -49,7 +49,7 @@ export function SignUpStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
@@ -85,7 +85,7 @@ export function SignUpStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
+                  {options.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -139,7 +139,7 @@ export function SignUpStart() {
                     </div>
                   ) : null}
 
-                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
+                  {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
 
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
