@@ -165,7 +165,6 @@ export const SignInRouterMachine = setup({
       resendable: false,
       resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
-
     setActive: ({ context, event }) => {
       if (context.exampleMode) {
         return;
