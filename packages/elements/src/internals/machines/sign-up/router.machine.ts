@@ -9,6 +9,7 @@ import {
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
+  SIGN_UP_MODES,
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -156,6 +157,9 @@ export const SignUpRouterMachine = setup({
 
     isLoggedIn: or(['isStatusComplete', ({ context }) => Boolean(context.clerk.user)]),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
+    isRestricted: ({ context }) =>
+      context.clerk?.__unstable__environment?.userSettings.signUp.mode === SIGN_UP_MODES.RESTRICTED,
+    isRestrictedWithoutTicket: and(['isRestricted', not('hasTicket')]),
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
@@ -291,6 +295,10 @@ export const SignUpRouterMachine = setup({
               }),
             },
           ],
+        },
+        {
+          guard: 'isRestrictedWithoutTicket',
+          target: 'RestrictedAccess',
         },
         {
           guard: 'needsCallback',
@@ -476,6 +484,12 @@ export const SignUpRouterMachine = setup({
             target: 'Start',
           },
         ],
+      },
+    },
+    RestrictedAccess: {
+      tags: ['step:restricted-access'],
+      on: {
+        NEXT: 'Start',
       },
     },
     Error: {

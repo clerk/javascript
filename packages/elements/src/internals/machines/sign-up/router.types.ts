@@ -26,6 +26,7 @@ export const SignUpRouterSteps = {
   verification: 'step:verification',
   callback: 'step:callback',
   error: 'step:error',
+  restrictedAccess: 'step:restricted-access',
 } as const;
 
 export type SignUpRouterSteps = keyof typeof SignUpRouterSteps;

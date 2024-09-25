@@ -227,6 +227,11 @@ export default function SignUpPage() {
             <CustomResendable />
           </SignUp.Strategy>
         </SignUp.Step>
+
+        <SignUp.Step name='restricted-access'>
+          <H1>Restricted Access</H1>
+          <P>Access to this app is limited, and an invitation is required to sign up.</P>
+        </SignUp.Step>
       </div>
     </SignUp.Root>
   );
