@@ -6,7 +6,6 @@ import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
-import { ThirdPartyMachine } from '~/internals/machines/third-party';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInRouterMachineActorRef } from './router.types';
@@ -45,7 +44,6 @@ export const SignUpStartMachine = setup({
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),
-    thirdParty: ThirdPartyMachine,
   },
   actions: {
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),

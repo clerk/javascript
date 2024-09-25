@@ -6,7 +6,7 @@ import type { FormFields } from '../../form';
 export type StartAttemptInput = { clerk: LoadedClerk; fields: FormFields };
 export type StartAttemptOutput = SignInResource;
 
-export const startAttempt = fromPromise<SignInResource, StartAttemptInput>(({ input }) => {
+export const startAttempt = fromPromise<StartAttemptOutput, StartAttemptInput>(({ input }) => {
   const { clerk, fields } = input;
 
   const password = fields.get('password');
