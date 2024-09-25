@@ -44,8 +44,12 @@ const common = ({ mode }) => {
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
-      process.env.RSDOCTOR && new RsdoctorWebpackPlugin(),
-    ],
+      process.env.RSDOCTOR &&
+        new RsdoctorWebpackPlugin({
+          mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
+          disableClientServer: process.env.RSDOCTOR === 'brief',
+        }),
+    ].filter(Boolean),
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
     },
