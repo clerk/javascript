@@ -1,3 +1,5 @@
+import type { SignUpModes } from '@clerk/types';
+
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [
   'redirect_url',
@@ -29,3 +31,8 @@ export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'use
 export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'];
 
 export const DEBOUNCE_MS = 350;
+
+export const SIGN_UP_MODES: Record<string, SignUpModes> = {
+  PUBLIC: 'public',
+  RESTRICTED: 'restricted',
+};
