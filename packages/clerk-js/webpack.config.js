@@ -70,7 +70,11 @@ const common = ({ mode }) => {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => module.resource && !module.resource.includes('/ui/components'),
+            test: module =>
+              module.resource &&
+              !module.resource.includes('/ui/components') &&
+              !module.resource.includes('packages/elements') &&
+              !module.resource.includes('packages/ui'),
           },
           defaultVendors: {
             minChunks: 1,
