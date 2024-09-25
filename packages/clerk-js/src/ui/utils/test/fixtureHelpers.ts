@@ -17,6 +17,7 @@ import type {
   VerificationJSON,
 } from '@clerk/types';
 
+import { SIGN_UP_MODES } from '../../../core/constants';
 import type { OrgParams } from '../../../core/test/fixtures';
 import { createUser, getOrganizationId } from '../../../core/test/fixtures';
 import { createUserFixture } from './fixtures';
@@ -318,6 +319,8 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     show_zxcvbn: false,
     min_zxcvbn_strength: 0,
   };
+  us.sign_up.mode = SIGN_UP_MODES.PUBLIC;
+
   const emptyAttribute = {
     first_factors: [],
     second_factors: [],
@@ -477,6 +480,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withRestrictedMode = () => {
+    us.sign_up.mode = SIGN_UP_MODES.RESTRICTED;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -494,5 +501,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withAuthenticatorApp,
     withPasskey,
     withPasskeySettings,
+    withRestrictedMode,
   };
 };
