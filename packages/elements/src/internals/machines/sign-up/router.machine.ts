@@ -297,10 +297,6 @@ export const SignUpRouterMachine = setup({
           ],
         },
         {
-          guard: 'isRestrictedWithoutTicket',
-          target: 'RestrictedAccess',
-        },
-        {
           guard: 'needsCallback',
           target: 'Callback',
         },
@@ -318,6 +314,10 @@ export const SignUpRouterMachine = setup({
           guard: or(['needsContinue', 'hasClerkTransfer']),
           actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
           target: 'Continue',
+        },
+        {
+          guard: 'isRestrictedWithoutTicket',
+          target: 'RestrictedAccess',
         },
         {
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
