@@ -52,5 +52,5 @@ export const stringifyQueryParams = (
     }
   });
 
-  return queryParams.toString();
+  return queryParams.toString().replace(/\+/g, '%20');
 };

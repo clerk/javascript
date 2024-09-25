@@ -22,6 +22,14 @@ describe('getQueryParams(string)', () => {
     const res = getQueryParams('?foo=42&foo=43&bar=1');
     expect(res).toEqual({ foo: ['42', '43'], bar: '1' });
   });
+
+  it('parses spaces and "+" characters correctly', () => {
+    expect(getQueryParams('test=foo%20bar')).toEqual({ test: 'foo bar' });
+    expect(getQueryParams('test=foo%2Bbar%20lab')).toEqual({ test: 'foo+bar lab' });
+
+    expect(getQueryParams('?foo=42%20hey&foo=43%20%2B&bar=1')).toEqual({ foo: ['42 hey', '43 +'], bar: '1' });
+    expect(getQueryParams('?foo=42%20hey&foo=43&bar=1')).toEqual({ foo: ['42 hey', '43'], bar: '1' });
+  });
 });
 
 describe('stringifyQueryParams(object)', () => {
@@ -67,6 +75,14 @@ describe('stringifyQueryParams(object)', () => {
 
   it('handles false value', () => {
     expect(stringifyQueryParams({ test: false, boo: true })).toBe('test=false&boo=true');
+  });
+
+  it('handles spaces and "+" characters correctly', () => {
+    expect(stringifyQueryParams({ test: 'foo bar' })).toBe('test=foo%20bar');
+
+    expect(stringifyQueryParams({ test: 'foo+bar lab' })).toBe('test=foo%2Bbar%20lab');
+
+    expect(stringifyQueryParams({ test: ['foo+bar lab', 'new+'] })).toBe('test=foo%2Bbar%20lab&test=new%2B');
   });
 
   it('converts an object to querystring when key is camelCase', () => {
