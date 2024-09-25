@@ -35,8 +35,13 @@ const PhoneScreen = (props: PhoneScreenProps) => {
   );
 };
 
-export const PhoneSection = () => {
+export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreation?: boolean }) => {
   const { user } = useUser();
+  const hasPhoneNumbers = Boolean(user?.phoneNumbers?.length);
+
+  if (!shouldAllowCreation && !hasPhoneNumbers) {
+    return null;
+  }
 
   return (
     <ProfileSection.Root
@@ -84,19 +89,21 @@ export const PhoneSection = () => {
               </Action.Open>
             </Action.Root>
           ))}
-
-          <Action.Trigger value='add'>
-            <ProfileSection.ArrowButton
-              id='phoneNumbers'
-              localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
-            />
-          </Action.Trigger>
-
-          <Action.Open value='add'>
-            <Action.Card>
-              <PhoneScreen />
-            </Action.Card>
-          </Action.Open>
+          {shouldAllowCreation && (
+            <>
+              <Action.Trigger value='add'>
+                <ProfileSection.ArrowButton
+                  id='phoneNumbers'
+                  localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
+                />
+              </Action.Trigger>
+              <Action.Open value='add'>
+                <Action.Card>
+                  <PhoneScreen />
+                </Action.Card>
+              </Action.Open>
+            </>
+          )}
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
