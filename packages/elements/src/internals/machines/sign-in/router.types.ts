@@ -142,9 +142,9 @@ export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
 export interface SignInRouterContext extends BaseRouterContext {
   formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
+  resource: SignInResource;
   signUpPath: string;
   webAuthnAutofillSupport: boolean;
-  // resource?: SignInResource;
 
   // Verifications
   verificationCurrentFactor: SignInFactor | null;

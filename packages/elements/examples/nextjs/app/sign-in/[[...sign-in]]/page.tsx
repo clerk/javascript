@@ -120,8 +120,6 @@ function CustomResendable() {
 }
 
 export default function SignInPage() {
-  const [continueWithEmail, setContinueWithEmail] = useState(false);
-
   return (
     <SignIn.Root
       fallback={
@@ -146,34 +144,28 @@ export default function SignInPage() {
               <CustomProvider provider='google'>Continue with Google</CustomProvider>
             </div>
 
-            {continueWithEmail ? (
-              <>
-                <Clerk.Field
-                  className='flex w-full flex-col gap-4'
-                  name='identifier'
-                >
-                  {fieldState => (
-                    <>
-                      <Clerk.Label className='sr-only'>Email</Clerk.Label>
-                      <Clerk.Input
-                        className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
-                          fieldState === 'error' && 'border-red-500'
-                        }`}
-                        placeholder='Enter your email address'
-                      />
-                      <Clerk.FieldError className='block w-full font-mono text-red-400' />
-                    </>
-                  )}
-                </Clerk.Field>
+            <Clerk.Field
+              className='flex w-full flex-col gap-4'
+              name='identifier'
+            >
+              {fieldState => (
+                <>
+                  <Clerk.Label className='sr-only'>Email</Clerk.Label>
+                  <Clerk.Input
+                    className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
+                      fieldState === 'error' && 'border-red-500'
+                    }`}
+                    placeholder='Enter your email address'
+                  />
+                  <Clerk.FieldError className='block w-full font-mono text-red-400' />
+                </>
+              )}
+            </Clerk.Field>
 
-                <div className='flex w-full justify-between'>
-                  <CustomSubmit>Sign in with Email</CustomSubmit>
-                  <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
-                </div>
-              </>
-            ) : (
-              <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
-            )}
+            <div className='flex w-full justify-between'>
+              <CustomSubmit>Sign in with Email</CustomSubmit>
+              <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+            </div>
           </div>
         </div>
       }
@@ -209,35 +201,29 @@ export default function SignInPage() {
               <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}</Clerk.Loading>
             </SignIn.Passkey>
 
-            {continueWithEmail ? (
-              <>
-                <Clerk.Field
-                  className='flex w-full flex-col gap-4'
-                  name='identifier'
-                >
-                  {fieldState => (
-                    <>
-                      <Clerk.Label className='sr-only'>Email</Clerk.Label>
-                      <Clerk.Input
-                        className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
-                          fieldState === 'error' && 'border-red-500'
-                        }`}
-                        placeholder='Enter your email address'
-                        type='email'
-                      />
-                      <Clerk.FieldError className='block w-full font-mono text-red-400' />
-                    </>
-                  )}
-                </Clerk.Field>
+            <Clerk.Field
+              className='flex w-full flex-col gap-4'
+              name='identifier'
+            >
+              {fieldState => (
+                <>
+                  <Clerk.Label className='sr-only'>Email</Clerk.Label>
+                  <Clerk.Input
+                    className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
+                      fieldState === 'error' && 'border-red-500'
+                    }`}
+                    placeholder='Enter your email address'
+                    type='email'
+                  />
+                  <Clerk.FieldError className='block w-full font-mono text-red-400' />
+                </>
+              )}
+            </Clerk.Field>
 
-                <div className='flex w-full justify-between'>
-                  <CustomSubmit>Sign in with Email</CustomSubmit>
-                  <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
-                </div>
-              </>
-            ) : (
-              <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
-            )}
+            <div className='flex w-full justify-between'>
+              <CustomSubmit>Sign in with Email</CustomSubmit>
+              <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+            </div>
           </div>
         </SignIn.Step>
 
@@ -247,7 +233,10 @@ export default function SignInPage() {
         >
           <H3>CHOOSE SESSION:</H3>
 
-          <SignIn.SessionList asChild>
+          <SignIn.SessionList
+            includeCurrentSession
+            asChild
+          >
             <section>
               <SignIn.SessionListItem asChild>
                 {({ session }) => (

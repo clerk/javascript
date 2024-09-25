@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import { useClerkHostRouter } from '@clerk/shared/router';
+import { useClerkHostRouter, useClerkRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -10,7 +10,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
+import { Router, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
@@ -24,16 +24,37 @@ type SignInFlowProviderProps = {
    */
   fallback?: React.ReactNode;
   isRootPath: boolean;
+
+  /**
+   * The base path for your sign-in route.
+   * Will be automatically inferred in Next.js.
+   * @example `/sign-in`
+   */
+  path?: string;
+  /**
+   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+   */
+  routing?: ROUTING;
 };
 
 const actor = createActor(SignInRouterMachine, { inspect });
 actor.start();
 
-function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: SignInFlowProviderProps) {
+function SignInFlowProvider({ children, exampleMode, fallback, isRootPath, path, routing }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const formRef = useFormStore();
+
   const isReady = useSelector(actor, state => state.value !== 'Idle');
+
+  clerk.telemetry?.record(
+    eventComponentMounted('Elements_SignInRoot', {
+      exampleMode: exampleMode || false,
+      fallback: Boolean(fallback),
+      path: path || false,
+      routing: routing || false,
+    }),
+  );
 
   useEffect(() => {
     if (!clerk || !router) {
@@ -62,17 +83,18 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
       cb();
     }
 
-    // TODO: TEST!
-    // // Ensure that the latest instantiated formRef is attached to the router
-    // if (formRef && actor.getSnapshot().can({ type: 'RESET.STEP' })) {
-    //   actor.send({
-    //     type: 'FORM.ATTACH',
-    //     formRef,
-    //   });
-    // }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clerk, exampleMode, formRef?.id, !!router, clerk.loaded]);
+  }, [Boolean(clerk), exampleMode, !!router, clerk.loaded]);
+
+  useEffect(() => {
+    // Ensure that the latest instantiated formRef is attached to the router
+    if (formRef.id && actor.getSnapshot().can({ type: 'RESET.STEP' })) {
+      actor.send({
+        type: 'FORM.ATTACH',
+        formRef,
+      });
+    }
+  }, [formRef.id]);
 
   return (
     <SignInRouterCtx.Provider actorRef={actor}>
@@ -82,18 +104,7 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
   );
 }
 
-export type SignInRootProps = Omit<SignInFlowProviderProps, 'isRootPath'> & {
-  /**
-   * The base path for your sign-in route.
-   * Will be automatically inferred in Next.js.
-   * @example `/sign-in`
-   */
-  path?: string;
-  /**
-   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
-   */
-  routing?: ROUTING;
-};
+export type SignInRootProps = Omit<SignInFlowProviderProps, 'isRootPath'>;
 
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.
@@ -118,19 +129,8 @@ export function SignInRoot({
   path: pathProp,
   routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
-  const clerk = useClerk();
   const inferredPath = usePathnameWithoutCatchAll();
   const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
-
-  clerk.telemetry?.record(
-    eventComponentMounted('Elements_SignInRoot', {
-      exampleMode,
-      fallback: Boolean(fallback),
-      path,
-      routing,
-    }),
-  );
-
   const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
   const isRootPath = path === router.pathname();
 
@@ -144,6 +144,8 @@ export function SignInRoot({
           exampleMode={exampleMode}
           fallback={fallback}
           isRootPath={isRootPath}
+          path={path}
+          routing={routing}
         >
           {children}
         </SignInFlowProvider>

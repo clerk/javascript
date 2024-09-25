@@ -103,22 +103,17 @@ export const SignInRouterMachine = setup({
     // Returns the machine to the Init state after a delay
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     // Continues to the next valid step in the sign-in flow
-    goToNextStep: raise(({ event }) => {
-      assertActorEventDone(event);
-      return { type: 'NEXT', resource: event?.output } as SignInRouterNextEvent;
+    goToNextStep: enqueueActions(({ enqueue, event }) => {
+      assertActorEventDone<SignInResource>(event);
+      enqueue.raise({ type: 'NEXT', resource: event.output });
     }),
-    // goToNextStep: enqueueActions(({ context, enqueue, event }) => {
-    //   // {
-    //   //   type: 'setResource',
-    //   //   params: ({ event }) => ({ resource: event.output }),
-    //   // },
-    //   //
-    //   assertActorEventDone(event);
-
-    //   enqueue.assign({ resource: event?.output || context.clerk?.client.signIn });
-    //   enqueue.raise(({ event }) => ({ type: 'NEXT', resource: event?.output || event?.data }));
-    // }),
-
+    resetResource: assign({ resource: ({ context }) => context.clerk.client.signIn }),
+    setResource: assign({
+      resource: ({ event }) => {
+        assertActorEventDone<SignInResource>(event);
+        return event.output;
+      },
+    }),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) {
         return;
@@ -170,37 +165,25 @@ export const SignInRouterMachine = setup({
       resendable: false,
       resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
+
     setActive: ({ context, event }) => {
       if (context.exampleMode) {
         return;
       }
-
+      const resource = (event as SignInRouterNextEvent)?.resource;
       const id = (event as SignInRouterSessionSetActiveEvent)?.id;
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
-      const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
-        .createdSessionId;
+      const createdSessionId = (resource || context.clerk.client.signIn).createdSessionId;
 
       const session = id || createdSessionId || lastActiveSessionId || null;
+      const url = context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl();
 
-      console.log('setActive', { id, lastActiveSessionId, createdSessionId, session });
       const beforeEmit = async () => {
-        console.log('beforeEmit');
-        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
-        return Promise.resolve(true);
+        return await context.clerk.navigate(url);
       };
 
-      console.log('Running setActive');
       void context.clerk.setActive({ session, beforeEmit });
     },
-
-    // setResource: enqueueActions(({ context, enqueue }) => {
-    //   const resource = context.clerk.client.signIn;
-    //   enqueue.send({ type: 'RESOURCE.SET', resource });
-    // }),
-    //
-    setResource: assign({
-      resource: (_, { resource }: { resource?: SignInResource }) => resource,
-    }),
     setConsoleError: ({ event }) => {
       if (process.env.NODE_ENV !== 'development') {
         return;
@@ -272,6 +255,7 @@ export const SignInRouterMachine = setup({
           isLoading: false,
         },
         registeredStrategies: new Set(),
+        resource: event.clerk.client.signIn,
         router: event.router,
         signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
       };
@@ -354,13 +338,14 @@ export const SignInRouterMachine = setup({
     isActivePathRoot: isCurrentPath('/'),
     isComplete: ({ context, event }) => {
       const resource = (event as SignInRouterNextEvent)?.resource;
-      const signIn = context.clerk.client.signIn;
+      const signIn = context.resource || context.clerk.client.signIn;
 
       return (
         (resource?.status === 'complete' && Boolean(resource?.createdSessionId)) ||
         (signIn.status === 'complete' && Boolean(signIn.createdSessionId))
       );
     },
+    isntComplete: not('isComplete'),
     isLoggedIn: ({ context }) => Boolean(context.clerk?.user),
     isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
@@ -426,7 +411,11 @@ export const SignInRouterMachine = setup({
     },
     'FORM.ATTACH': {
       description: 'Attach/re-attach the form to the router.',
-      actions: enqueueActions(({ enqueue, event }) => {
+      actions: enqueueActions(({ context, enqueue, event }) => {
+        if (event.formRef.id === context.formRef.id) {
+          return;
+        }
+
         enqueue.assign({
           formRef: event.formRef,
         });
@@ -448,7 +437,10 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
-    RESET: '.Idle',
+    RESET: {
+      actions: 'resetResource',
+      target: '.Idle',
+    },
   },
   states: {
     Idle: {
@@ -561,6 +553,7 @@ export const SignInRouterMachine = setup({
           },
         ],
         'RESET.STEP': {
+          guard: 'isntComplete',
           target: 'Start',
           reenter: true,
         },
@@ -610,7 +603,7 @@ export const SignInRouterMachine = setup({
               fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -636,7 +629,7 @@ export const SignInRouterMachine = setup({
               flow: 'discoverable',
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -653,7 +646,7 @@ export const SignInRouterMachine = setup({
               flow: 'autofill',
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -681,7 +674,7 @@ export const SignInRouterMachine = setup({
               };
             },
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -713,6 +706,7 @@ export const SignInRouterMachine = setup({
           },
         ],
         'RESET.STEP': {
+          guard: 'isntComplete',
           target: 'FirstFactor',
           reenter: true,
         },
@@ -771,7 +765,7 @@ export const SignInRouterMachine = setup({
               } as PrepareFirstFactorParams,
             }),
             onDone: {
-              actions: 'resendableReset',
+              actions: ['setResource', 'resendableReset'],
               target: 'Pending',
             },
             onError: {
@@ -890,7 +884,7 @@ export const SignInRouterMachine = setup({
               fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -915,7 +909,7 @@ export const SignInRouterMachine = setup({
               flow: 'discoverable',
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -945,6 +939,7 @@ export const SignInRouterMachine = setup({
           },
         ],
         'RESET.STEP': {
+          guard: 'isntComplete',
           target: 'SecondFactor',
           reenter: true,
         },
@@ -1000,7 +995,7 @@ export const SignInRouterMachine = setup({
               params: context.verificationCurrentFactor as PrepareSecondFactorParams,
             }),
             onDone: {
-              actions: 'resendableReset',
+              actions: ['setResource', 'resendableReset'],
               target: 'Pending',
             },
             onError: {
@@ -1104,7 +1099,7 @@ export const SignInRouterMachine = setup({
               fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
@@ -1122,6 +1117,7 @@ export const SignInRouterMachine = setup({
       exit: 'clearFormErrors',
       on: {
         'RESET.STEP': {
+          guard: 'isntComplete',
           target: 'ResetPassword',
           reenter: true,
         },
@@ -1171,7 +1167,7 @@ export const SignInRouterMachine = setup({
               fields: context.formRef.getSnapshot().context.fields,
             }),
             onDone: {
-              actions: 'goToNextStep',
+              actions: ['setResource', 'goToNextStep'],
             },
             onError: {
               actions: 'setFormErrors',
