@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.23.0
+
+### Minor Changes
+
+- Hide sign up url from `<SignIn />` component when mode is `restricted` ([#4206](https://github.com/clerk/javascript/pull/4206)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Handle gracefully Coinbase Wallet initial configuration ([#4218](https://github.com/clerk/javascript/pull/4218)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Supports default role on `OrganizationProfile` invitations. When inviting a member, the default role will be automatically selected, otherwise it falls back to the only available role. ([#4210](https://github.com/clerk/javascript/pull/4210)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add type for \_\_internal_country ([#4215](https://github.com/clerk/javascript/pull/4215)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+  - @clerk/localizations@3.0.6
+  - @clerk/shared@2.8.3
+
 ## 5.22.4
 
 ### Patch Changes
