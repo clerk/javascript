@@ -1,9 +1,6 @@
 import { createDeferredPromise } from '@clerk/shared';
-import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
 import type { ClerkHostRouter } from '@clerk/shared/router';
-import { ClerkHostRouterContext } from '@clerk/shared/router';
 import type { ClerkOptions, LoadedClerk } from '@clerk/types';
-import type { ComponentType, ReactNode } from 'react';
 
 import type { init } from './renderer';
 import type { ComponentDefinition } from './types';
@@ -24,7 +21,6 @@ export class UI {
 
   #rendererPromise?: ReturnType<typeof createDeferredPromise>;
   #renderer?: ReturnType<typeof init>;
-  #wrapper: ComponentType<{ children: ReactNode }>;
 
   constructor({
     router,
@@ -54,17 +50,6 @@ export class UI {
           default: SignUp,
         })),
     });
-
-    this.#wrapper = ({ children }) => {
-      assertRouter(this.router);
-      return (
-        <ClerkInstanceContext.Provider value={{ value: this.clerk }}>
-          <OptionsContext.Provider value={this.options}>
-            <ClerkHostRouterContext.Provider value={this.router}>{children}</ClerkHostRouterContext.Provider>
-          </OptionsContext.Provider>
-        </ClerkInstanceContext.Provider>
-      );
-    };
   }
 
   // Mount a component from the registry
@@ -102,9 +87,10 @@ export class UI {
 
     this.#rendererPromise = createDeferredPromise();
 
-    import('./renderer').then(({ init }) => {
+    import('./renderer').then(({ init, wrapperInit }) => {
+      assertRouter(this.router);
       this.#renderer = init({
-        wrapper: this.#wrapper,
+        wrapper: wrapperInit({ clerk: this.clerk, options: this.options, router: this.router }),
       });
       this.#rendererPromise?.resolve();
     });

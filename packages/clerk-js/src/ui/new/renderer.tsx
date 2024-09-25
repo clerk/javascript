@@ -1,7 +1,11 @@
 // TODO: don't import here
 import '@clerk/ui/styles.css';
 
-import type { ElementType } from 'react';
+import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
+import type { ClerkHostRouter } from '@clerk/shared/router';
+import { ClerkHostRouterContext } from '@clerk/shared/router';
+import type { ClerkOptions, LoadedClerk } from '@clerk/types';
+import type { ElementType, ReactNode } from 'react';
 import { createElement, lazy } from 'react';
 import { createPortal } from 'react-dom';
 import { createRoot } from 'react-dom/client';
@@ -9,6 +13,26 @@ import { createRoot } from 'react-dom/client';
 import type { ComponentDefinition } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components-new';
+
+export function wrapperInit({
+  clerk,
+  options,
+  router,
+}: {
+  clerk: LoadedClerk;
+  options: ClerkOptions;
+  router: ClerkHostRouter;
+}) {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <ClerkInstanceContext.Provider value={{ value: clerk }}>
+        <OptionsContext.Provider value={options}>
+          <ClerkHostRouterContext.Provider value={router}>{children}</ClerkHostRouterContext.Provider>
+        </OptionsContext.Provider>
+      </ClerkInstanceContext.Provider>
+    );
+  };
+}
 
 // Initializes the react renderer
 export function init({ wrapper }: { wrapper: ElementType }) {
