@@ -243,7 +243,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                         </div>
                         <Command.List
                           ref={commandListRef}
-                          className='max-h-80 overflow-y-auto overflow-x-hidden'
+                          className='max-h-[18vh] overflow-y-auto overflow-x-hidden'
                         >
                           <Command.Empty className='text-gray-11 leading-small px-4 py-1.5 text-center text-base'>
                             No countries found
