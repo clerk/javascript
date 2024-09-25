@@ -1,9 +1,10 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/types';
 
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
   Organization,
+  OrganizationDomain,
   OrganizationInvitation,
   OrganizationInvitationStatus,
   OrganizationMembership,
@@ -97,6 +98,29 @@ type RevokeOrganizationInvitationParams = {
   organizationId: string;
   invitationId: string;
   requestingUserId: string;
+};
+
+type GetOrganizationDomainListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type CreateOrganizationDomainParams = {
+  organizationId: string;
+  name: string;
+  enrollmentMode: OrganizationEnrollmentMode;
+  verified?: boolean;
+};
+
+type UpdateOrganizationDomainParams = {
+  organizationId: string;
+  domainId: string;
+} & Partial<CreateOrganizationDomainParams>;
+
+type DeleteOrganizationDomainParams = {
+  organizationId: string;
+  domainId: string;
 };
 
 export class OrganizationAPI extends AbstractAPI {
@@ -283,6 +307,55 @@ export class OrganizationAPI extends AbstractAPI {
       bodyParams: {
         requestingUserId,
       },
+    });
+  }
+
+  public async getOrganizationDomainList(params: GetOrganizationDomainListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this.request<PaginatedResourceResponse<OrganizationDomain[]>>({
+      method: 'GET',
+      path: joinPaths(basePath, organizationId, 'domains'),
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationDomain(params: CreateOrganizationDomainParams) {
+    const { organizationId, name, enrollmentMode, verified = true } = params;
+    this.requireId(organizationId);
+
+    return this.request<OrganizationDomain>({
+      method: 'POST',
+      path: joinPaths(basePath, organizationId, 'domains'),
+      bodyParams: {
+        name,
+        enrollmentMode,
+        verified,
+      },
+    });
+  }
+
+  public async updateOrganizationDomain(params: UpdateOrganizationDomainParams) {
+    const { organizationId, domainId, ...bodyParams } = params;
+    this.requireId(organizationId);
+    this.requireId(domainId);
+
+    return this.request<OrganizationDomain>({
+      method: 'PATCH',
+      path: joinPaths(basePath, organizationId, 'domains', domainId),
+      bodyParams,
+    });
+  }
+
+  public async deleteOrganizationDomain(params: DeleteOrganizationDomainParams) {
+    const { organizationId, domainId } = params;
+    this.requireId(organizationId);
+    this.requireId(domainId);
+
+    return this.request<OrganizationDomain>({
+      method: 'DELETE',
+      path: joinPaths(basePath, organizationId, 'domains', domainId),
     });
   }
 }

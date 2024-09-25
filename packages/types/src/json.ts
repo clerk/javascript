@@ -353,7 +353,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-interface OrganizationDomainVerificationJSON {
+export interface OrganizationDomainVerificationJSON {
   status: OrganizationDomainVerificationStatus;
   strategy: 'email_code'; // only available value for now
   attempts: number;
