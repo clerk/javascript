@@ -1,4 +1,5 @@
 import type { SamlAccountJSON } from './JSON';
+import { SamlAccountConnection } from './SamlConnection';
 import { Verification } from './Verification';
 
 export class SamlAccount {
@@ -11,6 +12,7 @@ export class SamlAccount {
     readonly firstName: string,
     readonly lastName: string,
     readonly verification: Verification | null,
+    readonly samlConnection: SamlAccountConnection | null,
   ) {}
 
   static fromJSON(data: SamlAccountJSON): SamlAccount {
@@ -23,6 +25,7 @@ export class SamlAccount {
       data.first_name,
       data.last_name,
       data.verification && Verification.fromJSON(data.verification),
+      data.saml_connection && SamlAccountConnection.fromJSON(data.saml_connection),
     );
   }
 }

@@ -46,41 +46,43 @@ const errorCodesForReconnect = [
   'external_account_email_address_verification_required',
 ];
 
-export const ConnectedAccountsSection = withCardStateProvider(() => {
-  const { user } = useUser();
-  const card = useCardState();
+export const ConnectedAccountsSection = withCardStateProvider(
+  ({ shouldAllowCreation = true }: { shouldAllowCreation?: boolean }) => {
+    const { user } = useUser();
+    const card = useCardState();
+    const hasExternalAccounts = Boolean(user?.externalAccounts?.length);
 
-  if (!user) {
-    return null;
-  }
+    if (!user || (!shouldAllowCreation && !hasExternalAccounts)) {
+      return null;
+    }
 
-  const accounts = [
-    ...user.verifiedExternalAccounts,
-    ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
-  ];
+    const accounts = [
+      ...user.verifiedExternalAccounts,
+      ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
+    ];
 
-  return (
-    <ProfileSection.Root
-      title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
-      centered={false}
-      id='connectedAccounts'
-    >
-      <Card.Alert>{card.error}</Card.Alert>
-      <Action.Root>
-        <ProfileSection.ItemList id='connectedAccounts'>
-          {accounts.map(account => (
-            <ConnectedAccount
-              key={account.id}
-              account={account}
-            />
-          ))}
-        </ProfileSection.ItemList>
-
-        <AddConnectedAccount />
-      </Action.Root>
-    </ProfileSection.Root>
-  );
-});
+    return (
+      <ProfileSection.Root
+        title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
+        centered={false}
+        id='connectedAccounts'
+      >
+        <Card.Alert>{card.error}</Card.Alert>
+        <Action.Root>
+          <ProfileSection.ItemList id='connectedAccounts'>
+            {accounts.map(account => (
+              <ConnectedAccount
+                key={account.id}
+                account={account}
+              />
+            ))}
+          </ProfileSection.ItemList>
+          {shouldAllowCreation && <AddConnectedAccount />}
+        </Action.Root>
+      </ProfileSection.Root>
+    );
+  },
+);
 
 const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => {
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();

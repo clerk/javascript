@@ -35,7 +35,7 @@ const EmailScreen = (props: EmailScreenProps) => {
   );
 };
 
-export const EmailsSection = () => {
+export const EmailsSection = ({ shouldAllowCreation = true }) => {
   const { user } = useUser();
 
   return (
@@ -79,19 +79,21 @@ export const EmailsSection = () => {
               </Action.Open>
             </Action.Root>
           ))}
-
-          <Action.Trigger value='add'>
-            <ProfileSection.ArrowButton
-              id='emailAddresses'
-              localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
-            />
-          </Action.Trigger>
-
-          <Action.Open value='add'>
-            <Action.Card>
-              <EmailScreen />
-            </Action.Card>
-          </Action.Open>
+          {shouldAllowCreation && (
+            <>
+              <Action.Trigger value='add'>
+                <ProfileSection.ArrowButton
+                  id='emailAddresses'
+                  localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
+                />
+              </Action.Trigger>
+              <Action.Open value='add'>
+                <Action.Card>
+                  <EmailScreen />
+                </Action.Card>
+              </Action.Open>
+            </>
+          )}
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
