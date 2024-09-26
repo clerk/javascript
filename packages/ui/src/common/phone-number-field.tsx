@@ -215,7 +215,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 relative flex items-center gap-x-1 rounded-l-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
+                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 relative flex items-center gap-x-1 rounded-s-md bg-white px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <ChevronUpDownSm className='text-gray-9 size-4' />
@@ -296,7 +296,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
                   {...props}
-                  className='supports-ios:text-[length:1rem] w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
+                  className='supports-ios:text-[length:1rem] w-full rounded-md bg-white px-[--phone-number-field-px] py-[--phone-number-field-py] text-base outline-none'
                   data-field-input
                 />
               </div>
