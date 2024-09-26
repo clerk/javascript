@@ -147,7 +147,7 @@ describe('UserButton', () => {
       await userEvent.click(getByText('Sign out'));
       await waitFor(() => {
         expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function), { sessionId: '0' });
-        expect(fixtures.clerk.redirectWithAuth).toHaveBeenCalledWith('https://dashboard.clerk.com/sign-in/choose');
+        expect(fixtures.clerk.redirectWithAuth).toHaveBeenCalledWith('https://accounts.clerk.com/sign-in/choose');
       });
     });
 
