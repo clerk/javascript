@@ -245,6 +245,17 @@ describe('SignUpStart', () => {
     });
   });
 
+  describe('Restricted signup', () => {
+    it('shows the restricted component', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withRestrictedMode();
+      });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByText('Restricted access');
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -318,6 +329,33 @@ describe('SignUpStart', () => {
         '',
         expect.not.stringContaining('__clerk_invitation_token'),
       );
+    });
+
+    it('should show the sign up form when ticket detected and mode is restricted', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withRestrictedMode();
+      });
+      fixtures.signUp.create.mockResolvedValueOnce({} as SignUpResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: jest.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => screen.getByText(/create your account/i));
     });
   });
 });

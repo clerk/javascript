@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { ERROR_CODES } from '../../../core/constants';
+import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
@@ -22,6 +22,7 @@ import { buildRequest, createPasswordError, handleError, useFormControl } from '
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
+import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
@@ -48,6 +49,8 @@ function _SignUpStart(): JSX.Element {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
+
+  const { mode } = userSettings.signUp;
 
   const formState = {
     firstName: useFormControl('firstName', signUp.firstName || initialValues.firstName || '', {
@@ -245,6 +248,10 @@ function _SignUpStart(): JSX.Element {
   const showOauthProviders =
     (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
+
+  if (mode === SIGN_UP_MODES.RESTRICTED && !hasTicket) {
+    return <SignUpRestrictedAccess />;
+  }
 
   return (
     <Flow.Part part='start'>

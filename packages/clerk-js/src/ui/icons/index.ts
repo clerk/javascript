@@ -61,3 +61,4 @@ export { default as CaretRight } from './caret-right.svg';
 export { default as Organization } from './organization.svg';
 export { default as Users } from './users.svg';
 export { default as Fingerprint } from './fingerprint.svg';
+export { default as Block } from './block.svg';
