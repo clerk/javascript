@@ -84,7 +84,7 @@ The `requireAuth()` middleware functions similarly to `clerkMiddleware()`, but a
 The sign-in path will be read from the `signInUrl` option or the `CLERK_SIGN_IN_URL` environment variable if available.
 
 ```js
-import { clerkMiddleware, requireAuth } from '@clerk/express';
+import { requireAuth } from '@clerk/express';
 import express from 'express';
 
 const app = express();
