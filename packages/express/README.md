@@ -108,7 +108,7 @@ app.get('/protected', requireAuth({ signInUrl: '/sign-in' }), (req, res) => {
 The `getAuth()` helper retrieves authentication state from the request object. See the [Next.js reference documentation](https://clerk.com/docs/references/nextjs/get-auth) for more information on how to use it.
 
 ```js
-import { clerkMiddleware, getAuth, ForbiddenError } from '@clerk/express';
+import { clerkMiddleware, getAuth } from '@clerk/express';
 import express from 'express';
 
 const app = express();
@@ -122,8 +122,7 @@ hasPermission = (request, response, next) => {
 
   // Handle if the user is not authorized
   if (!auth.has({ permission: 'org:admin:testpermission' })) {
-    // Catch this inside an error-handling middleware
-    return next(new ForbiddenError());
+    return response.status(403).send('Unauthorized');
   }
 
   return next();
