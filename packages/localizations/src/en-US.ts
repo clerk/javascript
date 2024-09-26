@@ -508,6 +508,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
     },
+    restrictedAccess: {
+      title: 'Restricted access',
+      subtitle: 'Access to this app is limited, and an invitation is required to sign up.',
+      actionLink: 'Back to sign in',
+    },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
