@@ -10,6 +10,7 @@ import type {
 import { redirect } from 'next/navigation';
 import React from 'react';
 
+import { UserVerificationModal, UserVerificationTrigger } from '../../complementary-components';
 import { auth } from './auth';
 
 export function SignedIn(props: React.PropsWithChildren): React.JSX.Element | null {
@@ -164,7 +165,7 @@ type ProtectParams =
         maxAge: __experimental_SessionVerificationMaxAge;
       };
       redirectUrl?: never;
-      fallback?: React.ComponentType;
+      fallback?: React.ComponentType | 'modal';
     }
   | {
       condition?: never;
@@ -306,7 +307,24 @@ function protect<T extends ProtectParams>(params: T) {
 
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
-        return <Fallback />;
+
+        if (Fallback === 'modal') {
+          return <UserVerificationModal />;
+        }
+
+        if (typeof Fallback !== 'function') {
+          throw 'not valid';
+        }
+
+        return (
+          <Fallback
+            {
+              // Could this be unsafe ?
+              ...props
+            }
+            UserVerificationTrigger={UserVerificationTrigger}
+          />
+        );
       }
 
       if (failedItem?.redirectUrl === 'sign-in') {
