@@ -1,8 +1,7 @@
 import type { RequestHandler } from 'express';
 
-import { middlewareRequired } from './errors';
-import { getAuth } from './getAuth';
-import { requestHasAuthObject } from './utils';
+import { authenticateAndDecorateRequest } from './authenticateRequest';
+import type { ClerkMiddlewareOptions } from './types';
 
 /**
  * This error is typically thrown by the `requireAuth` middleware when
@@ -64,24 +63,19 @@ export class ForbiddenError extends Error {
 
 /**
  * Middleware to require authentication for user requests.
- * Passes an UnauthorizedError to the next middleware for unauthenticated requests,
- * which should be handled by an error middleware.
+ * Redirects unauthenticated requests to the sign-in page.
  *
  * @example
  * // Basic usage
- * import { requireAuth, UnauthorizedError } from '@clerk/express'
+ * import { requireAuth } from '@clerk/express'
  *
- * router.get('/path', requireAuth, getHandler)
+ * router.get('/path', requireAuth(), getHandler)
  * //or
- * router.use(requireAuth)
+ * router.use(requireAuth())
  *
- * router.use((err, req, res, next) => {
- *   if (err instanceof UnauthorizedError) {
- *     res.status(401).send('Unauthorized')
- *   } else {
- *     next(err)
- *   }
- * })
+ * @example
+ * // Customizing the sign-in path
+ * router.use(requireAuth({ signInPath: '/custom-signin' }))
  *
  * @example
  * // Combining with permission check
@@ -94,18 +88,27 @@ export class ForbiddenError extends Error {
  *    }
  *    return next()
  * }
- * router.get('/path', requireAuth, hasPermission, getHandler)
+ * router.get('/path', requireAuth(), hasPermission, getHandler)
  *
  * @throws {Error} If `clerkMiddleware` is not set in the middleware chain before this util is used.
  */
-export const requireAuth: RequestHandler = (request, _response, next) => {
-  if (!requestHasAuthObject(request)) {
-    throw new Error(middlewareRequired('requireAuth'));
-  }
+export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
+  const authMiddleware = authenticateAndDecorateRequest(options);
 
-  if (!getAuth(request).userId) {
-    return next(new UnauthorizedError());
-  }
+  return (request, response, next) => {
+    authMiddleware(request, response, err => {
+      if (err) {
+        return next(err);
+      }
 
-  return next();
+      const signInUrl = options.signInUrl || process.env.CLERK_SIGN_IN_URL || '/';
+
+      // @ts-expect-error: TODO, type this
+      if (!request.auth?.userId) {
+        return response.redirect(signInUrl);
+      }
+
+      next();
+    });
+  };
 };
