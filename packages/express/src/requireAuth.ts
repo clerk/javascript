@@ -5,34 +5,32 @@ import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 
 /**
  * Middleware to require authentication for user requests.
- * Redirects unauthenticated requests to the sign-in page.
+ * Redirects unauthenticated requests to the sign-in url.
  *
  * @example
  * // Basic usage
  * import { requireAuth } from '@clerk/express'
  *
- * router.get('/path', requireAuth(), getHandler)
- * //or
  * router.use(requireAuth())
+ * //or
+ * router.get('/path', requireAuth(), getHandler)
  *
  * @example
  * // Customizing the sign-in path
- * router.use(requireAuth({ signInPath: '/custom-signin' }))
+ * router.use(requireAuth({ signInUrl: '/sign-in' }))
  *
  * @example
  * // Combining with permission check
- * import { requireAuth, ForbiddenError } from '@clerk/express'
+ * import { getAuth, requireAuth } from '@clerk/express'
  *
  * const hasPermission = (req, res, next) => {
  *    const auth = getAuth(req)
  *    if (!auth.has({ permission: 'permission' })) {
- *      return next(new ForbiddenError())
+ *      return res.status(403).send('Forbidden')
  *    }
  *    return next()
  * }
  * router.get('/path', requireAuth(), hasPermission, getHandler)
- *
- * @throws {Error} If `clerkMiddleware` is not set in the middleware chain before this util is used.
  */
 export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const authMiddleware = authenticateAndDecorateRequest(options);

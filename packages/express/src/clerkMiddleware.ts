@@ -4,6 +4,10 @@ import { authenticateAndDecorateRequest } from './authenticateRequest';
 import type { ClerkMiddlewareOptions } from './types';
 
 /**
+ * Middleware that integrates Clerk authentication into your Express application.
+ * It checks the request's cookies and headers for a session JWT and, if found,
+ * attaches the Auth object to the request object under the `auth` key.
+ *
  * @example
  * app.use(clerkMiddleware(options));
  *
