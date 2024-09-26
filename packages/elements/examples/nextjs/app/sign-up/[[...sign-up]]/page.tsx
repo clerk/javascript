@@ -228,7 +228,7 @@ export default function SignUpPage() {
           </SignUp.Strategy>
         </SignUp.Step>
 
-        <SignUp.Step name='restricted-access'>
+        <SignUp.Step name='restricted'>
           <H1>Restricted Access</H1>
           <P>Access to this app is limited, and an invitation is required to sign up.</P>
         </SignUp.Step>

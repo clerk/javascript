@@ -3,11 +3,11 @@ import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
-export type SignUpRestrictedAccessProps = FormProps;
+export type SignUpRestrictedProps = FormProps;
 
-export function SignUpRestrictedAccess(props: SignUpRestrictedAccessProps) {
+export function SignUpRestricted(props: SignUpRestrictedProps) {
   const routerRef = SignUpRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'step:restricted-access');
+  const activeState = useActiveTags(routerRef, 'step:restricted');
 
   return activeState ? (
     <Form

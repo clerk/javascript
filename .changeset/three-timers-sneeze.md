@@ -1,5 +1,5 @@
 ---
-"@clerk/elements": minor
+'@clerk/elements': minor
 ---
 
-Adds `restricted-access` Step for invite-only applications
+Adds `restricted` Step for restricted sign-up mode

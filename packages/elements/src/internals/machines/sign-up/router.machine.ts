@@ -317,7 +317,7 @@ export const SignUpRouterMachine = setup({
         },
         {
           guard: 'isRestrictedWithoutTicket',
-          target: 'RestrictedAccess',
+          target: 'Restricted',
         },
         {
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
@@ -486,8 +486,8 @@ export const SignUpRouterMachine = setup({
         ],
       },
     },
-    RestrictedAccess: {
-      tags: ['step:restricted-access'],
+    Restricted: {
+      tags: ['step:restricted'],
       on: {
         NEXT: 'Start',
       },
