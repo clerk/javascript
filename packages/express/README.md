@@ -98,7 +98,7 @@ app.get('/protected', requireAuth(), (req, res) => {
 });
 
 // Custom sign-in URL
-app.get('/admin', requireAuth({ signInUrl: '/sign-in' }), (req, res) => {
+app.get('/protected', requireAuth({ signInUrl: '/sign-in' }), (req, res) => {
   res.send('This is a protected route');
 });
 ```
