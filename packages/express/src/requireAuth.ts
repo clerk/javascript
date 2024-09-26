@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 
 import { authenticateAndDecorateRequest } from './authenticateRequest';
-import type { ClerkMiddlewareOptions } from './types';
+import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 
 /**
  * Middleware to require authentication for user requests.
@@ -45,8 +45,7 @@ export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandle
 
       const signInUrl = options.signInUrl || process.env.CLERK_SIGN_IN_URL || '/';
 
-      // @ts-expect-error: TODO, type this
-      if (!request.auth?.userId) {
+      if (!(request as ExpressRequestWithAuth).auth?.userId) {
         return response.redirect(signInUrl);
       }
 
