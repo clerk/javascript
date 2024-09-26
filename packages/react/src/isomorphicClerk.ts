@@ -664,9 +664,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_closeUserVerification = (): void => {
+  __experimental_closeUserVerification = (options: { unstable_notify: boolean }): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_closeUserVerification();
+      this.clerkjs.__experimental_closeUserVerification(options);
     } else {
       this.preopenUserVerification = null;
     }

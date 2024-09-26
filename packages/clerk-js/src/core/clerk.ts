@@ -402,9 +402,11 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
-  public __experimental_closeUserVerification = (): void => {
+  public __experimental_closeUserVerification = (options?: { unstable_notify: boolean }): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
+    void this.#componentControls
+      .ensureMounted()
+      .then(controls => controls.closeModal('userVerification', { notify: options?.unstable_notify }));
   };
 
   public openSignUp = (props?: SignUpProps): void => {

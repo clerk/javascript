@@ -167,7 +167,7 @@ export interface Clerk {
    * Closes the Clerk user verification modal.
    * @experimantal This API is still under active development and may change at any moment.
    */
-  __experimental_closeUserVerification: () => void;
+  __experimental_closeUserVerification: (options?: { unstable_notify: boolean }) => void;
 
   /**
    * Opens the Google One Tap component.
