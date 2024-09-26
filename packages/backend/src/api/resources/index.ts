@@ -44,3 +44,5 @@ export type {
   WebhookEvent,
   WebhookEventType,
 } from './Webhooks';
+
+export * from './OrganizationDomain';

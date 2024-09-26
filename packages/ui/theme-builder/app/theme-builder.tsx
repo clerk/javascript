@@ -87,7 +87,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     <ClerkProvider key={CLERK_PROVIDER_KEY}>
       <AppearanceProvider
         appearance={{
-          layout: {
+          options: {
             unsafe_disableDevelopmentModeWarnings: devMode === 'off',
             animations: animations === 'on' ? true : false,
           },
