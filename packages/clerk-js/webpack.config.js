@@ -6,6 +6,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const TerserPlugin = require('terser-webpack-plugin');
+const { RsdoctorWebpackPlugin } = require('@rsdoctor/webpack-plugin');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -43,7 +44,12 @@ const common = ({ mode }) => {
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
-    ],
+      process.env.RSDOCTOR &&
+        new RsdoctorWebpackPlugin({
+          mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
+          disableClientServer: process.env.RSDOCTOR === 'brief',
+        }),
+    ].filter(Boolean),
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
     },
