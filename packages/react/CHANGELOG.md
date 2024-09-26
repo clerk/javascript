@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.9.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+  - @clerk/shared@2.8.3
+
+## 5.9.2
+
+### Patch Changes
+
+- Improve JSDoc comments for some public API properties ([#4190](https://github.com/clerk/javascript/pull/4190)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`cb32aaf59`](https://github.com/clerk/javascript/commit/cb32aaf59d38dcd12e959f542782f71a87adf9c1), [`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7), [`6275c242c`](https://github.com/clerk/javascript/commit/6275c242cd8bcb6f7766934059967e0fe775a0c1), [`f9faaf031`](https://github.com/clerk/javascript/commit/f9faaf03100baf679c78e6c24877fbf3b60be529)]:
+  - @clerk/shared@2.8.2
+  - @clerk/types@4.21.1
+
 ## 5.9.1
 
 ### Patch Changes

@@ -1,5 +1,48 @@
 # Change Log
 
+## 5.23.0
+
+### Minor Changes
+
+- Hide sign up url from `<SignIn />` component when mode is `restricted` ([#4206](https://github.com/clerk/javascript/pull/4206)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Handle gracefully Coinbase Wallet initial configuration ([#4218](https://github.com/clerk/javascript/pull/4218)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Supports default role on `OrganizationProfile` invitations. When inviting a member, the default role will be automatically selected, otherwise it falls back to the only available role. ([#4210](https://github.com/clerk/javascript/pull/4210)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add type for \_\_internal_country ([#4215](https://github.com/clerk/javascript/pull/4215)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+  - @clerk/localizations@3.0.6
+  - @clerk/shared@2.8.3
+
+## 5.22.4
+
+### Patch Changes
+
+- Fix UserProfile and OrganizationProfile wrong padding on footer for small screens when Development notice is enabled ([#4191](https://github.com/clerk/javascript/pull/4191)) by [@octoper](https://github.com/octoper)
+
+- Internal change to move `iconImageUrl` util to `shared` package. ([#4188](https://github.com/clerk/javascript/pull/4188)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only render the Sign out of all accounts action within `<UserButton />` when there are multiple sessions. ([#4200](https://github.com/clerk/javascript/pull/4200)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cb32aaf59`](https://github.com/clerk/javascript/commit/cb32aaf59d38dcd12e959f542782f71a87adf9c1), [`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7), [`6275c242c`](https://github.com/clerk/javascript/commit/6275c242cd8bcb6f7766934059967e0fe775a0c1), [`f9faaf031`](https://github.com/clerk/javascript/commit/f9faaf03100baf679c78e6c24877fbf3b60be529)]:
+  - @clerk/shared@2.8.2
+  - @clerk/types@4.21.1
+  - @clerk/localizations@3.0.5
+
+## 5.22.3
+
+### Patch Changes
+
+- Restore behavior of MetaMask compatible Web3 wallets. Before, even if a user didn't use the MetaMask browser extension but a compatible one, such as Rabby Wallet, it was possible to use it as they share the same API to authenticate themselves. This behavior stopped working when we added support for EIP6963 regarding handling multiple injected providers. This commit restores the previous behavior by using the existing injected provider if there is a single one ([#4185](https://github.com/clerk/javascript/pull/4185)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`5dde18f6b`](https://github.com/clerk/javascript/commit/5dde18f6b55ed4d5c2a6a5246ee3b3ba0d077df3)]:
+  - @clerk/localizations@3.0.4
+
 ## 5.22.2
 
 ### Patch Changes

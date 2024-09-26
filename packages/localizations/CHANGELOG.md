@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+
+## 3.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7)]:
+  - @clerk/types@4.21.1
+
+## 3.0.4
+
+### Patch Changes
+
+- nl-NL localization updates ([#4181](https://github.com/clerk/javascript/pull/4181)) by [@guustgoossens](https://github.com/guustgoossens)
+
 ## 3.0.3
 
 ### Patch Changes

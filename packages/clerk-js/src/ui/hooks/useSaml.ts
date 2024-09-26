@@ -1,7 +1,6 @@
+import { iconImageUrl } from '@clerk/shared/constants';
 import type { SamlIdpSlug } from '@clerk/types';
 import { SAML_IDPS } from '@clerk/types';
-
-import { iconImageUrl } from '../common/constants';
 
 function getSamlProviderLogoUrl(provider: SamlIdpSlug = 'saml_custom'): string {
   return iconImageUrl(SAML_IDPS[provider]?.logo);

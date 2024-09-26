@@ -5,13 +5,16 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 
-export function EmailOrUsernameField({
-  alternativeFieldTrigger,
+export const EmailOrUsernameField = React.forwardRef(function EmailOrUsernameField(
+  {
+    alternativeFieldTrigger,
 
-  ...props
-}: {
-  alternativeFieldTrigger?: React.ReactNode;
-} & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+    ...props
+  }: {
+    alternativeFieldTrigger?: React.ReactNode;
+  } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
+) {
   const { t } = useLocalizations();
 
   return (
@@ -30,6 +33,7 @@ export function EmailOrUsernameField({
           {({ state }) => {
             return (
               <Common.Input
+                ref={forwardedRef}
                 type='text'
                 {...props}
                 asChild
@@ -49,4 +53,4 @@ export function EmailOrUsernameField({
       </Field.Root>
     </Common.Field>
   );
-}
+});

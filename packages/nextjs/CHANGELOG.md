@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+  - @clerk/backend@1.13.4
+  - @clerk/clerk-react@5.9.3
+  - @clerk/shared@2.8.3
+
+## 5.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`cb32aaf59`](https://github.com/clerk/javascript/commit/cb32aaf59d38dcd12e959f542782f71a87adf9c1), [`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7), [`6275c242c`](https://github.com/clerk/javascript/commit/6275c242cd8bcb6f7766934059967e0fe775a0c1), [`418be2fdb`](https://github.com/clerk/javascript/commit/418be2fdb558bb5c85d7be491945935b44cad681), [`c59636a1a`](https://github.com/clerk/javascript/commit/c59636a1aca67be7d6732d281cec307ed456678b), [`5c18671f1`](https://github.com/clerk/javascript/commit/5c18671f158f8077f822877ce5c1fa192199aeda), [`f9faaf031`](https://github.com/clerk/javascript/commit/f9faaf03100baf679c78e6c24877fbf3b60be529), [`e0ca9dc94`](https://github.com/clerk/javascript/commit/e0ca9dc94fa68f3d3db5d2433fa6b85d800d4ca2)]:
+  - @clerk/shared@2.8.2
+  - @clerk/clerk-react@5.9.2
+  - @clerk/types@4.21.1
+  - @clerk/backend@1.13.3
+
+## 5.6.0
+
+### Minor Changes
+
+- Allows access to request object to dynamically define `clerkMiddleware` options ([#4160](https://github.com/clerk/javascript/pull/4160)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`02babaccb`](https://github.com/clerk/javascript/commit/02babaccb648fa4e22f38cc0f572d44f82b09f78)]:
+  - @clerk/backend@1.13.2
+
 ## 5.5.5
 
 ### Patch Changes

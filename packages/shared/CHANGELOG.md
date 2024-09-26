@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+
+## 2.8.2
+
+### Patch Changes
+
+- Exports `match` utility from the `path-to-regexp` lib. ([#4187](https://github.com/clerk/javascript/pull/4187)) by [@izaaklauer](https://github.com/izaaklauer)
+
+- Fix issue where class-based routers were unable to access their private members during the `pathname` and `searchParams` methods. ([#4197](https://github.com/clerk/javascript/pull/4197)) by [@dstaley](https://github.com/dstaley)
+
+- Internal change to move `iconImageUrl` util to `shared` package. ([#4188](https://github.com/clerk/javascript/pull/4188)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7)]:
+  - @clerk/types@4.21.1
+
 ## 2.8.1
 
 ### Patch Changes
