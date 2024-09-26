@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.73.7
+
+### Patch Changes
+
+- A bug was fixed to not override the existing sign-up state on the OAuth callback. ([#4227](https://github.com/clerk/javascript/pull/4227)) by [@anagstef](https://github.com/anagstef)
+
+  When continuing a sign-up flow with social connections, `@clerk/clerk-js` was creating a new `SignUpResource` object, instead of patching the existing one.
+
+  This was affecting Web3 sign-up flows, since the wallet ID was being overridden on the browser redirect.
+
 ## 4.73.6
 
 ### Patch Changes
