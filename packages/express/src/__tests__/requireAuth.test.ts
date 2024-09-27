@@ -1,55 +1,97 @@
-import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import type { RequestHandler } from 'express';
 
-import { requireAuth, UnauthorizedError } from '../requireAuth';
-import { mockRequest, mockRequestWithAuth, mockResponse } from './helpers';
+import { clerkMiddleware } from '../clerkMiddleware';
+import { requireAuth } from '../requireAuth';
+import { mockRequestWithAuth, runMiddleware } from './helpers';
 
-// This middleware is used to handle the UnauthorizedError thrown by requireAuth
-// See https://expressjs.com/en/guide/error-handling.html for handling errors in Express
-const errorHandler = (err: Error, _req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-  if (err instanceof UnauthorizedError) {
-    return res.status(401).send('Unauthorized');
-  }
+let mockAuthenticateAndDecorateRequest: jest.Mock;
+let mockAuthenticateRequest: jest.Mock;
 
-  return next(err);
-};
+jest.mock('../authenticateRequest', () => ({
+  authenticateAndDecorateRequest: (options = {}) => mockAuthenticateAndDecorateRequest(options),
+  authenticateRequest: (options = {}) => mockAuthenticateRequest(options),
+}));
 
 describe('requireAuth', () => {
-  it('throws error if clerkMiddleware is not executed before this middleware', async () => {
-    expect(() => requireAuth(mockRequest(), mockResponse(), () => undefined)).toThrow(
-      /The "clerkMiddleware" should be registered before using "requireAuth"/,
+  beforeEach(() => {
+    mockAuthenticateAndDecorateRequest = jest.fn();
+    mockAuthenticateRequest = jest.fn();
+    jest.clearAllMocks();
+  });
+
+  it('should redirect to sign-in page when user is not authenticated', async () => {
+    process.env.CLERK_SIGN_IN_URL = '/sign-in';
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        Object.assign(req, mockRequestWithAuth());
+        next();
+      };
+    });
+
+    const response = await runMiddleware(requireAuth());
+
+    expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalled();
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/sign-in');
+  });
+
+  it('should call next() when user is authenticated', async () => {
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        Object.assign(req, mockRequestWithAuth({ userId: 'user_123' }));
+        next();
+      };
+    });
+
+    const response = await runMiddleware(requireAuth());
+
+    expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('Hello world!');
+  });
+
+  it('should redirect to custom sign-in path when specified', async () => {
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        Object.assign(req, mockRequestWithAuth({ userId: null }));
+        next();
+      };
+    });
+
+    const response = await runMiddleware(
+      requireAuth({
+        signInUrl: '/custom-sign-in',
+      }),
     );
+
+    expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalled();
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/custom-sign-in');
   });
 
-  it('passes UnauthorizedError to next for unauthenticated requests', () => {
-    const request = mockRequestWithAuth();
-    const response = mockResponse();
-    const next = jest.fn();
+  it('should pass through if req.auth already exists', async () => {
+    mockAuthenticateRequest.mockReturnValue({
+      toAuth: () => ({ userId: null }),
+    });
 
-    requireAuth(request, response, next);
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        if ((req as any).auth) {
+          return next();
+        }
+        const requestState = mockAuthenticateRequest({ request: req });
+        Object.assign(req, { auth: requestState.toAuth() });
+        next();
+      };
+    });
 
-    // Simulate how Express would call the error middleware
-    const error = next.mock.calls[0][0];
-    errorHandler(error, request, response, next);
+    const response = await runMiddleware([clerkMiddleware(), requireAuth({ signInUrl: '/sign-in' })]);
 
-    expect(response.status).toHaveBeenCalledWith(401);
-    expect(response.send).toHaveBeenCalledWith('Unauthorized');
-  });
-
-  it('allows access for authenticated requests', async () => {
-    const request = mockRequestWithAuth({ userId: 'user_1234' });
-    const response = mockResponse();
-    const next = jest.fn();
-
-    requireAuth(request, response, next);
-
-    // Simulate a protected route
-    const protectedRoute = (_req: ExpressRequest, res: ExpressResponse) => {
-      res.status(200).send('Welcome, user_1234');
-    };
-
-    protectedRoute(request, response);
-
-    expect(response.status).toHaveBeenCalledWith(200);
-    expect(response.send).toHaveBeenCalledWith('Welcome, user_1234');
+    expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalledTimes(2);
+    // `authenticateRequest` should be called only once
+    expect(mockAuthenticateRequest).toHaveBeenCalledTimes(1);
+    // Redirect should still happen
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/sign-in');
   });
 });

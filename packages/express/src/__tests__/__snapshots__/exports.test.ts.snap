@@ -2,8 +2,6 @@
 
 exports[`module exports should not change unless explicitly set 1`] = `
 [
-  "ForbiddenError",
-  "UnauthorizedError",
   "clerkClient",
   "clerkMiddleware",
   "createClerkClient",

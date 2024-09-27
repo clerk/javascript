@@ -2,7 +2,6 @@ import type { Request, RequestHandler, Response } from 'express';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
-import { requireAuth } from '../requireAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware } from './helpers';
 
 describe('clerkMiddleware', () => {
@@ -83,47 +82,6 @@ describe('clerkMiddleware', () => {
     assertSignedOutDebugHeaders(response);
   });
 
-  it('supports usage with request handler: app.use(clerkMiddleware(requestHandler))', async () => {
-    const handler: RequestHandler = (_req, res, next) => {
-      res.setHeader('x-clerk-auth-custom', 'custom-value');
-      return next();
-    };
-
-    const response = await runMiddleware(clerkMiddleware(handler, { enableHandshake: true }), {
-      Cookie: '__clerk_db_jwt=deadbeef;',
-    }).expect(200, 'Hello world!');
-
-    expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
-    assertSignedOutDebugHeaders(response);
-  });
-
-  it('supports usage with parameters and request handler: app.use(clerkMiddleware(requestHandler, options))', async () => {
-    const handler: RequestHandler = (_req, res, next) => {
-      res.setHeader('x-clerk-auth-custom', 'custom-value');
-      return next();
-    };
-    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k', enableHandshake: true };
-
-    const response = await runMiddleware(clerkMiddleware(handler, options), {
-      Cookie: '__clerk_db_jwt=deadbeef;',
-    }).expect(200, 'Hello world!');
-
-    expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
-    assertSignedOutDebugHeaders(response);
-  });
-
-  it('throws error if clerkMiddleware is not executed before requireAuth', async () => {
-    const customMiddleware: RequestHandler = (_request, response, next) => {
-      response.setHeader('x-custom-middleware', 'custom');
-      return next();
-    };
-
-    const response = await runMiddleware([requireAuth, customMiddleware]).expect(500);
-
-    assertNoDebugHeaders(response);
-    expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
-  });
-
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
     const customMiddleware: RequestHandler = (request, response, next) => {
       const auth = getAuth(request);
@@ -165,7 +123,7 @@ describe('clerkMiddleware', () => {
     const res = {} as Response;
     const mockNext = jest.fn();
 
-    clerkMiddleware()[0](req, res, mockNext);
+    clerkMiddleware()(req, res, mockNext);
 
     expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
 
