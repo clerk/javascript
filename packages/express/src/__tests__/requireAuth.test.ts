@@ -1,20 +1,21 @@
 import type { RequestHandler } from 'express';
 
 import { clerkMiddleware } from '../clerkMiddleware';
-import { multipleMiddlewaresDetected } from '../errors';
 import { requireAuth } from '../requireAuth';
-import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from '../types';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
 let mockAuthenticateAndDecorateRequest: jest.Mock;
+let mockAuthenticateRequest: jest.Mock;
 
 jest.mock('../authenticateRequest', () => ({
-  authenticateAndDecorateRequest: (options: ClerkMiddlewareOptions = {}) => mockAuthenticateAndDecorateRequest(options),
+  authenticateAndDecorateRequest: (options = {}) => mockAuthenticateAndDecorateRequest(options),
+  authenticateRequest: (options = {}) => mockAuthenticateRequest(options),
 }));
 
 describe('requireAuth', () => {
   beforeEach(() => {
     mockAuthenticateAndDecorateRequest = jest.fn();
+    mockAuthenticateRequest = jest.fn();
     jest.clearAllMocks();
   });
 
@@ -68,19 +69,29 @@ describe('requireAuth', () => {
     expect(response.headers.location).toBe('/custom-sign-in');
   });
 
-  it('should throw an error when attempting to use both middlewares', async () => {
+  it('should pass through if req.auth already exists', async () => {
+    mockAuthenticateRequest.mockReturnValue({
+      toAuth: () => ({ userId: null }),
+    });
+
     mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
       return (req, _res, next) => {
-        if ((req as ExpressRequestWithAuth).auth) {
-          throw new Error(multipleMiddlewaresDetected);
+        if ((req as any).auth) {
+          return next();
         }
-
-        Object.assign(req, mockRequestWithAuth());
+        const requestState = mockAuthenticateRequest({ request: req });
+        Object.assign(req, { auth: requestState.toAuth() });
         next();
       };
     });
-    const response = await runMiddleware([clerkMiddleware(), requireAuth()]);
-    expect(response.status).toBe(500);
-    expect(response.text).toContain('Multiple Clerk middlewares detected');
+
+    const response = await runMiddleware([clerkMiddleware(), requireAuth({ signInUrl: '/sign-in' })]);
+
+    expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalledTimes(2);
+    // `authenticateRequest` should be called only once
+    expect(mockAuthenticateRequest).toHaveBeenCalledTimes(1);
+    // Redirect should still happen
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/sign-in');
   });
 });

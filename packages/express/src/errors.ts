@@ -17,12 +17,6 @@ const app = express();
 app.use(clerkMiddleware());
 `);
 
-export const multipleMiddlewaresDetected = createErrorMessage(`
-Multiple Clerk middlewares detected.
-Only one middleware should be registered.
-Use either 'clerkMiddleware()' or 'requireAuth()', but not both.
-`);
-
 export const satelliteAndMissingProxyUrlAndDomain =
   'Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl';
 export const satelliteAndMissingSignInUrl = `
