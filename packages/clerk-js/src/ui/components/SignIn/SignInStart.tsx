@@ -220,6 +220,7 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
           case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
+          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
             card.setError(error);
             break;
           default:

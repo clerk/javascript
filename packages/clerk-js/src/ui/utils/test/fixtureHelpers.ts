@@ -319,7 +319,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     show_zxcvbn: false,
     min_zxcvbn_strength: 0,
   };
-  us.sign_up.mode = SIGN_UP_MODES.PUBLIC;
+  us.sign_up = {
+    ...us.sign_up,
+    mode: SIGN_UP_MODES.PUBLIC,
+  };
 
   const emptyAttribute = {
     first_factors: [],

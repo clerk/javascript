@@ -16,10 +16,6 @@ import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, miss
 import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
-export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
-  Object.assign(req, { [key]: value });
-}
-
 export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
   // @ts-expect-error - TS doesn't like indexing into RequestLike
   return key in req ? req[key] : undefined;
@@ -30,13 +26,6 @@ export function getAuthKeyFromRequest(
   key: keyof typeof constants.Attributes,
 ): string | null | undefined {
   return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
-}
-
-// TODO: Rename Auth status and align the naming across media
-export function getAuthStatusFromRequest(req: RequestLike): string | null | undefined {
-  return (
-    getCustomAttributeFromRequest(req, constants.Attributes.AuthStatus) || getHeader(req, constants.Headers.AuthStatus)
-  );
 }
 
 export function getHeader(req: RequestLike, name: string): string | null | undefined {
@@ -171,12 +160,6 @@ export function decorateRequest(
 
 export const apiEndpointUnauthorizedNextResponse = () => {
   return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
-};
-
-export const isCrossOrigin = (from: string | URL, to: string | URL) => {
-  const fromUrl = new URL(from);
-  const toUrl = new URL(to);
-  return fromUrl.origin !== toUrl.origin;
 };
 
 export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {

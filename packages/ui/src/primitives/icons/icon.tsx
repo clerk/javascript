@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { mergeProps } from 'react-aria';
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {}
 
@@ -6,7 +7,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps & { children: Reac
   function Icon(props, ref) {
     const { children, 'aria-label': ariaLabel, 'aria-hidden': ariaHidden, ...restProps } = props;
     return React.cloneElement(children, {
-      ...restProps,
+      ...mergeProps(children.props, restProps),
       ref,
       width: '1em',
       height: '1em',
