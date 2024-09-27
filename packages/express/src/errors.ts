@@ -1,6 +1,6 @@
 const createErrorMessage = (msg: string) => {
   return `🔒 Clerk: ${msg.trim()}
-  
+
   For more info, check out the docs: https://clerk.com/docs,
   or come say hi in our discord server: https://clerk.com/discord
   `;
@@ -17,9 +17,11 @@ const app = express();
 app.use(clerkMiddleware());
 `);
 
-export const middlewareNotInvoked = createErrorMessage(
-  `The "clerkMiddleware" should be invoked. Use "clerkMiddleware()"`,
-);
+export const multipleMiddlewaresDetected = createErrorMessage(`
+Multiple Clerk middlewares detected.
+Only one middleware should be registered.
+Use either 'clerkMiddleware()' or 'requireAuth()', but not both.
+`);
 
 export const satelliteAndMissingProxyUrlAndDomain =
   'Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl';

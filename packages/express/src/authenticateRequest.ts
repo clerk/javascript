@@ -7,8 +7,12 @@ import type { RequestHandler, Response } from 'express';
 import type { IncomingMessage } from 'http';
 
 import { clerkClient as defaultClerkClient } from './clerkClient';
-import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
-import type { AuthenticateRequestParams, ClerkMiddlewareOptions } from './types';
+import {
+  multipleMiddlewaresDetected,
+  satelliteAndMissingProxyUrlAndDomain,
+  satelliteAndMissingSignInUrl,
+} from './errors';
+import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
 
 const authenticateRequest = (opts: AuthenticateRequestParams) => {
@@ -103,6 +107,10 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
+    if ((request as ExpressRequestWithAuth).auth) {
+      throw new Error(multipleMiddlewaresDetected);
+    }
+
     try {
       const requestState = await authenticateRequest({
         clerkClient,

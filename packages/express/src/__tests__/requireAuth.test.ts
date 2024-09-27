@@ -1,7 +1,9 @@
 import type { RequestHandler } from 'express';
 
+import { clerkMiddleware } from '../clerkMiddleware';
+import { multipleMiddlewaresDetected } from '../errors';
 import { requireAuth } from '../requireAuth';
-import type { ClerkMiddlewareOptions } from '../types';
+import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from '../types';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
 let mockAuthenticateAndDecorateRequest: jest.Mock;
@@ -64,5 +66,21 @@ describe('requireAuth', () => {
     expect(mockAuthenticateAndDecorateRequest).toHaveBeenCalled();
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/custom-sign-in');
+  });
+
+  it('should throw an error when attempting to use both middlewares', async () => {
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        if ((req as ExpressRequestWithAuth).auth) {
+          throw new Error(multipleMiddlewaresDetected);
+        }
+
+        Object.assign(req, mockRequestWithAuth());
+        next();
+      };
+    });
+    const response = await runMiddleware([clerkMiddleware(), requireAuth()]);
+    expect(response.status).toBe(500);
+    expect(response.text).toContain('Multiple Clerk middlewares detected');
   });
 });
