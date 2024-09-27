@@ -47,7 +47,7 @@ type UpdateParams = {
 
 type UpdateLogoParams = {
   file: Blob | File;
-  uploaderUserId: string;
+  uploaderUserId?: string;
 };
 
 type UpdateMetadataParams = MetadataParams;
@@ -168,7 +168,9 @@ export class OrganizationAPI extends AbstractAPI {
 
     const formData = new runtime.FormData();
     formData.append('file', params?.file);
-    formData.append('uploader_user_id', params?.uploaderUserId);
+    if (params?.uploaderUserId) {
+      formData.append('uploader_user_id', params?.uploaderUserId);
+    }
 
     return this.request<Organization>({
       method: 'PUT',
