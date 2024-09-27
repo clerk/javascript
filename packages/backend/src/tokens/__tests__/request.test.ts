@@ -13,7 +13,12 @@ import {
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest, RefreshTokenErrorReason, getOrganizationSyncTarget, type OrganizationSyncTarget } from '../request';
+import {
+  authenticateRequest,
+  getOrganizationSyncTarget,
+  type OrganizationSyncTarget,
+  RefreshTokenErrorReason,
+} from '../request';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
