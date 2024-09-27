@@ -114,6 +114,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   verification: VerificationJSON | null;
+  saml_connection: SamlAccountConnectionJSON | null;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
@@ -396,6 +397,20 @@ export interface PermissionJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  domain: string;
+  active: boolean;
+  provider: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
 }

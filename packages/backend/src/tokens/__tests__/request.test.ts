@@ -13,7 +13,7 @@ import {
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest, getOrganizationSyncTarget, type OrganizationSyncTarget } from '../request';
+import { authenticateRequest, RefreshTokenErrorReason, getOrganizationSyncTarget, type OrganizationSyncTarget } from '../request';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -413,7 +413,9 @@ export default (QUnit: QUnit) => {
 
       const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.strictEqual(requestState.toAuth(), null);
     });
 
@@ -662,7 +664,7 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -729,7 +731,9 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });

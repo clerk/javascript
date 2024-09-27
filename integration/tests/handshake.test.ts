@@ -163,7 +163,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -186,7 +186,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -210,7 +210,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -233,7 +233,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
     );
   });
 
@@ -257,7 +257,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
     );
   });
 
@@ -281,7 +281,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -305,7 +305,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -329,7 +329,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -353,7 +353,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -374,7 +374,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token${devBrowserQuery}`,
     );
   });
 
@@ -395,7 +395,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token`,
     );
   });
 
@@ -496,7 +496,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         app.serverUrl + '/',
-      )}&suffixed_cookies=false&__clerk_hs_reason=satellite-needs-syncing&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=satellite-needs-syncing`,
     );
   });
 
@@ -533,7 +533,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-missing&__clerk_refresh=no-cookie`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-missing`,
     );
   });
 
@@ -556,7 +556,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -579,7 +579,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -602,7 +602,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -625,7 +625,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -648,7 +648,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
@@ -671,7 +671,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-outdated&__clerk_refresh=no-cookie`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -800,7 +800,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-sync&__clerk_refresh=no-cookie&__clerk_db_jwt=asdf`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-sync&__clerk_db_jwt=asdf`,
     );
   });
 

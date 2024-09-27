@@ -1,3 +1,5 @@
+import type { SignUpModes } from '@clerk/types';
+
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [
   'redirect_url',
@@ -23,9 +25,15 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
   EXTERNAL_ACCOUNT_NOT_FOUND: 'external_account_not_found',
+  SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
 export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'];
 
 export const DEBOUNCE_MS = 350;
+
+export const SIGN_UP_MODES: Record<string, SignUpModes> = {
+  PUBLIC: 'public',
+  RESTRICTED: 'restricted',
+};

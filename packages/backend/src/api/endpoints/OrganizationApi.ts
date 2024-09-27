@@ -1,9 +1,10 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/types';
 
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
   Organization,
+  OrganizationDomain,
   OrganizationInvitation,
   OrganizationInvitationStatus,
   OrganizationMembership,
@@ -34,7 +35,9 @@ type CreateParams = {
   maxAllowedMemberships?: number;
 } & MetadataParams;
 
-type GetOrganizationParams = { organizationId: string } | { slug: string };
+type GetOrganizationParams = ({ organizationId: string } | { slug: string }) & {
+  includeMembersCount?: boolean;
+};
 
 type UpdateParams = {
   name?: string;
@@ -44,7 +47,7 @@ type UpdateParams = {
 
 type UpdateLogoParams = {
   file: Blob | File;
-  uploaderUserId: string;
+  uploaderUserId?: string;
 };
 
 type UpdateMetadataParams = MetadataParams;
@@ -97,6 +100,29 @@ type RevokeOrganizationInvitationParams = {
   requestingUserId: string;
 };
 
+type GetOrganizationDomainListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type CreateOrganizationDomainParams = {
+  organizationId: string;
+  name: string;
+  enrollmentMode: OrganizationEnrollmentMode;
+  verified?: boolean;
+};
+
+type UpdateOrganizationDomainParams = {
+  organizationId: string;
+  domainId: string;
+} & Partial<CreateOrganizationDomainParams>;
+
+type DeleteOrganizationDomainParams = {
+  organizationId: string;
+  domainId: string;
+};
+
 export class OrganizationAPI extends AbstractAPI {
   public async getOrganizationList(params?: GetOrganizationListParams) {
     return this.request<PaginatedResourceResponse<Organization[]>>({
@@ -115,12 +141,16 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async getOrganization(params: GetOrganizationParams) {
+    const { includeMembersCount } = params;
     const organizationIdOrSlug = 'organizationId' in params ? params.organizationId : params.slug;
     this.requireId(organizationIdOrSlug);
 
     return this.request<Organization>({
       method: 'GET',
       path: joinPaths(basePath, organizationIdOrSlug),
+      queryParams: {
+        includeMembersCount,
+      },
     });
   }
 
@@ -138,7 +168,9 @@ export class OrganizationAPI extends AbstractAPI {
 
     const formData = new runtime.FormData();
     formData.append('file', params?.file);
-    formData.append('uploader_user_id', params?.uploaderUserId);
+    if (params?.uploaderUserId) {
+      formData.append('uploader_user_id', params?.uploaderUserId);
+    }
 
     return this.request<Organization>({
       method: 'PUT',
@@ -277,6 +309,55 @@ export class OrganizationAPI extends AbstractAPI {
       bodyParams: {
         requestingUserId,
       },
+    });
+  }
+
+  public async getOrganizationDomainList(params: GetOrganizationDomainListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this.request<PaginatedResourceResponse<OrganizationDomain[]>>({
+      method: 'GET',
+      path: joinPaths(basePath, organizationId, 'domains'),
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationDomain(params: CreateOrganizationDomainParams) {
+    const { organizationId, name, enrollmentMode, verified = true } = params;
+    this.requireId(organizationId);
+
+    return this.request<OrganizationDomain>({
+      method: 'POST',
+      path: joinPaths(basePath, organizationId, 'domains'),
+      bodyParams: {
+        name,
+        enrollmentMode,
+        verified,
+      },
+    });
+  }
+
+  public async updateOrganizationDomain(params: UpdateOrganizationDomainParams) {
+    const { organizationId, domainId, ...bodyParams } = params;
+    this.requireId(organizationId);
+    this.requireId(domainId);
+
+    return this.request<OrganizationDomain>({
+      method: 'PATCH',
+      path: joinPaths(basePath, organizationId, 'domains', domainId),
+      bodyParams,
+    });
+  }
+
+  public async deleteOrganizationDomain(params: DeleteOrganizationDomainParams) {
+    const { organizationId, domainId } = params;
+    this.requireId(organizationId);
+    this.requireId(domainId);
+
+    return this.request<OrganizationDomain>({
+      method: 'DELETE',
+      path: joinPaths(basePath, organizationId, 'domains', domainId),
     });
   }
 }
