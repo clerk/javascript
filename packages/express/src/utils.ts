@@ -1,5 +1,5 @@
 import { isTruthy } from '@clerk/shared/underscore';
-import type { Request as ExpressRequest, RequestHandler } from 'express';
+import type { Request as ExpressRequest } from 'express';
 
 import type { ExpressRequestWithAuth } from './types';
 
@@ -36,5 +36,3 @@ export const loadApiEnv = () => {
     },
   };
 };
-
-export const defaultHandler: RequestHandler = (_req, _res, next) => next();

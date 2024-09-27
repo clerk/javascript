@@ -3,11 +3,12 @@ import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
-import type { Response } from 'express';
+import type { RequestHandler, Response } from 'express';
 import type { IncomingMessage } from 'http';
 
+import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
-import type { AuthenticateRequestParams } from './types';
+import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
@@ -62,7 +63,7 @@ const incomingMessageToRequest = (req: IncomingMessage): Request => {
   });
 };
 
-export const setResponseHeaders = (requestState: RequestState, res: Response): Error | undefined => {
+const setResponseHeaders = (requestState: RequestState, res: Response): Error | undefined => {
   if (requestState.headers) {
     requestState.headers.forEach((value, key) => res.appendHeader(key, value));
   }
@@ -94,4 +95,43 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
     return relativeOrAbsoluteUrl;
   }
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
+};
+
+export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}) => {
+  const clerkClient = options.clerkClient || defaultClerkClient;
+  const enableHandshake = options.enableHandshake || false;
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const middleware: RequestHandler = async (request, response, next) => {
+    if ((request as ExpressRequestWithAuth).auth) {
+      return next();
+    }
+
+    try {
+      const requestState = await authenticateRequest({
+        clerkClient,
+        request,
+        options,
+      });
+
+      if (enableHandshake) {
+        const err = setResponseHeaders(requestState, response);
+        if (err) {
+          return next(err);
+        }
+        if (response.writableEnded) {
+          return;
+        }
+      }
+
+      const auth = requestState.toAuth();
+      Object.assign(request, { auth });
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  return middleware;
 };
