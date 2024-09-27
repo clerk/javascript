@@ -15,6 +15,7 @@ export interface __experimental_SessionVerificationResource extends ClerkResourc
 
 export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 export type __experimental_SessionVerificationLevel = 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+// export type __experimental_SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
 export type __experimental_SessionVerificationMaxAge =
   | 'A0.1min'
   | 'A1.10min'

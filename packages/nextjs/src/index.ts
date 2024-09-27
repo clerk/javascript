@@ -69,5 +69,6 @@ export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModul
 export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
 export const Protect = ComponentsModule.Protect as ServerComponentsServerModuleTypes['Protect'];
 export const protect = ComponentsModule.protect as ServerComponentsServerModuleTypes['protect'];
+export const protectComponent = ComponentsModule.protect as ServerComponentsServerModuleTypes['protectComponent'];
 export const defineProtectParams =
   ComponentsModule.defineProtectParams as ServerComponentsServerModuleTypes['defineProtectParams'];

@@ -1,7 +1,14 @@
 import { ClerkProvider } from './app-router/server/ClerkProvider';
-import { defineProtectParams, Protect, protect, SignedIn, SignedOut } from './app-router/server/controlComponents';
+import {
+  defineProtectParams,
+  Protect,
+  protect,
+  protectComponent,
+  SignedIn,
+  SignedOut,
+} from './app-router/server/controlComponents';
 
-export { ClerkProvider, SignedOut, SignedIn, Protect, protect, defineProtectParams };
+export { ClerkProvider, SignedOut, SignedIn, Protect, protect, defineProtectParams, protectComponent };
 
 export type ServerComponentsServerModuleTypes = {
   ClerkProvider: typeof ClerkProvider;
@@ -10,4 +17,5 @@ export type ServerComponentsServerModuleTypes = {
   Protect: typeof Protect;
   protect: typeof protect;
   defineProtectParams: typeof defineProtectParams;
+  protectComponent: typeof protectComponent;
 };
