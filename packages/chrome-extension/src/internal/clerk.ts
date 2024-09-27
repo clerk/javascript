@@ -32,7 +32,7 @@ export async function createClerkClient({
   scope,
   storageCache = BrowserStorageCache,
   syncHost = process.env.CLERK_SYNC_HOST,
-  syncSessionWithTab = false,
+  syncSessionWithTab = Boolean(process.env.CLERK_SYNC_HOST),
 }: CreateClerkClientOptions): Promise<Clerk> {
   console.log('createClerkClient (props):', { publishableKey, scope, storageCache, syncHost, syncSessionWithTab });
 
@@ -54,12 +54,21 @@ export async function createClerkClient({
   });
 
   // Set up JWT handler and attempt to get JWT from storage on initialization
+  let url = DEFAULT_LOCAL_HOST_PERMISSION;
+
+  if (syncSessionWithTab) {
+    if (syncHost) {
+      url = syncHost;
+    } else if (isProd) {
+      url = `https://${key.frontendApi}`;
+    }
+  }
 
   const jwtOptions = {
     frontendApi: key.frontendApi,
     name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_JWT_KEY,
     sync: syncSessionWithTab,
-    url: syncHost || isProd ? `https://${key.frontendApi}` : DEFAULT_LOCAL_HOST_PERMISSION,
+    url,
   };
 
   console.log('JWTHandler (options):', jwtOptions);
