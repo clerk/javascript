@@ -354,23 +354,26 @@ ${error.getFullMessage()}`,
     authenticateContext: AuthenticateContext,
     auth: SignedInAuthObject,
   ): HandshakeState | SignedOutState | null {
-    const toActivate = getOrganizationSyncTarget(authenticateContext.clerkUrl, options.organizationSyncOptions);
-    if (!toActivate) {
+    const organizationSyncTarget = getOrganizationSyncTarget(
+      authenticateContext.clerkUrl,
+      options.organizationSyncOptions,
+    );
+    if (!organizationSyncTarget) {
       return null;
     }
     let mustActivate = false;
-    if (toActivate.type === 'organization') {
+    if (organizationSyncTarget.type === 'organization') {
       // Activate an org by slug?
-      if (toActivate.organizationSlug && toActivate.organizationSlug !== auth.orgSlug) {
+      if (organizationSyncTarget.organizationSlug && organizationSyncTarget.organizationSlug !== auth.orgSlug) {
         mustActivate = true;
       }
       // Activate an org by ID?
-      if (toActivate.organizationId && toActivate.organizationId !== auth.orgId) {
+      if (organizationSyncTarget.organizationId && organizationSyncTarget.organizationId !== auth.orgId) {
         mustActivate = true;
       }
     }
     // Activate the personal workspace?
-    if (toActivate.type === 'personalWorkspace' && auth.orgId) {
+    if (organizationSyncTarget.type === 'personalWorkspace' && auth.orgId) {
       mustActivate = true;
     }
     if (!mustActivate) {
