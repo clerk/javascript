@@ -912,49 +912,6 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  const start = async (orgSyncOptions: OrganizationSyncOptions): Promise<Application> => {
-    const env = appConfigs.envs.withEmailCodes
-      .clone()
-      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${jwksServer.address().port}`);
-
-    const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
-    // Set the paths that don't require the user to be signed in
-    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
-    export const middleware = (req, evt) => {
-      return authMiddleware({
-        publicRoutes: publicPaths,
-        publishableKey: req.headers.get("x-publishable-key"),
-        secretKey: req.headers.get("x-secret-key"),
-        proxyUrl: req.headers.get("x-proxy-url"),
-        domain: req.headers.get("x-domain"),
-        isSatellite: req.headers.get('x-satellite') === 'true',
-        signInUrl: req.headers.get("x-sign-in-url"),
-
-        // Critical
-        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
-
-      })(req, evt)
-    };
-    export const config = {
-      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-    };
-    `;
-
-    const app = await appConfigs.next.appRouter
-      .clone()
-      .addFile('src/middleware.ts', () => middlewareFile)
-      .commit();
-
-    await app.setup();
-    await app.withEnv(env);
-    await app.dev();
-    return app;
-  };
-
-  const end = async (app: Application): Promise<void> => {
-    await app.teardown();
-  };
-
   type testCase = {
     name: string;
     when: when;
@@ -1259,7 +1216,10 @@ test.describe('Client handshake with organization activation @nextjs', () => {
 
   for (const testCase of cookieAuthCases) {
     test(`${testCase.name}`, async () => {
-      const app = await start(testCase.when.orgSyncOptions);
+      const app = await startAppWithOrganizationSyncOptions(
+        testCase.when.orgSyncOptions,
+        `http://localhost:${jwksServer.address().port}`,
+      );
 
       const config = generateConfig({
         mode: 'test',
@@ -1297,7 +1257,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
       expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
 
-      await end(app);
+      await app.teardown();
     });
   }
 });
@@ -1325,59 +1285,19 @@ test.describe('Client handshake with an organization activation avoids infinite 
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
 
-    thisApp = await start({
-      organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
-      personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
-    });
+    thisApp = await startAppWithOrganizationSyncOptions(
+      {
+        organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+        personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
+      },
+      `http://localhost:${jwksServer.address().port}`,
+    );
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
-    await end(thisApp);
+    await thisApp.teardown();
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
-
-  const start = async (orgSyncOptions: OrganizationSyncOptions): Promise<Application> => {
-    const env = appConfigs.envs.withEmailCodes
-      .clone()
-      .setEnvVariable('private', 'CLERK_API_URL', `http://localhost:${jwksServer.address().port}`);
-
-    const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
-    // Set the paths that don't require the user to be signed in
-    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
-    export const middleware = (req, evt) => {
-      return authMiddleware({
-        publicRoutes: publicPaths,
-        publishableKey: req.headers.get("x-publishable-key"),
-        secretKey: req.headers.get("x-secret-key"),
-        proxyUrl: req.headers.get("x-proxy-url"),
-        domain: req.headers.get("x-domain"),
-        isSatellite: req.headers.get('x-satellite') === 'true',
-        signInUrl: req.headers.get("x-sign-in-url"),
-
-        // Critical
-        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
-
-      })(req, evt)
-    };
-    export const config = {
-      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-    };
-    `;
-
-    const app = await appConfigs.next.appRouter
-      .clone()
-      .addFile('src/middleware.ts', () => middlewareFile)
-      .commit();
-
-    await app.setup();
-    await app.withEnv(env);
-    await app.dev();
-    return app;
-  };
-
-  const end = async (app: Application): Promise<void> => {
-    await app.teardown();
-  };
 
   // -------------- Test begin ------------
 
@@ -1445,3 +1365,46 @@ test.describe('Client handshake with an organization activation avoids infinite 
     expect(res.headers.get('set-cookie')).toBe(null);
   });
 });
+
+/**
+ * Start the nextjs sample app with the given organization sync options
+ */
+const startAppWithOrganizationSyncOptions = async (
+  orgSyncOptions: OrganizationSyncOptions,
+  clerkAPIUrl: string,
+): Promise<Application> => {
+  const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('private', 'CLERK_API_URL', clerkAPIUrl);
+
+  const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
+    // Set the paths that don't require the user to be signed in
+    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+    export const middleware = (req, evt) => {
+      return authMiddleware({
+        publicRoutes: publicPaths,
+        publishableKey: req.headers.get("x-publishable-key"),
+        secretKey: req.headers.get("x-secret-key"),
+        proxyUrl: req.headers.get("x-proxy-url"),
+        domain: req.headers.get("x-domain"),
+        isSatellite: req.headers.get('x-satellite') === 'true',
+        signInUrl: req.headers.get("x-sign-in-url"),
+
+        // Critical
+        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
+
+      })(req, evt)
+    };
+    export const config = {
+      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    };
+    `;
+
+  const app = await appConfigs.next.appRouter
+    .clone()
+    .addFile('src/middleware.ts', () => middlewareFile)
+    .commit();
+
+  await app.setup();
+  await app.withEnv(env);
+  await app.dev();
+  return app;
+};
