@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.24.0
+
+### Minor Changes
+
+- Handle `sign_up_mode_restricted` error encountered in an oauth flow ([#4232](https://github.com/clerk/javascript/pull/4232)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Correctly pass `defaultOpen` prop to `OrganizationSwitcher` popover instance. ([#4233](https://github.com/clerk/javascript/pull/4233)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally renders identification sections on `UserProfile` based on the SAML connection configuration for disabling additional identifiers. ([#4211](https://github.com/clerk/javascript/pull/4211)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`4749ed4c5`](https://github.com/clerk/javascript/commit/4749ed4c55a5ba5810451b8d436aad0d49829050), [`f1f17eaab`](https://github.com/clerk/javascript/commit/f1f17eaabed0dc4b7de405fb77d85503cf75ad33), [`2e35ac538`](https://github.com/clerk/javascript/commit/2e35ac53885f8008779940d41d1e804fa77ebfa9)]:
+  - @clerk/types@4.23.0
+  - @clerk/localizations@3.1.0
+  - @clerk/shared@2.8.4
+
 ## 5.23.0
 
 ### Minor Changes
