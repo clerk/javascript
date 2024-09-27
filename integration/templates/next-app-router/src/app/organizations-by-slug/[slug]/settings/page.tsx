@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
-export default function Home({ params }): {} {
+export default function Home({ params }: { params: { slug: string } }) {
   const { orgSlug } = auth();
 
   if (params.slug != orgSlug) {
