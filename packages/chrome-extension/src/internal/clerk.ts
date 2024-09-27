@@ -76,8 +76,8 @@ export async function createClerkClient({
 
   // Create Clerk instance
   clerk = new Clerk(publishableKey);
-  clerk.__unstable__onAfterResponse(requestHandler(jwt));
-  clerk.__unstable__onAfterResponse(responseHandler(jwt));
+  clerk.__unstable__onAfterResponse(responseHandler(jwt, { isProd }));
+  clerk.__unstable__onBeforeRequest(requestHandler(jwt, { isProd }));
 
   return clerk;
 }
