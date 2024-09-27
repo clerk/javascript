@@ -1,11 +1,6 @@
 import type { ActorRefFrom, AnyActorRef, AnyStateMachine, SnapshotFrom } from 'xstate';
 
-import type {
-  TSignUpContinueMachine,
-  TSignUpRouterMachine,
-  TSignUpStartMachine,
-  TSignUpVerificationMachine,
-} from '~/internals/machines/sign-up';
+import type { TSignUpRouterMachine, TSignUpVerificationMachine } from '~/internals/machines/sign-up';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
 export type SnapshotState = SnapshotFrom<TSignUpRouterMachine>;
@@ -16,6 +11,4 @@ function useSignUpStep<M extends AnyStateMachine, T = ActorRefFrom<M>>(name: str
   return SignUpRouterCtx.useSelector(state => state.children[name] as AnyActorRef) as T;
 }
 
-export const useSignUpStartStep = () => useSignUpStep<TSignUpStartMachine>('start');
-export const useSignUpContinueStep = () => useSignUpStep<TSignUpContinueMachine>('continue');
 export const useSignUpVerificationStep = () => useSignUpStep<TSignUpVerificationMachine>('verification');

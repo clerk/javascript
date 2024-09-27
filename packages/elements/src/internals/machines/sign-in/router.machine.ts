@@ -104,7 +104,7 @@ export const SignInRouterMachine = setup({
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     // Continues to the next valid step in the sign-in flow
     goToNextStep: raise(({ event }) => {
-      assertActorEventDone(event);
+      assertActorEventDone<SignInResource>(event);
       return { type: 'NEXT', resource: event?.output } as SignInRouterNextEvent;
     }),
     // goToNextStep: enqueueActions(({ context, enqueue, event }) => {

@@ -1,19 +1,12 @@
 import type { SignInStrategy } from '@clerk/types';
 
-import type {
-  SignUpContinueContext,
-  SignUpContinueEvents,
-  SignUpStartContext,
-  SignUpStartRedirectEvent,
-  SignUpVerificationContext,
-  SignUpVerificationEvents,
-} from '~/internals/machines/sign-up';
+import type { SignUpVerificationContext, SignUpVerificationEvents } from '~/internals/machines/sign-up';
 import type { ThirdPartyMachineContext, ThirdPartyMachineEvent } from '~/internals/machines/third-party';
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 
 type SendToLoadingProps = {
-  context: ThirdPartyMachineContext | SignUpStartContext | SignUpContinueContext | SignUpVerificationContext;
-  event: ThirdPartyMachineEvent | SignUpStartRedirectEvent | SignUpContinueEvents | SignUpVerificationEvents;
+  context: ThirdPartyMachineContext | SignUpVerificationContext;
+  event: ThirdPartyMachineEvent | SignUpVerificationEvents;
 };
 
 export function sendToLoading({ context, event }: SendToLoadingProps): void {
@@ -51,29 +44,29 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
       step,
       strategy,
     });
-  } else if (context.loadingStep === 'continue') {
-    step = 'continue';
-    strategy = undefined;
-    action = 'action' in event ? event.action : undefined;
-    context.parent.send({
-      type: 'LOADING',
-      isLoading: true,
-      step,
-      strategy,
-      action,
-    });
-  } else if (context.loadingStep === 'start') {
-    step = 'start';
-    strategy = undefined;
-    action = 'action' in event ? event.action : undefined;
+    // } else if (context.loadingStep === 'continue') {
+    //   step = 'continue';
+    //   strategy = undefined;
+    //   action = 'action' in event ? event.action : undefined;
+    //   context.parent.send({
+    //     type: 'LOADING',
+    //     isLoading: true,
+    //     step,
+    //     strategy,
+    //     action,
+    //   });
+    // } else if (context.loadingStep === 'start') {
+    //   step = 'start';
+    //   strategy = undefined;
+    //   action = 'action' in event ? event.action : undefined;
 
-    context.parent.send({
-      type: 'LOADING',
-      isLoading: true,
-      step,
-      strategy,
-      action,
-    });
+    //   context.parent.send({
+    //     type: 'LOADING',
+    //     isLoading: true,
+    //     step,
+    //     strategy,
+    //     action,
+    //   });
   } else {
     step = context.loadingStep;
     strategy = undefined;

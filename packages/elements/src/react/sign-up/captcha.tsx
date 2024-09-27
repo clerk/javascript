@@ -4,7 +4,8 @@ import * as React from 'react';
 import { CAPTCHA_ELEMENT_ID } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import { SignUpStartCtx } from './start';
+import { useActiveTags } from '../hooks';
+import { SignUpRouterCtx } from './context';
 
 export type SignUpCaptchaElement = React.ElementRef<'div'>;
 
@@ -49,9 +50,10 @@ export type SignUpCaptchaProps =
 
 export const SignUpCaptcha = React.forwardRef<SignUpCaptchaElement, SignUpCaptchaProps>(
   ({ asChild, children, ...rest }, forwardedRef) => {
-    const ref = SignUpStartCtx.useActorRef(true);
+    const routerRef = SignUpRouterCtx.useActorRef();
+    const activeState = useActiveTags(routerRef, 'step:start');
 
-    if (!ref) {
+    if (!activeState) {
       throw new ClerkElementsRuntimeError('<Captcha> must be used within the <SignUp.Step name="start"> component.');
     }
 

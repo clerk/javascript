@@ -1,7 +1,8 @@
+import { snakeToCamel } from '@clerk/shared/underscore';
 import { joinURL } from '@clerk/shared/url';
-import type { SignUpStatus, VerificationStatus } from '@clerk/types';
+import type { SignInStrategy, SignUpResource, SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -12,21 +13,37 @@ import {
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import type { FormDefaultValues } from '~/internals/machines/form';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
-import { SignUpContinueMachine } from './continue.machine';
+import type { BaseRouterLoadingStep } from '../types';
+import { assertActorEventDone, assertActorEventError } from '../utils/assert';
+import type { StartAttemptParams } from './actors';
+import {
+  startAttempt,
+  startAttemptWeb3,
+  verificationAttempt,
+  verificationAttemptEmailLink,
+  verificationPrepare,
+} from './actors';
 import type {
   SignUpRouterContext,
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from './router.types';
-import { SignUpStartMachine } from './start.machine';
 import { SignUpVerificationMachine } from './verification.machine';
 
 export const SignUpRouterMachineId = 'SignUpRouter';
 export type TSignUpRouterMachine = typeof SignUpRouterMachine;
+
+type PrefillFieldsKeys = keyof Pick<
+  SignUpResource,
+  'username' | 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber'
+>;
+const PREFILL_FIELDS: PrefillFieldsKeys[] = ['firstName', 'lastName', 'emailAddress', 'username', 'phoneNumber'];
+const DISABLEABLE_FIELDS = ['emailAddress', 'phoneNumber'] as const;
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -40,8 +57,12 @@ const needsStatus =
 
 export const SignUpRouterMachine = setup({
   actors: {
-    continueMachine: SignUpContinueMachine,
-    startMachine: SignUpStartMachine,
+    startAttempt,
+    startAttemptWeb3,
+    verificationAttempt,
+    verificationAttemptEmailLink,
+    verificationPrepare,
+
     thirdPartyMachine: ThirdPartyMachine,
     verificationMachine: SignUpVerificationMachine,
   },
@@ -83,6 +104,54 @@ export const SignUpRouterMachine = setup({
       void context.clerk.setActive({ session, beforeEmit });
     },
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
+    goToNextStep: raise(({ event }) => {
+      assertActorEventDone<SignUpResource>(event);
+      return { type: 'NEXT', resource: event?.output } as SignUpRouterNextEvent;
+    }),
+    markFormAsProgressive: ({ context }) => {
+      const signUp = context.clerk.client.signUp;
+
+      const missing = signUp.missingFields.map(snakeToCamel);
+      const optional = signUp.optionalFields.map(snakeToCamel);
+      const required = signUp.requiredFields.map(snakeToCamel);
+
+      const progressiveFieldValues: FormDefaultValues = new Map();
+
+      for (const key of required.concat(optional) as (keyof SignUpResource)[]) {
+        if (key in signUp) {
+          // @ts-expect-error - TS doesn't understand that key is a valid key of SignUpResource
+          progressiveFieldValues.set(key, signUp[key]);
+        }
+      }
+
+      sendTo(context.formRef, {
+        type: 'MARK_AS_PROGRESSIVE',
+        missing,
+        optional,
+        required,
+        defaultValues: progressiveFieldValues,
+      });
+    },
+    unmarkFormAsProgressive: ({ context }) => context.formRef.send({ type: 'UNMARK_AS_PROGRESSIVE' }),
+    loadingBegin: assign((_, params: { step: BaseRouterLoadingStep; strategy?: SignInStrategy; action?: 'submit' }) => {
+      const { step, strategy, action } = params;
+      return {
+        loading: {
+          action,
+          isLoading: true,
+          step,
+          strategy,
+        },
+      };
+    }),
+    loadingEnd: assign({
+      loading: {
+        action: undefined,
+        isLoading: false,
+        step: undefined,
+        strategy: undefined,
+      },
+    }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
         if (error) {
@@ -91,6 +160,44 @@ export const SignUpRouterMachine = setup({
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
+    setFormDefaultValues: ({ context }) => {
+      const signUp = context.clerk.client.signUp;
+      const prefilledDefaultValues = new Map();
+
+      for (const key of PREFILL_FIELDS) {
+        if (key in signUp) {
+          prefilledDefaultValues.set(key, signUp[key]);
+        }
+      }
+
+      context.formRef.send({
+        type: 'PREFILL_DEFAULT_VALUES',
+        defaultValues: prefilledDefaultValues,
+      });
+    },
+    setFormDisabledTicketFields: ({ context }) => {
+      if (!context.ticket) {
+        return;
+      }
+
+      const currentFields = context.formRef.getSnapshot().context.fields;
+
+      for (const name of DISABLEABLE_FIELDS) {
+        if (currentFields.has(name)) {
+          sendTo(context.formRef, { type: 'FIELD.DISABLE', field: { name } });
+        }
+      }
+    },
+    setFormErrors: sendTo(
+      ({ context }) => context.formRef,
+      ({ event }) => {
+        assertActorEventError(event);
+        return {
+          type: 'ERRORS.SET',
+          error: event.error,
+        };
+      },
+    ),
     setFormOAuthErrors: ({ context }) => {
       const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
 
@@ -319,20 +426,6 @@ export const SignUpRouterMachine = setup({
     },
     Start: {
       tags: ['step:start'],
-      exit: 'clearFormErrors',
-      invoke: {
-        id: 'start',
-        src: 'startMachine',
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath,
-          formRef: context.formRef,
-          parent: self,
-          ticket: context.ticket,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
       on: {
         'RESET.STEP': {
           target: 'Start',
@@ -360,21 +453,111 @@ export const SignUpRouterMachine = setup({
           },
         ],
       },
+      entry: 'setFormDefaultValues',
+      exit: 'clearFormErrors',
+      initial: 'Init',
+      states: {
+        Init: {
+          description:
+            'Handle ticket, if present; Else, default to Pending state. Per tickets, `Attempting` makes a `signUp.create` request allowing for an incomplete sign up to contain progressively filled fields on the Start step.',
+          always: [
+            {
+              guard: 'hasTicket',
+              target: 'Attempting',
+            },
+            {
+              target: 'Pending',
+            },
+          ],
+        },
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            SUBMIT: {
+              guard: not('isExampleMode'),
+              target: 'Attempting',
+              reenter: true,
+            },
+            'AUTHENTICATE.WEB3': {
+              guard: not('isExampleMode'),
+              target: 'AttemptingWeb3',
+              reenter: true,
+            },
+          },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'start',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'startAttempt',
+            src: 'startAttempt',
+            input: ({ context }) => {
+              // Standard fields
+              const defaultParams = {
+                clerk: context.clerk,
+                fields: context.formRef.getSnapshot().context.fields,
+              };
+
+              // Handle ticket-specific flows
+              const params: StartAttemptParams = context.ticket
+                ? {
+                    strategy: 'ticket',
+                    ticket: context.ticket,
+                  }
+                : {};
+
+              return { ...defaultParams, params };
+            },
+            onDone: {
+              actions: ['setFormDisabledTicketFields', 'goToNextStep'],
+            },
+            onError: {
+              actions: ['setFormDisabledTicketFields', 'setFormErrors'],
+              target: 'Pending',
+            },
+          },
+        },
+        AttemptingWeb3: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'start',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'startAttemptWeb3',
+            src: 'startAttemptWeb3',
+            input: ({ context, event }) => {
+              assertEvent(event, 'AUTHENTICATE.WEB3');
+              return {
+                clerk: context.clerk,
+                strategy: event.strategy,
+              };
+            },
+            onDone: {
+              actions: ['goToNextStep'],
+            },
+            onError: {
+              actions: ['setFormErrors'],
+              target: 'Pending',
+            },
+          },
+        },
+      },
     },
     Continue: {
       tags: ['step:continue'],
-      invoke: {
-        id: 'continue',
-        src: 'continueMachine',
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath,
-          formRef: context.formRef,
-          parent: self,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
+      entry: 'markFormAsProgressive',
+      exit: 'unmarkFormAsProgressive',
       on: {
         'RESET.STEP': {
           target: 'Continue',
@@ -391,6 +574,44 @@ export const SignUpRouterMachine = setup({
             actions: { type: 'navigateInternal', params: { path: '/verify' } },
           },
         ],
+      },
+      initial: 'Pending',
+      states: {
+        Pending: {
+          tags: ['state:pending'],
+          description: 'Waiting for user input',
+          on: {
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
+          },
+        },
+        Attempting: {
+          tags: ['state:attempting', 'state:loading'],
+          entry: {
+            type: 'loadingBegin',
+            params: {
+              step: 'continue',
+            },
+          },
+          exit: 'loadingEnd',
+          invoke: {
+            id: 'continueAttempt',
+            src: 'startAttempt', // Re-use the same actor
+            input: ({ context }) => ({
+              clerk: context.clerk,
+              fields: context.formRef.getSnapshot().context.fields,
+            }),
+            onDone: {
+              actions: 'goToNextStep',
+            },
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
+          },
+        },
       },
     },
     Verification: {

@@ -1,5 +1,5 @@
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom, SnapshotFrom, StateMachine } from 'xstate';
+import type { ActorRefFrom, ErrorActorEvent, SnapshotFrom, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
 import type {
@@ -20,6 +20,13 @@ import type {
 
 // ---------------------------------- Tags ---------------------------------- //
 
+export const SignUpRouterStates = {
+  attempting: 'state:attempting',
+  loading: 'state:loading',
+  pending: 'state:pending',
+  preparing: 'state:preparing',
+} as const;
+
 export const SignUpRouterSteps = {
   start: 'step:start',
   continue: 'step:continue',
@@ -28,8 +35,12 @@ export const SignUpRouterSteps = {
   error: 'step:error',
 } as const;
 
+export type SignUpRouterStates = keyof typeof SignUpRouterStates;
 export type SignUpRouterSteps = keyof typeof SignUpRouterSteps;
-export type SignUpRouterTags = (typeof SignUpRouterSteps)[keyof typeof SignUpRouterSteps];
+
+export type SignUpRouterTags =
+  | (typeof SignUpRouterSteps)[keyof typeof SignUpRouterSteps]
+  | (typeof SignUpRouterStates)[keyof typeof SignUpRouterStates];
 
 // ---------------------------------- Children ---------------------------------- //
 
@@ -52,7 +63,11 @@ export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
 export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignUpRouterResetEvent = BaseRouterResetEvent;
 export type SignUpRouterResetStepEvent = BaseRouterResetStepEvent;
-export type SignUpRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'continue'>;
+// TODO: Omit invalid
+export type SignUpRouterLoadingEvent = BaseRouterLoadingEvent<
+  'start' | 'continue' | 'verifications' | 'reset-password' | 'forgot-password' | 'choose-strategy' | 'error'
+>;
+export type SignUpRouterSubmitEvent = { type: 'SUBMIT' };
 export type SignUpRouterSetClerkEvent = BaseRouterSetClerkEvent;
 
 export interface SignUpRouterInitEvent extends BaseRouterInput {
@@ -64,6 +79,7 @@ export interface SignUpRouterInitEvent extends BaseRouterInput {
 export type SignUpRouterNavigationEvents = SignUpRouterStartEvent | SignUpRouterPrevEvent;
 
 export type SignUpRouterEvents =
+  | ErrorActorEvent
   | SignUpRouterFormAttachEvent
   | SignUpRouterInitEvent
   | SignUpRouterNextEvent
@@ -74,7 +90,8 @@ export type SignUpRouterEvents =
   | SignUpRouterResetEvent
   | SignUpRouterResetStepEvent
   | SignUpRouterLoadingEvent
-  | SignUpRouterSetClerkEvent;
+  | SignUpRouterSetClerkEvent
+  | SignUpRouterSubmitEvent;
 
 // ---------------------------------- Delays ---------------------------------- //
 
@@ -106,9 +123,9 @@ export interface SignUpRouterSchema {
 
 // ---------------------------------- Machine Type ---------------------------------- //
 
-export type SignUpRouterChildren = any; // TODO: Update
-export type SignUpRouterOuptut = any; // TODO: Update
-export type SignUpRouterStateValue = any; // TODO: Update
+export type SignUpRouterChildren = any;
+export type SignUpRouterOuptut = any;
+export type SignUpRouterStateValue = any;
 
 export type TSignUpRouterParentMachine = StateMachine<
   SignUpRouterContext, // context
