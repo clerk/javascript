@@ -662,9 +662,6 @@ export const debugRequestState = (params: RequestState) => {
 /**
  * Determines if the given URL and settings indicate a desire to activate a specific
  * organization or personal workspace.
- *
- * @returns {OrganizationSyncTarget | null} - The function can return the following:
- *  - {OrganizationSyncTarget}: If the URL and settings indicate a desire to activate an organization or personal workspace.
  */
 export function getOrganizationSyncTarget(
   url: URL,
