@@ -45,6 +45,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
   const { onShowAlternativeMethodsClick, onPasswordPwned } = props;
+  const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
   const { setActive } = useClerk();
   const signIn = useCoreSignIn();
@@ -87,6 +88,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         }
 
         handleError(err, [passwordControl], card.setError);
+
+        setTimeout(() => passwordInputRef.current?.focus(), 0);
       });
   };
 
@@ -129,6 +132,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               <Form.ControlRow elementId={passwordControl.id}>
                 <Form.PasswordInput
                   {...passwordControl.props}
+                  ref={passwordInputRef}
                   autoFocus
                 />
               </Form.ControlRow>
