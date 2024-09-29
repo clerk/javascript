@@ -48,7 +48,8 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
 
   const otherOrgs = ((userMemberships.count || 0) > 0 ? userMemberships.data || [] : [])
     .map(e => e.organization)
-    .filter(o => o.id !== currentOrg?.id);
+    .filter(o => o.id !== currentOrg?.id)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   if (!user) {
     return null;
