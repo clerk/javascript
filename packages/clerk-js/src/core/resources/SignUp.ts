@@ -70,6 +70,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdSessionId: string | null = null;
   createdUserId: string | null = null;
   abandonAt: number | null = null;
+  legalAcceptedAt: number | null = null;
 
   constructor(data: SignUpJSON | null = null) {
     super();
@@ -258,6 +259,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
+    legalAccepted,
   }: AuthenticateWithRedirectParams & {
     unsafeMetadata?: SignUpUnsafeMetadata;
   }): Promise<void> => {
@@ -268,6 +270,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
+        legalAccepted,
       };
       return continueSignUp && this.id ? this.update(params) : this.create(params);
     };
@@ -328,6 +331,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.createdUserId = data.created_user_id;
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
+      this.legalAcceptedAt = data.legal_accepted_at;
     }
     return this;
   }
