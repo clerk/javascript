@@ -49,9 +49,9 @@ export function SignUpContinue() {
                 <GlobalError />
 
                 <Card.Body>
-                  <div className='space-y-4'>
+                  <div className='flex flex-col gap-y-4'>
                     {firstNameEnabled && lastNameEnabled ? (
-                      <div className='flex gap-4'>
+                      <div className='flex gap-4 empty:hidden'>
                         <FirstNameField
                           required={firstNameRequired}
                           disabled={isGlobalLoading}
