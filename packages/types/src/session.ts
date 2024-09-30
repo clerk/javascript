@@ -16,6 +16,7 @@ import type {
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type {
+  __experimental_ReverificationConfig,
   __experimental_SessionVerificationLevel,
   __experimental_SessionVerificationMaxAge,
   __experimental_SessionVerificationResource,
@@ -39,10 +40,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = (
     }
   | { role?: never; permission?: never }
 ) & {
-  __experimental_assurance?: {
-    level: __experimental_SessionVerificationLevel;
-    maxAge: __experimental_SessionVerificationMaxAge;
-  };
+  __experimental_reverification?: __experimental_ReverificationConfig;
 };
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
