@@ -104,6 +104,9 @@ export const SignUpForm = (props: SignUpFormProps) => {
       </Col>
       <Col center>
         <CaptchaElement />
+        <Form.ControlRow elementId='legalConsent'>
+          <Form.Checkbox {...formState.legalAccepted.props} />
+        </Form.ControlRow>
         <Form.SubmitButton
           hasArrow
           localizationKey={localizationKeys('formButtonPrimary')}

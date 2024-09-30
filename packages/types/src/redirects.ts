@@ -79,6 +79,11 @@ export type AuthenticateWithRedirectParams = {
    * Email address to use for targeting a SAML connection at sign-up
    */
   emailAddress?: string;
+
+  /**
+   * Whether the user has accepted the legal terms.
+   */
+  legalAccepted?: boolean;
 };
 
 export type RedirectUrlProp = {
