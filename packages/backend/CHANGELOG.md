@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.13.6
+
+### Patch Changes
+
+- Add the 'session-token-expired-refresh-expired-session-token-missing-sid-claim' handshake reason for debugging purposes ([#4237](https://github.com/clerk/javascript/pull/4237)) by [@anagstef](https://github.com/anagstef)
+
+- Update `uploaderUserId` parameter on `updateOrganizationLogo` to be optional. ([#4236](https://github.com/clerk/javascript/pull/4236)) by [@izaaklauer](https://github.com/izaaklauer)
+
+- Handle "Cannot convert argument to a ByteString" errors ([#4244](https://github.com/clerk/javascript/pull/4244)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.13.5
 
 ### Patch Changes
