@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.24.1
+
+### Patch Changes
+
+- Maintain focus on password input after error during sign in flow. ([#4240](https://github.com/clerk/javascript/pull/4240)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.24.0
 
 ### Minor Changes
