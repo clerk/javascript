@@ -27,7 +27,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   const isUsernameRequired = userSettings.attributes.username.required;
 
   const canSubmit =
-    (isUsernameRequired ? usernameField.value.length > 1 : true) && user.username !== usernameField.value;
+    (isUsernameRequired ? usernameField.value.length > 0 : true) && user.username !== usernameField.value;
 
   const updatePassword = async () => {
     try {
