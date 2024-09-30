@@ -59,6 +59,7 @@ export interface SignUpResource extends ClerkResource {
   createdSessionId: string | null;
   createdUserId: string | null;
   abandonAt: number | null;
+  legalAcceptedAt: number | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
@@ -161,6 +162,7 @@ export type SignUpCreateParams = Partial<
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
     token: string;
+    legalAccepted: boolean;
   } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
 >;
 

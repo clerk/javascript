@@ -79,6 +79,10 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
+    legalAccepted: useFormControl('legalAccepted', 'false', {
+      type: 'checkbox',
+      label: 'I agree to the terms and conditions',
+    }),
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
@@ -203,6 +207,8 @@ function _SignUpStart(): JSX.Element {
       // fieldsToSubmit: Constructing a fake fields object for strategy.
       fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
     }
+
+    console.log('fieldsToSubmit', fieldsToSubmit);
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
     // add both to the submitted fields to trigger and render an error for both respective inputs
