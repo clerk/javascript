@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { requireAuth } from '../requireAuth';
+import type { ExpressRequestWithAuth } from '../types';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
 let mockAuthenticateAndDecorateRequest: jest.Mock;
@@ -76,7 +77,7 @@ describe('requireAuth', () => {
 
     mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
       return (req, _res, next) => {
-        if ((req as any).auth) {
+        if ((req as ExpressRequestWithAuth).auth) {
           return next();
         }
         const requestState = mockAuthenticateRequest({ request: req });

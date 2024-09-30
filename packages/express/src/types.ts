@@ -14,6 +14,8 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    *
    * This is useful for server-rendered fullstack applications to handle
    * expired JWTs securely and maintain session continuity.
+   *
+   * @default true
    */
   enableHandshake?: boolean;
 };

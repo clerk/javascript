@@ -99,7 +99,7 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
 
 export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}) => {
   const clerkClient = options.clerkClient || defaultClerkClient;
-  const enableHandshake = options.enableHandshake || false;
+  const enableHandshake = options.enableHandshake ?? true;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
