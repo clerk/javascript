@@ -30,6 +30,16 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), 'auth-reason');
       assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), 'auth-message');
     });
+
+    test('handles debug headers containing invalid unicode characters without throwing', assert => {
+      const headers = new Headers({ 'custom-header': 'value' });
+      const authObject = signedOut({} as any, 'auth-reason+RR�56', 'auth-message+RR�56', headers);
+
+      assert.strictEqual(authObject.headers.get('custom-header'), 'value');
+      assert.strictEqual(authObject.headers.get('x-clerk-auth-status'), 'signed-out');
+      assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), null);
+      assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), null);
+    });
   });
 
   module('handshake', () => {
