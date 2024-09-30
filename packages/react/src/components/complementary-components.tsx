@@ -1,14 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useClerk } from '@clerk/shared/react';
 import type { ComponentProps } from 'react';
 import React, { useEffect } from 'react';
 
-import { useClerk } from './client-boundary/hooks';
-
 const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Element => {
   const clerk = useClerk();
-  const router = useRouter();
+  // const router = useRouter();
   return (
     <button
       {...props}
@@ -17,7 +15,7 @@ const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Ele
         clerk?.__experimental_openUserVerification({
           level: 'secondFactor',
           afterVerificationCancelled() {
-            router.back();
+            // router.back();
           },
         });
       }}
@@ -29,7 +27,7 @@ const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Ele
 
 const UserVerificationModal = (): React.JSX.Element | null => {
   const clerk = useClerk();
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     return () => {
@@ -42,11 +40,11 @@ const UserVerificationModal = (): React.JSX.Element | null => {
       clerk.__experimental_openUserVerification({
         afterVerificationCancelled() {
           // TODO: This is not reliable, find another solution
-          if (window.history.length > 1) {
-            router.back();
-          } else {
-            router.push('/start');
-          }
+          // if (window.history.length > 1) {
+          //   router.back();
+          // } else {
+          //   router.push('/start');
+          // }
         },
       });
     }

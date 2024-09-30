@@ -37,6 +37,8 @@ export { buildClerkProps } from './buildClerkProps';
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { clerkMiddleware } from './clerkMiddleware';
+export { protectAction } from './protectAction';
+export { protectRoute } from './protectRoute';
 export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
 
 /**

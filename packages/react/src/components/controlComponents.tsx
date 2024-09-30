@@ -1,6 +1,9 @@
+import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  Autocomplete,
+  // __experimental_SessionVerificationLevel,
+  // __experimental_SessionVerificationMaxAge,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -14,6 +17,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
+import { UserVerificationModal, UserVerificationTrigger } from './complementary-components';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
@@ -143,74 +147,74 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 };
 /* eslint-enable react-hooks/rules-of-hooks */
 
-type ProtectParams =
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-      assurance?: never;
-      redirectUrl?: never;
-      fallback?: React.ComponentType;
-    }
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-      assurance?: never;
-      redirectUrl?: string;
-      fallback?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-      assurance?: never;
-      redirectUrl?: never;
-      fallback?: React.ComponentType;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-      assurance?: never;
-      redirectUrl?: string;
-      fallback?: never;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      assurance?: never;
-      redirectUrl?: string;
-      fallback?: React.ComponentType;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      assurance: {
-        level: __experimental_SessionVerificationLevel;
-        maxAge: __experimental_SessionVerificationMaxAge;
-      };
-      redirectUrl?: never;
-      fallback?: React.ComponentType;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      assurance?: never;
-      redirectUrl?: string;
-      fallback?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-      assurance?: never;
-      redirectUrl?: never;
-      fallback?: React.ComponentType;
-    };
+// type ProtectParams =
+//   | {
+//       condition?: never;
+//       role: OrganizationCustomRoleKey;
+//       permission?: never;
+//       assurance?: never;
+//       redirectUrl?: never;
+//       fallback?: React.ComponentType;
+//     }
+//   | {
+//       condition?: never;
+//       role: OrganizationCustomRoleKey;
+//       permission?: never;
+//       assurance?: never;
+//       redirectUrl?: string;
+//       fallback?: never;
+//     }
+//   | {
+//       condition?: never;
+//       role?: never;
+//       permission: OrganizationCustomPermissionKey;
+//       assurance?: never;
+//       redirectUrl?: never;
+//       fallback?: React.ComponentType;
+//     }
+//   | {
+//       condition?: never;
+//       role?: never;
+//       permission: OrganizationCustomPermissionKey;
+//       assurance?: never;
+//       redirectUrl?: string;
+//       fallback?: never;
+//     }
+//   | {
+//       condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+//       role?: never;
+//       permission?: never;
+//       assurance?: never;
+//       redirectUrl?: string;
+//       fallback?: React.ComponentType;
+//     }
+//   | {
+//       condition?: never;
+//       role?: never;
+//       permission?: never;
+//       assurance: {
+//         level: __experimental_SessionVerificationLevel;
+//         maxAge: __experimental_SessionVerificationMaxAge;
+//       };
+//       redirectUrl?: never;
+//       fallback?: React.ComponentType;
+//     }
+//   | {
+//       condition?: never;
+//       role?: never;
+//       permission?: never;
+//       assurance?: never;
+//       redirectUrl?: string;
+//       fallback?: never;
+//     }
+//   | {
+//       condition?: never;
+//       role?: never;
+//       permission?: never;
+//       assurance?: never;
+//       redirectUrl?: never;
+//       fallback?: React.ComponentType;
+//     };
 
 // type ProtectParams =
 //   | {
@@ -256,26 +260,120 @@ type ProtectParams =
 //     }
 //   | undefined;
 
-const findFailedItem = (configs: ProtectParams[], auth: ReturnType<typeof useAuth>): ProtectParams | undefined => {
+// const findFailedItem = (configs: ProtectParams[], auth: ReturnType<typeof useAuth>): ProtectParams | undefined => {
+//   const finals = configs.map(config => {
+//     const { has, userId } = auth;
+//     const { role, permission, assurance } = config as any;
+//     if (permission) {
+//       return has({ permission });
+//     }
+//     if (role) {
+//       return has({ role });
+//     }
+//     if (assurance) {
+//       return has({ __experimental_assurance: assurance });
+//     }
+//     // this just checks for sign-out
+//     return !!userId;
+//   });
+//
+//   console.log('finals', finals);
+//
+//   const failedItemIndex = finals.findIndex(a => a === false);
+//
+//   const failedItem = configs[failedItemIndex];
+//
+//   console.log('failedItem', failedItem);
+//   return failedItem;
+// };
+//
+// type MyAuth = ReturnType<typeof useAuth>;
+//
+// type InferStrictTypeParams<T extends ProtectParams> = T;
+//
+// type NonNullable<T> = T extends null | undefined ? never : T;
+// type NonNullableRecord<T, K extends keyof T> = {
+//   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
+// };
+//
+// function protect<T extends ProtectParams>(params: T) {
+//   // We will accumulate permissions here
+//   const configs: ProtectParams[] = [params];
+//
+//   function protectNext(nextParams: ProtectParams) {
+//     // Add the next permission to the array
+//     configs.push(nextParams);
+//     // Return the same function to allow chaining
+//     return { protect: protectNext, component };
+//   }
+//
+//   const component = <P,>(
+//     Component: React.ComponentType<
+//       P & {
+//         auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+//           ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
+//           : NonNullableRecord<MyAuth, 'userId'>;
+//       }
+//     >,
+//   ) => {
+//     return (props: P) => {
+//       const auth = useAuth();
+//
+//       const failedItem = findFailedItem(configs, auth) as any;
+//
+//       if (failedItem?.fallback) {
+//         const Fallback = failedItem.fallback;
+//         return <Fallback />;
+//       }
+//
+//       if (failedItem?.redirectUrl) {
+//         throw 'Redirect is not support for client components';
+//       }
+//
+//       if (failedItem) {
+//         return null;
+//       }
+//
+//       return (
+//         // @ts-ignore not sure why this errors
+//         <Component
+//           {...props}
+//           auth={auth}
+//         />
+//       );
+//     };
+//   };
+//
+//   // Return the protect method and the component method to enable chaining
+//   return { protect: protectNext, component };
+// }
+
+const findFailedItemNew = (
+  configs: MixedParams[],
+  has: CheckAuthorizationWithCustomPermissions,
+): MixedParams | undefined => {
   const finals = configs.map(config => {
-    const { has, userId } = auth;
-    const { role, permission, assurance } = config as any;
+    const { role, permission, reverification } = config as any;
     if (permission) {
       return has({ permission });
     }
     if (role) {
       return has({ role });
     }
-    if (assurance) {
-      return has({ __experimental_assurance: assurance });
+    if (reverification) {
+      return has({ __experimental_reverification: reverification });
     }
     // this just checks for sign-out
-    return !!userId;
+    return !!useAuth().userId;
+    // return has({});
   });
 
   console.log('finals', finals);
 
   const failedItemIndex = finals.findIndex(a => a === false);
+  if (failedItemIndex === -1) {
+    return undefined;
+  }
 
   const failedItem = configs[failedItemIndex];
 
@@ -283,47 +381,228 @@ const findFailedItem = (configs: ProtectParams[], auth: ReturnType<typeof useAut
   return failedItem;
 };
 
+type MixedParams = {
+  fallback?: React.ComponentType | Autocomplete<'redirectToSignIn' | 'modal'>;
+  reverification?:
+    | 'veryStrict'
+    | 'strict'
+    | 'moderate'
+    | 'lax'
+    | {
+        level: __experimental_SessionVerificationLevel;
+        afterMinutes: number;
+      };
+  permission?: OrganizationCustomPermissionKey;
+  role?: OrganizationCustomRoleKey;
+};
+
 type MyAuth = ReturnType<typeof useAuth>;
 
-type InferStrictTypeParams<T extends ProtectParams> = T;
+// type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
+// type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
+// type InferParameters3<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
+//
+// type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+// // type NonNullable<T> = T extends null | undefined ? never : T;
+//
+// // Helper to infer the strict type of the result
+// type InferStrictTypeParams<T extends ProtectParams> = T;
+
+type InferStrictTypeParams2<T extends WithProtectComponentParams> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
 };
 
-function protect<T extends ProtectParams>(params: T) {
-  // We will accumulate permissions here
-  const configs: ProtectParams[] = [params];
+type WithProtectComponentParams =
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+      reverification?: never;
+      fallback?: React.ComponentType | string;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+      reverification?: never;
+      fallback?: React.ComponentType | string;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+      reverification?: never;
+      fallback?: React.ComponentType;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+      reverification:
+        | 'veryStrict'
+        | 'strict'
+        | 'moderate'
+        | 'lax'
+        | {
+            level: __experimental_SessionVerificationLevel;
+            afterMinutes: number;
+          };
+      fallback?: React.ComponentType | 'modal';
+    };
 
-  function protectNext(nextParams: ProtectParams) {
-    // Add the next permission to the array
-    configs.push(nextParams);
-    // Return the same function to allow chaining
-    return { protect: protectNext, component };
+type ProtectComponentParams = {
+  fallback?: React.ComponentType | 'redirectToSignIn';
+};
+
+type ComponentParam<Props, AuthObject> = React.ComponentType<
+  Props & {
+    auth: AuthObject;
   }
+>;
 
-  const component = <P,>(
-    Component: React.ComponentType<
-      P & {
-        auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
-          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
-          : NonNullableRecord<MyAuth, 'userId'>;
+type CustomAuthObject<T extends WithProtectComponentParams> =
+  InferStrictTypeParams2<T> extends
+    | { permission: any }
+    | {
+        role: any;
       }
-    >,
-  ) => {
-    return (props: P) => {
-      const auth = useAuth();
+    ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
+    : NonNullableRecord<MyAuth, 'userId'>;
 
-      const failedItem = findFailedItem(configs, auth) as any;
+export function __experimental_protectComponent(params?: ProtectComponentParams) {
+  // We will accumulate permissions here
+  const configs: MixedParams[] = params ? [params] : [];
+
+  const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
+    configs.push(nextParams);
+
+    const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
+      return (props: P) => {
+        const _auth = useAuth();
+        const clerk = useClerk();
+        const { has } = _auth;
+
+        const failedItem = findFailedItemNew(configs, has);
+
+        React.useEffect(() => {
+          if (failedItem?.fallback === 'redirectToSignIn') {
+            void clerk.redirectToSignIn();
+          }
+        }, []);
+
+        if (failedItem?.fallback) {
+          const Fallback = failedItem.fallback;
+
+          if (Fallback === 'modal') {
+            return <UserVerificationModal />;
+          }
+
+          // if (Fallback === 'redirectToSignIn') {
+          //   redirectToSignIn();
+          // }
+          //
+          // if (typeof Fallback === 'string') {
+          //   redirect(Fallback);
+          // }
+
+          if (typeof Fallback !== 'function') {
+            throw 'not valid';
+          }
+
+          if (!failedItem.reverification) {
+            return (
+              // @ts-expect-error type props
+              <Fallback
+                {
+                  // Could this be unsafe ?
+                  ...props
+                }
+              />
+            );
+          }
+
+          return (
+            // @ts-expect-error type props
+            <Fallback
+              {
+                // Could this be unsafe ?
+                ...props
+              }
+              UserVerificationTrigger={UserVerificationTrigger}
+            />
+          );
+        }
+
+        if (failedItem) {
+          return null;
+        }
+
+        return (
+          <Component
+            {...props}
+            auth={_auth as CustomAuthObject<T>}
+          />
+        );
+      };
+    };
+
+    return { with: withNext, component };
+  };
+
+  const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
+    return (props: P) => {
+      const _auth = useAuth();
+      const clerk = useClerk();
+      const { has } = _auth;
+
+      const failedItem = findFailedItemNew(configs, has);
+
+      React.useEffect(() => {
+        if (failedItem?.fallback === 'redirectToSignIn') {
+          void clerk.redirectToSignIn();
+        }
+      }, []);
 
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
-        return <Fallback />;
-      }
 
-      if (failedItem?.redirectUrl) {
-        throw 'Redirect is not support for client components';
+        if (Fallback === 'modal') {
+          return <UserVerificationModal />;
+        }
+
+        // if (typeof Fallback === 'string') {
+        //   redirect(Fallback);
+        // }
+
+        if (typeof Fallback !== 'function') {
+          throw 'not valid';
+        }
+
+        if (!failedItem.reverification) {
+          return (
+            // @ts-expect-error type props
+            <Fallback
+              {
+                // Could this be unsafe ?
+                ...props
+              }
+            />
+          );
+        }
+
+        return (
+          // @ts-expect-error type props
+          <Fallback
+            {
+              // Could this be unsafe ?
+              ...props
+            }
+            UserVerificationTrigger={UserVerificationTrigger}
+          />
+        );
       }
 
       if (failedItem) {
@@ -331,20 +610,17 @@ function protect<T extends ProtectParams>(params: T) {
       }
 
       return (
-        // @ts-ignore not sure why this errors
         <Component
           {...props}
-          auth={auth}
+          auth={_auth as NonNullableRecord<MyAuth, 'userId'>}
         />
       );
     };
   };
 
   // Return the protect method and the component method to enable chaining
-  return { protect: protectNext, component };
+  return { with: withNext, component };
 }
-
-export { protect };
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;

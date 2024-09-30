@@ -228,35 +228,35 @@ type ProtectParams =
 //     }
 //   | undefined;
 
-const findFailedItem = (
-  configs: ProtectParams[],
-  has: CheckAuthorizationWithCustomPermissions,
-): ProtectParams | undefined => {
-  const finals = configs.map(config => {
-    const { role, permission, assurance } = config as any;
-    if (permission) {
-      return has({ permission });
-    }
-    if (role) {
-      return has({ role });
-    }
-    if (assurance) {
-      return has({ __experimental_assurance: assurance });
-    }
-    // this just checks for sign-out
-    return !!auth().userId;
-    // return has({});
-  });
-
-  console.log('finals', finals);
-
-  const failedItemIndex = finals.findIndex(a => a === false);
-
-  const failedItem = configs[failedItemIndex];
-
-  console.log('failedItem', failedItem);
-  return failedItem;
-};
+// const findFailedItem = (
+//   configs: ProtectParams[],
+//   has: CheckAuthorizationWithCustomPermissions,
+// ): ProtectParams | undefined => {
+//   const finals = configs.map(config => {
+//     const { role, permission, assurance } = config as any;
+//     if (permission) {
+//       return has({ permission });
+//     }
+//     if (role) {
+//       return has({ role });
+//     }
+//     if (assurance) {
+//       return has({ __experimental_assurance: assurance });
+//     }
+//     // this just checks for sign-out
+//     return !!auth().userId;
+//     // return has({});
+//   });
+//
+//   console.log('finals', finals);
+//
+//   const failedItemIndex = finals.findIndex(a => a === false);
+//
+//   const failedItem = configs[failedItemIndex];
+//
+//   console.log('failedItem', failedItem);
+//   return failedItem;
+// };
 
 type MixedParams = {
   fallback?: React.ComponentType | Autocomplete<'redirectToSignIn' | 'modal'>;
@@ -278,15 +278,15 @@ const findFailedItemNew = (
   has: CheckAuthorizationWithCustomPermissions,
 ): MixedParams | undefined => {
   const finals = configs.map(config => {
-    const { role, permission, assurance } = config as any;
+    const { role, permission, reverification } = config as any;
     if (permission) {
       return has({ permission });
     }
     if (role) {
       return has({ role });
     }
-    if (assurance) {
-      return has({ __experimental_assurance: assurance });
+    if (reverification) {
+      return has({ __experimental_reverification: reverification });
     }
     // this just checks for sign-out
     return !!auth().userId;
@@ -296,6 +296,9 @@ const findFailedItemNew = (
   console.log('finals', finals);
 
   const failedItemIndex = finals.findIndex(a => a === false);
+  if (failedItemIndex === -1) {
+    return undefined;
+  }
 
   const failedItem = configs[failedItemIndex];
 
@@ -306,14 +309,14 @@ const findFailedItemNew = (
 type MyAuth = ReturnType<typeof auth>;
 
 // type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
-type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
-type InferParameters3<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
-
-type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-// type NonNullable<T> = T extends null | undefined ? never : T;
-
-// Helper to infer the strict type of the result
-type InferStrictTypeParams<T extends ProtectParams> = T;
+// type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
+// type InferParameters3<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
+//
+// type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+// // type NonNullable<T> = T extends null | undefined ? never : T;
+//
+// // Helper to infer the strict type of the result
+// type InferStrictTypeParams<T extends ProtectParams> = T;
 
 type InferStrictTypeParams2<T extends WithProtectComponentParams> = T;
 
@@ -326,205 +329,205 @@ function defineProtectParams<T extends ProtectParams>(params: T) {
   return params;
 }
 
-function protect<T extends ProtectParams>(params: T) {
-  // We will accumulate permissions here
-  const configs: ProtectParams[] = [params];
-
-  function protectNext(nextParams: ProtectParams) {
-    // Add the next permission to the array
-    configs.push(nextParams);
-    // Return the same function to allow chaining
-    return { protect: protectNext, component, action, route };
-  }
-
-  const component = <P,>(
-    Component: React.ComponentType<
-      P & {
-        auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
-          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-          : NonNullableRecord<MyAuth, 'userId'>;
-      }
-    >,
-  ) => {
-    return (props: P) => {
-      const _auth = auth();
-      const { has, redirectToSignIn } = _auth;
-
-      const failedItem = findFailedItem(configs, has) as any;
-
-      if (failedItem?.fallback) {
-        const Fallback = failedItem.fallback;
-
-        if (Fallback === 'modal') {
-          return <UserVerificationModal />;
-        }
-
-        if (typeof Fallback !== 'function') {
-          throw 'not valid';
-        }
-
-        return (
-          <Fallback
-            {
-              // Could this be unsafe ?
-              ...props
-            }
-            UserVerificationTrigger={UserVerificationTrigger}
-          />
-        );
-      }
-
-      if (failedItem?.redirectUrl === 'sign-in') {
-        redirectToSignIn();
-      }
-
-      if (failedItem?.redirectUrl) {
-        redirect(failedItem.redirectUrl);
-      }
-
-      if (failedItem) {
-        return null;
-      }
-
-      return (
-        // @ts-ignore not sure why this errors
-        <Component
-          {...props}
-          auth={_auth}
-        />
-      );
-    };
-  };
-
-  // Maybe this should return the correct types instead of hiding them
-  const action =
-    <
-      H extends (
-        _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
-          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-          : NonNullableRecord<MyAuth, 'userId'>,
-        ...args: InferParameters2<H>
-      ) => InferReturnType<H>,
-    >(
-      handler: H,
-    ) =>
-    (
-      ...args: InferParameters2<H>
-    ):
-      | InferReturnType<H>
-      | Promise<
-          InferStrictTypeParams<T> extends { assurance: any }
-            ? {
-                // a: InferStrictTypeParams<T>;
-                clerk_error: {
-                  type: 'forbidden';
-                  reason: 'assurance';
-                  metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
-                  //   {
-                  //   level: __experimental_SessionVerificationLevel;
-                  //   maxAge: __experimental_SessionVerificationMaxAge;
-                  // };
-                };
-              }
-            : {
-                clerk_error: {
-                  type: 'something';
-                  reason: 'something';
-                  metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
-                };
-              }
-        > => {
-      const { has } = auth();
-      const failedItem = findFailedItem(configs, has) as any;
-
-      if (failedItem?.assurance) {
-        const errorObj = {
-          clerk_error: {
-            type: 'forbidden',
-            reason: 'assurance',
-            metadata: failedItem.assurance as {
-              level: __experimental_SessionVerificationLevel;
-              maxAge: __experimental_SessionVerificationMaxAge;
-            },
-          },
-        } as const;
-
-        //@ts-ignore
-        return errorObj;
-      }
-
-      if (failedItem?.role || failedItem?.permission) {
-        // What should we do here ?
-        return {
-          //@ts-ignore
-          clerk_error: {
-            type: 'something',
-            reason: 'something',
-            metadata: failedItem as Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>,
-          },
-        };
-      }
-
-      if (failedItem) {
-        auth().redirectToSignIn();
-      }
-
-      // @ts-ignore not sure why this errors
-      return handler(auth(), ...args);
-    };
-
-  const route =
-    <
-      H extends (
-        _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
-          ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-          : NonNullableRecord<MyAuth, 'userId'>,
-        req: Request,
-        ...args: InferParameters3<H>
-      ) => Response | Promise<Response>,
-    >(
-      handler: H,
-    ) =>
-    (req: Request, ...args: InferParameters3<H>) => {
-      const { has } = auth();
-      const failedItem = findFailedItem(configs, has) as any;
-
-      if (failedItem?.assurance) {
-        const errorObj = {
-          clerk_error: {
-            type: 'forbidden',
-            reason: 'assurance',
-            metadata: failedItem.assurance as {
-              level: __experimental_SessionVerificationLevel;
-              maxAge: __experimental_SessionVerificationMaxAge;
-            },
-          },
-        };
-
-        return new Response(JSON.stringify(errorObj), {
-          status: 403,
-        });
-      }
-
-      if (failedItem?.role || failedItem?.permission) {
-        return new Response(null, {
-          status: 403,
-        });
-      }
-
-      if (failedItem) {
-        return new Response(null, {
-          status: 401,
-        });
-      }
-
-      // @ts-ignore auth does not match exactly
-      return handler(auth(), req, ...args);
-    };
-
-  // Return the protect method and the component method to enable chaining
-  return { protect: protectNext, component, action, route };
-}
+// function protect<T extends ProtectParams>(params: T) {
+//   // We will accumulate permissions here
+//   const configs: ProtectParams[] = [params];
+//
+//   function protectNext(nextParams: ProtectParams) {
+//     // Add the next permission to the array
+//     configs.push(nextParams);
+//     // Return the same function to allow chaining
+//     return { protect: protectNext, component, action, route };
+//   }
+//
+//   const component = <P,>(
+//     Component: React.ComponentType<
+//       P & {
+//         auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+//           ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+//           : NonNullableRecord<MyAuth, 'userId'>;
+//       }
+//     >,
+//   ) => {
+//     return (props: P) => {
+//       const _auth = auth();
+//       const { has, redirectToSignIn } = _auth;
+//
+//       const failedItem = findFailedItem(configs, has) as any;
+//
+//       if (failedItem?.fallback) {
+//         const Fallback = failedItem.fallback;
+//
+//         if (Fallback === 'modal') {
+//           return <UserVerificationModal />;
+//         }
+//
+//         if (typeof Fallback !== 'function') {
+//           throw 'not valid';
+//         }
+//
+//         return (
+//           <Fallback
+//             {
+//               // Could this be unsafe ?
+//               ...props
+//             }
+//             UserVerificationTrigger={UserVerificationTrigger}
+//           />
+//         );
+//       }
+//
+//       if (failedItem?.redirectUrl === 'sign-in') {
+//         redirectToSignIn();
+//       }
+//
+//       if (failedItem?.redirectUrl) {
+//         redirect(failedItem.redirectUrl);
+//       }
+//
+//       if (failedItem) {
+//         return null;
+//       }
+//
+//       return (
+//         // @ts-ignore not sure why this errors
+//         <Component
+//           {...props}
+//           auth={_auth}
+//         />
+//       );
+//     };
+//   };
+//
+//   // Maybe this should return the correct types instead of hiding them
+//   const action =
+//     <
+//       H extends (
+//         _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+//           ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+//           : NonNullableRecord<MyAuth, 'userId'>,
+//         ...args: InferParameters2<H>
+//       ) => InferReturnType<H>,
+//     >(
+//       handler: H,
+//     ) =>
+//     (
+//       ...args: InferParameters2<H>
+//     ):
+//       | InferReturnType<H>
+//       | Promise<
+//           InferStrictTypeParams<T> extends { assurance: any }
+//             ? {
+//                 // a: InferStrictTypeParams<T>;
+//                 clerk_error: {
+//                   type: 'forbidden';
+//                   reason: 'assurance';
+//                   metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+//                   //   {
+//                   //   level: __experimental_SessionVerificationLevel;
+//                   //   maxAge: __experimental_SessionVerificationMaxAge;
+//                   // };
+//                 };
+//               }
+//             : {
+//                 clerk_error: {
+//                   type: 'something';
+//                   reason: 'something';
+//                   metadata: Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>;
+//                 };
+//               }
+//         > => {
+//       const { has } = auth();
+//       const failedItem = findFailedItem(configs, has) as any;
+//
+//       if (failedItem?.assurance) {
+//         const errorObj = {
+//           clerk_error: {
+//             type: 'forbidden',
+//             reason: 'assurance',
+//             metadata: failedItem.assurance as {
+//               level: __experimental_SessionVerificationLevel;
+//               maxAge: __experimental_SessionVerificationMaxAge;
+//             },
+//           },
+//         } as const;
+//
+//         //@ts-ignore
+//         return errorObj;
+//       }
+//
+//       if (failedItem?.role || failedItem?.permission) {
+//         // What should we do here ?
+//         return {
+//           //@ts-ignore
+//           clerk_error: {
+//             type: 'something',
+//             reason: 'something',
+//             metadata: failedItem as Omit<InferStrictTypeParams<T>, 'fallback' | 'redirectUrl'>,
+//           },
+//         };
+//       }
+//
+//       if (failedItem) {
+//         auth().redirectToSignIn();
+//       }
+//
+//       // @ts-ignore not sure why this errors
+//       return handler(auth(), ...args);
+//     };
+//
+//   const route =
+//     <
+//       H extends (
+//         _auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
+//           ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
+//           : NonNullableRecord<MyAuth, 'userId'>,
+//         req: Request,
+//         ...args: InferParameters3<H>
+//       ) => Response | Promise<Response>,
+//     >(
+//       handler: H,
+//     ) =>
+//     (req: Request, ...args: InferParameters3<H>) => {
+//       const { has } = auth();
+//       const failedItem = findFailedItem(configs, has) as any;
+//
+//       if (failedItem?.assurance) {
+//         const errorObj = {
+//           clerk_error: {
+//             type: 'forbidden',
+//             reason: 'assurance',
+//             metadata: failedItem.assurance as {
+//               level: __experimental_SessionVerificationLevel;
+//               maxAge: __experimental_SessionVerificationMaxAge;
+//             },
+//           },
+//         };
+//
+//         return new Response(JSON.stringify(errorObj), {
+//           status: 403,
+//         });
+//       }
+//
+//       if (failedItem?.role || failedItem?.permission) {
+//         return new Response(null, {
+//           status: 403,
+//         });
+//       }
+//
+//       if (failedItem) {
+//         return new Response(null, {
+//           status: 401,
+//         });
+//       }
+//
+//       // @ts-ignore auth does not match exactly
+//       return handler(auth(), req, ...args);
+//     };
+//
+//   // Return the protect method and the component method to enable chaining
+//   return { protect: protectNext, component, action, route };
+// }
 
 type WithProtectComponentParams =
   | {
@@ -649,9 +652,9 @@ type CustomAuthObject<T extends WithProtectComponentParams> =
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
-function protectComponent(params: ProtectComponentParams) {
+function __experimental_protectComponent(params?: ProtectComponentParams) {
   // We will accumulate permissions here
-  const configs: MixedParams[] = [params];
+  const configs: MixedParams[] = params ? [params] : [];
 
   const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -727,6 +730,7 @@ function protectComponent(params: ProtectComponentParams) {
       const _auth = auth();
       const { has, redirectToSignIn } = _auth;
 
+      console.log('DWAWDADAWDA', configs);
       const failedItem = findFailedItemNew(configs, has);
 
       if (failedItem?.fallback) {
@@ -789,4 +793,4 @@ function protectComponent(params: ProtectComponentParams) {
   return { with: withNext, component };
 }
 
-export { protect, defineProtectParams, protectComponent };
+export { defineProtectParams, __experimental_protectComponent };

@@ -68,7 +68,8 @@ export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsS
 export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
 export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
 export const Protect = ComponentsModule.Protect as ServerComponentsServerModuleTypes['Protect'];
-export const protect = ComponentsModule.protect as ServerComponentsServerModuleTypes['protect'];
-export const protectComponent = ComponentsModule.protect as ServerComponentsServerModuleTypes['protectComponent'];
-export const defineProtectParams =
+// export const old_protect = ComponentsModule.protect as ServerComponentsServerModuleTypes['protect'];
+export const __experimental_protectComponent =
+  ComponentsModule.__experimental_protectComponent as ServerComponentsServerModuleTypes['__experimental_protectComponent'];
+export const old_defineProtectParams =
   ComponentsModule.defineProtectParams as ServerComponentsServerModuleTypes['defineProtectParams'];
