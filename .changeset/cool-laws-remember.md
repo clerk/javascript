@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Sort organizations list in OrganizationSwitcher
+Sort organizations list alphabetically in `OrganizationSwitcher`
