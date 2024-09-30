@@ -1,6 +1,26 @@
 import { cva, type VariantProps } from 'cva';
 import * as React from 'react';
 
+import { type ParsedElementsFragment, useAppearance } from '~/contexts/AppearanceContext';
+
+export const layoutStyle = {
+  link: {
+    className: '-mx-0.5 px-0.5 font-medium outline-none',
+  },
+  link__busy: {
+    className: 'cursor-wait',
+  },
+} satisfies ParsedElementsFragment;
+
+export const visualStyle = {
+  link: {
+    className: 'text-accent-9 rounded-sm',
+  },
+  link__busy: {
+    className: 'opacity-50',
+  },
+} satisfies ParsedElementsFragment;
+
 export const link = cva({
   base: 'text-accent-9 -mx-0.5 rounded-sm px-0.5 font-medium outline-none',
   variants: {
@@ -51,6 +71,7 @@ export const LinkButton = React.forwardRef(function LinkButton(
     Omit<VariantProps<typeof link>, 'disabled'>,
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     // eslint-disable-next-line react/button-has-type
     <button
