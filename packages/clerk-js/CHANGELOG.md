@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.8
+
+### Patch Changes
+
+- Handle gracefully yet unknown to our components Web3 providers ([#4264](https://github.com/clerk/javascript/pull/4264)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.73.7
 
 ### Patch Changes
