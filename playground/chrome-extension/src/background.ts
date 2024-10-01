@@ -9,7 +9,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 async function getToken() {
   const clerk = await __unstable__createClerkClient({
     publishableKey,
-    syncSessionWithTab: true,
+    syncHost: 'http://localhost:4011',
   });
   return await clerk.session?.getToken();
 }
