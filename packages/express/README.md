@@ -62,59 +62,44 @@ import 'dotenv/config';
 
 ### `clerkMiddleware()`
 
-The `clerkMiddleware()` helper integrates Clerk authentication into your Express application. It is required to be set in the middleware chain before using other Clerk utilities, such as `requireAuth` and `getAuth()`.
+The `clerkMiddleware()` function checks the request's cookies and headers for a session JWT and, if found, attaches the [`Auth`](https://clerk.com/docs/references/nextjs/auth-object#auth-object) object to the request object under the `auth` key.
 
 ```js
 import { clerkMiddleware } from '@clerk/express';
+import express from 'express';
 
 const app = express();
 
 // Pass no parameters
 app.use(clerkMiddleware());
 
-// Pass a function that will run as middleware
-app.use(clerkMiddleware(handler));
-
 // Pass options
 app.use(clerkMiddleware(options));
-
-// Pass both
-app.use(clerkMiddleware(handler, options));
 ```
 
 ### `requireAuth`
 
-`requireAuth` is a middleware function that you can use to protect routes in your Express.js application. This function checks if the user is authenticated, and passes an `UnauthorizedError` to the next middleware if they are not.
+The `requireAuth()` middleware functions similarly to `clerkMiddleware()`, but also protects your routes by redirecting unauthenticated users to the sign-in page.
 
-`clerkMiddleware()` is required to be set in the middleware chain before this util is used.
+The sign-in path will be read from the `signInUrl` option or the `CLERK_SIGN_IN_URL` environment variable if available.
 
 ```js
-import { clerkMiddleware, requireAuth, UnauthorizedError } from '@clerk/express';
+import { requireAuth } from '@clerk/express';
 import express from 'express';
 
 const app = express();
 
-const port = 3000;
-
 // Apply centralized middleware
-app.use(clerkMiddleware());
+app.use(requireAuth());
 
-// Define a protected route
-app.get('/protected', requireAuth, (req, res) => {
+// Apply middleware to a specific route
+app.get('/protected', requireAuth(), (req, res) => {
   res.send('This is a protected route');
 });
 
-app.use((err, req, res, next) => {
-  if (err instanceof UnauthorizedError) {
-    res.status(401).send('Unauthorized');
-  } else {
-    next(err);
-  }
-});
-
-// Start the server and listen on the specified port
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+// Custom sign-in URL
+app.get('/protected', requireAuth({ signInUrl: '/sign-in' }), (req, res) => {
+  res.send('This is a protected route');
 });
 ```
 
@@ -123,11 +108,10 @@ app.listen(port, () => {
 The `getAuth()` helper retrieves authentication state from the request object. See the [Next.js reference documentation](https://clerk.com/docs/references/nextjs/get-auth) for more information on how to use it.
 
 ```js
-import { clerkMiddleware, getAuth, ForbiddenError } from '@clerk/express';
+import { clerkMiddleware, getAuth } from '@clerk/express';
 import express from 'express';
 
 const app = express();
-const port = 3000;
 
 // Apply centralized middleware
 app.use(clerkMiddleware());
@@ -138,19 +122,13 @@ hasPermission = (request, response, next) => {
 
   // Handle if the user is not authorized
   if (!auth.has({ permission: 'org:admin:testpermission' })) {
-    // Catch this inside an error-handling middleware
-    return next(new ForbiddenError());
+    return response.status(403).send('Unauthorized');
   }
 
   return next();
 };
 
 app.get('/path', requireAuth, hasPermission, (req, res) => res.json(req.auth));
-
-// Start the server and listen on the specified port
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
 ```
 
 ### `clerkClient`
@@ -164,15 +142,10 @@ import { clerkClient } from '@clerk/express';
 import express from 'express';
 
 const app = express();
-const port = 3000;
 
-const users = await clerkClient.users.getUserList();
-
-app.get('/users', requireAuth, (req, res) => res.json(users));
-
-// Start the server and listen on the specified port
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.get('/users', requireAuth, async (req, res) => {
+  const users = await clerkClient.users.getUserList();
+  return res.json({ users });
 });
 ```
 

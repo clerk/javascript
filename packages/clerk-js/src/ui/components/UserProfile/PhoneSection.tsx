@@ -130,12 +130,14 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
       isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: () => open('verify'),
           }
         : null,
       !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__nonPrimary'),
+            // TODO-STEPUP: Is this a sensitive action ?
             onClick: setPrimary,
           }
         : null,

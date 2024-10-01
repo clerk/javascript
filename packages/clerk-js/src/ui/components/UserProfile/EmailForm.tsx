@@ -7,6 +7,7 @@ import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
@@ -19,6 +20,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { emailId: id, onSuccess, onReset } = props;
   const card = useCardState();
   const { user } = useUser();
+  const { handleAssurance } = useAssurance();
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
 
@@ -39,8 +41,10 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   const addEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    return user
-      ?.createEmailAddress({ email: emailField.value })
+    if (!user) {
+      return;
+    }
+    return handleAssurance(() => user.createEmailAddress({ email: emailField.value }))
       .then(res => {
         emailAddressRef.current = res;
         wizard.nextStep();

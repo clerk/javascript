@@ -35,9 +35,9 @@ const withEmailCodes = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
-const withEmailCodes_persist_client = withEmailCodes
+const withEmailCodes_destroy_client = withEmailCodes
   .clone()
-  .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'true');
+  .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
 
 const withEmailLinks = base
   .clone()
@@ -88,10 +88,16 @@ const withDynamicKeys = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
   .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', instanceKeys.get('with-email-codes').sk);
 
+const withRestrictedMode = withEmailCodes
+  .clone()
+  .setId('withRestrictedMode')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk);
+
 export const envs = {
   base,
   withEmailCodes,
-  withEmailCodes_persist_client,
+  withEmailCodes_destroy_client,
   withEmailLinks,
   withCustomRoles,
   withEmailCodesQuickstart,
@@ -100,4 +106,5 @@ export const envs = {
   withAPCore2ClerkLatest,
   withAPCore2ClerkV4,
   withDynamicKeys,
+  withRestrictedMode,
 } as const;

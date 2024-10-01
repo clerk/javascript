@@ -5,6 +5,7 @@ import { expect } from '@playwright/test';
 import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
+import { createInvitationService } from './invitationsService';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
@@ -73,6 +74,7 @@ export const createTestUtils = <
   const services = {
     email: createEmailService(),
     users: createUserService(clerkClient),
+    invitations: createInvitationService(clerkClient),
     clerk: clerkClient,
   };
 
