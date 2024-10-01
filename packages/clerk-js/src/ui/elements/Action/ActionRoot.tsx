@@ -6,9 +6,11 @@ import { Animated } from '..';
 
 type ActionRootProps = PropsWithChildren<{ animate?: boolean }>;
 
+type ActionOpen = (value: string) => void;
+
 export const [ActionContext, useActionContext, _] = createContextAndHook<{
   active: string | null;
-  open: (value: string) => void;
+  open: ActionOpen;
   close: () => void;
 }>('ActionContext');
 
@@ -20,7 +22,7 @@ export const ActionRoot = (props: ActionRootProps) => {
     setActive(null);
   }, []);
 
-  const open = useCallback((value: string) => {
+  const open: ActionOpen = useCallback(value => {
     setActive(value);
   }, []);
 

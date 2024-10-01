@@ -14,9 +14,11 @@ type ErrorCardProps = {
   cardSubtitle?: LocalizationKey;
   message?: LocalizationKey;
   onBackLinkClick?: React.MouseEventHandler | undefined;
+  shouldNavigateBack?: boolean;
 };
 
 export const ErrorCard = (props: ErrorCardProps) => {
+  const { shouldNavigateBack = true } = props;
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
@@ -29,7 +31,9 @@ export const ErrorCard = (props: ErrorCardProps) => {
     if (props.onBackLinkClick) {
       return props.onBackLinkClick(e);
     }
-    void navigate('../');
+    if (shouldNavigateBack) {
+      void navigate('../');
+    }
   };
 
   return (
@@ -58,12 +62,14 @@ export const ErrorCard = (props: ErrorCardProps) => {
               onClick={handleEmailSupport}
               hasArrow
             />
-            <Card.Action elementId='alternativeMethods'>
-              <Card.ActionLink
-                localizationKey={localizationKeys('backButton')}
-                onClick={goBack}
-              />
-            </Card.Action>
+            {shouldNavigateBack ? (
+              <Card.Action elementId='alternativeMethods'>
+                <Card.ActionLink
+                  localizationKey={localizationKeys('backButton')}
+                  onClick={goBack}
+                />
+              </Card.Action>
+            ) : null}
           </Flex>
         </Card.Content>
         <Card.Footer />

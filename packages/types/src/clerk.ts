@@ -870,10 +870,15 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
  * @experimantal
  */
 export type __experimental_UserVerificationProps = RoutingOptions & {
-  // TODO(STEP-UP): Verify and write a description
+  /**
+   * Non-awaitable callback for when verification is completed successfully
+   */
   afterVerification?: () => void;
-  // TODO(STEP-UP): Verify and write a description
-  afterVerificationUrl?: string;
+
+  /**
+   * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
+   */
+  afterVerificationCancelled?: () => void;
 
   /**
    * Defines the steps of the verification flow.

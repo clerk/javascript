@@ -7,6 +7,7 @@ import type { LocalizationKey } from '../../customizables';
 import { Button, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 
@@ -49,6 +50,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
+  const { handleAssurance } = useAssurance();
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
@@ -61,8 +63,10 @@ export const AddPhone = (props: AddPhoneProps) => {
 
   const addPhone = async (e: React.FormEvent) => {
     e.preventDefault();
-    return user
-      ?.createPhoneNumber({ phoneNumber: phoneField.value })
+    if (!user) {
+      return;
+    }
+    return handleAssurance(() => user.createPhoneNumber({ phoneNumber: phoneField.value }))
       .then(res => {
         resourceRef.current = res;
         onSuccess();

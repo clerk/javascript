@@ -4,12 +4,14 @@ import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;
 
 export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => {
   const { onSuccess, onReset } = props;
+  const { handleAssurance } = useAssurance();
   const { user } = useUser();
 
   if (!user) {
@@ -31,7 +33,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
 
   const updatePassword = async () => {
     try {
-      await user.update({ username: usernameField.value });
+      await handleAssurance(() => user.update({ username: usernameField.value }));
       onSuccess();
     } catch (e) {
       handleError(e, [usernameField], card.setError);

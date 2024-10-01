@@ -9,28 +9,24 @@ import { useRouter } from '../../router';
 import { useUserVerificationSession } from './useUserVerificationSession';
 
 const useAfterVerification = () => {
-  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
+  const { afterVerification, routing } = useUserVerification();
   const supportEmail = useSupportEmail();
   const { setActive } = useClerk();
   const { setCache } = useUserVerificationSession();
-  const { __experimental_closeUserVerification } = useClerk();
   const { navigate } = useRouter();
 
   const beforeEmit = useCallback(async () => {
     if (routing === 'virtual') {
       /**
-       * if `afterVerificationUrl` and modal redirect there,
-       * else if `afterVerificationUrl` redirect there,
-       * else If modal close it,
+       * Moves the code below into the task queue and ensures that client and fva has been updated correctly before triggering the events
        */
-      afterVerification?.();
-      __experimental_closeUserVerification();
+      setTimeout(() => {
+        afterVerification?.();
+      }, 0);
     } else {
-      if (afterVerificationUrl) {
-        await navigate(afterVerificationUrl);
-      }
+      throw 'afterVerification is only triggered in modals';
     }
-  }, [__experimental_closeUserVerification, afterVerification, afterVerificationUrl, navigate, routing]);
+  }, [afterVerification, routing]);
 
   const handleVerificationResponse = useCallback(
     async (sessionVerification: __experimental_SessionVerificationResource) => {

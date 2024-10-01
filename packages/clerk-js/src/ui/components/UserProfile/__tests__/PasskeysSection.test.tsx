@@ -51,13 +51,13 @@ describe('PasskeySection', () => {
     it('renders add passkey button', async () => {
       const { wrapper } = await createFixtures(withPasskeys);
 
-      const { getByRole, userEvent } = render(
+      const { getByRole } = render(
         <CardStateProvider>
           <PasskeySection />
         </CardStateProvider>,
         { wrapper },
       );
-      await userEvent.click(getByRole('button', { name: 'Add a passkey' }));
+      getByRole('button', { name: 'Add a passkey' });
     });
 
     it('create a new passkey', async () => {

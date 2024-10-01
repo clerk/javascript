@@ -11,6 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 
@@ -19,15 +20,15 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   const { onSuccess } = props;
   const { user } = useUser();
   const card = useCardState();
+  const { handleAssurance } = useAssurance();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
   React.useEffect(() => {
-    if (backupCode) {
+    if (backupCode || !user) {
       return;
     }
 
-    void user
-      ?.createBackupCode()
+    void handleAssurance(user.createBackupCode)
       .then((backupCode: BackupCodeResource) => setBackupCode(backupCode))
       .catch(err => handleError(err, [], card.setError));
   }, []);

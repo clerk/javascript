@@ -80,6 +80,10 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
     return handleClerkApiError(err, fieldStates, setGlobalError);
   }
 
+  if (isClerkRuntimeError(err) && err.code === 'assurance_cancelled') {
+    return;
+  }
+
   if (isClerkRuntimeError(err)) {
     return handleClerkRuntimeError(err, fieldStates, setGlobalError);
   }

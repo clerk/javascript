@@ -61,6 +61,7 @@ describe('PasswordSection', () => {
     it('sets a new password and calls the appropriate function and closes', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
+      fixtures.clerk.user?.updatePassword.mockResolvedValue({});
       const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /set password/i }));
       await waitFor(() => getByRole('heading', { name: /set password/i }));
@@ -89,6 +90,7 @@ describe('PasswordSection', () => {
     it('updates passwords and leave other sessions intact', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
+      fixtures.clerk.user?.updatePassword.mockResolvedValue({});
       const { userEvent, getByRole, getByLabelText } = render(<PasswordSection />, { wrapper });
 
       await userEvent.click(getByRole('button', { name: /set password/i }));
@@ -223,6 +225,7 @@ describe('PasswordSection', () => {
     it('changes a new password and calls the appropriate function and closes', async () => {
       const { wrapper, fixtures } = await createFixtures(updatePasswordConfig);
 
+      fixtures.clerk.user?.updatePassword.mockResolvedValue({});
       const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /update password/i }));
       await waitFor(() => getByRole('heading', { name: /update password/i }));
