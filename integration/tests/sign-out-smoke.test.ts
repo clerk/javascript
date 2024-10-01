@@ -20,7 +20,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await app.teardown();
   });
 
-  test('sign out throught all open tabs at once', async ({ page, context }) => {
+  test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
