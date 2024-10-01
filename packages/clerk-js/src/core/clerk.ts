@@ -18,7 +18,6 @@ import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -509,38 +508,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
-  public __experimental_mountUserVerification = (
-    node: HTMLDivElement,
-    props?: __experimental_UserVerificationProps,
-  ): void => {
-    this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
-          code: 'cannot_render_user_missing',
-        });
-      }
-      return;
-    }
-    void this.#componentControls.ensureMounted({ preloadHint: 'UserVerification' }).then(controls =>
-      controls.mountComponent({
-        name: 'UserVerification',
-        appearanceKey: 'userVerification',
-        node,
-        props,
-      }),
-    );
-  };
-
-  public __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
