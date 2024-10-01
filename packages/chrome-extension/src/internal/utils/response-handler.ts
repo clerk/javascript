@@ -20,7 +20,6 @@ export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: bo
 
 async function devHandler(response: Res, jwtHandler: JWTHandler) {
   const header = response?.headers.get(AUTH_HEADER_DEV);
-  console.log(`responseHandler (${AUTH_HEADER_DEV}):`, header);
 
   if (header) {
     await jwtHandler.set(header);
@@ -31,7 +30,6 @@ async function devHandler(response: Res, jwtHandler: JWTHandler) {
 
 async function prodHandler(response: Res, jwtHandler: JWTHandler) {
   const header = response?.headers.get(AUTH_HEADER);
-  console.log(`responseHandler (${AUTH_HEADER}):`, header);
 
   if (header?.startsWith('Bearer')) {
     const jwt = header.split(' ')[1] || undefined;

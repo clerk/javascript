@@ -29,7 +29,6 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
    * @param value: JWT generally from the cookie or authorization header
    */
   const set = async (value: string): Promise<void> => {
-    console.log('JWTHandler.set:', CACHE_KEY, value);
     return await store.set(CACHE_KEY, value).catch(errorLogger);
   };
 
@@ -37,7 +36,6 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
    * Remove the JWT value
    */
   const remove = async (): Promise<void> => {
-    console.log('JWTHandler.remove:', CACHE_KEY);
     return await store.remove(CACHE_KEY).catch(errorLogger);
   };
 
@@ -46,15 +44,10 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
    * If not set, attempt to get it from the synced session and save for later use.
    */
   const get = async () => {
-    console.log('JWTHandler.get:', CACHE_KEY);
-    console.log('JWTHandler.get (shouldSync):', shouldSync(sync, cookieParams));
-
     if (shouldSync(sync, cookieParams)) {
-      console.dir({ cookieParams, sync, shouldSync: true });
       // Get client cookie from browser
       const syncedJWT = await getClientCookie(cookieParams).catch(errorLogger);
 
-      console.log('JWTHandler.get (syncedJWT):', syncedJWT);
       if (syncedJWT) {
         // Set client cookie in StorageCache
         await set(syncedJWT.value);
@@ -63,7 +56,6 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
     }
 
     const value = await store.get<string>(CACHE_KEY);
-    console.log('JWTHandler.get (value):', value);
 
     // Get current JWT from StorageCache
     return value;

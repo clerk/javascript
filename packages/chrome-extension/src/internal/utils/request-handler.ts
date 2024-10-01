@@ -14,22 +14,17 @@ export function requestHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boo
     const currentJWT = await jwtHandler.get();
 
     if (!currentJWT) {
-      unauthenticatedHandler(requestInit);
-    } else if (isProd) {
+      return;
+    }
+
+    if (isProd) {
       prodHandler(requestInit, currentJWT);
-      console.log('requestHandler (authHeader):', AUTH_HEADER, `Bearer ${currentJWT}`);
     } else {
       devHandler(requestInit, currentJWT);
     }
-
-    console.log('requestHandler (searchParams):', requestInit.url?.searchParams.toString());
   };
 
   return handler;
-}
-
-function unauthenticatedHandler(_requestInit: Req) {
-  // requestInit.url?.searchParams.append('_is_native', '1');
 }
 
 function devHandler(requestInit: Req, jwt: string) {
