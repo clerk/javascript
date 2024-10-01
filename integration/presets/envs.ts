@@ -88,6 +88,12 @@ const withDynamicKeys = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
   .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', instanceKeys.get('with-email-codes').sk);
 
+const withRestrictedMode = withEmailCodes
+  .clone()
+  .setId('withRestrictedMode')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk);
+
 export const envs = {
   base,
   withEmailCodes,
@@ -100,4 +106,5 @@ export const envs = {
   withAPCore2ClerkLatest,
   withAPCore2ClerkV4,
   withDynamicKeys,
+  withRestrictedMode,
 } as const;
