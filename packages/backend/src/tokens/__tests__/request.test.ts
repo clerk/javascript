@@ -206,7 +206,7 @@ export default (QUnit: QUnit) => {
         whenOrgSyncOptions: {
           organizationPatterns: ['/orgs/:id'],
         },
-        whenAppRequestPath: '/personal-workspace/my-resource',
+        whenAppRequestPath: '/personal-account/my-resource',
         thenExpectActivationEntity: null,
       },
       {
@@ -276,13 +276,13 @@ export default (QUnit: QUnit) => {
         },
       },
       {
-        name: 'Can activate the personal workspace',
+        name: 'Can activate the personal account',
         whenOrgSyncOptions: {
-          personalWorkspacePatterns: ['/personal-workspace'],
+          personalAccountPatterns: ['/personal-account'],
         },
-        whenAppRequestPath: '/personal-workspace',
+        whenAppRequestPath: '/personal-account',
         thenExpectActivationEntity: {
-          type: 'personalWorkspace',
+          type: 'personalAccount',
         },
       },
       {
@@ -297,24 +297,24 @@ export default (QUnit: QUnit) => {
         },
       },
       {
-        name: 'personal workspace match precedes org match',
+        name: 'personal account match precedes org match',
         whenOrgSyncOptions: {
-          organizationPatterns: ['/personal-workspace'], // bad practice
-          personalWorkspacePatterns: ['/personal-workspace'],
+          organizationPatterns: ['/personal-account'], // bad practice
+          personalAccountPatterns: ['/personal-account'],
         },
-        whenAppRequestPath: '/personal-workspace',
+        whenAppRequestPath: '/personal-account',
         thenExpectActivationEntity: {
-          type: 'personalWorkspace',
+          type: 'personalAccount',
         },
       },
       {
-        name: 'personal workspace may contain path tokens',
+        name: 'personal account may contain path tokens',
         whenOrgSyncOptions: {
-          personalWorkspacePatterns: ['/user/:any', '/user/:any/(.*)'],
+          personalAccountPatterns: ['/user/:any', '/user/:any/(.*)'],
         },
         whenAppRequestPath: '/user/123/home',
         thenExpectActivationEntity: {
-          type: 'personalWorkspace',
+          type: 'personalAccount',
         },
       },
       {
@@ -326,7 +326,7 @@ export default (QUnit: QUnit) => {
             '/orgs-by-slug/:slug',
             '/orgs-by-slug/:slug/(.*)',
           ],
-          personalWorkspacePatterns: ['/personal-workspace', '/personal-workspace/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
         },
         whenAppRequestPath: '/orgs-by-slug/org_bar/sub-resource',
         thenExpectActivationEntity: {

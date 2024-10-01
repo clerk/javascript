@@ -15,9 +15,9 @@ export type AuthenticateRequestOptions = {
 } & VerifyTokenOptions;
 
 /**
- * Defines the options for syncing an organization or personal workspace state from the URL to the clerk session.
+ * Defines the options for syncing an organization or personal account state from the URL to the clerk session.
  * Useful if the application requires the inclusion of a URL that indicates that a given clerk organization
- * (or personal workspace) must be active on the clerk session.
+ * (or personal account) must be active on the clerk session.
  *
  * If a mismatch between the active organization on the session and the organization as indicated by the URL is
  * detected, an attempt to activate the given organization will be made.
@@ -36,7 +36,7 @@ export type OrganizationSyncOptions = {
    * organization-related fields will be set to null. The server component must detect this and respond
    * with an appropriate error (e.g., notFound()).
    *
-   * If the route also matches the personalWorkspacePatterns, the personalWorkspacePattern takes precedence.
+   * If the route also matches the personalAccountPatterns, the personalAccountPattern takes precedence.
    *
    * Must have a path token named either ":id" (matches a clerk organization ID) or ":slug" (matches a clerk
    * organization slug).
@@ -49,14 +49,14 @@ export type OrganizationSyncOptions = {
   organizationPatterns?: Array<Pattern>;
 
   /**
-   * URL patterns for resources in the context of a clerk personal workspace (user-specific, outside any organization).
+   * URL patterns for resources in the context of a clerk personal account (user-specific, outside any organization).
    * If the route also matches the organizationPattern, this takes precedence.
    *
    * Common examples:
    * - ["/user", "/user/(.*)"]
    * - ["/user/:any", "/user/:any/(.*)"]
    */
-  personalWorkspacePatterns?: Array<Pattern>;
+  personalAccountPatterns?: Array<Pattern>;
 };
 
 /**
@@ -64,6 +64,6 @@ export type OrganizationSyncOptions = {
  * In addition to a valid URL, may include:
  * - Named path tokens prefixed with a colon (e.g., ":id", ":slug", ":any")
  * - Wildcard token (e.g., ".(*)"), which will match the remainder of the path
- * Examples: "/orgs/:slug", "/app/:any/orgs/:id", "/personal-workspace/(.*)"
+ * Examples: "/orgs/:slug", "/app/:any/orgs/:id", "/personal-account/(.*)"
  */
 type Pattern = string;

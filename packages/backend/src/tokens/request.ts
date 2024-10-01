@@ -372,8 +372,8 @@ ${error.getFullMessage()}`,
         mustActivate = true;
       }
     }
-    // Activate the personal workspace?
-    if (organizationSyncTarget.type === 'personalWorkspace' && auth.orgId) {
+    // Activate the personal account?
+    if (organizationSyncTarget.type === 'personalAccount' && auth.orgId) {
       mustActivate = true;
     }
     if (!mustActivate) {
@@ -664,7 +664,7 @@ export const debugRequestState = (params: RequestState) => {
 
 /**
  * Determines if the given URL and settings indicate a desire to activate a specific
- * organization or personal workspace.
+ * organization or personal account.
  */
 export function getOrganizationSyncTarget(
   url: URL,
@@ -674,14 +674,14 @@ export function getOrganizationSyncTarget(
     return null;
   }
 
-  // Check for personal workspace activation
-  if (options.personalWorkspacePatterns) {
+  // Check for personal account activation
+  if (options.personalAccountPatterns) {
     let matcher: MatchFunction<Partial<Record<string, string | string[]>>>;
     try {
-      matcher = match(options.personalWorkspacePatterns);
+      matcher = match(options.personalAccountPatterns);
     } catch (e) {
       // Likely to be encountered during development, so throwing the error is more prudent than logging
-      throw new Error(`Invalid personal workspace pattern "${options.personalWorkspacePatterns}": "${e}"`);
+      throw new Error(`Invalid personal account pattern "${options.personalAccountPatterns}": "${e}"`);
     }
 
     let personalResult: Match<Partial<Record<string, string | string[]>>>;
@@ -689,12 +689,12 @@ export function getOrganizationSyncTarget(
       personalResult = matcher(url.pathname);
     } catch (e) {
       // Intentionally not logging the path to avoid potentially leaking anything sensitive
-      console.error(`Failed to apply personal workspace pattern "${options.personalWorkspacePatterns}" to a path`, e);
+      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
       return null;
     }
 
     if (personalResult) {
-      return { type: 'personalWorkspace' };
+      return { type: 'personalAccount' };
     }
   }
 
@@ -735,20 +735,20 @@ export function getOrganizationSyncTarget(
 }
 
 /**
- * Represents an organization or a personal workspace - e.g. an
+ * Represents an organization or a personal account - e.g. an
  * entity that can be activated by the handshake API.
  */
 export type OrganizationSyncTarget =
-  | { type: 'personalWorkspace' }
+  | { type: 'personalAccount' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
 /**
- * Generates the query parameters to activate an organization or personal workspace
+ * Generates the query parameters to activate an organization or personal account
  * via the FAPI handshake api.
  */
 function getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
   const ret = new Map();
-  if (toActivate.type === 'personalWorkspace') {
+  if (toActivate.type === 'personalAccount') {
     ret.set('organization_id', '');
   }
   if (toActivate.type === 'organization') {
