@@ -47,15 +47,15 @@ export const SignUpForm = (props: SignUpFormProps) => {
             {shouldShow('firstName') && (
               <Form.PlainInput
                 {...formState.firstName.props}
-                isRequired={fields.firstName!.required}
-                isOptional={!fields.firstName!.required}
+                isRequired={fields.firstName?.required}
+                isOptional={!fields.firstName?.required}
               />
             )}
             {shouldShow('lastName') && (
               <Form.PlainInput
                 {...formState.lastName.props}
-                isRequired={fields.lastName!.required}
-                isOptional={!fields.lastName!.required}
+                isRequired={fields.lastName?.required}
+                isOptional={!fields.lastName?.required}
               />
             )}
           </Form.ControlRow>
@@ -64,8 +64,8 @@ export const SignUpForm = (props: SignUpFormProps) => {
           <Form.ControlRow elementId='username'>
             <Form.PlainInput
               {...formState.username.props}
-              isRequired={fields.username!.required}
-              isOptional={!fields.username!.required}
+              isRequired={fields.username?.required}
+              isOptional={!fields.username?.required}
             />
           </Form.ControlRow>
         )}
@@ -73,9 +73,9 @@ export const SignUpForm = (props: SignUpFormProps) => {
           <Form.ControlRow elementId='emailAddress'>
             <Form.PlainInput
               {...formState.emailAddress.props}
-              isRequired={fields.emailAddress!.required}
-              isOptional={!fields.emailAddress!.required}
-              isDisabled={fields.emailAddress!.disabled}
+              isRequired={fields.emailAddress?.required}
+              isOptional={!fields.emailAddress?.required}
+              isDisabled={fields.emailAddress?.disabled}
               actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
               onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
             />
@@ -85,8 +85,8 @@ export const SignUpForm = (props: SignUpFormProps) => {
           <Form.ControlRow elementId='phoneNumber'>
             <Form.PhoneInput
               {...formState.phoneNumber.props}
-              isRequired={fields.phoneNumber!.required}
-              isOptional={!fields.phoneNumber!.required}
+              isRequired={fields.phoneNumber?.required}
+              isOptional={!fields.phoneNumber?.required}
               actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
               onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
             />
@@ -96,21 +96,31 @@ export const SignUpForm = (props: SignUpFormProps) => {
           <Form.ControlRow elementId='password'>
             <Form.PasswordInput
               {...formState.password.props}
-              isRequired={fields.password!.required}
-              isOptional={!fields.password!.required}
+              isRequired={fields.password?.required}
+              isOptional={!fields.password?.required}
             />
           </Form.ControlRow>
         )}
       </Col>
       <Col center>
         <CaptchaElement />
-        <Form.ControlRow elementId='legalConsent'>
-          <Form.Checkbox {...formState.legalAccepted.props} />
-        </Form.ControlRow>
-        <Form.SubmitButton
-          hasArrow
-          localizationKey={localizationKeys('formButtonPrimary')}
-        />
+        <Col
+          gap={4}
+          sx={{
+            width: '100%',
+          }}
+        >
+          <Form.ControlRow elementId='legalConsent'>
+            <Form.Checkbox
+              {...formState.legalAccepted.props}
+              isRequired={fields.legalAccepted?.required}
+            />
+          </Form.ControlRow>
+          <Form.SubmitButton
+            hasArrow
+            localizationKey={localizationKeys('formButtonPrimary')}
+          />
+        </Col>
       </Col>
     </Form.Root>
   );
