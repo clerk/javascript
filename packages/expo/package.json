@@ -71,7 +71,7 @@
     "@types/react-dom": "*",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.5.0",
-    "expo-secure-store": "^12.4.0",
+    "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
     "react-native": "^0.73.9",
     "typescript": "*"
