@@ -87,7 +87,7 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "concurrently": "^8.2.2",
-    "next": "^14.2.4",
+    "next": "^14.2.10",
     "tslib": "2.4.1",
     "tsup": "*",
     "type-fest": "^4.9.0",
