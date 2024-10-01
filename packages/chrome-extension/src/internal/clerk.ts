@@ -24,7 +24,6 @@ export type CreateClerkClientOptions = {
   scope?: Scope;
   storageCache?: StorageCache;
   syncHost?: string;
-  syncSessionWithTab?: boolean;
 };
 
 export async function createClerkClient({
@@ -32,13 +31,13 @@ export async function createClerkClient({
   scope,
   storageCache = BrowserStorageCache,
   syncHost = process.env.CLERK_SYNC_HOST,
-  syncSessionWithTab = Boolean(process.env.CLERK_SYNC_HOST),
 }: CreateClerkClientOptions): Promise<Clerk> {
-  console.log('createClerkClient (props):', { publishableKey, scope, storageCache, syncHost, syncSessionWithTab });
-
   if (clerk) {
     return clerk;
   }
+
+  // Sync is enabled if a `syncHost` is provided
+  const sync = Boolean(syncHost);
 
   // Parse publishableKey and assert it's present/valid, throw if not
   const key = parsePublishableKey(publishableKey);
@@ -50,28 +49,19 @@ export async function createClerkClient({
   // Will throw if manifest is invalid
   validateManifest(manifest, {
     background: scope === SCOPE.background,
-    sync: syncSessionWithTab,
+    sync,
   });
 
   // Set up JWT handler and attempt to get JWT from storage on initialization
-  let url = DEFAULT_LOCAL_HOST_PERMISSION;
-
-  if (syncSessionWithTab) {
-    if (syncHost) {
-      url = syncHost;
-    } else if (isProd) {
-      url = `https://${key.frontendApi}`;
-    }
-  }
+  const url = syncHost ? syncHost : DEFAULT_LOCAL_HOST_PERMISSION;
 
   const jwtOptions = {
     frontendApi: key.frontendApi,
     name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_JWT_KEY,
-    sync: syncSessionWithTab,
+    sync,
     url,
   };
 
-  console.log('JWTHandler (options):', jwtOptions);
   const jwt = JWTHandler(storageCache, jwtOptions);
 
   // Create Clerk instance
