@@ -28,8 +28,8 @@ export function requestHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boo
   return handler;
 }
 
-function unauthenticatedHandler(requestInit: Req) {
-  requestInit.url?.searchParams.append('_is_native', '1');
+function unauthenticatedHandler(_requestInit: Req) {
+  // requestInit.url?.searchParams.append('_is_native', '1');
 }
 
 function devHandler(requestInit: Req, jwt: string) {
