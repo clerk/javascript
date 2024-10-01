@@ -21,18 +21,18 @@ export type __experimental_SessionVerificationConfig =
   | __experimental_SessionVerificationTypes
   | {
       level: __experimental_SessionVerificationLevel;
-      maxAgeMinutes: __experimental_SessionVerificationMaxAge;
+      maxAgeMinutes: __experimental_SessionVerificationMaxAgeMinutes;
     };
 
 export type __experimental_ReverificationConfig =
   | __experimental_SessionVerificationTypes
   | {
       level: __experimental_SessionVerificationLevel;
-      afterMinutes: __experimental_SessionVerificationMaxAge;
+      afterMinutes: __experimental_SessionVerificationMaxAgeMinutes;
     };
 
 export type __experimental_SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
-export type __experimental_SessionVerificationMaxAge = number;
+export type __experimental_SessionVerificationMaxAgeMinutes = number;
 
 export type __experimental_SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;
 export type __experimental_SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
