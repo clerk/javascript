@@ -1,0 +1,93 @@
+name: Major Version Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-major-bump:
+    runs-on: ubuntu-latest
+    outputs:
+      has_major_changeset: ${{ steps.check_major.outputs.has_major_changeset }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # Checkout the PR's head to access the changes
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check for major changesets
+        id: check_major
+        run: |
+          echo "Checking for major changesets..."
+          MAJOR_CHANGESETS=$(git diff origin/main --name-only | grep '^.changeset/' | xargs grep -l 'major' || true)
+          if [ -n "$MAJOR_CHANGESETS" ]; then
+            echo "Found major changesets:"
+            echo "$MAJOR_CHANGESETS"
+            echo "has_major_changeset=true" >> $GITHUB_OUTPUT
+          else
+            echo "No major changesets found."
+            echo "has_major_changeset=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update PR description with confirmation checkbox
+        if: ${{ steps.check_major.outputs.has_major_changeset == 'true' }}
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            let body = pr.body || '';
+
+            const checkboxText = '## ⚠️ Major Bump Confirmation\n- [ ] I confirm that this PR should bump a major version.'
+
+            if (!body.includes(checkboxText) && !body.includes('- [x] I confirm that this PR should bump a major version.')) {
+              body += `\n\n${checkboxText}`;
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                body: body,
+              });
+            }
+
+  confirm-major-bump:
+    needs: check-major-bump
+    if: needs.check-major-bump.outputs.has_major_changeset == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if major bump not confirmed
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            let body = pr.body || '';
+
+            const confirmationText = '- [x] I confirm that this PR should bump a major version.'
+
+            if (!body.includes(confirmationText)) {
+              core.setFailed('You must confirm a major version bump by checking the checkbox in the PR description.');
+            } else {
+              console.log('Major version bump confirmed.');
+            }
