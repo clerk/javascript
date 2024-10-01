@@ -20,7 +20,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await app.teardown();
   });
 
-  test('sign out throught all open tabs at once', async ({ page, context }) => {
+  test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
@@ -46,7 +46,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await mainTab.po.expect.toBeSignedOut();
   });
 
-  test('sign out destroying client', async ({ page, context }) => {
+  test('sign out persisting client', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
@@ -55,21 +55,23 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
     await u.page.goToAppHome();
-
-    await u.page.waitForSelector('p[data-clerk-id]', { state: 'attached' });
+    const client_id_element = await u.page.waitForSelector('p[data-clerk-id]', { state: 'attached' });
+    const client_id = await client_id_element.innerHTML();
 
     await u.page.evaluate(async () => {
       await window.Clerk.signOut();
     });
 
     await u.po.expect.toBeSignedOut();
-    await u.page.waitForSelector('p[data-clerk-id]', { state: 'detached' });
     await u.page.waitForSelector('p[data-clerk-session]', { state: 'detached' });
+
+    const client_id_after_sign_out = await u.page.locator('p[data-clerk-id]').innerHTML();
+    expect(client_id).toEqual(client_id_after_sign_out);
   });
 });
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_persist_client] })(
-  'sign out with persistClient smoke test @generic',
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_destroy_client] })(
+  'sign out with destroy client smoke test @generic',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
@@ -86,7 +88,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_persist_client
       await app.teardown();
     });
 
-    test('sign out persisting client', async ({ page, context }) => {
+    test('sign out destroying client', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
@@ -95,18 +97,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_persist_client
       await u.po.signIn.continue();
       await u.po.expect.toBeSignedIn();
       await u.page.goToAppHome();
-      const client_id_element = await u.page.waitForSelector('p[data-clerk-id]', { state: 'attached' });
-      const client_id = await client_id_element.innerHTML();
+
+      await u.page.waitForSelector('p[data-clerk-id]', { state: 'attached' });
 
       await u.page.evaluate(async () => {
         await window.Clerk.signOut();
       });
 
       await u.po.expect.toBeSignedOut();
+      await u.page.waitForSelector('p[data-clerk-id]', { state: 'detached' });
       await u.page.waitForSelector('p[data-clerk-session]', { state: 'detached' });
-
-      const client_id_after_sign_out = await u.page.locator('p[data-clerk-id]').innerHTML();
-      expect(client_id).toEqual(client_id_after_sign_out);
     });
   },
 );

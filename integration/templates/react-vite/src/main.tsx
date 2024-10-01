@@ -21,7 +21,9 @@ const Root = () => {
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
       experimental={{
-        persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true',
+        persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT
+          ? import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true'
+          : undefined,
       }}
     >
       <Outlet />

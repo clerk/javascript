@@ -19,14 +19,14 @@ export const createLongRunningApps = () => {
   const configs = [
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
-    { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_persist_client },
+    { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
     {
       id: 'next.appRouter.withEmailCodes_persist_client',
       config: next.appRouter,
-      env: envs.withEmailCodes_persist_client,
+      env: envs.withEmailCodes_destroy_client,
     },
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
