@@ -331,7 +331,7 @@ export class Clerk implements ClerkInterface {
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      if (this.#options.experimental?.persistClient) {
+      if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
