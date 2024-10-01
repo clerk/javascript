@@ -13,7 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider
       experimental={{
-        persistClient: process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT === 'true',
+        persistClient: process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT
+          ? process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT === 'true'
+          : undefined,
       }}
     >
       <html lang='en'>

@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.23.0
+
+### Minor Changes
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Conditionally renders identification sections on `UserProfile` based on the SAML connection configuration for disabling additional identifiers. ([#4211](https://github.com/clerk/javascript/pull/4211)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Introduces the CRUD of organization domains under the `organizations` API. ([#4224](https://github.com/clerk/javascript/pull/4224)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
 ## 4.22.0
 
 ### Minor Changes

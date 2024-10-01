@@ -331,7 +331,7 @@ export class Clerk implements ClerkInterface {
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      if (this.#options.experimental?.persistClient) {
+      if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
@@ -969,7 +969,16 @@ export class Clerk implements ClerkInterface {
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
-      return this.buildAfterSignOutUrl();
+      return this.buildUrlWithAuth(
+        buildURL(
+          {
+            base: this.#options.signInUrl
+              ? `${this.#options.signInUrl}/choose`
+              : this.environment?.displayConfig.afterSignOutOneUrl,
+          },
+          { stringify: true },
+        ),
+      );
     }
 
     return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
