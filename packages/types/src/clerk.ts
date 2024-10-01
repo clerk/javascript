@@ -848,7 +848,7 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
 /**
  * @experimantal
  */
-type __experimental_UserVerificationProps = RoutingOptions & {
+export type __experimental_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */

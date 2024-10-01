@@ -11,4 +11,3 @@ Removes:
 - `<__experimental_UserVerification/>`
 - `__experimental_mountUserVerification()`
 - `__experimental_unmountUserVerification()`
-- `__experimental_UserVerificationProps`
