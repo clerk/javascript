@@ -7,6 +7,7 @@ import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useAssurance } from '../../hooks/useAssurance';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 
@@ -16,6 +17,8 @@ export const AddConnectedAccount = () => {
   const { navigate } = useRouter();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
+
+  const { handleAssurance } = useAssurance();
   const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
@@ -26,6 +29,9 @@ export const AddConnectedAccount = () => {
   });
 
   const connect = (strategy: OAuthStrategy) => {
+    if (!user) {
+      return;
+    }
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
     const redirectUrl = isModal
       ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
@@ -35,12 +41,13 @@ export const AddConnectedAccount = () => {
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    user
-      ?.createExternalAccount({
+    return handleAssurance(() =>
+      user.createExternalAccount({
         strategy,
         redirectUrl,
         additionalScopes,
-      })
+      }),
+    )
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
           void sleep(2000).then(() => card.setIdle(strategy));
