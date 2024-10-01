@@ -12,7 +12,7 @@ const useUserVerificationSession = () => {
     {
       level: level || 'secondFactor',
       // TODO(STEP-UP): Figure out if this needs to be a prop
-      maxAge: 10,
+      maxAgeMinutes: 10,
     },
     {
       throttleTime: 300,
