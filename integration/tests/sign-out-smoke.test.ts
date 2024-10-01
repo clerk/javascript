@@ -70,7 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   });
 });
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withOutEmailCodes_persist_client] })(
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_destroy_client] })(
   'sign out with destroy client smoke test @generic',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
