@@ -253,8 +253,7 @@ const Components = (props: ComponentsProps) => {
       clearUrlStateParam();
       setState(s => {
         function handleCloseModalForExperimentalUserVerification() {
-          // @ts-ignore Expected value s['userVerificationModal']
-          const modal = s[name + 'Modal'] || {};
+          const modal = s[`${name}Modal`] || {};
           if ('afterVerificationCancelled' in modal && notify) {
             modal.afterVerificationCancelled?.();
           }
@@ -266,7 +265,7 @@ const Components = (props: ComponentsProps) => {
          */
         handleCloseModalForExperimentalUserVerification();
 
-        return { ...s, [name + 'Modal']: null };
+        return { ...s, [`${name}Modal`]: null };
       });
     };
 
@@ -278,7 +277,7 @@ const Components = (props: ComponentsProps) => {
 
         setState(s => ({
           ...s,
-          [name + 'Modal']: {
+          [`${name}Modal`]: {
             ...props,
             /**
              * When a UserVerification flow is completed, we need to close the modal without trigger a cancellation callback
@@ -294,7 +293,7 @@ const Components = (props: ComponentsProps) => {
       if ('afterVerificationCancelled' in props) {
         handleCloseModalForExperimentalUserVerification();
       } else {
-        setState(s => ({ ...s, [name + 'Modal']: props }));
+        setState(s => ({ ...s, [`${name}Modal`]: props }));
       }
     };
 

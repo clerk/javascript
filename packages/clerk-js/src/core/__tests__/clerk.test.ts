@@ -448,11 +448,13 @@ describe('Clerk singleton', () => {
 
   describe('.signOut()', () => {
     const mockClientDestroy = jest.fn();
+    const mockClientRemoveSessions = jest.fn();
     const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
     const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
+      mockClientRemoveSessions.mockReset();
       mockSession1.remove.mockReset();
       mockSession2.remove.mockReset();
     });
@@ -480,6 +482,7 @@ describe('Clerk singleton', () => {
           activeSessions: [mockSession1, mockSession2],
           sessions: [mockSession1, mockSession2],
           destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
         }),
       );
 
@@ -488,7 +491,8 @@ describe('Clerk singleton', () => {
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
-        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
           beforeEmit: expect.any(Function),
@@ -502,6 +506,7 @@ describe('Clerk singleton', () => {
           activeSessions: [mockSession1],
           sessions: [mockSession1],
           destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
         }),
       );
 
@@ -510,7 +515,8 @@ describe('Clerk singleton', () => {
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
-        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalled();
         expect(mockSession1.remove).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
       });

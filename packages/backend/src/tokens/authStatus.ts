@@ -64,7 +64,10 @@ export const AuthErrorReason = {
   SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',
   SessionTokenAndUATMissing: 'session-token-and-uat-missing',
   SessionTokenMissing: 'session-token-missing',
-  SessionTokenOutdated: 'session-token-outdated',
+  SessionTokenExpired: 'session-token-expired',
+  SessionTokenIATBeforeClientUAT: 'session-token-iat-before-client-uat',
+  SessionTokenNBF: 'session-token-nbf',
+  SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   UnexpectedError: 'unexpected-error',
 } as const;
@@ -155,13 +158,27 @@ const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {
-    headers.set(constants.Headers.AuthMessage, requestState.message);
+    try {
+      headers.set(constants.Headers.AuthMessage, requestState.message);
+    } catch (e) {
+      // headers.set can throw if unicode strings are passed to it. In this case, simply do nothing
+    }
   }
+
   if (requestState.reason) {
-    headers.set(constants.Headers.AuthReason, requestState.reason);
+    try {
+      headers.set(constants.Headers.AuthReason, requestState.reason);
+    } catch (e) {
+      /* empty */
+    }
   }
+
   if (requestState.status) {
-    headers.set(constants.Headers.AuthStatus, requestState.status);
+    try {
+      headers.set(constants.Headers.AuthStatus, requestState.status);
+    } catch (e) {
+      /* empty */
+    }
   }
 
   requestState.headers = headers;

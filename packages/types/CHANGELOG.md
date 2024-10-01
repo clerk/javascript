@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.23.0
+
+### Minor Changes
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Conditionally renders identification sections on `UserProfile` based on the SAML connection configuration for disabling additional identifiers. ([#4211](https://github.com/clerk/javascript/pull/4211)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Introduces the CRUD of organization domains under the `organizations` API. ([#4224](https://github.com/clerk/javascript/pull/4224)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.22.0
+
+### Minor Changes
+
+- Hide sign up url from `<SignIn />` component when mode is `restricted` ([#4206](https://github.com/clerk/javascript/pull/4206)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Supports default role on `OrganizationProfile` invitations. When inviting a member, the default role will be automatically selected, otherwise it falls back to the only available role. ([#4210](https://github.com/clerk/javascript/pull/4210)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add type for \_\_internal_country ([#4215](https://github.com/clerk/javascript/pull/4215)) by [@dstaley](https://github.com/dstaley)
+
+## 4.21.1
+
+### Patch Changes
+
+- Improve JSDoc comments for some public API properties ([#4190](https://github.com/clerk/javascript/pull/4190)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.21.0
 
 ### Minor Changes

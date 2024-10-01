@@ -52,7 +52,7 @@ async function resolveResult<T>(result: Promise<T>): Promise<T | AssuranceHint> 
 /**
  * Polyfill for Promise.withResolvers()
  */
-function customPromiseWithResolves() {
+function customPromiseWithResolvers() {
   let resolve: PromiseWithResolvers<unknown>['resolve'];
   let reject: PromiseWithResolvers<unknown>['reject'];
 
@@ -90,7 +90,7 @@ function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_ope
       /**
        * Create a promise
        */
-      const resolvers = customPromiseWithResolves();
+      const resolvers = customPromiseWithResolvers();
 
       /**
        * On success resolve the pending promise
