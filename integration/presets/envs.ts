@@ -35,9 +35,9 @@ const withEmailCodes = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
-const withEmailCodes_persist_client = withEmailCodes
+const withEmailCodes_destroy_client = withEmailCodes
   .clone()
-  .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'true');
+  .setEnvVariable('public', 'EXPERIMENTAL_PERSIST_CLIENT', 'false');
 
 const withEmailLinks = base
   .clone()
@@ -91,7 +91,7 @@ const withDynamicKeys = withEmailCodes
 export const envs = {
   base,
   withEmailCodes,
-  withEmailCodes_persist_client,
+  withEmailCodes_destroy_client,
   withEmailLinks,
   withCustomRoles,
   withEmailCodesQuickstart,
