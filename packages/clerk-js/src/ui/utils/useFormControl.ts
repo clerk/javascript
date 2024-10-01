@@ -181,12 +181,12 @@ export const useFormControl = <Id extends string>(
   return { props, ...props, buildErrorMessage, setError, setValue, setChecked };
 };
 
-type FormControlStateLike = Pick<FormControlState, 'id' | 'value'>;
+type FormControlStateLike = Pick<FormControlState, 'id' | 'value' | 'checked' | 'type'>;
 
 export const buildRequest = (fieldStates: Array<FormControlStateLike>): Record<string, any> => {
   const request: { [x: string]: any } = {};
   fieldStates.forEach(x => {
-    request[x.id] = x.value;
+    request[x.id] = x.type !== 'checkbox' ? x.value : x.checked;
   });
   return request;
 };
