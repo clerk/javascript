@@ -3,9 +3,7 @@ import type { ClerkHostRouter } from '@clerk/shared/router';
 import type { ClerkOptions, LoadedClerk } from '@clerk/types';
 
 import type { init } from './renderer';
-import type { ComponentDefinition } from './types';
-
-type $TODO = any;
+import type { ClerkNewComponents, ComponentDefinition } from './types';
 
 function assertRouter(router: ClerkHostRouter | undefined): asserts router is ClerkHostRouter {
   if (!router) {
@@ -53,7 +51,7 @@ export class UI {
   }
 
   // Mount a component from the registry
-  mount(componentName: string, node: HTMLElement, props: $TODO) {
+  mount<C extends keyof ClerkNewComponents>(componentName: C, node: HTMLElement, props: ClerkNewComponents[C]): void {
     const component = this.componentRegistry.get(componentName);
     if (!component) {
       throw new Error(`clerk/ui: Unable to find component definition for ${componentName}`);
