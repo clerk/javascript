@@ -6,6 +6,8 @@ _Note: Only Clerk employees can trigger the actions described below._
 
 We are using [changesets](https://github.com/changesets/changesets), so our CICD is using [`changesets/action`](https://github.com/changesets/action) to automate the release process when releasing stable package versions targeting the `@latest` tag.
 
+**Important:** In order to merge PRs that include changesets with **major** version bumps, you need to comment `!allow-major` in the PR. This is to ensure that major version bumps are intentional and not accidental. **Note:** Ensure that your Clerk organization membership status is set to "Public". To set your status to "Public", follow [these steps](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-your-membership-in-organizations/publicizing-or-hiding-organization-membership).
+
 Every time a PR is merged into `main`, the changesets action parses all changesets found in `.changeset` and updates the "ci(repo): Version packages" PR with the new package versions and the changelog for the next stable release.
 
 To release a new stable version of all Clerk packages, find the "ci(repo): Version packages" PR, verify the changes, and merge it.
