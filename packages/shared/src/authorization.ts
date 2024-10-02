@@ -1,12 +1,16 @@
 import type {
+  __experimental_ReverificationConfig,
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationTypes,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
 
-type MaxAgeMap = Record<__experimental_SessionVerificationMaxAge, number>;
+type TypesToConfig = Record<
+  __experimental_SessionVerificationTypes,
+  Exclude<__experimental_ReverificationConfig, __experimental_SessionVerificationTypes>
+>;
 type AuthorizationOptions = {
   userId: string | null | undefined;
   orgId: string | null | undefined;
@@ -22,34 +26,38 @@ type CheckOrgAuthorization = (
 
 type CheckStepUpAuthorization = (
   params: {
-    __experimental_assurance?: {
-      level: __experimental_SessionVerificationLevel;
-      maxAge: __experimental_SessionVerificationMaxAge;
-    };
+    __experimental_reverification?: __experimental_ReverificationConfig;
   },
   { __experimental_factorVerificationAge }: AuthorizationOptions,
 ) => boolean | null;
 
-const MAX_AGE_TO_MINUTES: MaxAgeMap = {
-  'A1.10min': 10,
-  'A2.1hr': 60,
-  'A3.4hr': 240, //4 * 60
-  'A4.1day': 1440, //24 * 60,
-  'A5.1wk': 10080, //7 * 24 * 60,
+const TYPES_TO_OBJECTS: TypesToConfig = {
+  veryStrict: {
+    afterMinutes: 10,
+    level: 'multiFactor',
+  },
+  strict: {
+    afterMinutes: 10,
+    level: 'secondFactor',
+  },
+  moderate: {
+    afterMinutes: 60,
+    level: 'secondFactor',
+  },
+  lax: {
+    afterMinutes: 1_440,
+    level: 'secondFactor',
+  },
 };
 
-const ALLOWED_MAX_AGES = new Set<__experimental_SessionVerificationMaxAge>(
-  Object.keys(MAX_AGE_TO_MINUTES) as __experimental_SessionVerificationMaxAge[],
-);
-const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>([
-  'L1.firstFactor',
-  'L2.secondFactor',
-  'L3.multiFactor',
-]);
+const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>(['firstFactor', 'secondFactor', 'multiFactor']);
+
+const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['veryStrict', 'strict', 'moderate', 'lax']);
 
 // Helper functions
-const isValidMaxAge = (maxAge: __experimental_SessionVerificationMaxAge) => ALLOWED_MAX_AGES.has(maxAge);
-const isValidLevel = (level: __experimental_SessionVerificationLevel) => ALLOWED_LEVELS.has(level);
+const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
+const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
+const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 
 /**
  * Checks if a user has the required organization-level authorization.
@@ -74,6 +82,25 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   return null;
 };
 
+const validateReverificationConfig = (config: __experimental_ReverificationConfig | undefined) => {
+  const convertConfigToObject = (config: __experimental_ReverificationConfig) => {
+    if (typeof config === 'string') {
+      return TYPES_TO_OBJECTS[config];
+    }
+    return config;
+  };
+
+  if (typeof config === 'string' && isValidVerificationType(config)) {
+    return convertConfigToObject.bind(null, config);
+  }
+
+  if (typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes)) {
+    return convertConfigToObject.bind(null, config);
+  }
+
+  return false;
+};
+
 /**
  * Evaluates if the user meets step-up authentication requirements.
  * Compares the user's factor verification ages against the specified maxAge.
@@ -81,29 +108,29 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
  * @returns null, if requirements or verification data are missing.
  */
 const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experimental_factorVerificationAge }) => {
-  if (!params.__experimental_assurance || !__experimental_factorVerificationAge) {
-    return null;
-  }
-  const { level, maxAge } = params.__experimental_assurance;
-
-  if (!isValidLevel(level) || !isValidMaxAge(maxAge)) {
+  if (!params.__experimental_reverification || !__experimental_factorVerificationAge) {
     return null;
   }
 
+  const isValidReverification = validateReverificationConfig(params.__experimental_reverification);
+  if (!isValidReverification) {
+    return null;
+  }
+
+  const { level, afterMinutes } = isValidReverification();
   const [factor1Age, factor2Age] = __experimental_factorVerificationAge;
-  const maxAgeInMinutes = MAX_AGE_TO_MINUTES[maxAge];
 
   // -1 indicates the factor group (1fa,2fa) is not enabled
   // -1 for 1fa is not a valid scenario, but we need to make sure we handle it properly
-  const isValidFactor1 = factor1Age !== -1 ? maxAgeInMinutes > factor1Age : null;
-  const isValidFactor2 = factor2Age !== -1 ? maxAgeInMinutes > factor2Age : null;
+  const isValidFactor1 = factor1Age !== -1 ? afterMinutes > factor1Age : null;
+  const isValidFactor2 = factor2Age !== -1 ? afterMinutes > factor2Age : null;
 
   switch (level) {
-    case 'L1.firstFactor':
+    case 'firstFactor':
       return isValidFactor1;
-    case 'L2.secondFactor':
+    case 'secondFactor':
       return factor2Age !== -1 ? isValidFactor2 : isValidFactor1;
-    case 'L3.multiFactor':
+    case 'multiFactor':
       return factor2Age === -1 ? isValidFactor1 : isValidFactor1 && isValidFactor2;
   }
 };
