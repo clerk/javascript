@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.26.0
+
+### Minor Changes
+
+- Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
+  - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
+  - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
+    - Allowed values 'veryStrict' | 'strict' | 'moderate' | 'lax'
+
+### Patch Changes
+
+- Updated dependencies [[`fb932e5cf`](https://github.com/clerk/javascript/commit/fb932e5cf21315adf60bee0855b6bd5ee2ff9867)]:
+  - @clerk/shared@2.9.0
+  - @clerk/types@4.25.0
+  - @clerk/localizations@3.1.2
+
 ## 5.25.0
 
 ### Minor Changes
