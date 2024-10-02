@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize]
   issue_comment:
-    types: [created]
+    types: [created, edited]
 
 permissions:
   contents: read
