@@ -11,12 +11,14 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { SIGN_UP_MODES } from '~/constants/user-settings';
 import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -27,6 +29,7 @@ import { Separator } from '~/primitives/separator';
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
+  const { userSettings } = useEnvironment();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -36,7 +39,7 @@ export function SignInStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
@@ -68,7 +71,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
+                  {options.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -135,7 +138,7 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
-                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
+                  {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
                   <Common.Loading scope='submit'>
@@ -184,12 +187,14 @@ export function SignInStart() {
               </Card.Content>
 
               <Card.Footer {...footerProps}>
-                <Card.FooterAction>
-                  <Card.FooterActionText>
-                    {t('signIn.start.actionText')}{' '}
-                    <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
-                  </Card.FooterActionText>
-                </Card.FooterAction>
+                {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC ? (
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.start.actionText')}{' '}
+                      <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                ) : null}
               </Card.Footer>
             </Card.Root>
           </SignIn.Step>

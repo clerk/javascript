@@ -1,5 +1,146 @@
 # Change Log
 
+## 5.26.0
+
+### Minor Changes
+
+- Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
+  - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
+  - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
+    - Allowed values 'veryStrict' | 'strict' | 'moderate' | 'lax'
+
+### Patch Changes
+
+- Updated dependencies [[`fb932e5cf`](https://github.com/clerk/javascript/commit/fb932e5cf21315adf60bee0855b6bd5ee2ff9867)]:
+  - @clerk/shared@2.9.0
+  - @clerk/types@4.25.0
+  - @clerk/localizations@3.1.2
+
+## 5.25.0
+
+### Minor Changes
+
+- Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
+
+  Removes:
+
+  - `<__experimental_UserVerification/>`
+  - `__experimental_mountUserVerification()`
+  - `__experimental_unmountUserVerification()`
+
+- _Experimental Feature_: `<UserProfile/>` allows users to update their information. Mostly of this information is considered sensitive data. ([#4127](https://github.com/clerk/javascript/pull/4127)) by [@panteliselef](https://github.com/panteliselef)
+
+  We want to ensure that only the users themselves can alter any sensitive data.
+
+  To increase security we are now, require users to re-verify their credentials when they are about to perform these actions:
+
+  | Operation                        | Reverification | Strategy            | Timeframe |
+  | -------------------------------- | -------------- | ------------------- | --------- |
+  | Update account (first/last name) | ❌             |                     |           |
+  | Update username                  | ✅             | Strongest available | 10m       |
+  | Delete account                   | ✅             | Strongest available | 10m       |
+  | Create/Remove profile image      | ❌             |                     |           |
+  | Update password                  | ✅             | Strongest available | 10m       |
+  | Remove password                  | ❌             |                     |           |
+  | Revoke session                   | ✅             | Strongest available | 10m       |
+  | Create identification            | ✅             | Strongest available | 10m       |
+  | Remove identification            | ✅             | Strongest available | 10m       |
+  | Change primary identification    | ✅             | Strongest available | 10m       |
+  | Update Passkey name              | ❌             |                     |           |
+  | Enable MFA (TOTP, Phone number)  | ✅             | Strongest available | 10m       |
+  | Disable MFA (TOΤP, Phone number) | ✅             | Strongest available | 10m       |
+  | Create/Regenerate Backup Codes   | ✅             | Strongest available | 10m       |
+  | Connect External Account         | ✅             | Strongest available | 10m       |
+  | Re-authorize External Account    | ❌             |                     |           |
+  | Remove External Account          | ✅             | Strongest available | 10m       |
+  | Leave organization               | ❌             |                     |           |
+
+- We recently shipped an experimental feature to persist the Clerk client (under `persistClient` flag) as an opt-in. This allows for matching a user's device with a client. We want to test this behavior with more users, so we're making it opt-out as the next step. After more successful testing we'll remove the experimental flag and enable it by default. ([#4250](https://github.com/clerk/javascript/pull/4250)) by [@panteliselef](https://github.com/panteliselef)
+
+  If you're encountering issues, please open an issue. You can disable this new behavior like so:
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: false }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: false } });
+  ```
+
+### Patch Changes
+
+- Allow single-character usernames in `<UserProfile />` validation ([#4243](https://github.com/clerk/javascript/pull/4243)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Handle gracefully yet unknown to our components Web3 providers ([#4263](https://github.com/clerk/javascript/pull/4263)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Navigate to `/choose` when signing out during multi session. ([#4203](https://github.com/clerk/javascript/pull/4203)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`f6fb8b53d`](https://github.com/clerk/javascript/commit/f6fb8b53d236863ad7eca576ee7a16cd33f3506b), [`4a8570590`](https://github.com/clerk/javascript/commit/4a857059059a02bb4f20893e08601e1e67babbed)]:
+  - @clerk/types@4.24.0
+  - @clerk/localizations@3.1.1
+  - @clerk/shared@2.8.5
+
+## 5.24.1
+
+### Patch Changes
+
+- Maintain focus on password input after error during sign in flow. ([#4240](https://github.com/clerk/javascript/pull/4240)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.24.0
+
+### Minor Changes
+
+- Handle `sign_up_mode_restricted` error encountered in an oauth flow ([#4232](https://github.com/clerk/javascript/pull/4232)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Correctly pass `defaultOpen` prop to `OrganizationSwitcher` popover instance. ([#4233](https://github.com/clerk/javascript/pull/4233)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally renders identification sections on `UserProfile` based on the SAML connection configuration for disabling additional identifiers. ([#4211](https://github.com/clerk/javascript/pull/4211)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`4749ed4c5`](https://github.com/clerk/javascript/commit/4749ed4c55a5ba5810451b8d436aad0d49829050), [`f1f17eaab`](https://github.com/clerk/javascript/commit/f1f17eaabed0dc4b7de405fb77d85503cf75ad33), [`2e35ac538`](https://github.com/clerk/javascript/commit/2e35ac53885f8008779940d41d1e804fa77ebfa9)]:
+  - @clerk/types@4.23.0
+  - @clerk/localizations@3.1.0
+  - @clerk/shared@2.8.4
+
+## 5.23.0
+
+### Minor Changes
+
+- Hide sign up url from `<SignIn />` component when mode is `restricted` ([#4206](https://github.com/clerk/javascript/pull/4206)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Handle gracefully Coinbase Wallet initial configuration ([#4218](https://github.com/clerk/javascript/pull/4218)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Supports default role on `OrganizationProfile` invitations. When inviting a member, the default role will be automatically selected, otherwise it falls back to the only available role. ([#4210](https://github.com/clerk/javascript/pull/4210)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add type for \_\_internal_country ([#4215](https://github.com/clerk/javascript/pull/4215)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+  - @clerk/localizations@3.0.6
+  - @clerk/shared@2.8.3
+
+## 5.22.4
+
+### Patch Changes
+
+- Fix UserProfile and OrganizationProfile wrong padding on footer for small screens when Development notice is enabled ([#4191](https://github.com/clerk/javascript/pull/4191)) by [@octoper](https://github.com/octoper)
+
+- Internal change to move `iconImageUrl` util to `shared` package. ([#4188](https://github.com/clerk/javascript/pull/4188)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only render the Sign out of all accounts action within `<UserButton />` when there are multiple sessions. ([#4200](https://github.com/clerk/javascript/pull/4200)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cb32aaf59`](https://github.com/clerk/javascript/commit/cb32aaf59d38dcd12e959f542782f71a87adf9c1), [`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7), [`6275c242c`](https://github.com/clerk/javascript/commit/6275c242cd8bcb6f7766934059967e0fe775a0c1), [`f9faaf031`](https://github.com/clerk/javascript/commit/f9faaf03100baf679c78e6c24877fbf3b60be529)]:
+  - @clerk/shared@2.8.2
+  - @clerk/types@4.21.1
+  - @clerk/localizations@3.0.5
+
 ## 5.22.3
 
 ### Patch Changes

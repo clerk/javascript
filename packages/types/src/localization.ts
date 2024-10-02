@@ -144,6 +144,11 @@ type _LocalizationResource = {
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    restrictedAccess: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+    };
   };
   signIn: {
     start: {

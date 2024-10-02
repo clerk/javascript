@@ -18,6 +18,7 @@ export function mockResponse(): ExpressResponse {
   return {
     status: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
+    redirect: jest.fn().mockReturnThis(),
   } as unknown as ExpressResponse;
 }
 

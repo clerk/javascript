@@ -4,6 +4,7 @@ import type { SessionWithActivitiesResource } from '@clerk/types';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
 import { useFetch, useLoadingStatus } from '../../hooks';
+import { useAssurance } from '../../hooks/useAssurance';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
 import { getRelativeToNowDateKey } from '../../utils';
@@ -48,12 +49,19 @@ export const ActiveDevicesSection = () => {
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
+  const { handleAssurance } = useAssurance();
+
   const revoke = async () => {
     if (isCurrent || !session) {
       return;
     }
     status.setLoading();
-    return session.revoke().finally(() => status.setIdle());
+    return (
+      handleAssurance(() => session.revoke())
+        // TODO-STEPUP: Properly handler the response with a setCardError
+        .catch(() => {})
+        .finally(() => status.setIdle())
+    );
   };
 
   return (

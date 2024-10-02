@@ -311,9 +311,9 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -338,9 +338,9 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -362,9 +362,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -386,9 +386,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -410,9 +410,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -434,9 +434,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -458,9 +458,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -482,10 +482,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
-        },
+        __experimental_reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(false);
@@ -506,10 +503,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
-        },
+        __experimental_reverification: 'veryStrict',
       });
 
       expect(isAuthorized).toBe(true);
@@ -530,9 +524,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -554,9 +548,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -578,9 +572,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -602,9 +596,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -626,9 +620,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -650,9 +644,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -674,10 +668,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
-        },
+        __experimental_reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(false);
@@ -686,7 +677,7 @@ describe('Session', () => {
     /**
      * Test for invalid input
      */
-    it('incorrect params for __experimental_assurance', async () => {
+    it('incorrect params for __experimental_reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -701,17 +692,17 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
+        __experimental_reverification: {
           //@ts-expect-error
           level: 'any level',
-          maxAge: 'A1.10min',
+          afterMinutes: 10,
         },
       });
 
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_assurance', async () => {
+    it('incorrect params for __experimental_reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -726,18 +717,18 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
+        __experimental_reverification: {
           //@ts-expect-error
           level: 'any level',
           //@ts-expect-error
-          maxAge: 'som-value',
+          afterMinutes: 'some-value',
         },
       });
 
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_assurance', async () => {
+    it('incorrect params for __experimental_reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -752,10 +743,52 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
+        __experimental_reverification: 'invalid-value',
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('incorrect params for __experimental_reverification', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_reverification: 123,
+      });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('incorrect params for __experimental_reverification', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser(),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+        factor_verification_age: [0, 0],
+      } as SessionJSON);
+
+      const isAuthorized = session.checkAuthorization({
+        __experimental_reverification: {
+          level: 'firstFactor',
           //@ts-expect-error
-          maxAge: 100,
+          afterMinutes: '10',
         },
       });
 
@@ -780,9 +813,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L3.multiFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'multiFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -804,9 +837,9 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: 10,
         },
       });
 
@@ -828,10 +861,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_assurance: {
-          level: 'L2.secondFactor',
-          maxAge: 'A1.10min',
-        },
+        __experimental_reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(true);

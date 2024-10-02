@@ -246,7 +246,6 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
 
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>(
   (props, ref) => {
-    // @ts-expect-error
     const { __internal_country } = useClerk();
 
     return (
