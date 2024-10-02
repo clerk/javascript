@@ -1,5 +1,69 @@
 # Change Log
 
+## 5.25.0
+
+### Minor Changes
+
+- Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
+
+  Removes:
+
+  - `<__experimental_UserVerification/>`
+  - `__experimental_mountUserVerification()`
+  - `__experimental_unmountUserVerification()`
+
+- _Experimental Feature_: `<UserProfile/>` allows users to update their information. Mostly of this information is considered sensitive data. ([#4127](https://github.com/clerk/javascript/pull/4127)) by [@panteliselef](https://github.com/panteliselef)
+
+  We want to ensure that only the users themselves can alter any sensitive data.
+
+  To increase security we are now, require users to re-verify their credentials when they are about to perform these actions:
+
+  | Operation                        | Reverification | Strategy            | Timeframe |
+  | -------------------------------- | -------------- | ------------------- | --------- |
+  | Update account (first/last name) | ❌             |                     |           |
+  | Update username                  | ✅             | Strongest available | 10m       |
+  | Delete account                   | ✅             | Strongest available | 10m       |
+  | Create/Remove profile image      | ❌             |                     |           |
+  | Update password                  | ✅             | Strongest available | 10m       |
+  | Remove password                  | ❌             |                     |           |
+  | Revoke session                   | ✅             | Strongest available | 10m       |
+  | Create identification            | ✅             | Strongest available | 10m       |
+  | Remove identification            | ✅             | Strongest available | 10m       |
+  | Change primary identification    | ✅             | Strongest available | 10m       |
+  | Update Passkey name              | ❌             |                     |           |
+  | Enable MFA (TOTP, Phone number)  | ✅             | Strongest available | 10m       |
+  | Disable MFA (TOΤP, Phone number) | ✅             | Strongest available | 10m       |
+  | Create/Regenerate Backup Codes   | ✅             | Strongest available | 10m       |
+  | Connect External Account         | ✅             | Strongest available | 10m       |
+  | Re-authorize External Account    | ❌             |                     |           |
+  | Remove External Account          | ✅             | Strongest available | 10m       |
+  | Leave organization               | ❌             |                     |           |
+
+- We recently shipped an experimental feature to persist the Clerk client (under `persistClient` flag) as an opt-in. This allows for matching a user's device with a client. We want to test this behavior with more users, so we're making it opt-out as the next step. After more successful testing we'll remove the experimental flag and enable it by default. ([#4250](https://github.com/clerk/javascript/pull/4250)) by [@panteliselef](https://github.com/panteliselef)
+
+  If you're encountering issues, please open an issue. You can disable this new behavior like so:
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: false }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: false } });
+  ```
+
+### Patch Changes
+
+- Allow single-character usernames in `<UserProfile />` validation ([#4243](https://github.com/clerk/javascript/pull/4243)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Handle gracefully yet unknown to our components Web3 providers ([#4263](https://github.com/clerk/javascript/pull/4263)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Navigate to `/choose` when signing out during multi session. ([#4203](https://github.com/clerk/javascript/pull/4203)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`f6fb8b53d`](https://github.com/clerk/javascript/commit/f6fb8b53d236863ad7eca576ee7a16cd33f3506b), [`4a8570590`](https://github.com/clerk/javascript/commit/4a857059059a02bb4f20893e08601e1e67babbed)]:
+  - @clerk/types@4.24.0
+  - @clerk/localizations@3.1.1
+  - @clerk/shared@2.8.5
+
 ## 5.24.1
 
 ### Patch Changes
