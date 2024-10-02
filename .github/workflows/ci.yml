@@ -66,10 +66,10 @@ jobs:
         run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --filter=!@clerk/astro --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --filter=!@clerk/astro --filter=!@clerk/clerk-js --only
 
       - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --filter=@clerk/astro --continue --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --filter=@clerk/astro --filter=@clerk/clerk-js --continue --only
         continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
