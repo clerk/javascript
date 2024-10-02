@@ -87,24 +87,14 @@ const findFailedItemNew = (
       return has({ role });
     }
     if (reverification) {
-      console.log('has reverification param');
-      const a = has({ __experimental_reverification: reverification });
-      console.log('has reverification result', a);
-      return a;
+      return has({ __experimental_reverification: reverification });
     }
-    // this just checks for sign-out
+    // check for sign-out
     return !!auth().userId;
-    // return has({});
   });
 
-  console.log('finals', finals);
-
   const failedItemIndex = finals.findIndex(a => a === false);
-
-  const failedItem = configs[failedItemIndex];
-
-  console.log('failedItem', failedItem);
-  return failedItem;
+  return configs[failedItemIndex];
 };
 
 function protectRoute() {

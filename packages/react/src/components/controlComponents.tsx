@@ -2,8 +2,6 @@ import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_SessionVerificationLevel,
   Autocomplete,
-  // __experimental_SessionVerificationLevel,
-  // __experimental_SessionVerificationMaxAge,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -147,207 +145,6 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 };
 /* eslint-enable react-hooks/rules-of-hooks */
 
-// type ProtectParams =
-//   | {
-//       condition?: never;
-//       role: OrganizationCustomRoleKey;
-//       permission?: never;
-//       assurance?: never;
-//       redirectUrl?: never;
-//       fallback?: React.ComponentType;
-//     }
-//   | {
-//       condition?: never;
-//       role: OrganizationCustomRoleKey;
-//       permission?: never;
-//       assurance?: never;
-//       redirectUrl?: string;
-//       fallback?: never;
-//     }
-//   | {
-//       condition?: never;
-//       role?: never;
-//       permission: OrganizationCustomPermissionKey;
-//       assurance?: never;
-//       redirectUrl?: never;
-//       fallback?: React.ComponentType;
-//     }
-//   | {
-//       condition?: never;
-//       role?: never;
-//       permission: OrganizationCustomPermissionKey;
-//       assurance?: never;
-//       redirectUrl?: string;
-//       fallback?: never;
-//     }
-//   | {
-//       condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-//       role?: never;
-//       permission?: never;
-//       assurance?: never;
-//       redirectUrl?: string;
-//       fallback?: React.ComponentType;
-//     }
-//   | {
-//       condition?: never;
-//       role?: never;
-//       permission?: never;
-//       assurance: {
-//         level: __experimental_SessionVerificationLevel;
-//         maxAge: __experimental_SessionVerificationMaxAge;
-//       };
-//       redirectUrl?: never;
-//       fallback?: React.ComponentType;
-//     }
-//   | {
-//       condition?: never;
-//       role?: never;
-//       permission?: never;
-//       assurance?: never;
-//       redirectUrl?: string;
-//       fallback?: never;
-//     }
-//   | {
-//       condition?: never;
-//       role?: never;
-//       permission?: never;
-//       assurance?: never;
-//       redirectUrl?: never;
-//       fallback?: React.ComponentType;
-//     };
-
-// type ProtectParams =
-//   | {
-//       role: OrganizationCustomRoleKey;
-//     }
-//   | {
-//       role: OrganizationCustomRoleKey;
-//       redirectUrl: string;
-//     }
-//   | {
-//       role: OrganizationCustomRoleKey;
-//       fallback: React.ComponentType;
-//     }
-//   | {
-//       permission: OrganizationCustomPermissionKey;
-//     }
-//   | {
-//       permission: OrganizationCustomPermissionKey;
-//       redirectUrl: string;
-//     }
-//   | {
-//       permission: OrganizationCustomPermissionKey;
-//       fallback: React.ComponentType;
-//     }
-//   | {
-//       assurance: {
-//         level: __experimental_SessionVerificationLevel;
-//         maxAge: __experimental_SessionVerificationMaxAge;
-//       };
-//     }
-//   | {
-//       assurance: {
-//         level: __experimental_SessionVerificationLevel;
-//         maxAge: __experimental_SessionVerificationMaxAge;
-//       };
-//       fallback: React.ComponentType;
-//     }
-//   | {
-//       redirectUrl: string;
-//     }
-//   | {
-//       fallback: React.ComponentType;
-//     }
-//   | undefined;
-
-// const findFailedItem = (configs: ProtectParams[], auth: ReturnType<typeof useAuth>): ProtectParams | undefined => {
-//   const finals = configs.map(config => {
-//     const { has, userId } = auth;
-//     const { role, permission, assurance } = config as any;
-//     if (permission) {
-//       return has({ permission });
-//     }
-//     if (role) {
-//       return has({ role });
-//     }
-//     if (assurance) {
-//       return has({ __experimental_assurance: assurance });
-//     }
-//     // this just checks for sign-out
-//     return !!userId;
-//   });
-//
-//   console.log('finals', finals);
-//
-//   const failedItemIndex = finals.findIndex(a => a === false);
-//
-//   const failedItem = configs[failedItemIndex];
-//
-//   console.log('failedItem', failedItem);
-//   return failedItem;
-// };
-//
-// type MyAuth = ReturnType<typeof useAuth>;
-//
-// type InferStrictTypeParams<T extends ProtectParams> = T;
-//
-// type NonNullable<T> = T extends null | undefined ? never : T;
-// type NonNullableRecord<T, K extends keyof T> = {
-//   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
-// };
-//
-// function protect<T extends ProtectParams>(params: T) {
-//   // We will accumulate permissions here
-//   const configs: ProtectParams[] = [params];
-//
-//   function protectNext(nextParams: ProtectParams) {
-//     // Add the next permission to the array
-//     configs.push(nextParams);
-//     // Return the same function to allow chaining
-//     return { protect: protectNext, component };
-//   }
-//
-//   const component = <P,>(
-//     Component: React.ComponentType<
-//       P & {
-//         auth: InferStrictTypeParams<T> extends { permission: any } | { role: any }
-//           ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
-//           : NonNullableRecord<MyAuth, 'userId'>;
-//       }
-//     >,
-//   ) => {
-//     return (props: P) => {
-//       const auth = useAuth();
-//
-//       const failedItem = findFailedItem(configs, auth) as any;
-//
-//       if (failedItem?.fallback) {
-//         const Fallback = failedItem.fallback;
-//         return <Fallback />;
-//       }
-//
-//       if (failedItem?.redirectUrl) {
-//         throw 'Redirect is not support for client components';
-//       }
-//
-//       if (failedItem) {
-//         return null;
-//       }
-//
-//       return (
-//         // @ts-ignore not sure why this errors
-//         <Component
-//           {...props}
-//           auth={auth}
-//         />
-//       );
-//     };
-//   };
-//
-//   // Return the protect method and the component method to enable chaining
-//   return { protect: protectNext, component };
-// }
-
 const findFailedItemNew = (
   configs: MixedParams[],
   has: CheckAuthorizationWithCustomPermissions,
@@ -363,22 +160,16 @@ const findFailedItemNew = (
     if (reverification) {
       return has({ __experimental_reverification: reverification });
     }
-    // this just checks for sign-out
+    // check for sign-out
     return !!useAuth().userId;
-    // return has({});
   });
-
-  console.log('finals', finals);
 
   const failedItemIndex = finals.findIndex(a => a === false);
   if (failedItemIndex === -1) {
     return undefined;
   }
 
-  const failedItem = configs[failedItemIndex];
-
-  console.log('failedItem', failedItem);
-  return failedItem;
+  return configs[failedItemIndex];
 };
 
 type MixedParams = {
@@ -397,17 +188,6 @@ type MixedParams = {
 };
 
 type MyAuth = ReturnType<typeof useAuth>;
-
-// type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
-// type InferParameters2<T> = T extends (auth: any, ...args: infer P) => any ? P : never;
-// type InferParameters3<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
-//
-// type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-// // type NonNullable<T> = T extends null | undefined ? never : T;
-//
-// // Helper to infer the strict type of the result
-// type InferStrictTypeParams<T extends ProtectParams> = T;
-
 type InferStrictTypeParams2<T extends WithProtectComponentParams> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
