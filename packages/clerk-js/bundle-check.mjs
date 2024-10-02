@@ -11,6 +11,9 @@ import { chromium } from 'playwright';
  * This script generates a CLI report detailing the gzipped size of JavaScript resources loaded by `clerk-js` for a
  * given configuration. This is useful to ensure that the total amount of loaded JavaScript does not exceed the
  * anticipated amount for a particular invocation.
+ *
+ * Note: The publishable key embedded in this script isn't anything special; any publishable key will do, so feel free
+ * to replace it with another key should the current one stop working.
  */
 
 /**
@@ -27,7 +30,7 @@ function template(script) {
         <script
           type="text/javascript"
           src="/clerk.browser.js"
-          data-clerk-publishable-key="${process.env.CLERK_PUBLISHABLE_KEY}"
+          data-clerk-publishable-key="pk_test_Zmx1ZW50LWxhYnJhZG9yLTM0LmNsZXJrLmFjY291bnRzLmRldiQ"
         ></script>
         <script type="text/javascript">
         class VirtualRouter {
@@ -116,6 +119,8 @@ const routes = {
   '/sign-up': signUp(),
 };
 
+const SERVER_ROOT = path.resolve('./dist');
+
 const server = http
   .createServer((req, res) => {
     const onError = err => {
@@ -125,21 +130,35 @@ const server = http
       }
     };
 
-    if (req.url && req.url in routes) {
+    // This should never happen, and is only here to appease TypeScript. `req.url` is always defined for incoming
+    // messages received by the HTTP server.
+    if (!req.url) {
+      throw new Error('Unable to determine URL from request.');
+    }
+
+    if (req.url in routes) {
       res.writeHead(200, { 'content-type': 'text/html' });
       res.end(routes[req.url]);
+      return;
+    }
+
+    const filePath = path.resolve(SERVER_ROOT, `.${req.url}`);
+    // This is here to prevent GitHub from complaining about a security vulnerability.
+    if (!filePath.startsWith(SERVER_ROOT)) {
+      res.writeHead(403, { 'content-type': 'text/plain' });
+      res.end('403 Forbidden\n');
+      console.error(`Attempted to access ${filePath}, which is outsite of SERVER_ROOT directory ${SERVER_ROOT}.`);
+      return;
+    }
+    const extname = path.extname(filePath);
+    if (fs.existsSync(filePath) && (extname === '.js' || extname === '.css')) {
+      const contentType = extname === '.js' ? 'text/javascript' : 'text/css';
+      res.writeHead(200, { 'content-encoding': 'gzip', 'content-type': contentType, vary: 'Accept-Encoding' });
+      // We specifically use gzip here since that's the bundle size we really care about.
+      pipeline(fs.createReadStream(filePath), zlib.createGzip(), res, onError);
     } else {
-      const filePath = `./dist${req.url}`;
-      const extname = path.extname(filePath);
-      if (fs.existsSync(filePath) && (extname === '.js' || extname === '.css')) {
-        const contentType = extname === '.js' ? 'text/javascript' : 'text/css';
-        res.writeHead(200, { 'content-encoding': 'gzip', 'content-type': contentType, vary: 'Accept-Encoding' });
-        // We specifically use gzip here since that's the bundle size we really care about.
-        pipeline(fs.createReadStream(filePath), zlib.createGzip(), res, onError);
-      } else {
-        res.writeHead(404, { 'content-type': 'text/plain' });
-        res.end('404 Not Found\n');
-      }
+      res.writeHead(404, { 'content-type': 'text/plain' });
+      res.end('404 Not Found\n');
     }
   })
   .listen(4000);
