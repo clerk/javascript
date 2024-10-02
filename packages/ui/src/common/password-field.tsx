@@ -9,21 +9,26 @@ import EyeSlashSm from '~/primitives/icons/eye-slash-sm';
 import EyeSm from '~/primitives/icons/eye-sm';
 import { translatePasswordError } from '~/utils/make-localizable';
 
-export function PasswordField({
-  alternativeFieldTrigger,
-  className,
-  label,
-  name = 'password',
-  ...props
-}: {
-  alternativeFieldTrigger?: React.ReactNode;
-  validatePassword?: boolean;
-  name?: 'password' | 'confirmPassword';
-  /**
-   * **Note:** this prop is required as the `label` differs depending on the context (e.g. new password)
-   */
-  label: React.ReactNode;
-} & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
+export const PasswordField = React.forwardRef(function PasswordField(
+  {
+    alternativeFieldTrigger,
+    className,
+    fieldClassName,
+    label,
+    name = 'password',
+    ...props
+  }: {
+    alternativeFieldTrigger?: React.ReactNode;
+    validatePassword?: boolean;
+    name?: 'password' | 'confirmPassword';
+    /**
+     * **Note:** this prop is required as the `label` differs depending on the context (e.g. new password)
+     */
+    label: React.ReactNode;
+    fieldClassName?: string;
+  } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
+) {
   const [type, setType] = React.useState('password');
   const id = React.useId();
   const { t, locale } = useLocalizations();
@@ -33,7 +38,7 @@ export function PasswordField({
       name={name}
       asChild
     >
-      <Field.Root>
+      <Field.Root className={fieldClassName}>
         <Common.Label asChild>
           <Field.Label>
             {label}
@@ -48,6 +53,7 @@ export function PasswordField({
                   type={type}
                   className={cx('pe-7', className)}
                   {...props}
+                  ref={forwardedRef}
                   aria-describedby={props.validatePassword && state !== 'idle' ? id : undefined}
                   asChild
                 >
@@ -68,6 +74,7 @@ export function PasswordField({
                     onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
                     title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
                     disabled={props.disabled}
+                    tabIndex={props.tabIndex}
                   >
                     <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
                     {type === 'password' ? <EyeSlashSm /> : <EyeSm />}
@@ -121,4 +128,4 @@ export function PasswordField({
       </Field.Root>
     </Common.Field>
   );
-}
+});
