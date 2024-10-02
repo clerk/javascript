@@ -5,8 +5,7 @@ import { SignUpContinue } from '~/components/sign-up/steps/continue';
 import { SignUpStart } from '~/components/sign-up/steps/start';
 // import { SignUpStatus } from '~/components/sign-up/steps/status';
 import { SignUpVerifications } from '~/components/sign-up/steps/verifications';
-import type { Appearance } from '~/contexts';
-import { AppearanceProvider } from '~/contexts';
+import { type Appearance, AppearanceProvider } from '~/contexts';
 
 export function SignUp({ appearance, ...props }: { appearance?: Appearance } & SignUpProps) {
   return (
