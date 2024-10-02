@@ -14,6 +14,7 @@ export const PasswordField = React.forwardRef(function PasswordField(
     alternativeFieldTrigger,
     className,
     fieldClassName,
+    fieldRef,
     label,
     name = 'password',
     ...props
@@ -25,6 +26,7 @@ export const PasswordField = React.forwardRef(function PasswordField(
      * **Note:** this prop is required as the `label` differs depending on the context (e.g. new password)
      */
     label: React.ReactNode;
+    fieldRef?: React.Ref<HTMLDivElement>;
     fieldClassName?: string;
   } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
@@ -38,7 +40,10 @@ export const PasswordField = React.forwardRef(function PasswordField(
       name={name}
       asChild
     >
-      <Field.Root className={fieldClassName}>
+      <Field.Root
+        className={fieldClassName}
+        ref={fieldRef}
+      >
         <Common.Label asChild>
           <Field.Label>
             {label}
@@ -74,7 +79,6 @@ export const PasswordField = React.forwardRef(function PasswordField(
                     onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
                     title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
                     disabled={props.disabled}
-                    tabIndex={props.tabIndex}
                   >
                     <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
                     {type === 'password' ? <EyeSlashSm /> : <EyeSm />}
