@@ -50,9 +50,6 @@
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
-    "@clerk/localizations": "3.1.1",
-    "@clerk/shared": "2.8.5",
-    "@clerk/types": "4.24.0",
     "@clerk/localizations": "3.1.2",
     "@clerk/shared": "2.9.0",
     "@clerk/types": "4.25.0",
