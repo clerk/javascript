@@ -109,7 +109,7 @@ const findFailedItemNew = (
 
 function protectRoute() {
   // We will accumulate permissions here
-  const configs: MixedActionParams[] = [];
+  const configs: MixedActionParams[] = [{}];
 
   const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
     configs.push(nextParams);
