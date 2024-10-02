@@ -32,7 +32,7 @@ export function AutoFillPasswordField() {
     <PasswordField
       label={t('formFieldLabel__password')}
       fieldRef={fieldRef}
-      fieldClassName={cx(!isAutoFilled && 'absolute [clip-path:polygon(0px_0px,_0px_0px,_0px_0px,_0px_0px)]')}
+      fieldClassName={cx(!isAutoFilled && 'absolute opacity-0 [clip-path:polygon(0px_0px,_0px_0px,_0px_0px,_0px_0px)]')}
       onChange={handleAutofill}
     />
   );
