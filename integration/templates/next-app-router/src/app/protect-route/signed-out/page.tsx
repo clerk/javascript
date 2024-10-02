@@ -1,25 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { PageComponent } from '@/app/protect-route/page-component';
 
 function Page() {
-  const [res, setRes] = useState(null);
-
-  return (
-    <>
-      <button
-        onClick={async () => {
-          await fetch('/api/log-user-id', {
-            method: 'POST',
-          })
-            .then(res => res.json())
-            .then(setRes);
-        }}
-      >
-        LogUserId
-      </button>
-      <pre>{JSON.stringify(res)}</pre>
-    </>
-  );
+  return <PageComponent url={'/api/log-user-id'} />;
 }
 
 export default Page;

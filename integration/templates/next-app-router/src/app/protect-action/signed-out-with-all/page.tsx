@@ -1,26 +1,9 @@
 'use client';
-import { useState, useTransition } from 'react';
 import { logUserIdActionStack } from '@/app/protect-action/actions';
+import { PageComponent } from '@/app/protect-action/page-component';
 
 function Page() {
-  const [pending, startTransition] = useTransition();
-  const [res, setRes] = useState(null);
-
-  return (
-    <>
-      <button
-        disabled={pending}
-        onClick={() => {
-          startTransition(async () => {
-            await logUserIdActionStack().then(setRes);
-          });
-        }}
-      >
-        LogUserId
-      </button>
-      <pre>{JSON.stringify(res)}</pre>
-    </>
-  );
+  return <PageComponent action={logUserIdActionStack} />;
 }
 
 export default Page;
