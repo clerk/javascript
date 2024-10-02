@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
@@ -38,12 +38,6 @@ function _SignUpContinue() {
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
 
-  // Redirect to sign-up if there is no persisted sign-up
-  if (!signUp.id) {
-    void navigate(displayConfig.signUpUrl);
-    return <LoadingCard />;
-  }
-
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
     firstName: useFormControl('firstName', initialValues.firstName || '', {
@@ -77,7 +71,24 @@ function _SignUpContinue() {
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       validatePassword: true,
     }),
+    legalAccepted: useFormControl('legalAccepted', '', {
+      type: 'checkbox',
+      label: 'I agree to the Terms of Service and Privacy Policy',
+      defaultChecked: false,
+      isRequired: userSettings.signUp.legal_consent_enabled || false,
+    }),
   } as const;
+
+  const onlyLegalConsentMissing = useMemo(
+    () => signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
+    [signUp.missingFields],
+  );
+
+  // Redirect to sign-up if there is no persisted sign-up
+  if (!signUp.id) {
+    void navigate(displayConfig.signUpUrl);
+    return <LoadingCard />;
+  }
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
@@ -89,6 +100,7 @@ function _SignUpContinue() {
     activeCommIdentifierType,
     signUp,
     isProgressiveSignUp,
+    legalConsentRequired: userSettings.signUp.legal_consent_enabled,
   });
   minimizeFieldsForExistingSignup(fields, signUp);
 
@@ -131,8 +143,8 @@ function _SignUpContinue() {
       !phoneNumberProvided &&
       emailOrPhone(attributes, isProgressiveSignUp)
     ) {
-      fieldsToSubmit.push(formState['emailAddress']);
-      fieldsToSubmit.push(formState['phoneNumber']);
+      fieldsToSubmit.push(formState.emailAddress);
+      fieldsToSubmit.push(formState.phoneNumber);
     }
 
     card.setLoading();
@@ -161,8 +173,18 @@ function _SignUpContinue() {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
+            <Header.Title
+              localizationKey={
+                !onlyLegalConsentMissing ? localizationKeys('signUp.continue.title') : 'Legal requirements'
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                !onlyLegalConsentMissing
+                  ? localizationKeys('signUp.continue.subtitle')
+                  : 'Please accept legal requirements to continue'
+              }
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex
@@ -182,6 +204,7 @@ function _SignUpContinue() {
                 handleSubmit={handleSubmit}
                 fields={fields}
                 formState={formState}
+                onlyLegalAcceptedMissing={onlyLegalConsentMissing}
                 canToggleEmailPhone={canToggleEmailPhone}
                 handleEmailPhoneToggle={handleChangeActive}
               />
