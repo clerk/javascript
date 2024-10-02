@@ -1,7 +1,7 @@
 import type { ProtectProps } from '@clerk/clerk-react';
 import type {
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationMaxAgeMinutes,
   Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
@@ -162,7 +162,7 @@ type ProtectParams =
       permission?: never;
       assurance: {
         level: __experimental_SessionVerificationLevel;
-        maxAge: __experimental_SessionVerificationMaxAge;
+        maxAge: __experimental_SessionVerificationMaxAgeMinutes;
       };
       redirectUrl?: never;
       fallback?: React.ComponentType | 'modal';

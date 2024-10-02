@@ -2,7 +2,7 @@ import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from 
 import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationMaxAgeMinutes,
   Clerk,
 } from '@clerk/types';
 import { useMemo } from 'react';
@@ -23,7 +23,7 @@ type AssuranceHint = {
     reason: 'assurance';
     metadata: {
       level: __experimental_SessionVerificationLevel;
-      maxAge: __experimental_SessionVerificationMaxAge;
+      maxAge: __experimental_SessionVerificationMaxAgeMinutes;
     };
   };
 };
