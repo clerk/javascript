@@ -903,12 +903,16 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     res.end();
   });
 
+  let app: Application;
+
   test.beforeAll('setup local jwks server', async () => {
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
+    app = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
+    await app.teardown();
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
@@ -1216,11 +1220,6 @@ test.describe('Client handshake with organization activation @nextjs', () => {
 
   for (const testCase of cookieAuthCases) {
     test(`${testCase.name}`, async () => {
-      const app = await startAppWithOrganizationSyncOptions(
-        testCase.when.orgSyncOptions,
-        `http://localhost:${jwksServer.address().port}`,
-      );
-
       const config = generateConfig({
         mode: 'test',
       });
@@ -1233,6 +1232,10 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       const headers = new Headers({
         'X-Publishable-Key': config.pk,
         'X-Secret-Key': config.sk,
+
+        // NOTE(izaak): To avoid needing to start a server with every test, we're passing in
+        // organization options to the app via a header.
+        'x-organization-sync-options': JSON.stringify(testCase.when.orgSyncOptions),
       });
 
       if (testCase.when.secFetchDestHeader) {
@@ -1256,15 +1259,11 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       expect(res.status).toBe(testCase.then.expectStatus);
       const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
       expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
-
-      await app.teardown();
     });
   }
 });
 
 test.describe('Client handshake with an organization activation avoids infinite loops @nextjs', () => {
-  test.describe.configure({ mode: 'parallel' });
-
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
 
   const jwksServer = http.createServer(function (req, res) {
@@ -1285,13 +1284,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
 
-    thisApp = await startAppWithOrganizationSyncOptions(
-      {
-        organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
-        personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
-      },
-      `http://localhost:${jwksServer.address().port}`,
-    );
+    thisApp = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
@@ -1305,6 +1298,11 @@ test.describe('Client handshake with an organization activation avoids infinite 
     mode: 'test',
   });
 
+  const organizationSyncOptions = {
+    organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+    personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+  };
+
   test('Sets the redirect loop tracking cookie', async () => {
     // Create a new map with an org_id key
     const { token, claims } = config.generateToken({
@@ -1316,6 +1314,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
       'Sec-Fetch-Dest': 'document',
+      'x-organization-sync-options': JSON.stringify(organizationSyncOptions),
     });
     headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
 
@@ -1345,6 +1344,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
       'X-Publishable-Key': config.pk,
       'X-Secret-Key': config.sk,
       'Sec-Fetch-Dest': 'document',
+      'x-organization-sync-options': JSON.stringify(organizationSyncOptions),
     });
 
     // Critical cookie: __clerk_redirect_count
@@ -1368,17 +1368,17 @@ test.describe('Client handshake with an organization activation avoids infinite 
 
 /**
  * Start the nextjs sample app with the given organization sync options
+ * organization sync options can be passed to the app via the
+ * "x-organization-sync-options" header
  */
-const startAppWithOrganizationSyncOptions = async (
-  orgSyncOptions: OrganizationSyncOptions,
-  clerkAPIUrl: string,
-): Promise<Application> => {
+const startAppWithOrganizationSyncOptions = async (clerkAPIUrl: string): Promise<Application> => {
   const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('private', 'CLERK_API_URL', clerkAPIUrl);
 
   const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
     // Set the paths that don't require the user to be signed in
     const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
     export const middleware = (req, evt) => {
+      const orgSyncOptions = req.headers.get("x-organization-sync-options")
       return authMiddleware({
         publicRoutes: publicPaths,
         publishableKey: req.headers.get("x-publishable-key"),
@@ -1389,7 +1389,7 @@ const startAppWithOrganizationSyncOptions = async (
         signInUrl: req.headers.get("x-sign-in-url"),
 
         // Critical
-        organizationSyncOptions: ${JSON.stringify(orgSyncOptions)}
+        organizationSyncOptions: JSON.parse(req.headers.get("x-organization-sync-options")),
 
       })(req, evt)
     };
