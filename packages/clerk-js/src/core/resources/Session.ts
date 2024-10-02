@@ -122,7 +122,7 @@ export class Session extends BaseResource implements SessionResource {
 
   __experimental_startVerification = async ({
     level,
-    maxAge,
+    maxAgeMinutes,
   }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
@@ -130,7 +130,7 @@ export class Session extends BaseResource implements SessionResource {
         path: `/client/sessions/${this.id}/verify`,
         body: {
           level,
-          maxAge,
+          maxAgeMinutes,
         } as any,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;

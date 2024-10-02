@@ -10,9 +10,9 @@ const useUserVerificationSession = () => {
   const data = useFetch(
     session ? session.__experimental_startVerification : undefined,
     {
-      level: level || 'L2.secondFactor',
+      level: level || 'secondFactor',
       // TODO(STEP-UP): Figure out if this needs to be a prop
-      maxAge: 'A1.10min',
+      maxAgeMinutes: 10,
     },
     {
       throttleTime: 300,

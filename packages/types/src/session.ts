@@ -16,8 +16,9 @@ import type {
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type {
+  __experimental_ReverificationConfig,
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationMaxAgeMinutes,
   __experimental_SessionVerificationResource,
 } from './sessionVerification';
 import type { TokenResource } from './token';
@@ -39,10 +40,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = (
     }
   | { role?: never; permission?: never }
 ) & {
-  __experimental_assurance?: {
-    level: __experimental_SessionVerificationLevel;
-    maxAge: __experimental_SessionVerificationMaxAge;
-  };
+  __experimental_reverification?: __experimental_ReverificationConfig;
 };
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
@@ -61,10 +59,7 @@ type CheckAuthorizationParams = (
       permission?: never;
     }
 ) & {
-  __experimental_assurance?: {
-    level: __experimental_SessionVerificationLevel;
-    maxAge: __experimental_SessionVerificationMaxAge;
-  };
+  __experimental_reverification?: __experimental_ReverificationConfig;
 };
 
 export interface SessionResource extends ClerkResource {
@@ -160,7 +155,7 @@ export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
 export type __experimental_SessionVerifyCreateParams = {
   level: __experimental_SessionVerificationLevel;
-  maxAge: __experimental_SessionVerificationMaxAge;
+  maxAgeMinutes: __experimental_SessionVerificationMaxAgeMinutes;
 };
 
 export type __experimental_SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;

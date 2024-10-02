@@ -861,8 +861,8 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
 
   /**
    * Defines the steps of the verification flow.
-   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
-   * @default `'L2.secondFactor'`
+   * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'secondFactor'`
    */
   level?: __experimental_SessionVerificationLevel;
 
