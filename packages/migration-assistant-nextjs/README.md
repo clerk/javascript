@@ -6,7 +6,7 @@
     </picture>
   </a>
   <br />
-  <h1 align="center">@clerk/migration-assistant</h1>
+  <h1 align="center">@clerk/migration-assistant-nextjs</h1>
 </p>
 
 <div align="center">
@@ -29,19 +29,19 @@
 
 ## Getting Started
 
-TODO
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_nextjs) is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
-TODO
-
-### Installation
-
-TODO
+- Next.js 13.0.4 or later
+- React 18 or later
+- Node.js `>=18.17.0` or later
+- An existing authentication provider (like Next-Auth, Supabase, etc.)
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
 
 ## Usage
 
-TODO
+For further information, guides, and examples visit the [Clerk Migrations Assistant reference documentation](https://clerk.com/docs/references/nextjs/overview?utm_source=github&utm_medium=clerk_nextjs).
 
 ## Support
 
@@ -56,9 +56,9 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ## Security
 
-`@clerk/migration-assistant` follows good practices of security, but 100% security cannot be assured.
+`@clerk/migration-assistant-nextjs` follows good practices of security, but 100% security cannot be assured.
 
-`@clerk/migration-assistant` is provided **"as is"** without any **warranty**. Use at your own risk.
+`@clerk/migration-assistant-nextjs` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
