@@ -1,3 +1,3 @@
 ---
-"@clerk/example": patch
+"@clerk/example": major
 ---
