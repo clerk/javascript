@@ -9,7 +9,7 @@ export function AutoFillPasswordField() {
   const { t } = useLocalizations();
   const [isAutoFilled, setIsAutoFilled] = React.useState(false);
 
-  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAutofill = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value && !isAutoFilled) {
       setIsAutoFilled(true);
     }
@@ -20,7 +20,7 @@ export function AutoFillPasswordField() {
       label={t('formFieldLabel__password')}
       fieldClassName={cx(!isAutoFilled && 'absolute [clip-path:polygon(0px_0px,_0px_0px,_0px_0px,_0px_0px)]')}
       tabIndex={isAutoFilled ? undefined : -1}
-      onChange={handleInput}
+      onChange={handleAutofill}
     />
   );
 }
