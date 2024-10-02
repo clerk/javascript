@@ -1,8 +1,7 @@
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import * as React from 'react';
 
-import { AutoFillPasswordField } from '~/common/auto-filled-password-field';
+import { AutoFillPasswordField } from '~/common/auto-fill-password-field';
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
