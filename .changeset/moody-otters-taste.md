@@ -1,5 +1,2 @@
 ---
-"@clerk/example": major
 ---
-
-Test
