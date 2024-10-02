@@ -1,5 +1,2 @@
 ---
-"@clerk/testing": major
 ---
-
-test
