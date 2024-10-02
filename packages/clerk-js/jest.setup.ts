@@ -3,10 +3,13 @@ import { TextDecoder, TextEncoder } from 'node:util';
 
 import { jest } from '@jest/globals';
 
+class FakeResponse {}
+
 if (typeof window !== 'undefined') {
   Object.defineProperties(globalThis, {
     TextDecoder: { value: TextDecoder },
     TextEncoder: { value: TextEncoder },
+    Response: { value: FakeResponse },
     crypto: { value: crypto.webcrypto },
   });
 

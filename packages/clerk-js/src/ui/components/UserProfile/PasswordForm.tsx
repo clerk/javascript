@@ -14,6 +14,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
+import { useAssurance } from '../../hooks/useAssurance';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
@@ -36,6 +37,7 @@ type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
   const { onSuccess, onReset } = props;
   const { user } = useUser();
+  const { handleAssurance } = useAssurance();
 
   if (!user) {
     return null;
@@ -117,7 +119,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
-      await user.updatePassword(opts);
+      await handleAssurance(() => user.updatePassword(opts));
       onSuccess();
     } catch (e) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
