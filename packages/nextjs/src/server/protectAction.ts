@@ -112,7 +112,7 @@ const findFailedItemNew = (
 
 function protectAction() {
   // We will accumulate permissions here
-  const configs: MixedActionParams[] = [];
+  const configs: MixedActionParams[] = [{}];
 
   const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -260,7 +260,6 @@ function protectAction() {
           },
         };
       }
-
       // @ts-ignore not sure why this errors
       return handler(auth(), ...args);
     };
