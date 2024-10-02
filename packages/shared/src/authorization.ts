@@ -1,7 +1,6 @@
 import type {
   __experimental_ReverificationConfig,
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
   __experimental_SessionVerificationTypes,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
@@ -56,9 +55,9 @@ const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>(['firstF
 const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['veryStrict', 'strict', 'moderate', 'lax']);
 
 // Helper functions
-const isValidMaxAge = (maxAge: __experimental_SessionVerificationMaxAge) => typeof maxAge === 'number' && maxAge > 0;
-const isValidLevel = (level: __experimental_SessionVerificationLevel) => ALLOWED_LEVELS.has(level);
-const isValidVerificationType = (type: __experimental_SessionVerificationTypes) => ALLOWED_TYPES.has(type);
+const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
+const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
+const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 
 /**
  * Checks if a user has the required organization-level authorization.
