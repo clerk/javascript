@@ -916,12 +916,12 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     return new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  type testCase = {
+  type TestCase = {
     name: string;
-    when: when;
-    then: then;
+    when: When;
+    then: Then;
   };
-  type when = {
+  type When = {
     // With this initial state...
     initialAuthState: 'active' | 'expired' | 'early';
     initialSessionClaims: Map<string, string>;
@@ -939,7 +939,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     secFetchDestHeader: string | null;
   };
 
-  type then = {
+  type Then = {
     // A handshake should (or should not) occur:
     expectStatus: number;
 
@@ -947,7 +947,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
     fapiOrganizationIdParamValue: string | null;
   };
 
-  const cookieAuthCases: testCase[] = [
+  const cookieAuthCases: TestCase[] = [
     // ---------------- Session active vs expired tests ----------------
     // Note: it would be possible to run _every_ test with both active and expired initial states
     //       and expect the same results, but we're avoiding that to save some test execution time.
