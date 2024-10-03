@@ -97,7 +97,7 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     // Hide any non-required fields
     Object.entries(fields).forEach(([k, v]) => {
       if (v && !v.required) {
-        delete fields[k];
+        delete fields[k as FieldKey];
       }
     });
   }
