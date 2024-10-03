@@ -46,7 +46,7 @@ export type OrganizationSyncOptions = {
    * - ["/orgs/:id", "/orgs/:id/(.*)"]
    * - ["/app/:any/orgs/:slug", "/app/:any/orgs/:slug/(.*)"]
    */
-  organizationPatterns?: Array<Pattern>;
+  organizationPatterns?: Pattern[];
 
   /**
    * URL patterns for resources in the context of a clerk personal account (user-specific, outside any organization).
@@ -56,7 +56,7 @@ export type OrganizationSyncOptions = {
    * - ["/user", "/user/(.*)"]
    * - ["/user/:any", "/user/:any/(.*)"]
    */
-  personalAccountPatterns?: Array<Pattern>;
+  personalAccountPatterns?: Pattern[];
 };
 
 /**
