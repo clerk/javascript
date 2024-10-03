@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
+import { Button, Col, descriptors, Flex, Form as FormPrim, FormLabel, localizationKeys, Text } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { OTPInputProps } from './CodeControl';
@@ -201,6 +201,8 @@ const InputGroup = (
 const Checkbox = (
   props: CommonFieldRootProps & {
     description?: string | LocalizationKey;
+    termsLink?: string;
+    privacyLink?: string;
   },
 ) => {
   return (
@@ -209,6 +211,35 @@ const Checkbox = (
       <Flex align='start'>
         <Field.CheckboxIndicator />
         <Field.CheckboxLabel description={props.description} />
+      </Flex>
+    </Field.Root>
+  );
+};
+
+const LegalCheckbox = (
+  props: CommonFieldRootProps & {
+    description?: string | LocalizationKey;
+  },
+) => {
+  return (
+    <Field.Root {...props}>
+      <Flex align='start'>
+        <Field.CheckboxIndicator />
+        <FormLabel
+          elementDescriptor={descriptors.formFieldRadioLabel}
+          htmlFor={props.itemID}
+          sx={t => ({
+            padding: `${t.space.$none} ${t.space.$2}`,
+            display: 'flex',
+            flexDirection: 'column',
+          })}
+        >
+          <Text
+            elementDescriptor={descriptors.formFieldRadioLabelTitle}
+            variant='subtitle'
+            localizationKey={props.label}
+          />
+        </FormLabel>
       </Flex>
     </Field.Root>
   );
@@ -294,6 +325,7 @@ export const Form = {
   InputGroup,
   RadioGroup,
   Checkbox,
+  LegalCheckbox: LegalCheckbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
