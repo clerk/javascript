@@ -1,6 +1,6 @@
-import { protectRoute } from '@clerk/nextjs/server';
+import { __experimental_protectRoute } from '@clerk/nextjs/server';
 
-export const POST = protectRoute()
+export const POST = __experimental_protectRoute()
   .with({
     role: 'org:admin',
   })

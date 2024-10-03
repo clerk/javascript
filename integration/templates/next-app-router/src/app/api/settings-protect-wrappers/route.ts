@@ -1,11 +1,11 @@
-import { protectRoute } from '@clerk/nextjs/server';
+import { __experimental_protectRoute } from '@clerk/nextjs/server';
 
 // export function GET() {
 //   const { userId } = auth().protect(has => has({ role: 'admin' }) || has({ role: 'org:editor' }));
 //   return new Response(JSON.stringify({ userId }));
 // }
 
-export const GET = protectRoute()
+export const GET = __experimental_protectRoute()
   .with({
     role: 'org:admin',
   })

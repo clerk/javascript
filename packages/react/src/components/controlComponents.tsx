@@ -1,4 +1,4 @@
-import type { ProtectConfiguration } from '@clerk/shared';
+import type { __internal_ProtectConfiguration } from '@clerk/shared';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
   __experimental_SessionVerificationLevel,
@@ -145,7 +145,7 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 };
 /* eslint-enable react-hooks/rules-of-hooks */
 
-type ReactProtectConfiguration = ProtectConfiguration & {
+type ReactProtectConfiguration = __internal_ProtectConfiguration & {
   fallback?: React.ComponentType | 'modal';
 };
 

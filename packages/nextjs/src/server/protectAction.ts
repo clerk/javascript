@@ -1,4 +1,4 @@
-import type { ProtectConfiguration } from '@clerk/shared/protect';
+import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
@@ -55,9 +55,9 @@ type CustomAuthObject<T extends WithProtectActionParams> =
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
-function protectAction() {
+function __experimental_protectAction() {
   // We will accumulate permissions here
-  const configs: ProtectConfiguration[] = [{}];
+  const configs: __internal_ProtectConfiguration[] = [{}];
 
   const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -181,4 +181,4 @@ function protectAction() {
   return { with: withNext, action };
 }
 
-export { protectAction };
+export { __experimental_protectAction };

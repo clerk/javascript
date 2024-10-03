@@ -6,7 +6,7 @@ import type {
 } from '@clerk/types';
 
 const __internal_findFailedProtectConfiguration = <
-  T extends ProtectConfiguration,
+  T extends __internal_ProtectConfiguration,
   AO extends {
     has: CheckAuthorizationWithCustomPermissions;
     userId: string | null | undefined;
@@ -39,7 +39,7 @@ const __internal_findFailedProtectConfiguration = <
   return configs[failedItemIndex];
 };
 
-type ProtectConfiguration = {
+type __internal_ProtectConfiguration = {
   reverification?:
     | 'veryStrict'
     | 'strict'
@@ -53,4 +53,4 @@ type ProtectConfiguration = {
   role?: OrganizationCustomRoleKey;
 };
 
-export { __internal_findFailedProtectConfiguration, type ProtectConfiguration };
+export { __internal_findFailedProtectConfiguration, type __internal_ProtectConfiguration };

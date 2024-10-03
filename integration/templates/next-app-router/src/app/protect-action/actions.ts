@@ -1,13 +1,13 @@
 'use server';
-import { protectAction } from '@clerk/nextjs/server';
+import { __experimental_protectAction } from '@clerk/nextjs/server';
 
-const logUserIdAction = protectAction().action(auth => {
+const logUserIdAction = __experimental_protectAction().action(auth => {
   return {
     userId: auth.userId,
   };
 });
 
-const logUserIdActionRole = protectAction()
+const logUserIdActionRole = __experimental_protectAction()
   .with({
     role: 'org:admin',
   })
@@ -17,7 +17,7 @@ const logUserIdActionRole = protectAction()
     };
   });
 
-const logUserIdActionReverification = protectAction()
+const logUserIdActionReverification = __experimental_protectAction()
   .with({
     reverification: {
       level: 'secondFactor',
@@ -30,7 +30,7 @@ const logUserIdActionReverification = protectAction()
     };
   });
 
-const logUserIdActionStack = protectAction()
+const logUserIdActionStack = __experimental_protectAction()
   .with({
     role: 'org:admin',
   })

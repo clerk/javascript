@@ -1,5 +1,5 @@
 import type { ProtectProps } from '@clerk/clerk-react';
-import type { ProtectConfiguration } from '@clerk/shared';
+import type { __internal_ProtectConfiguration } from '@clerk/shared';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
   __experimental_SessionVerificationLevel,
@@ -80,9 +80,7 @@ export function Protect(props: ProtectProps): React.JSX.Element | null {
   return authorized;
 }
 
-// type AsyncComponentType<P> = (p: P) => JSX.Element | null | Promise<JSX.Element | null>;
-
-type NextServerProtectConfiguration = ProtectConfiguration & {
+type NextServerProtectConfiguration = __internal_ProtectConfiguration & {
   fallback?: React.ComponentType | Autocomplete<'redirectToSignIn' | 'modal'>;
 };
 

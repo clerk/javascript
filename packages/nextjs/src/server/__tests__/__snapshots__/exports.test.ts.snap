@@ -2,6 +2,8 @@
 
 exports[`/server public exports should not include a breaking change 1`] = `
 [
+  "__experimental_protectAction",
+  "__experimental_protectRoute",
   "auth",
   "authMiddleware",
   "buildClerkProps",
@@ -11,8 +13,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "createRouteMatcher",
   "currentUser",
   "getAuth",
-  "protectAction",
-  "protectRoute",
   "redirectToSignIn",
   "redirectToSignUp",
   "verifyToken",
