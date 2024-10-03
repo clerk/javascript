@@ -1,3 +1,4 @@
+import { useClerkHostRouter } from '@clerk/shared/router';
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
@@ -356,11 +357,21 @@ export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.Butt
 
 export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
   function CardFooterActionLink({ children, className, ...props }, forwardedRef) {
+    const router = useClerkHostRouter();
+
+    const { href, ...rest } = props;
     return (
       <a
         ref={forwardedRef}
         data-card-footer-action-link=''
-        {...props}
+        {...rest}
+        href={href}
+        onClick={e => {
+          e.preventDefault();
+          if (href) {
+            router.push(href);
+          }
+        }}
         className={footerActionButton({ className })}
       >
         {children}
