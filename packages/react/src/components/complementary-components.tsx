@@ -1,56 +1,33 @@
 'use client';
 
-import { useClerk } from '@clerk/shared/react';
+import {
+  UserVerificationModal as SharedUserVerificationModal,
+  UserVerificationTrigger as SharedUserVerificationTrigger,
+} from '@clerk/shared/react';
 import type { ComponentProps } from 'react';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Element => {
-  const clerk = useClerk();
-  // const router = useRouter();
   return (
-    <button
+    <SharedUserVerificationTrigger
       {...props}
-      type={'button'}
-      onClick={() => {
-        clerk?.__experimental_openUserVerification({
-          level: 'secondFactor',
-          afterVerificationCancelled() {
-            // router.back();
-          },
-        });
-      }}
-    >
-      {props.children}
-    </button>
+      afterVerificationCancelled={
+        //TODO-STEP-UP: Figure out how to go back any react app
+        () => null
+      }
+    />
   );
 };
 
 const UserVerificationModal = (): React.JSX.Element | null => {
-  const clerk = useClerk();
-  // const router = useRouter();
-
-  useEffect(() => {
-    return () => {
-      clerk.__experimental_closeUserVerification({ unstable_notify: false });
-    };
-  }, []);
-
-  useEffect(() => {
-    if (clerk.loaded) {
-      clerk.__experimental_openUserVerification({
-        afterVerificationCancelled() {
-          // TODO: This is not reliable, find another solution
-          // if (window.history.length > 1) {
-          //   router.back();
-          // } else {
-          //   router.push('/start');
-          // }
-        },
-      });
-    }
-  }, [clerk.loaded]);
-
-  return null;
+  return (
+    <SharedUserVerificationModal
+      afterVerificationCancelled={
+        //TODO-STEP-UP: Figure out how to go back any react app
+        () => null
+      }
+    />
+  );
 };
 
 export { UserVerificationTrigger, UserVerificationModal };
