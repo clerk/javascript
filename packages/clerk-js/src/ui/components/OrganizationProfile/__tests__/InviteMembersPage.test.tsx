@@ -251,6 +251,7 @@ describe('InviteMembersPage', () => {
       expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
+      await userEvent.click(getByRole('button', { name: /mydefaultrole/i }));
     });
   });
 
