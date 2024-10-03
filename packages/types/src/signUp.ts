@@ -162,7 +162,7 @@ export type SignUpCreateParams = Partial<
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
     token: string;
-    legalAccepted: boolean;
+    __experimental_legalAccepted: boolean;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
