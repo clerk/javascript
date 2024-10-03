@@ -82,7 +82,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"assurance"\s*,\s*"metadata"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
 
@@ -90,7 +90,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"assurance"\s*,\s*"metadata"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
       });
@@ -138,7 +138,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"something"\s*,\s*"reason"\s*:\s*"something"\s*,\s*"metadata"\s*:\s*\{\s*"role"\s*:\s*"org:admin"\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"role-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"role"\s*:\s*"org:admin"\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
 
@@ -150,7 +150,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"something"\s*,\s*"reason"\s*:\s*"something"\s*,\s*"metadata"\s*:\s*\{\s*"role"\s*:\s*"org:admin"\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"role-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"role"\s*:\s*"org:admin"\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
 
@@ -167,7 +167,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"assurance"\s*,\s*"metadata"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
       });

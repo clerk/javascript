@@ -1,3 +1,9 @@
+import {
+  permissionMismatch,
+  reverificationMismatch,
+  roleMismatch,
+  signedOut,
+} from '@clerk/shared/authorization-errors';
 import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
@@ -103,38 +109,23 @@ function __experimental_protectAction() {
         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
         if (failedItem?.reverification) {
-          const errorObj = {
-            clerk_error: {
-              type: 'forbidden',
-              reason: 'assurance',
-              metadata: failedItem.reverification,
-            },
-          } as const;
-
-          //@ts-ignore
-          return errorObj;
+          //@ts-expect-error
+          return reverificationMismatch(failedItem.reverification);
         }
 
-        if (failedItem?.role || failedItem?.permission) {
-          // What should we do here ?
-          return {
-            //@ts-ignore
-            clerk_error: {
-              type: 'something',
-              reason: 'something',
-              metadata: failedItem,
-            },
-          };
+        if (failedItem?.role) {
+          //@ts-expect-error
+          return roleMismatch(failedItem.role);
+        }
+
+        if (failedItem?.permission) {
+          //@ts-expect-error
+          return permissionMismatch(failedItem.permission);
         }
 
         if (failedItem) {
-          return {
-            //@ts-ignore
-            clerk_error: {
-              type: 'unauthorized',
-              reason: 'signed-out',
-            },
-          };
+          // @ts-expect-error
+          return signedOut();
         }
 
         // @ts-ignore not sure why ts complains TODO-STEP-UP
@@ -166,13 +157,8 @@ function __experimental_protectAction() {
       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
       if (failedItem) {
-        return {
-          //@ts-ignore
-          clerk_error: {
-            type: 'unauthorized',
-            reason: 'signed-out',
-          },
-        };
+        // @ts-expect-error
+        return signedOut();
       }
       // @ts-ignore not sure why ts complains TODO-STEP-UP
       return handler(auth(), ...args);

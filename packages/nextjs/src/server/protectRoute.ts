@@ -1,3 +1,9 @@
+import {
+  permissionMismatchResponse,
+  reverificationMismatchResponse,
+  roleMismatchResponse,
+  signedOutResponse,
+} from '@clerk/shared/authorization-errors';
 import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
@@ -75,46 +81,19 @@ function __experimental_protectRoute() {
         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
         if (failedItem?.reverification) {
-          const errorObj = {
-            clerk_error: {
-              type: 'forbidden',
-              reason: 'assurance',
-              metadata: failedItem.reverification,
-            },
-          } as const;
-
-          return new Response(JSON.stringify(errorObj), {
-            status: 403,
-          });
+          return reverificationMismatchResponse(failedItem.reverification);
         }
 
-        if (failedItem?.role || failedItem?.permission) {
-          // What should we do here ?
-          return new Response(
-            JSON.stringify({
-              clerk_error: {
-                type: 'something',
-                reason: 'something',
-                metadata: failedItem,
-              },
-            }),
-            {
-              status: 403,
-            },
-          );
+        if (failedItem?.role) {
+          return roleMismatchResponse(failedItem.role);
         }
+
+        if (failedItem?.permission) {
+          return permissionMismatchResponse(failedItem.permission);
+        }
+
         if (failedItem) {
-          return new Response(
-            JSON.stringify({
-              clerk_error: {
-                type: 'unauthorized',
-                reason: 'signed-out',
-              },
-            }),
-            {
-              status: 401,
-            },
-          );
+          return signedOutResponse();
         }
 
         // @ts-ignore not sure why ts complains TODO-STEP-UP
@@ -138,17 +117,7 @@ function __experimental_protectRoute() {
       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
       if (failedItem) {
-        return new Response(
-          JSON.stringify({
-            clerk_error: {
-              type: 'unauthorized',
-              reason: 'signed-out',
-            },
-          }),
-          {
-            status: 401,
-          },
-        );
+        return signedOutResponse();
       }
 
       // @ts-ignore not sure why ts complains TODO-STEP-UP
