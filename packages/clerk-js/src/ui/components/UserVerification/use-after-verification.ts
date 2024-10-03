@@ -37,7 +37,6 @@ const useAfterVerification = () => {
         error: null,
         cachedAt: Date.now(),
       });
-      console.log('done', sessionVerification);
       switch (sessionVerification.status) {
         case 'complete':
           return setActive({ session: sessionVerification.session.id, beforeEmit });

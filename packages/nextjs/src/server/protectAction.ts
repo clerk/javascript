@@ -137,7 +137,7 @@ function __experimental_protectAction() {
           };
         }
 
-        // @ts-ignore not sure why this errors
+        // @ts-ignore not sure why ts complains TODO-STEP-UP
         return handler(auth(), ...args);
       };
     return { with: withNext<WithProtectActionParams>, action };
@@ -174,7 +174,7 @@ function __experimental_protectAction() {
           },
         };
       }
-      // @ts-ignore not sure why this errors
+      // @ts-ignore not sure why ts complains TODO-STEP-UP
       return handler(auth(), ...args);
     };
 
