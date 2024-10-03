@@ -15,6 +15,7 @@ import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
 import {
   authenticateRequest,
+  computeOrganizationSyncTargetMatchers,
   getOrganizationSyncTarget,
   type OrganizationSyncTarget,
   RefreshTokenErrorReason,
@@ -339,7 +340,8 @@ export default (QUnit: QUnit) => {
     testCases.forEach(testCase => {
       test(testCase.name, assert => {
         const path = new URL(`http://localhost:3000${testCase.whenAppRequestPath}`);
-        const toActivate = getOrganizationSyncTarget(path, testCase.whenOrgSyncOptions);
+        const matchers = computeOrganizationSyncTargetMatchers(testCase.whenOrgSyncOptions);
+        const toActivate = getOrganizationSyncTarget(path, testCase.whenOrgSyncOptions, matchers);
         assert.deepEqual(toActivate, testCase.thenExpectActivationEntity);
       });
     });
