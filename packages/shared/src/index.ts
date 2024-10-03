@@ -37,3 +37,4 @@ export * from './logger';
 export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
 export * from './fastDeepMerge';
+export * from './protect';

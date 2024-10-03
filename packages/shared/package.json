@@ -76,7 +76,8 @@
     "logger",
     "webauthn",
     "router",
-    "pathToRegexp"
+    "pathToRegexp",
+    "protect"
   ],
   "scripts": {
     "build": "tsup",

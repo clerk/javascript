@@ -1,7 +1,7 @@
-import { useClerk } from '@clerk/shared/react';
+import type { ProtectConfiguration } from '@clerk/shared';
+import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
   __experimental_SessionVerificationLevel,
-  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -145,75 +145,28 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 };
 /* eslint-enable react-hooks/rules-of-hooks */
 
-const findFailedItemNew = (
-  configs: MixedParams[],
-  has: CheckAuthorizationWithCustomPermissions,
-): MixedParams | undefined => {
-  const finals = configs.map(config => {
-    const { role, permission, reverification } = config as any;
-    if (permission) {
-      return has({ permission });
-    }
-    if (role) {
-      return has({ role });
-    }
-    if (reverification) {
-      return has({ __experimental_reverification: reverification });
-    }
-    // check for sign-out
-    return !!useAuth().userId;
-  });
-
-  const failedItemIndex = finals.findIndex(a => a === false);
-  if (failedItemIndex === -1) {
-    return undefined;
-  }
-
-  return configs[failedItemIndex];
-};
-
-type MixedParams = {
-  fallback?: React.ComponentType | Autocomplete<'redirectToSignIn' | 'modal'>;
-  reverification?:
-    | 'veryStrict'
-    | 'strict'
-    | 'moderate'
-    | 'lax'
-    | {
-        level: __experimental_SessionVerificationLevel;
-        afterMinutes: number;
-      };
-  permission?: OrganizationCustomPermissionKey;
-  role?: OrganizationCustomRoleKey;
+type ReactProtectConfiguration = ProtectConfiguration & {
+  fallback?: React.ComponentType | 'modal';
 };
 
 type MyAuth = ReturnType<typeof useAuth>;
-type InferStrictTypeParams2<T extends WithProtectComponentParams> = T;
+type InferStrictTypeParams<T extends WithProtectComponentReactParams> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
   [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
 };
 
-type WithProtectComponentParams =
+type WithProtectComponentReactParams =
   | {
-      condition?: never;
       role: OrganizationCustomRoleKey;
       permission?: never;
       reverification?: never;
-      fallback?: React.ComponentType | string;
+      fallback?: React.ComponentType;
     }
   | {
-      condition?: never;
       role?: never;
       permission: OrganizationCustomPermissionKey;
-      reverification?: never;
-      fallback?: React.ComponentType | string;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
       reverification?: never;
       fallback?: React.ComponentType;
     }
@@ -234,7 +187,7 @@ type WithProtectComponentParams =
     };
 
 type ProtectComponentParams = {
-  fallback?: React.ComponentType | 'redirectToSignIn';
+  fallback?: React.ComponentType;
 };
 
 type ComponentParam<Props, AuthObject> = React.ComponentType<
@@ -243,8 +196,8 @@ type ComponentParam<Props, AuthObject> = React.ComponentType<
   }
 >;
 
-type CustomAuthObject<T extends WithProtectComponentParams> =
-  InferStrictTypeParams2<T> extends
+type CustomAuthObject<T extends WithProtectComponentReactParams> =
+  InferStrictTypeParams<T> extends
     | { permission: any }
     | {
         role: any;
@@ -253,25 +206,16 @@ type CustomAuthObject<T extends WithProtectComponentParams> =
     : NonNullableRecord<MyAuth, 'userId'>;
 
 export function __experimental_protectComponent(params?: ProtectComponentParams) {
-  // We will accumulate permissions here
-  const configs: MixedParams[] = params ? [params] : [];
+  const configs: ReactProtectConfiguration[] = params ? [params] : [];
 
-  const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
+  const withNext = <T extends WithProtectComponentReactParams>(nextParams: T) => {
     configs.push(nextParams);
 
     const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
       return (props: P) => {
         const _auth = useAuth();
-        const clerk = useClerk();
-        const { has } = _auth;
 
-        const failedItem = findFailedItemNew(configs, has);
-
-        React.useEffect(() => {
-          if (failedItem?.fallback === 'redirectToSignIn') {
-            void clerk.redirectToSignIn();
-          }
-        }, []);
+        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
         if (failedItem?.fallback) {
           const Fallback = failedItem.fallback;
@@ -280,16 +224,9 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
             return <UserVerificationModal />;
           }
 
-          // if (Fallback === 'redirectToSignIn') {
-          //   redirectToSignIn();
-          // }
-          //
-          // if (typeof Fallback === 'string') {
-          //   redirect(Fallback);
-          // }
-
+          // Types don't allow this
           if (typeof Fallback !== 'function') {
-            throw 'not valid';
+            throw 'As fallback, only a React Component or "modal" is allowed';
           }
 
           if (!failedItem.reverification) {
@@ -297,7 +234,7 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
               // @ts-expect-error type props
               <Fallback
                 {
-                  // Could this be unsafe ?
+                  // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
                   ...props
                 }
               />
@@ -308,7 +245,7 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
             // @ts-expect-error type props
             <Fallback
               {
-                // Could this be unsafe ?
+                // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
                 ...props
               }
               UserVerificationTrigger={UserVerificationTrigger}
@@ -335,52 +272,24 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
   const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
     return (props: P) => {
       const _auth = useAuth();
-      const clerk = useClerk();
-      const { has } = _auth;
 
-      const failedItem = findFailedItemNew(configs, has);
-
-      React.useEffect(() => {
-        if (failedItem?.fallback === 'redirectToSignIn') {
-          void clerk.redirectToSignIn();
-        }
-      }, []);
+      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
 
-        if (Fallback === 'modal') {
-          return <UserVerificationModal />;
-        }
-
-        // if (typeof Fallback === 'string') {
-        //   redirect(Fallback);
-        // }
-
+        // Types don't allow this
         if (typeof Fallback !== 'function') {
-          throw 'not valid';
-        }
-
-        if (!failedItem.reverification) {
-          return (
-            // @ts-expect-error type props
-            <Fallback
-              {
-                // Could this be unsafe ?
-                ...props
-              }
-            />
-          );
+          throw 'As fallback, only a React Component is allowed';
         }
 
         return (
           // @ts-expect-error type props
           <Fallback
             {
-              // Could this be unsafe ?
+              // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
               ...props
             }
-            UserVerificationTrigger={UserVerificationTrigger}
           />
         );
       }

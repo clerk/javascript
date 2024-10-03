@@ -1,4 +1,6 @@
 import type { ProtectProps } from '@clerk/clerk-react';
+import type { ProtectConfiguration } from '@clerk/shared';
+import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
   __experimental_SessionVerificationLevel,
   Autocomplete,
@@ -81,52 +83,12 @@ export function Protect(props: ProtectProps): React.JSX.Element | null {
 
 // type AsyncComponentType<P> = (p: P) => JSX.Element | null | Promise<JSX.Element | null>;
 
-type MixedParams = {
+type NextServerProtectConfiguration = ProtectConfiguration & {
   fallback?: React.ComponentType | Autocomplete<'redirectToSignIn' | 'modal'>;
-  reverification?:
-    | 'veryStrict'
-    | 'strict'
-    | 'moderate'
-    | 'lax'
-    | {
-        level: __experimental_SessionVerificationLevel;
-        afterMinutes: number;
-      };
-  permission?: OrganizationCustomPermissionKey;
-  role?: OrganizationCustomRoleKey;
-};
-
-const findFailedItemNew = (
-  configs: MixedParams[],
-  has: CheckAuthorizationWithCustomPermissions,
-): MixedParams | undefined => {
-  const finals = configs.map(config => {
-    const { role, permission, reverification } = config as any;
-    if (permission) {
-      return has({ permission });
-    }
-    if (role) {
-      return has({ role });
-    }
-    if (reverification) {
-      return has({ __experimental_reverification: reverification });
-    }
-
-    // check for sign-out
-    return !!auth().userId;
-  });
-
-  const failedItemIndex = finals.findIndex(a => a === false);
-  if (failedItemIndex === -1) {
-    return undefined;
-  }
-
-  return configs[failedItemIndex];
 };
 
 type MyAuth = ReturnType<typeof auth>;
-
-type InferStrictTypeParams2<T extends WithProtectComponentParams> = T;
+type InferStrictTypeParams<T extends WithProtectComponentParams> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
@@ -182,7 +144,7 @@ type ComponentParam<Props, AuthObject> = React.ComponentType<
 >;
 
 type CustomAuthObject<T extends WithProtectComponentParams> =
-  InferStrictTypeParams2<T> extends
+  InferStrictTypeParams<T> extends
     | { permission: any }
     | {
         role: any;
@@ -191,7 +153,7 @@ type CustomAuthObject<T extends WithProtectComponentParams> =
     : NonNullableRecord<MyAuth, 'userId'>;
 
 function __experimental_protectComponent(params?: ProtectComponentParams) {
-  const configs: MixedParams[] = params ? [params] : [];
+  const configs: NextServerProtectConfiguration[] = params ? [params] : [];
 
   const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -199,9 +161,8 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
     const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
       return (props: P) => {
         const _auth = auth();
-        const { has, redirectToSignIn } = _auth;
 
-        const failedItem = findFailedItemNew(configs, has);
+        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
         if (failedItem?.fallback) {
           const Fallback = failedItem.fallback;
@@ -211,7 +172,7 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
           }
 
           if (Fallback === 'redirectToSignIn') {
-            redirectToSignIn();
+            _auth.redirectToSignIn();
           }
 
           if (typeof Fallback === 'string') {
@@ -265,9 +226,8 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
   const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
     return (props: P) => {
       const _auth = auth();
-      const { has, redirectToSignIn } = _auth;
 
-      const failedItem = findFailedItemNew(configs, has);
+      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
@@ -277,7 +237,7 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
         }
 
         if (Fallback === 'redirectToSignIn') {
-          redirectToSignIn();
+          _auth.redirectToSignIn();
         }
 
         if (typeof Fallback === 'string') {

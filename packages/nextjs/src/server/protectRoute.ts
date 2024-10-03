@@ -1,3 +1,5 @@
+import type { ProtectConfiguration } from '@clerk/shared/protect';
+import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
   CheckAuthorizationWithCustomPermissions,
@@ -10,7 +12,7 @@ import { auth } from '../app-router/server/auth';
 type MyAuth = ReturnType<typeof auth>;
 type InferParametersFromThird<T> = T extends (auth: any, req: Request, ...args: infer P) => any ? P : never;
 
-type InferStrictTypeParams2<T extends WithProtectActionParams> = T;
+type InferStrictTypeParams<T extends WithProtectActionParams> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
@@ -52,7 +54,7 @@ type WithProtectActionParams =
     };
 
 type CustomAuthObject<T extends WithProtectActionParams> =
-  InferStrictTypeParams2<T> extends
+  InferStrictTypeParams<T> extends
     | { permission: any }
     | {
         role: any;
@@ -60,46 +62,9 @@ type CustomAuthObject<T extends WithProtectActionParams> =
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
-type MixedActionParams = {
-  reverification?:
-    | 'veryStrict'
-    | 'strict'
-    | 'moderate'
-    | 'lax'
-    | {
-        level: __experimental_SessionVerificationLevel;
-        afterMinutes: number;
-      };
-  permission?: OrganizationCustomPermissionKey;
-  role?: OrganizationCustomRoleKey;
-};
-
-const findFailedItemNew = (
-  configs: MixedActionParams[],
-  has: CheckAuthorizationWithCustomPermissions,
-): MixedActionParams | undefined => {
-  const finals = configs.map(config => {
-    const { role, permission, reverification } = config as any;
-    if (permission) {
-      return has({ permission });
-    }
-    if (role) {
-      return has({ role });
-    }
-    if (reverification) {
-      return has({ __experimental_reverification: reverification });
-    }
-    // check for sign-out
-    return !!auth().userId;
-  });
-
-  const failedItemIndex = finals.findIndex(a => a === false);
-  return configs[failedItemIndex];
-};
-
 function protectRoute() {
   // We will accumulate permissions here
-  const configs: MixedActionParams[] = [{}];
+  const configs: ProtectConfiguration[] = [{}];
 
   const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -116,8 +81,8 @@ function protectRoute() {
         handler: H,
       ) =>
       (req: Request, ...args: InferParametersFromThird<H>): Response | Promise<Response> => {
-        const { has } = auth();
-        const failedItem = findFailedItemNew(configs, has);
+        const _auth = auth();
+        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
         if (failedItem?.reverification) {
           const errorObj = {
@@ -179,8 +144,8 @@ function protectRoute() {
       handler: H,
     ) =>
     (req: Request, ...args: InferParametersFromThird<H>): Response | Promise<Response> => {
-      const { has } = auth();
-      const failedItem = findFailedItemNew(configs, has);
+      const _auth = auth();
+      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
       if (failedItem?.reverification) {
         const errorObj = {
