@@ -47,6 +47,7 @@
     "dist",
     "scripts",
     "authorization",
+    "authorization-errors",
     "browser",
     "callWithRetry",
     "color",
