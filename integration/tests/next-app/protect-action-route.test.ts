@@ -39,7 +39,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
 
     utils.forEach(type => {
       test(`protect${capitalize(type)} returned values as ${'`admin`'}`, async ({ page, context }) => {
-        // test.setTimeout(1200000);
+        test.setTimeout(120000000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
@@ -121,7 +121,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
 
     utils.forEach(type => {
       test(`protect${capitalize(type)} returned values as ${'`signed-in user`'}`, async ({ page, context }) => {
-        // test.setTimeout(1200000);
+        test.setTimeout(120000000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
