@@ -6,7 +6,7 @@ import type { JWTHandler } from './jwt-handler';
 type Handler = Parameters<Clerk['__unstable__onAfterResponse']>[0];
 type Res = Parameters<Handler>[1];
 
-/** Append appropriate query params to all Clerk requests */
+/** Retrieve the JWT to the FAPI response */
 export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: boolean }) {
   const handler: Handler = async (_, response) => {
     if (isProd) {
@@ -18,6 +18,7 @@ export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: bo
   return handler;
 }
 
+/** Retrieve the JWT to the FAPI response, per development instances */
 async function devHandler(response: Res, jwtHandler: JWTHandler) {
   const header = response?.headers.get(AUTH_HEADER_DEV);
 
@@ -28,6 +29,7 @@ async function devHandler(response: Res, jwtHandler: JWTHandler) {
   }
 }
 
+/** Retrieve the JWT to the FAPI response, per production instances */
 async function prodHandler(response: Res, jwtHandler: JWTHandler) {
   const header = response?.headers.get(AUTH_HEADER);
 

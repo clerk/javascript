@@ -27,7 +27,7 @@
 
 ## Getting Started
 
-[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_chrome_extension) is the easiest way to add authentication and user management to your Chrome Extension. Add sign up, sign in, and profile management to your application in minutes.
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_chrome_extension) is the easiest way to add authentication and user management to your Browser Extension. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
@@ -35,126 +35,48 @@
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_chrome_extension).
 - An existing React app (using [Vite](https://crxjs.dev/vite-plugin/) for example)
 
-### Installation
+### Feature Support
 
-1. Add `@clerk/chrome-extension` to your project:
+Please see the latest extension [authentication support matrix](https://clerk.com/docs/references/chrome-extension/overview?utm_source=github&utm_medium=clerk_chrome_extension) in the Clerk documentation for more information.
 
-   ```shell
-   npm install @clerk/chrome-extension
-   ```
+### Usage
 
-1. Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) and set it as an environment variable. For example, if you used Vite:
+1.  **Installation:** `npm install @clerk/chrome-extension`
+2.  **Set a consistent extension key**: A browser extension can be identified by its unique key, in a similar way to how a website can be identified by its domain. You will need to explicitly configure your extension's key or it will change often. If the key changes, it can cause the extension to fail. See the [Configure a Consistent Key](https://clerk.com/docs/references/chrome-extension/configure-consistent-crx-id?utm_source=github&utm_medium=clerk_chrome_extension) guide for more information.
+3.  **Update Clerk Settings**: Once you've set up a consistent extension key, you'll need to configure your Clerk settings to allow the extension to communicate with your Clerk API.
+    You can do this by adding the extension key to the list of allowed origins in your Clerk settings. Setting the `allowed_origins` is **required** for both **Development** and **Production** instances.
 
-   ```sh
-   VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxx
-   ```
+    ```bash
+    curl  -X PATCH https://api.clerk.com/v1/instance \
+          -H "Content-type: application/json" \
+          -H "Authorization: Bearer <CLERK_SECRET_KEY>" \
+          -d '{"allowed_origins": ["chrome-extension://<YOUR_EXTENSION_KEY>"]}'
+    ```
 
-1. Add `<ClerkProvider>` to your app and define the `routerPush` & `routerReplace` properties. For example, with using `react-router-dom`:
+4.  **Set Environment Variables:** Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys&utm_source=github&utm_medium=clerk_chrome_extension) and set it as an environment variable.
 
-   ```tsx
-   // App.tsx
-   import { SignedIn, SignedOut, SignIn, SignUp, ClerkProvider } from '@clerk/chrome-extension';
-   import { useNavigate, Routes, Route, MemoryRouter } from 'react-router-dom';
+    ```sh
+    # Vite
+    VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+    ```
 
-   function HelloUser() {
-     return <p>Hello user</p>;
-   }
+    ```sh
+    # Plasmo
+    PLASMO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+    ```
 
-   const publishableKey = process.env.VITE_CLERK_PUBLISHABLE_KEY || '';
+5.  **Update the extension manifest:** You'll need to update your extension manifest permissions to support Clerk.
+    1. [**Base configuration**:](/docs/manifest.md#base-configuration) Use this if you plan to only use Clerk in the context of the extention.
+    2. [**Session sync configuration**:](/docs/manifest.md#sync-host-configuration) Use this if you plan to share authentication with a website in the same browser.
+6.  **Add Clerk to your app:** Though not required, we generally suggest using Plasmo for browser extension development. This will enforce common standards across your extension as well as allow for easier integration with other browsers in the future.
 
-   function ClerkProviderWithRoutes() {
-     const navigate = useNavigate();
+    1. [**Via `ClerkProvider`:**](/docs/clerk-provider.md) This is the general approach to all extensions. From here you'll be able to support extension-only authentication as well as sharing authentication with a website in the same browser.
+    2. [**Via service workers**:](/docs/service-workers.md) If you also require the use of background service workers, this will allow you to access the Clerk client from the extension context.
 
-     return (
-       <ClerkProvider
-         publishableKey={publishableKey}
-         routerPush={to => navigate(to)}
-         routerReplace={to => navigate(to, { replace: true })}
-       >
-         <Routes>
-           <Route
-             path='/sign-up/*'
-             element={<SignUp signInUrl='/' />}
-           />
-           <Route
-             path='/'
-             element={
-               <>
-                 <SignedIn>
-                   <HelloUser />
-                 </SignedIn>
-                 <SignedOut>
-                   <SignIn
-                     afterSignInUrl='/'
-                     signUpUrl='/sign-up'
-                   />
-                 </SignedOut>
-               </>
-             }
-           />
-         </Routes>
-       </ClerkProvider>
-     );
-   }
-
-   function App() {
-     return (
-       <MemoryRouter>
-         <ClerkProviderWithRoutes />
-       </MemoryRouter>
-     );
-   }
-
-   export default App;
-   ```
-
-## Usage
-
-Example repositories:
+## Example repositories
 
 - [Standalone](https://github.com/clerk/clerk-chrome-extension-starter/tree/main): The extension is using its own authentication
 - [WebSSO](https://github.com/clerk/clerk-chrome-extension-starter/tree/webapp_sso): The extensions shares authentication with a website in the same browser
-
-### WebSSO
-
-If you want to use **WebSSO** (extension shares authentication state with a website in same browser) you'll need to add the `syncSessionWithTab` prop to `<ClerkProvider>`.
-
-#### Extension Manifest (`manifest.json`)
-
-You must enable the following permissions in your `manifest.json` file:
-
-```json
-{
-  "permissions": ["cookies", "storage"]
-}
-```
-
-More info on the "cookies" permission: [Google Developer Cookies Reference](https://developer.chrome.com/docs/extensions/reference/cookies/).
-More info on the "storage" permission: [Google Developer Storage Reference](https://developer.chrome.com/docs/extensions/reference/storage/).
-
-#### Host Permissions
-
-You must enable the following host permissions in your `manifest.json` file:
-
-- **Development:** `"host_permissions": ["http://localhost"]`
-  - If you're using a domain other than `localhost`, you'll want replace that entry with your domain: `http://<DOMAIN>`
-- **Production:** `"host_permissions": ["https://<YOUR_CLERK_FRONTEND_API_GOES_HERE>/"]`
-  - Your Frontend API URL can be found in [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys) under the **Show API URLs** option.
-
-For more info on host permissions visit [Google's developer `host_permissions` reference](https://developer.chrome.com/docs/extensions/mv3/declare_permissions/#host-permissions).
-
-#### Clerk Settings
-
-Add your Chrome extension origin to your instance's `allowed_origins` using the [Backend API](https://clerk.com/docs/reference/backend-api):
-
-```bash
-curl  -X PATCH https://api.clerk.com/v1/instance \
-      -H "Authorization: Bearer sk_secret_key" \
-      -H "Content-type: application/json" \
-      -d '{"allowed_origins": ["chrome-extension://extension_id_goes_here"]}'
-```
-
-Setting the `allowed_origins` is **required** for both **Development** and **Production** instances.
 
 ## Support
 
