@@ -163,7 +163,7 @@ export type SignUpCreateParams = Partial<
     ticket: string;
     token: string;
     legalAccepted: boolean;
-  } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
+  } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
 export type SignUpUpdateParams = SignUpCreateParams;
