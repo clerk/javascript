@@ -13,6 +13,7 @@ import { GlobalError } from '~/common/global-error';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
+import { RouterLink } from '~/common/router-link';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { SIGN_UP_MODES } from '~/constants/user-settings';
@@ -200,10 +201,12 @@ export function SignInStart() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.start.actionText')}{' '}
-                      <Card.FooterActionLink href={clerk.buildUrlWithAuth(signUpUrl || '')}>
-                        {' '}
-                        {t('signIn.start.actionLink')}
-                      </Card.FooterActionLink>
+                      <RouterLink
+                        asChild
+                        href={clerk.buildUrlWithAuth(signUpUrl || '/sign-up')}
+                      >
+                        <Card.FooterActionLink>{t('signIn.start.actionLink')}</Card.FooterActionLink>
+                      </RouterLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 ) : null}
