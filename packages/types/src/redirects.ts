@@ -81,9 +81,9 @@ export type AuthenticateWithRedirectParams = {
   emailAddress?: string;
 
   /**
-   * Whether the user has accepted the legal terms.
+   * Whether the user has accepted the legal requirements.
    */
-  legalAccepted?: boolean;
+  __experimental_legalAccepted?: boolean;
 };
 
 export type RedirectUrlProp = {

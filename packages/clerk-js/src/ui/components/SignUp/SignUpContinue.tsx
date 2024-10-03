@@ -193,7 +193,7 @@ function _SignUpContinue() {
             gap={8}
           >
             <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && (
+              {(showOauthProviders || showWeb3Providers) && !onlyLegalConsentMissing && (
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
