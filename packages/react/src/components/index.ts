@@ -16,7 +16,6 @@ export {
   SignedOut,
   SignedIn,
   Protect,
-  // protect as __experimental_protect,
   __experimental_protectComponent,
   RedirectToSignIn,
   RedirectToSignUp,

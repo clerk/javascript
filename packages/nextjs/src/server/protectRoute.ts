@@ -2,7 +2,6 @@ import type { ProtectConfiguration } from '@clerk/shared/protect';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
-  CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
@@ -21,25 +20,16 @@ type NonNullableRecord<T, K extends keyof T> = {
 
 type WithProtectActionParams =
   | {
-      condition?: never;
       role: OrganizationCustomRoleKey;
       permission?: never;
       reverification?: never;
     }
   | {
-      condition?: never;
       role?: never;
       permission: OrganizationCustomPermissionKey;
       reverification?: never;
     }
   | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      reverification?: never;
-    }
-  | {
-      condition?: never;
       role?: never;
       permission?: never;
       reverification:
@@ -122,7 +112,7 @@ function protectRoute() {
               },
             }),
             {
-              status: 403,
+              status: 401,
             },
           );
         }
@@ -147,36 +137,6 @@ function protectRoute() {
       const _auth = auth();
       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
-      if (failedItem?.reverification) {
-        const errorObj = {
-          clerk_error: {
-            type: 'forbidden',
-            reason: 'assurance',
-            metadata: failedItem.reverification,
-          },
-        } as const;
-
-        return new Response(JSON.stringify(errorObj), {
-          status: 403,
-        });
-      }
-
-      if (failedItem?.role || failedItem?.permission) {
-        // What should we do here ?
-        return new Response(
-          JSON.stringify({
-            clerk_error: {
-              type: 'something',
-              reason: 'something',
-              metadata: failedItem,
-            },
-          }),
-          {
-            status: 403,
-          },
-        );
-      }
-
       if (failedItem) {
         return new Response(
           JSON.stringify({
@@ -186,7 +146,7 @@ function protectRoute() {
             },
           }),
           {
-            status: 403,
+            status: 401,
           },
         );
       }

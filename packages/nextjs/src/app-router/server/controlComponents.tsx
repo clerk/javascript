@@ -4,7 +4,6 @@ import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
   __experimental_SessionVerificationLevel,
   Autocomplete,
-  CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
@@ -97,28 +96,18 @@ type NonNullableRecord<T, K extends keyof T> = {
 
 type WithProtectComponentParams =
   | {
-      condition?: never;
       role: OrganizationCustomRoleKey;
       permission?: never;
       reverification?: never;
       fallback?: React.ComponentType | string;
     }
   | {
-      condition?: never;
       role?: never;
       permission: OrganizationCustomPermissionKey;
       reverification?: never;
       fallback?: React.ComponentType | string;
     }
   | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      reverification?: never;
-      fallback?: React.ComponentType;
-    }
-  | {
-      condition?: never;
       role?: never;
       permission?: never;
       reverification:
@@ -232,10 +221,6 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
       if (failedItem?.fallback) {
         const Fallback = failedItem.fallback;
 
-        if (Fallback === 'modal') {
-          return <UserVerificationModal />;
-        }
-
         if (Fallback === 'redirectToSignIn') {
           _auth.redirectToSignIn();
         }
@@ -248,18 +233,6 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
           throw 'not valid';
         }
 
-        if (!failedItem.reverification) {
-          return (
-            // @ts-expect-error type props
-            <Fallback
-              {
-                // Could this be unsafe ?
-                ...props
-              }
-            />
-          );
-        }
-
         return (
           // @ts-expect-error type props
           <Fallback
@@ -267,7 +240,6 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
               // Could this be unsafe ?
               ...props
             }
-            UserVerificationTrigger={UserVerificationTrigger}
           />
         );
       }

@@ -2,7 +2,6 @@ import type { ProtectConfiguration } from '@clerk/shared/protect';
 import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
-  CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
@@ -24,25 +23,16 @@ type NonNullableRecord<T, K extends keyof T> = {
 
 type WithProtectActionParams =
   | {
-      condition?: never;
       role: OrganizationCustomRoleKey;
       permission?: never;
       reverification?: never;
     }
   | {
-      condition?: never;
       role?: never;
       permission: OrganizationCustomPermissionKey;
       reverification?: never;
     }
   | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-      reverification?: never;
-    }
-  | {
-      condition?: never;
       role?: never;
       permission?: never;
       reverification:
@@ -84,15 +74,10 @@ function protectAction() {
         | Promise<
             InferStrictTypeParams<T> extends { reverification: any }
               ? {
-                  // a: InferStrictTypeParams<T>;
                   clerk_error: {
                     type: 'forbidden';
                     reason: 'assurance';
                     metadata: Omit<InferStrictTypeParams<T>, 'fallback'>;
-                    //   {
-                    //   level: __experimental_SessionVerificationLevel;
-                    //   maxAge: __experimental_SessionVerificationMaxAge;
-                    // };
                   };
                 }
               : InferStrictTypeParams<T> extends
@@ -179,31 +164,6 @@ function protectAction() {
         }> => {
       const _auth = auth();
       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
-
-      if (failedItem?.reverification) {
-        const errorObj = {
-          clerk_error: {
-            type: 'forbidden',
-            reason: 'assurance',
-            metadata: failedItem.reverification,
-          },
-        } as const;
-
-        //@ts-ignore
-        return errorObj;
-      }
-
-      if (failedItem?.role || failedItem?.permission) {
-        // What should we do here ?
-        return {
-          //@ts-ignore
-          clerk_error: {
-            type: 'something',
-            reason: 'something',
-            metadata: failedItem,
-          },
-        };
-      }
 
       if (failedItem) {
         return {
