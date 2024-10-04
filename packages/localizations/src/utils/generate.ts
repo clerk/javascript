@@ -10,6 +10,7 @@ import * as path from 'node:path';
 import * as fs from 'fs';
 
 import { arSA } from '../ar-SA';
+import { beBY } from '../be-BY';
 import { bgBG } from '../bg-BG';
 import { csCZ } from '../cs-CZ';
 import { daDK } from '../da-DK';
@@ -159,6 +160,7 @@ function run(langObj: any, name: string) {
 run(enUS, 'en-US');
 run(elGR, 'el-GR');
 run(arSA, 'ar-SA');
+run(beBY, 'be-BY');
 run(csCZ, 'cs-CZ');
 run(daDK, 'da-DK');
 run(deDE, 'de-DE');
