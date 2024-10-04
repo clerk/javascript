@@ -1,4 +1,5 @@
 import {
+  beBY,
   csCZ,
   deDE,
   enUS,
@@ -135,6 +136,11 @@ describe('ClerkProvider', () => {
     });
 
     it('works with all our prebuilt localizations', () => {
+      expectTypeOf({
+        ...defaultProps,
+        localization: beBY,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
       expectTypeOf({
         ...defaultProps,
         localization: deDE,
