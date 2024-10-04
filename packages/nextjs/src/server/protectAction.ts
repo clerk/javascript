@@ -1,10 +1,8 @@
+import type { PPermissionMismatchError, RReverificationMismatchError } from '@clerk/shared/authorization-errors';
 import {
   permissionMismatch,
-  PPermissionMismatchError,
   reverificationMismatch,
-  ReverificationMismatchError,
   roleMismatch,
-  RReverificationMismatchError,
   signedOut,
 } from '@clerk/shared/authorization-errors';
 import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
@@ -156,54 +154,81 @@ type Merge<T, U> = T & U extends infer O ? { [K in keyof O]: O[K] } : never;
 type HasReverification<T> = T extends { reverification: any } ? true : false;
 
 // Chainable type that keeps track of whether reverification has been set
+// @ts-ignore
 type Chainable<T = {}> =
   HasReverification<T> extends true
     ? {
-        action(): T extends { reverification: any; permission: any; role: any }
-          ?
-              | ReturnType<typeof reverificationMismatch<T['reverification']>>
-              | ReturnType<typeof permissionMismatch<T['permission']>>
-              | ReturnType<typeof roleMismatch<T['role']>>
-          : T extends { reverification: any; permission: any }
-            ? RReverificationMismatchError<T['reverification']> | PPermissionMismatchError<T['permission']>
-            : T extends { reverification: any; role: any }
-              ?
-                  | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                  | ReturnType<typeof roleMismatch<T['role']>>
-              : T extends { permission: any; role: any }
-                ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof roleMismatch<T['role']>>
-                : T extends { permission: any }
-                  ? ReturnType<typeof permissionMismatch<T['permission']>>
-                  : T extends { role: any }
-                    ? ReturnType<typeof roleMismatch<T['role']>>
-                    : T extends { reverification: any }
-                      ? ReturnType<typeof reverificationMismatch<T['reverification']>>
-                      : ReturnType<typeof signedOut>;
-      }
-    : {
-        with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
-        action(): T extends { reverification: any; permission: any; role: any }
-          ?
-              | ReturnType<typeof reverificationMismatch<T['reverification']>>
-              | ReturnType<typeof permissionMismatch<T['permission']>>
-              | ReturnType<typeof roleMismatch<T['role']>>
-          : T extends { reverification: any; permission: any }
+        // @ts-ignore
+        action<H extends (_auth: CustomAuthObject<T>, ...args: InferParametersFromSecond<H>) => InferReturnType<H>>(
+          handler: H,
+        ): (
+          ...args: InferParametersFromSecond<H>
+        ) => InferReturnType<H> &
+          (T extends { reverification: any; permission: any; role: any }
             ?
                 | ReturnType<typeof reverificationMismatch<T['reverification']>>
                 | ReturnType<typeof permissionMismatch<T['permission']>>
-            : T extends { reverification: any; role: any }
+                | ReturnType<typeof roleMismatch<T['role']>>
+                | ReturnType<typeof signedOut>
+            : T extends { reverification: any; permission: any }
+              ?
+                  | RReverificationMismatchError<T['reverification']>
+                  | PPermissionMismatchError<T['permission']>
+                  | ReturnType<typeof signedOut>
+              : T extends { reverification: any; role: any }
+                ?
+                    | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                    | ReturnType<typeof roleMismatch<T['role']>>
+                    | ReturnType<typeof signedOut>
+                : T extends { permission: any; role: any }
+                  ?
+                      | ReturnType<typeof permissionMismatch<T['permission']>>
+                      | ReturnType<typeof roleMismatch<T['role']>>
+                      | ReturnType<typeof signedOut>
+                  : T extends { permission: any }
+                    ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
+                    : T extends { role: any }
+                      ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
+                      : T extends { reverification: any }
+                        ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
+                        : ReturnType<typeof signedOut>);
+      }
+    : {
+        with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
+        // @ts-ignore
+        action<H extends (_auth: CustomAuthObject<T>, ...args: InferParametersFromSecond<H>) => InferReturnType<H>>(
+          handler: H,
+        ): (
+          ...args: InferParametersFromSecond<H>
+        ) => InferReturnType<H> &
+          (T extends { reverification: any; permission: any; role: any }
+            ?
+                | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                | ReturnType<typeof permissionMismatch<T['permission']>>
+                | ReturnType<typeof roleMismatch<T['role']>>
+                | ReturnType<typeof signedOut>
+            : T extends { reverification: any; permission: any }
               ?
                   | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                  | ReturnType<typeof roleMismatch<T['role']>>
-              : T extends { permission: any; role: any }
-                ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof roleMismatch<T['role']>>
-                : T extends { permission: any }
-                  ? ReturnType<typeof permissionMismatch<T['permission']>>
-                  : T extends { role: any }
-                    ? ReturnType<typeof roleMismatch<T['role']>>
-                    : T extends { reverification: any }
-                      ? ReturnType<typeof reverificationMismatch<T['reverification']>>
-                      : ReturnType<typeof signedOut>;
+                  | ReturnType<typeof permissionMismatch<T['permission']>>
+                  | ReturnType<typeof signedOut>
+              : T extends { reverification: any; role: any }
+                ?
+                    | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                    | ReturnType<typeof roleMismatch<T['role']>>
+                    | ReturnType<typeof signedOut>
+                : T extends { permission: any; role: any }
+                  ?
+                      | ReturnType<typeof permissionMismatch<T['permission']>>
+                      | ReturnType<typeof roleMismatch<T['role']>>
+                      | ReturnType<typeof signedOut>
+                  : T extends { permission: any }
+                    ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
+                    : T extends { role: any }
+                      ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
+                      : T extends { reverification: any }
+                        ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
+                        : ReturnType<typeof signedOut>);
       };
 
 // type ChainableCreator<T extends {} = {}> = (p: T) => Chainable<T>;
@@ -224,13 +249,44 @@ type Chainable<T = {}> =
 // };
 
 function __experimental_protectAction() {
+  const configs: __internal_ProtectConfiguration[] = [{}];
   const createBuilder = <A extends {}>(config: A): Chainable => {
+    // We will accumulate permissions here
     return {
+      // @ts-expect-error
       with(p) {
+        configs.push(p);
         return createBuilder({ ...p, ...config });
       },
-      action() {
-        return config;
+      // @ts-expect-error
+      action(handler) {
+        return (...args) => {
+          const _auth = auth();
+          const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+
+          if (failedItem?.reverification) {
+            return reverificationMismatch(failedItem.reverification);
+          }
+
+          if (failedItem?.role) {
+            return roleMismatch(failedItem.role);
+          }
+
+          if (failedItem?.permission) {
+            return permissionMismatch(failedItem.permission);
+          }
+
+          if (failedItem) {
+            return signedOut();
+          }
+
+          return handler(
+            // @ts-expect-error Slight inconsistency in types
+            auth(),
+            // @ts-expect-error Slight inconsistency in types
+            ...args,
+          );
+        };
       },
     };
   };
@@ -289,28 +345,41 @@ function __experimental_protectAction() {
 //   c.clerk_error.metadata.permission
 // }
 
-const wlwda = __experimental_protectAction()
-  // .with({
-  //   role:'admin'
-  // })
-  .with({
-    permission: 'dwada',
-  })
-  .with({
-    role: 'dwa'
-  })
-  .with({
-    reverification: 'lax'
-  })
-  .action();
+// const wlwda = __experimental_protectAction()
+//   .with({
+//     role: 'admin'
+//   })
+//   .with({
+//     permission: 'dwada',
+//   })
+//   .with({
+//     permission: 'dwaddwadawa',
+//   })
+//   // .with({
+//   //   role: 'dwa',
+//   // })
+//   .with({
+//     reverification: 'lax',
+//   })
+//   .action((auth, lole: string) => {
+//     const apa = (auth.orgId)
+//     console.log(apa, lole)
+//     return {
+//       pantelis: 'elef',
+//     };
+//   });
+//
+// type Prettify<T> = {
+//   [K in keyof T]: T[K];
+// } & {};
 
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
-const dwada: Prettify<typeof wlwda>;
-
-if(dwada.clerk_error.reason === 'reverification-mismatch') {
-  dwada.clerk_error.metadata.reverification === 'lax'
-}
+// const dwada: Prettify<ReturnType<typeof wlwda>>
+//
+// if ('clerk_error' in dwada) {
+//   if (dwada.clerk_error.reason === 'permission-mismatch') {
+//     dwada.clerk_error.metadata.permission === 'sdwa'
+//   }
+// } else {
+//   dwada.
+// }
 export { __experimental_protectAction };
