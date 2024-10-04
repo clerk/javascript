@@ -1,4 +1,5 @@
 export { arSA } from './ar-SA';
+export { beBY } from './be-BY';
 export { enUS } from './en-US';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
