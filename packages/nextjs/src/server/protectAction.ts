@@ -20,7 +20,7 @@ type InferParametersFromSecond<T> = T extends (auth: any, ...args: infer P) => a
 
 type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
-type InferStrictTypeParams<T extends WithProtectActionParams> = T;
+type InferStrictTypeParams<T extends WithProtectActionParams | undefined> = T;
 
 type NonNullable<T> = T extends null | undefined ? never : T;
 type NonNullableRecord<T, K extends keyof T> = {
@@ -61,21 +61,106 @@ type CustomAuthObject<T extends WithProtectActionParams> =
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
+// function __experimental_protectAction() {
+//   // We will accumulate permissions here
+//   const configs: __internal_ProtectConfiguration[] = [{}];
+//
+//   const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
+//     configs.push(nextParams);
+//
+//     // Maybe this should return the correct types instead of hiding them
+//     const action =
+//       <H extends (_auth: CustomAuthObject<T>, ...args: InferParametersFromSecond<H>) => InferReturnType<H>>(
+//         handler: H,
+//       ) =>
+//       (
+//         ...args: InferParametersFromSecond<H>
+//       ):
+//         | Promise<Awaited<InferReturnType<H>>>
+//         | Promise<
+//             InferStrictTypeParams<T> extends { reverification: any }
+//               ? ReturnType<typeof reverificationMismatch<T['reverification']>>
+//               : InferStrictTypeParams<T> extends
+//                     | { permission: any }
+//                     | {
+//                         role: any;
+//                       }
+//                 ? InferStrictTypeParams<T> extends {
+//                     permission: any;
+//                   }
+//                   ? ReturnType<typeof permissionMismatch<T['permission']>>
+//                   : ReturnType<typeof roleMismatch<T['role']>>
+//                 : ReturnType<typeof signedOut>
+//           > => {
+//         const _auth = auth();
+//         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+//
+//         if (failedItem?.reverification) {
+//           //@ts-expect-error
+//           return reverificationMismatch(failedItem.reverification);
+//         }
+//
+//         if (failedItem?.role) {
+//           //@ts-expect-error
+//           return roleMismatch(failedItem.role);
+//         }
+//
+//         if (failedItem?.permission) {
+//           //@ts-expect-error
+//           return permissionMismatch(failedItem.permission);
+//         }
+//
+//         if (failedItem) {
+//           // @ts-expect-error
+//           return signedOut();
+//         }
+//
+//         // @ts-ignore not sure why ts complains TODO-STEP-UP
+//         return handler(auth(), ...args);
+//       };
+//     return { with: withNext<WithProtectActionParams>, action };
+//   };
+//
+//   const action =
+//     <
+//       H extends (
+//         _auth: NonNullableRecord<MyAuth, 'userId'>,
+//         ...args: InferParametersFromSecond<H>
+//       ) => InferReturnType<H>,
+//     >(
+//       handler: H,
+//     ) =>
+//     (
+//       ...args: InferParametersFromSecond<H>
+//     ): Promise<Awaited<InferReturnType<H>>> | Promise<ReturnType<typeof signedOut>> => {
+//       const _auth = auth();
+//       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+//
+//       if (failedItem) {
+//         // @ts-expect-error
+//         return signedOut();
+//       }
+//       // @ts-ignore not sure why ts complains TODO-STEP-UP
+//       return handler(auth(), ...args);
+//     };
+//
+//   return { with: withNext, action };
+// }
+
 function __experimental_protectAction() {
-  // We will accumulate permissions here
-  const configs: __internal_ProtectConfiguration[] = [{}];
-
-  const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
-    configs.push(nextParams);
-
-    // Maybe this should return the correct types instead of hiding them
-    const action =
-      <H extends (_auth: CustomAuthObject<T>, ...args: InferParametersFromSecond<H>) => InferReturnType<H>>(
+  function createBuilder<T extends __internal_ProtectConfiguration>(params: T) {
+    return {
+      with<P extends WithProtectActionParams>(newParams: P) {
+        return createBuilder<T & P>({ ...params, ...newParams });
+      },
+      action<
+        H extends (
+          _auth: NonNullableRecord<MyAuth, 'userId'>,
+          ...args: InferParametersFromSecond<H>
+        ) => InferReturnType<H>,
+      >(
         handler: H,
-      ) =>
-      (
-        ...args: InferParametersFromSecond<H>
-      ):
+      ): (...args: InferParametersFromSecond<H>) =>
         | Promise<Awaited<InferReturnType<H>>>
         | Promise<
             InferStrictTypeParams<T> extends { reverification: any }
@@ -91,60 +176,53 @@ function __experimental_protectAction() {
                   ? ReturnType<typeof permissionMismatch<T['permission']>>
                   : ReturnType<typeof roleMismatch<T['role']>>
                 : ReturnType<typeof signedOut>
-          > => {
+          > {
         const _auth = auth();
         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
-
-        if (failedItem?.reverification) {
-          //@ts-expect-error
-          return reverificationMismatch(failedItem.reverification);
-        }
-
-        if (failedItem?.role) {
-          //@ts-expect-error
-          return roleMismatch(failedItem.role);
-        }
-
-        if (failedItem?.permission) {
-          //@ts-expect-error
-          return permissionMismatch(failedItem.permission);
-        }
 
         if (failedItem) {
           // @ts-expect-error
           return signedOut();
         }
-
         // @ts-ignore not sure why ts complains TODO-STEP-UP
         return handler(auth(), ...args);
-      };
-    return { with: withNext<WithProtectActionParams>, action };
-  };
-
-  const action =
-    <
-      H extends (
-        _auth: NonNullableRecord<MyAuth, 'userId'>,
-        ...args: InferParametersFromSecond<H>
-      ) => InferReturnType<H>,
-    >(
-      handler: H,
-    ) =>
-    (
-      ...args: InferParametersFromSecond<H>
-    ): Promise<Awaited<InferReturnType<H>>> | Promise<ReturnType<typeof signedOut>> => {
-      const _auth = auth();
-      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
-
-      if (failedItem) {
-        // @ts-expect-error
-        return signedOut();
-      }
-      // @ts-ignore not sure why ts complains TODO-STEP-UP
-      return handler(auth(), ...args);
+      },
     };
+  }
 
-  return { with: withNext, action };
+  //
+  // type Builder<CurrentState extends WithProtectActionParams> = {
+  //   with(newState: Partial<WithProtectActionParams>): Builder<CurrentState & Partial<BuilderState>>;
+  //   action<T>(actionFn: () => T): () => Promise<Success<T> | ErrorTypesFromState<CurrentState>>;
+  // };
+
+  return createBuilder({});
 }
+
+const lol = __experimental_protectAction().action(() => ({
+  pantelis: 'name',
+}));
+
+const lol2 = __experimental_protectAction()
+  .with({
+    role: 'dwa'
+  })
+  .with({
+    reverification: 'strict',
+  })
+  .action(() => ({
+    pantelis: 'name',
+  }));
+
+type Prettify<T,> = {
+  [K in keyof T]: T[K];
+} & {};
+
+const lodlwadawdwa =  __experimental_protectAction().with({
+  role: 'dwa'
+})
+const  lwddwada: Prettify<typeof lodlwadawdwa>
+
+// const a: Awaited<ReturnType<typeof lol>>;
 
 export { __experimental_protectAction };
