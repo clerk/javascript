@@ -4,15 +4,15 @@ import {
   roleMismatch,
   signedOut,
 } from '@clerk/shared/authorization-errors';
-import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
-import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
+import type {__internal_ProtectConfiguration} from '@clerk/shared/protect';
+import {__internal_findFailedProtectConfiguration} from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
 
-import { auth } from '../app-router/server/auth';
+import {auth} from '../app-router/server/auth';
 
 type MyAuth = ReturnType<typeof auth>;
 
@@ -29,35 +29,34 @@ type NonNullableRecord<T, K extends keyof T> = {
 
 type WithProtectActionParams =
   | {
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-      reverification?: never;
-    }
+  role: OrganizationCustomRoleKey;
+  permission?: never;
+  reverification?: never;
+}
   | {
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-      reverification?: never;
-    }
+  role?: never;
+  permission: OrganizationCustomPermissionKey;
+  reverification?: never;
+}
   | {
-      role?: never;
-      permission?: never;
-      reverification:
-        | 'veryStrict'
-        | 'strict'
-        | 'moderate'
-        | 'lax'
-        | {
-            level: __experimental_SessionVerificationLevel;
-            afterMinutes: number;
-          };
-    };
+  role?: never;
+  permission?: never;
+  reverification:
+    | 'veryStrict'
+    | 'strict'
+    | 'moderate'
+    | 'lax'
+    | {
+    level: __experimental_SessionVerificationLevel;
+    afterMinutes: number;
+  };
+};
 
 type CustomAuthObject<T extends WithProtectActionParams> =
-  InferStrictTypeParams<T> extends
-    | { permission: any }
+  InferStrictTypeParams<T> extends | { permission: any }
     | {
-        role: any;
-      }
+    role: any;
+  }
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
@@ -149,9 +148,10 @@ type CustomAuthObject<T extends WithProtectActionParams> =
 
 function __experimental_protectAction() {
   function createBuilder<T extends __internal_ProtectConfiguration>(params: T) {
+    ']
     return {
       with<P extends WithProtectActionParams>(newParams: P) {
-        return createBuilder<T & P>({ ...params, ...newParams });
+        return createBuilder<T & P>({...params, ...newParams});
       },
       action<
         H extends (
@@ -160,23 +160,20 @@ function __experimental_protectAction() {
         ) => InferReturnType<H>,
       >(
         handler: H,
-      ): (...args: InferParametersFromSecond<H>) =>
-        | Promise<Awaited<InferReturnType<H>>>
-        | Promise<
-            InferStrictTypeParams<T> extends { reverification: any }
-              ? ReturnType<typeof reverificationMismatch<T['reverification']>>
-              : InferStrictTypeParams<T> extends
-                    | { permission: any }
-                    | {
-                        role: any;
-                      }
-                ? InferStrictTypeParams<T> extends {
-                    permission: any;
-                  }
-                  ? ReturnType<typeof permissionMismatch<T['permission']>>
-                  : ReturnType<typeof roleMismatch<T['role']>>
-                : ReturnType<typeof signedOut>
-          > {
+      ): (...args: InferParametersFromSecond<H>) => Promise<
+        Awaited<InferReturnType<H>> & (T extends { reverification: any }
+        ? ReturnType<typeof reverificationMismatch<'moderate'>>
+        : T extends | { permission: any }
+          | {
+          role: any;
+        }
+          ? T extends {
+              permission: any;
+            }
+            ? ReturnType<typeof permissionMismatch<T['permission']>> & ReturnType<typeof roleMismatch<T['role']>>
+            : ReturnType<typeof roleMismatch<T['role']>>
+          : ReturnType<typeof signedOut>)
+      > {
         const _auth = auth();
         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
@@ -189,6 +186,28 @@ function __experimental_protectAction() {
       },
     };
   }
+
+  // Promise<
+  // Awaited<InferReturnType<H>> & T extends { reverification: any; permission: any; role: any }
+  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
+  //   ReturnType<typeof permissionMismatch<T['permission']>> &
+  //   ReturnType<typeof roleMismatch<T['role']>>
+  //   : T extends { reverification: any; permission: any }
+  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
+  //   ReturnType<typeof permissionMismatch<T['permission']>>
+  //   : T extends { reverification: any; role: any }
+  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
+  //   ReturnType<typeof permissionMismatch<T['role']>>
+  //   : T extends { permission: any; role: any }
+  //   ? ReturnType<typeof reverificationMismatch<T['permission']>> &
+  //   ReturnType<typeof permissionMismatch<T['role']>>
+  //   : T extends { permission: any }
+  //   ? ReturnType<typeof reverificationMismatch<T['permission']>>
+  //   : T extends { role: any }
+  //   ? ReturnType<typeof permissionMismatch<T['role']>>
+  //   : T extends { reverification: any }
+  //   ? ReturnType<typeof permissionMismatch<T['reverification']>>
+  //   : ReturnType<typeof signedOut>
 
   //
   // type Builder<CurrentState extends WithProtectActionParams> = {
@@ -204,25 +223,34 @@ const lol = __experimental_protectAction().action(() => ({
 }));
 
 const lol2 = __experimental_protectAction()
+
+  // .with({
+  //   reverification: 'strict',
+  // })
   .with({
-    role: 'dwa'
+    permission: 'dwa',
   })
   .with({
-    reverification: 'strict',
+    role: 'dwa',
   })
   .action(() => ({
     pantelis: 'name',
   }));
 
-type Prettify<T,> = {
+type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
-const lodlwadawdwa =  __experimental_protectAction().with({
-  role: 'dwa'
-})
-const  lwddwada: Prettify<typeof lodlwadawdwa>
+const lodlwadawdwa = __experimental_protectAction()
+  .with({
+    reverification: 'lax',
+  })
+  .action(() => ({
+    pantelis: 'name',
+  }));
+
+const lwddwada: Prettify<Awaited<ReturnType<typeof lol2>>>;
 
 // const a: Awaited<ReturnType<typeof lol>>;
 
-export { __experimental_protectAction };
+export {__experimental_protectAction};
