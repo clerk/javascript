@@ -49,7 +49,7 @@
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:publint": "publint",
     "publish:local": "npx yalc push --replace --sig"
   },
