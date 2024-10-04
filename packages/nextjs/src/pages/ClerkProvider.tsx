@@ -18,12 +18,12 @@ setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-export const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
+const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
 
 /**
  * Clerk router integration with Next.js's router.
  */
-export const useNextRouter = (): ClerkHostRouter => {
+const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
 
   // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
