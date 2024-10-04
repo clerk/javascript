@@ -1,5 +1,7 @@
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import { cx } from 'cva';
+import * as React from 'react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -7,6 +9,7 @@ import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { EmailOrUsernameField } from '~/common/email-or-username-field';
 import { EmailOrUsernameOrPhoneNumberField } from '~/common/email-or-username-or-phone-number-field';
 import { GlobalError } from '~/common/global-error';
+import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
@@ -136,6 +139,8 @@ export function SignInStart() {
                           required
                         />
                       ) : null}
+
+                      <AutoFillPasswordField />
                     </div>
                   ) : null}
                   {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
@@ -201,5 +206,38 @@ export function SignInStart() {
         );
       }}
     </Common.Loading>
+  );
+}
+
+function AutoFillPasswordField() {
+  const { t } = useLocalizations();
+  const [isAutoFilled, setIsAutoFilled] = React.useState(false);
+  const fieldRef = React.useRef<HTMLDivElement>(null);
+
+  const handleAutofill = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value && !isAutoFilled) {
+      setIsAutoFilled(true);
+    }
+  };
+
+  React.useEffect(() => {
+    if (fieldRef.current) {
+      fieldRef.current.setAttribute('inert', '');
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (fieldRef.current && isAutoFilled) {
+      fieldRef.current.removeAttribute('inert');
+    }
+  }, [isAutoFilled]);
+
+  return (
+    <PasswordField
+      label={t('formFieldLabel__password')}
+      fieldRef={fieldRef}
+      fieldClassName={cx(!isAutoFilled && 'absolute opacity-0 [clip-path:polygon(0px_0px,_0px_0px,_0px_0px,_0px_0px)]')}
+      onChange={handleAutofill}
+    />
   );
 }

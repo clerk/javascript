@@ -2,7 +2,7 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganization } from '@clerk/shared/react';
 import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Flex } from '../../customizables';
@@ -42,9 +42,18 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
+  const defaultRole = useDefaultRole();
   const roleField = useFormControl('role', '', {
     label: localizationKeys('formFieldLabel__role'),
   });
+
+  useEffect(() => {
+    if (roleField.value || !defaultRole) {
+      return;
+    }
+
+    roleField.setValue(defaultRole);
+  }, [defaultRole, roleField]);
 
   if (!organization) {
     return null;
@@ -188,8 +197,6 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
 
   const { t } = useLocalizations();
 
-  const defaultRole = useDefaultRole();
-
   return (
     <Form.ControlRow elementId={field.id}>
       <Flex
@@ -198,7 +205,6 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       >
         <RoleSelect
           {...field.props}
-          value={field.props.value || (defaultRole ?? '')}
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
