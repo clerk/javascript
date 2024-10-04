@@ -92,23 +92,11 @@ export type SignInRouterSessionSetActiveEvent = {
   id: string;
 };
 
-export type SignInVerificationSubmitEvent = {
-  type: 'SUBMIT';
-  action: 'submit';
-};
-export type SignInVerificationFactorUpdateEvent = {
-  type: 'STRATEGY.UPDATE';
-  factor: SignInFactor | undefined;
-};
+export type SignInVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
+export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
 export type SignInVerificationRetryEvent = { type: 'RETRY' };
-export type SignInVerificationStrategyRegisterEvent = {
-  type: 'STRATEGY.REGISTER';
-  factor: SignInStrategyName;
-};
-export type SignInVerificationStrategyUnregisterEvent = {
-  type: 'STRATEGY.UNREGISTER';
-  factor: SignInStrategyName;
-};
+export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };
+export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInStrategyName };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -154,9 +142,9 @@ export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
 export interface SignInRouterContext extends BaseRouterContext {
   formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
+  resource: SignInResource;
   signUpPath: string;
   webAuthnAutofillSupport: boolean;
-  // resource?: SignInResource;
 
   // Verifications
   verificationCurrentFactor: SignInFactor | null;

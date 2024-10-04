@@ -7,7 +7,7 @@ export function SignInSafeIdentifierSelectorForStrategy(
   strategy: SignInStrategyName | undefined,
 ): (s: SignInRouterSnapshot) => string {
   return (s: SignInRouterSnapshot) => {
-    const signIn = s.context.clerk?.client.signIn;
+    const signIn = s.context.resource;
 
     if (strategy) {
       const matchingFactors = [
@@ -39,8 +39,8 @@ export function SignInSafeIdentifierSelectorForStrategy(
  * Returns a formatted salutation given the current sign-in context / identifiable information available.
  */
 export function SignInSalutationSelector(s: SignInRouterSnapshot): string {
-  // const signIn = s.context.resource || s.context.clerk?.client.signIn;
-  const signIn = s.context.clerk?.client.signIn;
+  const signIn = s.context.resource;
+
   return formatSalutation({
     firstName: signIn?.userData?.firstName,
     identifier: signIn?.identifier,
@@ -59,7 +59,7 @@ export function SignInCurrentStrategy(s: SignInRouterSnapshot) {
  * Returns the list of factors that are supported for the current sign-in context.
  */
 export function SignInFactors(s: SignInRouterSnapshot) {
-  const signIn = s?.context.clerk.client.signIn;
+  const signIn = s?.context.resource;
   const supportedFirstFactors = signIn.status === 'needs_first_factor' ? signIn.supportedFirstFactors || [] : [];
   const supportedSecondFactors = signIn.status === 'needs_second_factor' ? signIn.supportedSecondFactors || [] : [];
 
