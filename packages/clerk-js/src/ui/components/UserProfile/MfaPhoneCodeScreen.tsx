@@ -15,6 +15,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
@@ -80,6 +81,7 @@ const AddMfa = (props: AddMfaProps) => {
   const { onSuccess, onReset, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
+  const { handleAssurance } = useAssurance();
 
   if (!user) {
     return null;
@@ -94,10 +96,9 @@ const AddMfa = (props: AddMfaProps) => {
 
     card.setLoading(phone.id);
     try {
-      await phone.setReservedForSecondFactor({ reserved: true }).then(() => {
-        resourceRef.current = phone;
-        onSuccess();
-      });
+      await handleAssurance(() => phone.setReservedForSecondFactor({ reserved: true }));
+      resourceRef.current = phone;
+      onSuccess();
     } catch (err) {
       handleError(err, [], card.setError);
     } finally {

@@ -80,6 +80,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
         cardTitle={localizationKeys('__experimental_userVerification.noAvailableMethods.title')}
         cardSubtitle={localizationKeys('__experimental_userVerification.noAvailableMethods.subtitle')}
         message={localizationKeys('__experimental_userVerification.noAvailableMethods.message')}
+        shouldNavigateBack={false}
       />
     );
   }

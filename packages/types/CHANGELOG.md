@@ -1,5 +1,55 @@
 # Change Log
 
+## 4.25.0
+
+### Minor Changes
+
+- Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
+  - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
+  - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
+    - Allowed values 'veryStrict' | 'strict' | 'moderate' | 'lax'
+
+## 4.24.0
+
+### Minor Changes
+
+- Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
+
+  Removes:
+
+  - `<__experimental_UserVerification/>`
+  - `__experimental_mountUserVerification()`
+  - `__experimental_unmountUserVerification()`
+
+- _Experimental Feature_: `<UserProfile/>` allows users to update their information. Mostly of this information is considered sensitive data. ([#4127](https://github.com/clerk/javascript/pull/4127)) by [@panteliselef](https://github.com/panteliselef)
+
+  We want to ensure that only the users themselves can alter any sensitive data.
+
+  To increase security we are now, require users to re-verify their credentials when they are about to perform these actions:
+
+  | Operation                        | Reverification | Strategy            | Timeframe |
+  | -------------------------------- | -------------- | ------------------- | --------- |
+  | Update account (first/last name) | ❌             |                     |           |
+  | Update username                  | ✅             | Strongest available | 10m       |
+  | Delete account                   | ✅             | Strongest available | 10m       |
+  | Create/Remove profile image      | ❌             |                     |           |
+  | Update password                  | ✅             | Strongest available | 10m       |
+  | Remove password                  | ❌             |                     |           |
+  | Revoke session                   | ✅             | Strongest available | 10m       |
+  | Create identification            | ✅             | Strongest available | 10m       |
+  | Remove identification            | ✅             | Strongest available | 10m       |
+  | Change primary identification    | ✅             | Strongest available | 10m       |
+  | Update Passkey name              | ❌             |                     |           |
+  | Enable MFA (TOTP, Phone number)  | ✅             | Strongest available | 10m       |
+  | Disable MFA (TOΤP, Phone number) | ✅             | Strongest available | 10m       |
+  | Create/Regenerate Backup Codes   | ✅             | Strongest available | 10m       |
+  | Connect External Account         | ✅             | Strongest available | 10m       |
+  | Re-authorize External Account    | ❌             |                     |           |
+  | Remove External Account          | ✅             | Strongest available | 10m       |
+  | Leave organization               | ❌             |                     |           |
+
 ## 4.23.0
 
 ### Minor Changes
