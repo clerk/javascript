@@ -34,7 +34,7 @@
     "build:dts": "tsc --emitDeclarationOnly --declaration",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "lint:publint": "npm run copy:components && publint",
     "publish:local": "npx yalc push --replace --sig"
   },

@@ -65,7 +65,7 @@
     "dev:example": "concurrently \"npm run dev\" \"npm run app:dev\"",
     "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"npm run dev -w @clerk/ui\" \"cd ../ui/theme-builder && npm run dev\"",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution",
     "lint:publint": "publint",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"

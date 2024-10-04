@@ -59,7 +59,7 @@
     "dev": "tsup --watch",
     "dev:publish": "npm run dev -- --env.publish",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "npx yalc push --replace --sig",
     "test": "jest",

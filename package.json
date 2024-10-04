@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
-    "@arethetypeswrong/cli": "^0.15.3",
+    "@arethetypeswrong/cli": "0.15.4",
     "@changesets/cli": "^2.26.2",
     "@changesets/get-github-info": "^0.5.2",
     "@commitlint/cli": "^19.3.0",
