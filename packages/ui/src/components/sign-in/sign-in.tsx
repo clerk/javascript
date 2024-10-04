@@ -24,13 +24,16 @@ import { type Appearance, AppearanceProvider } from '~/contexts';
  *   where we'll consider its integration within Elements, as well as ensure
  *   bulletproof a11y.
  */
-export function SignIn({ appearance, ...rest }: { appearance?: Appearance } & SignInProps) {
+export function SignIn({ appearance, ...props }: { appearance?: Appearance } & SignInProps) {
   const [showHelp, setShowHelp] = React.useState(false);
 
+  // If __experimental.newComponents is `true`, we should use __experimental.appearance instead of appearance.
+  const componentAppearance = props.__experimental?.newComponents ? props.__experimental.appearance : appearance;
+
   return (
-    <AppearanceProvider appearance={appearance}>
+    <AppearanceProvider appearance={componentAppearance}>
       <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
-        <SignInRoot {...rest}>
+        <SignInRoot {...props}>
           {showHelp ? (
             <SignInGetHelp />
           ) : (

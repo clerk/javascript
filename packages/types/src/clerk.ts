@@ -837,12 +837,7 @@ export type SignInProps = RoutingOptions & {
   /**
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
-  __experimental?: Autocomplete<
-    {
-      newComponents: boolean;
-    },
-    Record<string, any>
-  >;
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -952,12 +947,7 @@ export type SignUpProps = RoutingOptions & {
   /**
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
-  __experimental?: Autocomplete<
-    {
-      newComponents: boolean;
-    },
-    Record<string, any>
-  >;
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
