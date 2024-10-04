@@ -86,7 +86,7 @@
     "@types/node": "^18.19.33",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "@types/semver": "^7.5.4",
+    "@types/semver": "^7.5.8",
     "typescript": "*"
   },
   "peerDependencies": {
