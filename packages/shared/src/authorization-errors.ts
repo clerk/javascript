@@ -10,27 +10,44 @@ type ClerkError<T> = {
 
 // const a:Prettify<PermissionMismatchError>
 
-type PermissionMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
+export type PermissionMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
   {
     type: 'forbidden';
     reason: 'permission-mismatch';
   } & M
 >;
-type RoleMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
+
+export type RoleMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
   {
     type: 'forbidden';
     reason: 'role-mismatch';
   } & M
 >;
 
-type ReverificationMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
+export type ReverificationMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
   {
     type: 'forbidden';
     reason: 'reverification-mismatch';
   } & M
 >;
 
-type SignedOutError = ClerkError<{
+export type RReverificationMismatchError<M> = {
+  clerk_error: {
+    type: 'forbidden';
+    reason: 'reverification-mismatch';
+    metadata: { reverification: M };
+  };
+};
+
+export type PPermissionMismatchError<M> = {
+  clerk_error: {
+    type: 'forbidden';
+    reason: 'permission-mismatch';
+    metadata: { permission: M };
+  };
+};
+
+export type SignedOutError = ClerkError<{
   type: 'unauthorized';
   reason: 'signed-out';
 }>;

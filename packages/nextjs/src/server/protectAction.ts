@@ -1,18 +1,21 @@
 import {
   permissionMismatch,
+  PPermissionMismatchError,
   reverificationMismatch,
+  ReverificationMismatchError,
   roleMismatch,
+  RReverificationMismatchError,
   signedOut,
 } from '@clerk/shared/authorization-errors';
-import type {__internal_ProtectConfiguration} from '@clerk/shared/protect';
-import {__internal_findFailedProtectConfiguration} from '@clerk/shared/protect';
+import type { __internal_ProtectConfiguration } from '@clerk/shared/protect';
+import { __internal_findFailedProtectConfiguration } from '@clerk/shared/protect';
 import type {
   __experimental_SessionVerificationLevel,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
 
-import {auth} from '../app-router/server/auth';
+import { auth } from '../app-router/server/auth';
 
 type MyAuth = ReturnType<typeof auth>;
 
@@ -29,34 +32,35 @@ type NonNullableRecord<T, K extends keyof T> = {
 
 type WithProtectActionParams =
   | {
-  role: OrganizationCustomRoleKey;
-  permission?: never;
-  reverification?: never;
-}
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+      reverification?: never;
+    }
   | {
-  role?: never;
-  permission: OrganizationCustomPermissionKey;
-  reverification?: never;
-}
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+      reverification?: never;
+    }
   | {
-  role?: never;
-  permission?: never;
-  reverification:
-    | 'veryStrict'
-    | 'strict'
-    | 'moderate'
-    | 'lax'
-    | {
-    level: __experimental_SessionVerificationLevel;
-    afterMinutes: number;
-  };
-};
+      role?: never;
+      permission?: never;
+      reverification:
+        | 'veryStrict'
+        | 'strict'
+        | 'moderate'
+        | 'lax'
+        | {
+            level: __experimental_SessionVerificationLevel;
+            afterMinutes: number;
+          };
+    };
 
 type CustomAuthObject<T extends WithProtectActionParams> =
-  InferStrictTypeParams<T> extends | { permission: any }
+  InferStrictTypeParams<T> extends
+    | { permission: any }
     | {
-    role: any;
-  }
+        role: any;
+      }
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
     : NonNullableRecord<MyAuth, 'userId'>;
 
@@ -146,111 +150,167 @@ type CustomAuthObject<T extends WithProtectActionParams> =
 //   return { with: withNext, action };
 // }
 
-function __experimental_protectAction() {
-  function createBuilder<T extends __internal_ProtectConfiguration>(params: T) {
-    ']
-    return {
-      with<P extends WithProtectActionParams>(newParams: P) {
-        return createBuilder<T & P>({...params, ...newParams});
-      },
-      action<
-        H extends (
-          _auth: NonNullableRecord<MyAuth, 'userId'>,
-          ...args: InferParametersFromSecond<H>
-        ) => InferReturnType<H>,
-      >(
-        handler: H,
-      ): (...args: InferParametersFromSecond<H>) => Promise<
-        Awaited<InferReturnType<H>> & (T extends { reverification: any }
-        ? ReturnType<typeof reverificationMismatch<'moderate'>>
-        : T extends | { permission: any }
-          | {
-          role: any;
-        }
-          ? T extends {
-              permission: any;
-            }
-            ? ReturnType<typeof permissionMismatch<T['permission']>> & ReturnType<typeof roleMismatch<T['role']>>
-            : ReturnType<typeof roleMismatch<T['role']>>
-          : ReturnType<typeof signedOut>)
-      > {
-        const _auth = auth();
-        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+type Merge<T, U> = T & U extends infer O ? { [K in keyof O]: O[K] } : never;
 
-        if (failedItem) {
-          // @ts-expect-error
-          return signedOut();
-        }
-        // @ts-ignore not sure why ts complains TODO-STEP-UP
-        return handler(auth(), ...args);
+// Utility type to check if "reverification" is already set in T
+type HasReverification<T> = T extends { reverification: any } ? true : false;
+
+// Chainable type that keeps track of whether reverification has been set
+type Chainable<T = {}> =
+  HasReverification<T> extends true
+    ? {
+        action(): T extends { reverification: any; permission: any; role: any }
+          ?
+              | ReturnType<typeof reverificationMismatch<T['reverification']>>
+              | ReturnType<typeof permissionMismatch<T['permission']>>
+              | ReturnType<typeof roleMismatch<T['role']>>
+          : T extends { reverification: any; permission: any }
+            ? RReverificationMismatchError<T['reverification']> | PPermissionMismatchError<T['permission']>
+            : T extends { reverification: any; role: any }
+              ?
+                  | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                  | ReturnType<typeof roleMismatch<T['role']>>
+              : T extends { permission: any; role: any }
+                ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof roleMismatch<T['role']>>
+                : T extends { permission: any }
+                  ? ReturnType<typeof permissionMismatch<T['permission']>>
+                  : T extends { role: any }
+                    ? ReturnType<typeof roleMismatch<T['role']>>
+                    : T extends { reverification: any }
+                      ? ReturnType<typeof reverificationMismatch<T['reverification']>>
+                      : ReturnType<typeof signedOut>;
+      }
+    : {
+        with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
+        action(): T extends { reverification: any; permission: any; role: any }
+          ?
+              | ReturnType<typeof reverificationMismatch<T['reverification']>>
+              | ReturnType<typeof permissionMismatch<T['permission']>>
+              | ReturnType<typeof roleMismatch<T['role']>>
+          : T extends { reverification: any; permission: any }
+            ?
+                | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                | ReturnType<typeof permissionMismatch<T['permission']>>
+            : T extends { reverification: any; role: any }
+              ?
+                  | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                  | ReturnType<typeof roleMismatch<T['role']>>
+              : T extends { permission: any; role: any }
+                ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof roleMismatch<T['role']>>
+                : T extends { permission: any }
+                  ? ReturnType<typeof permissionMismatch<T['permission']>>
+                  : T extends { role: any }
+                    ? ReturnType<typeof roleMismatch<T['role']>>
+                    : T extends { reverification: any }
+                      ? ReturnType<typeof reverificationMismatch<T['reverification']>>
+                      : ReturnType<typeof signedOut>;
+      };
+
+// type ChainableCreator<T extends {} = {}> = (p: T) => Chainable<T>;
+
+// Updated 'config' as a function that returns a Chainable instance
+// const __experimental_protectAction = (): Chainable => {
+//   const chainable: Chainable = {
+//     with(key) {
+//       // Return a new Chainable instance with the updated state
+//       return this;
+//     },
+//     action() {
+//       // This would return the accumulated options in a real implementation
+//       return {} as any;
+//     },
+//   };
+//   return chainable;
+// };
+
+function __experimental_protectAction() {
+  const createBuilder = <A extends {}>(config: A): Chainable => {
+    return {
+      with(p) {
+        return createBuilder({ ...p, ...config });
+      },
+      action() {
+        return config;
       },
     };
-  }
-
-  // Promise<
-  // Awaited<InferReturnType<H>> & T extends { reverification: any; permission: any; role: any }
-  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
-  //   ReturnType<typeof permissionMismatch<T['permission']>> &
-  //   ReturnType<typeof roleMismatch<T['role']>>
-  //   : T extends { reverification: any; permission: any }
-  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
-  //   ReturnType<typeof permissionMismatch<T['permission']>>
-  //   : T extends { reverification: any; role: any }
-  //   ? ReturnType<typeof reverificationMismatch<T['reverification']>> &
-  //   ReturnType<typeof permissionMismatch<T['role']>>
-  //   : T extends { permission: any; role: any }
-  //   ? ReturnType<typeof reverificationMismatch<T['permission']>> &
-  //   ReturnType<typeof permissionMismatch<T['role']>>
-  //   : T extends { permission: any }
-  //   ? ReturnType<typeof reverificationMismatch<T['permission']>>
-  //   : T extends { role: any }
-  //   ? ReturnType<typeof permissionMismatch<T['role']>>
-  //   : T extends { reverification: any }
-  //   ? ReturnType<typeof permissionMismatch<T['reverification']>>
-  //   : ReturnType<typeof signedOut>
-
-  //
-  // type Builder<CurrentState extends WithProtectActionParams> = {
-  //   with(newState: Partial<WithProtectActionParams>): Builder<CurrentState & Partial<BuilderState>>;
-  //   action<T>(actionFn: () => T): () => Promise<Success<T> | ErrorTypesFromState<CurrentState>>;
-  // };
+  };
 
   return createBuilder({});
+
+  // function createBuilder<T = {}>(params: T) {
+  //   return {
+  //     with<P extends WithProtectActionParams>(newParams: P) {
+  //       return createBuilder<T & P>({...params, ...newParams});
+  //     },
+  //     action<
+  //       H extends (
+  //         _auth: NonNullableRecord<MyAuth, 'userId'>,
+  //         ...args: InferParametersFromSecond<H>
+  //       ) => InferReturnType<H>,
+  //     >(
+  //       handler: H,
+  //     ): (...args: InferParametersFromSecond<H>) => Promise<
+  //       Awaited<InferReturnType<H>> & (T extends { reverification: any }
+  //       ? ReturnType<typeof reverificationMismatch<'moderate'>>
+  //       : T extends | { permission: any }
+  //         | {
+  //         role: any;
+  //       }
+  //         ? T extends {
+  //             permission: any;
+  //           }
+  //           ? ReturnType<typeof permissionMismatch<T['permission']>> & ReturnType<typeof roleMismatch<T['role']>>
+  //           : ReturnType<typeof roleMismatch<T['role']>>
+  //         : ReturnType<typeof signedOut>)
+  //     > {
+  //       const _auth = auth();
+  //       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+  //
+  //       if (failedItem) {
+  //         // @ts-expect-error
+  //         return signedOut();
+  //       }
+  //       // @ts-ignore not sure why ts complains TODO-STEP-UP
+  //       return handler(auth(), ...args);
+  //     },
+  //   };
+  // }
+  //
+  // return createBuilder({});
 }
 
-const lol = __experimental_protectAction().action(() => ({
-  pantelis: 'name',
-}));
+// const a: Prettify<PPermissionMismatchError<'dwadadaw'> | RReverificationMismatchError<'strict'>>;
+//
+// const b: Prettify<PPermissionMismatchError<'dwadwa'> | RReverificationMismatchError<'dwada'>>;
+//
+// const c: Prettify<ReturnType<typeof permissionMismatch<'dwadwa'>> | ReturnType<typeof reverificationMismatch<'strict'>>>
+//
+// if(c.clerk_error.reason === 'permission-mismatch') {
+//   c.clerk_error.metadata.permission
+// }
 
-const lol2 = __experimental_protectAction()
-
+const wlwda = __experimental_protectAction()
   // .with({
-  //   reverification: 'strict',
+  //   role:'admin'
   // })
   .with({
-    permission: 'dwa',
+    permission: 'dwada',
   })
   .with({
-    role: 'dwa',
+    role: 'dwa'
   })
-  .action(() => ({
-    pantelis: 'name',
-  }));
+  .with({
+    reverification: 'lax'
+  })
+  .action();
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
-const lodlwadawdwa = __experimental_protectAction()
-  .with({
-    reverification: 'lax',
-  })
-  .action(() => ({
-    pantelis: 'name',
-  }));
+const dwada: Prettify<typeof wlwda>;
 
-const lwddwada: Prettify<Awaited<ReturnType<typeof lol2>>>;
-
-// const a: Awaited<ReturnType<typeof lol>>;
-
-export {__experimental_protectAction};
+if(dwada.clerk_error.reason === 'reverification-mismatch') {
+  dwada.clerk_error.metadata.reverification === 'lax'
+}
+export { __experimental_protectAction };
