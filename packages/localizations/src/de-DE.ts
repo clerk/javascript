@@ -109,7 +109,7 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account löschen',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
