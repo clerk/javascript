@@ -76,34 +76,21 @@ function __experimental_protectAction() {
       (
         ...args: InferParametersFromSecond<H>
       ):
-        | InferReturnType<H>
+        | Promise<Awaited<InferReturnType<H>>>
         | Promise<
             InferStrictTypeParams<T> extends { reverification: any }
-              ? {
-                  clerk_error: {
-                    type: 'forbidden';
-                    reason: 'assurance';
-                    metadata: Omit<InferStrictTypeParams<T>, 'fallback'>;
-                  };
-                }
+              ? ReturnType<typeof reverificationMismatch<T['reverification']>>
               : InferStrictTypeParams<T> extends
                     | { permission: any }
                     | {
                         role: any;
                       }
-                ? {
-                    clerk_error: {
-                      type: 'something';
-                      reason: 'something';
-                      metadata: Omit<InferStrictTypeParams<T>, 'fallback'>;
-                    };
+                ? InferStrictTypeParams<T> extends {
+                    permission: any;
                   }
-                : {
-                    clerk_error: {
-                      type: 'unauthorized';
-                      reason: 'signed-out';
-                    };
-                  }
+                  ? ReturnType<typeof permissionMismatch<T['permission']>>
+                  : ReturnType<typeof roleMismatch<T['role']>>
+                : ReturnType<typeof signedOut>
           > => {
         const _auth = auth();
         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
@@ -145,14 +132,7 @@ function __experimental_protectAction() {
     ) =>
     (
       ...args: InferParametersFromSecond<H>
-    ):
-      | InferReturnType<H>
-      | Promise<{
-          clerk_error: {
-            type: 'unauthorized';
-            reason: 'signed-out';
-          };
-        }> => {
+    ): Promise<Awaited<InferReturnType<H>>> | Promise<ReturnType<typeof signedOut>> => {
       const _auth = auth();
       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
