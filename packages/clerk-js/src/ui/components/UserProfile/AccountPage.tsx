@@ -53,6 +53,8 @@ export const AccountPage = withCardStateProvider(() => {
         {showEmail && <EmailsSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
         {showPhone && <PhoneSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
         {showConnectedAccounts && <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
+
+        {/*TODO-STEP-UP: Verify that these work as expected*/}
         {showSamlAccounts && <EnterpriseAccountsSection />}
         {showWeb3 && <Web3Section shouldAllowCreation={shouldAllowIdentificationCreation} />}
       </Col>

@@ -9,6 +9,7 @@ import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvide
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useAssurance } from '../../hooks/useAssurance';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
@@ -89,6 +90,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { navigate } = useRouter();
   const { user } = useUser();
   const card = useCardState();
+  const { handleAssurance } = useAssurance();
 
   if (!user) {
     return null;
@@ -115,11 +117,13 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
-        response = await user.createExternalAccount({
-          strategy: account.verification!.strategy as OAuthStrategy,
-          redirectUrl,
-          additionalScopes,
-        });
+        response = await handleAssurance(() =>
+          user.createExternalAccount({
+            strategy: account.verification!.strategy as OAuthStrategy,
+            redirectUrl,
+            additionalScopes,
+          }),
+        );
       }
 
       await navigate(response.verification!.externalVerificationRedirectURL?.href || '');

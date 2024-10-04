@@ -243,27 +243,6 @@ export interface Clerk {
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mounts a user reverification flow component at the target element.
-   *
-   * @experimantal This API is still under active development and may change at any moment.
-   * @param targetNode Target node to mount the UserVerification component from.
-   * @param props user verification configuration parameters.
-   */
-  __experimental_mountUserVerification: (
-    targetNode: HTMLDivElement,
-    props?: __experimental_UserVerificationProps,
-  ) => void;
-
-  /**
-   * Unmount a user reverification flow component from the target element.
-   * If there is no component mounted at the target node, results in a noop.
-   *
-   * @experimantal This API is still under active development and may change at any moment.
-   * @param targetNode Target node to unmount the UserVerification component from.
-   */
-  __experimental_unmountUserVerification: (targetNode: HTMLDivElement) => void;
-
-  /**
    * Mounts a sign up flow component at the target element.
    *
    * @param targetNode Target node to mount the SignUp component.
@@ -870,15 +849,20 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
  * @experimantal
  */
 export type __experimental_UserVerificationProps = RoutingOptions & {
-  // TODO(STEP-UP): Verify and write a description
+  /**
+   * Non-awaitable callback for when verification is completed successfully
+   */
   afterVerification?: () => void;
-  // TODO(STEP-UP): Verify and write a description
-  afterVerificationUrl?: string;
+
+  /**
+   * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
+   */
+  afterVerificationCancelled?: () => void;
 
   /**
    * Defines the steps of the verification flow.
-   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
-   * @default `'L2.secondFactor'`
+   * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'secondFactor'`
    */
   level?: __experimental_SessionVerificationLevel;
 
