@@ -106,9 +106,6 @@ const common = ({ mode }) => {
         },
       },
     },
-    experiments: {
-      css: true,
-    },
   };
 };
 
@@ -173,12 +170,21 @@ const typescriptLoaderDev = () => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
+const clerkUICSSLoader = () => {
+  // This emits a module exporting the URL to the styles.css file.
+  return {
+    test: /packages\/ui\/dist\/styles\.css/,
+    type: 'asset/resource',
+  };
+};
+
 /** @type { () => (import('webpack').Configuration) } */
 const commonForProd = () => {
   return {
     devtool: undefined,
     module: {
-      rules: [svgLoader(), typescriptLoaderProd()],
+      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSLoader()],
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -297,7 +303,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), typescriptLoaderDev()],
+        rules: [svgLoader(), typescriptLoaderDev(), clerkUICSSLoader()],
       },
       plugins: [
         new ReactRefreshWebpackPlugin({ overlay: { sockHost: devUrl.host } }),

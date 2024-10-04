@@ -1,10 +1,9 @@
-// TODO: don't import here
-import '@clerk/ui/styles.css';
-
+//@ts-ignore - This is treated as a string export by Webpack
 import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
 import type { ClerkHostRouter } from '@clerk/shared/router';
 import { ClerkHostRouterContext } from '@clerk/shared/router';
 import type { ClerkOptions, LoadedClerk } from '@clerk/types';
+import stylesheetURL from '@clerk/ui/styles.css';
 import type { ElementType, ReactNode } from 'react';
 import { createElement, lazy } from 'react';
 import { createPortal } from 'react-dom';
@@ -43,6 +42,12 @@ export function init({ wrapper }: { wrapper: ElementType }) {
     rootElement = document.createElement('div');
     rootElement.setAttribute('id', 'clerk-components');
     document.body.appendChild(rootElement);
+
+    const stylesheet = document.createElement('link');
+    stylesheet.href = stylesheetURL;
+    stylesheet.rel = 'stylesheet';
+    // Add as first stylesheet so that application styles take precedence over our styles.
+    document.head.prepend(stylesheet);
   }
 
   const root = createRoot(rootElement);
