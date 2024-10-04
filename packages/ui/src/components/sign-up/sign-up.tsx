@@ -8,8 +8,11 @@ import { SignUpVerifications } from '~/components/sign-up/steps/verifications';
 import { type Appearance, AppearanceProvider } from '~/contexts';
 
 export function SignUp({ appearance, ...props }: { appearance?: Appearance } & SignUpProps) {
+  // If __experimental.newComponents is `true`, we should use __experimental.appearance instead of appearance.
+  const componentAppearance = props.__experimental?.newComponents ? props.__experimental.appearance : appearance;
+
   return (
-    <AppearanceProvider appearance={appearance}>
+    <AppearanceProvider appearance={componentAppearance}>
       <SignUpRoot {...props}>
         <SignUpStart />
         <SignUpVerifications />
