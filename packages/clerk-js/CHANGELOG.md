@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.26.1
+
+### Patch Changes
+
+- Enable "Send invitation" button when default role is loaded ([#4281](https://github.com/clerk/javascript/pull/4281)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.26.0
 
 ### Minor Changes
