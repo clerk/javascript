@@ -1,11 +1,11 @@
 import type { SignInStrategy } from '@clerk/types';
 
-import type { SignUpVerificationContext, SignUpVerificationEvents } from '~/internals/machines/sign-up';
+import type { SignUpVerificationEvents } from '~/internals/machines/sign-up';
 import type { ThirdPartyMachineContext, ThirdPartyMachineEvent } from '~/internals/machines/third-party';
 import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 
 type SendToLoadingProps = {
-  context: ThirdPartyMachineContext | SignUpVerificationContext;
+  context: ThirdPartyMachineContext;
   event: ThirdPartyMachineEvent | SignUpVerificationEvents;
 };
 

@@ -1,18 +1,10 @@
-import type {
-  SignUpVerificationFriendlyTags,
-  SignUpVerificationTags,
-  TSignUpVerificationMachine,
-} from '~/internals/machines/sign-up';
+import type { SignUpVerificationFriendlyTags, SignUpVerificationTags } from '~/internals/machines/sign-up';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
-import { SignUpRouterCtx, useSignUpVerificationStep } from '~/react/sign-up/context';
-
-import { createContextFromActorRef } from '../utils/create-context-from-actor-ref';
+import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 export type SignUpVerificationsProps = FormProps;
-
-export const SignUpVerificationCtx = createContextFromActorRef<TSignUpVerificationMachine>('SignUpVerificationCtx');
 
 /**
  * Renders its children when the user is in the verification step of the sign-up flow. This happens after the user has signed up but before their account is active & verified.
@@ -33,24 +25,12 @@ export function SignUpVerifications(props: SignUpVerificationsProps) {
   const ref = SignUpRouterCtx.useActorRef();
   const activeState = useActiveTags(ref, 'step:verification');
 
-  return activeState ? <SignUpVerifyInner {...props} /> : null;
-}
-
-function SignUpVerifyInner(props: SignUpVerificationsProps) {
-  const ref = useSignUpVerificationStep();
-
-  if (!ref) {
-    return null;
-  }
-
-  return (
-    <SignUpVerificationCtx.Provider actorRef={ref}>
-      <Form
-        flowActor={ref}
-        {...props}
-      />
-    </SignUpVerificationCtx.Provider>
-  );
+  return activeState ? (
+    <Form
+      flowActor={ref}
+      {...props}
+    />
+  ) : null;
 }
 
 export type SignUpStrategyProps = { name: SignUpVerificationFriendlyTags; children: React.ReactNode };
@@ -71,11 +51,12 @@ export type SignUpStrategyProps = { name: SignUpVerificationFriendlyTags; childr
  * </SignUp.Strategy>
  */
 export function SignUpStrategy({ children, name: tag }: SignUpStrategyProps) {
-  const ref = SignUpVerificationCtx.useActorRef(true);
+  const ref = SignUpRouterCtx.useActorRef();
+  const activeState = useActiveTags(ref, 'step:verification');
 
-  if (!ref) {
+  if (!activeState) {
     throw new Error(
-      '<Strategy> used outside of <SignUp>. Did you mean to `import { Strategy } from "@clerk/elements/sign-in"` instead?',
+      '<Strategy> used outside of <SignUp>. Did you mean to `import { Strategy } from "@clerk/elements/sign-up"` instead?',
     );
   }
 

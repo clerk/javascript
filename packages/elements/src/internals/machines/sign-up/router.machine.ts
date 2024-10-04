@@ -1,11 +1,22 @@
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { joinURL } from '@clerk/shared/url';
-import type { SignInStrategy, SignUpResource, SignUpStatus, VerificationStatus } from '@clerk/types';
+import type {
+  Attribute,
+  SignInStrategy,
+  SignUpResource,
+  SignUpStatus,
+  SignUpVerifiableField,
+  VerificationStatus,
+  VerificationStrategy,
+} from '@clerk/types';
+import type { Writable } from 'type-fest';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  RESENDABLE_COUNTDOWN_DEFAULT,
   ROUTING,
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
@@ -32,8 +43,14 @@ import type {
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
+  // SignUpVerificationDelays,
+  SignUpVerificationEmailLinkFailedEvent,
+  SignUpVerificationEvents,
 } from './router.types';
-import { SignUpVerificationMachine } from './verification.machine';
+import {
+  SignUpRouterDelays,
+  // SignUpVerificationEvents,
+} from './router.types';
 
 export const SignUpRouterMachineId = 'SignUpRouter';
 export type TSignUpRouterMachine = typeof SignUpRouterMachine;
@@ -55,6 +72,29 @@ const needsStatus =
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
     (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
+const shouldVerify = (field: SignUpVerifiableField, strategy?: VerificationStrategy) => {
+  const guards: Writable<Parameters<typeof and<SignUpRouterContext, SignUpVerificationEvents, any>>[0]> = [
+    {
+      type: 'isFieldUnverified',
+      params: {
+        field,
+      },
+    },
+  ];
+
+  if (strategy) {
+    guards.push({
+      type: 'isStrategyEnabled',
+      params: {
+        attribute: field,
+        strategy,
+      },
+    });
+  }
+
+  return and(guards);
+};
+
 export const SignUpRouterMachine = setup({
   actors: {
     startAttempt,
@@ -64,7 +104,6 @@ export const SignUpRouterMachine = setup({
     verificationPrepare,
 
     thirdPartyMachine: ThirdPartyMachine,
-    verificationMachine: SignUpVerificationMachine,
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
@@ -89,6 +128,14 @@ export const SignUpRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
+    resendableTick: assign(({ context }) => ({
+      resendable: context.resendableAfter === 0,
+      resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
+    })),
+    resendableReset: assign({
+      resendable: false,
+      resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
+    }),
     setActive: ({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) => {
       if (context.exampleMode) {
         return;
@@ -214,6 +261,7 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
         case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
         case ERROR_CODES.USER_LOCKED:
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
         default:
@@ -228,6 +276,13 @@ export const SignUpRouterMachine = setup({
         error,
       });
     },
+    resetResource: assign({ resource: ({ context }) => context.clerk.client.signUp }),
+    setResource: assign({
+      resource: ({ event }) => {
+        assertActorEventDone<SignUpResource>(event);
+        return event.output;
+      },
+    }),
     transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl()),
   },
   guards: {
@@ -249,6 +304,7 @@ export const SignUpRouterMachine = setup({
     hasTicket: ({ context }) => Boolean(context.ticket),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
+    isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
@@ -266,11 +322,22 @@ export const SignUpRouterMachine = setup({
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
+    isStrategyEnabled: (
+      { context },
+      { attribute, strategy }: { attribute: Attribute; strategy: VerificationStrategy },
+    ) =>
+      Boolean(
+        context.clerk.__unstable__environment?.userSettings.attributes?.[attribute].verifications.includes(strategy),
+      ),
 
     needsIdentifier: or(['statusNeedsIdentifier', isCurrentPath('/')]),
     needsContinue: and(['statusNeedsContinue', isCurrentPath('/continue')]),
     needsVerification: and(['statusNeedsVerification', isCurrentPath('/verify')]),
     needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
+
+    shouldVerifyPhoneCode: shouldVerify('phone_number'),
+    shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
+    shouldVerifyEmailCode: shouldVerify('email_address', 'email_code'),
 
     statusNeedsIdentifier: or([not('hasResource'), 'isStatusAbandoned']),
     statusNeedsContinue: or(['isMissingRequiredFields']),
@@ -278,6 +345,7 @@ export const SignUpRouterMachine = setup({
   },
   delays: {
     'TIMEOUT.POLLING': 300_000, // 5 minutes
+    ...SignUpRouterDelays, // TODO: Refactor so as not to need spreading
   },
   types: {} as SignUpRouterSchema,
 }).createMachine({
@@ -544,7 +612,7 @@ export const SignUpRouterMachine = setup({
               };
             },
             onDone: {
-              actions: ['goToNextStep'],
+              actions: 'goToNextStep',
             },
             onError: {
               actions: ['setFormErrors'],
@@ -616,20 +684,6 @@ export const SignUpRouterMachine = setup({
     },
     Verification: {
       tags: ['step:verification'],
-      invoke: {
-        id: 'verification',
-        src: 'verificationMachine',
-        input: ({ context, self }) => ({
-          attributes: context.clerk.__unstable__environment?.userSettings.attributes,
-          basePath: context.router?.basePath,
-          formRef: context.formRef,
-          parent: self,
-          resource: context.clerk.client.signUp,
-        }),
-        onDone: {
-          actions: 'raiseNext',
-        },
-      },
       always: [
         {
           guard: 'hasCreatedSession',
@@ -665,7 +719,362 @@ export const SignUpRouterMachine = setup({
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'Continue',
           },
+          {
+            description: 'Validate via phone number',
+            guard: 'shouldVerifyPhoneCode',
+            target: '.PhoneCode',
+          },
+          {
+            description: 'Validate via email link',
+            guard: 'shouldVerifyEmailLink',
+            target: '.EmailLink',
+          },
+          {
+            description: 'Verify via email code',
+            guard: 'shouldVerifyEmailCode',
+            target: '.EmailCode',
+          },
         ],
+      },
+      states: {
+        Init: {
+          always: [
+            {
+              description: 'Validate via phone number',
+              guard: 'shouldVerifyPhoneCode',
+              target: 'PhoneCode',
+            },
+            {
+              description: 'Validate via email link',
+              guard: 'shouldVerifyEmailLink',
+              target: 'EmailLink',
+            },
+            {
+              description: 'Verify via email code',
+              guard: 'shouldVerifyEmailCode',
+              target: 'EmailCode',
+            },
+            {
+              actions: raise({ type: 'NEXT' }),
+            },
+          ],
+        },
+        EmailLink: {
+          tags: ['verification:method:email', 'verification:category:link', 'verification:email_link'],
+          initial: 'Preparing',
+          on: {
+            RETRY: '.Preparing',
+            'EMAIL_LINK.RESTART': {
+              target: '.Attempting',
+              reenter: true,
+            },
+            'EMAIL_LINK.FAILED': {
+              actions: [
+                {
+                  type: 'setFormErrors',
+                  params: ({ event }: { event: SignUpVerificationEmailLinkFailedEvent }) => ({ error: event.error }),
+                },
+                assign({ resource: ({ event }) => event.resource }),
+              ],
+              target: '.Pending',
+            },
+            'EMAIL_LINK.*': {
+              actions: enqueueActions(({ enqueue, event }) => {
+                if (event.type === 'EMAIL_LINK.RESTART') {
+                  return;
+                }
+
+                enqueue.assign({ resource: event.resource });
+                enqueue.raise({ type: 'NEXT', resource: event.resource });
+              }),
+            },
+          },
+          states: {
+            Preparing: {
+              tags: ['state:preparing', 'state:loading'],
+              exit: 'resendableReset',
+              invoke: {
+                id: 'prepareEmailLinkVerification',
+                src: 'verificationPrepare',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                  params: {
+                    strategy: 'email_link',
+                    redirectUrl: `${context.router?.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`,
+                  },
+                }),
+                onDone: {
+                  target: 'Attempting',
+                  actions: 'setResource',
+                },
+                onError: {
+                  actions: 'setFormErrors',
+                  target: 'Pending',
+                },
+              },
+            },
+            Pending: {
+              description: 'Placeholder for allowing resending of email link',
+              tags: ['state:pending'],
+              on: {
+                NEXT: 'Preparing',
+              },
+            },
+            Attempting: {
+              tags: ['state:attempting'],
+              invoke: {
+                id: 'attemptEmailLinkVerification',
+                src: 'verificationAttemptEmailLink',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                }),
+              },
+              after: {
+                emailLinkTimeout: {
+                  description: 'Timeout after 5 minutes',
+                  target: 'Pending',
+                  actions: sendTo(({ context }) => context.formRef, {
+                    type: 'ERRORS.SET',
+                    error: new ClerkElementsError('verify-email-link-timeout', 'Email link verification timed out'),
+                  }),
+                },
+              },
+              initial: 'NotResendable',
+              states: {
+                Resendable: {
+                  description: 'Waiting for user to retry',
+                },
+                NotResendable: {
+                  description: 'Handle countdowns',
+                  on: {
+                    RETRY: {
+                      actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                    },
+                  },
+                  after: {
+                    resendableTimeout: [
+                      {
+                        description: 'Set as retriable if countdown is 0',
+                        guard: 'isResendable',
+                        actions: 'resendableTick',
+                        target: 'Resendable',
+                      },
+                      {
+                        description: 'Continue countdown if not retriable',
+                        actions: 'resendableTick',
+                        target: 'NotResendable',
+                        reenter: true,
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        EmailCode: {
+          tags: ['verification:method:email', 'verification:category:code', 'verification:email_code'],
+          initial: 'Preparing',
+          states: {
+            Preparing: {
+              tags: ['state:preparing', 'state:loading'],
+              exit: 'resendableReset',
+              invoke: {
+                id: 'prepareEmailAddressCodeVerification',
+                src: 'verificationPrepare',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                  params: {
+                    strategy: 'email_code',
+                  },
+                }),
+                onDone: [
+                  {
+                    guard: 'shouldVerifyEmailCode',
+                    target: 'Pending',
+                  },
+                  {
+                    actions: ['setResource', 'goToNextStep'],
+                  },
+                ],
+                onError: {
+                  actions: 'setFormErrors',
+                  target: 'Pending',
+                },
+              },
+            },
+            Pending: {
+              tags: ['state:pending'],
+              on: {
+                RETRY: 'Preparing',
+                SUBMIT: {
+                  target: 'Attempting',
+                  reenter: true,
+                },
+              },
+              initial: 'NotResendable',
+              states: {
+                Resendable: {
+                  description: 'Waiting for user to retry',
+                },
+                NotResendable: {
+                  description: 'Handle countdowns',
+                  on: {
+                    RETRY: {
+                      actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                    },
+                  },
+                  after: {
+                    resendableTimeout: [
+                      {
+                        description: 'Set as retriable if countdown is 0',
+                        guard: 'isResendable',
+                        actions: 'resendableTick',
+                        target: 'Resendable',
+                      },
+                      {
+                        description: 'Continue countdown if not retriable',
+                        actions: 'resendableTick',
+                        target: 'NotResendable',
+                        reenter: true,
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            Attempting: {
+              tags: ['state:attempting', 'state:loading'],
+              entry: {
+                type: 'loadingBegin',
+                params: {
+                  step: 'verifications',
+                },
+              },
+              exit: 'loadingEnd',
+              invoke: {
+                id: 'attemptEmailAddressCodeVerification',
+                src: 'verificationAttempt',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                  params: {
+                    strategy: 'email_code',
+                    code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
+                  },
+                }),
+                onDone: {
+                  actions: 'goToNextStep',
+                },
+                onError: {
+                  actions: 'setFormErrors',
+                  target: 'Pending',
+                },
+              },
+            },
+          },
+        },
+        PhoneCode: {
+          tags: ['verification:method:phone', 'verification:category:code', 'verification:phone_code'],
+          initial: 'Preparing',
+          states: {
+            Preparing: {
+              tags: ['state:preparing', 'state:loading'],
+              exit: 'resendableReset',
+              invoke: {
+                id: 'preparePhoneCodeVerification',
+                src: 'verificationPrepare',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                  params: {
+                    strategy: 'phone_code',
+                  },
+                }),
+                onDone: [
+                  {
+                    guard: 'shouldVerifyPhoneCode',
+                    target: 'Pending',
+                    actions: 'setResource',
+                  },
+                  {
+                    actions: ['setResource', 'goToNextStep'],
+                  },
+                ],
+                onError: {
+                  actions: 'setFormErrors',
+                  target: 'Pending',
+                },
+              },
+            },
+            Pending: {
+              tags: ['state:pending'],
+              on: {
+                RETRY: 'Preparing',
+                SUBMIT: {
+                  target: 'Attempting',
+                  reenter: true,
+                },
+              },
+              initial: 'NotResendable',
+              states: {
+                Resendable: {
+                  description: 'Waiting for user to retry',
+                },
+                NotResendable: {
+                  description: 'Handle countdowns',
+                  on: {
+                    RETRY: {
+                      actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                    },
+                  },
+                  after: {
+                    resendableTimeout: [
+                      {
+                        description: 'Set as retriable if countdown is 0',
+                        guard: 'isResendable',
+                        actions: 'resendableTick',
+                        target: 'Resendable',
+                      },
+                      {
+                        description: 'Continue countdown if not retriable',
+                        actions: 'resendableTick',
+                        target: 'NotResendable',
+                        reenter: true,
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            Attempting: {
+              tags: ['state:attempting', 'state:loading'],
+              entry: {
+                type: 'loadingBegin',
+                params: {
+                  step: 'verifications',
+                },
+              },
+              exit: 'loadingEnd',
+              invoke: {
+                id: 'attemptPhoneNumberVerification',
+                src: 'verificationAttempt',
+                input: ({ context }) => ({
+                  clerk: context.clerk,
+                  params: {
+                    strategy: 'phone_code',
+                    code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
+                  },
+                }),
+                onDone: {
+                  actions: 'goToNextStep',
+                },
+                onError: {
+                  actions: 'setFormErrors',
+                  target: 'Pending',
+                },
+              },
+            },
+          },
+        },
       },
     },
     Callback: {

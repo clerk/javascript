@@ -2,7 +2,9 @@ import { Slot } from '@radix-ui/react-slot';
 import { useSelector } from '@xstate/react';
 import * as React from 'react';
 
-import { SignUpVerificationCtx } from '../verifications';
+import { useActiveTags } from '~/react/hooks';
+
+import { SignUpRouterCtx } from '../context';
 
 export type SignUpResendElement = React.ElementRef<'button'>;
 export type SignUpResendFallbackProps = {
@@ -33,9 +35,10 @@ const SIGN_UP_RESEND_NAME = 'SignUpResend';
  */
 export const SignUpResend = React.forwardRef<SignUpResendElement, SignUpResendProps>(
   ({ asChild, fallback, ...rest }, forwardedRef) => {
-    const ref = SignUpVerificationCtx.useActorRef(true);
+    const ref = SignUpRouterCtx.useActorRef();
+    const activeState = useActiveTags(ref, 'step:verification');
 
-    if (!ref) {
+    if (!activeState) {
       throw new Error('The resend action must be used within <SignUp.Step name="verifications">.');
     }
 
