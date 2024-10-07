@@ -188,6 +188,8 @@ type WithProtectComponentReactParams =
 
 type ProtectComponentParams = {
   fallback?: React.ComponentType;
+  __internalModalComponent?: React.ComponentType;
+  __internalTriggerComponent?: React.ComponentType;
 };
 
 type ComponentParam<Props, AuthObject> = React.ComponentType<
@@ -206,7 +208,8 @@ type CustomAuthObject<T extends WithProtectComponentReactParams> =
     : NonNullableRecord<MyAuth, 'userId'>;
 
 export function __experimental_protectComponent(params?: ProtectComponentParams) {
-  const configs: ReactProtectConfiguration[] = params ? [params] : [];
+  const { __internalModalComponent, __internalTriggerComponent, ...restParams } = params || {};
+  const configs: ReactProtectConfiguration[] = restParams ? [restParams] : [];
 
   const withNext = <T extends WithProtectComponentReactParams>(nextParams: T) => {
     configs.push(nextParams);
@@ -221,6 +224,9 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
           const Fallback = failedItem.fallback;
 
           if (Fallback === 'modal') {
+            if (__internalModalComponent) {
+              return <__internalModalComponent />;
+            }
             return <UserVerificationModal />;
           }
 
@@ -248,7 +254,7 @@ export function __experimental_protectComponent(params?: ProtectComponentParams)
                 // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
                 ...props
               }
-              UserVerificationTrigger={UserVerificationTrigger}
+              UserVerificationTrigger={__internalTriggerComponent || UserVerificationTrigger}
             />
           );
         }
