@@ -189,6 +189,70 @@ describe('InviteMembersPage', () => {
       await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
       await waitFor(() => expect(getByRole('button', { name: /select role/i })).toBeInTheDocument());
     });
+
+    it('enables send button with default role once email address has been entered', async () => {
+      const defaultRole = 'mydefaultrole';
+
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, defaultRole);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        total_count: 3,
+        data: [
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'member',
+            key: 'member',
+            name: 'member',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: 'admin',
+            key: 'admin',
+            name: 'Admin',
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            pathRoot: '',
+            reload: jest.fn(),
+            id: defaultRole,
+            key: defaultRole,
+            name: defaultRole,
+            description: '',
+            permissions: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      });
+
+      const { getByRole, userEvent, getByTestId } = render(
+        <Action.Root>
+          <InviteMembersScreen />
+        </Action.Root>,
+        { wrapper },
+      );
+
+      expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
+      await userEvent.type(getByTestId('tag-input'), 'test+1@clerk.com,');
+      expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
+      await userEvent.click(getByRole('button', { name: /mydefaultrole/i }));
+    });
   });
 
   describe('when submitting', () => {

@@ -4,6 +4,7 @@ import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import { useAssurance } from '../../hooks/useAssurance';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { handleError, useFormControl } from '../../utils';
 
@@ -16,6 +17,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
   const { setActive } = useClerk();
+  const { handleAssurance } = useAssurance();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -38,8 +40,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
         throw Error('user is not defined');
       }
 
-      await user.delete();
-      // TODO: Investigate if we need to call `setActive` with {session: null}
+      await handleAssurance(user.delete);
       const navigationCallback =
         otherSessions.length === 0 ? navigateAfterSignOut : navigateAfterMultiSessionSingleSignOutUrl;
       return await setActive({

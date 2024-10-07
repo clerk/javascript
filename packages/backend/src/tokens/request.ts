@@ -27,6 +27,7 @@ export const RefreshTokenErrorReason = {
   MissingSessionToken: 'missing-session-token',
   MissingRefreshToken: 'missing-refresh-token',
   ExpiredSessionTokenDecodeFailed: 'expired-session-token-decode-failed',
+  ExpiredSessionTokenMissingSidClaim: 'expired-session-token-missing-sid-claim',
   FetchError: 'fetch-error',
   UnexpectedSDKError: 'unexpected-sdk-error',
 } as const;
@@ -252,6 +253,16 @@ ${error.getFullMessage()}`,
         error: {
           message: 'Unable to decode the expired session token.',
           cause: { reason: RefreshTokenErrorReason.ExpiredSessionTokenDecodeFailed, errors: decodedErrors },
+        },
+      };
+    }
+
+    if (!decodeResult?.payload?.sid) {
+      return {
+        data: null,
+        error: {
+          message: 'Expired session token is missing the `sid` claim.',
+          cause: { reason: RefreshTokenErrorReason.ExpiredSessionTokenMissingSidClaim },
         },
       };
     }

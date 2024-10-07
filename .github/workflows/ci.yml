@@ -36,6 +36,7 @@ jobs:
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
+          node-version: 20
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
@@ -65,11 +66,7 @@ jobs:
         run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --filter=!@clerk/astro --only
-
-      - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --filter=@clerk/astro --continue --only
-        continue-on-error: true # TODO: Remove this when all related errors are fixed
+        run: npx turbo lint:attw $TURBO_ARGS --only
 
       - name: Run lint
         run: npx turbo lint $TURBO_ARGS --only -- --quiet

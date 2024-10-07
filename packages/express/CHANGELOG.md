@@ -1,5 +1,38 @@
 # Change Log
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`fb932e5cf`](https://github.com/clerk/javascript/commit/fb932e5cf21315adf60bee0855b6bd5ee2ff9867)]:
+  - @clerk/shared@2.9.0
+  - @clerk/types@4.25.0
+  - @clerk/backend@1.13.8
+
+## 1.2.0
+
+### Minor Changes
+
+- Enable handshake flow by default ([#4248](https://github.com/clerk/javascript/pull/4248)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`f6fb8b53d`](https://github.com/clerk/javascript/commit/f6fb8b53d236863ad7eca576ee7a16cd33f3506b), [`4a8570590`](https://github.com/clerk/javascript/commit/4a857059059a02bb4f20893e08601e1e67babbed)]:
+  - @clerk/types@4.24.0
+  - @clerk/backend@1.13.7
+  - @clerk/shared@2.8.5
+
+## 1.1.0
+
+### Minor Changes
+
+- Make the `requireAuth` middleware redirect to sign-in URL instead of forwarding errors, and remove custom handler option from `clerkMiddleware`. ([#4234](https://github.com/clerk/javascript/pull/4234)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`3e9160072`](https://github.com/clerk/javascript/commit/3e9160072aea72455a3db9cc710680a0a5359c55), [`748c0bae4`](https://github.com/clerk/javascript/commit/748c0bae4cfa1c2a721267fc9de7c6458200beb4), [`b579c3685`](https://github.com/clerk/javascript/commit/b579c36850126d994a96affa89bb1abc618ec38e)]:
+  - @clerk/backend@1.13.6
+
 ## 1.0.2
 
 ### Patch Changes

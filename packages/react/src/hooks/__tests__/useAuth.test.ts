@@ -11,6 +11,12 @@ describe('useAuth type tests', () => {
       expectTypeOf({} as const).toMatchTypeOf<ParamsOfHas>();
     });
 
+    it('has({randomKey}) is not allowed', () => {
+      expectTypeOf({
+        randomKey: '',
+      }).not.toMatchTypeOf<ParamsOfHas>();
+    });
+
     it('has({role: string}) is allowed', () => {
       expectTypeOf({ role: 'org:admin' }).toMatchTypeOf<ParamsOfHas>();
     });
@@ -22,64 +28,85 @@ describe('useAuth type tests', () => {
     it('has with role and assurance is allowed', () => {
       expectTypeOf({
         role: 'org:admin',
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('has with permission and assurance is allowed', () => {
+    it('has with permission and reverification is allowed', () => {
       expectTypeOf({
         permission: 'org:edit:posts',
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('has({assurance: {level, maxAge}}) is allowed', () => {
+    it('has({reverification: {level, maxAge}}) is allowed', () => {
       expectTypeOf({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'A1.10min',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('assurance with other strings as maxAge should throw', () => {
+    it('reverification with other values as maxAge should throw', () => {
       expectTypeOf({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 'some-value',
+        __experimental_reverification: {
+          level: 'firstFactor',
+          afterMinutes: '10',
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('assurance with number as maxAge should throw', () => {
+    it('veryStrict reverification is allowed', () => {
       expectTypeOf({
-        __experimental_assurance: {
-          level: 'L1.firstFactor',
-          maxAge: 1000,
-        },
+        __experimental_reverification: 'veryStrict',
+      } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('strict reverification is allowed', () => {
+      expectTypeOf({
+        __experimental_reverification: 'strict',
+      } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('moderate reverification is allowed', () => {
+      expectTypeOf({
+        __experimental_reverification: 'moderate',
+      } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('lax reverification is allowed', () => {
+      expectTypeOf({
+        __experimental_reverification: 'lax',
+      } as const).toMatchTypeOf<ParamsOfHas>();
+    });
+
+    it('random reverification is not allowed', () => {
+      expectTypeOf({
+        __experimental_reverification: 'random',
       } as const).not.toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('assurance with other strings as level should throw', () => {
+    it('reverification with other strings as level should throw', () => {
       expectTypeOf({
-        __experimental_assurance: {
+        __experimental_reverification: {
           level: 'some-factor',
-          maxAge: 'A1.10min',
+          afterMinutes: 10,
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('assurance with number as level should throw', () => {
+    it('reverification with number as level should throw', () => {
       expectTypeOf({
-        __experimental_assurance: {
+        __experimental_reverification: {
           level: 2,
-          maxAge: 'A1.10min',
+          afterMinutes: 10,
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
     });
