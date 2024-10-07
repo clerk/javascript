@@ -5,9 +5,3 @@ exports[`/client public exports > should not include a breaking change 1`] = `
   "ClerkProvider": [Function],
 }
 `;
-
-exports[`/client public exports should not include a breaking change 1`] = `
-{
-  "ClerkProvider": [Function],
-}
-`;
