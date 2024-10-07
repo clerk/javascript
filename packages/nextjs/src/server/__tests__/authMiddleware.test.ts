@@ -4,27 +4,32 @@ import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const authenticateRequestMock = jest.fn().mockResolvedValue({
+const authenticateRequestMock = vi.fn().mockResolvedValue({
   toAuth: () => ({}),
   headers: new Headers(),
 });
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('../constants', () => {
+vi.mock(import('../constants'), async importOriginal => {
+  const actual = await importOriginal();
   return {
+    ...actual,
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
   };
 });
 
-jest.mock('../clerkClient', () => {
+vi.mock('../clerkClient', () => {
   return {
     clerkClient: {
-      authenticateRequest: authenticateRequestMock,
-      telemetry: { record: jest.fn() },
+      authenticateRequest: vi.fn().mockResolvedValue({
+        toAuth: () => ({}),
+        headers: new Headers(),
+      }),
+      telemetry: { record: vi.fn() },
     },
   };
 });
@@ -40,9 +45,9 @@ import { createRouteMatcher } from '../routeMatcher';
  * Disable console warnings about config matchers
  */
 const consoleWarn = console.warn;
-global.console.warn = jest.fn();
+global.console.warn = vi.fn();
 beforeAll(() => {
-  global.console.warn = jest.fn();
+  global.console.warn = vi.fn();
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
@@ -220,8 +225,8 @@ describe('authMiddleware(params)', () => {
 
   describe('with ignoredRoutes', function () {
     it('skips auth middleware execution', async () => {
-      const beforeAuthSpy = jest.fn();
-      const afterAuthSpy = jest.fn();
+      const beforeAuthSpy = vi.fn();
+      const afterAuthSpy = vi.fn();
       const resp = await authMiddleware({
         ignoredRoutes: '/ignored',
         beforeAuth: beforeAuthSpy,
@@ -235,8 +240,8 @@ describe('authMiddleware(params)', () => {
     });
 
     it('executes auth middleware execution when is not matched', async () => {
-      const beforeAuthSpy = jest.fn();
-      const afterAuthSpy = jest.fn();
+      const beforeAuthSpy = vi.fn();
+      const afterAuthSpy = vi.fn();
       const resp = await authMiddleware({
         ignoredRoutes: '/ignored',
         beforeAuth: beforeAuthSpy,
@@ -303,7 +308,7 @@ describe('authMiddleware(params)', () => {
 
   describe('with beforeAuth', function () {
     it('skips auth middleware execution when beforeAuth returns false', async () => {
-      const afterAuthSpy = jest.fn();
+      const afterAuthSpy = vi.fn(() => null);
       const resp = await authMiddleware({
         beforeAuth: () => false,
         afterAuth: afterAuthSpy,
@@ -316,7 +321,7 @@ describe('authMiddleware(params)', () => {
     });
 
     it('executes auth middleware execution when beforeAuth returns undefined', async () => {
-      const afterAuthSpy = jest.fn();
+      const afterAuthSpy = vi.fn();
       const resp = await authMiddleware({
         beforeAuth: () => undefined,
         afterAuth: afterAuthSpy,
@@ -328,7 +333,7 @@ describe('authMiddleware(params)', () => {
     });
 
     it('skips auth middleware execution when beforeAuth returns NextResponse.redirect', async () => {
-      const afterAuthSpy = jest.fn();
+      const afterAuthSpy = vi.fn(() => null);
       const resp = await authMiddleware({
         beforeAuth: () => NextResponse.redirect('https://www.clerk.com/custom-redirect'),
         afterAuth: afterAuthSpy,
@@ -380,7 +385,7 @@ describe('authMiddleware(params)', () => {
       const req = mockRequest({ url: '/protected' });
       const event = {} as NextFetchEvent;
       authenticateRequestMock.mockResolvedValueOnce({ toAuth: () => ({ userId: null }), headers: new Headers() });
-      const afterAuthSpy = jest.fn();
+      const afterAuthSpy = vi.fn();
 
       await authMiddleware({ afterAuth: afterAuthSpy })(req, event);
 

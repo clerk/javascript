@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 import { clerkClient } from '../clerkClient';
 
@@ -8,8 +8,8 @@ describe('clerkClient', () => {
   it('should pass version package to userAgent', async () => {
     await clerkClient().users.getUser('user_test');
 
-    expect(global.fetch).toBeCalled();
-    expect((global.fetch as any).mock.calls[0][1].headers).toMatchObject({
+    expect(globalThis.fetch).toBeCalled();
+    expect((globalThis.fetch as any).mock.calls[0][1].headers).toMatchObject({
       Authorization: 'Bearer TEST_SECRET_KEY',
       'Content-Type': 'application/json',
       'User-Agent': '@clerk/nextjs@0.0.0-test',

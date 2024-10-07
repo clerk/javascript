@@ -18,7 +18,7 @@ vi.mock('../clerkClient', () => {
   return {
     clerkClient: () => ({
       authenticateRequest: authenticateRequestMock,
-      telemetry: { record: jest.fn() },
+      telemetry: { record: vi.fn() },
     }),
   };
 });
@@ -48,11 +48,13 @@ afterAll(() => {
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-vi.mock('../constants', () => {
+vi.mock(import('../constants.js'), async importOriginal => {
+  const actual = await importOriginal();
   return {
+    ...actual,
+    ENCRYPTION_KEY: 'encryption-key',
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-    ENCRYPTION_KEY: 'encryption-key',
   };
 });
 
@@ -584,7 +586,7 @@ describe('clerkMiddleware(params)', () => {
 
   describe('debug', () => {
     beforeEach(() => {
-      (global.console.log as jest.Mock).mockClear();
+      global.console.log.mockClear();
     });
 
     it('outputs debug logs when used with only params', async () => {
