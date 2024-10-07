@@ -272,6 +272,7 @@ const prodConfig = ({ mode }) => {
     output: {
       filename: '[name].mjs',
       libraryTarget: 'module',
+      publicPath: '',
     },
     plugins: [
       // Include the lazy chunks in the bundle as well
@@ -283,13 +284,20 @@ const prodConfig = ({ mode }) => {
     ],
   });
 
-  const clerkCjs = merge(clerkEsm, {
+  const clerkCjs = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), {
     output: {
       filename: '[name].js',
       libraryTarget: 'commonjs',
-      chunkFormat: 'commonjs',
-      scriptType: 'text/javascript',
+      publicPath: '',
     },
+    plugins: [
+      // Include the lazy chunks in the bundle as well
+      // so that the final bundle can be imported and bundled again
+      // by a different bundler, eg the webpack instance used by react-scripts
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
   });
 
   return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
