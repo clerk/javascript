@@ -193,7 +193,7 @@ const commonForProd = () => {
       globalObject: 'globalThis',
     },
     optimization: {
-      minimize: true,
+      minimize: false,
       minimizer: [
         compiler => {
           new TerserPlugin({
@@ -288,6 +288,7 @@ const prodConfig = ({ mode }) => {
       filename: '[name].js',
       libraryTarget: 'commonjs',
       chunkFormat: 'commonjs',
+      scriptType: 'text/javascript',
     },
   });
 
