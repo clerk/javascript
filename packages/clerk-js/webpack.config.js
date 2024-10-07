@@ -193,7 +193,7 @@ const commonForProd = () => {
       globalObject: 'globalThis',
     },
     optimization: {
-      minimize: false,
+      minimize: true,
       minimizer: [
         compiler => {
           new TerserPlugin({
