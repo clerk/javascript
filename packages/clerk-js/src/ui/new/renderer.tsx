@@ -42,11 +42,17 @@ export function init({ wrapper }: { wrapper: ElementType }) {
     rootElement.setAttribute('id', 'clerk-components');
     document.body.appendChild(rootElement);
 
-    const stylesheet = document.createElement('link');
-    stylesheet.href = stylesheetURL;
-    stylesheet.rel = 'stylesheet';
-    // Add as first stylesheet so that application styles take precedence over our styles.
-    document.head.prepend(stylesheet);
+    // Just for completeness, we check to see if we've already added the stylesheet to the DOM.
+    const STYLESHEET_SIGIL = 'data-clerk-styles';
+    const existingStylesheet = document.querySelector(`link[${STYLESHEET_SIGIL}]`);
+    if (!existingStylesheet) {
+      const stylesheet = document.createElement('link');
+      stylesheet.href = stylesheetURL;
+      stylesheet.rel = 'stylesheet';
+      stylesheet.setAttribute(STYLESHEET_SIGIL, '');
+      // Add as first stylesheet so that application styles take precedence over our styles.
+      document.head.prepend(stylesheet);
+    }
   }
 
   const root = createRoot(rootElement);
