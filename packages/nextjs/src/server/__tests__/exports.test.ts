@@ -1,4 +1,4 @@
-jest.mock('server-only', () => null);
+import { describe, expect, it } from 'vitest';
 
 import * as publicExports from '../index';
 

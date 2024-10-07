@@ -4,6 +4,7 @@ import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { describe, expect, it } from 'vitest';
 
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),

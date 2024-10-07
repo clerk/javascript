@@ -1,4 +1,6 @@
-global.fetch = jest.fn(() => Promise.resolve(new Response(null)));
+import { describe, expect, it, vi } from 'vitest';
+
+global.fetch = vi.fn();
 
 import { clerkClient } from '../clerkClient';
 
