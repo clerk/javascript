@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.26.2
+
+### Patch Changes
+
+- Handle gracefully Coinbase Wallet use of existing Passkey ([#4302](https://github.com/clerk/javascript/pull/4302)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updates webpack to address CVE-2024-43788. ([#4287](https://github.com/clerk/javascript/pull/4287)) by [@dependabot](https://github.com/apps/dependabot)
+
+- Updated dependencies [[`e29a8061d`](https://github.com/clerk/javascript/commit/e29a8061d4106b9192837056e5f505c05f3c3a64), [`00a9ddb5b`](https://github.com/clerk/javascript/commit/00a9ddb5bd566fea7f22182047ae2c02e28e2ddc)]:
+  - @clerk/localizations@3.2.0
+
 ## 5.26.1
 
 ### Patch Changes
