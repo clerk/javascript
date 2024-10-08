@@ -17,7 +17,6 @@ const plugin: FastifyPluginCallback<ClerkFastifyOptions> = (
     throw new Error(`Unsupported hookName: ${hookName}`);
   }
 
-  // @ts-expect-error unions don't play well with TS overload signatures
   instance.addHook(hookName, withClerkMiddleware(opts));
 
   done();
@@ -25,5 +24,5 @@ const plugin: FastifyPluginCallback<ClerkFastifyOptions> = (
 
 export const clerkPlugin = fp(plugin, {
   name: '@clerk/fastify',
-  fastify: '4.x',
+  fastify: '5.x',
 });

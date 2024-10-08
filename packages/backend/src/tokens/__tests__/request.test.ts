@@ -13,8 +13,14 @@ import {
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest, RefreshTokenErrorReason } from '../request';
-import type { AuthenticateRequestOptions } from '../types';
+import {
+  authenticateRequest,
+  computeOrganizationSyncTargetMatchers,
+  getOrganizationSyncTarget,
+  type OrganizationSyncTarget,
+  RefreshTokenErrorReason,
+} from '../request';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -164,6 +170,182 @@ export default (QUnit: QUnit) => {
 
     return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
   };
+
+  // Tests both getOrganizationSyncTarget and the organizationSyncOptions usage patterns
+  // that are recommended for typical use.
+  module('tokens.getOrganizationSyncTarget(url,options)', _ => {
+    type testCase = {
+      name: string;
+      // When the customer app specifies these orgSyncOptions to middleware...
+      whenOrgSyncOptions: OrganizationSyncOptions | undefined;
+      // And the path arrives at this URL path...
+      whenAppRequestPath: string;
+      // A handshake should (or should not) occur:
+      thenExpectActivationEntity: OrganizationSyncTarget | null;
+    };
+
+    const testCases: testCase[] = [
+      {
+        name: 'none activates nothing',
+        whenOrgSyncOptions: undefined,
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: null,
+      },
+      {
+        name: 'Can activate an org by ID (basic)',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id'],
+        },
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'mimatch activates nothing',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id'],
+        },
+        whenAppRequestPath: '/personal-account/my-resource',
+        thenExpectActivationEntity: null,
+      },
+      {
+        name: 'Can activate an org by ID (recommended matchers)',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with a trailing slash',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with a trailing path component',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/nested-resource',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with many trailing path component',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/nested-resource/and/more/deeply/nested/resources',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with an unrelated path token in the prefix',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/unknown-thing/:any/orgs/:id'],
+        },
+        whenAppRequestPath: '/unknown-thing/thing/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by slug',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:slug'],
+        },
+        whenAppRequestPath: '/orgs/my-org',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationSlug: 'my-org',
+        },
+      },
+      {
+        name: 'Can activate the personal account',
+        whenOrgSyncOptions: {
+          personalAccountPatterns: ['/personal-account'],
+        },
+        whenAppRequestPath: '/personal-account',
+        thenExpectActivationEntity: {
+          type: 'personalAccount',
+        },
+      },
+      {
+        name: 'ID match precedes slug match',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:slug'], // bad practice
+        },
+        whenAppRequestPath: '/orgs/my-org',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'my-org',
+        },
+      },
+      {
+        name: 'personal account match precedes org match',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/personal-account'], // bad practice
+          personalAccountPatterns: ['/personal-account'],
+        },
+        whenAppRequestPath: '/personal-account',
+        thenExpectActivationEntity: {
+          type: 'personalAccount',
+        },
+      },
+      {
+        name: 'personal account may contain path tokens',
+        whenOrgSyncOptions: {
+          personalAccountPatterns: ['/user/:any', '/user/:any/(.*)'],
+        },
+        whenAppRequestPath: '/user/123/home',
+        thenExpectActivationEntity: {
+          type: 'personalAccount',
+        },
+      },
+      {
+        name: 'All of the config at once',
+        whenOrgSyncOptions: {
+          organizationPatterns: [
+            '/orgs-by-id/:id',
+            '/orgs-by-id/:id/(.*)',
+            '/orgs-by-slug/:slug',
+            '/orgs-by-slug/:slug/(.*)',
+          ],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        whenAppRequestPath: '/orgs-by-slug/org_bar/sub-resource',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationSlug: 'org_bar',
+        },
+      },
+    ];
+
+    testCases.forEach(testCase => {
+      test(testCase.name, assert => {
+        const path = new URL(`http://localhost:3000${testCase.whenAppRequestPath}`);
+        const matchers = computeOrganizationSyncTargetMatchers(testCase.whenOrgSyncOptions);
+        const toActivate = getOrganizationSyncTarget(path, testCase.whenOrgSyncOptions, matchers);
+        assert.deepEqual(toActivate, testCase.thenExpectActivationEntity);
+      });
+    });
+  });
 
   module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;
