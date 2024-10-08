@@ -60,7 +60,7 @@ type CustomAuthObject<T extends WithProtectActionParams> =
         role: any;
       }
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-    : NonNullableRecord<MyAuth, 'userId'>;
+    : NonNullableRecord<MyAuth, 'userId' | 'sessionId'>;
 
 // function __experimental_protectAction() {
 //   // We will accumulate permissions here
@@ -155,7 +155,7 @@ type HasReverification<T> = T extends { reverification: any } ? true : false;
 
 // Chainable type that keeps track of whether reverification has been set
 // @ts-ignore
-type Chainable<T = {}> =
+type Chainable<T = object> =
   HasReverification<T> extends true
     ? {
         // @ts-ignore
@@ -180,18 +180,9 @@ type Chainable<T = {}> =
                     | ReturnType<typeof reverificationMismatch<T['reverification']>>
                     | ReturnType<typeof roleMismatch<T['role']>>
                     | ReturnType<typeof signedOut>
-                : T extends { permission: any; role: any }
-                  ?
-                      | ReturnType<typeof permissionMismatch<T['permission']>>
-                      | ReturnType<typeof roleMismatch<T['role']>>
-                      | ReturnType<typeof signedOut>
-                  : T extends { permission: any }
-                    ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
-                    : T extends { role: any }
-                      ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
-                      : T extends { reverification: any }
-                        ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
-                        : ReturnType<typeof signedOut>);
+                : T extends { reverification: any }
+                  ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
+                  : ReturnType<typeof signedOut>);
       }
     : {
         with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
@@ -201,34 +192,16 @@ type Chainable<T = {}> =
         ): (
           ...args: InferParametersFromSecond<H>
         ) => InferReturnType<H> &
-          (T extends { reverification: any; permission: any; role: any }
+          (T extends { permission: any; role: any }
             ?
-                | ReturnType<typeof reverificationMismatch<T['reverification']>>
                 | ReturnType<typeof permissionMismatch<T['permission']>>
                 | ReturnType<typeof roleMismatch<T['role']>>
                 | ReturnType<typeof signedOut>
-            : T extends { reverification: any; permission: any }
-              ?
-                  | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                  | ReturnType<typeof permissionMismatch<T['permission']>>
-                  | ReturnType<typeof signedOut>
-              : T extends { reverification: any; role: any }
-                ?
-                    | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                    | ReturnType<typeof roleMismatch<T['role']>>
-                    | ReturnType<typeof signedOut>
-                : T extends { permission: any; role: any }
-                  ?
-                      | ReturnType<typeof permissionMismatch<T['permission']>>
-                      | ReturnType<typeof roleMismatch<T['role']>>
-                      | ReturnType<typeof signedOut>
-                  : T extends { permission: any }
-                    ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
-                    : T extends { role: any }
-                      ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
-                      : T extends { reverification: any }
-                        ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
-                        : ReturnType<typeof signedOut>);
+            : T extends { permission: any }
+              ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
+              : T extends { role: any }
+                ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
+                : ReturnType<typeof signedOut>);
       };
 
 // type ChainableCreator<T extends {} = {}> = (p: T) => Chainable<T>;
@@ -250,7 +223,7 @@ type Chainable<T = {}> =
 
 function __experimental_protectAction() {
   const configs: __internal_ProtectConfiguration[] = [{}];
-  const createBuilder = <A extends {}>(config: A): Chainable => {
+  const createBuilder = <A extends object>(config: A): Chainable => {
     // We will accumulate permissions here
     return {
       // @ts-expect-error
