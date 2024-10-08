@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Add be-BY translation ([#4280](https://github.com/clerk/javascript/pull/4280)) by [@NikitaRadzkov](https://github.com/NikitaRadzkov)
+
+### Patch Changes
+
+- Update `de-DE` translation to be GDPR-compliant ([#4195](https://github.com/clerk/javascript/pull/4195)) by [@serbanradulescu](https://github.com/serbanradulescu)
+
 ## 3.1.2
 
 ### Patch Changes
