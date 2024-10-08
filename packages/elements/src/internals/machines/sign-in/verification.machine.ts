@@ -14,7 +14,7 @@ import type {
   Web3Attempt,
 } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
-import { assign, fromPromise, log, not, sendTo, setup } from 'xstate';
+import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import {
   MAGIC_LINK_VERIFY_PATH_ROUTE,
@@ -270,7 +270,6 @@ const SignInVerificationMachine = setup({
       description: 'Waiting for user input',
       on: {
         'AUTHENTICATE.PASSKEY': {
-          guard: not('isExampleMode'),
           target: 'AttemptingPasskey',
           reenter: true,
         },
@@ -411,8 +410,8 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       // prepareFirstFactor, we need to assert that the input is a PrepareFirstFactor. For some reason, ESLint thinks
       // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
       // rule for the line.
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const { params, parent, resendable } = input as PrepareFirstFactorInput;
+
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
@@ -515,7 +514,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input as PrepareSecondFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
