@@ -168,23 +168,21 @@ function _SignUpContinue() {
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
   const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
+  const headerTitle = !onlyLegalConsentMissing
+    ? localizationKeys('signUp.continue.title')
+    : localizationKeys('signUp.legalConsent.continue.title');
+
+  const headerSubtitle = !onlyLegalConsentMissing
+    ? localizationKeys('signUp.continue.subtitle')
+    : localizationKeys('signUp.legalConsent.continue.subtitle');
+
   return (
     <Flow.Part part='complete'>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title
-              localizationKey={
-                !onlyLegalConsentMissing ? localizationKeys('signUp.continue.title') : 'Legal requirements'
-              }
-            />
-            <Header.Subtitle
-              localizationKey={
-                !onlyLegalConsentMissing
-                  ? localizationKeys('signUp.continue.subtitle')
-                  : 'Please accept legal requirements to continue'
-              }
-            />
+            <Header.Title localizationKey={headerTitle} />
+            <Header.Subtitle localizationKey={headerSubtitle} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex
