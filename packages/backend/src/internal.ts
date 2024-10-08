@@ -7,7 +7,7 @@ export { createAuthenticateRequest } from './tokens/factory';
 
 export { debugRequestState } from './tokens/request';
 
-export type { AuthenticateRequestOptions } from './tokens/types';
+export type { AuthenticateRequestOptions, OrganizationSyncOptions } from './tokens/types';
 
 export type { SignedInAuthObjectOptions, SignedInAuthObject, SignedOutAuthObject } from './tokens/authObjects';
 export { makeAuthObjectSerializable, signedOutAuthObject, signedInAuthObject } from './tokens/authObjects';

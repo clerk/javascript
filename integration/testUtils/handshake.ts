@@ -104,7 +104,13 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     exp: number;
     nbf: number;
   };
-  const generateToken = ({ state }: { state: 'active' | 'expired' | 'early' }) => {
+  const generateToken = ({
+    state,
+    extraClaims,
+  }: {
+    state: 'active' | 'expired' | 'early';
+    extraClaims?: Map<string, any>;
+  }) => {
     const claims = { sub: 'user_12345' } as Claims;
 
     const now = Math.floor(Date.now() / 1000);
@@ -121,6 +127,14 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
       claims.nbf = now - 10 + 600;
       claims.exp = now + 60 + 600;
     }
+
+    // Merge claims with extraClaims
+    if (extraClaims) {
+      for (const [key, value] of extraClaims) {
+        claims[key] = value;
+      }
+    }
+
     return {
       token: jwt.sign(claims, rsa.private, {
         algorithm: 'RS256',
