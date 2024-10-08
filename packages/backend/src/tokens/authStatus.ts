@@ -69,6 +69,7 @@ export const AuthErrorReason = {
   SessionTokenNBF: 'session-token-nbf',
   SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
+  ActiveOrganizationMismatch: 'active-organization-mismatch',
   UnexpectedError: 'unexpected-error',
 } as const;
 

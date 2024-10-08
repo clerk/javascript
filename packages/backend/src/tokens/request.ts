@@ -1,3 +1,5 @@
+import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
+import { match } from '@clerk/shared/pathToRegexp';
 import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
@@ -8,12 +10,13 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
+import type { SignedInAuthObject } from './authObjects';
 import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
 import { verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -101,6 +104,9 @@ export async function authenticateRequest(
     assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
+  // NOTE(izaak): compute regex matchers early for efficiency - they can be used multiple times.
+  const organizationSyncTargetMatchers = computeOrganizationSyncTargetMatchers(options.organizationSyncOptions);
+
   function removeDevBrowserFromURL(url: URL) {
     const updatedURL = new URL(url);
 
@@ -122,6 +128,19 @@ export async function authenticateRequest(
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
+    }
+
+    const toActivate = getOrganizationSyncTarget(
+      authenticateContext.clerkUrl,
+      options.organizationSyncOptions,
+      organizationSyncTargetMatchers,
+    );
+    if (toActivate) {
+      const params = getOrganizationSyncQueryParams(toActivate);
+
+      params.forEach((value, key) => {
+        url.searchParams.append(key, value);
+      });
     }
 
     return new Headers({ [constants.Headers.Location]: url.href });
@@ -340,6 +359,67 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message);
   }
 
+  /**
+   * Determines if a handshake must occur to resolve a mismatch between the organization as specified
+   * by the URL (according to the options) and the actual active organization on the session.
+   *
+   * @returns {HandshakeState | SignedOutState | null} - The function can return the following:
+   *   - {HandshakeState}: If a handshake is needed to resolve the mismatched organization.
+   *   - {SignedOutState}: If a handshake is required but cannot be performed.
+   *   - {null}:           If no action is required.
+   */
+  function handleMaybeOrganizationSyncHandshake(
+    authenticateContext: AuthenticateContext,
+    auth: SignedInAuthObject,
+  ): HandshakeState | SignedOutState | null {
+    const organizationSyncTarget = getOrganizationSyncTarget(
+      authenticateContext.clerkUrl,
+      options.organizationSyncOptions,
+      organizationSyncTargetMatchers,
+    );
+    if (!organizationSyncTarget) {
+      return null;
+    }
+    let mustActivate = false;
+    if (organizationSyncTarget.type === 'organization') {
+      // Activate an org by slug?
+      if (organizationSyncTarget.organizationSlug && organizationSyncTarget.organizationSlug !== auth.orgSlug) {
+        mustActivate = true;
+      }
+      // Activate an org by ID?
+      if (organizationSyncTarget.organizationId && organizationSyncTarget.organizationId !== auth.orgId) {
+        mustActivate = true;
+      }
+    }
+    // Activate the personal account?
+    if (organizationSyncTarget.type === 'personalAccount' && auth.orgId) {
+      mustActivate = true;
+    }
+    if (!mustActivate) {
+      return null;
+    }
+    if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+      // We have an organization that needs to be activated, but this isn't our first time redirecting.
+      // This is because we attempted to activate the organization previously, but the organization
+      // must not have been valid (either not found, or not valid for this user), and gave us back
+      // a null organization. We won't re-try the handshake, and leave it to the server component to handle.
+      console.warn(
+        'Clerk: Organization activation handshake loop detected. This is likely due to an invalid organization ID or slug. Skipping organization activation.',
+      );
+      return null;
+    }
+    const handshakeState = handleMaybeHandshakeStatus(
+      authenticateContext,
+      AuthErrorReason.ActiveOrganizationMismatch,
+      '',
+    );
+    if (handshakeState.status !== 'handshake') {
+      // Currently, this is only possible if we're in a redirect loop, but the above check should guard against that.
+      return null;
+    }
+    return handshakeState;
+  }
+
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
 
@@ -509,7 +589,23 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      return signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
+      const signedInRequestState = signedIn(
+        authenticateContext,
+        data,
+        undefined,
+        authenticateContext.sessionTokenInCookie!,
+      );
+
+      // Org sync if necessary
+      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
+        authenticateContext,
+        signedInRequestState.toAuth(),
+      );
+      if (handshakeRequestState) {
+        return handshakeRequestState;
+      }
+
+      return signedInRequestState;
     } catch (err) {
       return handleError(err, 'cookie');
     }
@@ -584,6 +680,132 @@ export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
+
+type OrganizationSyncTargetMatchers = {
+  OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+  PersonalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+};
+
+/**
+ * Computes regex-based matchers from the given organization sync options.
+ */
+export function computeOrganizationSyncTargetMatchers(
+  options: OrganizationSyncOptions | undefined,
+): OrganizationSyncTargetMatchers {
+  let personalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null = null;
+  if (options?.personalAccountPatterns) {
+    try {
+      personalAccountMatcher = match(options.personalAccountPatterns);
+    } catch (e) {
+      // Likely to be encountered during development, so throwing the error is more prudent than logging
+      throw new Error(`Invalid personal account pattern "${options.personalAccountPatterns}": "${e}"`);
+    }
+  }
+
+  let organizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null = null;
+  if (options?.organizationPatterns) {
+    try {
+      organizationMatcher = match(options.organizationPatterns);
+    } catch (e) {
+      // Likely to be encountered during development, so throwing the error is more prudent than logging
+      throw new Error(`Clerk: Invalid organization pattern "${options.organizationPatterns}": "${e}"`);
+    }
+  }
+
+  return {
+    OrganizationMatcher: organizationMatcher,
+    PersonalAccountMatcher: personalAccountMatcher,
+  };
+}
+
+/**
+ * Determines if the given URL and settings indicate a desire to activate a specific
+ * organization or personal account.
+ *
+ * @param url - The URL of the original request.
+ * @param options - The organization sync options.
+ * @param matchers - The matchers for the organization and personal account patterns, as generated by `computeOrganizationSyncTargetMatchers`.
+ */
+export function getOrganizationSyncTarget(
+  url: URL,
+  options: OrganizationSyncOptions | undefined,
+  matchers: OrganizationSyncTargetMatchers,
+): OrganizationSyncTarget | null {
+  if (!options) {
+    return null;
+  }
+
+  // Check for personal account activation
+  if (matchers.PersonalAccountMatcher) {
+    let personalResult: Match<Partial<Record<string, string | string[]>>>;
+    try {
+      personalResult = matchers.PersonalAccountMatcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
+      return null;
+    }
+
+    if (personalResult) {
+      return { type: 'personalAccount' };
+    }
+  }
+
+  // Check for organization activation
+  if (matchers.OrganizationMatcher) {
+    let orgResult: Match<Partial<Record<string, string | string[]>>>;
+    try {
+      orgResult = matchers.OrganizationMatcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Clerk: Failed to apply organization pattern "${options.organizationPatterns}" to a path`, e);
+      return null;
+    }
+
+    if (orgResult && 'params' in orgResult) {
+      const params = orgResult.params;
+
+      if ('id' in params && typeof params.id === 'string') {
+        return { type: 'organization', organizationId: params.id };
+      }
+      if ('slug' in params && typeof params.slug === 'string') {
+        return { type: 'organization', organizationSlug: params.slug };
+      }
+      console.warn(
+        'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
+      );
+    }
+  }
+  return null;
+}
+
+/**
+ * Represents an organization or a personal account - e.g. an
+ * entity that can be activated by the handshake API.
+ */
+export type OrganizationSyncTarget =
+  | { type: 'personalAccount' }
+  | { type: 'organization'; organizationId?: string; organizationSlug?: string };
+
+/**
+ * Generates the query parameters to activate an organization or personal account
+ * via the FAPI handshake api.
+ */
+function getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
+  const ret = new Map();
+  if (toActivate.type === 'personalAccount') {
+    ret.set('organization_id', '');
+  }
+  if (toActivate.type === 'organization') {
+    if (toActivate.organizationId) {
+      ret.set('organization_id', toActivate.organizationId);
+    }
+    if (toActivate.organizationSlug) {
+      ret.set('organization_id', toActivate.organizationSlug);
+    }
+  }
+  return ret;
+}
 
 const convertTokenVerificationErrorReasonToAuthErrorReason = ({
   tokenError,
