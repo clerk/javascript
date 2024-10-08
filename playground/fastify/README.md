@@ -1,31 +1,26 @@
-## Setup development
+# playground-fastify
 
-Execute in root folder:
+Use this example app to test `@clerk/fastify`.
 
-```bash
-npm i
-npm run build && npm run yalc:all
+## Usage
+
+1. Install dependencies
+
+```shell
+npm install
 ```
 
-Execute in current folder:
+1. Use [`@clerk/dev-cli`](https://github.com/clerk/javascript/tree/main/packages/dev-cli) to build all repository packages and install the local version into this playground.
 
-```bash
-touch .env # set PUBLISHABLE_KEY and SECRET_KEY from Clerk Dashboard API keys
-npm i
-rm -rf node_modules/@clerk
-yalc add @clerk/fastify @clerk/backend @clerk/types --pure
-```
+1. Start the server:
 
-## Getting Started
-
-First, run the development server:
-
-```bash
+```shell
 npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You can visit these routes:
 
-## Reload changes from packages/\* package
-
-Apply change in packages/\* project folder and run `npm run build`. Then restart Fastify server by killing the current and executing `npm start` and the change should be visible.
+- `/`
+- `/sign-in`
+- `/me` (requires sign-in)
+- `/private` (requires sign-in)
