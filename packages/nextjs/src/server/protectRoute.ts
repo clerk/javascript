@@ -56,75 +56,88 @@ type CustomAuthObject<T extends WithProtectActionParams> =
         role: any;
       }
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-    : NonNullableRecord<MyAuth, 'userId'>;
+    : NonNullableRecord<MyAuth, 'userId' | 'sessionId'>;
+
+type Merge<T, U> = T & U extends infer O ? { [K in keyof O]: O[K] } : never;
+
+// Utility type to check if "reverification" is already set in T
+type HasReverification<T> = T extends { reverification: any } ? true : false;
+
+// Chainable type that keeps track of whether reverification has been set
+// @ts-ignore
+type Chainable<T = object> =
+  HasReverification<T> extends true
+    ? {
+        route<
+          H extends (
+            // @ts-ignore
+            _auth: CustomAuthObject<T>,
+            req: Request,
+            ...args: InferParametersFromThird<H>
+          ) => Response | Promise<Response>,
+        >(
+          handler: H,
+        ): (req: Request, ...args: InferParametersFromThird<H>) => Response | Promise<Response>;
+      }
+    : {
+        with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
+
+        route<
+          H extends (
+            // @ts-ignore
+            _auth: CustomAuthObject<T>,
+            req: Request,
+            ...args: InferParametersFromThird<H>
+          ) => Response | Promise<Response>,
+        >(
+          handler: H,
+        ): (req: Request, ...args: InferParametersFromThird<H>) => Response | Promise<Response>;
+      };
 
 function __experimental_protectRoute() {
-  // We will accumulate permissions here
   const configs: __internal_ProtectConfiguration[] = [{}];
+  const createBuilder = <A extends object>(config: A): Chainable => {
+    // We will accumulate permissions here
+    return {
+      // @ts-expect-error
+      with(p) {
+        configs.push(p);
+        return createBuilder({ ...p, ...config });
+      },
+      route(handler) {
+        return (req, ...args) => {
+          const _auth = auth();
+          const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
-  const withNext = <T extends WithProtectActionParams>(nextParams: T) => {
-    configs.push(nextParams);
+          if (failedItem?.reverification) {
+            return reverificationMismatchResponse(failedItem.reverification);
+          }
 
-    // Maybe this should return the correct types instead of hiding them
-    const route =
-      <
-        H extends (
-          _auth: CustomAuthObject<T>,
-          req: Request,
-          ...args: InferParametersFromThird<H>
-        ) => Response | Promise<Response>,
-      >(
-        handler: H,
-      ) =>
-      (req: Request, ...args: InferParametersFromThird<H>): Response | Promise<Response> => {
-        const _auth = auth();
-        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+          if (failedItem?.role) {
+            return roleMismatchResponse(failedItem.role);
+          }
 
-        if (failedItem?.reverification) {
-          return reverificationMismatchResponse(failedItem.reverification);
-        }
+          if (failedItem?.permission) {
+            return permissionMismatchResponse(failedItem.permission);
+          }
 
-        if (failedItem?.role) {
-          return roleMismatchResponse(failedItem.role);
-        }
+          if (failedItem) {
+            return signedOutResponse();
+          }
 
-        if (failedItem?.permission) {
-          return permissionMismatchResponse(failedItem.permission);
-        }
-
-        if (failedItem) {
-          return signedOutResponse();
-        }
-
-        // @ts-ignore not sure why ts complains TODO-STEP-UP
-        return handler(auth(), req, ...args);
-      };
-    return { with: withNext<WithProtectActionParams>, route };
+          return handler(
+            // @ts-expect-error Slight inconsistency in types
+            auth(),
+            req,
+            // @ts-expect-error Slight inconsistency in types
+            ...args,
+          );
+        };
+      },
+    };
   };
 
-  const route =
-    <
-      H extends (
-        _auth: NonNullableRecord<MyAuth, 'userId'>,
-        req: Request,
-        ...args: InferParametersFromThird<H>
-      ) => Response | Promise<Response>,
-    >(
-      handler: H,
-    ) =>
-    (req: Request, ...args: InferParametersFromThird<H>): Response | Promise<Response> => {
-      const _auth = auth();
-      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
-
-      if (failedItem) {
-        return signedOutResponse();
-      }
-
-      // @ts-ignore not sure why ts complains TODO-STEP-UP
-      return handler(auth(), req, ...args);
-    };
-
-  return { with: withNext, route };
+  return createBuilder({});
 }
 
 export { __experimental_protectRoute };
