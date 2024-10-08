@@ -151,6 +151,12 @@ type _LocalizationResource = {
       actionText: LocalizationValue;
       blockButton__emailSupport: LocalizationValue;
     };
+    legalConsent: {
+      continue: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+    };
   };
   signIn: {
     start: {

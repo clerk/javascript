@@ -234,6 +234,7 @@ const LegalCheckbox = (
             flexDirection: 'column',
           })}
         >
+          {/* TODO(@vaggelis): Handle the legal label */}
           <Text
             elementDescriptor={descriptors.formFieldRadioLabelTitle}
             variant='subtitle'
