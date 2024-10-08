@@ -77,26 +77,28 @@ type Chainable<T = object> =
           handler: H,
         ): (
           ...args: InferParametersFromSecond<H>
-        ) => InferReturnType<H> &
-          (T extends { reverification: any; permission: any; role: any }
-            ?
-                | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                | ReturnType<typeof permissionMismatch<T['permission']>>
-                | ReturnType<typeof roleMismatch<T['role']>>
-                | ReturnType<typeof signedOut>
-            : T extends { reverification: any; permission: any }
+        ) => Promise<Awaited<InferReturnType<H>>> &
+          Promise<
+            T extends { reverification: any; permission: any; role: any }
               ?
-                  | RReverificationMismatchError<T['reverification']>
-                  | PPermissionMismatchError<T['permission']>
+                  | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                  | ReturnType<typeof permissionMismatch<T['permission']>>
+                  | ReturnType<typeof roleMismatch<T['role']>>
                   | ReturnType<typeof signedOut>
-              : T extends { reverification: any; role: any }
+              : T extends { reverification: any; permission: any }
                 ?
-                    | ReturnType<typeof reverificationMismatch<T['reverification']>>
-                    | ReturnType<typeof roleMismatch<T['role']>>
+                    | RReverificationMismatchError<T['reverification']>
+                    | PPermissionMismatchError<T['permission']>
                     | ReturnType<typeof signedOut>
-                : T extends { reverification: any }
-                  ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
-                  : ReturnType<typeof signedOut>);
+                : T extends { reverification: any; role: any }
+                  ?
+                      | ReturnType<typeof reverificationMismatch<T['reverification']>>
+                      | ReturnType<typeof roleMismatch<T['role']>>
+                      | ReturnType<typeof signedOut>
+                  : T extends { reverification: any }
+                    ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
+                    : ReturnType<typeof signedOut>
+          >;
       }
     : {
         with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
@@ -105,17 +107,19 @@ type Chainable<T = object> =
           handler: H,
         ): (
           ...args: InferParametersFromSecond<H>
-        ) => InferReturnType<H> &
-          (T extends { permission: any; role: any }
-            ?
-                | ReturnType<typeof permissionMismatch<T['permission']>>
-                | ReturnType<typeof roleMismatch<T['role']>>
-                | ReturnType<typeof signedOut>
-            : T extends { permission: any }
-              ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
-              : T extends { role: any }
-                ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
-                : ReturnType<typeof signedOut>);
+        ) => Promise<Awaited<InferReturnType<H>>> &
+          Promise<
+            T extends { permission: any; role: any }
+              ?
+                  | ReturnType<typeof permissionMismatch<T['permission']>>
+                  | ReturnType<typeof roleMismatch<T['role']>>
+                  | ReturnType<typeof signedOut>
+              : T extends { permission: any }
+                ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
+                : T extends { role: any }
+                  ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
+                  : ReturnType<typeof signedOut>
+          >;
       };
 
 function __experimental_protectAction() {
@@ -130,7 +134,7 @@ function __experimental_protectAction() {
       },
       // @ts-expect-error
       action(handler) {
-        return (...args) => {
+        return async (...args) => {
           const _auth = auth();
           const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 

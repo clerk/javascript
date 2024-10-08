@@ -15,11 +15,11 @@ const __experimental_protectAction = (() => {
 describe('__experimental_protectAction', () => {
   describe('Type tests', () => {
     describe('signed out', () => {
-      it('1', () => {
+      it('1', async () => {
         const action = __experimental_protectAction().action(() => ({
           test: '1234',
         }));
-        const res = action();
+        const res = await action();
         expectTypeOf(res).toMatchTypeOf<{ clerk_error: { type: 'unauthorized'; reason: 'signed-out' } }>();
       });
 
@@ -31,11 +31,11 @@ describe('__experimental_protectAction', () => {
         expectTypeOf(res).not.toMatchTypeOf<{ clerk_error: { type: 'forbidden'; reason: any } }>();
       });
 
-      it('3', () => {
-        const action = __experimental_protectAction().action(() => ({
+      it('3', async () => {
+        const action = __experimental_protectAction().action(async () => ({
           test: '1234',
         }));
-        const res = action();
+        const res = await action();
         expectTypeOf(res).toMatchTypeOf<{ test: string }>();
       });
     });
@@ -45,6 +45,9 @@ describe('__experimental_protectAction', () => {
         with: any;
         action: any;
       }>();
+
+      expectTypeOf(__experimental_protectAction().action).toBeFunction();
+      expectTypeOf(__experimental_protectAction().with).toBeFunction();
 
       expectTypeOf(__experimental_protectAction().with({ role: '' })).toMatchTypeOf<{
         with: any;
@@ -56,27 +59,25 @@ describe('__experimental_protectAction', () => {
         action: any;
       }>();
 
-      expectTypeOf(__experimental_protectAction().with({ reverification: 'strict' })).toMatchTypeOf<{
-        action: any;
-      }>();
+      expectTypeOf(__experimental_protectAction().with({ reverification: 'strict' }).action).toBeFunction();
     });
 
     describe('signed out', () => {
-      it('1', () => {
+      it('1', async () => {
         const action = __experimental_protectAction()
           .with({
             reverification: 'strict',
           })
-          .action(() => ({
+          .action(async () => ({
             test: '1234',
           }));
-        const res = action();
+        const res = await action();
 
         expectTypeOf(res?.clerk_error?.type).toEqualTypeOf<'forbidden' | 'unauthorized'>();
         expectTypeOf(res?.clerk_error?.reason).toEqualTypeOf<'reverification-mismatch' | 'signed-out'>();
       });
 
-      it('2', () => {
+      it('2', async () => {
         const action = __experimental_protectAction()
           .with({
             role: 'admin',
@@ -84,13 +85,13 @@ describe('__experimental_protectAction', () => {
           .action(() => ({
             test: '1234',
           }));
-        const res = action();
+        const res = await action();
 
         expectTypeOf(res?.clerk_error?.type).toEqualTypeOf<'forbidden' | 'unauthorized'>();
         expectTypeOf(res?.clerk_error?.reason).toEqualTypeOf<'role-mismatch' | 'signed-out'>();
       });
 
-      it('3', () => {
+      it('3', async () => {
         const action = __experimental_protectAction()
           .with({
             permission: 'admin',
@@ -98,13 +99,13 @@ describe('__experimental_protectAction', () => {
           .action(() => ({
             test: '1234',
           }));
-        const res = action();
+        const res = await action();
 
         expectTypeOf(res?.clerk_error?.type).toEqualTypeOf<'forbidden' | 'unauthorized'>();
         expectTypeOf(res?.clerk_error?.reason).toEqualTypeOf<'permission-mismatch' | 'signed-out'>();
       });
 
-      it('4', () => {
+      it('4', async () => {
         const action = __experimental_protectAction()
           .with({
             permission: 'admin',
@@ -115,13 +116,13 @@ describe('__experimental_protectAction', () => {
           .action(() => ({
             test: '1234',
           }));
-        const res = action();
+        const res = await action();
 
         expectTypeOf(res?.clerk_error?.type).toEqualTypeOf<'forbidden' | 'unauthorized'>();
         expectTypeOf(res?.clerk_error?.reason).toEqualTypeOf<'role-mismatch' | 'permission-mismatch' | 'signed-out'>();
       });
 
-      it('5', () => {
+      it('5', async () => {
         const action = __experimental_protectAction()
           .with({
             permission: 'admin',
@@ -135,7 +136,7 @@ describe('__experimental_protectAction', () => {
           .action(() => ({
             test: '1234',
           }));
-        const res = action();
+        const res = await action();
 
         expectTypeOf(res?.clerk_error?.type).toEqualTypeOf<'forbidden' | 'unauthorized'>();
         expectTypeOf(res?.clerk_error?.reason).toEqualTypeOf<
