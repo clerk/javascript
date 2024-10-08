@@ -31,8 +31,8 @@
 
 ### Prerequisites
 
-- Fastify `^4.0.0` or later
-- Node.js `>=18.17.0` or later
+- Fastify `^5.0.0` or later
+- Node.js `>=20.0.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_fastify).
 
 ### Installation

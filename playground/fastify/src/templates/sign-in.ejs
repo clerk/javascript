@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script
+      async
+      crossorigin="anonymous"
+      data-clerk-publishable-key="<%= CLERK_PUBLISHABLE_KEY %>"
+      src="<%= FRONTEND_API_URL %>/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+      type="text/javascript"
+      onLoad="startClerk()"
+    ></script>
+  </head>
+  <body>
+    <script>
+        window.startClerk = async () => {
+          await Clerk.load({
+            signInUrl: "<%= PUBLIC_CLERK_SIGN_IN_URL %>",
+          });
+          Clerk.openSignIn();
+        }
+    </script>
+  </body>
+</html>
