@@ -2,8 +2,6 @@ import { expectTypeOf } from 'expect-type';
 
 import type { __experimental_protectAction as protectAction } from '../server/protectAction';
 
-// type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
-
 const __experimental_protectAction = (() => {
   const creator = () => {
     return {
@@ -40,6 +38,27 @@ describe('__experimental_protectAction', () => {
         const res = action();
         expectTypeOf(res).toMatchTypeOf<{ test: string }>();
       });
+    });
+
+    it('1', () => {
+      expectTypeOf(__experimental_protectAction()).toMatchTypeOf<{
+        with: any;
+        action: any;
+      }>();
+
+      expectTypeOf(__experimental_protectAction().with({ role: '' })).toMatchTypeOf<{
+        with: any;
+        action: any;
+      }>();
+
+      expectTypeOf(__experimental_protectAction().with({ reverification: 'strict' })).not.toMatchTypeOf<{
+        with: any;
+        action: any;
+      }>();
+
+      expectTypeOf(__experimental_protectAction().with({ reverification: 'strict' })).toMatchTypeOf<{
+        action: any;
+      }>();
     });
 
     describe('signed out', () => {
@@ -128,13 +147,11 @@ describe('__experimental_protectAction', () => {
     describe('auth param', () => {
       it('1', () => {
         __experimental_protectAction().action(_auth => {
-          expectTypeOf(_auth).toMatchTypeOf<{
-            userId: string;
-            orgId: string | null | undefined;
-            sessionId: string;
-            orgRole: string | undefined | null;
-            orgPermissions: string[] | undefined | null;
-          }>();
+          expectTypeOf(_auth.userId).toEqualTypeOf<string>();
+          expectTypeOf(_auth.sessionId).toEqualTypeOf<string>();
+          expectTypeOf(_auth.orgId).toEqualTypeOf<string | null | undefined>();
+          expectTypeOf(_auth.orgRole).toEqualTypeOf<string | null | undefined>();
+          expectTypeOf(_auth.orgPermissions).toEqualTypeOf<string[] | null | undefined>();
         });
       });
 
@@ -142,69 +159,13 @@ describe('__experimental_protectAction', () => {
         __experimental_protectAction()
           .with({ role: 'admin' })
           .action(_auth => {
-            expectTypeOf(_auth).toMatchTypeOf<{
-              userId: string;
-              orgId: string;
-              sessionId: string;
-              orgRole: string;
-              orgPermissions: string[];
-            }>();
+            expectTypeOf(_auth.userId).toEqualTypeOf<string>();
+            expectTypeOf(_auth.sessionId).toEqualTypeOf<string>();
+            expectTypeOf(_auth.orgId).toEqualTypeOf<string>();
+            expectTypeOf(_auth.orgRole).toEqualTypeOf<string>();
+            expectTypeOf(_auth.orgPermissions).toEqualTypeOf<string[]>();
           });
       });
     });
   });
-
-  // describe('Multi domain', () => {
-  //   const defaultProps = { children: '' };
-  //
-  //   it('proxyUrl (primary app)', () => {
-  //     expectTypeOf({ ...defaultProps, proxyUrl: 'test' }).toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('proxyUrl + isSatellite (satellite app)', () => {
-  //     expectTypeOf({ ...defaultProps, proxyUrl: 'test', isSatellite: true }).toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('domain + isSatellite (satellite app)', () => {
-  //     expectTypeOf({ ...defaultProps, domain: 'test', isSatellite: true }).toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('only domain is not allowed', () => {
-  //     expectTypeOf({ ...defaultProps, domain: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('only isSatellite is not allowed', () => {
-  //     expectTypeOf({ ...defaultProps, isSatellite: true }).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('proxyUrl + domain is not allowed', () => {
-  //     expectTypeOf({ ...defaultProps, proxyUrl: 'test', domain: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  //
-  //   it('proxyUrl + domain + isSatellite is not allowed', () => {
-  //     expectTypeOf({
-  //       ...defaultProps,
-  //       proxyUrl: 'test',
-  //       domain: 'test',
-  //       isSatellite: true,
-  //     }).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  // });
-  //
-  // describe('clerkJSVariant', () => {
-  //   const defaultProps = { children: '' };
-  //
-  //   it('is either headless or empty', () => {
-  //     expectTypeOf({ ...defaultProps, clerkJSVariant: 'headless' as const }).toMatchTypeOf<ClerkProviderProps>();
-  //     expectTypeOf({ ...defaultProps, clerkJSVariant: '' as const }).toMatchTypeOf<ClerkProviderProps>();
-  //     expectTypeOf({ ...defaultProps, clerkJSVariant: undefined }).toMatchTypeOf<ClerkProviderProps>();
-  //     expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  // });
-  //
-  // describe('children', () => {
-  //   it('errors if no children', () => {
-  //     expectTypeOf({}).not.toMatchTypeOf<ClerkProviderProps>();
-  //   });
-  // });
 });
