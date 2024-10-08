@@ -133,40 +133,196 @@ type CustomAuthObject<T extends WithProtectComponentParams> =
         role: any;
       }
     ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole' | 'orgPermissions'>
-    : NonNullableRecord<MyAuth, 'userId'>;
+    : NonNullableRecord<MyAuth, 'userId' | 'sessionId'>;
+
+// function __experimental_protectComponent(params?: ProtectComponentParams) {
+//   const configs: NextServerProtectConfiguration[] = params ? [params] : [];
+//
+//   const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
+//     configs.push(nextParams);
+//
+//     const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
+//       return (props: P) => {
+//         const _auth = auth();
+//
+//         const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+//
+//         if (failedItem?.fallback) {
+//           const Fallback = failedItem.fallback;
+//
+//           if (Fallback === 'modal') {
+//             return <UserVerificationModal />;
+//           }
+//
+//           if (Fallback === 'redirectToSignIn') {
+//             _auth.redirectToSignIn();
+//           }
+//
+//           if (typeof Fallback === 'string') {
+//             redirect(Fallback);
+//           }
+//
+//           if (typeof Fallback !== 'function') {
+//             throw 'not valid';
+//           }
+//
+//           if (!failedItem.reverification) {
+//             return (
+//               // @ts-expect-error type props
+//               <Fallback
+//                 {
+//                   // Could this be unsafe ?
+//                   ...props
+//                 }
+//               />
+//             );
+//           }
+//
+//           return (
+//             // @ts-expect-error type props
+//             <Fallback
+//               {
+//                 // Could this be unsafe ?
+//                 ...props
+//               }
+//               UserVerificationTrigger={UserVerificationTrigger}
+//             />
+//           );
+//         }
+//
+//         if (failedItem) {
+//           return null;
+//         }
+//
+//         return (
+//           <Component
+//             {...props}
+//             auth={_auth as CustomAuthObject<T>}
+//           />
+//         );
+//       };
+//     };
+//
+//     return { with: withNext, component };
+//   };
+//
+//   const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
+//     return (props: P) => {
+//       const _auth = auth();
+//
+//       const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+//
+//       if (failedItem?.fallback) {
+//         const Fallback = failedItem.fallback;
+//
+//         if (Fallback === 'redirectToSignIn') {
+//           _auth.redirectToSignIn();
+//         }
+//
+//         if (typeof Fallback === 'string') {
+//           redirect(Fallback);
+//         }
+//
+//         if (typeof Fallback !== 'function') {
+//           throw 'not valid';
+//         }
+//
+//         return (
+//           // @ts-expect-error type props
+//           <Fallback
+//             {
+//               // Could this be unsafe ?
+//               ...props
+//             }
+//           />
+//         );
+//       }
+//
+//       if (failedItem) {
+//         return null;
+//       }
+//
+//       return (
+//         <Component
+//           {...props}
+//           auth={_auth as NonNullableRecord<MyAuth, 'userId'>}
+//         />
+//       );
+//     };
+//   };
+//
+//   // Return the protect method and the component method to enable chaining
+//   return { with: withNext, component };
+// }
+
+type Merge<T, U> = T & U extends infer O ? { [K in keyof O]: O[K] } : never;
+
+type HasReverification<T> = T extends { reverification: any } ? true : false;
+
+// Chainable type that keeps track of whether reverification has been set
+// @ts-ignore
+type ChainableComponent<T = object> =
+  HasReverification<T> extends true
+    ? {
+        // @ts-ignore
+        component<P>(Component: ComponentParam<P, CustomAuthObject<T>>): (props: P) => React.JSX.Element | null;
+      }
+    : {
+        with<K extends WithProtectComponentParams>(key: K): ChainableComponent<Merge<T, K>>;
+        // @ts-ignore
+        component<P>(
+          Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>,
+        ): (props: P) => React.JSX.Element | null;
+      };
 
 function __experimental_protectComponent(params?: ProtectComponentParams) {
-  const configs: NextServerProtectConfiguration[] = params ? [params] : [];
+  const configs: NextServerProtectConfiguration[] = params ? [params] : [{}];
+  const createBuilder = <A extends object>(config: A): ChainableComponent => {
+    // We will accumulate permissions here
+    return {
+      // @ts-expect-error
+      with(p) {
+        configs.push(p);
+        return createBuilder({ ...p, ...config });
+      },
 
-  const withNext = <T extends WithProtectComponentParams>(nextParams: T) => {
-    configs.push(nextParams);
+      component(Component) {
+        return props => {
+          const _auth = auth();
 
-    const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
-      return (props: P) => {
-        const _auth = auth();
+          const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
 
-        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+          if (failedItem?.fallback) {
+            const Fallback = failedItem.fallback;
 
-        if (failedItem?.fallback) {
-          const Fallback = failedItem.fallback;
+            if (Fallback === 'modal') {
+              return <UserVerificationModal />;
+            }
 
-          if (Fallback === 'modal') {
-            return <UserVerificationModal />;
-          }
+            if (Fallback === 'redirectToSignIn') {
+              _auth.redirectToSignIn();
+            }
 
-          if (Fallback === 'redirectToSignIn') {
-            _auth.redirectToSignIn();
-          }
+            if (typeof Fallback === 'string') {
+              redirect(Fallback);
+            }
 
-          if (typeof Fallback === 'string') {
-            redirect(Fallback);
-          }
+            if (typeof Fallback !== 'function') {
+              throw 'not valid';
+            }
 
-          if (typeof Fallback !== 'function') {
-            throw 'not valid';
-          }
+            if (!failedItem.reverification) {
+              return (
+                // @ts-expect-error type props
+                <Fallback
+                  {
+                    // Could this be unsafe ?
+                    ...props
+                  }
+                />
+              );
+            }
 
-          if (!failedItem.reverification) {
             return (
               // @ts-expect-error type props
               <Fallback
@@ -174,85 +330,26 @@ function __experimental_protectComponent(params?: ProtectComponentParams) {
                   // Could this be unsafe ?
                   ...props
                 }
+                UserVerificationTrigger={UserVerificationTrigger}
               />
             );
           }
 
+          if (failedItem) {
+            return null;
+          }
+
           return (
-            // @ts-expect-error type props
-            <Fallback
-              {
-                // Could this be unsafe ?
-                ...props
-              }
-              UserVerificationTrigger={UserVerificationTrigger}
+            <Component
+              {...props}
+              auth={_auth as any}
             />
           );
-        }
-
-        if (failedItem) {
-          return null;
-        }
-
-        return (
-          <Component
-            {...props}
-            auth={_auth as CustomAuthObject<T>}
-          />
-        );
-      };
-    };
-
-    return { with: withNext, component };
-  };
-
-  const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
-    return (props: P) => {
-      const _auth = auth();
-
-      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
-
-      if (failedItem?.fallback) {
-        const Fallback = failedItem.fallback;
-
-        if (Fallback === 'redirectToSignIn') {
-          _auth.redirectToSignIn();
-        }
-
-        if (typeof Fallback === 'string') {
-          redirect(Fallback);
-        }
-
-        if (typeof Fallback !== 'function') {
-          throw 'not valid';
-        }
-
-        return (
-          // @ts-expect-error type props
-          <Fallback
-            {
-              // Could this be unsafe ?
-              ...props
-            }
-          />
-        );
-      }
-
-      if (failedItem) {
-        return null;
-      }
-
-      return (
-        <Component
-          {...props}
-          auth={_auth as NonNullableRecord<MyAuth, 'userId'>}
-        />
-      );
+        };
+      },
     };
   };
-
-  // Return the protect method and the component method to enable chaining
-  return { with: withNext, component };
+  return createBuilder({});
 }
 
 export { __experimental_protectComponent };

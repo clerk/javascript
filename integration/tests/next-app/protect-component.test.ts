@@ -8,7 +8,7 @@ import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
   '@nextjs authorization with protectComponent',
   ({ app }) => {
-    test.describe.configure({ mode: 'serial' });
+    test.describe.configure({ mode: 'parallel' });
 
     let fakeAdmin: FakeUser;
     let fakeViewer: FakeUser;
@@ -78,13 +78,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
        * Hard navigations
        */
       await u.page.goToRelative('/settings-protect-wrappers/rsc-protect');
-      await expect(u.page.getByText(/User is not admin/i)).toBeVisible();
+      await expect(u.page.getByText(/Signed out!/i)).toBeVisible();
       await u.page.goToRelative('/settings-protect-wrappers/rcc-protect');
-      await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
+      await expect(u.page.getByText(/Signed out!/i)).toBeVisible();
       await u.page.goToRelative('/settings-protect-wrappers/useAuth-has');
-      await expect(u.page.getByText(/User is not admin/i)).toBeVisible();
+      await expect(u.page.getByText(/Signed out!/i)).toBeVisible();
       await u.page.goToRelative('/settings-protect-wrappers/auth-has');
-      await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
+      await expect(u.page.getByText(/Signed out!/i)).toBeVisible();
       await u.page.goToRelative('/settings-protect-wrappers/auth-protect');
       await u.po.signIn.waitForMounted();
       await u.page.goToRelative('/protected');
@@ -115,6 +115,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
       await u.page.goToRelative('/settings-protect-wrappers/auth-protect');
       await expect(u.page.getByText(/this page could not be found/i)).toBeHidden();
+      await expect(u.page.getByText(/User has access/i)).toBeHidden();
 
       // Route Handler
       await u.page.goToRelative('/api/settings-protect-wrappers/').catch(() => {});
