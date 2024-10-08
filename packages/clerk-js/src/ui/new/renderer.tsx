@@ -2,7 +2,7 @@ import { ClerkInstanceContext, OptionsContext } from '@clerk/shared/react';
 import type { ClerkHostRouter } from '@clerk/shared/router';
 import { ClerkHostRouterContext } from '@clerk/shared/router';
 import type { ClerkOptions, LoadedClerk } from '@clerk/types';
-import stylesheetURL from '@clerk/ui/styles.css';
+import stylesheetURLOrContent from '@clerk/ui/styles.css';
 import type { ElementType, ReactNode } from 'react';
 import { createElement, lazy } from 'react';
 import { createPortal } from 'react-dom';
@@ -43,12 +43,22 @@ export function init({ wrapper }: { wrapper: ElementType }) {
     document.body.appendChild(rootElement);
 
     // Just for completeness, we check to see if we've already added the stylesheet to the DOM.
-    const STYLESHEET_SIGIL = 'data-clerk-styles';
-    const existingStylesheet = document.querySelector(`link[${STYLESHEET_SIGIL}]`);
+    const STYLESHEET_SIGIL = 'data-clerk-injected-styles';
+    const existingStylesheet = document.querySelector(`[${STYLESHEET_SIGIL}]`);
     if (!existingStylesheet) {
-      const stylesheet = document.createElement('link');
-      stylesheet.href = stylesheetURL;
-      stylesheet.rel = 'stylesheet';
+      let stylesheet: HTMLLinkElement | HTMLStyleElement;
+
+      if (stylesheetURLOrContent.endsWith('.css')) {
+        // stylesheetURLOrContent is a URL to a stylesheet
+        stylesheet = document.createElement('link');
+        (stylesheet as HTMLLinkElement).href = stylesheetURLOrContent;
+        (stylesheet as HTMLLinkElement).rel = 'stylesheet';
+      } else {
+        // stylesheetURLOrContent is CSS
+        stylesheet = document.createElement('style');
+        stylesheet.textContent = stylesheetURLOrContent;
+      }
+
       stylesheet.setAttribute(STYLESHEET_SIGIL, '');
       // Add as first stylesheet so that application styles take precedence over our styles.
       document.head.prepend(stylesheet);

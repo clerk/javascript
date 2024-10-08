@@ -170,12 +170,51 @@ const typescriptLoaderDev = () => {
   };
 };
 
-/** @type { () => (import('webpack').RuleSetRule) } */
+/**
+ * Used in outputs that utilize chunking, and returns a URL to the stylesheet.
+ * @type { () => (import('webpack').RuleSetRule) }
+ */
 const clerkUICSSLoader = () => {
-  // This emits a module exporting the URL to the styles.css file.
+  // This emits a module exporting a URL to the styles.css file.
   return {
     test: /packages\/ui\/dist\/styles\.css/,
     type: 'asset/resource',
+  };
+};
+
+/**
+ * Used in outputs that _do not_ utilize chunking, and returns the contents of the stylesheet.
+ * @type { () => (import('webpack').RuleSetRule) }
+ */
+const clerkUICSSSourceLoader = () => {
+  // This emits a module exporting the contents of the styles.css file.
+  return {
+    test: /packages\/ui\/dist\/styles\.css/,
+    type: 'asset/source',
+  };
+};
+
+/**
+ * Used for production builds that have dynamicly loaded chunks.
+ * @type { () => (import('webpack').Configuration) }
+ * */
+const commonForProdChunked = () => {
+  return {
+    module: {
+      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSLoader()],
+    },
+  };
+};
+
+/**
+ * Used for production builds that combine all files into one single file (such as for Chrome Extensions).
+ * @type { () => (import('webpack').Configuration) }
+ * */
+const commonForProdBundled = () => {
+  return {
+    module: {
+      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSSourceLoader()],
+    },
   };
 };
 
@@ -183,9 +222,6 @@ const clerkUICSSLoader = () => {
 const commonForProd = () => {
   return {
     devtool: undefined,
-    module: {
-      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSLoader()],
-    },
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
@@ -238,12 +274,18 @@ const entryForVariant = variant => {
 
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode }) => {
-  const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
+  const clerkBrowser = merge(
+    entryForVariant(variants.clerkBrowser),
+    common({ mode }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
 
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
     commonForProd(),
+    commonForProdChunked(),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
     // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
     // chunking in our browser bundles.
@@ -262,10 +304,11 @@ const prodConfig = ({ mode }) => {
     entryForVariant(variants.clerkHeadlessBrowser),
     common({ mode }),
     commonForProd(),
+    commonForProdChunked(),
     // externalsForHeadless(),
   );
 
-  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), {
+  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
     experiments: {
       outputModule: true,
     },
@@ -283,13 +326,19 @@ const prodConfig = ({ mode }) => {
     ],
   });
 
-  const clerkCjs = merge(clerkEsm, {
+  const clerkCjs = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
     output: {
       filename: '[name].js',
       libraryTarget: 'commonjs',
-      chunkFormat: 'commonjs',
-      scriptType: 'text/javascript',
     },
+    plugins: [
+      // Include the lazy chunks in the bundle as well
+      // so that the final bundle can be imported and bundled again
+      // by a different bundler, eg the webpack instance used by react-scripts
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
   });
 
   return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
