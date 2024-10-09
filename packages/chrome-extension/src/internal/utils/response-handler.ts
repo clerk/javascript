@@ -1,6 +1,6 @@
 import type { Clerk } from '@clerk/clerk-js';
 
-import { AUTH_HEADER, AUTH_HEADER_DEV } from '../constants';
+import { AUTH_HEADER } from '../constants';
 import type { JWTHandler } from './jwt-handler';
 
 type Handler = Parameters<Clerk['__unstable__onAfterResponse']>[0];
@@ -20,7 +20,7 @@ export function responseHandler(jwtHandler: JWTHandler, { isProd }: { isProd: bo
 
 /** Retrieve the JWT to the FAPI response, per development instances */
 async function devHandler(response: Res, jwtHandler: JWTHandler) {
-  const header = response?.headers.get(AUTH_HEADER_DEV);
+  const header = response?.headers.get(AUTH_HEADER.DEVELOPMENT);
 
   if (header) {
     await jwtHandler.set(header);
@@ -31,7 +31,7 @@ async function devHandler(response: Res, jwtHandler: JWTHandler) {
 
 /** Retrieve the JWT to the FAPI response, per production instances */
 async function prodHandler(response: Res, jwtHandler: JWTHandler) {
-  const header = response?.headers.get(AUTH_HEADER);
+  const header = response?.headers.get(AUTH_HEADER.PRODUCTION);
 
   if (header?.startsWith('Bearer')) {
     const jwt = header.split(' ')[1] || undefined;
