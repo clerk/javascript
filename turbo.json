@@ -16,6 +16,7 @@
   "globalEnv": [
     "CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
+    "PLASMO_PUBLIC_CLERK_*",
     "PUBLIC_CLERK_*",
     "NODE_ENV",
     "NODE_VERSION",
