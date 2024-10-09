@@ -47,7 +47,7 @@
     "test:integration:remix": "echo 'placeholder'",
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
-    "version": "changeset version && npm install --package-lock-only",
+    "version": "changeset version && npm install --package-lock-only --engine-strict=false",
     "version:canary": "./scripts/canary.mjs",
     "version:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; npx yalc push --replace --sig; cd '../../'; done"
