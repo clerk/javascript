@@ -7,7 +7,7 @@ export default defineConfig(() => {
     },
     minify: false,
     clean: true,
-    sourcemap: true,
+    sourcemap: false,
     format: ['cjs', 'esm'],
     legacyOutput: true,
     dts: true,

@@ -12,7 +12,7 @@ export default defineConfig(overrideOptions => {
   const common: Options = {
     entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts'],
     onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
-    sourcemap: true,
+    sourcemap: false,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
