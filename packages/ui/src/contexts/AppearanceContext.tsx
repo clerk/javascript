@@ -2,15 +2,8 @@ import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
+import type { DescriptorIdentifier } from '~/descriptors';
 import { fullTheme } from '~/themes';
-
-type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
-type SeparatorDescriptorIdentifier = 'separator';
-
-/**
- * Union of all valid descriptors used throughout the components.
- */
-export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
@@ -25,7 +18,7 @@ export type PartialDescriptor = Omit<Partial<ParsedDescriptor>, 'descriptor'>;
 /**
  * A full theme generated from merging ParsedElementsFragments. Has entries for each descriptor, but they're not complete.
  */
-export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
+export type PartialTheme = Partial<Record<DescriptorIdentifier, PartialDescriptor>>;
 
 /**
  * A subset of a partial theme. This is the type used when authoring style objects within a component.
