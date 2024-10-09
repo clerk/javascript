@@ -6,6 +6,7 @@ export class OrganizationMembership {
   constructor(
     readonly id: string,
     readonly role: OrganizationMembershipRole,
+    readonly permissions: string[],
     readonly publicMetadata: OrganizationMembershipPublicMetadata = {},
     readonly privateMetadata: OrganizationMembershipPrivateMetadata = {},
     readonly createdAt: number,
@@ -18,6 +19,7 @@ export class OrganizationMembership {
     return new OrganizationMembership(
       data.id,
       data.role,
+      data.permissions,
       data.public_metadata,
       data.private_metadata,
       data.created_at,
