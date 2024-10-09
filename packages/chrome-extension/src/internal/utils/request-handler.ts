@@ -35,5 +35,5 @@ function devHandler(requestInit: Req, jwt: string) {
 /** Append the JWT to the FAPI request, per production instances */
 function prodHandler(requestInit: Req, jwt: string) {
   requestInit.url?.searchParams.append('_is_native', '1');
-  (requestInit.headers as Headers).set(AUTH_HEADER, `Bearer ${jwt}`);
+  (requestInit.headers as Headers).set(AUTH_HEADER.PRODUCTION, `Bearer ${jwt}`);
 }

@@ -1,6 +1,3 @@
-// export const AUTH_HEADER = 'Authorization';
-// export const AUTH_HEADER_DEV = '__clerk_db_jwt';
-
 export const AUTH_HEADER = {
   PRODUCTION: 'Authorization',
   DEVELOPMENT: '__clerk_db_jwt',
