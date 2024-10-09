@@ -1,6 +1,6 @@
-import { useSignIn } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import { useClerk } from '@clerk/shared/react';
 
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
@@ -22,7 +22,7 @@ import { LinkButton } from '~/primitives/link';
   ============================================ */
 
 function FirstFactorConnections({ isGlobalLoading }: { isGlobalLoading: boolean }) {
-  const { signIn } = useSignIn();
+  const { signIn } = useClerk().client;
   const isFirstFactor = signIn?.status === 'needs_first_factor';
 
   if (isFirstFactor) {

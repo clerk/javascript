@@ -1,5 +1,4 @@
-export { type ClerkRouter, type ClerkHostRouter, createClerkRouter } from './router/router';
-export { type RoutingMode } from './router/types';
+export { type ClerkRouter, type ClerkHostRouter, type RoutingMode, createClerkRouter } from './router/router';
 export {
   Router,
   useClerkRouter,

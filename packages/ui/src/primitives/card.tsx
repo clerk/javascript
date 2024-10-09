@@ -1,6 +1,8 @@
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
+import { useAppearance } from '~/contexts';
+import { mergeDescriptors, type ParsedElementsFragment } from '~/contexts/AppearanceContext';
 import type { PolymorphicForwardRefExoticComponent, PolymorphicPropsWithoutRef } from '~/types/utils';
 
 import { ClerkLogo } from './clerk-logo';
@@ -106,9 +108,24 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   );
 });
 
+const logoLayoutStyle = {
+  logoBox: {
+    className: 'z-1 mb-5 flex h-8 justify-center',
+  },
+  logoLink: {
+    className: '-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring',
+  },
+  logoImage: {
+    className: 'size-full object-contain',
+  },
+} satisfies ParsedElementsFragment;
+const logoVisualStyle = {
+  logoBox: {},
+  logoLink: {},
+  logoImage: {},
+} satisfies ParsedElementsFragment;
 export const Logo = React.forwardRef(function CardLogo(
   {
-    className,
     href,
     src,
     ...props
@@ -117,6 +134,7 @@ export const Logo = React.forwardRef(function CardLogo(
   },
   forwardedRef: React.ForwardedRef<HTMLImageElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   if (!src) {
     return null;
   }
@@ -128,15 +146,15 @@ export const Logo = React.forwardRef(function CardLogo(
       src={src}
       size={200}
       {...props}
-      className={cx('size-full object-contain', className)}
+      {...mergeDescriptors(elements.logoImage)}
     />
   );
   return (
-    <div className='z-1 mb-5 flex h-8 justify-center'>
+    <div {...mergeDescriptors(elements.logoBox)}>
       {href ? (
         <a
           href={href}
-          className='-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring'
+          {...mergeDescriptors(elements.logoLink)}
         >
           {img}
         </a>
@@ -384,3 +402,11 @@ const FooterPageLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttri
     );
   },
 );
+
+export const layoutStyle = {
+  ...logoLayoutStyle,
+} satisfies ParsedElementsFragment;
+
+export const visualStyle = {
+  ...logoVisualStyle,
+} satisfies ParsedElementsFragment;

@@ -1,8 +1,3 @@
-import { useClerk } from '@clerk/clerk-react';
-import type { ClerkOptions } from '@clerk/types';
+import { useOptionsContext } from '@clerk/shared/react';
 
-export function useOptions() {
-  const clerk = useClerk();
-  const options = (clerk as any)?.options as ClerkOptions;
-  return options;
-}
+export const useOptions = useOptionsContext;

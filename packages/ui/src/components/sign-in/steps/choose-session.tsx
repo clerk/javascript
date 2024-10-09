@@ -1,5 +1,5 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as SignIn from '@clerk/elements/sign-in';
+import { useClerk } from '@clerk/shared/react';
 import { cva } from 'cva';
 import { Button } from 'react-aria-components';
 

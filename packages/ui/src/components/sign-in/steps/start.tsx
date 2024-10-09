@@ -1,5 +1,6 @@
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import { useClerk } from '@clerk/shared/react';
 import { cx } from 'cva';
 import * as React from 'react';
 
@@ -12,6 +13,7 @@ import { GlobalError } from '~/common/global-error';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
+import { RouterLink } from '~/common/router-link';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { SIGN_UP_MODES } from '~/constants/user-settings';
@@ -23,6 +25,7 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useOptions } from '~/hooks/use-options';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
@@ -44,6 +47,8 @@ export function SignInStart() {
   const isDev = useDevModeWarning();
   const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
+  const clerk = useClerk();
+  const { signUpUrl } = useOptions();
 
   return (
     <Common.Loading scope='global'>
@@ -196,7 +201,12 @@ export function SignInStart() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.start.actionText')}{' '}
-                      <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
+                      <RouterLink
+                        asChild
+                        href={clerk.buildUrlWithAuth(signUpUrl || '/sign-up')}
+                      >
+                        <Card.FooterActionLink>{t('signIn.start.actionLink')}</Card.FooterActionLink>
+                      </RouterLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 ) : null}

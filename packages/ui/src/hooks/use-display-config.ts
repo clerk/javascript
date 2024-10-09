@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import type { EnvironmentResource } from '@clerk/types';
 
 export function useDisplayConfig() {

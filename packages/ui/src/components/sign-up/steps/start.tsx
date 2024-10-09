@@ -1,6 +1,6 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -10,6 +10,7 @@ import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
+import { RouterLink } from '~/common/router-link';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/contexts';
@@ -20,6 +21,7 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useOptions } from '~/hooks/use-options';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
@@ -27,6 +29,7 @@ import { Separator } from '~/primitives/separator';
 
 export function SignUpStart() {
   const clerk = useClerk();
+  const { signInUrl } = useOptions();
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
   const { t } = useLocalizations();
@@ -170,7 +173,12 @@ export function SignUpStart() {
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.start.actionText')}{' '}
-                    <Card.FooterActionLink href='/sign-in'>{t('signUp.start.actionLink')}</Card.FooterActionLink>
+                    <RouterLink
+                      asChild
+                      href={clerk.buildUrlWithAuth(signInUrl || '/sign-in')}
+                    >
+                      <Card.FooterActionLink>{t('signUp.start.actionLink')}</Card.FooterActionLink>
+                    </RouterLink>
                   </Card.FooterActionText>
                 </Card.FooterAction>
               </Card.Footer>

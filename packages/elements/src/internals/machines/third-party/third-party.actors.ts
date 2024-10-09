@@ -74,7 +74,7 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
 
     // @ts-expect-error - Clerk types are incomplete
     // TODO: Update local Clerk types
-    const loadedClerk = clerk.clerkjs as LoadedClerk;
+    const loadedClerk = (clerk.clerkjs ?? clerk) as LoadedClerk;
 
     void loadedClerk.handleRedirectCallback(
       {

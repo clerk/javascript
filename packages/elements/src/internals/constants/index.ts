@@ -51,6 +51,7 @@ export const ERROR_CODES = {
 export const ROUTING = {
   path: 'path',
   virtual: 'virtual',
+  hash: 'hash',
 } as const;
 
 export type ROUTING = (typeof ROUTING)[keyof typeof ROUTING];

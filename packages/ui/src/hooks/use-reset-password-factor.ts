@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor, SignInStrategy } from '@clerk/types';
 
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];
