@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Replace `OrganizationSwitcher` popover small gear icon with labelled action
+Update `OrganizationSwitcher` popover action to include label
