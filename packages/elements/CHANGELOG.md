@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.15.10
+
+### Patch Changes
+
+- Remove "example mode" guard form "AUTHENICTATE.PASSKEY" event in verification flow ([#4295](https://github.com/clerk/javascript/pull/4295)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.15.9
 
 ### Patch Changes

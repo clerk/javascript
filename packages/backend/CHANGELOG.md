@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.13.9
+
+### Patch Changes
+
+- Expose `permissions` field for `OrganizationMembership` resource ([#4310](https://github.com/clerk/javascript/pull/4310)) by [@dstaley](https://github.com/dstaley)
+
 ## 1.13.8
 
 ### Patch Changes

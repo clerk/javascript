@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.7.2
+
+### Patch Changes
+
+- Introduces `organizationSyncOptions` option to `clerkMiddleware`, which syncs an active organization or personal account from a URL to the Clerk session. ([#3977](https://github.com/clerk/javascript/pull/3977)) by [@izaaklauer](https://github.com/izaaklauer)
+
+- Updated dependencies [[`358be296a`](https://github.com/clerk/javascript/commit/358be296a8181bb256fc1e15f878932c741b8743)]:
+  - @clerk/backend@1.13.9
+
 ## 5.7.1
 
 ### Patch Changes
