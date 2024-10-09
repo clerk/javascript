@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.49
+
+### Patch Changes
+
+- Add transition period notice and migration info ([#4305](https://github.com/clerk/javascript/pull/4305)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`358be296a`](https://github.com/clerk/javascript/commit/358be296a8181bb256fc1e15f878932c741b8743)]:
+  - @clerk/backend@1.13.9
+
 ## 5.0.48
 
 ### Patch Changes

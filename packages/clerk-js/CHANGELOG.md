@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.26.3
+
+### Patch Changes
+
+- Update `OrganizationSwitcher` popover action to include label ([#4304](https://github.com/clerk/javascript/pull/4304)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.26.2
 
 ### Patch Changes
