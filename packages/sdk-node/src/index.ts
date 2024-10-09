@@ -24,3 +24,9 @@ export { createClerkExpressRequireAuth, createClerkExpressWithAuth };
 
 export { requireAuth } from './requireAuth';
 export { withAuth } from './withAuth';
+
+console.warn(
+  'Starting October 8, 2024, the Node SDK is entering a three-month notice period. ' +
+    'We encourage everyone to migrate to @clerk/express. ' +
+    'For full details, please see our changelog: https://clerk.com/changelog/2024-10-08-express-sdk',
+);

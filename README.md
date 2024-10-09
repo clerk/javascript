@@ -39,11 +39,11 @@ Would you like to work on Open Source software and help maintain this repository
 This repository contains the SDKs for environment/platforms that Clerk supports. For example, if you want to use Clerk with Node.js you can install:
 
 ```sh
-npm install @clerk/clerk-sdk-node
+npm install @clerk/backend
 # or
-yarn add @clerk/clerk-sdk-node
+yarn add @clerk/backend
 # or
-pnpm add @clerk/clerk-sdk-node
+pnpm add @clerk/backend
 ```
 
 ## 🎓 Learning Clerk

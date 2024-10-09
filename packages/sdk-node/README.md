@@ -25,6 +25,9 @@
 
 </div>
 
+> [!IMPORTANT]
+> Starting October 8, 2024, the Node SDK is entering a three-month notice period. We encourage everyone to migrate to `@clerk/express`. For full details, please see our [changelog](https://clerk.com/changelog/2024-10-08-express-sdk).
+
 ## Getting Started
 
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node.js application. Add sign up, sign in, and profile management to your application in minutes.
