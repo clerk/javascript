@@ -13,6 +13,7 @@ export class Client extends BaseResource implements ClientResource {
   signUp: SignUpResource = new SignUp();
   signIn: SignInResource = new SignIn();
   lastActiveSessionId: string | null = null;
+  cookieExpiration: Date | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 
@@ -61,6 +62,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(null);
       this.signIn = new SignIn(null);
       this.lastActiveSessionId = null;
+      this.cookieExpiration = null;
       this.createdAt = null;
       this.updatedAt = null;
     });
@@ -83,6 +85,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
+      this.cookieExpiration = data.cookie_expiration ? unixEpochToDate(data.cookie_expiration) : null;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
     }

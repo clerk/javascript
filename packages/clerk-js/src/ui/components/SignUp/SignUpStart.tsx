@@ -37,7 +37,7 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = ctx;
+  const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -127,7 +127,7 @@ function _SignUpStart(): JSX.Element {
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp });
+            return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
           },
           navigate,
         });
@@ -227,7 +227,7 @@ function _SignUpStart(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
           redirectUrl,
           redirectUrlComplete,
