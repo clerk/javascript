@@ -72,7 +72,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         performance.mark('endTime');
         const delay = performance.measure('dwa', startTime, 'endTime');
 
-        const total = 1000 * 100 - delay.duration;
+        const total = 1000 * 120 - delay.duration;
         await page.waitForTimeout(total / 3);
         await page.waitForTimeout(total / 3);
         await u.po.userProfile.goTo();
@@ -157,7 +157,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         const delay = performance.measure('dwa', startTime, 'endTime');
 
         const seconds = Math.floor(delay.duration / 1000);
-        const total = 1000 * 90 - seconds;
+        const total = 1000 * 120 - seconds;
         await page.waitForTimeout(total / 3);
         await page.waitForTimeout(total / 3);
         await u.po.userProfile.goTo();
