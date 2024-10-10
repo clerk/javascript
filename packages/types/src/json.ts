@@ -532,4 +532,6 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
 export interface WaitlistJSON extends ClerkResourceJSON {
   object: 'waitlist';
   id: string;
+  created_at: number;
+  updated_at: number;
 }
