@@ -14,6 +14,7 @@ const isDevelopment = mode => !isProduction(mode);
 const variants = {
   clerk: 'clerk',
   clerkBrowser: 'clerk.browser',
+  clerkBrowserReactless: 'clerk.browser.no-react',
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
 };
@@ -21,6 +22,7 @@ const variants = {
 const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
+  [variants.clerkBrowserReactless]: './src/index.browser.ts',
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
 };
@@ -209,6 +211,20 @@ const entryForVariant = variant => {
 const prodConfig = ({ mode }) => {
   const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
 
+  const clerkBrowserReactless = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd(), {
+    output: {
+      filename: 'clerk.browser.no-react.js',
+    },
+    resolve: {
+      alias: {
+        react$: path.resolve(__dirname, 'src/react-shim.ts'),
+        'react/jsx-runtime': path.resolve(__dirname, 'src/react-jsx-runtime-shim.ts'),
+        'react-dom$': path.resolve(__dirname, 'src/react-dom-shim.ts'),
+        'react-dom/client': path.resolve(__dirname, 'src/react-dom-client-shim.ts'),
+      },
+    },
+  });
+
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
@@ -259,11 +275,11 @@ const prodConfig = ({ mode }) => {
     },
   });
 
-  return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
+  return [clerkBrowser, clerkBrowserReactless, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
 };
 
 const devConfig = ({ mode, env }) => {
-  const variant = env.variant || variants.clerkBrowser;
+  const variant = env.variant || variants.clerkBrowserReactless;
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
@@ -311,6 +327,22 @@ const devConfig = ({ mode, env }) => {
       entryForVariant(variants.clerkBrowser),
       common({ mode }),
       commonForDev(),
+    ),
+    // prettier-ignore
+    [variants.clerkBrowserReactless]: merge(
+      entryForVariant(variants.clerkBrowser),
+      common({ mode }),
+      commonForDev(),
+      {
+        resolve: {
+          alias: {
+            react$: path.resolve(__dirname, 'src/react-shim.ts'),
+            'react/jsx-runtime': path.resolve(__dirname, 'src/react-jsx-runtime-shim.ts'),
+            'react-dom$': path.resolve(__dirname, 'src/react-dom-shim.ts'),
+            'react-dom/client': path.resolve(__dirname, 'src/react-dom-client-shim.ts'),
+          },
+        },
+      }
     ),
     [variants.clerkHeadless]: merge(
       entryForVariant(variants.clerkHeadless),
