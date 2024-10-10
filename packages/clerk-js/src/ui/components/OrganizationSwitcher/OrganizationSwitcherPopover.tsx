@@ -8,7 +8,6 @@ import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Actions,
-  ExtraSmallAction,
   OrganizationPreview,
   PersonalWorkspacePreview,
   PopoverCard,
@@ -105,20 +104,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       });
     };
 
-    const manageOrganizationSmallIconButton = (
-      <ExtraSmallAction
-        elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
-        elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
-        iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
-        iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
-        iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
-        iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
-        icon={CogFilled}
-        onClick={() => handleItemClick()}
-        trailing={<NotificationCountBadgeManageButton />}
-      />
-    );
-
     const manageOrganizationButton = (
       <SmallAction
         elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
@@ -195,7 +180,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
           />
-          <Actions role='menu'>{manageOrganizationSmallIconButton}</Actions>
+          <Actions role='menu'>{manageOrganizationButton}</Actions>
         </Flex>
       );
 
