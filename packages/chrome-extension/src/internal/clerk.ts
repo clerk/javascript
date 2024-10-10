@@ -48,7 +48,7 @@ export async function createClerkClient({
 
   // Will throw if manifest is invalid
   validateManifest(manifest, {
-    background: scope === SCOPE.background,
+    background: scope === SCOPE.BACKGROUND,
     sync,
   });
 
