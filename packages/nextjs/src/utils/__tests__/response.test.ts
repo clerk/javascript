@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { describe, expect, it } from 'vitest';
 
 import { mergeResponses } from '../response';
 
