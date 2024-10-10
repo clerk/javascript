@@ -233,12 +233,12 @@ export interface Clerk {
    * Opens the Clerk Waitlist modal.
    * @param props Optional props that will be passed to the Waitlist component.
    */
-  openWaitlist: (props?: __experimental_WaitlistProps) => void;
+  __experimental_openWaitlist: (props?: __experimental_WaitlistProps) => void;
 
   /**
    * Closes the Clerk Waitlist modal.
    */
-  closeWaitlist: () => void;
+  __experimental_closeWaitlist: () => void;
 
   /**
    * Mounts a sign in flow component at the target element.
@@ -368,13 +368,13 @@ export interface Clerk {
    * @param targetNode Target to mount the Waitlist component.
    * @param props Configuration parameters.
    */
-  mountWaitlist: (targetNode: HTMLDivElement, props?: __experimental_WaitlistProps) => void;
+  __experimental_mountWaitlist: (targetNode: HTMLDivElement, props?: __experimental_WaitlistProps) => void;
 
   /**
    * Unmount the Waitlist component from the target node.
    * @param targetNode Target node to unmount the Waitlist component from.
    */
-  unmountWaitlist: (targetNode: HTMLDivElement) => void;
+  __experimental_unmountWaitlist: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.

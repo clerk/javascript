@@ -5,6 +5,7 @@ import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
   __experimental_UserVerificationProps,
+  __experimental_WaitlistProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -19,6 +20,7 @@ import type {
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
+  JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
   OrganizationListProps,
@@ -41,7 +43,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
-  WaitlistProps,
+  WaitlistResource,
   Without,
 } from '@clerk/types';
 
@@ -101,6 +103,7 @@ type IsomorphicLoadedClerk = Without<
   | 'authenticateWithGoogleOneTap'
   | 'createOrganization'
   | 'getOrganization'
+  | 'joinWaitlist'
   | 'mountUserButton'
   | 'mountOrganizationList'
   | 'mountOrganizationSwitcher'
@@ -109,7 +112,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
-  | 'mountWaitlist'
+  | '__experimental_mountWaitlist'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -127,6 +130,8 @@ type IsomorphicLoadedClerk = Without<
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource | void>;
   // TODO: Align return type (maybe not possible or correct)
   getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
+  // TODO: Align return type
+  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource | void>;
 
   // TODO: Align return type
   buildSignInUrl: (opts?: RedirectOptions) => string | void;
@@ -155,7 +160,7 @@ type IsomorphicLoadedClerk = Without<
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
-  mountWaitlist: (node: HTMLDivElement, props: WaitlistProps) => void;
+  __experimental_mountWaitlist: (node: HTMLDivElement, props: __experimental_WaitlistProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -171,7 +176,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
-  private preOpenWaitlist?: null | WaitlistProps = null;
+  private preOpenWaitlist?: null | __experimental_WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -181,7 +186,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
-  private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps>();
+  private premountWaitlistNodes = new Map<HTMLDivElement, __experimental_WaitlistProps>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -532,7 +537,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preOpenWaitlist !== null) {
-      clerkjs.openWaitlist(this.preOpenWaitlist);
+      clerkjs.__experimental_openWaitlist(this.preOpenWaitlist);
     }
 
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
@@ -555,8 +560,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountOrganizationList(node, props);
     });
 
-    this.premountWaitlistNodes.forEach((props: WaitlistProps, node: HTMLDivElement) => {
-      clerkjs.mountWaitlist(node, props);
+    this.premountWaitlistNodes.forEach((props: __experimental_WaitlistProps, node: HTMLDivElement) => {
+      clerkjs.__experimental_mountWaitlist(node, props);
     });
 
     this.#loaded = true;
@@ -742,17 +747,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  openWaitlist = (props?: WaitlistProps): void => {
+  __experimental_openWaitlist = (props?: __experimental_WaitlistProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.openWaitlist(props);
+      this.clerkjs.__experimental_openWaitlist(props);
     } else {
       this.preOpenWaitlist = props;
     }
   };
 
-  closeWaitlist = (): void => {
+  __experimental_closeWaitlist = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.closeWaitlist();
+      this.clerkjs.__experimental_closeWaitlist();
     } else {
       this.preOpenWaitlist = null;
     }
@@ -911,17 +916,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountWaitlist = (node: HTMLDivElement, props: WaitlistProps): void => {
+  __experimental_mountWaitlist = (node: HTMLDivElement, props: __experimental_WaitlistProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.mountWaitlist(node, props);
+      this.clerkjs.__experimental_mountWaitlist(node, props);
     } else {
       this.premountWaitlistNodes.set(node, props);
     }
   };
 
-  unmountWaitlist = (node: HTMLDivElement): void => {
+  __experimental_unmountWaitlist = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.unmountWaitlist(node);
+      this.clerkjs.__experimental_unmountWaitlist(node);
     }
   };
 
@@ -1132,6 +1137,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
+    }
+  };
+
+  joinWaitlist = async (params: JoinWaitlistParams): Promise<WaitlistResource | void> => {
+    const callback = () => this.clerkjs?.joinWaitlist(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<WaitlistResource>;
+    } else {
+      this.premountMethodCalls.set('joinWaitlist', callback);
     }
   };
 

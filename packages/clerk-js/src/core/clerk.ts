@@ -498,14 +498,14 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('createOrganization'));
   };
 
-  public openWaitlist = (props?: __experimental_WaitlistProps): void => {
+  public __experimental_openWaitlist = (props?: __experimental_WaitlistProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
   };
 
-  public closeWaitlist = (): void => {
+  public __experimental_closeWaitlist = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('waitlist'));
   };
@@ -736,7 +736,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountWaitlist = (node: HTMLDivElement, props?: __experimental_WaitlistProps) => {
+  public __experimental_mountWaitlist = (node: HTMLDivElement, props?: __experimental_WaitlistProps) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted({ preloadHint: 'Waitlist' }).then(controls =>
       controls.mountComponent({
@@ -750,7 +750,7 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props));
   };
 
-  public unmountWaitlist = (node: HTMLDivElement): void => {
+  public __experimental_unmountWaitlist = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };

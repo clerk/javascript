@@ -479,8 +479,8 @@ export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<Google
 export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<__experimental_WaitlistProps>) => {
   return (
     <Portal
-      mount={clerk.mountWaitlist}
-      unmount={clerk.unmountWaitlist}
+      mount={clerk.__experimental_mountWaitlist}
+      unmount={clerk.__experimental_unmountWaitlist}
       updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />

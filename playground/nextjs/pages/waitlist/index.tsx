@@ -10,7 +10,7 @@ const WailistPage: NextPage = () => {
         <Waitlist />
       </div>
       <div style={{ textAlign: 'center' , marginTop: '1rem' }}>
-        <button type='button' onClick={() => clerk.openWaitlist()}>open waitlist</button>
+        <button type='button' onClick={() => clerk.__experimental_openWaitlist()}>open waitlist</button>
       </div>
     </>
   )
