@@ -55,10 +55,8 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
       }
     }
 
-    const value = await store.get<string>(CACHE_KEY);
-
     // Get current JWT from StorageCache
-    return value;
+    return await store.get<string>(CACHE_KEY);
   };
 
   /**
