@@ -6,6 +6,8 @@
 
 - Expose `permissions` field for `OrganizationMembership` resource ([#4310](https://github.com/clerk/javascript/pull/4310)) by [@dstaley](https://github.com/dstaley)
 
+- Introduces organizationSyncOptions option to clerkMiddleware, which syncs an active organization or personal account from a URL to the Clerk session. (https://github.com/clerk/javascript/pull/3977) by [@izaaklauer](https://github.com/izaaklauer)
+
 ## 1.13.8
 
 ### Patch Changes
