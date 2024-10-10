@@ -2,10 +2,12 @@ import { useWaitlist } from '@clerk/shared/react';
 import type { JoinWaitlistParams } from '@clerk/types';
 
 import { useWizard, Wizard } from '../../common';
+import { useWaitlistContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Card, Form, Header, useCardState } from '../../elements';
-import type { FormControlState } from '../../utils';
-import { handleError } from '../../utils';
+import { useLoadingStatus } from '../../hooks';
+import { useRouter } from '../../router';
+import { type FormControlState, handleError } from '../../utils';
 import type { Fields } from './Waitlist';
 
 type WaitlistFormProps = {
@@ -14,6 +16,9 @@ type WaitlistFormProps = {
 
 export const WaitlistForm = (props: WaitlistFormProps) => {
   const card = useCardState();
+  const status = useLoadingStatus();
+  const { navigate } = useRouter();
+  const ctx = useWaitlistContext();
   const { formState } = props;
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -28,20 +33,38 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    status.setLoading();
     card.setLoading();
     card.setError(undefined);
 
-    try {
-      const joinWaitlistParams: JoinWaitlistParams = { emailAddress: formState.emailAddress.value };
+    const joinWaitlistParams: JoinWaitlistParams = { emailAddress: formState.emailAddress.value };
 
-      const data = await joinWaitlist(joinWaitlistParams);
+    await joinWaitlist(joinWaitlistParams)
+      .then(() => {
+        if (ctx.redirectUrl) {
+          void navigate(ctx.redirectUrl);
+          return;
+        }
+        wizard.nextStep();
+      })
+      .catch(error => {
+        handleError(error, [], card.setError);
+      })
+      .finally(() => {
+        status.setIdle();
+        card.setIdle();
+      });
+    // try {
 
-      console.log(data);
+    //   await joinWaitlist(joinWaitlistParams);
 
-      wizard.nextStep();
-    } catch (error) {
-      handleError(error, [], card.setError);
-    }
+    //   if (ctx.redirectUrl) {
+    //     return navigate(ctx.redirectUrl);
+    //   }
+    //   wizard.nextStep();
+    // } catch (error) {
+    //   handleError(error, [], card.setError);
+    // }
   };
 
   return (

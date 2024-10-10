@@ -628,6 +628,7 @@ export const useGoogleOneTapContext = () => {
 
 export type WaitlistContextType = WaitlistCtx & {
   signInUrl: string;
+  redirectUrl?: string;
 };
 
 export const useWaitlistContext = (): WaitlistContextType => {
