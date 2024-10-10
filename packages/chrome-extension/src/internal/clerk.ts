@@ -4,7 +4,7 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
 import { SCOPE, type Scope } from '../types';
-import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION, PUBLISHABLE_KEY, SYNC_HOST } from './constants';
+import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
 import { validateManifest } from './utils/manifest';
@@ -20,17 +20,17 @@ Clerk.sdkMetadata = {
 };
 
 export type CreateClerkClientOptions = {
-  publishableKey?: string;
+  publishableKey: string;
   scope?: Scope;
   storageCache?: StorageCache;
   syncHost?: string;
 };
 
 export async function createClerkClient({
-  publishableKey = PUBLISHABLE_KEY,
+  publishableKey,
   scope,
   storageCache = BrowserStorageCache,
-  syncHost = SYNC_HOST,
+  syncHost,
 }: CreateClerkClientOptions): Promise<Clerk> {
   if (clerk) {
     return clerk;

@@ -10,7 +10,7 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
 console.log('VITE_CLERK_SYNC_HOST', import.meta.env.VITE_CLERK_SYNC_HOST);
 
-export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncSessionWithTab'> & {
+export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncHost'> & {
   className?: string;
 };
 
@@ -31,7 +31,6 @@ export function SharedApp({ className, ...rest }: SharedAppProps) {
       routerPush={to => navigate(to)}
       routerReplace={to => navigate(to, { replace: true })}
       {...rest}
-      // syncSessionWithTab
     >
       <div className='container'>
         <header>
@@ -95,6 +94,7 @@ export function SharedApp({ className, ...rest }: SharedAppProps) {
             href='https://clerk.dev/docs'
             target='_blank'
             className='button invert'
+            rel='noreferrer'
           >
             Learn more about Clerk
           </a>
