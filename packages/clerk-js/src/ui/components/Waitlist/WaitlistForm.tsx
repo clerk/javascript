@@ -54,17 +54,6 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
         status.setIdle();
         card.setIdle();
       });
-    // try {
-
-    //   await joinWaitlist(joinWaitlistParams);
-
-    //   if (ctx.redirectUrl) {
-    //     return navigate(ctx.redirectUrl);
-    //   }
-    //   wizard.nextStep();
-    // } catch (error) {
-    //   handleError(error, [], card.setError);
-    // }
   };
 
   return (
