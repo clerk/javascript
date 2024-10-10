@@ -8,8 +8,6 @@ import { CurrentUser } from '@/components/CurrentUser';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
-console.log('VITE_CLERK_SYNC_HOST', import.meta.env.VITE_CLERK_SYNC_HOST);
-
 export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncHost'> & {
   className?: string;
 };
