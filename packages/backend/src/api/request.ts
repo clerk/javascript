@@ -88,7 +88,7 @@ export function buildRequest(options: BuildRequestOptions) {
     let res: Response | undefined;
     try {
       if (formData) {
-        res = await runtime.fetch(finalUrl.href, {
+        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
           method,
           headers,
           body: formData,
@@ -100,7 +100,7 @@ export function buildRequest(options: BuildRequestOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        res = await runtime.fetch(finalUrl.href, {
+        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
           method,
           headers,
           ...body,

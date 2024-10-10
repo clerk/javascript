@@ -164,7 +164,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
-  const response = await runtime.fetch(url.href, {
+  const response = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json',
