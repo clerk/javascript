@@ -14,7 +14,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   // @ts-expect-error -- private method for the time being
   const { setActive, __internal_navigateWithError } = useClerk();
   const supportEmail = useSupportEmail();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { afterSignInUrl } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
       const res = await authenticateWithPasskey(...args);
       switch (res.status) {
         case 'complete':
-          return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
+          return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
         case 'needs_second_factor':
           return onSecondFactor();
         default:
