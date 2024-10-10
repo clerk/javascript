@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import type { OrganizationSystemPermissionKey } from '@clerk/types';
 
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
@@ -177,10 +178,30 @@ const OrganizationDomainsSection = () => {
   );
 };
 
-const OrganizationLeaveSection = () => {
-  const { organization } = useOrganization();
+/**
+ * Minimum system permissions required for critical organization management.
+ * Used to ensure at least one member retains administrative capabilities.
+ */
+const MINIMUM_REQUIRED_SYSTEM_PERMISSIONS: OrganizationSystemPermissionKey[] = [
+  'org:sys_profile:delete',
+  'org:sys_memberships:read',
+  'org:sys_memberships:manage',
+];
 
-  if (!organization) {
+const OrganizationLeaveSection = () => {
+  const { organization, membership } = useOrganization();
+  const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
+  const { memberships } = useOrganization({
+    memberships: canReadMemberships || undefined,
+  });
+
+  const canLeaveOrganization = memberships?.data?.some(
+    ({ permissions, id }) =>
+      id !== membership?.id &&
+      MINIMUM_REQUIRED_SYSTEM_PERMISSIONS.every(permission => permissions.includes(permission)),
+  );
+
+  if (!organization || !canLeaveOrganization) {
     return null;
   }
 
@@ -213,11 +234,13 @@ const OrganizationLeaveSection = () => {
           </ProfileSection.Item>
         </Action.Closed>
 
-        <Action.Open value='leave'>
-          <Action.Card variant='destructive'>
-            <LeaveOrganizationScreen />
-          </Action.Card>
-        </Action.Open>
+        {canLeaveOrganization && (
+          <Action.Open value='leave'>
+            <Action.Card variant='destructive'>
+              <LeaveOrganizationScreen />
+            </Action.Card>
+          </Action.Open>
+        )}
       </Action.Root>
     </ProfileSection.Root>
   );
