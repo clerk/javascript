@@ -1,4 +1,7 @@
+import type { __internal_ProtectConfiguration } from '@clerk/shared';
+import { __internal_findFailedProtectConfiguration } from '@clerk/shared';
 import type {
+  __experimental_SessionVerificationLevel,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -12,6 +15,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
+import { UserVerificationModal, UserVerificationTrigger } from './complementary-components';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
@@ -140,6 +144,178 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   return authorized;
 };
 /* eslint-enable react-hooks/rules-of-hooks */
+
+type ReactProtectConfiguration = __internal_ProtectConfiguration & {
+  fallback?: React.ComponentType | 'modal';
+};
+
+type MyAuth = ReturnType<typeof useAuth>;
+type InferStrictTypeParams<T extends WithProtectComponentReactParams> = T;
+
+type NonNullable<T> = T extends null | undefined ? never : T;
+type NonNullableRecord<T, K extends keyof T> = {
+  [P in keyof T]: P extends K ? NonNullable<T[P]> : T[P];
+};
+
+type WithProtectComponentReactParams =
+  | {
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+      reverification?: never;
+      fallback?: React.ComponentType;
+    }
+  | {
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+      reverification?: never;
+      fallback?: React.ComponentType;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+      reverification:
+        | 'veryStrict'
+        | 'strict'
+        | 'moderate'
+        | 'lax'
+        | {
+            level: __experimental_SessionVerificationLevel;
+            afterMinutes: number;
+          };
+      fallback?: React.ComponentType | 'modal';
+    };
+
+type ProtectComponentParams = {
+  fallback?: React.ComponentType;
+  __internalModalComponent?: React.ComponentType;
+  __internalTriggerComponent?: React.ComponentType;
+};
+
+type ComponentParam<Props, AuthObject> = React.ComponentType<
+  Props & {
+    auth: AuthObject;
+  }
+>;
+
+type CustomAuthObject<T extends WithProtectComponentReactParams> =
+  InferStrictTypeParams<T> extends
+    | { permission: any }
+    | {
+        role: any;
+      }
+    ? NonNullableRecord<MyAuth, 'orgId' | 'userId' | 'sessionId' | 'orgRole'>
+    : NonNullableRecord<MyAuth, 'userId'>;
+
+export function __experimental_protectComponent(params?: ProtectComponentParams) {
+  const { __internalModalComponent, __internalTriggerComponent, ...restParams } = params || {};
+  const configs: ReactProtectConfiguration[] = restParams ? [restParams] : [];
+
+  const withNext = <T extends WithProtectComponentReactParams>(nextParams: T) => {
+    configs.push(nextParams);
+
+    const component = <P,>(Component: ComponentParam<P, CustomAuthObject<T>>) => {
+      return (props: P) => {
+        const _auth = useAuth();
+
+        const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+
+        if (failedItem?.fallback) {
+          const Fallback = failedItem.fallback;
+
+          if (Fallback === 'modal') {
+            if (__internalModalComponent) {
+              return <__internalModalComponent />;
+            }
+            return <UserVerificationModal />;
+          }
+
+          // Types don't allow this
+          if (typeof Fallback !== 'function') {
+            throw 'As fallback, only a React Component or "modal" is allowed';
+          }
+
+          if (!failedItem.reverification) {
+            return (
+              // @ts-expect-error type props
+              <Fallback
+                {
+                  // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
+                  ...props
+                }
+              />
+            );
+          }
+
+          return (
+            // @ts-expect-error type props
+            <Fallback
+              {
+                // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
+                ...props
+              }
+              UserVerificationTrigger={__internalTriggerComponent || UserVerificationTrigger}
+            />
+          );
+        }
+
+        if (failedItem) {
+          return null;
+        }
+
+        return (
+          <Component
+            {...props}
+            auth={_auth as CustomAuthObject<T>}
+          />
+        );
+      };
+    };
+
+    return { with: withNext, component };
+  };
+
+  const component = <P,>(Component: ComponentParam<P, NonNullableRecord<MyAuth, 'userId'>>) => {
+    return (props: P) => {
+      const _auth = useAuth();
+
+      const failedItem = __internal_findFailedProtectConfiguration(configs, _auth);
+
+      if (failedItem?.fallback) {
+        const Fallback = failedItem.fallback;
+
+        // Types don't allow this
+        if (typeof Fallback !== 'function') {
+          throw 'As fallback, only a React Component is allowed';
+        }
+
+        return (
+          // @ts-expect-error type props
+          <Fallback
+            {
+              // TODO-STEP-UP: Could this be unsafe ? Should we allow fallback to have access to children ?
+              ...props
+            }
+          />
+        );
+      }
+
+      if (failedItem) {
+        return null;
+      }
+
+      return (
+        <Component
+          {...props}
+          auth={_auth as NonNullableRecord<MyAuth, 'userId'>}
+        />
+      );
+    };
+  };
+
+  // Return the protect method and the component method to enable chaining
+  return { with: withNext, component };
+}
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;

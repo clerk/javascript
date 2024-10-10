@@ -15,7 +15,6 @@ import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
-type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
@@ -28,7 +27,7 @@ type UseAuthReturn =
       orgId: undefined;
       orgRole: undefined;
       orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -143,7 +142,7 @@ export const useAuth: UseAuth = () => {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: undefined,
+      has: () => false,
       signOut,
       getToken,
     };
