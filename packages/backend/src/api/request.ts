@@ -2,7 +2,7 @@ import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
-import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
+import { API_URL, API_VERSION, constants, EPHEMERAL_MODE_AVAILABLE, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -56,6 +56,14 @@ type BuildRequestOptions = {
 };
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
+    // TODO: Remove this once we have a better way to handle ephemeral keys
+    if (!options.secretKey && EPHEMERAL_MODE_AVAILABLE) {
+      const ephemeralAccount = await runtime.fetchEphemeralAccount();
+      if (ephemeralAccount) {
+        options.secretKey = ephemeralAccount.secretKey;
+      }
+    }
+
     const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
