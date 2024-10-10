@@ -4,7 +4,9 @@ import { clerkClient } from '../clerkClient';
 
 describe('clerkClient', () => {
   it('should pass version package to userAgent', async () => {
-    await clerkClient().users.getUser('user_test');
+    const resolvedClerkClient = await clerkClient();
+
+    await resolvedClerkClient.users.getUser('user_test');
 
     expect(global.fetch).toBeCalled();
     expect((global.fetch as any).mock.calls[0][1].headers).toMatchObject({

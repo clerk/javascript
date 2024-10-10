@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 
-export default function Page() {
-  auth().protect({ role: 'admin' });
+export default async function Page() {
+  const { protect } = await auth();
+  protect({ role: 'admin' });
   return <p>User has access</p>;
 }

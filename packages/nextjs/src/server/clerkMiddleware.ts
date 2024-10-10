@@ -76,7 +76,8 @@ interface ClerkMiddleware {
 const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
 export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
 
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
+// @ts-expect-error TS is not happy here. Will dig into it
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
@@ -105,7 +106,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
 
-      clerkClient().telemetry.record(
+      const resolvedClerkClient = await clerkClient();
+
+      resolvedClerkClient.telemetry.record(
         eventMethodCalled('clerkMiddleware', {
           handler: Boolean(handler),
           satellite: Boolean(options.isSatellite),
@@ -120,7 +123,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
-      const requestState = await clerkClient().authenticateRequest(
+      const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
       );
