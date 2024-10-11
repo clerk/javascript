@@ -77,9 +77,9 @@ type Chainable<T = object> =
           handler: H,
         ): (
           ...args: InferParametersFromSecond<H>
-        ) => Promise<Awaited<InferReturnType<H>>> &
-          Promise<
-            T extends { reverification: any; permission: any; role: any }
+        ) => Promise<
+          Awaited<InferReturnType<H>> &
+            (T extends { reverification: any; permission: any; role: any }
               ?
                   | ReturnType<typeof reverificationMismatch<T['reverification']>>
                   | ReturnType<typeof permissionMismatch<T['permission']>>
@@ -97,8 +97,8 @@ type Chainable<T = object> =
                       | ReturnType<typeof signedOut>
                   : T extends { reverification: any }
                     ? ReturnType<typeof reverificationMismatch<T['reverification']>> | ReturnType<typeof signedOut>
-                    : ReturnType<typeof signedOut>
-          >;
+                    : ReturnType<typeof signedOut>)
+        >;
       }
     : {
         with<K extends WithProtectActionParams>(key: K): Chainable<Merge<T, K>>;
@@ -107,9 +107,9 @@ type Chainable<T = object> =
           handler: H,
         ): (
           ...args: InferParametersFromSecond<H>
-        ) => Promise<Awaited<InferReturnType<H>>> &
-          Promise<
-            T extends { permission: any; role: any }
+        ) => Promise<
+          Awaited<InferReturnType<H>> &
+            (T extends { permission: any; role: any }
               ?
                   | ReturnType<typeof permissionMismatch<T['permission']>>
                   | ReturnType<typeof roleMismatch<T['role']>>
@@ -118,8 +118,8 @@ type Chainable<T = object> =
                 ? ReturnType<typeof permissionMismatch<T['permission']>> | ReturnType<typeof signedOut>
                 : T extends { role: any }
                   ? ReturnType<typeof roleMismatch<T['role']>> | ReturnType<typeof signedOut>
-                  : ReturnType<typeof signedOut>
-          >;
+                  : ReturnType<typeof signedOut>)
+        >;
       };
 
 function __experimental_protectAction() {
