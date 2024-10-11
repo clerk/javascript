@@ -1,11 +1,9 @@
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextRequest } from 'next/server';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createGetAuth, getAuth } from '../createGetAuth';
-
-vi.stubGlobal('PACKAGE_NAME', '@clerk/nextjs');
 
 const mockSecretKey = 'sk_test_mock';
 
