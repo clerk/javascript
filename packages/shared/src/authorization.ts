@@ -37,7 +37,7 @@ const TYPES_TO_OBJECTS: TypesToConfig = {
     level: 'multiFactor',
   },
   strict: {
-    afterMinutes: 10,
+    afterMinutes: 1,
     level: 'secondFactor',
   },
   moderate: {
