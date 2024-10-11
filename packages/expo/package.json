@@ -81,15 +81,15 @@
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
-    "react-native": ">=0.73",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-native": ">=0.73"
   },
   "peerDependenciesMeta": {
-    "expo-secure-store": {
+    "expo-local-authentication": {
       "optional": true
     },
-    "expo-local-authentication": {
+    "expo-secure-store": {
       "optional": true
     }
   },
