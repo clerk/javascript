@@ -26,14 +26,14 @@ describe('clerkClient', () => {
       sdkMetadata: {
         environment: 'test',
         name: '@clerk/nextjs',
-        version: '1',
+        version: '0.0.0-test',
       },
       secretKey: 'TEST_SECRET_KEY',
       telemetry: {
         debug: false,
         disabled: false,
       },
-      userAgent: '@clerk/nextjs@1',
+      userAgent: '@clerk/nextjs@0.0.0-test',
     });
   });
 });
