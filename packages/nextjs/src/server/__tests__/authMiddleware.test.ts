@@ -2,14 +2,8 @@
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus } from '@clerk/backend/internal';
 import { expectTypeOf } from 'expect-type';
-import type { NextFetchEvent } from 'next/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-
-const authenticateRequestMock = vi.fn().mockResolvedValue({
-  toAuth: () => ({}),
-  headers: new Headers(),
-});
 
 // Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
@@ -382,9 +376,14 @@ describe('authMiddleware(params)', () => {
     });
 
     it('uses authenticateRequest result as auth', async () => {
+      // @ts-expect-error - clerkClient is mocked
+      clerkClient.authenticateRequest.mockResolvedValueOnce({
+        toAuth: () => ({ userId: null }),
+        headers: new Headers(),
+      });
+
       const req = mockRequest({ url: '/protected' });
       const event = {} as NextFetchEvent;
-      authenticateRequestMock.mockResolvedValueOnce({ toAuth: () => ({ userId: null }), headers: new Headers() });
       const afterAuth = vi.fn();
 
       await authMiddleware({ afterAuth })(req, event);
@@ -392,7 +391,7 @@ describe('authMiddleware(params)', () => {
       expect(clerkClient.authenticateRequest).toBeCalled();
       expect(afterAuth).toBeCalledWith(
         {
-          userId: undefined,
+          userId: null,
           isPublicRoute: false,
           isApiRoute: false,
         },
@@ -402,14 +401,16 @@ describe('authMiddleware(params)', () => {
     });
   });
 
-  // TODO: Fix this test
-  describe.skip('authenticateRequest', function () {
+  describe('authenticateRequest', function () {
     it('returns 307 and starts the handshake flow for handshake requestState status', async () => {
       const mockLocationUrl = 'https://example.com';
-      authenticateRequestMock.mockResolvedValueOnce({
+
+      // @ts-expect-error - clerkClient is mocked
+      clerkClient.authenticateRequest.mockResolvedValueOnce({
         status: AuthStatus.Handshake,
         headers: new Headers({ Location: mockLocationUrl }),
       });
+
       const resp = await authMiddleware()(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
