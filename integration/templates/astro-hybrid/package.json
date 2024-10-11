@@ -1,18 +1,18 @@
 {
   "name": "astro-clerk-hybrid-playground",
-  "type": "module",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev --port $PORT",
+    "astro": "astro",
     "build": "astro check && astro build",
+    "dev": "astro dev",
     "preview": "astro preview --port $PORT",
-    "astro": "astro"
+    "start": "astro dev --port $PORT"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/react": "^3.6.2",
     "@astrojs/node": "^8.3.4",
+    "@astrojs/react": "^3.6.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "astro": "^4.15.11",

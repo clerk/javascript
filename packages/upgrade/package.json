@@ -1,6 +1,11 @@
 {
   "name": "@clerk/upgrade",
   "version": "1.0.9",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/upgrade"
+  },
   "license": "MIT",
   "type": "module",
   "main": "dist/cli.js",
@@ -16,11 +21,6 @@
     "dev": "babel --out-dir=dist --watch src --copy-files",
     "lint": "eslint src/",
     "lint:publint": "publint"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/upgrade"
   },
   "babel": {
     "presets": [
