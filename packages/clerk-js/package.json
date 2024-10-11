@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.26.2",
+  "version": "5.26.3",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -70,12 +70,6 @@
     "regenerator-runtime": "0.13.11"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
-    "@babel/preset-react": "^7.12.5",
-    "@babel/preset-typescript": "^7.12.1",
     "@clerk/eslint-config-custom": "*",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@rsdoctor/webpack-plugin": "^0.4.4",
@@ -84,8 +78,6 @@
     "@types/react-dom": "*",
     "@types/webpack-dev-server": "^4.7.2",
     "@types/webpack-env": "^1.16.4",
-    "babel-loader": "^9.1.2",
-    "babel-plugin-module-resolver": "^5.0.0",
     "bundlewatch": "^0.4.0",
     "react-refresh": "^0.14.0",
     "react-refresh-typescript": "^2.0.5",
