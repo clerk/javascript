@@ -1,18 +1,7 @@
 {
   "name": "@clerk/astro",
-  "description": "Clerk SDK for Astro",
   "version": "1.3.13",
-  "type": "module",
-  "license": "MIT",
-  "author": "Clerk",
-  "homepage": "https://clerk.com/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/astro"
-  },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
     "authentication",
@@ -24,29 +13,27 @@
     "astro-component",
     "withastro"
   ],
-  "sideEffects": false,
+  "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerk/javascript/issues"
   },
-  "scripts": {
-    "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
-    "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
-    "build:dts": "tsc --emitDeclarationOnly --declaration",
-    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
-    "lint:publint": "npm run copy:components && publint",
-    "publish:local": "npx yalc push --replace --sig"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/astro"
   },
-  "files": [
-    "dist",
-    "client",
-    "server",
-    "internal",
-    "components",
-    "env.d.ts",
-    "types.ts"
-  ],
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#async-local-storage": {
+      "workerd": "./dist/async-local-storage.server.js",
+      "browser": "./dist/async-local-storage.client.js",
+      "node": "./dist/async-local-storage.server.js",
+      "default": "./dist/async-local-storage.server.js"
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -72,13 +59,26 @@
     "./components": "./components/index.ts",
     "./package.json": "./package.json"
   },
-  "imports": {
-    "#async-local-storage": {
-      "workerd": "./dist/async-local-storage.server.js",
-      "browser": "./dist/async-local-storage.client.js",
-      "node": "./dist/async-local-storage.server.js",
-      "default": "./dist/async-local-storage.server.js"
-    }
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "client",
+    "server",
+    "internal",
+    "components",
+    "env.d.ts",
+    "types.ts"
+  ],
+  "scripts": {
+    "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
+    "build:dts": "tsc --emitDeclarationOnly --declaration",
+    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
+    "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
+    "lint": "eslint src/",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:publint": "npm run copy:components && publint",
+    "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {
     "@clerk/backend": "1.13.9",
