@@ -1,5 +1,6 @@
 import type { ActorRefFrom, AnyActorRef, AnyStateMachine, SnapshotFrom } from 'xstate';
 
+import { SignInStartMachineId } from '~/internals/machines/sign-in';
 import type {
   TSignUpContinueMachine,
   TSignUpRouterMachine,
@@ -16,6 +17,6 @@ function useSignUpStep<M extends AnyStateMachine, T = ActorRefFrom<M>>(name: str
   return SignUpRouterCtx.useSelector(state => state.children[name] as AnyActorRef) as T;
 }
 
-export const useSignUpStartStep = () => useSignUpStep<TSignUpStartMachine>('start');
+export const useSignUpStartStep = () => useSignUpStep<TSignUpStartMachine>(SignInStartMachineId);
 export const useSignUpContinueStep = () => useSignUpStep<TSignUpContinueMachine>('continue');
 export const useSignUpVerificationStep = () => useSignUpStep<TSignUpVerificationMachine>('verification');

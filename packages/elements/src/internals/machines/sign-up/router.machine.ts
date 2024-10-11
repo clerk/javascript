@@ -16,6 +16,7 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { SignInStartMachineId } from '../sign-in';
 import { SignUpContinueMachine } from './continue.machine';
 import type {
   SignUpRouterContext,
@@ -329,7 +330,7 @@ export const SignUpRouterMachine = setup({
       tags: ['step:start'],
       exit: 'clearFormErrors',
       invoke: {
-        id: 'start',
+        id: SignInStartMachineId,
         src: 'startMachine',
         input: ({ context, self }) => ({
           basePath: context.router?.basePath,
@@ -343,8 +344,10 @@ export const SignUpRouterMachine = setup({
       },
       on: {
         'RESET.STEP': {
-          target: 'Start',
-          reenter: true,
+          actions: enqueueActions(({ enqueue, context }) => {
+            enqueue('clearFormErrors');
+            enqueue.sendTo(SignInStartMachineId, { type: 'SET_FORM', formRef: context.formRef });
+          }),
         },
         NEXT: [
           {
@@ -355,6 +358,7 @@ export const SignUpRouterMachine = setup({
             guard: and(['hasTicket', 'statusNeedsContinue']),
             actions: { type: 'navigateInternal', params: { path: '/' } },
             target: 'Start',
+            reenter: true,
           },
           {
             guard: 'statusNeedsVerification',
