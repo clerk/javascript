@@ -1,16 +1,17 @@
 {
   "name": "@clerk/ui",
   "version": "0.1.9",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui"
+  },
   "license": "MIT",
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/ui"
   },
   "sideEffects": [
     "*.css"
@@ -46,9 +47,9 @@
   ],
   "scripts": {
     "build": "tsup",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "dev": "tsup --watch",
     "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\"",
-    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "test": "vitest"
   },
   "dependencies": {

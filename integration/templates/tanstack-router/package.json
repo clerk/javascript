@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port=$PORT",
     "build": "vite build",
+    "dev": "vite --port=$PORT",
     "serve": "vite preview --port=$PORT",
     "start": "vite"
   },
