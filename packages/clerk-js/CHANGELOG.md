@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.26.4
+
+### Patch Changes
+
+- Correctly handle malformed or protocol-relative URLs before navigating to cross-origin URLs ([#4317](https://github.com/clerk/javascript/pull/4317)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.26.3
 
 ### Patch Changes

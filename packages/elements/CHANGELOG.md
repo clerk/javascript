@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.16.0
+
+### Minor Changes
+
+- Adds `restricted` Step for restricted sign-up mode ([#4221](https://github.com/clerk/javascript/pull/4221)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.15.10
 
 ### Patch Changes
