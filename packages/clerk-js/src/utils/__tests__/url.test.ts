@@ -472,6 +472,12 @@ describe('isAllowedRedirectOrigin', () => {
     // regexp
     ['https://www.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], true],
     ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
+    // malformed or protocol-relative URLs
+    ['http:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['http//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['https//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
   ];
 
   const warnMock = jest.spyOn(logger, 'warnOnce');

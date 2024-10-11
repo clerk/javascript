@@ -241,15 +241,29 @@ export function relativeToAbsoluteUrl(url: string, origin: string | URL): string
   return new URL(url, origin).href;
 }
 
-export function isRelativeUrl(val: unknown): val is string {
+export function isRelativeUrl(val: string): boolean {
   if (val !== val && !val) {
     return false;
   }
-  try {
-    const temp = new URL(val as string, DUMMY_URL_BASE);
-    return temp.origin === DUMMY_URL_BASE;
-  } catch (e) {
+
+  if (val.startsWith('//') || val.startsWith('http/') || val.startsWith('https/')) {
+    // Protocol-relative URL; consider it absolute.
     return false;
+  }
+
+  try {
+    // If this does not throw, it's a valid absolute URL
+    new URL(val);
+    return false;
+  } catch (e) {
+    try {
+      // If this does not throw, it's a valid relative URL
+      new URL(val, DUMMY_URL_BASE);
+      return true;
+    } catch (e) {
+      // Invalid URL case
+      return false;
+    }
   }
 }
 
@@ -344,12 +358,11 @@ export const isAllowedRedirectOrigin =
       return true;
     }
 
-    const url = new URL(_url, DUMMY_URL_BASE);
-    const isRelativeUrl = url.origin === DUMMY_URL_BASE;
-    if (isRelativeUrl) {
+    if (isRelativeUrl(_url)) {
       return true;
     }
 
+    const url = new URL(_url, DUMMY_URL_BASE);
     const isAllowed = allowedRedirectOrigins
       .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
       .some(origin => origin.test(trimTrailingSlash(url.origin)));
@@ -380,16 +393,3 @@ export function createAllowedRedirectOrigins(
 
   return origins;
 }
-
-export const isCrossOrigin = (url: string | URL, origin: string | URL = window.location.origin): boolean => {
-  try {
-    if (isRelativeUrl(url)) {
-      return false;
-    }
-    const urlOrigin = new URL(url).origin;
-    const originOrigin = new URL(origin).origin;
-    return urlOrigin !== originOrigin;
-  } catch (e) {
-    return false;
-  }
-};
