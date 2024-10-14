@@ -1,5 +1,6 @@
 import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { OAuthStrategy } from './strategies';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 export type CaptchaWidgetType = 'smart' | 'invisible' | null;
@@ -19,6 +20,7 @@ export interface DisplayConfigJSON {
   captcha_widget_type: CaptchaWidgetType;
   captcha_public_key_invisible: string | null;
   captcha_provider: CaptchaProvider;
+  captcha_oauth_bypass: OAuthStrategy[] | null;
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
@@ -52,6 +54,12 @@ export interface DisplayConfigResource extends ClerkResource {
   captchaWidgetType: CaptchaWidgetType;
   captchaProvider: CaptchaProvider;
   captchaPublicKeyInvisible: string | null;
+  /**
+   * An array of OAuth strategies for which we will bypass the captcha.
+   * We trust that the provider will verify that the user is not a bot on their end.
+   * This can also be used to bypass the captcha for a specific OAuth provider on a per-instance basis.
+   */
+  captchaOauthBypass: OAuthStrategy[];
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;

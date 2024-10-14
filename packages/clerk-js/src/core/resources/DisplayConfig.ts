@@ -4,6 +4,7 @@ import type {
   DisplayConfigJSON,
   DisplayConfigResource,
   DisplayThemeJSON,
+  OAuthStrategy,
   PreferredSignInStrategy,
 } from '@clerk/types';
 
@@ -24,6 +25,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaWidgetType: CaptchaWidgetType = null;
   captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKeyInvisible: string | null = null;
+  captchaOauthBypass: OAuthStrategy[] = [];
   homeUrl!: string;
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
@@ -74,6 +76,9 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.captchaWidgetType = data.captcha_widget_type;
     this.captchaProvider = data.captcha_provider;
     this.captchaPublicKeyInvisible = data.captcha_public_key_invisible;
+    // These are the OAuth strategies we used to bypass the captcha for by default
+    // before the introduction of the captcha_oauth_bypass field
+    this.captchaOauthBypass = data.captcha_oauth_bypass || ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.organizationProfileUrl = data.organization_profile_url;
