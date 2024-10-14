@@ -156,6 +156,12 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
+      checkbox: {
+        label__prefixText: LocalizationValue;
+        label__termsOfServiceText: LocalizationValue;
+        label__privacyPolicyText: LocalizationValue;
+        label__conjunctionText: LocalizationValue;
+      };
     };
   };
   signIn: {
