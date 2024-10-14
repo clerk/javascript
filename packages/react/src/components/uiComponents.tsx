@@ -25,6 +25,7 @@ import {
   userProfilePageRenderedError,
 } from '../errors/messages';
 import type {
+  CustomPortalsRendererProps,
   MountProps,
   OpenProps,
   OrganizationProfileLinkProps,
@@ -198,11 +199,7 @@ class Portal extends React.PureComponent<
   }
 }
 
-const CustomPortalsRenderer = (props: MountProps) => {
-  if (!isMountProps(props)) {
-    return null;
-  }
-
+const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
       {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
@@ -252,8 +249,9 @@ const _UserProfile = withClerk(
         unmount={clerk.unmountUserProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
-        customPagesPortals={customPagesPortals}
-      />
+      >
+        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+      </Portal>
     );
   },
   'UserProfile',
@@ -278,25 +276,21 @@ const _UserButton = withClerk(
       unmount: clerk.unmountUserButton,
       updateProps: (clerk as any).__unstable__updateProps,
       props: { ...props, userProfileProps, customMenuItems },
+    };
+    const portalProps = {
       customPagesPortals: customPagesPortals,
       customMenuItemsPortals: customMenuItemsPortals,
     };
 
     return (
-      <UserButtonContext.Provider
-        value={{
-          mount: clerk.mountUserButton,
-          unmount: clerk.unmountUserButton,
-          updateProps: (clerk as any).__unstable__updateProps,
-          props: { ...props, userProfileProps, customMenuItems },
-        }}
-      >
+      <UserButtonContext.Provider value={passableProps}>
         <Portal
           {...passableProps}
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
-          {props.children}
-          <CustomPortalsRenderer {...passableProps} />
+          {/*This mimics the previous behaviour before asProvider existed*/}
+          {props.__experimental_asProvider ? props.children : null}
+          <CustomPortalsRenderer {...portalProps} />
         </Portal>
       </UserButtonContext.Provider>
     );
@@ -361,8 +355,9 @@ const _OrganizationProfile = withClerk(
         unmount={clerk.unmountOrganizationProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
-        customPagesPortals={customPagesPortals}
-      />
+      >
+        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+      </Portal>
     );
   },
   'OrganizationProfile',
@@ -399,7 +394,6 @@ const _OrganizationSwitcher = withClerk(
       unmount: clerk.unmountOrganizationSwitcher,
       updateProps: (clerk as any).__unstable__updateProps,
       props: { ...props, organizationProfileProps },
-      customPagesPortals: customPagesPortals,
     };
 
     /**
@@ -408,20 +402,14 @@ const _OrganizationSwitcher = withClerk(
     clerk.__internal_prefetchOrganizationSwitcher();
 
     return (
-      <OrganizationSwitcherContext.Provider
-        value={{
-          mount: clerk.mountOrganizationSwitcher,
-          unmount: clerk.unmountOrganizationSwitcher,
-          updateProps: (clerk as any).__unstable__updateProps,
-          props: { ...props, organizationProfileProps },
-        }}
-      >
+      <OrganizationSwitcherContext.Provider value={passableProps}>
         <Portal
           {...passableProps}
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
-          {props.children}
-          <CustomPortalsRenderer {...passableProps} />
+          {/*This mimics the previous behaviour before asProvider existed*/}
+          {props.__experimental_asProvider ? props.children : null}
+          <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
         </Portal>
       </OrganizationSwitcherContext.Provider>
     );
