@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.26.4",
+  "version": "5.26.5",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -50,9 +50,9 @@
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
-    "@clerk/localizations": "3.2.0",
-    "@clerk/shared": "2.9.0",
-    "@clerk/types": "4.25.0",
+    "@clerk/localizations": "3.2.1",
+    "@clerk/shared": "2.9.1",
+    "@clerk/types": "4.25.1",
     "@coinbase/wallet-sdk": "4.0.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
