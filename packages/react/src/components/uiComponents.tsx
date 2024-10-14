@@ -1,7 +1,6 @@
 import { logErrorInDevMode, without } from '@clerk/shared';
 import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
-  __experimental_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -342,20 +341,6 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   Link: MenuLink,
   __experimental_Outlet: UserButtonOutlet,
 });
-
-export const __experimental_UserVerification = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<__experimental_UserVerificationProps>>) => {
-    return (
-      <Portal
-        mount={clerk.__experimental_mountUserVerification}
-        unmount={clerk.__experimental_unmountUserVerification}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={props}
-      />
-    );
-  },
-  '__experimental_UserVerification',
-);
 
 export function OrganizationProfilePage(_: PropsWithChildren<OrganizationProfilePageProps>) {
   logErrorInDevMode(organizationProfilePageRenderedError);

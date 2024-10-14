@@ -1,17 +1,17 @@
 {
   "name": "@clerk/ui",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui"
+  },
   "license": "MIT",
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/ui"
   },
   "exports": {
     "./contexts": {
@@ -41,9 +41,9 @@
   ],
   "scripts": {
     "build": "tsup",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "dev": "tsup --watch",
     "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\"",
-    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "test": "vitest"
   },
   "dependencies": {
@@ -62,6 +62,7 @@
     "@clerk/tailwindcss-transformer": "*",
     "@testing-library/react": "^16.0.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "bundlewatch": "^0.4.0",
     "concurrently": "^8.2.2",
     "jsdom": "^24.1.1",
     "vitest": "^2.0.5"

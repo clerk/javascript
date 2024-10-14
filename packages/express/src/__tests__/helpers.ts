@@ -18,6 +18,7 @@ export function mockResponse(): ExpressResponse {
   return {
     status: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
+    redirect: jest.fn().mockReturnThis(),
   } as unknown as ExpressResponse;
 }
 
@@ -44,6 +45,7 @@ export function mockRequestWithAuth(auth: Partial<AuthObject> = {}): ExpressRequ
   } as unknown as ExpressRequestWithAuth;
 }
 
+// Applicable when opting-in to handshake flow
 export function assertSignedOutDebugHeaders(response: any) {
   expect(response.header).toHaveProperty('x-clerk-auth-status', 'signed-out');
   expect(response.header).toHaveProperty('x-clerk-auth-reason', 'session-token-and-uat-missing');

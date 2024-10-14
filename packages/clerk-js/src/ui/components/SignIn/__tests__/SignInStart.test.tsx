@@ -111,6 +111,29 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('Restricted mode', () => {
+    it('"Don\'t have an account?" text should not be presented', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withRestrictedMode();
+      });
+      render(<SignInStart />, { wrapper });
+      expect(screen.queryByText(/Don’t have an account/i)).not.toBeInTheDocument();
+    });
+
+    it('"Don\'t have an account?" text should be visible', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      render(<SignInStart />, { wrapper });
+
+      const signUpLink = screen.getByText(/Don’t have an account/i).nextElementSibling;
+      expect(signUpLink?.textContent).toBe('Sign up');
+      expect(signUpLink?.tagName.toUpperCase()).toBe('A');
+      expect(signUpLink?.getAttribute('href')).toMatch(fixtures.environment.displayConfig.signUpUrl);
+    });
+  });
+
   describe('Social OAuth', () => {
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
       const { wrapper } = await createFixtures(f => {

@@ -1,23 +1,44 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignOutOptions } from '@clerk/types';
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<{ as: Tag; } & SignOutOptions>
+import type { SignOutOptions, Without } from '@clerk/types'
+import type { ButtonProps } from '../../types';
+import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
 
-import { generateSafeId } from '@clerk/astro/internal';
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignOutOptions & Without<ButtonProps<Tag>, 'mode'>>
+
+import { generateSafeId } from '@clerk/astro/internal'
 
 const safeId = generateSafeId();
 
+if ('as' in Astro.props) {
+  logAsPropUsageDeprecation()
+}
+
 const {
   as: Tag = 'button',
+  asChild,
   redirectUrl = '/',
   sessionId,
   ...elementProps
 } = Astro.props
+
+let htmlElement = ''
+
+if (asChild) {
+  htmlElement = await Astro.slots.render('default')
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId)
+}
 ---
 
-<Tag {...elementProps} data-clerk-unstyled-id={safeId}>
-  <slot>Sign out</slot>
-</Tag >
+{
+  asChild ? (
+    <Fragment set:html={htmlElement} />
+  ) : (
+    <Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+      <slot>Sign out</slot>
+    </Tag >
+  )
+}
 
 <script is:inline define:vars={{ redirectUrl, sessionId, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);

@@ -2,6 +2,7 @@ import * as http from 'node:http';
 
 import { expect, test } from '@playwright/test';
 
+import type { OrganizationSyncOptions } from '../../packages/backend/src/tokens/types';
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
@@ -72,7 +73,7 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('Test standard signed-in - dev', async () => {
+  test('standard signed-in - dev', async () => {
     const config = generateConfig({ mode: 'test' });
     const { token, claims } = config.generateToken({ state: 'active' });
     const clientUat = claims.iat;
@@ -88,7 +89,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - dev', async () => {
+  test('standard signed-in - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -107,7 +108,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - prod', async () => {
+  test('standard signed-in - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -125,7 +126,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - prod', async () => {
+  test('standard signed-in - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -143,7 +144,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test expired session token - dev', async () => {
+  test('expired session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -162,11 +163,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test expired session token - prod', async () => {
+  test('expired session token - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -185,11 +186,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test expired session token - authorization header - prod', async () => {
+  test('expired session token - authorization header - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -209,11 +210,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test early session token - dev', async () => {
+  test('early session token - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -232,11 +233,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
     );
   });
 
-  test('Test early session token - authorization header - dev', async () => {
+  test('early session token - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -256,11 +257,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
     );
   });
 
-  test('Test proxyUrl - dev', async () => {
+  test('proxyUrl - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -280,11 +281,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test proxyUrl - prod', async () => {
+  test('proxyUrl - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -304,11 +305,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test domain - dev', async () => {
+  test('domain - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -328,11 +329,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test domain - prod', async () => {
+  test('domain - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -352,11 +353,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test missing session token, positive uat - dev', async () => {
+  test('missing session token, positive uat - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -373,11 +374,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false${devBrowserQuery}`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token${devBrowserQuery}`,
     );
   });
 
-  test('Test missing session token, positive uat - prod', async () => {
+  test('missing session token, positive uat - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -394,11 +395,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token`,
     );
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - dev', async () => {
+  test('missing session token, 0 uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -414,7 +415,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, 0 uat (indicating signed out) - prod', async () => {
+  test('missing session token, 0 uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -430,7 +431,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - dev', async () => {
+  test('missing session token, missing uat (indicating signed out) - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -446,7 +447,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out) - prod', async () => {
+  test('missing session token, missing uat (indicating signed out) - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -461,7 +462,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite no sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite no sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -477,7 +478,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test signed out satellite with sec-fetch-dest=document - prod', async () => {
+  test('signed out satellite with sec-fetch-dest=document - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -495,11 +496,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
         app.serverUrl + '/',
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=satellite-needs-syncing`,
     );
   });
 
-  test('Test signed out satellite - dev', async () => {
+  test('signed out satellite - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -516,7 +517,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
+  test('missing session token, missing uat (indicating signed out), missing devbrowser - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -532,11 +533,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-missing`,
     );
   });
 
-  test('Test redirect url - path and qs - dev', async () => {
+  test('redirect url - path and qs - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -555,11 +556,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - path and qs - prod', async () => {
+  test('redirect url - path and qs - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -578,11 +579,11 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test redirect url - proxy - dev', async () => {
+  test('redirect url - proxy - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -601,11 +602,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - proxy - prod', async () => {
+  test('redirect url - proxy - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -624,11 +625,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
-  test('Test redirect url - proxy with port - dev', async () => {
+  test('redirect url - proxy with port - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -647,11 +648,11 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
     );
   });
 
-  test('Test redirect url - proxy with port - prod', async () => {
+  test('redirect url - proxy with port - prod', async () => {
     const config = generateConfig({
       mode: 'live',
     });
@@ -670,7 +671,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
     );
   });
 
@@ -799,7 +800,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_db_jwt=asdf`,
+      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-sync&__clerk_db_jwt=asdf`,
     );
   });
 
@@ -885,3 +886,525 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 });
+
+test.describe('Client handshake with organization activation @nextjs', () => {
+  test.describe.configure({ mode: 'parallel' });
+
+  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
+
+  const jwksServer = http.createServer(function (req, res) {
+    const sk = req.headers.authorization?.replace('Bearer ', '');
+    if (!sk) {
+      console.log('No SK to', req.url, req.headers);
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.write(JSON.stringify(getJwksFromSecretKey(sk)));
+    res.end();
+  });
+
+  let app: Application;
+
+  test.beforeAll('setup local jwks server', async () => {
+    // Start the jwks server
+    await new Promise<void>(resolve => jwksServer.listen(0, resolve));
+    app = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
+  });
+
+  test.afterAll('setup local Clerk API mock', async () => {
+    await app.teardown();
+    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  });
+
+  type TestCase = {
+    name: string;
+    when: When;
+    then: Then;
+  };
+  type When = {
+    // With this initial state...
+    initialAuthState: 'active' | 'expired' | 'early';
+    initialSessionClaims: Map<string, string>;
+
+    // When the customer app specifies these orgSyncOptions to middleware...
+    orgSyncOptions: OrganizationSyncOptions;
+
+    // And a request arrives to the app at this path...
+    appRequestPath: string;
+
+    // With a token specified in...
+    tokenAppearsIn: 'header' | 'cookie';
+
+    // And the Sec-fetch-dest header is...
+    secFetchDestHeader: string | null;
+  };
+
+  type Then = {
+    // A handshake should (or should not) occur:
+    expectStatus: number;
+
+    // The middleware should redirect to fapi with this query param value:
+    fapiOrganizationIdParamValue: string | null;
+  };
+
+  const cookieAuthCases: TestCase[] = [
+    // ---------------- Session active vs expired tests ----------------
+    // Note: it would be possible to run _every_ test with both active and expired initial states
+    //       and expect the same results, but we're avoiding that to save some test execution time.
+    {
+      name: 'Expired session, no org in session, but org a requested by ID => attempts to activate org A',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
+    {
+      name: 'Active session, no org in session, but org a requested by ID => attempts to activate org A',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
+
+    // ---------------- Header-based auth tests ----------------
+    // Header-based auth requests come from non-browser actors, which don't have the __client cookie.
+    // Handshaking depends on a redirect that includes that __client cookie, so we should not handshake
+    // for this auth method, even if there's an org mismatch
+    {
+      name: 'Header-based auth should not handshake with active auth',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'header',
+        secFetchDestHeader: null,
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Header-based auth should not handshake with expired auth',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'header',
+        secFetchDestHeader: null,
+      },
+      then: {
+        expectStatus: 307, // Should redirect to sign-in
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+
+    // ---------------- Existing session active org tests ----------------
+    {
+      name: 'Active session, org A active in session, but org B is requested by ID => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'Active session, no active org in session, but org B is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      name: 'Active session, org a in session, but *an org B subresource* is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp/settings',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      // This case ensures that, for the prototypical nextjs app, we permanent redirect before attempting the handshake logic.
+      // If this wasn't the case, we'd need to recommend adding an additional pattern with a trailing slash to our docs.
+      name: 'When org A is active in a signed-out session but an org B is requested by ID with a trailing slash, permanent redirects to the non-slash route without error.',
+      when: {
+        initialAuthState: 'expired',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_b/',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 308, // Handshake never 308's - this points to `/organizations-by-id/org_b` (no trailing slash)
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+
+    // ---------------- Personal account tests ----------------
+    {
+      name: 'Active session, org a in session, but *the personal account* is requested => attempts to activate PWS',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+          ],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/personal-account',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: '', // <-- Empty string indicates personal account
+      },
+    },
+
+    // ---------------- No activation required tests ----------------
+    {
+      name: 'Active session, nothing session, and the personal account is requested => nothing to activate!',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/personal-account',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Active session, org a active in session, and org a is requested => nothing to activate!',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      // NOTE(izaak): Would we prefer 500ing in this case?
+      name: 'No config => nothing to activate, return 200',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: null,
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+
+    // ---------------- Invalid permutation tests ----------------
+    {
+      name: 'Invalid config => ignore it and return 200',
+      when: {
+        initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['i am not valid config'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+  ];
+
+  for (const testCase of cookieAuthCases) {
+    test(`${testCase.name}`, async () => {
+      const config = generateConfig({
+        mode: 'test',
+      });
+      // Create a new map with an org_id key
+      const { token, claims } = config.generateToken({
+        state: testCase.when.initialAuthState, // <-- Critical
+        extraClaims: testCase.when.initialSessionClaims,
+      });
+
+      const headers = new Headers({
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+
+        // NOTE(izaak): To avoid needing to start a server with every test, we're passing in
+        // organization options to the app via a header.
+        'x-organization-sync-options': JSON.stringify(testCase.when.orgSyncOptions),
+      });
+
+      if (testCase.when.secFetchDestHeader) {
+        headers.set('Sec-Fetch-Dest', testCase.when.secFetchDestHeader);
+      }
+
+      switch (testCase.when.tokenAppearsIn) {
+        case 'cookie':
+          headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
+          break;
+        case 'header':
+          headers.set('Authorization', `Bearer ${token}`);
+          break;
+      }
+
+      const res = await fetch(app.serverUrl + testCase.when.appRequestPath, {
+        headers: headers,
+        redirect: 'manual',
+      });
+
+      expect(res.status).toBe(testCase.then.expectStatus);
+      const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+      expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
+    });
+  }
+});
+
+test.describe('Client handshake with an organization activation avoids infinite loops @nextjs', () => {
+  const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
+
+  const jwksServer = http.createServer(function (req, res) {
+    const sk = req.headers.authorization?.replace('Bearer ', '');
+    if (!sk) {
+      console.log('No SK to', req.url, req.headers);
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.write(JSON.stringify(getJwksFromSecretKey(sk)));
+    res.end();
+  });
+
+  // define app as an application
+  let thisApp: Application;
+
+  test.beforeAll('setup local jwks server', async () => {
+    // Start the jwks server
+    await new Promise<void>(resolve => jwksServer.listen(0, resolve));
+
+    thisApp = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
+  });
+
+  test.afterAll('setup local Clerk API mock', async () => {
+    await thisApp.teardown();
+    return new Promise<void>(resolve => jwksServer.close(() => resolve()));
+  });
+
+  // -------------- Test begin ------------
+
+  const config = generateConfig({
+    mode: 'test',
+  });
+
+  const organizationSyncOptions = {
+    organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+    personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+  };
+
+  test('Sets the redirect loop tracking cookie', async () => {
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'active',
+      extraClaims: new Map<string, string>([]),
+    });
+
+    const headers = new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'Sec-Fetch-Dest': 'document',
+      'x-organization-sync-options': JSON.stringify(organizationSyncOptions),
+    });
+    headers.set('Cookie', `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}`);
+
+    const res = await fetch(thisApp.serverUrl + '/organizations-by-id/org_a', {
+      headers: headers,
+      redirect: 'manual',
+    });
+
+    expect(res.status).toBe(307);
+    const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+    expect(redirectSearchParams.get('organization_id')).toBe('org_a');
+
+    // read the set-cookie directives
+    const setCookie = res.headers.get('set-cookie');
+
+    expect(setCookie).toContain(`__clerk_redirect_count=1`); // <-- Critical
+  });
+
+  test('Ignores organization config when being redirected to', async () => {
+    // Create a new map with an org_id key
+    const { token, claims } = config.generateToken({
+      state: 'active', // Must be active - handshake logic only runs once session is determined to be active
+      extraClaims: new Map<string, string>([]),
+    });
+
+    const headers = new Headers({
+      'X-Publishable-Key': config.pk,
+      'X-Secret-Key': config.sk,
+      'Sec-Fetch-Dest': 'document',
+      'x-organization-sync-options': JSON.stringify(organizationSyncOptions),
+    });
+
+    // Critical cookie: __clerk_redirect_count
+    headers.set(
+      'Cookie',
+      `${devBrowserCookie} __client_uat=${claims.iat}; __session=${token}; __clerk_redirect_count=1`,
+    );
+
+    const res = await fetch(thisApp.serverUrl + '/organizations-by-id/org_a', {
+      headers: headers,
+      redirect: 'manual',
+    });
+
+    expect(res.status).toBe(200);
+    const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
+    expect(redirectSearchParams.get('organization_id')).toBe(null);
+
+    expect(res.headers.get('set-cookie')).toBe(null);
+  });
+});
+
+/**
+ * Start the nextjs sample app with the given organization sync options
+ * organization sync options can be passed to the app via the
+ * "x-organization-sync-options" header
+ */
+const startAppWithOrganizationSyncOptions = async (clerkAPIUrl: string): Promise<Application> => {
+  const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('private', 'CLERK_API_URL', clerkAPIUrl);
+
+  const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
+    // Set the paths that don't require the user to be signed in
+    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+    export const middleware = (req, evt) => {
+      const orgSyncOptions = req.headers.get("x-organization-sync-options")
+      return authMiddleware({
+        publicRoutes: publicPaths,
+        publishableKey: req.headers.get("x-publishable-key"),
+        secretKey: req.headers.get("x-secret-key"),
+        proxyUrl: req.headers.get("x-proxy-url"),
+        domain: req.headers.get("x-domain"),
+        isSatellite: req.headers.get('x-satellite') === 'true',
+        signInUrl: req.headers.get("x-sign-in-url"),
+
+        // Critical
+        organizationSyncOptions: JSON.parse(req.headers.get("x-organization-sync-options")),
+
+      })(req, evt)
+    };
+    export const config = {
+      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    };
+    `;
+
+  const app = await appConfigs.next.appRouter
+    .clone()
+    .addFile('src/middleware.ts', () => middlewareFile)
+    .commit();
+
+  await app.setup();
+  await app.withEnv(env);
+  await app.dev();
+  return app;
+};

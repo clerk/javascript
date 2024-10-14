@@ -37,7 +37,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   });
 
   const profileCardFooterStyles = (t: InternalTheme) => ({
-    padding: `${t.space.$4} ${t.space.$6} ${t.space.$2}`,
+    padding: `${t.space.$4} ${t.space.$8}`,
   });
 
   return (
@@ -59,7 +59,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
             marginTop: 0,
           },
         }),
-        isProfileFooter ? profileCardFooterStyles : footerStyles,
+        !isProfileFooter && footerStyles,
         sx,
       ]}
       {...rest}
@@ -72,6 +72,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         devModeNoticeSx={t => ({
           padding: t.space.$none,
         })}
+        outerSx={isProfileFooter ? profileCardFooterStyles : undefined}
         withDevOverlay
       />
     </Flex>

@@ -16,8 +16,9 @@ import type {
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type {
+  __experimental_ReverificationConfig,
   __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationMaxAgeMinutes,
   __experimental_SessionVerificationResource,
 } from './sessionVerification';
 import type { TokenResource } from './token';
@@ -28,7 +29,7 @@ export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boole
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
-export type CheckAuthorizationParamsWithCustomPermissions =
+export type CheckAuthorizationParamsWithCustomPermissions = (
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -36,11 +37,15 @@ export type CheckAuthorizationParamsWithCustomPermissions =
   | {
       role?: never;
       permission: OrganizationCustomPermissionKey;
-    };
+    }
+  | { role?: never; permission?: never }
+) & {
+  __experimental_reverification?: __experimental_ReverificationConfig;
+};
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
-type CheckAuthorizationParams =
+type CheckAuthorizationParams = (
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -48,7 +53,14 @@ type CheckAuthorizationParams =
   | {
       role?: never;
       permission: OrganizationPermissionKey;
-    };
+    }
+  | {
+      role?: never;
+      permission?: never;
+    }
+) & {
+  __experimental_reverification?: __experimental_ReverificationConfig;
+};
 
 export interface SessionResource extends ClerkResource {
   id: string;
@@ -61,7 +73,7 @@ export interface SessionResource extends ClerkResource {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number | null, number | null];
+  __experimental_factorVerificationAge: [number, number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
@@ -143,7 +155,7 @@ export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
 export type __experimental_SessionVerifyCreateParams = {
   level: __experimental_SessionVerificationLevel;
-  maxAge: __experimental_SessionVerificationMaxAge;
+  maxAgeMinutes: __experimental_SessionVerificationMaxAgeMinutes;
 };
 
 export type __experimental_SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;

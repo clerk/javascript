@@ -2,8 +2,9 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganization } from '@clerk/shared/react';
 import type { ClerkAPIError } from '@clerk/types';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useEnvironment } from '../../contexts';
 import { Flex } from '../../customizables';
 import { Form, FormButtonContainer, TagInput, useCardState } from '../../elements';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
@@ -31,7 +32,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     },
   });
   const card = useCardState();
-  const { t, locale, translateError } = useLocalizations();
+  const { t, locale } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
@@ -41,9 +42,18 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
+  const defaultRole = useDefaultRole();
   const roleField = useFormControl('role', '', {
     label: localizationKeys('formFieldLabel__role'),
   });
+
+  useEffect(() => {
+    if (roleField.value || !defaultRole) {
+      return;
+    }
+
+    roleField.setValue(defaultRole);
+  }, [defaultRole, roleField]);
 
   if (!organization) {
     return null;
@@ -85,24 +95,53 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         return onSuccess?.();
       })
       .catch(err => {
-        if (isClerkAPIResponseError(err)) {
-          removeInvalidEmails(err.errors[0]);
+        if (!isClerkAPIResponseError(err)) {
+          handleError(err, [], card.setError);
+          return;
         }
 
-        if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'duplicate_record') {
-          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
-          card.setError(
-            t(
-              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
-                // Create a localized list of email addresses
-                email_addresses: createListFormat(unlocalizedEmailsList, locale),
-              }),
-            ),
-          );
-        } else if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_param_format_invalid') {
-          card.setError(translateError(err.errors[0]));
-        } else {
-          handleError(err, [], card.setError);
+        removeInvalidEmails(err.errors[0]);
+
+        switch (err.errors?.[0]?.code) {
+          case 'duplicate_record': {
+            const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
+            card.setError(
+              t(
+                localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+                  // Create a localized list of email addresses
+                  email_addresses: createListFormat(unlocalizedEmailsList, locale),
+                }),
+              ),
+            );
+            break;
+          }
+          case 'already_a_member_in_organization': {
+            /**
+             * Extracts email from the error message since it's not provided in the error response
+             */
+            const longMessage = err.errors[0].longMessage ?? '';
+            const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
+
+            handleError(err, [], err =>
+              email
+                ? /**
+                   * Fallbacks to original error message in case the email cannot be extracted
+                   */
+                  card.setError(
+                    t(
+                      localizationKeys('unstable__errors.already_a_member_in_organization', {
+                        email,
+                      }),
+                    ),
+                  )
+                : card.setError(err),
+            );
+
+            break;
+          }
+          default: {
+            handleError(err, [], card.setError);
+          }
         }
       });
   };
@@ -176,4 +215,21 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
       </Flex>
     </Form.ControlRow>
   );
+};
+
+/**
+ * Determines default role from the organization settings or fallback to
+ * the only available role.
+ */
+const useDefaultRole = () => {
+  const { options } = useFetchRoles();
+  const { organizationSettings } = useEnvironment();
+
+  let defaultRole = organizationSettings.domains.defaultRole;
+
+  if (!defaultRole && options?.length === 1) {
+    defaultRole = options[0].value;
+  }
+
+  return defaultRole;
 };

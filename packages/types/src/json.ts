@@ -110,7 +110,7 @@ export interface SessionJSON extends ClerkResourceJSON {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  factor_verification_age: [number | null, number | null];
+  factor_verification_age: [number, number] | null;
   expire_at: number;
   abandon_at: number;
   last_active_at: number;
@@ -199,6 +199,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   verification?: VerificationJSON;
+  saml_connection?: SamlAccountConnectionJSON;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -352,7 +353,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-interface OrganizationDomainVerificationJSON {
+export interface OrganizationDomainVerificationJSON {
   status: OrganizationDomainVerificationStatus;
   strategy: 'email_code'; // only available value for now
   attempts: number;
@@ -511,4 +512,18 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   rpId: string;
   timeout: number;
   userVerification: 'discouraged' | 'preferred' | 'required';
+}
+
+export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  domain: string;
+  active: boolean;
+  provider: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }

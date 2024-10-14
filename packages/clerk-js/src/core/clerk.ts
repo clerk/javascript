@@ -18,7 +18,6 @@ import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -331,7 +330,7 @@ export class Clerk implements ClerkInterface {
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      if (this.#options.experimental?.persistClient) {
+      if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
@@ -509,38 +508,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
-  public __experimental_mountUserVerification = (
-    node: HTMLDivElement,
-    props?: __experimental_UserVerificationProps,
-  ): void => {
-    this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
-          code: 'cannot_render_user_missing',
-        });
-      }
-      return;
-    }
-    void this.#componentControls.ensureMounted({ preloadHint: 'UserVerification' }).then(controls =>
-      controls.mountComponent({
-        name: 'UserVerification',
-        appearanceKey: 'userVerification',
-        node,
-        props,
-      }),
-    );
-  };
-
-  public __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -976,7 +943,16 @@ export class Clerk implements ClerkInterface {
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
-      return this.buildAfterSignOutUrl();
+      return this.buildUrlWithAuth(
+        buildURL(
+          {
+            base: this.#options.signInUrl
+              ? `${this.#options.signInUrl}/choose`
+              : this.environment?.displayConfig.afterSignOutOneUrl,
+          },
+          { stringify: true },
+        ),
+      );
     }
 
     return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);

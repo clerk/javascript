@@ -1,5 +1,5 @@
 import { isTruthy } from '@clerk/shared/underscore';
-import type { Request as ExpressRequest, RequestHandler } from 'express';
+import type { Request as ExpressRequest } from 'express';
 
 import type { ExpressRequestWithAuth } from './types';
 
@@ -30,7 +30,9 @@ export const loadApiEnv = () => {
       version: PACKAGE_VERSION,
       environment: process.env.NODE_ENV,
     },
+    telemetry: {
+      disabled: isTruthy(process.env.CLERK_TELEMETRY_DISABLED),
+      debug: isTruthy(process.env.CLERK_TELEMETRY_DEBUG),
+    },
   };
 };
-
-export const defaultHandler: RequestHandler = (_req, _res, next) => next();

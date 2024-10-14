@@ -1,12 +1,14 @@
 import * as React from 'react';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import ExclamationTrianglelg from '~/primitives/icons/exclamation-triangle-lg';
+import SpinnerLg from '~/primitives/icons/spinner-lg';
+import SwitchArrowslg from '~/primitives/icons/switch-arrows-lg';
+import TickShieldlg from '~/primitives/icons/tick-shield-lg';
 import type { VerificationStatus } from '~/types/utils';
 import type { DefaultLocalizationKey } from '~/utils/make-localizable';
 
@@ -46,57 +48,19 @@ const signUpStatusLocalizationKeys: Record<
 type Status = keyof typeof signUpStatusLocalizationKeys;
 
 const statusIcon: Record<Status, React.ReactElement> = {
-  loading: (
-    <Icon.SpinnerLg
-      size='lg'
-      className='mb-8 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]'
-    />
-  ),
-  verified: (
-    <Icon.TickShieldlg
-      size='lg'
-      className='text-gray-11 mb-2'
-    />
-  ),
-  verified_switch_tab: (
-    <Icon.SwitchArrowslg
-      size='lg'
-      className='text-gray-11 mb-2'
-    />
-  ),
-  expired: (
-    <Icon.ExclamationTrianglelg
-      size='lg'
-      className='mb-2 text-[#F36B16]'
-    />
-  ),
-  failed: (
-    <Icon.ExclamationTrianglelg
-      size='lg'
-      className='mb-2 text-[#EF4444]'
-    />
-  ),
-  client_mismatch: (
-    <Icon.ExclamationTrianglelg
-      size='lg'
-      className='mb-2 text-[#F36B16]'
-    />
-  ),
+  loading: <SpinnerLg className='mb-8 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]' />,
+  verified: <TickShieldlg className='mb-2 text-[#22C543]' />,
+  verified_switch_tab: <SwitchArrowslg className='mb-2 text-[#747686]' />,
+  expired: <ExclamationTrianglelg className='mb-2 text-[#F36B16]' />,
+  failed: <ExclamationTrianglelg className='mb-2 text-[#EF4444]' />,
+  client_mismatch: <ExclamationTrianglelg className='mb-2 text-[#F36B16]' />,
 };
 
 export function SignUpStatus() {
   const { t } = useLocalizations();
-  const { branded } = useDisplayConfig();
-  const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
   const [status] = React.useState<Status>('loading');
-
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { footerProps } = useCard();
 
   return (
     <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
@@ -112,7 +76,7 @@ export function SignUpStatus() {
           </Card.Body>
         ) : null}
       </Card.Content>
-      <Card.Footer {...cardFooterProps} />
+      <Card.Footer {...footerProps} />
     </Card.Root>
   );
 }

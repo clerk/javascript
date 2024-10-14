@@ -1,5 +1,145 @@
 # Change Log
 
+## 4.25.0
+
+### Minor Changes
+
+- Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
+  - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
+  - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
+    - Allowed values 'veryStrict' | 'strict' | 'moderate' | 'lax'
+
+## 4.24.0
+
+### Minor Changes
+
+- Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
+
+  Removes:
+
+  - `<__experimental_UserVerification/>`
+  - `__experimental_mountUserVerification()`
+  - `__experimental_unmountUserVerification()`
+
+- _Experimental Feature_: `<UserProfile/>` allows users to update their information. Mostly of this information is considered sensitive data. ([#4127](https://github.com/clerk/javascript/pull/4127)) by [@panteliselef](https://github.com/panteliselef)
+
+  We want to ensure that only the users themselves can alter any sensitive data.
+
+  To increase security we are now, require users to re-verify their credentials when they are about to perform these actions:
+
+  | Operation                        | Reverification | Strategy            | Timeframe |
+  | -------------------------------- | -------------- | ------------------- | --------- |
+  | Update account (first/last name) | ❌             |                     |           |
+  | Update username                  | ✅             | Strongest available | 10m       |
+  | Delete account                   | ✅             | Strongest available | 10m       |
+  | Create/Remove profile image      | ❌             |                     |           |
+  | Update password                  | ✅             | Strongest available | 10m       |
+  | Remove password                  | ❌             |                     |           |
+  | Revoke session                   | ✅             | Strongest available | 10m       |
+  | Create identification            | ✅             | Strongest available | 10m       |
+  | Remove identification            | ✅             | Strongest available | 10m       |
+  | Change primary identification    | ✅             | Strongest available | 10m       |
+  | Update Passkey name              | ❌             |                     |           |
+  | Enable MFA (TOTP, Phone number)  | ✅             | Strongest available | 10m       |
+  | Disable MFA (TOΤP, Phone number) | ✅             | Strongest available | 10m       |
+  | Create/Regenerate Backup Codes   | ✅             | Strongest available | 10m       |
+  | Connect External Account         | ✅             | Strongest available | 10m       |
+  | Re-authorize External Account    | ❌             |                     |           |
+  | Remove External Account          | ✅             | Strongest available | 10m       |
+  | Leave organization               | ❌             |                     |           |
+
+## 4.23.0
+
+### Minor Changes
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Conditionally renders identification sections on `UserProfile` based on the SAML connection configuration for disabling additional identifiers. ([#4211](https://github.com/clerk/javascript/pull/4211)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Introduces the CRUD of organization domains under the `organizations` API. ([#4224](https://github.com/clerk/javascript/pull/4224)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.22.0
+
+### Minor Changes
+
+- Hide sign up url from `<SignIn />` component when mode is `restricted` ([#4206](https://github.com/clerk/javascript/pull/4206)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Supports default role on `OrganizationProfile` invitations. When inviting a member, the default role will be automatically selected, otherwise it falls back to the only available role. ([#4210](https://github.com/clerk/javascript/pull/4210)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add type for \_\_internal_country ([#4215](https://github.com/clerk/javascript/pull/4215)) by [@dstaley](https://github.com/dstaley)
+
+## 4.21.1
+
+### Patch Changes
+
+- Improve JSDoc comments for some public API properties ([#4190](https://github.com/clerk/javascript/pull/4190)) by [@LekoArts](https://github.com/LekoArts)
+
+## 4.21.0
+
+### Minor Changes
+
+- Experimental support for `has()` with assurance. ([#4118](https://github.com/clerk/javascript/pull/4118)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage:
+
+  ```ts
+  has({
+    __experimental_assurance: {
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
+    },
+  });
+  ```
+
+  Created a shared utility called `createCheckAuthorization` exported from `@clerk/shared`
+
+### Patch Changes
+
+- Adds translation keys for error messages from the [organizations API](https://clerk.com/docs/references/api/organizations#errors). ([#4123](https://github.com/clerk/javascript/pull/4123)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.20.1
+
+### Patch Changes
+
+- Update type of `__experimental_factorVerificationAge` to be `[number, number] | null`. ([#4135](https://github.com/clerk/javascript/pull/4135)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.20.0
+
+### Minor Changes
+
+- Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups. ([#4061](https://github.com/clerk/javascript/pull/4061)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Server side
+
+  This can be applied to any helper that returns the auth object
+
+  **Nextjs example**
+
+  ```ts
+  auth().__experimental_factorVerificationAge;
+  ```
+
+  ### Client side
+
+  **React example**
+
+  ```ts
+  const { session } = useSession();
+  session?.__experimental_factorVerificationAge;
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments coverage on `<ClerkProvider>` properties ([#4098](https://github.com/clerk/javascript/pull/4098)) by [@LekoArts](https://github.com/LekoArts)
+
+- Drop support for deprecated Coinbase Web3 provider ([#4092](https://github.com/clerk/javascript/pull/4092)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.19.0
 
 ### Minor Changes

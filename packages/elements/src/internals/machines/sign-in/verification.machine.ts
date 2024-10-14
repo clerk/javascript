@@ -59,7 +59,7 @@ export type AttemptSecondFactorInput = {
   currentFactor: SignInSecondFactor | null;
 };
 
-const isNonPreperableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+const isNonPreparableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
   if (!strategy) {
     return false;
   }
@@ -80,6 +80,14 @@ const SignInVerificationMachine = setup({
     attempt: fromPromise<SignInResource, AttemptFirstFactorInput | AttemptSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `attempt` must be overridden')),
     ),
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
   },
   actions: {
     resendableTick: assign(({ context }) => ({
@@ -175,7 +183,7 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) => isNonPreperableStrategy(context.currentFactor?.strategy),
+    isNeverResendable: ({ context }) => isNonPreparableStrategy(context.currentFactor?.strategy),
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -261,6 +269,10 @@ const SignInVerificationMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
+        'AUTHENTICATE.PASSKEY': {
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
         'NAVIGATE.FORGOT_PASSWORD': 'ChooseStrategy',
         RETRY: 'Preparing',
@@ -355,6 +367,25 @@ const SignInVerificationMachine = setup({
         },
       },
     },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'discoverable',
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
     Hist: {
       type: 'history',
     },
@@ -379,7 +410,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       // prepareFirstFactor, we need to assert that the input is a PrepareFirstFactor. For some reason, ESLint thinks
       // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
       // rule for the line.
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
       const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
@@ -387,7 +418,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (isNonPreperableStrategy(params?.strategy) || !needsPrepare) {
+      if (isNonPreparableStrategy(params?.strategy) || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -483,7 +514,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareSecondFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send

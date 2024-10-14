@@ -1,5 +1,101 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Add be-BY translation ([#4280](https://github.com/clerk/javascript/pull/4280)) by [@NikitaRadzkov](https://github.com/NikitaRadzkov)
+
+### Patch Changes
+
+- Update `de-DE` translation to be GDPR-compliant ([#4195](https://github.com/clerk/javascript/pull/4195)) by [@serbanradulescu](https://github.com/serbanradulescu)
+
+## 3.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`fb932e5cf`](https://github.com/clerk/javascript/commit/fb932e5cf21315adf60bee0855b6bd5ee2ff9867)]:
+  - @clerk/types@4.25.0
+
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6fb8b53d`](https://github.com/clerk/javascript/commit/f6fb8b53d236863ad7eca576ee7a16cd33f3506b), [`4a8570590`](https://github.com/clerk/javascript/commit/4a857059059a02bb4f20893e08601e1e67babbed)]:
+  - @clerk/types@4.24.0
+
+## 3.1.0
+
+### Minor Changes
+
+- Render "Restricted access" screen in `<SignUp />` component when `signup.mode` in `userSettings` is `restricted` ([#4220](https://github.com/clerk/javascript/pull/4220)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Updated dependencies [[`4749ed4c5`](https://github.com/clerk/javascript/commit/4749ed4c55a5ba5810451b8d436aad0d49829050), [`f1f17eaab`](https://github.com/clerk/javascript/commit/f1f17eaabed0dc4b7de405fb77d85503cf75ad33), [`2e35ac538`](https://github.com/clerk/javascript/commit/2e35ac53885f8008779940d41d1e804fa77ebfa9)]:
+  - @clerk/types@4.23.0
+
+## 3.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`c9063853e`](https://github.com/clerk/javascript/commit/c9063853e538a4010f5d4e522a3da5abc80098a4), [`19d3808d4`](https://github.com/clerk/javascript/commit/19d3808d4672234944226d6709ec51214e8d6e1d), [`737bcbb0f`](https://github.com/clerk/javascript/commit/737bcbb0ffb5e2dcadbb02e8fc718fe8825c5842)]:
+  - @clerk/types@4.22.0
+
+## 3.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`2e5c550e4`](https://github.com/clerk/javascript/commit/2e5c550e4aec61150c2a17fdcd4a0e1273cb50e7)]:
+  - @clerk/types@4.21.1
+
+## 3.0.4
+
+### Patch Changes
+
+- nl-NL localization updates ([#4181](https://github.com/clerk/javascript/pull/4181)) by [@guustgoossens](https://github.com/guustgoossens)
+
+## 3.0.3
+
+### Patch Changes
+
+- Update he-IL ([#4169](https://github.com/clerk/javascript/pull/4169)) by [@develad](https://github.com/develad)
+
+- Added Croatian localization (hr-HR) ([#4168](https://github.com/clerk/javascript/pull/4168)) by [@psiho](https://github.com/psiho)
+
+## 3.0.2
+
+### Patch Changes
+
+- Add empty translation keys for organization name validation errors ([#4152](https://github.com/clerk/javascript/pull/4152)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Replace empty strings with undefined to ensure localizations fallback to `en-US` properly. ([#4151](https://github.com/clerk/javascript/pull/4151)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds translation keys for error messages from the [organizations API](https://clerk.com/docs/references/api/organizations#errors). ([#4123](https://github.com/clerk/javascript/pull/4123)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Adding missing localisation for es-ES on update profile button ([#4148](https://github.com/clerk/javascript/pull/4148)) by [@kduprey](https://github.com/kduprey)
+
+- Updated dependencies [[`248142a6d`](https://github.com/clerk/javascript/commit/248142a6ded6ca937d0df7d628197f25228aadec), [`1189f71f8`](https://github.com/clerk/javascript/commit/1189f71f872f2683c12de5add5f154aeb953ca8d)]:
+  - @clerk/types@4.21.0
+
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`8c6909d46`](https://github.com/clerk/javascript/commit/8c6909d46328c943f1d464a28f1a324a27d0f3f1)]:
+  - @clerk/types@4.20.1
+
+## 3.0.0
+
+### Major Changes
+
+- Update Simplified Chinese based on en US version ([#4107](https://github.com/clerk/javascript/pull/4107)) by [@youyou-sudo](https://github.com/youyou-sudo)
+
+### Patch Changes
+
+- Updated dependencies [[`c63a5adf0`](https://github.com/clerk/javascript/commit/c63a5adf0ba4b99252146f168318f51b709bb5dd), [`8823c21a2`](https://github.com/clerk/javascript/commit/8823c21a26bc81cbc3ed007908b1a9ea474bd343), [`a0cb062fa`](https://github.com/clerk/javascript/commit/a0cb062faa4d23bef7a577e5cc486f4c5efe6bfa)]:
+  - @clerk/types@4.20.0
+
 ## 2.8.1
 
 ### Patch Changes

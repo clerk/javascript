@@ -1,39 +1,53 @@
 import type { RequestHandler } from 'express';
 
-import { middlewareRequired } from './errors';
-import { getAuth } from './getAuth';
-import { requestHasAuthObject } from './utils';
+import { authenticateAndDecorateRequest } from './authenticateRequest';
+import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
 
 /**
- * Middleware to require auth requests for user authenticated or authorized requests.
- * An HTTP 401 status code is returned for unauthenticated requests.
+ * Middleware to require authentication for user requests.
+ * Redirects unauthenticated requests to the sign-in url.
  *
  * @example
- * router.get('/path', requireAuth, getHandler)
+ * // Basic usage
+ * import { requireAuth } from '@clerk/express'
+ *
+ * router.use(requireAuth())
  * //or
- * router.use(requireAuth)
- * @example
- * hasPermission = (request, response, next) => {
- *    const auth = getAuth(request);
- *    if (!auth.has({ permission: 'permission' })) {
- *      response.status(403).send('Forbidden');
- *      return;
- *    }
- *    return next();
- * }
- * router.get('/path', requireAuth, hasPermission, getHandler)
+ * router.get('/path', requireAuth(), getHandler)
  *
- * @throws {Error} `clerkMiddleware` is required to be set in the middleware chain before this util is used.
+ * @example
+ * // Customizing the sign-in path
+ * router.use(requireAuth({ signInUrl: '/sign-in' }))
+ *
+ * @example
+ * // Combining with permission check
+ * import { getAuth, requireAuth } from '@clerk/express'
+ *
+ * const hasPermission = (req, res, next) => {
+ *    const auth = getAuth(req)
+ *    if (!auth.has({ permission: 'permission' })) {
+ *      return res.status(403).send('Forbidden')
+ *    }
+ *    return next()
+ * }
+ * router.get('/path', requireAuth(), hasPermission, getHandler)
  */
-export const requireAuth: RequestHandler = (request, response, next) => {
-  if (!requestHasAuthObject(request)) {
-    throw new Error(middlewareRequired('requireAuth'));
-  }
+export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
+  const authMiddleware = authenticateAndDecorateRequest(options);
 
-  if (!getAuth(request).userId) {
-    response.status(401).send('Unauthorized');
-    return;
-  }
+  return (request, response, next) => {
+    authMiddleware(request, response, err => {
+      if (err) {
+        return next(err);
+      }
 
-  return next();
+      const signInUrl = options.signInUrl || process.env.CLERK_SIGN_IN_URL || '/';
+
+      if (!(request as ExpressRequestWithAuth).auth?.userId) {
+        return response.redirect(signInUrl);
+      }
+
+      next();
+    });
+  };
 };

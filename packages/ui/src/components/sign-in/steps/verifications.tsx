@@ -13,7 +13,8 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
+import PenSm from '~/primitives/icons/pen-sm';
 import { LinkButton } from '~/primitives/link';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
@@ -55,7 +56,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -66,6 +67,8 @@ export function SignInVerifications() {
 
                   <Card.Body>
                     <PasswordField
+                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                      autoFocus
                       label={t('formFieldLabel__password')}
                       alternativeFieldTrigger={
                         isPasswordResetSupported ? (
@@ -97,7 +100,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -132,7 +135,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -152,7 +155,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -193,7 +196,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -232,7 +235,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -276,7 +279,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -311,7 +314,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -356,7 +359,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -391,7 +394,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -474,7 +477,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -512,7 +515,7 @@ export function SignInVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
