@@ -343,8 +343,10 @@ export const SignUpRouterMachine = setup({
       },
       on: {
         'RESET.STEP': {
-          target: 'Start',
-          reenter: true,
+          actions: enqueueActions(({ enqueue, context }) => {
+            enqueue('clearFormErrors');
+            enqueue.sendTo('start', { type: 'SET_FORM', formRef: context.formRef });
+          }),
         },
         NEXT: [
           {
@@ -355,6 +357,7 @@ export const SignUpRouterMachine = setup({
             guard: and(['hasTicket', 'statusNeedsContinue']),
             actions: { type: 'navigateInternal', params: { path: '/' } },
             target: 'Start',
+            reenter: true,
           },
           {
             guard: 'statusNeedsVerification',
