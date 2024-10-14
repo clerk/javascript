@@ -9,13 +9,11 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SignOutAllActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
-type UserButtonPopoverProps = {
-  close?: (open: boolean | ((prevState: boolean) => boolean)) => void;
-} & PropsOfComponent<typeof PopoverCard.Root>;
+type UserButtonPopoverProps = { close?: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
   const { close: optionalClose, ...rest } = props;
-  const close = () => optionalClose?.(false);
+  const close = () => optionalClose?.();
   const { session } = useSession() as { session: ActiveSessionResource };
   const { authConfig } = useEnvironment();
   const { user } = useUser();
@@ -27,11 +25,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSignOutSessionClicked,
     handleUserProfileActionClicked,
     otherSessions,
-  } = useMultisessionActions({
-    ...useUserButtonContext(),
-    actionCompleteCallback: close,
-    user,
-  });
+  } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
 
   return (
     <RootBox elementDescriptor={descriptors.userButtonPopoverRootBox}>
