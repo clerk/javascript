@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.26.5
+
+### Patch Changes
+
+- Only retry the OAuth flow if the captcha check failed. ([#4329](https://github.com/clerk/javascript/pull/4329)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Improve bot detection by loading the Turnstile SDK directly from CloudFlare. ([#4321](https://github.com/clerk/javascript/pull/4321)) by [@anagstef](https://github.com/anagstef)
+
+  If loading fails due to CSP rules, load it through FAPI instead.
+
+- Bypass captcha for providers dynamically provided in environment ([#4322](https://github.com/clerk/javascript/pull/4322)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`d64e54c40`](https://github.com/clerk/javascript/commit/d64e54c40c9cf001b25e45a1b8939c9f7e80c6d6), [`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/shared@2.9.1
+  - @clerk/types@4.25.1
+  - @clerk/localizations@3.2.1
+
 ## 5.26.4
 
 ### Patch Changes
