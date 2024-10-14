@@ -36,7 +36,12 @@ import type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-import { useOrganizationProfileCustomPages, useUserButtonCustomMenuItems, useUserProfileCustomPages } from '../utils';
+import {
+  useOrganizationProfileCustomPages,
+  useSanitizedChildren,
+  useUserButtonCustomMenuItems,
+  useUserProfileCustomPages,
+} from '../utils';
 import { withClerk } from './withClerk';
 
 type UserProfileExportType = typeof _UserProfile & {
@@ -230,14 +235,14 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
   );
 }, 'SignUp');
 
-export function UserProfilePage(_: PropsWithChildren<UserProfilePageProps>) {
+export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
   logErrorInDevMode(userProfilePageRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
-export function UserProfileLink(_: PropsWithChildren<UserProfileLinkProps>) {
+export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkProps>) {
   logErrorInDevMode(userProfileLinkRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
 const _UserProfile = withClerk(
@@ -267,9 +272,12 @@ const UserButtonContext = createContext<MountProps>({});
 
 const _UserButton = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages>>) => {
-    const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
+    const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+    const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
       mount: clerk.mountUserButton,
@@ -289,7 +297,7 @@ const _UserButton = withClerk(
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {/*This mimics the previous behaviour before asProvider existed*/}
-          {props.__experimental_asProvider ? props.children : null}
+          {props.__experimental_asProvider ? sanitizedChildren : null}
           <CustomPortalsRenderer {...portalProps} />
         </Portal>
       </UserButtonContext.Provider>
@@ -298,19 +306,19 @@ const _UserButton = withClerk(
   'UserButton',
 );
 
-export function MenuItems(_: PropsWithChildren) {
+export function MenuItems({ children }: PropsWithChildren) {
   logErrorInDevMode(userButtonMenuItemsRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
-export function MenuAction(_: PropsWithChildren<UserButtonActionProps>) {
+export function MenuAction({ children }: PropsWithChildren<UserButtonActionProps>) {
   logErrorInDevMode(userButtonMenuActionRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
-export function MenuLink(_: PropsWithChildren<UserButtonLinkProps>) {
+export function MenuLink({ children }: PropsWithChildren<UserButtonLinkProps>) {
   logErrorInDevMode(userButtonMenuLinkRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
 export function UserButtonOutlet(outletProps: Without<UserButtonProps, 'userProfileProps'>) {
@@ -336,14 +344,14 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   __experimental_Outlet: UserButtonOutlet,
 });
 
-export function OrganizationProfilePage(_: PropsWithChildren<OrganizationProfilePageProps>) {
+export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
   logErrorInDevMode(organizationProfilePageRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
-export function OrganizationProfileLink(_: PropsWithChildren<OrganizationProfileLinkProps>) {
+export function OrganizationProfileLink({ children }: PropsWithChildren<OrganizationProfileLinkProps>) {
   logErrorInDevMode(organizationProfileLinkRenderedError);
-  return null;
+  return <>{children}</>;
 }
 
 const _OrganizationProfile = withClerk(
@@ -386,8 +394,11 @@ const OrganizationSwitcherContext = createContext<MountProps>(
 
 const _OrganizationSwitcher = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages>>) => {
-    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
+    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
       mount: clerk.mountOrganizationSwitcher,
@@ -399,7 +410,7 @@ const _OrganizationSwitcher = withClerk(
     /**
      * Prefetch organization list
      */
-    clerk.__internal_prefetchOrganizationSwitcher();
+    clerk.__experimental_prefetchOrganizationSwitcher();
 
     return (
       <OrganizationSwitcherContext.Provider value={passableProps}>
@@ -408,7 +419,7 @@ const _OrganizationSwitcher = withClerk(
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {/*This mimics the previous behaviour before asProvider existed*/}
-          {props.__experimental_asProvider ? props.children : null}
+          {props.__experimental_asProvider ? sanitizedChildren : null}
           <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
         </Portal>
       </OrganizationSwitcherContext.Provider>

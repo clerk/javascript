@@ -667,7 +667,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public __internal_prefetchOrganizationSwitcher = () => {
+  public __experimental_prefetchOrganizationSwitcher = () => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       ?.ensureMounted({ preloadHint: 'OrganizationSwitcher' })

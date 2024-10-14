@@ -10,33 +10,45 @@ import {
   UserProfileLink,
   UserProfilePage,
 } from '../components/uiComponents';
-import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
+import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors/messages';
 import type { UserProfilePageProps } from '../types';
 import { isThatComponent } from './componentValidation';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
 
-export const useUserProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
+export const useUserProfileCustomPages = (
+  children: React.ReactNode | React.ReactNode[],
+  options?: UseCustomPagesOptions,
+) => {
   const reorderItemsLabels = ['account', 'security'];
-  return useCustomPages({
-    children,
-    reorderItemsLabels,
-    LinkComponent: UserProfileLink,
-    PageComponent: UserProfilePage,
-    MenuItemsComponent: MenuItems,
-    componentName: 'UserProfile',
-  });
+  return useCustomPages(
+    {
+      children,
+      reorderItemsLabels,
+      LinkComponent: UserProfileLink,
+      PageComponent: UserProfilePage,
+      MenuItemsComponent: MenuItems,
+      componentName: 'UserProfile',
+    },
+    options,
+  );
 };
 
-export const useOrganizationProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
+export const useOrganizationProfileCustomPages = (
+  children: React.ReactNode | React.ReactNode[],
+  options?: UseCustomPagesOptions,
+) => {
   const reorderItemsLabels = ['general', 'members'];
-  return useCustomPages({
-    children,
-    reorderItemsLabels,
-    LinkComponent: OrganizationProfileLink,
-    PageComponent: OrganizationProfilePage,
-    componentName: 'OrganizationProfile',
-  });
+  return useCustomPages(
+    {
+      children,
+      reorderItemsLabels,
+      LinkComponent: OrganizationProfileLink,
+      PageComponent: OrganizationProfilePage,
+      componentName: 'OrganizationProfile',
+    },
+    options,
+  );
 };
 
 type UseCustomPagesParams = {
@@ -48,16 +60,40 @@ type UseCustomPagesParams = {
   componentName: string;
 };
 
+type UseCustomPagesOptions = {
+  allowForAnyChildren: boolean;
+};
+
 type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
 
-const useCustomPages = ({
-  children,
-  LinkComponent,
-  PageComponent,
-  MenuItemsComponent,
-  reorderItemsLabels,
-  componentName,
-}: UseCustomPagesParams) => {
+export const useSanitizedChildren = (children: React.ReactNode) => {
+  const sanitizedChildren: React.ReactNode[] = [];
+
+  const excludedComponents: any[] = [
+    OrganizationProfileLink,
+    OrganizationProfilePage,
+    MenuItems,
+    UserProfilePage,
+    UserProfileLink,
+  ];
+
+  React.Children.forEach(children, child => {
+    if (
+      !excludedComponents.some(component => isThatComponent(child, component))
+      // !isThatComponent(child, PageComponent) &&
+      // !isThatComponent(child, LinkComponent) &&
+      // !isThatComponent(child, MenuItemsComponent)
+    ) {
+      sanitizedChildren.push(child);
+    }
+  });
+
+  return sanitizedChildren;
+};
+
+const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOptions) => {
+  const { children, LinkComponent, PageComponent, MenuItemsComponent, reorderItemsLabels, componentName } = params;
+  const { allowForAnyChildren = false } = options || {};
   const validChildren: CustomPageWithIdType[] = [];
 
   React.Children.forEach(children, child => {
@@ -66,8 +102,8 @@ const useCustomPages = ({
       !isThatComponent(child, LinkComponent) &&
       !isThatComponent(child, MenuItemsComponent)
     ) {
-      if (child) {
-        // logErrorInDevMode(customPagesIgnoredComponent(componentName));
+      if (child && !allowForAnyChildren) {
+        logErrorInDevMode(customPagesIgnoredComponent(componentName));
       }
       return;
     }

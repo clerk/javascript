@@ -329,7 +329,13 @@ export interface Clerk {
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
-  __internal_prefetchOrganizationSwitcher: () => void;
+  /**
+   * Prefetches the data displayed by an organization switcher.
+   * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_prefetchOrganizationSwitcher: () => void;
 
   /**
    * Mount an organization list component at the target element.
