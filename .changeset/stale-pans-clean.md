@@ -2,4 +2,4 @@
 "@clerk/backend": minor
 ---
 
-Grants organization URL patterns presedence over personal account patterns in organization sync options.
+Updates `organizationPatterns` to take precedence over `personalAccountPatterns` in `organizationSyncOptions`
