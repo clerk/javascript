@@ -73,33 +73,26 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
 
 async function loadCaptcha(fallbackUrl: string) {
   if (!window.turnstile) {
-    try {
-      await loadCaptchaFromCloudflareURL();
-    } catch {
-      await loadCaptchaFromFAPIProxiedURL(fallbackUrl);
-    }
+    await loadCaptchaFromCloudflareURL()
+      .catch(() => loadCaptchaFromFAPIProxiedURL(fallbackUrl))
+      .catch(() => {
+        throw { captchaError: 'captcha_script_failed_to_load' };
+      });
   }
   return window.turnstile;
 }
 
 async function loadCaptchaFromCloudflareURL() {
-  try {
-    await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
-  } catch (err) {
-    console.error('Clerk: Failed to load the CAPTCHA script from the original Cloudflare URL.');
-    throw err;
-  }
+  return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
 }
 
 async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
   try {
-    await loadScript(fallbackUrl, { defer: true });
-  } catch {
+    return await loadScript(fallbackUrl, { defer: true });
+  } catch (err) {
     // Rethrow with specific message
     console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', fallbackUrl);
-    throw {
-      captchaError: 'captcha_script_failed_to_load',
-    };
+    throw err;
   }
 }
 
