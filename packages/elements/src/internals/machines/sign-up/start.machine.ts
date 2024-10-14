@@ -1,9 +1,11 @@
 import type { SignUpResource, Web3Strategy } from '@clerk/types';
-import { assertEvent, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
+import type { DoneActorEvent } from 'xstate';
+import { and, assertEvent, assign, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
+import type { SetFormEvent } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { ThirdPartyMachine } from '~/internals/machines/third-party';
@@ -48,8 +50,14 @@ export const SignUpStartMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignUpResource>).output }),
     sendToLoading,
+    setFormRef: assign(({ event }) => {
+      return {
+        formRef: (event as unknown as SetFormEvent).formRef,
+      };
+    }),
     setFormDisabledTicketFields: enqueueActions(({ context, enqueue }) => {
       if (!context.ticket) {
         return;
@@ -90,6 +98,8 @@ export const SignUpStartMachine = setup({
     },
   },
   guards: {
+    isMissingRequirements: ({ context }) =>
+      context.parent.getSnapshot().context.clerk?.client?.signUp?.status === 'missing_requirements',
     hasTicket: ({ context }) => Boolean(context.ticket),
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
   },
@@ -105,11 +115,20 @@ export const SignUpStartMachine = setup({
   }),
   entry: 'setDefaultFormValues',
   initial: 'Init',
+  on: {
+    SET_FORM: {
+      actions: 'setFormRef',
+    },
+  },
   states: {
     Init: {
       description:
         'Handle ticket, if present; Else, default to Pending state. Per tickets, `Attempting` makes a `signUp.create` request allowing for an incomplete sign up to contain progressively filled fields on the Start step.',
       always: [
+        {
+          guard: and(['hasTicket', 'isMissingRequirements']),
+          target: 'Pending',
+        },
         {
           guard: 'hasTicket',
           target: 'Attempting',

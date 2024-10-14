@@ -4,6 +4,7 @@ import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
+import type { SetFormEvent } from '../shared';
 import type { SignInRouterMachineActorRef } from './router.types';
 
 // ---------------------------------- Tags ---------------------------------- //
@@ -24,7 +25,7 @@ export type SignUpStartRedirectEvent =
   | SignUpStartRedirectSamlEvent
   | SignUpStartRedirectWeb3Event;
 
-export type SignUpStartEvents = ErrorActorEvent | SignUpStartSubmitEvent | SignUpStartRedirectEvent;
+export type SignUpStartEvents = ErrorActorEvent | SignUpStartSubmitEvent | SignUpStartRedirectEvent | SetFormEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

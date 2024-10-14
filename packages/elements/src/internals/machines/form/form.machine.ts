@@ -169,7 +169,7 @@ export const FormMachine = setup({
 
           if (field) {
             field.checked = event.field.checked;
-            field.disabled = event.field.disabled || false;
+            field.disabled = event.field.disabled ?? field.disabled;
             field.value = event.field.value;
 
             context.fields.set(event.field.name, field);
