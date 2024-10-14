@@ -1130,30 +1130,13 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     defaultOpen?: boolean;
 
-    __experimental_asProvider?: boolean;
-
     /**
-     * If true the UserButton will only render the popover.
+     * If true, OrganizationSwitcher will only render the popover.
      * Enables developers to implement a custom dialog.
      * @experimental This API is experimental and may change at any moment.
      * @default undefined
      */
-    __experimental_asStandalone?: {
-      /**
-       * The controlled open state of the popover. When defined the trigger will not be rendered
-       * Should be used in conjunction with `__experimental_asStandalone.onOpenChanged`.
-       * @experimental This API is experimental and may change at any moment.
-       */
-      open: boolean;
-
-      /**
-       * Event handler called when the open state of the dialog changes.
-       * It only fires when used in conjunction with `__experimental_asStandalone.open`.
-       * @experimental This API is experimental and may change at any moment.
-       * @default undefined
-       */
-      onOpenChanged: (open: boolean | ((prevState: boolean) => boolean)) => void;
-    };
+    __experimental_asStandalone?: boolean;
 
     /**
      * By default, users can switch between organization and their personal account.

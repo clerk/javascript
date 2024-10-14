@@ -65,11 +65,26 @@ type OrganizationProfileExportType = typeof _OrganizationProfile & {
 type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfilePage: typeof OrganizationProfilePage;
   OrganizationProfileLink: typeof OrganizationProfileLink;
-  Body: () => React.JSX.Element;
+  /**
+   * The `Outlet` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the OrganizationSwitcher without affecting its configuration or any custom pages
+   * that could be mounted
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_Outlet: typeof OrganizationSwitcherOutlet;
 };
 
-type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
+type OrganizationSwitcherPropsWithoutCustomPages = Without<
+  OrganizationSwitcherProps,
+  'organizationProfileProps' | '__experimental_asStandalone'
+> & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
+  /**
+   * Adding `asProvider` will defer rendering until the `Outlet` component is mounted.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asProvider?: boolean;
 };
 
 const isMountProps = (props: any): props is MountProps => {
@@ -128,7 +143,6 @@ class Portal extends React.PureComponent<
     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
 
-    console.log(prevProps, newProps, isDeeplyEqual(prevProps, newProps));
     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
       if (this.portalRef.current) {
         this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
@@ -385,14 +399,6 @@ const _OrganizationSwitcher = withClerk(
     clerk.__internal_prefetchOrganizationSwitcher();
 
     return (
-      // <Portal
-      //   mount={clerk.mountOrganizationSwitcher}
-      //   unmount={clerk.unmountOrganizationSwitcher}
-      //   updateProps={(clerk as any).__unstable__updateProps}
-      //   props={{ ...props, organizationProfileProps }}
-      //   customPagesPortals={customPagesPortals}
-      // />
-
       <OrganizationSwitcherContext.Provider
         value={{
           mount: clerk.mountOrganizationSwitcher,
@@ -403,7 +409,7 @@ const _OrganizationSwitcher = withClerk(
       >
         <Portal
           {...passableProps}
-          hideRootHtmlElement={!!props.__experimental_asStandalone}
+          hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {props.children}
           <CustomPortalsRenderer {...passableProps} />
@@ -414,15 +420,26 @@ const _OrganizationSwitcher = withClerk(
   'OrganizationSwitcher',
 );
 
-export function OrganizationSwitcherOutlet() {
-  const props = useContext(OrganizationSwitcherContext);
-  return <Portal {...props} />;
+export function OrganizationSwitcherOutlet(
+  outletProps: Without<OrganizationSwitcherProps, 'organizationProfileProps'>,
+) {
+  const providerProps = useContext(OrganizationSwitcherContext);
+
+  const portalProps = {
+    ...providerProps,
+    props: {
+      ...providerProps.props,
+      ...outletProps,
+    },
+  } satisfies MountProps;
+
+  return <Portal {...portalProps} />;
 }
 
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
   OrganizationProfilePage,
   OrganizationProfileLink,
-  Body: OrganizationSwitcherOutlet,
+  __experimental_Outlet: OrganizationSwitcherOutlet,
 });
 
 export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {

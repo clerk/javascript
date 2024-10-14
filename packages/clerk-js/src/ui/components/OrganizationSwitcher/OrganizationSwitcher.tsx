@@ -54,9 +54,7 @@ const _OrganizationSwitcher = () => {
     >
       <AcceptedInvitationsProvider>
         {__experimental_asStandalone ? (
-          __experimental_asStandalone.open ? (
-            <OrganizationSwitcherPopover close={__experimental_asStandalone.onOpenChanged} />
-          ) : null
+          <OrganizationSwitcherPopover />
         ) : (
           <OrganizationSwitcherWithFloatingTree>
             <OrganizationSwitcherPopover />
