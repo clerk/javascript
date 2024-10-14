@@ -324,18 +324,19 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (
-      params.strategy === 'oauth_google' ||
-      params.strategy === 'oauth_microsoft' ||
-      params.strategy === 'oauth_apple'
-    ) {
+    if (!params.strategy) {
+      return false;
+    }
+
+    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+
+    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
+
     if (
       params.transfer &&
-      (SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_google' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_microsoft' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_apple')
+      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
       return true;
     }
