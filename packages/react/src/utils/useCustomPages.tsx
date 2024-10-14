@@ -78,12 +78,7 @@ export const useSanitizedChildren = (children: React.ReactNode) => {
   ];
 
   React.Children.forEach(children, child => {
-    if (
-      !excludedComponents.some(component => isThatComponent(child, component))
-      // !isThatComponent(child, PageComponent) &&
-      // !isThatComponent(child, LinkComponent) &&
-      // !isThatComponent(child, MenuItemsComponent)
-    ) {
+    if (!excludedComponents.some(component => isThatComponent(child, component))) {
       sanitizedChildren.push(child);
     }
   });

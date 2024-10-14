@@ -6,6 +6,7 @@ import React from 'react';
 import { MenuAction, MenuItems, MenuLink, UserProfileLink, UserProfilePage } from '../components/uiComponents';
 import {
   customMenuItemsIgnoredComponent,
+  userButtonIgnoredComponent,
   userButtonMenuItemLinkWrongProps,
   userButtonMenuItemsActionWrongsProps,
 } from '../errors/messages';
@@ -59,7 +60,7 @@ const useCustomMenuItems = ({
       !isThatComponent(child, UserProfilePageComponent)
     ) {
       if (child) {
-        // logErrorInDevMode(userButtonIgnoredComponent);
+        logErrorInDevMode(userButtonIgnoredComponent);
       }
       return;
     }
