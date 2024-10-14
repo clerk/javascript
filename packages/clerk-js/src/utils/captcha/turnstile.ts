@@ -3,6 +3,8 @@ import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 
+const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+
 interface RenderOptions {
   /**
    * Every widget has a sitekey. This sitekey is associated with the corresponding widget configuration and is created upon the widget creation.
@@ -69,19 +71,29 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha(url: string) {
+async function loadCaptcha(fallbackUrl: string) {
   if (!window.turnstile) {
-    try {
-      await loadScript(url, { defer: true });
-    } catch {
-      // Rethrow with specific message
-      console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', url);
-      throw {
-        captchaError: 'captcha_script_failed_to_load',
-      };
-    }
+    await loadCaptchaFromCloudflareURL()
+      .catch(() => loadCaptchaFromFAPIProxiedURL(fallbackUrl))
+      .catch(() => {
+        throw { captchaError: 'captcha_script_failed_to_load' };
+      });
   }
   return window.turnstile;
+}
+
+async function loadCaptchaFromCloudflareURL() {
+  return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
+}
+
+async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
+  try {
+    return await loadScript(fallbackUrl, { defer: true });
+  } catch (err) {
+    // Rethrow with specific message
+    console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', fallbackUrl);
+    throw err;
+  }
 }
 
 /*
