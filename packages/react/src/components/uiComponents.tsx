@@ -361,8 +361,10 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
   );
 }, 'CreateOrganization');
 
-// @ts-ignore
-const OrganizationSwitcherContext = createContext<MountProps>({});
+const OrganizationSwitcherContext = createContext<MountProps>(
+  // @ts-expect-error We are defining the values below
+  {},
+);
 
 const _OrganizationSwitcher = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages>>) => {
@@ -376,6 +378,11 @@ const _OrganizationSwitcher = withClerk(
       props: { ...props, organizationProfileProps },
       customPagesPortals: customPagesPortals,
     };
+
+    /**
+     * Prefetch organization list
+     */
+    clerk.__internal_prefetchOrganizationSwitcher();
 
     return (
       // <Portal

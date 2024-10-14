@@ -348,6 +348,8 @@ export interface Clerk {
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
+  __internal_prefetchOrganizationSwitcher: () => void;
+
   /**
    * Mount an organization list component at the target element.
    * @param targetNode Target to mount the OrganizationList component.
@@ -1042,6 +1044,8 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
 
+  __experimental_asProvider?: boolean;
+
   /**
    * If true the UserButton will only render the popover.
    * Enables developers to implement a custom dialog.
@@ -1125,6 +1129,8 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+
+    __experimental_asProvider?: boolean;
 
     /**
      * If true the UserButton will only render the popover.

@@ -16,6 +16,11 @@ const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal }
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+const OrganizationSwitcherPrefetch = lazy(() =>
+  import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
+    default: m.OrganizationSwitcherPrefetch,
+  })),
+);
 
 type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
 
@@ -155,3 +160,5 @@ export const LazyOneTapRenderer = (props: LazyOneTapRendererProps) => {
     </AppearanceProvider>
   );
 };
+
+export { OrganizationSwitcherPrefetch };

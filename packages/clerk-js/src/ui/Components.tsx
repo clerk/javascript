@@ -37,6 +37,7 @@ import {
   LazyModalRenderer,
   LazyOneTapRenderer,
   LazyProviders,
+  OrganizationSwitcherPrefetch,
 } from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
 
@@ -85,6 +86,7 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification',
   ) => void;
+  prefetch: (component: 'organizationSwitcher') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
 };
@@ -113,6 +115,7 @@ interface ComponentsState {
   userVerificationModal: null | __experimental_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  organizationSwitcherPrefetch: boolean;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -190,6 +193,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
+    organizationSwitcherPrefetch: false,
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -256,6 +260,10 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.prefetch = component => {
+      setState(s => ({ ...s, [`${component}Prefetch`]: true }));
     };
 
     props.onComponentsMounted();
@@ -409,6 +417,8 @@ const Components = (props: ComponentsProps) => {
             <ImpersonationFab />
           </LazyImpersonationFabProvider>
         )}
+
+        <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>
     </Suspense>
   );
