@@ -262,8 +262,6 @@ export const useUserButtonContext = () => {
   const { displayConfig } = useEnvironment();
   const options = useOptions();
 
-  console.log(ctx?.userProfileProps?.customPages);
-
   if (componentName !== 'UserButton') {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
