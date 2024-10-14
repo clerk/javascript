@@ -3,8 +3,21 @@ import type { FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useState } from 'react';
 
+import { useEnvironment } from '../../ui/contexts';
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Form as FormPrim, FormLabel, localizationKeys, Text } from '../customizables';
+import {
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Form as FormPrim,
+  FormLabel,
+  Link,
+  localizationKeys,
+  Text,
+  useAppearance,
+  useLocalizations,
+} from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { OTPInputProps } from './CodeControl';
@@ -216,29 +229,75 @@ const Checkbox = (
   );
 };
 
+const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: string }) => {
+  const { t } = useLocalizations();
+  return (
+    <Text
+      variant='subtitle'
+      as='span'
+    >
+      {t(localizationKeys('signUp.legalConsent.checkbox.label__prefixText'))}
+      {props.termsUrl && (
+        <>
+          {' '}
+          <Link
+            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceText')}
+            href={props.termsUrl}
+            sx={{
+              textDecoration: 'underline',
+            }}
+          />
+        </>
+      )}
+
+      {props.termsUrl && props.privacyPolicyUrl && (
+        <> {t(localizationKeys('signUp.legalConsent.checkbox.label__conjunctionText'))} </>
+      )}
+
+      {props.privacyPolicyUrl && (
+        <Link
+          localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__privacyPolicyText')}
+          href={props.termsUrl}
+          sx={{
+            textDecoration: 'underline',
+            display: 'inline-block',
+          }}
+        />
+      )}
+    </Text>
+  );
+};
+
 const LegalCheckbox = (
   props: CommonFieldRootProps & {
     description?: string | LocalizationKey;
   },
 ) => {
+  const { displayConfig } = useEnvironment();
+  const { parsedLayout } = useAppearance();
+
+  const termsLink = parsedLayout.termsPageUrl || displayConfig.termsUrl || '/terms';
+  const privacyPolicy = parsedLayout.termsPageUrl || displayConfig.termsUrl || '/privacy';
+
   return (
     <Field.Root {...props}>
-      <Flex align='start'>
+      <Flex
+        align='start'
+        sx={t => ({
+          gap: t.space.$1x5,
+        })}
+      >
         <Field.CheckboxIndicator />
         <FormLabel
           elementDescriptor={descriptors.formFieldRadioLabel}
           htmlFor={props.itemID}
-          sx={t => ({
-            padding: `${t.space.$none} ${t.space.$2}`,
-            display: 'flex',
-            flexDirection: 'column',
-          })}
+          sx={{
+            textAlign: 'initial',
+          }}
         >
-          {/* TODO(@vaggelis): Handle the legal label */}
-          <Text
-            elementDescriptor={descriptors.formFieldRadioLabelTitle}
-            variant='subtitle'
-            localizationKey={props.label}
+          <LegalCheckboxLabel
+            termsUrl={termsLink}
+            privacyPolicyUrl={privacyPolicy}
           />
         </FormLabel>
       </Flex>

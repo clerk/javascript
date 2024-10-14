@@ -112,9 +112,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
-    if (params.__experimental_legalAccepted) {
-      paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
-    }
+    paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
+    paramsWithCaptcha.__experimental_legalAccepted = undefined;
 
     return this._basePost({
       path: this.pathRoot,
@@ -318,6 +317,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+    // @ts-expect-error - This is a temporary until the feature is stable
+    params.legalAccepted = params.__experimental_legalAccepted;
+    params.__experimental_legalAccepted = undefined;
+
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });

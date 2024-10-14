@@ -8,6 +8,7 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
+  Form,
   Header,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
@@ -79,7 +80,7 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
-    legalAccepted: useFormControl('legalAccepted', '', {
+    legalAccepted: useFormControl('legalConsent', '', {
       type: 'checkbox',
       label: 'I agree to the Terms of Service and Privacy Policy',
       defaultChecked: false,
@@ -278,6 +279,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
+                  legalAccepted={Boolean(formState.legalAccepted.value)}
                 />
               )}
               {shouldShowForm && (
@@ -290,6 +292,14 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && (
+              <Form.ControlRow elementId='legalConsent'>
+                <Form.LegalCheckbox
+                  {...formState.legalAccepted.props}
+                  isRequired={fields.legalAccepted?.required}
+                />
+              </Form.ControlRow>
+            )}
             {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>

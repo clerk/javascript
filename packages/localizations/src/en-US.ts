@@ -520,6 +520,12 @@ export const enUS: LocalizationResource = {
         subtitle: 'Please read and accept the terms to continue',
         title: 'Legal consent',
       },
+      checkbox: {
+        label__prefixText: 'I agree to the',
+        label__privacyPolicyText: 'Privacy Policy',
+        label__termsOfServiceText: 'Terms of Service',
+        label__conjunctionText: 'and',
+      },
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
