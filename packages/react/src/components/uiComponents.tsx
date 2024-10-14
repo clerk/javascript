@@ -50,11 +50,26 @@ type UserButtonExportType = typeof _UserButton & {
   MenuItems: typeof MenuItems;
   Action: typeof MenuAction;
   Link: typeof MenuLink;
-  Body: () => React.JSX.Element;
+  /**
+   * The `Outlet` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the OrganizationSwitcher without affecting its configuration or any custom pages
+   * that could be mounted
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_Outlet: typeof UserButtonOutlet;
 };
 
-type UserButtonPropsWithoutCustomPages = Without<UserButtonProps, 'userProfileProps'> & {
+type UserButtonPropsWithoutCustomPages = Without<
+  UserButtonProps,
+  'userProfileProps' | '__experimental_asStandalone'
+> & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  /**
+   * Adding `asProvider` will defer rendering until the `Outlet` component is mounted.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asProvider?: boolean;
 };
 
 type OrganizationProfileExportType = typeof _OrganizationProfile & {
@@ -279,7 +294,7 @@ const _UserButton = withClerk(
       >
         <Portal
           {...passableProps}
-          hideRootHtmlElement={!!props.__experimental_asStandalone}
+          hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {props.children}
           <CustomPortalsRenderer {...passableProps} />
@@ -305,9 +320,18 @@ export function MenuLink(_: PropsWithChildren<UserButtonLinkProps>) {
   return null;
 }
 
-export function UserButtonOutlet() {
-  const props = useContext(UserButtonContext);
-  return <Portal {...props} />;
+export function UserButtonOutlet(outletProps: Without<UserButtonProps, 'userProfileProps'>) {
+  const providerProps = useContext(UserButtonContext);
+
+  const portalProps = {
+    ...providerProps,
+    props: {
+      ...providerProps.props,
+      ...outletProps,
+    },
+  } satisfies MountProps;
+
+  return <Portal {...portalProps} />;
 }
 
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
@@ -316,7 +340,7 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   MenuItems,
   Action: MenuAction,
   Link: MenuLink,
-  Body: UserButtonOutlet as () => React.JSX.Element,
+  __experimental_Outlet: UserButtonOutlet,
 });
 
 export const __experimental_UserVerification = withClerk(

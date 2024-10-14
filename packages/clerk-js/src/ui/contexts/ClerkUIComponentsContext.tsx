@@ -227,8 +227,6 @@ export const useUserProfileContext = (): UserProfileContextType => {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
-  console.log('----- profile', customPages);
-
   const pages = useMemo(() => {
     return createUserProfileCustomPages(customPages || [], clerk);
   }, [customPages]);
