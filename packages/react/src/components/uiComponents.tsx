@@ -391,13 +391,11 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
   );
 }, 'CreateOrganization');
 
-const OrganizationSwitcherContext = createContext<MountProps>(
-  {
-    mount: () => {},
-    unmount: () => {},
-    updateProps: () => {},
-  },
-);
+const OrganizationSwitcherContext = createContext<MountProps>({
+  mount: () => {},
+  unmount: () => {},
+  updateProps: () => {},
+});
 
 const _OrganizationSwitcher = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages>>) => {
