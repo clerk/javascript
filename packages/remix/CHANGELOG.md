@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.2.11
+
+### Patch Changes
+
+- Updated dependencies [[`c5df11382`](https://github.com/clerk/javascript/commit/c5df1138244b784f0400d2607565368a10f05bae), [`c5df11382`](https://github.com/clerk/javascript/commit/c5df1138244b784f0400d2607565368a10f05bae)]:
+  - @clerk/shared@1.4.2
+  - @clerk/types@3.65.4
+  - @clerk/backend@0.38.14
+  - @clerk/clerk-react@4.32.4
+
 ## 3.2.10
 
 ### Patch Changes

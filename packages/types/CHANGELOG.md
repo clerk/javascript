@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.65.4
+
+### Patch Changes
+
+- Bypass captcha for providers dynamically provided in environment ([#4330](https://github.com/clerk/javascript/pull/4330)) by [@anagstef](https://github.com/anagstef)
+
 ## 3.65.3
 
 ### Patch Changes
