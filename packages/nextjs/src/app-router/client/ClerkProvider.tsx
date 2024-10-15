@@ -91,20 +91,22 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
        */
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
-        startTransition(() => {
-          if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
-            router.refresh();
-          } else {
-            void invalidateCacheAction();
-          }
-        });
-      });
-    };
 
-    window.__unstable__onAfterSetActive = () => {
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
-        return router.refresh();
-      }
+        // NOTE: the following code will allow `useReverification()` to work properly when `handlerReverification` is called inside `startTransition`
+        if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
+          startTransition(() => {
+            router.refresh();
+          });
+        } else {
+          void invalidateCacheAction().then(() => res());
+        }
+      });
+
+      window.__unstable__onAfterSetActive = () => {
+        if (__unstable_invokeMiddlewareOnAuthStateChange) {
+          return router.refresh();
+        }
+      };
     };
   }, []);
 
