@@ -71,7 +71,7 @@ function _SignUpContinue() {
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       validatePassword: true,
     }),
-    legalAccepted: useFormControl('legalAccepted', '', {
+    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
       type: 'checkbox',
       label: 'I agree to the Terms of Service and Privacy Policy',
       defaultChecked: false,
@@ -149,6 +149,7 @@ function _SignUpContinue() {
 
     card.setLoading();
     card.setError(undefined);
+
     return signUp
       .update(buildRequest(fieldsToSubmit))
       .then(res =>
