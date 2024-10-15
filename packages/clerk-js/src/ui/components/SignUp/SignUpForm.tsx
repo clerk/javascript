@@ -120,11 +120,11 @@ export const SignUpForm = (props: SignUpFormProps) => {
             width: '100%',
           }}
         >
-          {shouldShow('legalAccepted') && (
-            <Form.ControlRow elementId='legalConsent'>
+          {shouldShow('__experimental_legalAccepted') && (
+            <Form.ControlRow elementId='__experimental_legalAccepted'>
               <Form.LegalCheckbox
-                {...formState.legalAccepted.props}
-                isRequired={fields.legalAccepted?.required}
+                {...formState.__experimental_legalAccepted.props}
+                isRequired={fields.__experimental_legalAccepted?.required}
               />
             </Form.ControlRow>
           )}

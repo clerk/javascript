@@ -1377,6 +1377,7 @@ export class Clerk implements ClerkInterface {
           return this.client?.signUp.create({
             strategy: 'google_one_tap',
             token: params.token,
+            __experimental_legalAccepted: params.__experimental_legalAccepted,
           });
         }
         throw err;
@@ -1397,6 +1398,7 @@ export class Clerk implements ClerkInterface {
     customNavigate,
     unsafeMetadata,
     strategy,
+    __experimental_legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -1419,6 +1421,7 @@ export class Clerk implements ClerkInterface {
           generateSignature,
           unsafeMetadata,
           strategy,
+          __experimental_legalAccepted,
         });
 
         if (
