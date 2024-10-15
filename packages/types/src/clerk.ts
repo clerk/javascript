@@ -1287,6 +1287,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithMetamaskParams {
@@ -1294,6 +1295,7 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
@@ -1301,10 +1303,12 @@ export interface AuthenticateWithCoinbaseWalletParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {
