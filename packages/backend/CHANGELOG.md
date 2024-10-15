@@ -1,10 +1,20 @@
 # Change Log
 
+## 1.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`d64e54c40`](https://github.com/clerk/javascript/commit/d64e54c40c9cf001b25e45a1b8939c9f7e80c6d6), [`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/shared@2.9.1
+  - @clerk/types@4.25.1
+
 ## 1.13.9
 
 ### Patch Changes
 
 - Expose `permissions` field for `OrganizationMembership` resource ([#4310](https://github.com/clerk/javascript/pull/4310)) by [@dstaley](https://github.com/dstaley)
+
+- Introduces organizationSyncOptions option to clerkMiddleware, which syncs an active organization or personal account from a URL to the Clerk session. (https://github.com/clerk/javascript/pull/3977) by [@izaaklauer](https://github.com/izaaklauer)
 
 ## 1.13.8
 

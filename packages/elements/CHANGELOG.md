@@ -1,5 +1,20 @@
 # @clerk/elements
 
+## 0.16.1
+
+### Patch Changes
+
+- Fixes a bug during a ticket-based sign-up where the form could not be submitted if additional fields were needed. ([#4318](https://github.com/clerk/javascript/pull/4318)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/types@4.25.1
+
+## 0.16.0
+
+### Minor Changes
+
+- Adds `restricted` Step for restricted sign-up mode ([#4221](https://github.com/clerk/javascript/pull/4221)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.15.10
 
 ### Patch Changes
