@@ -37,6 +37,9 @@ const UserVerificationModal = (props: { afterVerificationCancelled: () => void }
   useEffect(() => {
     if (clerk.loaded) {
       clerk.__experimental_openUserVerification({
+        afterVerification: () => {
+          console.log('UserVerificationModal', 'afterVerification');
+        },
         afterVerificationCancelled: props.afterVerificationCancelled,
       });
     }

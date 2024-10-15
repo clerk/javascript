@@ -39,7 +39,22 @@ const useAfterVerification = () => {
       });
       switch (sessionVerification.status) {
         case 'complete':
-          return setActive({ session: sessionVerification.session.id, beforeEmit });
+          // does not work (1)
+          await setActive({ session: sessionVerification.session.id });
+          console.log('done setActive');
+          return afterVerification?.();
+
+        // does not work (2)
+        // return setActive({ session: sessionVerification.session.id });
+
+        // does not work (3)
+        // await setActive({ session: sessionVerification.session.id, beforeEmit });
+        // return;
+
+        // works but it's wrong, breaks modal inside UserProfile (4)
+        // afterVerification?.();
+        // return setActive({ session: sessionVerification.session.id });
+
         case 'needs_second_factor':
           return navigate('./factor-two');
         default:

@@ -770,7 +770,11 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
+    console.log('before onBeforeSetActive');
+
     await onBeforeSetActive();
+
+    console.log('after onBeforeSetActive');
 
     // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
@@ -815,7 +819,11 @@ export class Clerk implements ClerkInterface {
     this.#setAccessors(newSession);
 
     this.#emit();
+
+    console.log('before onAfterSetActive');
     await onAfterSetActive();
+    console.log('after onAfterSetActive');
+
     this.#resetComponentsState();
   };
 

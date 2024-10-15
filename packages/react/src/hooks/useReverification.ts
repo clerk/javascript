@@ -94,7 +94,7 @@ type RemovePropertyIfExists<T, K extends keyof any> = K extends keyof T ? Omit<T
 type ExcludeClerkError<T> = Prettify<RemovePropertyIfExists<T, 'clerk_error'>>;
 
 // Applying the utility to type B
-type WithoutClerkError<T> = ExcludeClerkError<T>;
+// type WithoutClerkError<T> = ExcludeClerkError<T>;
 
 // type WithoutAssuranceHint<T> = Exclude<T, AssuranceHint>;
 
@@ -116,6 +116,7 @@ type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
+  // eslint-disable-next-line @typescript-eslint/ban-types
 } & {};
 
 function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
@@ -142,6 +143,7 @@ function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_ope
            */
           params.onOpenModal?.({
             afterVerification() {
+              console.log('useReverification', 'afterVerification');
               resolvers.resolve(true);
             },
             afterVerificationCancelled() {
