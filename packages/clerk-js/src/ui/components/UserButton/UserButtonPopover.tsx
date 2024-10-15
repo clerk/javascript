@@ -12,8 +12,8 @@ import { useMultisessionActions } from './useMultisessionActions';
 type UserButtonPopoverProps = { close?: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
-  const { close: optionalClose, ...rest } = props;
-  const close = () => optionalClose?.();
+  const { close: unsafeClose, ...rest } = props;
+  const close = () => unsafeClose?.();
   const { session } = useSession() as { session: ActiveSessionResource };
   const { authConfig } = useEnvironment();
   const { user } = useUser();

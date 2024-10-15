@@ -66,6 +66,20 @@ type UseCustomPagesOptions = {
 
 type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
 
+/**
+ * Exclude any children that is used for identifying Custom Pages or Custom Items.
+ * Passing:
+ * ```tsx
+ *  <UserProfile.Page/>
+ *  <OrganizationProfile.Link/>
+ *  <MyComponent>
+ *  <UserButton.MenuItems/>
+ * ```
+ * Gives back
+ * ```tsx
+ * <MyComponent>
+ * ````
+ */
 export const useSanitizedChildren = (children: React.ReactNode) => {
   const sanitizedChildren: React.ReactNode[] = [];
 

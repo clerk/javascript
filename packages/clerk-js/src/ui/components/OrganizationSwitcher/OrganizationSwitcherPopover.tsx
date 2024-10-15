@@ -26,8 +26,8 @@ type OrganizationSwitcherPopoverProps = {
 
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
   (props, ref) => {
-    const { close: undefinedClose, ...rest } = props;
-    const close = () => undefinedClose?.(false);
+    const { close: unsafeClose, ...rest } = props;
+    const close = () => unsafeClose?.(false);
     const card = useCardState();
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();

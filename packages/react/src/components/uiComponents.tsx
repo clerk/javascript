@@ -267,7 +267,6 @@ export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
   Link: UserProfileLink,
 });
 
-// @ts-ignore
 const UserButtonContext = createContext<MountProps>({
   mount: () => {},
   unmount: () => {},

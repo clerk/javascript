@@ -8,19 +8,19 @@ Introducing experimental `asProvider`, `asStandalone`, and `<X.Outlet />` for `<
 
 Example usage:
 ```tsx
-<UserButton asProvider afterSignOutUrl='/'>
+<UserButton __experimental_asProvider afterSignOutUrl='/'>
   <UserButton.UserProfilePage label="Custom Page" url="/custom-page"> 
     <h1> This is my page available to all children </h1>
   </UserButton.UserProfilePage>
-  <UserButton.Outlet asStandalone />
+  <UserButton.__experimental_Outlet __experimental_asStandalone />
 </UserButton>
 ```
 
 ```tsx
-<OrganizationSwitcher asProvider afterSignOutUrl='/'>
+<OrganizationSwitcher __experimental_asProvider afterSignOutUrl='/'>
   <OrganizationSwitcher.OrganizationProfilePage label="Custom Page" url="/custom-page">
     <h1> This is my page available to all children </h1>
   </OrganizationSwitcher.OrganizationProfilePage>
-  <OrganizationSwitcher.Outlet asStandalone />
+  <OrganizationSwitcher.__experimental_Outlet __experimental_asStandalone />
 </OrganizationSwitcher>
 ```

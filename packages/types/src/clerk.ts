@@ -1045,7 +1045,7 @@ export type UserButtonProps = UserButtonProfileMode & {
   defaultOpen?: boolean;
 
   /**
-   * If true the UserButton will only render the popover.
+   * If true the `<UserButton />` will only render the popover.
    * Enables developers to implement a custom dialog.
    * @experimental This API is experimental and may change at any moment.
    * @default undefined
@@ -1114,7 +1114,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     defaultOpen?: boolean;
 
     /**
-     * If true, OrganizationSwitcher will only render the popover.
+     * If true, `<OrganizationSwitcher />` will only render the popover.
      * Enables developers to implement a custom dialog.
      * @experimental This API is experimental and may change at any moment.
      * @default undefined
