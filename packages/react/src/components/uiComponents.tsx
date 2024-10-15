@@ -56,8 +56,8 @@ type UserButtonExportType = typeof _UserButton & {
   Action: typeof MenuAction;
   Link: typeof MenuLink;
   /**
-   * The `Outlet` component can be used in conjunction with `asProvider` in order to control rendering
-   * of the OrganizationSwitcher without affecting its configuration or any custom pages
+   * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
    * that could be mounted
    * @experimental This API is experimental and may change at any moment.
    */
@@ -70,7 +70,7 @@ type UserButtonPropsWithoutCustomPages = Without<
 > & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
   /**
-   * Adding `asProvider` will defer rendering until the `Outlet` component is mounted.
+   * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
@@ -86,8 +86,8 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfilePage: typeof OrganizationProfilePage;
   OrganizationProfileLink: typeof OrganizationProfileLink;
   /**
-   * The `Outlet` component can be used in conjunction with `asProvider` in order to control rendering
-   * of the OrganizationSwitcher without affecting its configuration or any custom pages
+   * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
    * that could be mounted
    * @experimental This API is experimental and may change at any moment.
    */
@@ -100,7 +100,7 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 > & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
   /**
-   * Adding `asProvider` will defer rendering until the `Outlet` component is mounted.
+   * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
