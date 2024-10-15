@@ -3,7 +3,9 @@ import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 
-const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+// We use the explicit render mode to be able to control when the widget is rendered.
+// CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
+const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
 interface RenderOptions {
   /**
@@ -87,7 +89,7 @@ async function loadCaptchaFromCloudflareURL() {
     return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
   } catch (err) {
     console.warn(
-      'Clerk: Failed to load the CAPTCHA script from Clouflare. If you see a CSP error in your browser, please add the necessary CSP rules to your app. Visit https://clerk.com/docs/security/clerk-csp for more information.',
+      'Clerk: Failed to load the CAPTCHA script from Cloudflare. If you see a CSP error in your browser, please add the necessary CSP rules to your app. Visit https://clerk.com/docs/security/clerk-csp for more information.',
     );
     throw err;
   }
