@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.9.1
+
+### Patch Changes
+
+- Only retry the OAuth flow if the captcha check failed. ([#4329](https://github.com/clerk/javascript/pull/4329)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/types@4.25.1
+
 ## 2.9.0
 
 ### Minor Changes
