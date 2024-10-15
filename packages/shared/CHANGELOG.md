@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.2
+
+### Patch Changes
+
+- Only retry the OAuth flow if the captcha check failed. ([#4330](https://github.com/clerk/javascript/pull/4330)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.4.1
 
 ### Patch Changes
