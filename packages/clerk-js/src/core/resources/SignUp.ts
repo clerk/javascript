@@ -1,4 +1,5 @@
 import { deprecated, Poller } from '@clerk/shared';
+import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -275,15 +276,26 @@ export class SignUp extends BaseResource implements SignUpResource {
   }: AuthenticateWithRedirectParams & {
     unsafeMetadata?: SignUpUnsafeMetadata;
   }): Promise<void> => {
-    const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
-      continueSignUp && this.id ? this.update(args) : this.create(args);
+    const authenticateFn = () => {
+      const params = {
+        strategy,
+        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+        unsafeMetadata,
+        emailAddress,
+      };
+      return continueSignUp && this.id ? this.update(params) : this.create(params);
+    };
 
-    const { verifications } = await authenticateFn({
-      strategy,
-      redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-      actionCompleteRedirectUrl: redirectUrlComplete,
-      unsafeMetadata,
-      emailAddress,
+    const { verifications } = await authenticateFn().catch(async e => {
+      // If captcha verification failed because the environment has changed, we need
+      // to reload the environment and try again one more time with the new environment.
+      // If this fails again, we will let the caller handle the error accordingly.
+      if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+        await SignUp.clerk.__unstable__environment!.reload();
+        return authenticateFn();
+      }
+      throw e;
     });
 
     const { externalAccount } = verifications;
@@ -339,18 +351,19 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (
-      params.strategy === 'oauth_google' ||
-      params.strategy === 'oauth_microsoft' ||
-      params.strategy === 'oauth_apple'
-    ) {
+    if (!params.strategy) {
+      return false;
+    }
+
+    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+
+    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
+
     if (
       params.transfer &&
-      (SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_google' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_microsoft' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_apple')
+      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
       return true;
     }

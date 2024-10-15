@@ -33,7 +33,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.fromJSON(data);
   }
 
-  fetch({ touch = false }: { touch: boolean }): Promise<Environment> {
+  fetch({ touch }: { touch: boolean } = { touch: false }): Promise<Environment> {
     if (touch) {
       return this._basePatch({});
     }
