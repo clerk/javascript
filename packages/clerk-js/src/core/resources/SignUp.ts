@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared';
+import { deprecated, Poller } from '@clerk/shared';
 import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AttemptEmailAddressVerificationParams,
