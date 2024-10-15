@@ -12,7 +12,6 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
-  },
   "sideEffects": [
     "*.css"
   ],
