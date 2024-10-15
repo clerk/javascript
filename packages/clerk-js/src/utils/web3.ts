@@ -21,14 +21,12 @@ export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promis
   return (identifiers && identifiers[0]) || '';
 }
 
-type GenerateWeb3SignatureParams = {
-  identifier: string;
-  nonce: string;
+type GenerateWeb3SignatureParams = GenerateSignatureParams & {
   provider: Web3Provider;
 };
 
 export async function generateWeb3Signature(params: GenerateWeb3SignatureParams): Promise<string> {
-  const { identifier, nonce, provider } = params;
+  const { identifier, message, provider } = params;
   const ethereum = await getEthereumProvider(provider);
   if (!ethereum) {
     // If a plugin for the requested provider is not found,
@@ -38,7 +36,7 @@ export async function generateWeb3Signature(params: GenerateWeb3SignatureParams)
 
   return await ethereum.request({
     method: 'personal_sign',
-    params: [`0x${toHex(nonce)}`, identifier],
+    params: [`0x${toHex(message)}`, identifier],
   });
 }
 
@@ -52,18 +50,15 @@ export async function getCoinbaseWalletIdentifier(): Promise<string> {
 
 type GenerateSignatureParams = {
   identifier: string;
-  nonce: string;
+  message: string;
 };
 
-export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'metamask' });
+export async function generateSignatureWithMetamask(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'metamask' });
 }
 
-export async function generateSignatureWithCoinbaseWallet({
-  identifier,
-  nonce,
-}: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'coinbase_wallet' });
+export async function generateSignatureWithCoinbaseWallet(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'coinbase_wallet' });
 }
 
 async function getEthereumProvider(provider: Web3Provider) {
