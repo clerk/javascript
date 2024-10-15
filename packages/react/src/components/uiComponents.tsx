@@ -268,7 +268,11 @@ export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
 });
 
 // @ts-ignore
-const UserButtonContext = createContext<MountProps>({});
+const UserButtonContext = createContext<MountProps>({
+  mount: () => {},
+  unmount: () => {},
+  updateProps: () => {},
+});
 
 const _UserButton = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages>>) => {
@@ -388,8 +392,11 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
 }, 'CreateOrganization');
 
 const OrganizationSwitcherContext = createContext<MountProps>(
-  // @ts-expect-error We are defining the values below
-  {},
+  {
+    mount: () => {},
+    unmount: () => {},
+    updateProps: () => {},
+  },
 );
 
 const _OrganizationSwitcher = withClerk(

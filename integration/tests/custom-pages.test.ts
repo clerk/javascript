@@ -112,7 +112,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
           await expect(u.page.locator('p[data-page="1"]')).toHaveText('Counter: 1');
         });
 
-        test('does not leak children', async ({ page, context }) => {
+        test('renders only custom pages and does not display unrelated child components', async ({ page, context }) => {
           const u = createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();

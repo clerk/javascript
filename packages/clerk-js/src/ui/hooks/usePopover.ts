@@ -25,7 +25,6 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   const { bubbles = false, shoudFlip = true, outsidePress, adjustToReferenceWidth = false, referenceElement } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
-
   const { update, refs, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
