@@ -136,7 +136,7 @@ export interface DefineConfig {
 /* Exports
   ============================================ */
 
-const falsyToString = <T>(value: T) => (typeof value === 'boolean' ? `${value}` : value === 0 ? '0' : value);
+const falsyToString = <T, _>(value: T) => (typeof value === 'boolean' ? `${value}` : value === 0 ? '0' : value);
 
 export const defineConfig: DefineConfig = options => {
   const cx: CX = (...inputs) => {
