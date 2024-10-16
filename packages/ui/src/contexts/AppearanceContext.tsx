@@ -5,7 +5,6 @@ import React from 'react';
 import { fullTheme } from '~/themes';
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
-type SeparatorDescriptorIdentifier = 'separator';
 type ButtonDescriptorIdentifier =
   | 'button'
   | 'buttonPrimary'
@@ -14,18 +13,26 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
-  | 'button--disabled'
   | 'buttonDisabled'
   | 'buttonBusy'
-  | 'buttonConnection__google';
+  | 'buttonConnection__google'
+  | 'buttonText'
+  | 'buttonTextVisuallyHidden'
+  | 'buttonIcon'
+  | 'buttonIconStart'
+  | 'buttonIconEnd'
+  | 'buttonSpinner';
+type SeparatorDescriptorIdentifier = 'separator';
+type SpinnerDescriptorIdentifier = 'spinner';
 
 /**
  * Union of all valid descriptors used throughout the components.
  */
 export type DescriptorIdentifier =
   | AlertDescriptorIdentifier
+  | ButtonDescriptorIdentifier
   | SeparatorDescriptorIdentifier
-  | ButtonDescriptorIdentifier;
+  | SpinnerDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.

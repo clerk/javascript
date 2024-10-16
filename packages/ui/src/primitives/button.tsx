@@ -1,16 +1,10 @@
-import { cx } from 'cva';
 import * as React from 'react';
 
 import type { ParsedElementsFragment } from '~/contexts/AppearanceContext';
-import { useAppearance } from '~/contexts/AppearanceContext';
+import { mergeDescriptors, useAppearance } from '~/contexts/AppearanceContext';
 import { applyDescriptors, dva, type VariantProps } from '~/utils/dva';
 
 import { Spinner } from './spinner';
-
-// Note:
-// - To create the overlapping border/shadow effect"
-//   - `ring` – "focus ring"
-//   - `ring-offset` - border
 
 export const layoutStyle = {
   button: {
@@ -36,6 +30,16 @@ export const layoutStyle = {
   buttonDisabled: {},
   buttonBusy: {},
   buttonConnection__google: {},
+  buttonText: {},
+  buttonTextVisuallyHidden: {},
+  buttonIcon: {
+    className: 'shrink-0',
+  },
+  buttonIconStart: {},
+  buttonIconEnd: {},
+  buttonSpinner: {
+    className: 'shrink-0',
+  },
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
@@ -82,6 +86,20 @@ export const visualStyle = {
     className: 'cursor-wait',
   },
   buttonConnection__google: {},
+  buttonText: {
+    className: 'truncate leading-4',
+  },
+  buttonTextVisuallyHidden: {
+    className: 'sr-only',
+  },
+  buttonIcon: {
+    className: 'text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]',
+  },
+  buttonIconStart: {},
+  buttonIconEnd: {},
+  buttonSpinner: {
+    className: 'text-[length:--button-icon-size] text-[--button-icon-color]',
+  },
 } satisfies ParsedElementsFragment;
 
 const button = dva({
@@ -132,13 +150,10 @@ export const Button = React.forwardRef(function Button(
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
   const { elements } = useAppearance().parsedAppearance;
-  const spinner = (
-    <Spinner className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color]'>Loading…</Spinner>
-  );
+  const spinner = <Spinner descriptor='buttonSpinner'>Loading…</Spinner>;
 
   return (
     <button
-      data-button=''
       ref={forwardedRef}
       {...applyDescriptors(elements, button({ busy, disabled, intent, descriptor }))}
       disabled={busy || disabled}
@@ -154,25 +169,15 @@ export const Button = React.forwardRef(function Button(
             busy && intent === 'connection' ? (
               spinner
             ) : (
-              <span
-                data-button-icon=''
-                className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]'
-              >
-                {iconStart}
-              </span>
+              <span {...applyDescriptors(elements, 'buttonIcon buttonIconStart')}>{iconStart}</span>
             )
           ) : null}
           {children ? (
-            <span className={cx('truncate leading-4', textVisuallyHidden && 'sr-only')}>{children}</span>
-          ) : null}
-          {iconEnd ? (
-            <span
-              data-button-icon=''
-              className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]'
-            >
-              {iconEnd}
+            <span {...mergeDescriptors(elements.buttonText, !!textVisuallyHidden && elements.buttonTextVisuallyHidden)}>
+              {children}
             </span>
           ) : null}
+          {iconEnd ? <span {...applyDescriptors(elements, 'buttonIcon buttonIconEnd')}>{iconEnd}</span> : null}
         </>
       )}
     </button>
