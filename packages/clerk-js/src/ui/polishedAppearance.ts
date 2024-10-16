@@ -143,6 +143,21 @@ export const polishedAppearance: Appearance = {
           ...inputStyles(theme),
         },
       },
+      checkbox: {
+        padding: `${theme.space.$1}`,
+        width: theme.sizes.$3x5,
+        height: theme.sizes.$3x5,
+        appearance: 'none',
+        borderRadius: theme.radii.$sm,
+        '&:checked': {
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.25 8L6.5 9.75L9.75 4.25' stroke='${theme.colors.$whiteAlpha900}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E")`,
+          borderColor: theme.colors.$transparent,
+          backgroundColor: theme.colors.$primary500,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        },
+      },
       tagInputContainer: {
         ...inputStyles(theme),
       },
