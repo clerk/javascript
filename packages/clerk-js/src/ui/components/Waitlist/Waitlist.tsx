@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { WaitlistModalProps } from '@clerk/types';
+import type { __experimental_WaitlistModalProps } from '@clerk/types';
 
 import { ComponentContext, useWaitlistContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
@@ -59,7 +59,7 @@ const _Waitlist = () => {
 
 export const Waitlist = withCardStateProvider(_Waitlist);
 
-export const WaitlistModal = (props: WaitlistModalProps): JSX.Element => {
+export const WaitlistModal = (props: __experimental_WaitlistModalProps): JSX.Element => {
   const waitlistProps: WaitlistCtx = {
     ...props,
     componentName: 'Waitlist',

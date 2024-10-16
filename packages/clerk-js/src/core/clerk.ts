@@ -18,6 +18,7 @@ import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
+  __experimental_WaitlistProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -61,7 +62,6 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
-  WaitlistProps,
   WaitlistResource,
   Web3Provider,
 } from '@clerk/types';
@@ -498,7 +498,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('createOrganization'));
   };
 
-  public openWaitlist = (props?: WaitlistProps): void => {
+  public openWaitlist = (props?: __experimental_WaitlistProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Waitlist' })
@@ -736,7 +736,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountWaitlist = (node: HTMLDivElement, props?: WaitlistProps) => {
+  public mountWaitlist = (node: HTMLDivElement, props?: __experimental_WaitlistProps) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted({ preloadHint: 'Waitlist' }).then(controls =>
       controls.mountComponent({

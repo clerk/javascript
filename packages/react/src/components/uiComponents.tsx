@@ -1,6 +1,7 @@
 import { logErrorInDevMode, without } from '@clerk/shared';
 import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
+  __experimental_WaitlistProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -10,7 +11,6 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
-  WaitlistProps,
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
@@ -476,7 +476,7 @@ export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<Google
   );
 }, 'GoogleOneTap');
 
-export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistProps>) => {
+export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<__experimental_WaitlistProps>) => {
   return (
     <Portal
       mount={clerk.mountWaitlist}
