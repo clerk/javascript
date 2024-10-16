@@ -10,6 +10,7 @@ import SignUp from './sign-up';
 import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
 import UserButtonCustom from './custom-user-button';
+import UserButtonCustomTrigger from './custom-user-button-trigger';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: '/custom-user-button',
         element: <UserButtonCustom />,
+      },
+      {
+        path: '/custom-user-button-trigger',
+        element: <UserButtonCustomTrigger />,
       },
     ],
   },

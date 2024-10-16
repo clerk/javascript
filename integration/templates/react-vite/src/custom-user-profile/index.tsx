@@ -38,7 +38,7 @@ export default function Page() {
         >
           <h1>Page 2</h1>
         </UserProfile.Page>
-        🌐
+        <p data-leaked-child>This is leaking</p>
         <UserProfile.Link
           url={'https://clerk.com'}
           label={'Visit Clerk'}

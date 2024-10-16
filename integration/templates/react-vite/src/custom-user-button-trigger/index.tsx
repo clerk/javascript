@@ -1,5 +1,5 @@
 import { UserButton } from '@clerk/clerk-react';
-import { useContext } from 'react';
+import { PropsWithChildren, useContext, useState } from 'react';
 import { PageContext, PageContextProvider } from '../PageContext.tsx';
 
 function Page1() {
@@ -19,10 +19,26 @@ function Page1() {
   );
 }
 
+function ToggleChildren(props: PropsWithChildren) {
+  const [isMounted, setMounted] = useState(false);
+
+  return (
+    <>
+      <button
+        data-toggle-btn
+        onClick={() => setMounted(v => !v)}
+      >
+        Toggle
+      </button>
+      {isMounted ? props.children : null}
+    </>
+  );
+}
+
 export default function Page() {
   return (
     <PageContextProvider>
-      <UserButton>
+      <UserButton __experimental_asProvider>
         <UserButton.UserProfilePage
           label={'Page 1'}
           labelIcon={<p data-label-icon={'page-1'}>🙃</p>}
@@ -75,6 +91,9 @@ export default function Page() {
           label={'Visit User page'}
           labelIcon={<p data-label-icon={'page-4'}>🌐</p>}
         />
+        <ToggleChildren>
+          <UserButton.__experimental_Outlet __experimental_asStandalone />
+        </ToggleChildren>
       </UserButton>
     </PageContextProvider>
   );

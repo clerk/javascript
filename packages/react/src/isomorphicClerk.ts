@@ -841,6 +841,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __experimental_prefetchOrganizationSwitcher = (): void => {
+    const callback = () => this.clerkjs?.__experimental_prefetchOrganizationSwitcher();
+    if (this.clerkjs && this.#loaded) {
+      void callback();
+    } else {
+      this.premountMethodCalls.set('__experimental_prefetchOrganizationSwitcher', callback);
+    }
+  };
+
   mountOrganizationList = (node: HTMLDivElement, props: OrganizationListProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountOrganizationList(node, props);

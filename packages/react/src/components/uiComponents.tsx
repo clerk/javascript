@@ -13,7 +13,7 @@ import type {
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { createElement } from 'react';
+import React, { createContext, createElement, useContext } from 'react';
 
 import {
   organizationProfileLinkRenderedError,
@@ -25,6 +25,7 @@ import {
   userProfilePageRenderedError,
 } from '../errors/messages';
 import type {
+  CustomPortalsRendererProps,
   MountProps,
   OpenProps,
   OrganizationProfileLinkProps,
@@ -35,7 +36,12 @@ import type {
   UserProfilePageProps,
   WithClerkProp,
 } from '../types';
-import { useOrganizationProfileCustomPages, useUserButtonCustomMenuItems, useUserProfileCustomPages } from '../utils';
+import {
+  useOrganizationProfileCustomPages,
+  useSanitizedChildren,
+  useUserButtonCustomMenuItems,
+  useUserProfileCustomPages,
+} from '../utils';
 import { withClerk } from './withClerk';
 
 type UserProfileExportType = typeof _UserProfile & {
@@ -49,10 +55,26 @@ type UserButtonExportType = typeof _UserButton & {
   MenuItems: typeof MenuItems;
   Action: typeof MenuAction;
   Link: typeof MenuLink;
+  /**
+   * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
+   * that could be mounted
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_Outlet: typeof UserButtonOutlet;
 };
 
-type UserButtonPropsWithoutCustomPages = Without<UserButtonProps, 'userProfileProps'> & {
+type UserButtonPropsWithoutCustomPages = Without<
+  UserButtonProps,
+  'userProfileProps' | '__experimental_asStandalone'
+> & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  /**
+   * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asProvider?: boolean;
 };
 
 type OrganizationProfileExportType = typeof _OrganizationProfile & {
@@ -63,10 +85,34 @@ type OrganizationProfileExportType = typeof _OrganizationProfile & {
 type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfilePage: typeof OrganizationProfilePage;
   OrganizationProfileLink: typeof OrganizationProfileLink;
+  /**
+   * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
+   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
+   * that could be mounted
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_Outlet: typeof OrganizationSwitcherOutlet;
 };
 
-type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherProps, 'organizationProfileProps'> & {
+type OrganizationSwitcherPropsWithoutCustomPages = Without<
+  OrganizationSwitcherProps,
+  'organizationProfileProps' | '__experimental_asStandalone'
+> & {
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
+  /**
+   * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asProvider?: boolean;
+};
+
+const isMountProps = (props: any): props is MountProps => {
+  return 'mount' in props;
+};
+
+const isOpenProps = (props: any): props is OpenProps => {
+  return 'open' in props;
 };
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
@@ -98,15 +144,9 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherP
 
 // Portal.displayName = 'ClerkPortal';
 
-const isMountProps = (props: any): props is MountProps => {
-  return 'mount' in props;
-};
-
-const isOpenProps = (props: any): props is OpenProps => {
-  return 'open' in props;
-};
-
-class Portal extends React.PureComponent<MountProps | OpenProps> {
+class Portal extends React.PureComponent<
+  PropsWithChildren<(MountProps | OpenProps) & { hideRootHtmlElement?: boolean }>
+> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
@@ -122,8 +162,11 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
     // instead, we simply use the length of customPages to determine if it changed or not
     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
+
     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
-      this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+      if (this.portalRef.current) {
+        this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+      }
     }
   }
 
@@ -151,17 +194,24 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   }
 
   render() {
+    const { hideRootHtmlElement = false } = this.props;
     return (
       <>
-        <div ref={this.portalRef} />
-        {isMountProps(this.props) &&
-          this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-        {isMountProps(this.props) &&
-          this.props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+        {!hideRootHtmlElement && <div ref={this.portalRef} />}
+        {this.props.children}
       </>
     );
   }
 }
+
+const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
+  return (
+    <>
+      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+    </>
+  );
+};
 
 export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
   return (
@@ -204,8 +254,9 @@ const _UserProfile = withClerk(
         unmount={clerk.unmountUserProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
-        customPagesPortals={customPagesPortals}
-      />
+      >
+        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+      </Portal>
     );
   },
   'UserProfile',
@@ -216,21 +267,43 @@ export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
   Link: UserProfileLink,
 });
 
+const UserButtonContext = createContext<MountProps>({
+  mount: () => {},
+  unmount: () => {},
+  updateProps: () => {},
+});
+
 const _UserButton = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages>>) => {
-    const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
+    const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+    const sanitizedChildren = useSanitizedChildren(props.children);
+
+    const passableProps = {
+      mount: clerk.mountUserButton,
+      unmount: clerk.unmountUserButton,
+      updateProps: (clerk as any).__unstable__updateProps,
+      props: { ...props, userProfileProps, customMenuItems },
+    };
+    const portalProps = {
+      customPagesPortals: customPagesPortals,
+      customMenuItemsPortals: customMenuItemsPortals,
+    };
 
     return (
-      <Portal
-        mount={clerk.mountUserButton}
-        unmount={clerk.unmountUserButton}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, userProfileProps, customMenuItems }}
-        customPagesPortals={customPagesPortals}
-        customMenuItemsPortals={customMenuItemsPortals}
-      />
+      <UserButtonContext.Provider value={passableProps}>
+        <Portal
+          {...passableProps}
+          hideRootHtmlElement={!!props.__experimental_asProvider}
+        >
+          {/*This mimics the previous behaviour before asProvider existed*/}
+          {props.__experimental_asProvider ? sanitizedChildren : null}
+          <CustomPortalsRenderer {...portalProps} />
+        </Portal>
+      </UserButtonContext.Provider>
     );
   },
   'UserButton',
@@ -251,12 +324,27 @@ export function MenuLink({ children }: PropsWithChildren<UserButtonLinkProps>) {
   return <>{children}</>;
 }
 
+export function UserButtonOutlet(outletProps: Without<UserButtonProps, 'userProfileProps'>) {
+  const providerProps = useContext(UserButtonContext);
+
+  const portalProps = {
+    ...providerProps,
+    props: {
+      ...providerProps.props,
+      ...outletProps,
+    },
+  } satisfies MountProps;
+
+  return <Portal {...portalProps} />;
+}
+
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   UserProfilePage,
   UserProfileLink,
   MenuItems,
   Action: MenuAction,
   Link: MenuLink,
+  __experimental_Outlet: UserButtonOutlet,
 });
 
 export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
@@ -278,8 +366,9 @@ const _OrganizationProfile = withClerk(
         unmount={clerk.unmountOrganizationProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
-        customPagesPortals={customPagesPortals}
-      />
+      >
+        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+      </Portal>
     );
   },
   'OrganizationProfile',
@@ -301,27 +390,68 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
   );
 }, 'CreateOrganization');
 
+const OrganizationSwitcherContext = createContext<MountProps>({
+  mount: () => {},
+  unmount: () => {},
+  updateProps: () => {},
+});
+
 const _OrganizationSwitcher = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages>>) => {
-    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
+    const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    const sanitizedChildren = useSanitizedChildren(props.children);
+
+    const passableProps = {
+      mount: clerk.mountOrganizationSwitcher,
+      unmount: clerk.unmountOrganizationSwitcher,
+      updateProps: (clerk as any).__unstable__updateProps,
+      props: { ...props, organizationProfileProps },
+    };
+
+    /**
+     * Prefetch organization list
+     */
+    clerk.__experimental_prefetchOrganizationSwitcher();
 
     return (
-      <Portal
-        mount={clerk.mountOrganizationSwitcher}
-        unmount={clerk.unmountOrganizationSwitcher}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, organizationProfileProps }}
-        customPagesPortals={customPagesPortals}
-      />
+      <OrganizationSwitcherContext.Provider value={passableProps}>
+        <Portal
+          {...passableProps}
+          hideRootHtmlElement={!!props.__experimental_asProvider}
+        >
+          {/*This mimics the previous behaviour before asProvider existed*/}
+          {props.__experimental_asProvider ? sanitizedChildren : null}
+          <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+        </Portal>
+      </OrganizationSwitcherContext.Provider>
     );
   },
   'OrganizationSwitcher',
 );
 
+export function OrganizationSwitcherOutlet(
+  outletProps: Without<OrganizationSwitcherProps, 'organizationProfileProps'>,
+) {
+  const providerProps = useContext(OrganizationSwitcherContext);
+
+  const portalProps = {
+    ...providerProps,
+    props: {
+      ...providerProps.props,
+      ...outletProps,
+    },
+  } satisfies MountProps;
+
+  return <Portal {...portalProps} />;
+}
+
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
   OrganizationProfilePage,
   OrganizationProfileLink,
+  __experimental_Outlet: OrganizationSwitcherOutlet,
 });
 
 export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {

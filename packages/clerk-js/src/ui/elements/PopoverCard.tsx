@@ -3,27 +3,41 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
-import type { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
 import { Card } from '.';
 
-const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
-  const { elementDescriptor, ...rest } = props;
+const PopoverCardRoot = React.forwardRef<
+  HTMLDivElement,
+  PropsOfComponent<typeof Card.Content> & {
+    shouldEntryAnimate?: boolean;
+  }
+>((props, ref) => {
+  const { elementDescriptor, shouldEntryAnimate = true, ...rest } = props;
+
+  const withAnimation: ThemableCssProp = t => ({
+    animation: shouldEntryAnimate
+      ? `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`
+      : undefined,
+  });
+
   return (
     <Flow.Part part='popover'>
       <Card.Root
         elementDescriptor={[descriptors.popoverBox, elementDescriptor as ElementDescriptor]}
         {...rest}
         ref={ref}
-        sx={t => ({
-          width: t.sizes.$94,
-          maxWidth: `calc(100vw - ${t.sizes.$8})`,
-          zIndex: t.zIndices.$modal,
-          borderRadius: t.radii.$xl,
-          animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
-          outline: 'none',
-        })}
+        sx={[
+          t => ({
+            width: t.sizes.$94,
+            maxWidth: `calc(100vw - ${t.sizes.$8})`,
+            zIndex: t.zIndices.$modal,
+            borderRadius: t.radii.$xl,
+            outline: 'none',
+          }),
+          withAnimation,
+        ]}
       >
         {props.children}
       </Card.Root>
