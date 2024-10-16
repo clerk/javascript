@@ -112,6 +112,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
+    // TODO(@vaggelis): Remove this once the legalAccepted is stable
     paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
     paramsWithCaptcha.__experimental_legalAccepted = undefined;
 
@@ -317,6 +318,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+    // TODO(@vaggelis): Remove this once the legalAccepted is stable
     // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
     params.legalAccepted = params.__experimental_legalAccepted;
     params.__experimental_legalAccepted = undefined;
