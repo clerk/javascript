@@ -86,6 +86,11 @@ export type GoogleOneTapCtx = GoogleOneTapProps & {
   componentName: 'GoogleOneTap';
 };
 
+export type WaitlistCtx = {
+  componentName: 'Waitlist';
+  mode?: ComponentMode;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -96,4 +101,5 @@ export type AvailableComponentCtx =
   | CreateOrganizationCtx
   | OrganizationSwitcherCtx
   | OrganizationListCtx
-  | GoogleOneTapCtx;
+  | GoogleOneTapCtx
+  | WaitlistCtx;

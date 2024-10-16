@@ -11,6 +11,7 @@ import type {
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
+  WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -39,6 +40,7 @@ import type { SignUpResource } from './signUp';
 import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Contains information about the SDK that the host application is using.
@@ -228,6 +230,17 @@ export interface Clerk {
   closeCreateOrganization: () => void;
 
   /**
+   * Opens the Clerk Waitlist modal.
+   * @param props Optional props that will be passed to the Waitlist component.
+   */
+  openWaitlist: (props?: WaitlistProps) => void;
+
+  /**
+   * Closes the Clerk Waitlist modal.
+   */
+  closeWaitlist: () => void;
+
+  /**
    * Mounts a sign in flow component at the target element.
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
@@ -349,6 +362,19 @@ export interface Clerk {
    * @param targetNode Target node to unmount the OrganizationList component from.
    */
   unmountOrganizationList: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount a waitlist at the target element.
+   * @param targetNode Target to mount the Waitlist component.
+   * @param props Configuration parameters.
+   */
+  mountWaitlist: (targetNode: HTMLDivElement, props?: WaitlistProps) => void;
+
+  /**
+   * Unmount the Waitlist component from the target node.
+   * @param targetNode Target node to unmount the Waitlist component from.
+   */
+  unmountWaitlist: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -548,6 +574,8 @@ export interface Clerk {
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
    */
   handleUnauthenticated: () => Promise<unknown>;
+
+  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1234,6 +1262,21 @@ export type OrganizationListProps = {
   hideSlug?: boolean;
 };
 
+export type WaitlistProps = {
+  /**
+   * Full URL or path to navigate after successful waitlist submission.
+   */
+  redirectUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: WaitlistTheme;
+};
+
+export type WaitlistModalProps = WaitlistProps;
+
 export interface HandleEmailLinkVerificationParams {
   /**
    * Full URL or path to navigate after successful magic link verification
@@ -1274,6 +1317,10 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
 }
+
+export type JoinWaitlistParams = {
+  emailAddress: string;
+};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;

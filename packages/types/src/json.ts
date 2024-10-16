@@ -528,3 +528,8 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface WaitlistJSON extends ClerkResourceJSON {
+  object: 'waitlist';
+  id: string;
+}

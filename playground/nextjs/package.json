@@ -11,8 +11,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "beta",
-    "@clerk/themes": "beta",
+    "@clerk/backend": "file:.yalc/@clerk/backend",
+    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
+    "@clerk/themes": "file:.yalc/@clerk/themes",
+    "@clerk/types": "file:.yalc/@clerk/types",
     "next": "^14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

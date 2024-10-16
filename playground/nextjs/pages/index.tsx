@@ -49,6 +49,9 @@ const Home: NextPage = () => {
           <li>
             <Link href={'/user-examples'}>User examples</Link>
           </li>
+          <li>
+            <Link href={'/waitlist'}>Waitlist</Link>
+          </li>
         </ul>
       </main>
     </div>

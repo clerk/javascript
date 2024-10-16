@@ -886,4 +886,17 @@ export const enUS: LocalizationResource = {
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
+  waitlist: {
+    start: {
+      title: 'Join the waitlist',
+      subtitle: 'Enter your email address and we’ll let you know when your spot is ready',
+      formButton: 'Join the waitlist',
+      actionText: 'Already has access?',
+      actionLink: 'Sign in',
+    },
+    success: {
+      title: 'Thanks for joining the waitlist!',
+      subtitle: 'We’ll be in touch when your spot is ready',
+    },
+  },
 } as const;

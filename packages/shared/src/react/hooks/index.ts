@@ -7,3 +7,4 @@ export { useSessionList } from './useSessionList';
 export { useUser } from './useUser';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
+export { useWaitlist } from './useWaitlist';

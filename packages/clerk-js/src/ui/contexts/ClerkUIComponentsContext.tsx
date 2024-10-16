@@ -24,6 +24,7 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
   UserVerificationCtx,
+  WaitlistCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
 import {
@@ -622,5 +623,23 @@ export const useGoogleOneTapContext = () => {
     ...ctx,
     componentName,
     generateCallbackUrls,
+  };
+};
+
+export type WaitlistContextType = WaitlistCtx & {
+  signInUrl: string;
+};
+
+export const useWaitlistContext = (): WaitlistContextType => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as WaitlistCtx;
+  const { displayConfig } = useEnvironment();
+  const options = useOptions();
+
+  const signInUrl = options.signInUrl || displayConfig.signInUrl;
+
+  return {
+    ...ctx,
+    componentName,
+    signInUrl,
   };
 };

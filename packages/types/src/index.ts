@@ -60,3 +60,4 @@ export * from './pagination';
 export * from './passkey';
 export * from './customMenuItems';
 export * from './samlConnection';
+export * from './waitlist';
