@@ -2,6 +2,7 @@
 
 exports[`module exports should not change unless explicitly set 1`] = `
 [
+  "authenticateRequest",
   "clerkClient",
   "clerkMiddleware",
   "createClerkClient",
