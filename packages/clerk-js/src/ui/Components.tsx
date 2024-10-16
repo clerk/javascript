@@ -52,7 +52,6 @@ export type ComponentControls = {
     props?: AvailableComponentProps;
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
-  flushEmotionCache: () => void;
   updateProps: (params: {
     appearance?: Appearance | undefined;
     options?: ClerkOptions | undefined;
@@ -92,6 +91,7 @@ export type ComponentControls = {
     },
   ) => void;
   prefetch: (component: 'organizationSwitcher') => void;
+  flushEmotionCache: () => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
 };
