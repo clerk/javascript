@@ -4,7 +4,7 @@ import React from 'react';
 
 import { fullTheme } from '~/themes';
 
-type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
+type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
 type ButtonDescriptorIdentifier =
   | 'button'
   | 'buttonPrimary'
@@ -15,7 +15,6 @@ type ButtonDescriptorIdentifier =
   | 'buttonConnectionDefault'
   | 'buttonDisabled'
   | 'buttonBusy'
-  | 'buttonConnection__google'
   | 'buttonText'
   | 'buttonTextVisuallyHidden'
   | 'buttonIcon'
