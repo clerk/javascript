@@ -6,11 +6,25 @@ import { fullTheme } from '~/themes';
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
 type SeparatorDescriptorIdentifier = 'separator';
+type ButtonDescriptorIdentifier =
+  | 'button'
+  | 'buttonPrimary'
+  | 'buttonSecondary'
+  | 'buttonConnection'
+  | 'buttonPrimaryDefault'
+  | 'buttonSecondaryDefault'
+  | 'buttonConnectionDefault'
+  | 'buttonDisabled'
+  | 'buttonWait'
+  | 'buttonConnection__google';
 
 /**
  * Union of all valid descriptors used throughout the components.
  */
-export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier;
+export type DescriptorIdentifier =
+  | AlertDescriptorIdentifier
+  | SeparatorDescriptorIdentifier
+  | ButtonDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.

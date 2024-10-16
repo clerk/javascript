@@ -1,6 +1,9 @@
-import type { VariantProps } from 'cva';
-import { cva, cx } from 'cva';
+import { cx } from 'cva';
 import * as React from 'react';
+
+import type { ParsedElementsFragment } from '~/contexts/AppearanceContext';
+import { useAppearance } from '~/contexts/AppearanceContext';
+import { applyDescriptors, dva, type VariantProps } from '~/utils/dva';
 
 import { Spinner } from './spinner';
 
@@ -8,45 +11,86 @@ import { Spinner } from './spinner';
 // - To create the overlapping border/shadow effect"
 //   - `ring` – "focus ring"
 //   - `ring-offset` - border
-const button = cva({
-  base: [
-    '[--button-icon-size:calc(var(--cl-font-size)*1.24)]', // 16px
-    'appearance-none relative isolate select-none',
-    'text-base font-medium',
-    'px-3 py-1.5',
-    'min-h-[1.875rem]',
-    'inline-flex w-full items-center justify-center gap-3',
-    'ring ring-offset-1 rounded-md',
-    '[&:not(:focus-visible)]:ring-transparent',
-    'outline-none',
-    '*:min-w-0',
-  ],
+
+export const layoutStyle = {
+  button: {
+    className: [
+      '[--button-icon-size:calc(var(--cl-font-size)*1.24)]', // 16px
+      'appearance-none relative isolate select-none',
+      'text-base font-medium',
+      'px-3 py-1.5',
+      'min-h-[1.875rem]',
+      'inline-flex w-full items-center justify-center gap-3',
+      'ring ring-offset-1 rounded-md',
+      '[&:not(:focus-visible)]:ring-transparent',
+      'outline-none',
+      '*:min-w-0',
+    ].join(' '),
+  },
+  buttonPrimary: {},
+  buttonSecondary: {},
+  buttonConnection: {},
+  buttonPrimaryDefault: {},
+  buttonSecondaryDefault: {},
+  buttonConnectionDefault: {},
+  buttonDisabled: {},
+  buttonWait: {},
+  buttonConnection__google: {},
+} satisfies ParsedElementsFragment;
+
+export const visualStyle = {
+  button: {},
+  buttonPrimary: {
+    className: [
+      '[--button-icon-color:currentColor]',
+      '[--button-icon-opacity:0.6]',
+      'text-accent-contrast bg-accent-9 ring-offset-accent-9',
+      'shadow-[0px_1px_1px_0px_theme(colors.white/.07)_inset,0px_2px_3px_0px_theme(colors.gray.a7),0px_1px_1px_0px_theme(colors.gray.a9)]',
+      'before:absolute before:inset-0 before:rounded-[inherit] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
+      'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
+    ].join(' '),
+  },
+  buttonSecondary: {
+    className: [
+      '[--button-icon-color:theme(colors.gray.12)]',
+      '[--button-icon-opacity:1]',
+      'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
+      'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
+    ].join(' '),
+  },
+  buttonConnection: {
+    className: [
+      '[--button-icon-color:theme(colors.gray.12)]',
+      '[--button-icon-opacity:1]',
+      'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
+      'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
+    ].join(' '),
+  },
+  buttonPrimaryDefault: {
+    className: 'hover:bg-accent-10 hover:after:opacity-0',
+  },
+  buttonSecondaryDefault: {
+    className: 'hover:bg-gray-2',
+  },
+  buttonConnectionDefault: {
+    className: 'hover:bg-gray-2',
+  },
+  buttonDisabled: {
+    className: 'disabled:cursor-not-allowed disabled:opacity-50',
+  },
+  buttonWait: {
+    className: 'cursor-wait',
+  },
+  buttonConnection__google: {},
+} satisfies ParsedElementsFragment;
+
+const button = dva({
+  base: 'button',
   variants: {
     intent: {
-      primary: [
-        '[--button-icon-color:currentColor]',
-        '[--button-icon-opacity:0.6]',
-        'text-accent-contrast bg-accent-9 ring-offset-accent-9',
-        'shadow-[0px_1px_1px_0px_theme(colors.white/.07)_inset,0px_2px_3px_0px_theme(colors.gray.a7),0px_1px_1px_0px_theme(colors.gray.a9)]',
-        'before:absolute before:inset-0 before:rounded-[inherit] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
-        'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
-      ],
-      secondary: [
-        '[--button-icon-color:theme(colors.gray.12)]',
-        '[--button-icon-opacity:1]',
-        'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
-        'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
-      ],
-      // Note:
-      // This currently looks the same as `secondary`, but we've intentfully
-      // kept this as a separate variant for now, due to its nuances in `busy`
-      // behavior
-      connection: [
-        '[--button-icon-color:theme(colors.gray.12)]',
-        '[--button-icon-opacity:1]',
-        'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
-        'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
-      ],
+      primary: 'buttonPrimary',
+      secondary: 'buttonSecondary',
+      connection: 'buttonConnection',
     },
     busy: {
       false: null,
@@ -58,11 +102,11 @@ const button = cva({
     },
   },
   compoundVariants: [
-    { busy: false, disabled: false, intent: 'primary', className: 'hover:bg-accent-10 hover:after:opacity-0' },
-    { busy: false, disabled: false, intent: 'secondary', className: 'hover:bg-gray-2' },
-    { busy: false, disabled: false, intent: 'connection', className: 'hover:bg-gray-2' },
-    { busy: false, disabled: true, className: 'disabled:cursor-not-allowed disabled:opacity-50' },
-    { busy: true, disabled: false, className: 'cursor-wait' },
+    { busy: false, disabled: false, intent: 'primary', descriptor: 'buttonPrimaryDefault' },
+    { busy: false, disabled: false, intent: 'secondary', descriptor: 'buttonSecondaryDefault' },
+    { busy: false, disabled: false, intent: 'connection', descriptor: 'buttonConnectionDefault' },
+    { busy: false, disabled: true, descriptor: 'buttonDisabled' },
+    { busy: true, disabled: false, descriptor: 'buttonWait' },
   ],
 });
 
@@ -70,7 +114,7 @@ export const Button = React.forwardRef(function Button(
   {
     busy = false,
     children,
-    className,
+    descriptor,
     disabled = false,
     iconStart,
     iconEnd,
@@ -87,6 +131,7 @@ export const Button = React.forwardRef(function Button(
     },
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   const spinner = (
     <Spinner className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color]'>Loading…</Spinner>
   );
@@ -95,7 +140,7 @@ export const Button = React.forwardRef(function Button(
     <button
       data-button=''
       ref={forwardedRef}
-      className={button({ busy, disabled, intent, className })}
+      {...applyDescriptors(elements, button({ busy, disabled, intent, descriptor }))}
       disabled={busy || disabled}
       // eslint-disable-next-line react/button-has-type
       type={type}
