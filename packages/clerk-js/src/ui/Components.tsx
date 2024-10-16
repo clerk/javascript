@@ -312,7 +312,6 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.flushEmotionCache = () => {
-      console.log('flushing emotion cache...', emotionCache);
       emotionCache.sheet.flush();
       emotionCache.inserted = {};
       emotionCache.registered = {};

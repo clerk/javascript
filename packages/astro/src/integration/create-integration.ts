@@ -111,13 +111,13 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { runInjectionScript } from "${buildImportPath}";
 
-            document.addEventListener('astro:before-swap', e => {
-              console.log('astro:before-swap');
-              window.Clerk.__internal_clearEmotionCache();
+            await runInjectionScript(${JSON.stringify(internalParams)});
+
+            document.addEventListener('astro:before-swap', async e => {
+              window.Clerk.__internal_flushEmotionCache();
             });
 
             document.addEventListener('astro:page-load', async () => {
-              console.log('astro:page-load');
               await runInjectionScript(${JSON.stringify(internalParams)});
             })`,
           );
