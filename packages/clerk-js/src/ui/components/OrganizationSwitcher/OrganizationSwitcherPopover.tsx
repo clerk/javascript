@@ -29,6 +29,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { close: unsafeClose, ...rest } = props;
     const close = () => unsafeClose?.(false);
     const card = useCardState();
+    const { __experimental_asStandalone } = useOrganizationSwitcherContext();
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
@@ -194,6 +195,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           ref={ref}
           role='dialog'
           aria-label={`${currentOrg?.name} is active`}
+          shouldEntryAnimate={!__experimental_asStandalone}
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>

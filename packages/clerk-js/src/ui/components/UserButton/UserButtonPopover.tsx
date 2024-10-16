@@ -15,6 +15,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const { close: unsafeClose, ...rest } = props;
   const close = () => unsafeClose?.();
   const { session } = useSession() as { session: ActiveSessionResource };
+  const { __experimental_asStandalone } = useUserButtonContext();
   const { authConfig } = useEnvironment();
   const { user } = useUser();
   const {
@@ -34,6 +35,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         ref={ref}
         role='dialog'
         aria-label='User button popover'
+        shouldEntryAnimate={!__experimental_asStandalone}
         {...rest}
       >
         <PopoverCard.Content elementDescriptor={descriptors.userButtonPopoverMain}>
