@@ -1526,6 +1526,13 @@ export class Clerk implements ClerkInterface {
     return this.navigate(to);
   }
 
+  /**
+   * This clears the emotion cache, which is particularly useful
+   * when working with Astro View Transitions to prevent style loss during page navigation.
+   *
+   * For more info on the issue, see:
+   * https://github.com/withastro/astro/issues/11000
+   */
   __internal_flushEmotionCache() {
     return this.#componentControls?.ensureMounted().then(controls => controls.flushEmotionCache());
   }
