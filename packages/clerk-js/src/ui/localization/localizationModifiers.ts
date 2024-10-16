@@ -27,19 +27,9 @@ const numeric = (val: Date | number | string, locale?: string) => {
   }
 };
 
-const termsOfService = (val: string) => {
-  return `__${val}__`;
-};
-
-const privacyPolicy = (val: string) => {
-  return `__${val}__`;
-};
-
 export const MODIFIERS = {
   titleize,
   timeString,
   weekday,
   numeric,
-  termsOfService,
-  privacyPolicy,
 } as const;
