@@ -71,6 +71,7 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
+    "@clerk/shared": "2.9.1",
     "@clerk/types": "^4.25.1",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -81,7 +82,6 @@
   "devDependencies": {
     "@clerk/clerk-react": "5.11.1",
     "@clerk/eslint-config-custom": "*",
-    "@clerk/shared": "2.9.1",
     "@statelyai/inspect": "^0.4.0",
     "@types/node": "^18.19.33",
     "@types/react": "*",
