@@ -1,14 +1,14 @@
-import type { DeletedObjectJSON } from './JSON';
+import type { DeletedObjectJSON, ObjectType } from './JSON';
 
-export class DeletedObject {
+export class DeletedObject<T extends ObjectType> {
   constructor(
-    readonly object: string,
+    readonly object: T,
     readonly id: string | null,
     readonly slug: string | null,
     readonly deleted: boolean,
   ) {}
 
-  static fromJSON(data: DeletedObjectJSON) {
+  static fromJSON<T extends ObjectType>(data: DeletedObjectJSON<T>) {
     return new DeletedObject(data.object, data.id || null, data.slug || null, data.deleted);
   }
 }
