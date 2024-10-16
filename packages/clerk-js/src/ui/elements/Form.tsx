@@ -246,6 +246,7 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
             sx={{
               textDecoration: 'underline',
             }}
+            isExternal
           />
         </>
       )}
@@ -255,14 +256,18 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
       )}
 
       {props.privacyPolicyUrl && (
-        <Link
-          localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__privacyPolicyText')}
-          href={props.termsUrl}
-          sx={{
-            textDecoration: 'underline',
-            display: 'inline-block',
-          }}
-        />
+        <>
+          {' '}
+          <Link
+            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__privacyPolicyText')}
+            href={props.termsUrl}
+            sx={{
+              textDecoration: 'underline',
+              display: 'inline-block',
+            }}
+            isExternal
+          />
+        </>
       )}
     </Text>
   );
@@ -276,8 +281,8 @@ const LegalCheckbox = (
   const { displayConfig } = useEnvironment();
   const { parsedLayout } = useAppearance();
 
-  const termsLink = parsedLayout.termsPageUrl || displayConfig.termsUrl || '/terms';
-  const privacyPolicy = parsedLayout.termsPageUrl || displayConfig.termsUrl || '/privacy';
+  const termsLink = parsedLayout.termsPageUrl || displayConfig.termsUrl;
+  const privacyPolicy = parsedLayout.privacyPageUrl || displayConfig.privacyPolicyUrl;
 
   return (
     <Field.Root {...props}>
