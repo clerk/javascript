@@ -1526,8 +1526,8 @@ export class Clerk implements ClerkInterface {
     return this.navigate(to);
   }
 
-  __internal_clearEmotionCache() {
-    return this.#componentControls?.ensureMounted().then(controls => controls.clearEmotionCache());
+  __internal_flushEmotionCache() {
+    return this.#componentControls?.ensureMounted().then(controls => controls.flushEmotionCache());
   }
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';

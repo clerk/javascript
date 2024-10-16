@@ -54,7 +54,7 @@ export type ComponentControls = {
     props?: AvailableComponentProps;
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
-  clearEmotionCache: () => void;
+  flushEmotionCache: () => void;
   updateProps: (params: {
     appearance?: Appearance | undefined;
     options?: ClerkOptions | undefined;
@@ -257,12 +257,6 @@ const Components = (props: ComponentsProps) => {
       setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
     };
 
-    componentsControls.clearEmotionCache = () => {
-      emotionCache.sheet.flush();
-      emotionCache.inserted = {};
-      emotionCache.registered = {};
-    };
-
     componentsControls.closeModal = (name, options = {}) => {
       const { notify = true } = options;
       clearUrlStateParam();
@@ -318,6 +312,13 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.prefetch = component => {
       setState(s => ({ ...s, [`${component}Prefetch`]: true }));
+    };
+
+    componentsControls.flushEmotionCache = () => {
+      console.log('flushing emotion cache...', emotionCache);
+      emotionCache.sheet.flush();
+      emotionCache.inserted = {};
+      emotionCache.registered = {};
     };
 
     props.onComponentsMounted();
