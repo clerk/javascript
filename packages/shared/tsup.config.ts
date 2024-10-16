@@ -15,7 +15,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     dts: true,
     external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],

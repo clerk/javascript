@@ -7,7 +7,7 @@ export default defineConfig(_overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     dts: true,
     splitting: false,
   };
