@@ -1,3 +1,5 @@
+import { afterAll, describe, expect, it } from 'vitest';
+
 import { removeBasePath } from '../removeBasePath';
 
 describe('removeBasePath', () => {
