@@ -9,7 +9,7 @@ import type { InternalTheme } from './index';
 
 const el = document.querySelector('style#cl-style-insertion-point');
 
-const cache = createCache({
+export const emotionCache = createCache({
   key: 'cl-internal',
   prepend: !el,
   insertionPoint: el ? (el as HTMLElement) : undefined,
@@ -23,7 +23,7 @@ export const InternalThemeProvider = (props: InternalThemeProviderProps) => {
   const { parsedInternalTheme } = useAppearance();
 
   return (
-    <CacheProvider value={cache}>
+    <CacheProvider value={emotionCache}>
       <ThemeProvider theme={parsedInternalTheme}>{props.children}</ThemeProvider>
     </CacheProvider>
   );

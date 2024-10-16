@@ -13,9 +13,6 @@ import type {
   SignUpProps,
   UserProfileProps,
 } from '@clerk/types';
-// @ts-expect-error: __unsafe_useEmotionCache is internal
-// eslint-disable-next-line no-restricted-imports
-import { __unsafe_useEmotionCache } from '@emotion/react';
 import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
@@ -42,6 +39,7 @@ import {
   LazyProviders,
   OrganizationSwitcherPrefetch,
 } from './lazyModules/providers';
+import { emotionCache } from './styledSystem/InternalThemeProvider';
 import type { AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
@@ -217,7 +215,6 @@ const Components = (props: ComponentsProps) => {
   } = state;
 
   const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useClerkModalStateParams();
-  const emotionCache = __unsafe_useEmotionCache();
 
   useSafeLayoutEffect(() => {
     if (decodedRedirectParams) {
