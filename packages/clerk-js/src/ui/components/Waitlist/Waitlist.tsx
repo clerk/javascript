@@ -4,7 +4,7 @@ import type { __experimental_WaitlistModalProps } from '@clerk/types';
 import { ComponentContext, useWaitlistContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { Card, withCardStateProvider } from '../../elements';
-import type { WaitlistCtx } from '../../types';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { useFormControl } from '../../utils';
 import { WaitlistForm } from './WaitlistForm';
 
@@ -39,20 +39,24 @@ const _Waitlist = () => {
 
   return (
     <Flow.Root flow='waitlist'>
-      <Card.Root>
-        <Card.Content>
-          <WaitlistForm formState={formState} />
-        </Card.Content>
-        <Card.Footer>
-          <Card.Action elementId='waitlist'>
-            <Card.ActionText localizationKey={localizationKeys('__experimental_waitlist.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('__experimental_waitlist.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+      <Switch>
+        <Route index>
+          <Card.Root>
+            <Card.Content>
+              <WaitlistForm formState={formState} />
+            </Card.Content>
+            <Card.Footer>
+              <Card.Action elementId='waitlist'>
+                <Card.ActionText localizationKey={localizationKeys('__experimental_waitlist.start.actionText')} />
+                <Card.ActionLink
+                  localizationKey={localizationKeys('__experimental_waitlist.start.actionLink')}
+                  to={clerk.buildUrlWithAuth(signInUrl)}
+                />
+              </Card.Action>
+            </Card.Footer>
+          </Card.Root>
+        </Route>
+      </Switch>
     </Flow.Root>
   );
 };
@@ -60,17 +64,19 @@ const _Waitlist = () => {
 export const Waitlist = withCardStateProvider(_Waitlist);
 
 export const WaitlistModal = (props: __experimental_WaitlistModalProps): JSX.Element => {
-  const waitlistProps: WaitlistCtx = {
+  const waitlistProps = {
+    signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
     ...props,
-    componentName: 'Waitlist',
-    mode: 'modal',
+    routing: 'virtual',
   };
 
   return (
-    <ComponentContext.Provider value={waitlistProps}>
-      <div>
-        <Waitlist />
-      </div>
-    </ComponentContext.Provider>
+    <Route path='waitlist'>
+      <ComponentContext.Provider value={{ ...waitlistProps, componentName: 'Waitlist', mode: 'modal' }}>
+        <div>
+          <Waitlist />
+        </div>
+      </ComponentContext.Provider>
+    </Route>
   );
 };

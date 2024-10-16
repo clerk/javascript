@@ -1,5 +1,6 @@
 import type {
   __experimental_UserVerificationProps,
+  __experimental_WaitlistProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -86,7 +87,7 @@ export type GoogleOneTapCtx = GoogleOneTapProps & {
   componentName: 'GoogleOneTap';
 };
 
-export type WaitlistCtx = {
+export type WaitlistCtx = __experimental_WaitlistProps & {
   componentName: 'Waitlist';
   mode?: ComponentMode;
 };

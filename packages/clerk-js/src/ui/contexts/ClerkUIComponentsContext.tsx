@@ -173,11 +173,12 @@ export const useSignInContext = (): SignInContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
   let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
-  const waitlistUrl = options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
+  let waitlistUrl = ctx.waitlistUrl || options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  waitlistUrl = buildURL({ base: waitlistUrl }, { stringify: true });
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
@@ -641,8 +642,10 @@ export const useWaitlistContext = (): WaitlistContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as WaitlistCtx;
   const { displayConfig } = useEnvironment();
   const options = useOptions();
+  console.log('useWaitlistContext', { ctx });
 
-  const signInUrl = options.signInUrl || displayConfig.signInUrl;
+  let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
+  signInUrl = buildURL({ base: signInUrl }, { stringify: true });
 
   return {
     ...ctx,

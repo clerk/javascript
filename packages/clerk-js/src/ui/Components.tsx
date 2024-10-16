@@ -190,7 +190,7 @@ const componentNodes = Object.freeze({
   UserProfile: 'userProfileModal',
   OrganizationProfile: 'organizationProfileModal',
   CreateOrganization: 'createOrganizationModal',
-  Waitlist: 'waitlist',
+  Waitlist: 'waitlistModal',
 }) as any;
 
 const Components = (props: ComponentsProps) => {
@@ -344,6 +344,7 @@ const Components = (props: ComponentsProps) => {
     >
       <SignInModal {...signInModal} />
       <SignUpModal {...signInModal} />
+      <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
 

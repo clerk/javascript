@@ -865,6 +865,11 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1274,6 +1279,10 @@ export type __experimental_WaitlistProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: WaitlistTheme;
+  /**
+   * Full URL or path where the SignIn component is mounted.
+   */
+  signInUrl?: string;
 };
 
 export type __experimental_WaitlistModalProps = __experimental_WaitlistProps;
