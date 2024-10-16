@@ -114,12 +114,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       <Col center>
         <CaptchaElement />
-        <Col
-          gap={6}
-          sx={{
-            width: '100%',
-          }}
-        >
+        <Col gap={6}>
           {shouldShow('__experimental_legalAccepted') && (
             <Form.ControlRow elementId='__experimental_legalAccepted'>
               <Form.LegalCheckbox

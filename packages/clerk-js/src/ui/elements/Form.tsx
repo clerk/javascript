@@ -233,7 +233,7 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
   const { t } = useLocalizations();
   return (
     <Text
-      variant='subtitle'
+      variant='body'
       as='span'
     >
       {t(localizationKeys('signUp.legalConsent.checkbox.label__prefixText'))}
@@ -282,18 +282,16 @@ const LegalCheckbox = (
   return (
     <Field.Root {...props}>
       <Flex
-        align='start'
-        sx={t => ({
-          gap: t.space.$1x5,
-        })}
+        align='center'
+        justify='center'
       >
         <Field.CheckboxIndicator />
         <FormLabel
           elementDescriptor={descriptors.formFieldRadioLabel}
           htmlFor={props.itemID}
-          sx={{
-            textAlign: 'initial',
-          }}
+          sx={t => ({
+            paddingLeft: t.space.$1x5,
+          })}
         >
           <LegalCheckboxLabel
             termsUrl={termsLink}

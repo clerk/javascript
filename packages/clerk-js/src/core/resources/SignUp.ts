@@ -317,12 +317,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
-    // @ts-expect-error - This is a temporary until the feature is stable
-    console.trace('params', params);
+    // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
     params.legalAccepted = params.__experimental_legalAccepted;
     params.__experimental_legalAccepted = undefined;
-
-    console.log('params', params);
 
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),

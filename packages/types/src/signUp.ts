@@ -90,7 +90,10 @@ export interface SignUpResource extends ClerkResource {
   ) => Promise<void>;
 
   authenticateWithWeb3: (
-    params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
+    params: AuthenticateWithWeb3Params & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+      __experimental_legalAccepted?: boolean;
+    },
   ) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
