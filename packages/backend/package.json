@@ -22,6 +22,10 @@
         "import": "./dist/runtime/node/crypto.mjs"
       },
       "default": "./dist/runtime/browser/crypto.mjs"
+    },
+    "#ephemeral": {
+      "node": "./dist/runtime/node/ephemeral.js",
+      "default": "./dist/runtime/browser/ephemeral.js"
     }
   },
   "exports": {

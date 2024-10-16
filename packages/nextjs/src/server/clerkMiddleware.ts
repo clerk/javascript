@@ -2,8 +2,16 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  EPHEMERAL_MODE_AVAILABLE,
+} from '@clerk/backend/internal';
+import { isClerkKeyError } from '@clerk/shared';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { EphemeralAccount } from '@clerk/types';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -80,15 +88,19 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
+  const ephemeralMode = EPHEMERAL_MODE_AVAILABLE;
+  let ephemeralAccount: EphemeralAccount | undefined;
+
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
-    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
+      const publishableKey = assertKey(
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || ephemeralAccount?.publishableKey || '',
+        () => errorThrower.throwMissingPublishableKeyError(),
       );
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || ephemeralAccount?.secretKey || '', () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -116,6 +128,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       if (options.debug) {
         logger.enable();
       }
+
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
@@ -177,6 +190,45 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
       return handlerResult;
     });
+
+    const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (!ephemeralMode) {
+        return await baseNextMiddleware(request, event);
+      }
+
+      const ephemeralParams = unpackEphemeralQueryParams(request);
+
+      if (ephemeralParams) {
+        ephemeralAccount = ephemeralParams;
+
+        const response = new NextResponse(null, {
+          status: 307,
+          headers: { location: `${request.nextUrl.protocol}//${request.nextUrl.host}` },
+        });
+
+        const options = {
+          expires: Number(ephemeralAccount.expiresAt) * 1000,
+        };
+
+        response.cookies.set(constants.Cookies.EphemeralExpiresAt, ephemeralAccount.expiresAt.toString(), options);
+        response.cookies.set(constants.Cookies.EphemeralPublishableKey, ephemeralAccount.publishableKey, options);
+        response.cookies.set(constants.Cookies.EphemeralSecretKey, ephemeralAccount.secretKey, options);
+
+        return response;
+      }
+
+      try {
+        const handlerResult = await baseNextMiddleware(request, event);
+
+        return handlerResult;
+      } catch (e: any) {
+        // And this is a clerkKeyError, return a no-op to allow the ClerkProvider to fetch the keys
+        if (isClerkKeyError(e)) {
+          return null;
+        }
+        throw e;
+      }
+    };
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
@@ -275,5 +327,25 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;
+  }
+};
+
+const unpackEphemeralQueryParams = (request: NextMiddlewareRequestParam): EphemeralAccount | undefined => {
+  const params = Object.fromEntries(request.nextUrl.searchParams);
+
+  const ephemeralParams = {
+    expiresAt: params[constants.QueryParameters.EphemeralExpiresAt],
+    publishableKey: params[constants.QueryParameters.EphemeralPublishableKey],
+    secretKey: params[constants.QueryParameters.EphemeralSecretKey],
+  };
+
+  const maybeEphemeral = Object.fromEntries(
+    Object.entries(ephemeralParams).filter(([_, v]) => v != null),
+  ) as Partial<EphemeralAccount>;
+
+  if (Object.keys(maybeEphemeral).length === Object.keys(ephemeralParams).length) {
+    return maybeEphemeral as EphemeralAccount;
+  } else {
+    return undefined;
   }
 };
