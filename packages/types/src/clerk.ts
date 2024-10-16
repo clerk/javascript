@@ -330,6 +330,14 @@ export interface Clerk {
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Prefetches the data displayed by an organization switcher.
+   * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_prefetchOrganizationSwitcher: () => void;
+
+  /**
    * Mount an organization list component at the target element.
    * @param targetNode Target to mount the OrganizationList component.
    * @param props Configuration parameters.
@@ -1035,6 +1043,15 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Controls the default state of the UserButton
    */
   defaultOpen?: boolean;
+
+  /**
+   * If true the `<UserButton />` will only render the popover.
+   * Enables developers to implement a custom dialog.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asStandalone?: boolean;
+
   /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
@@ -1095,6 +1112,15 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+
+    /**
+     * If true, `<OrganizationSwitcher />` will only render the popover.
+     * Enables developers to implement a custom dialog.
+     * @experimental This API is experimental and may change at any moment.
+     * @default undefined
+     */
+    __experimental_asStandalone?: boolean;
+
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account

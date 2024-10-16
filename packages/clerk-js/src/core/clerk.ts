@@ -667,6 +667,13 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public __experimental_prefetchOrganizationSwitcher = () => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      ?.ensureMounted({ preloadHint: 'OrganizationSwitcher' })
+      .then(controls => controls.prefetch('organizationSwitcher'));
+  };
+
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.environment)) {

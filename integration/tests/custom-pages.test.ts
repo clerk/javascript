@@ -6,6 +6,7 @@ import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 const CUSTOM_PROFILE_PAGE = '/custom-user-profile';
 const CUSTOM_BUTTON_PAGE = '/custom-user-button';
+const CUSTOM_BUTTON_TRIGGER_PAGE = '/custom-user-button-trigger';
 
 async function waitForMountedComponent(
   component: 'UserButton' | 'UserProfile',
@@ -106,9 +107,27 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
           await u.page.waitForSelector('p[data-page="1"]', { state: 'attached' });
 
           await expect(u.page.locator('p[data-page="1"]')).toHaveText('Counter: 0');
-          u.page.locator('button[data-page="1"]').click();
+          await u.page.locator('button[data-page="1"]').click();
 
           await expect(u.page.locator('p[data-page="1"]')).toHaveText('Counter: 1');
+        });
+
+        test('renders only custom pages and does not display unrelated child components', async ({ page, context }) => {
+          const u = createTestUtils({ app, page, context });
+          await u.po.signIn.goTo();
+          await u.po.signIn.waitForMounted();
+          await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+          await u.po.expect.toBeSignedIn();
+
+          await waitForMountedComponent(component, u);
+
+          const buttons = await u.page.locator('button.cl-navbarButton__custom-page-0').all();
+          expect(buttons.length).toBe(1);
+          const [profilePage] = buttons;
+          await expect(profilePage.locator('div.cl-navbarButtonIcon__custom-page-0')).toHaveText('🙃');
+          await profilePage.click();
+
+          await expect(u.page.locator('p[data-leaked-child]')).toBeHidden();
         });
 
         test('user profile custom external absolute link', async ({ page, context }) => {
@@ -146,6 +165,53 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
           await externalLink.click();
           await u.page.waitForAppUrl('/user');
         });
+      });
+    });
+
+    test.describe('User Button with experimental asStandalone and asProvider', () => {
+      test('items at the specified order', async ({ page, context }) => {
+        const u = createTestUtils({ app, page, context });
+        await u.po.signIn.goTo();
+        await u.po.signIn.waitForMounted();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+        await u.po.expect.toBeSignedIn();
+
+        await u.page.goToRelative(CUSTOM_BUTTON_TRIGGER_PAGE);
+        const toggleButton = await u.page.waitForSelector('button[data-toggle-btn]');
+        await toggleButton.click();
+
+        await u.po.userButton.waitForPopover();
+        await u.po.userButton.triggerManageAccount();
+        await u.po.userProfile.waitForMounted();
+
+        const pagesContainer = u.page.locator('div.cl-navbarButtons').first();
+
+        const buttons = await pagesContainer.locator('button').all();
+
+        expect(buttons.length).toBe(6);
+
+        const expectedTexts = ['Profile', '🙃Page 1', 'Security', '🙃Page 2', '🌐Visit Clerk', '🌐Visit User page'];
+        for (let i = 0; i < buttons.length; i++) {
+          await expect(buttons[i]).toHaveText(expectedTexts[i]);
+        }
+      });
+
+      test('children should be leaking when used with asProvider', async ({ page, context }) => {
+        const u = createTestUtils({ app, page, context });
+        await u.po.signIn.goTo();
+        await u.po.signIn.waitForMounted();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+        await u.po.expect.toBeSignedIn();
+
+        await u.page.goToRelative(CUSTOM_BUTTON_TRIGGER_PAGE);
+        const toggleButton = await u.page.waitForSelector('button[data-toggle-btn]');
+        await toggleButton.click();
+
+        await u.po.userButton.waitForPopover();
+        await u.po.userButton.triggerManageAccount();
+        await u.po.userProfile.waitForMounted();
+
+        await expect(u.page.locator('p[data-leaked-child]')).toBeVisible();
       });
     });
 
