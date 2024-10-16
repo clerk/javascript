@@ -3,4 +3,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Add support for Astro's View Transitions
+Add support for Astro View Transitions
