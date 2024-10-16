@@ -31,8 +31,8 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
 
       let web3Wallet = await user.createWeb3Wallet({ web3Wallet: identifier });
       web3Wallet = await web3Wallet.prepareVerification({ strategy });
-      const nonce = web3Wallet.verification.nonce as string;
-      const signature = await generateWeb3Signature({ identifier, nonce, provider });
+      const message = web3Wallet.verification.message as string;
+      const signature = await generateWeb3Signature({ identifier, nonce: message, provider });
       await web3Wallet.attemptVerification({ signature });
       card.setIdle();
     } catch (err) {
