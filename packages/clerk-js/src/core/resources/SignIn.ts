@@ -250,14 +250,14 @@ export class SignIn extends BaseResource implements SignInResource {
 
     await this.prepareFirstFactor(web3FirstFactor);
 
-    const { nonce } = this.firstFactorVerification;
-    if (!nonce) {
+    const { message } = this.firstFactorVerification;
+    if (!message) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
     }
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider });
     } catch (err) {
       // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
       // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -266,7 +266,7 @@ export class SignIn extends BaseResource implements SignInResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce, provider });
+        signature = await generateSignature({ identifier, nonce: message, provider });
       } else {
         throw err;
       }

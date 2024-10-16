@@ -17,22 +17,15 @@ export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'n
 
 export type __experimental_SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
 
-export type __experimental_SessionVerificationConfig =
-  | __experimental_SessionVerificationTypes
-  | {
-      level: __experimental_SessionVerificationLevel;
-      maxAgeMinutes: __experimental_SessionVerificationMaxAgeMinutes;
-    };
-
 export type __experimental_ReverificationConfig =
   | __experimental_SessionVerificationTypes
   | {
       level: __experimental_SessionVerificationLevel;
-      afterMinutes: __experimental_SessionVerificationMaxAgeMinutes;
+      afterMinutes: __experimental_SessionVerificationAfterMinutes;
     };
 
 export type __experimental_SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
-export type __experimental_SessionVerificationMaxAgeMinutes = number;
+export type __experimental_SessionVerificationAfterMinutes = number;
 
 export type __experimental_SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;
 export type __experimental_SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;

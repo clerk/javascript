@@ -21,6 +21,18 @@ describe('UserButton', () => {
     expect(queryByRole('button')).not.toBeNull();
   });
 
+  it('renders popover as standalone when there is a user', async () => {
+    const { wrapper, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    props.setProps({
+      __experimental_asStandalone: true,
+    });
+    const { getByText, queryByRole } = render(<UserButton />, { wrapper });
+    expect(queryByRole('button', { name: 'Open user button' })).toBeNull();
+    getByText('Manage account');
+  });
+
   it('opens the user button popover when clicked', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
