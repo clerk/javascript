@@ -58,6 +58,7 @@ export type SignUpContextType = SignUpCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  waitlistUrl: string;
 };
 
 export const useSignUpContext = (): SignUpContextType => {
@@ -101,6 +102,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  const waitlistUrl = options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -110,6 +112,7 @@ export const useSignUpContext = (): SignUpContextType => {
     componentName,
     signInUrl,
     signUpUrl,
+    waitlistUrl,
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
@@ -130,6 +133,7 @@ export type SignInContextType = SignInCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   transferable: boolean;
+  waitlistUrl: string;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -169,6 +173,7 @@ export const useSignInContext = (): SignInContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
   let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
+  const waitlistUrl = options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
@@ -182,6 +187,7 @@ export const useSignInContext = (): SignInContextType => {
     componentName,
     signUpUrl,
     signInUrl,
+    waitlistUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,

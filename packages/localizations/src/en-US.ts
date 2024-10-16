@@ -448,6 +448,8 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have an account?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
+      actionText__join_waitlist: 'Want early access?',
+      actionLink__join_waitlist: 'Join waitlist',
     },
     totpMfa: {
       formTitle: 'Verification code',

@@ -163,6 +163,8 @@ type _LocalizationResource = {
       actionLink__use_username: LocalizationValue;
       actionLink__use_email_username: LocalizationValue;
       actionLink__use_passkey: LocalizationValue;
+      actionText__join_waitlist: LocalizationValue;
+      actionLink__join_waitlist: LocalizationValue;
     };
     password: {
       title: LocalizationValue;

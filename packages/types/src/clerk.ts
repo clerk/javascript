@@ -726,6 +726,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        waitlistUrl: string;
       },
       Record<string, any>
     >;
