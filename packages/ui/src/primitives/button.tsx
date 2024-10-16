@@ -34,7 +34,7 @@ export const layoutStyle = {
   buttonSecondaryDefault: {},
   buttonConnectionDefault: {},
   buttonDisabled: {},
-  buttonWait: {},
+  buttonBusy: {},
   buttonConnection__google: {},
 } satisfies ParsedElementsFragment;
 
@@ -78,7 +78,7 @@ export const visualStyle = {
   buttonDisabled: {
     className: 'disabled:cursor-not-allowed disabled:opacity-50',
   },
-  buttonWait: {
+  buttonBusy: {
     className: 'cursor-wait',
   },
   buttonConnection__google: {},
@@ -106,7 +106,7 @@ const button = dva({
     { busy: false, disabled: false, intent: 'secondary', descriptor: 'buttonSecondaryDefault' },
     { busy: false, disabled: false, intent: 'connection', descriptor: 'buttonConnectionDefault' },
     { busy: false, disabled: true, descriptor: 'buttonDisabled' },
-    { busy: true, disabled: false, descriptor: 'buttonWait' },
+    { busy: true, disabled: false, descriptor: 'buttonBusy' },
   ],
 });
 

@@ -14,8 +14,9 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
+  | 'button--disabled'
   | 'buttonDisabled'
-  | 'buttonWait'
+  | 'buttonBusy'
   | 'buttonConnection__google';
 
 /**
