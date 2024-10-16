@@ -64,6 +64,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { emotionCache } from '../ui/styledSystem';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -1517,6 +1518,12 @@ export class Clerk implements ClerkInterface {
   __internal_navigateWithError(to: string, err: ClerkAPIError) {
     this.__internal_last_error = err;
     return this.navigate(to);
+  }
+
+  __internal_clearEmotionCache() {
+    emotionCache.sheet.flush();
+    emotionCache.inserted = {};
+    emotionCache.registered = {};
   }
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
