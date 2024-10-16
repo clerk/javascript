@@ -285,7 +285,15 @@ const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const withPreferredSignInStrategy = (opts: { strategy: DisplayConfigJSON['preferred_sign_in_strategy'] }) => {
     dc.preferred_sign_in_strategy = opts.strategy;
   };
-  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy };
+
+  const withTermsPrivacyPolicyUrls = (opts: {
+    termsOfService?: DisplayConfigJSON['terms_url'];
+    privacyPolicy?: DisplayConfigJSON['privacy_policy_url'];
+  }) => {
+    dc.terms_url = opts.termsOfService || '';
+    dc.privacy_policy_url = opts.privacyPolicy || '';
+  };
+  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy, withTermsPrivacyPolicyUrls };
 };
 
 const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -487,6 +495,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.mode = SIGN_UP_MODES.RESTRICTED;
   };
 
+  const withLegalConsent = () => {
+    us.sign_up.legal_consent_enabled = true;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -505,5 +517,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withPasskey,
     withPasskeySettings,
     withRestrictedMode,
+    withLegalConsent,
   };
 };
