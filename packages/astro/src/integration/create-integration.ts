@@ -113,7 +113,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
             document.addEventListener('astro:before-swap', e => {
               console.log('astro:before-swap');
-              window.Clerk.__internal_clearEmotionCache()
+              window.Clerk.__internal_clearEmotionCache();
             });
 
             document.addEventListener('astro:page-load', async () => {

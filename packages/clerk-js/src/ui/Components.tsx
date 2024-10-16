@@ -39,6 +39,7 @@ import {
   LazyProviders,
   OrganizationSwitcherPrefetch,
 } from './lazyModules/providers';
+import { emotionCache } from './styledSystem';
 import type { AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
@@ -51,6 +52,7 @@ export type ComponentControls = {
     props?: AvailableComponentProps;
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
+  clearEmotionCache: () => void;
   updateProps: (params: {
     appearance?: Appearance | undefined;
     options?: ClerkOptions | undefined;
@@ -250,6 +252,12 @@ const Components = (props: ComponentsProps) => {
       }
 
       setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
+    };
+
+    componentsControls.clearEmotionCache = () => {
+      emotionCache.sheet.flush();
+      emotionCache.inserted = {};
+      emotionCache.registered = {};
     };
 
     componentsControls.closeModal = (name, options = {}) => {
