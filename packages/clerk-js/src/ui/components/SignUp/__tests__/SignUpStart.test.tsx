@@ -252,7 +252,7 @@ describe('SignUpStart', () => {
       });
 
       render(<SignUpStart />, { wrapper });
-      screen.getByText('Restricted access');
+      screen.getByText('Access restricted');
     });
   });
 
