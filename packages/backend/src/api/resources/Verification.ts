@@ -10,6 +10,7 @@ export class Verification {
     readonly attempts: number | null = null,
     readonly expireAt: number | null = null,
     readonly nonce: string | null = null,
+    readonly message: string | null = null,
   ) {}
 
   static fromJSON(data: VerificationJSON): Verification {

@@ -203,14 +203,14 @@ export class SignUp extends BaseResource implements SignUpResource {
     await this.create({ web3Wallet, unsafeMetadata });
     await this.prepareWeb3WalletVerification({ strategy });
 
-    const { nonce } = this.verifications.web3Wallet;
-    if (!nonce) {
+    const { message } = this.verifications.web3Wallet;
+    if (!message) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
     }
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider });
     } catch (err) {
       // There is a chance that as a first time visitor when you try to setup and use the
       // Coinbase Wallet from scratch in order to authenticate, the initial generate
@@ -220,7 +220,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce, provider });
+        signature = await generateSignature({ identifier, nonce: message, provider });
       } else {
         throw err;
       }

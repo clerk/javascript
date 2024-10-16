@@ -261,6 +261,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   verified_at_client: string;
   strategy: string;
   nonce?: string;
+  message?: string;
   external_verification_redirect_url?: string;
   attempts: number;
   expire_at: number;

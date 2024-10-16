@@ -23,6 +23,7 @@ export class Verification extends BaseResource implements VerificationResource {
   status: VerificationStatus | null = null;
   strategy: string | null = null;
   nonce: string | null = null;
+  message: string | null = null;
   externalVerificationRedirectURL: URL | null = null;
   attempts: number | null = null;
   expireAt: Date | null = null;
@@ -44,6 +45,7 @@ export class Verification extends BaseResource implements VerificationResource {
       this.verifiedAtClient = data.verified_at_client;
       this.strategy = data.strategy;
       this.nonce = data.nonce || null;
+      this.message = data.message || null;
       if (data.external_verification_redirect_url) {
         this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
       } else {
