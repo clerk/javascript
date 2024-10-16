@@ -47,6 +47,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             signUpContinueUrl: 'continue',
             unsafeMetadata: ctx.unsafeMetadata,
             strategy,
+            __experimental_legalAccepted: props.legalAccepted,
           })
           .catch(err => handleError(err, [], card.setError));
       }}
