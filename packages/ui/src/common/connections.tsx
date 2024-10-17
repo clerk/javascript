@@ -82,13 +82,14 @@ export function Connections(
       ? props.textVisuallyHidden
       : enabledConnections.length > 2 || options?.socialButtonsVariant === 'iconButton';
   const columns = getColumnCount({ length: enabledConnections.length, max: props?.columns || 6 });
+  const descriptors = applyDescriptors(elements, 'connectionList');
   const localizationKey =
     enabledConnections.length === 1 ? 'socialButtonsBlockButton' : 'socialButtonsBlockButtonManyInView';
 
   return hasConnection ? (
     <ul
-      {...applyDescriptors(elements, 'connectionList')}
-      style={{ '--cl-connection-columns': columns } as React.CSSProperties}
+      className={descriptors.className}
+      style={{ ...descriptors.style, '--cl-connection-columns': columns } as React.CSSProperties}
     >
       {enabledConnections.map(c => {
         return (
