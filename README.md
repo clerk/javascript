@@ -8,7 +8,7 @@
   <br />
 </p>
 <h1 align="center">
-  Official Clerk JavaScript SDKs
+  Official Clerk JavaScript SDK
 </h1>
 <p align="center">
   <strong>
