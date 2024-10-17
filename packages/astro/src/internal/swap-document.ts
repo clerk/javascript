@@ -2,6 +2,7 @@
 import { swapFunctions } from 'astro:transitions/client';
 
 const PERSIST_ATTR = 'data-astro-transition-persist';
+const EMOTION_ATTR = 'data-emotion';
 
 /**
  * @internal
@@ -15,7 +16,7 @@ export function swapDocument(doc: Document) {
   swapFunctions.swapRootAttributes(doc);
 
   // Keep the elements created by `@emotion/cache`
-  const emotionElements = document.querySelectorAll('style[data-emotion]');
+  const emotionElements = document.querySelectorAll(`style[${EMOTION_ATTR}]`);
   swapHeadElements(doc, Array.from(emotionElements));
 
   const restoreFocusFunction = swapFunctions.saveFocus();
@@ -24,7 +25,7 @@ export function swapDocument(doc: Document) {
 }
 
 /**
- * This function is a copy of the original `swapHeadElements` function from Astro.
+ * This function is a copy of the original `swapHeadElements` function from `astro:transitions/client`.
  * The difference is that you can pass a list of elements that should not be removed
  * in the new document.
  *

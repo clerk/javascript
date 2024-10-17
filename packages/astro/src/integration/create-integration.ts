@@ -113,6 +113,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
             await runInjectionScript(${JSON.stringify(internalParams)});
 
+            // The 2 events below only runs when View Transitions are enabled
+
             document.addEventListener('astro:before-swap', (e) => {
               e.swap = () => swapDocument(e.newDocument);
             });
