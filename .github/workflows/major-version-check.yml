@@ -20,7 +20,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = context.payload.pull_request.number;
+            const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
 
             // Get list of files changed in the PR
             const { data: files } = await github.rest.pulls.listFiles({
@@ -28,6 +28,18 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber,
             });
+
+            let pullRequest = context.payload.pull_request;
+
+            if (!pullRequest) {
+              // Fetch the pull request data
+              const pullRequestData = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+              });
+              pullRequest = pullRequestData.data;
+            }
 
             // Check if any changeset files indicate a major bump
             let hasMajorChangeset = false;
@@ -38,7 +50,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   path: file.filename,
-                  ref: context.payload.pull_request.head.sha,
+                  ref: pullRequest.head.sha,
                 });
 
                 const content = Buffer.from(changesetContent.content, changesetContent.encoding).toString();
@@ -58,7 +70,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = context.payload.pull_request.number;
+            const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
             const org = context.repo.owner;
 
             // Get all comments on the PR
