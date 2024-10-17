@@ -1,9 +1,15 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
+import type {
+  Appearance as CurrentAppearance,
+  Layout as CurrentLayout,
+  OAuthProvider,
+  Web3Provider,
+} from '@clerk/types';
 import React from 'react';
 
-import type { PROVIDERS } from '~/primitives/icons/providers';
 import { fullTheme } from '~/themes';
+
+type Provider = OAuthProvider | Web3Provider;
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
 type ButtonDescriptorIdentifier =
@@ -14,7 +20,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
-  | `buttonConnection__${keyof typeof PROVIDERS}`
+  | `buttonConnection__${Provider}`
   | 'buttonDisabled'
   | 'buttonBusy'
   | 'buttonText'
@@ -177,7 +183,7 @@ function mergeElementsAppearanceConfig(
   }
 
   if (!result) {
-    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${JSON.stringify(a)} and ${JSON.stringify(b)}`);
   }
 
   return result;
