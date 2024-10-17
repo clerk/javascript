@@ -16,7 +16,8 @@ export default defineConfig({
   },
   vite: {
     optimizeDeps: {
-      // Fix "Outdated Optimize Dep" error in Vite
+      // Fix "Outdated Optimize Dep" error in Vite.
+      // This only happens in our test environment.
       exclude: ['@clerk/astro/internal'],
     },
   },
