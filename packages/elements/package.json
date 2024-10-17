@@ -71,7 +71,7 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/shared": "2.9.1",
+    "@clerk/shared": "2.9.2",
     "@clerk/types": "^4.26.0",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
