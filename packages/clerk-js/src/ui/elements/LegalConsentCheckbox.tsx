@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useEnvironment } from '../../ui/contexts';
 import type { LocalizationKey } from '../customizables';
 import {
