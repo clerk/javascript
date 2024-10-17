@@ -1,6 +1,11 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
 import type { Clerk } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import type {
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+} from '@clerk/types';
+import { Platform } from 'react-native';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
@@ -37,6 +42,26 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
       __internal_clerk = clerk = new ClerkClass(publishableKey);
+
+      if (Platform.OS === 'ios' || Platform.OS === 'android') {
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__createPublicCredentials = (
+          publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
+        ) => {
+          return options?.passkeysFunc.create(publicKeyCredential);
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__getPublicCredentials = (
+          publicKeyCredential: PublicKeyCredentialRequestOptionsWithoutExtensions,
+        ) => {
+          return options?.passkeysFunc.get(publicKeyCredential);
+        };
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnSupported = () => {
+          return options?.passkeysFunc.isSupported();
+        };
+      }
 
       // @ts-expect-error - This is an internal API
       __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
