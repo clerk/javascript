@@ -23,6 +23,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonIconStart'
   | 'buttonIconEnd'
   | 'buttonSpinner';
+type ConnectionDescriptorIdentifier = 'connectionList' | 'connectionListItem';
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
 type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
@@ -33,6 +34,7 @@ type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
 export type DescriptorIdentifier =
   | AlertDescriptorIdentifier
   | ButtonDescriptorIdentifier
+  | ConnectionDescriptorIdentifier
   | SeparatorDescriptorIdentifier
   | SpinnerDescriptorIdentifier
   | CardDescriptorIdentifier;

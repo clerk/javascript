@@ -15,9 +15,6 @@ export const layoutStyle = {
       'px-3 py-1.5',
       'min-h-[1.875rem]',
       'inline-flex w-full items-center justify-center gap-3',
-      'ring ring-offset-1 rounded-md',
-      '[&:not(:focus-visible)]:ring-transparent',
-      'outline-none',
       '*:min-w-0',
     ].join(' '),
   },
@@ -72,7 +69,9 @@ export const layoutStyle = {
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
-  button: {},
+  button: {
+    className: ['ring ring-offset-1 rounded-md', '[&:not(:focus-visible)]:ring-transparent', 'outline-none'].join(' '),
+  },
   buttonPrimary: {
     className: [
       '[--button-icon-color:currentColor]',
