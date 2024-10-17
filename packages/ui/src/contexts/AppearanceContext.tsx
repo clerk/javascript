@@ -117,7 +117,7 @@ export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment
 
   fragments.forEach(fragment => {
     for (const k in fragment) {
-      const key = k;
+      const key = k as keyof ParsedElementsFragment;
       if (key in acc) {
         acc[key]!.className = [acc[key]?.className, fragment[key]?.className].join(' ');
         acc[key]!.style = {
@@ -204,7 +204,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     result.elements = { ...b.elements };
   } else if (result.elements && b.elements) {
     Object.entries(b.elements).forEach(([element, config]) => {
-      const el = element;
+      const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
         result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
       } else {
@@ -232,7 +232,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 
   if (appearance.elements) {
     Object.entries(appearance.elements).forEach(([element, config]) => {
-      const el = element;
+      const el = element as DescriptorIdentifier;
       if (el in appearance.elements!) {
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
