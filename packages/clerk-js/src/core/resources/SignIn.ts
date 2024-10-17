@@ -303,7 +303,9 @@ export class SignIn extends BaseResource implements SignInResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-    if (!isWebAuthnSupported()) {
+
+    const _isWebAuthnSupported = SignIn.clerk.__unstable__isWebAuthnSupported || isWebAuthnSupported;
+    if (!_isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
       });
@@ -331,6 +333,21 @@ export class SignIn extends BaseResource implements SignInResource {
 
     if (!publicKeyOptions) {
       clerkMissingWebAuthnPublicKeyOptions('get');
+    }
+
+    // Handle the passkey authentication for EXPO apps
+    if (SignIn.clerk.__unstable__getPublicCredentials) {
+      //@ts-expect-error
+      const { publicKeyCredential, error } = await SignIn.clerk.__unstable__getPublicCredentials(publicKeyOptions);
+
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      return this.attemptFirstFactor({
+        publicKeyCredential,
+        strategy: 'passkey',
+      });
     }
 
     let canUseConditionalUI = false;
