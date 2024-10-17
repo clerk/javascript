@@ -19,7 +19,7 @@ type SignInFactorOneCodeFormProps = {
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const { navigateAfterSignUp } = useSignUpContext();
+  const { afterSignUpUrl } = useSignUpContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
 
@@ -36,7 +36,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           signUp: res,
           verifyEmailPath: '../verify-email-address',
           verifyPhonePath: '../verify-phone-number',
-          handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
         });
       })

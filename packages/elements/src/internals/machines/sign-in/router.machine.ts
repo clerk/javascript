@@ -87,9 +87,10 @@ export const SignInRouterMachine = setup({
 
       const session = id || createdSessionId || lastActiveSessionId || null;
 
-      const beforeEmit = () =>
-        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
-      void context.clerk.setActive({ session, beforeEmit });
+      void context.clerk.setActive({
+        session,
+        redirectUrl: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+      });
 
       enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
     }),
