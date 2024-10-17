@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.10
+
+### Patch Changes
+
+- Add the `?render=explicit` query parameter to the Turnstile script. ([#4341](https://github.com/clerk/javascript/pull/4341)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.73.9
 
 ### Patch Changes
