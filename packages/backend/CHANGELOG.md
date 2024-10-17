@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.14.1
+
+### Patch Changes
+
+- Remove console error message from refresh token flow failures. ([#4351](https://github.com/clerk/javascript/pull/4351)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.14.0
 
 ### Minor Changes
