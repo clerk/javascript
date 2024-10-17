@@ -87,6 +87,7 @@ export class User extends BaseResource implements UserResource {
   createOrganizationsLimit: number | null = null;
   deleteSelfEnabled = false;
   lastSignInAt: Date | null = null;
+  legalAcceptedAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -358,6 +359,10 @@ export class User extends BaseResource implements UserResource {
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
+    }
+
+    if (data.legal_accepted_at) {
+      this.legalAcceptedAt = unixEpochToDate(data.legal_accepted_at);
     }
 
     this.updatedAt = unixEpochToDate(data.updated_at);

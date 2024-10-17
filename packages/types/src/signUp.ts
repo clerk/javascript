@@ -1,4 +1,4 @@
-import type { FirstNameAttribute, LastNameAttribute, PasswordAttribute } from './attributes';
+import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
   EmailAddressIdentifier,
@@ -59,6 +59,7 @@ export interface SignUpResource extends ClerkResource {
   createdSessionId: string | null;
   createdUserId: string | null;
   abandonAt: number | null;
+  legalAcceptedAt: number | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
@@ -89,7 +90,10 @@ export interface SignUpResource extends ClerkResource {
   ) => Promise<void>;
 
   authenticateWithWeb3: (
-    params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
+    params: AuthenticateWithWeb3Params & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+      __experimental_legalAccepted?: boolean;
+    },
   ) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
@@ -135,7 +139,7 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute;
+export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
@@ -161,7 +165,8 @@ export type SignUpCreateParams = Partial<
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
     token: string;
-  } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
+    __experimental_legalAccepted: boolean;
+  } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
 export type SignUpUpdateParams = SignUpCreateParams;
