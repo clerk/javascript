@@ -1,3 +1,4 @@
+import { visualStyle as connectionsVisualStyle } from '~/common/connections';
 import { visualStyle as alertVisualStyle } from '~/primitives/alert';
 import { visualStyle as buttonVisualStyle } from '~/primitives/button';
 import { visualStyle as separatorVisualStyle } from '~/primitives/separator';
@@ -9,6 +10,7 @@ import { layoutTheme } from './layout';
 const visualTheme = buildTheme({
   ...alertVisualStyle,
   ...buttonVisualStyle,
+  ...connectionsVisualStyle,
   ...separatorVisualStyle,
   ...spinnerVisualStyle,
 });

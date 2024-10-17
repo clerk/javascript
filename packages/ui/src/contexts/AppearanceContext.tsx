@@ -2,6 +2,7 @@ import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
+// import type { PROVIDERS } from '~/primitives/icons/providers';
 import { fullTheme } from '~/themes';
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
@@ -13,6 +14,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
+  // | `buttonConnection__${keyof typeof PROVIDERS}`
   | 'buttonDisabled'
   | 'buttonBusy'
   | 'buttonText'

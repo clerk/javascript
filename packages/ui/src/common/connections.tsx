@@ -6,6 +6,7 @@ import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import { PROVIDERS } from '~/primitives/icons/providers';
+import { applyDescriptors } from '~/utils/dva';
 
 /**
  * Calculates the number of columns given the total number of items and the maximum columns allowed per row.
@@ -54,12 +55,27 @@ function getColumnCount({ length, max }: Record<'length' | 'max', number>): numb
   return Math.ceil(length / numRows);
 }
 
+export const layoutStyle = {
+  connectionList: {
+    className:
+      '-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]',
+  },
+  connectionListItem: {
+    className: 'w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]',
+  },
+};
+
+export const visualStyle = {
+  connectionList: {},
+  connectionListItem: {},
+};
+
 export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,
 ) {
   const { t } = useLocalizations();
   const enabledConnections = useEnabledConnections();
-  const { options } = useAppearance().parsedAppearance;
+  const { options, elements } = useAppearance().parsedAppearance;
   const hasConnection = enabledConnections.length > 0;
   const textVisuallyHidden =
     typeof props?.textVisuallyHidden !== 'undefined'
@@ -71,14 +87,14 @@ export function Connections(
 
   return hasConnection ? (
     <ul
-      className='-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]'
+      {...applyDescriptors(elements, 'connectionList')}
       style={{ '--cl-connection-columns': columns } as React.CSSProperties}
     >
       {enabledConnections.map(c => {
         return (
           <li
             key={c.provider}
-            className='w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]'
+            {...applyDescriptors(elements, 'connectionListItem')}
           >
             <Common.Loading scope={`provider:${c.provider}`}>
               {isConnectionLoading => {
