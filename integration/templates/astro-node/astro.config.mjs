@@ -14,4 +14,10 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT),
   },
+  vite: {
+    optimizeDeps: {
+      // Fix "Outdated Optimize Dep" error in Vite
+      exclude: ['@clerk/astro/internal'],
+    },
+  },
 });

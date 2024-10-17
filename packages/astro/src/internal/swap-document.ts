@@ -1,5 +1,5 @@
-// @ts-expect-error: todo
-import { swapFunctions } from 'astro/virtual-modules/transitions-swap-functions.js';
+// eslint-disable-next-line import/no-unresolved
+import { swapFunctions } from 'astro:transitions/client';
 
 const PERSIST_ATTR = 'data-astro-transition-persist';
 const EMOTION_ATTR = 'data-emotion';
