@@ -6,10 +6,9 @@ import React from 'react';
 import { createClerkClient } from '../internal/clerk';
 import type { StorageCache } from '../internal/utils/storage';
 
-type SyncHost = `${'http' | 'https'}://${string}`;
 type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
   storageCache?: StorageCache;
-  syncHost?: SyncHost;
+  syncHost?: string;
 };
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
