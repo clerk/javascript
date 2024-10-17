@@ -33,8 +33,11 @@ export default function App(props) {
   const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
   const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
   // See comments below, can be enabled on next major
+
+  // eslint-disable-next-line no-unused-vars
   const [fromVersion, setFromVersion] = useState(props.fromVersion);
   const [fromVersionGuessAttempted, setFromVersionGuessAttempted] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [toVersion, setToVersion] = useState(props.toVersion);
   const [dir, setDir] = useState(props.dir);
   const [ignore, setIgnore] = useState(props.ignore);
