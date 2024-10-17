@@ -72,8 +72,6 @@ export function _SignInStart(): JSX.Element {
     [userSettings.enabledFirstFactorIdentifiers],
   );
 
-  console.log(ctx);
-
   /**
    * Passkeys
    */

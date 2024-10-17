@@ -513,9 +513,11 @@ export const enUS: LocalizationResource = {
     restrictedAccess: {
       title: 'Access restricted',
       subtitle: 'Sign ups are currently disabled. If you believe you should have access, please contact support.',
+      subtitleWaitlist: 'Sign ups are currently disabled. To be the first to know when we launch, join the waitlist.',
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
       blockButton__emailSupport: 'Email support',
+      blockButton__joinWaitlist: 'Join waitlist',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',

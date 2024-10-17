@@ -98,11 +98,12 @@ export const useSignUpContext = (): SignUpContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
+  let waitlistUrl = ctx.waitlistUrl || options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-  const waitlistUrl = options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
+  waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -178,7 +179,7 @@ export const useSignInContext = (): SignInContextType => {
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-  waitlistUrl = buildURL({ base: waitlistUrl }, { stringify: true });
+  waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
@@ -642,7 +643,6 @@ export const useWaitlistContext = (): WaitlistContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as WaitlistCtx;
   const { displayConfig } = useEnvironment();
   const options = useOptions();
-  console.log('useWaitlistContext', { ctx });
 
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   signInUrl = buildURL({ base: signInUrl }, { stringify: true });

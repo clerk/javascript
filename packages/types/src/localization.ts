@@ -147,9 +147,11 @@ type _LocalizationResource = {
     restrictedAccess: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleWaitlist: LocalizationValue;
       actionLink: LocalizationValue;
       actionText: LocalizationValue;
       blockButton__emailSupport: LocalizationValue;
+      blockButton__joinWaitlist: LocalizationValue;
     };
   };
   signIn: {

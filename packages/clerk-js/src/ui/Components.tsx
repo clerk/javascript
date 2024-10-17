@@ -361,6 +361,7 @@ const Components = (props: ComponentsProps) => {
     >
       <SignInModal {...signUpModal} />
       <SignUpModal {...signUpModal} />
+      <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
 
