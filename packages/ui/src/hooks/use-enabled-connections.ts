@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import { type EnvironmentResource, OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types';
 
 export function useEnabledConnections() {

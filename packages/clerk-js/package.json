@@ -53,6 +53,7 @@
     "@clerk/localizations": "3.3.0",
     "@clerk/shared": "2.9.2",
     "@clerk/types": "4.26.0",
+    "@clerk/ui": "0.1.9",
     "@coinbase/wallet-sdk": "4.0.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",

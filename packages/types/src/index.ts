@@ -36,6 +36,7 @@ export * from './phoneNumber';
 export * from './redirects';
 export * from './resource';
 export * from './role';
+export * from './router';
 export * from './saml';
 export * from './samlAccount';
 export * from './session';

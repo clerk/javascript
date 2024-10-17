@@ -4,13 +4,14 @@ import React from 'react';
 
 import { fullTheme } from '~/themes';
 
-type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
+type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
 type SeparatorDescriptorIdentifier = 'separator';
+type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
 
 /**
  * Union of all valid descriptors used throughout the components.
  */
-export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier;
+export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier | CardDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
