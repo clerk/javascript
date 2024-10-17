@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 
-export default function Home({ params }: { params: { slug: string } }) {
-  const { orgSlug } = auth();
+export default async function Home({ params }: { params: { slug: string } }) {
+  const { orgSlug } = await auth();
 
   if (params.slug != orgSlug) {
     console.log('Mismatch - returning nothing for now...', params.slug, orgSlug);
