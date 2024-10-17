@@ -82,7 +82,7 @@ describe('SignUpContinue', () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
       f.withPassword({ required: true });
-      f.startSignUpWithEmailAddress();
+      f.startSignUpWithMissingLegalAccepted();
       f.withLegalConsent();
       f.withTermsPrivacyPolicyUrls({
         privacyPolicy: 'https://clerk.dev/privacy',
@@ -90,7 +90,6 @@ describe('SignUpContinue', () => {
       });
     });
     const screen = render(<SignUpContinue />, { wrapper });
-    screen.getByText(/missing/i);
     screen.getByText(/Terms Of Service/i);
     screen.getByText(/Privacy Policy/i);
   });

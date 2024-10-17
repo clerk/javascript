@@ -262,7 +262,16 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignUpJSON;
   };
 
-  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber };
+  const startSignUpWithMissingLegalAccepted = () => {
+    baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'missing_requirements',
+      legal_accepted_at: null,
+      missing_fields: ['legal_accepted'],
+    } as SignUpJSON;
+  };
+
+  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber, startSignUpWithMissingLegalAccepted };
 };
 
 const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
