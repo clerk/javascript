@@ -1,6 +1,5 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
-import { SignedIn, SignedOut, UserButton } from "@clerk/astro/components";
 
 interface Props {
   title: string;
@@ -21,16 +20,6 @@ const { title } = Astro.props;
     <ViewTransitions />
   </head>
   <body>
-  <header>
-    <nav>
-      <SignedOut>
-        <a href="/sign-in">Sign In</a>
-      </SignedOut>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-    </nav>
-  </header>
     <main>
       <slot />
     </main>

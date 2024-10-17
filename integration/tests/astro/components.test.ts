@@ -452,9 +452,17 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText('Not a member')).toBeVisible();
   });
 
-  test('renders components when view transitions is enabled', async ({ page, context }) => {
+  test('renders components and keep internal routing behavior when view transitions is enabled', async ({
+    page,
+    context,
+  }) => {
     const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/transitions/sign-in');
+    await u.page.goToRelative('/transitions');
+    await u.page.getByRole('link', { name: /Sign in/i }).click();
+
+    // Components should be rendered on the new document
+    // when navigating through links
+    await u.page.waitForURL(`${app.serverUrl}/transitions/sign-in`);
     await u.po.signIn.waitForMounted();
 
     await u.po.signIn.setIdentifier(fakeAdmin.email);
@@ -465,5 +473,11 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();
+
+    // Internal Clerk routing should still work
+    await u.page.waitForURL(`${app.serverUrl}/transitions`);
+
+    // Components should be rendered on hard reload
+    await u.po.userButton.waitForMounted();
   });
 });
