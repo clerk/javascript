@@ -113,7 +113,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
             await runInjectionScript(${JSON.stringify(internalParams)});
 
-            document.addEventListener('astro:before-swap', async e => {
+            document.addEventListener('astro:before-swap', () => {
               window.Clerk.__internal_flushEmotionCache();
             });
 
