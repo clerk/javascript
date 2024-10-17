@@ -2,7 +2,7 @@ import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
-// import type { PROVIDERS } from '~/primitives/icons/providers';
+import type { PROVIDERS } from '~/primitives/icons/providers';
 import { fullTheme } from '~/themes';
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
@@ -14,7 +14,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
-  // | `buttonConnection__${keyof typeof PROVIDERS}`
+  | `buttonConnection__${keyof typeof PROVIDERS}`
   | 'buttonDisabled'
   | 'buttonBusy'
   | 'buttonText'
@@ -113,7 +113,7 @@ export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment
 
   fragments.forEach(fragment => {
     for (const k in fragment) {
-      const key = k as keyof ParsedElementsFragment;
+      const key = k;
       if (key in acc) {
         acc[key]!.className = [acc[key]?.className, fragment[key]?.className].join(' ');
         acc[key]!.style = {
@@ -200,7 +200,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     result.elements = { ...b.elements };
   } else if (result.elements && b.elements) {
     Object.entries(b.elements).forEach(([element, config]) => {
-      const el = element as DescriptorIdentifier;
+      const el = element;
       if (el in result.elements!) {
         result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
       } else {
@@ -228,7 +228,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 
   if (appearance.elements) {
     Object.entries(appearance.elements).forEach(([element, config]) => {
-      const el = element as DescriptorIdentifier;
+      const el = element;
       if (el in appearance.elements!) {
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
