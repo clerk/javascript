@@ -109,8 +109,26 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             'page',
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
-            import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(internalParams)});`,
+            import { runInjectionScript, swapDocument } from "${buildImportPath}";
+
+            await runInjectionScript(${JSON.stringify(internalParams)});
+
+            // The 2 events below only runs when View Transitions are enabled
+
+            document.addEventListener('astro:before-swap', (e) => {
+              const clerkComponents = document.querySelector('#clerk-components');
+              // Keep the div element added by Clerk
+              if (clerkComponents) {
+                const clonedEl = clerkComponents.cloneNode(true);
+                e.newDocument.body.appendChild(clonedEl);
+              }
+
+              e.swap = () => swapDocument(e.newDocument);
+            });
+
+            document.addEventListener('astro:page-load', async (e) => {
+              await runInjectionScript(${JSON.stringify(internalParams)});
+            })`,
           );
         },
       },
