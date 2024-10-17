@@ -451,4 +451,19 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByText('Not a member')).toBeVisible();
   });
+
+  test('renders components when view transitions is enabled', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/transitions/sign-in');
+    await u.po.signIn.waitForMounted();
+
+    await u.po.signIn.setIdentifier(fakeAdmin.email);
+    await u.po.signIn.continue();
+    await u.page.waitForURL(`${app.serverUrl}/transitions/sign-in#/factor-one`);
+
+    await u.po.signIn.setPassword(fakeAdmin.password);
+    await u.po.signIn.continue();
+
+    await u.po.expect.toBeSignedIn();
+  });
 });
