@@ -8,20 +8,20 @@ import type { StorageCache } from '../internal/utils/storage';
 
 type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
   storageCache?: StorageCache;
-  syncSessionWithTab?: boolean;
+  syncHost?: string;
 };
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { children, storageCache, syncSessionWithTab, ...rest } = props;
+  const { children, storageCache, syncHost, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
 
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await createClerkClient({ publishableKey, storageCache, syncSessionWithTab }));
+      setClerkInstance(await createClerkClient({ publishableKey, storageCache, syncHost }));
     })();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [publishableKey, storageCache, syncHost]);
 
   if (!clerkInstance) {
     return null;
@@ -31,7 +31,7 @@ export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Ele
     <ClerkReactProvider
       {...rest}
       Clerk={clerkInstance}
-      standardBrowser={!syncSessionWithTab}
+      standardBrowser={!syncHost}
     >
       {children}
     </ClerkReactProvider>
