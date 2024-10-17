@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.14.0
+
+### Minor Changes
+
+- Updates `organizationPatterns` to take precedence over `personalAccountPatterns` in `organizationSyncOptions` ([#4320](https://github.com/clerk/javascript/pull/4320)) by [@izaaklauer](https://github.com/izaaklauer)
+
+- Use EIP-4361 message spec for Web3 wallets sign in signature requests ([#4334](https://github.com/clerk/javascript/pull/4334)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`752ce9bfa`](https://github.com/clerk/javascript/commit/752ce9bfa47a8eebd38cd272eeb58ae26fea3371), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+  - @clerk/shared@2.9.2
+
 ## 1.13.10
 
 ### Patch Changes

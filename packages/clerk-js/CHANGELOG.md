@@ -1,5 +1,38 @@
 # Change Log
 
+## 5.27.0
+
+### Minor Changes
+
+- Drop `maxAgeMinutes` from `__experimental_startVerification`. ([#4338](https://github.com/clerk/javascript/pull/4338)) by [@panteliselef](https://github.com/panteliselef)
+
+  Drop types `__experimental_SessionVerificationConfig` and `__experimental_SessionVerificationMaxAgeMinutes`.
+
+- The "Restricted access" screen has been improved for visual consistency and the ability to contact support. The displayed texts have been made more clear and the sign-in button has been moved to the bottom. ([#4335](https://github.com/clerk/javascript/pull/4335)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Add experimental standalone mode for `<UserButton />` and `<OrganizationSwitcher />`. ([#4042](https://github.com/clerk/javascript/pull/4042)) by [@panteliselef](https://github.com/panteliselef)
+
+  When `__experimental_asStandalone: true` the component will not render its trigger, and instead it will render only the contents of the popover in place.
+
+  APIs that changed:
+
+  - (For internal usage) Added `__experimental_prefetchOrganizationSwitcher` as a way to mount an internal component that will render the `useOrganizationList()` hook and prefetch the necessary data for the popover of `<OrganizationSwitcher />`. This enhances the UX since no loading state will be visible and keeps CLS to the minimum.
+  - New property for `mountOrganizationSwitcher(node, { __experimental_asStandalone: true })`
+  - New property for `mountUserButton(node, { __experimental_asStandalone: true })`
+
+- Use EIP-4361 message spec for Web3 wallets sign in signature requests ([#4334](https://github.com/clerk/javascript/pull/4334)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Retry with exponential backoff if loadScript fails to load the script ([#4349](https://github.com/clerk/javascript/pull/4349)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add the `?render=explicit` query parameter to the Turnstile script. ([#4332](https://github.com/clerk/javascript/pull/4332)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`752ce9bfa`](https://github.com/clerk/javascript/commit/752ce9bfa47a8eebd38cd272eeb58ae26fea3371), [`0a9bf8ef4`](https://github.com/clerk/javascript/commit/0a9bf8ef4902606f06b371e11c7ae84d493eda6c), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+  - @clerk/shared@2.9.2
+  - @clerk/localizations@3.3.0
+
 ## 5.26.5
 
 ### Patch Changes
