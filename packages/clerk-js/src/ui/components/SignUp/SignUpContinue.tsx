@@ -80,7 +80,7 @@ function _SignUpContinue() {
   } as const;
 
   const onlyLegalConsentMissing = useMemo(
-    () => signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
+    () => signUp.missingFields && signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
     [signUp.missingFields],
   );
 
