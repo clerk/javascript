@@ -88,6 +88,7 @@ export function Connections(
                     asChild
                   >
                     <Button
+                      // descriptor={`buttonConnection__${c.provider}`}
                       intent='connection'
                       busy={isConnectionLoading}
                       disabled={props?.disabled || isConnectionLoading}

@@ -1,9 +1,29 @@
+import type { VariantProps } from 'cva';
 import { cx } from 'cva';
 import { forwardRef, type HTMLAttributes } from 'react';
+
+import { type ParsedElementsFragment, useAppearance } from '~/contexts/AppearanceContext';
+import { applyDescriptors, dva } from '~/utils/dva';
 
 const SIZE = 16;
 
 type SpinnerRef = HTMLDivElement;
+
+export const layoutStyle = {
+  spinner: {
+    className: 'relative isolate block',
+  },
+} satisfies ParsedElementsFragment;
+
+export const visualStyle = {
+  spinner: {
+    className: 'size-[1em] text-current',
+  },
+} satisfies ParsedElementsFragment;
+
+const spinner = dva({
+  base: 'spinner',
+});
 
 /**
  * # Spinner
@@ -27,16 +47,18 @@ type SpinnerRef = HTMLDivElement;
 export const Spinner = forwardRef(function Spinner(
   {
     children,
-    className,
-  }: Pick<HTMLAttributes<SpinnerRef>, 'className'> & {
-    children: string;
-  },
+    descriptor,
+  }: HTMLAttributes<SpinnerRef> &
+    VariantProps<typeof spinner> & {
+      children: string;
+    },
   ref: React.ForwardedRef<SpinnerRef>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <span
       ref={ref}
-      className={cx('relative isolate block size-[1em] text-current', className)}
+      {...applyDescriptors(elements, spinner({ descriptor }))}
     >
       <span className='sr-only'>{children}</span>
 
