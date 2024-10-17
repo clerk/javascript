@@ -113,8 +113,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
-    paramsWithCaptcha.__experimental_legalAccepted = undefined;
+    if (typeof params.__experimental_legalAccepted !== 'undefined') {
+      paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
+      paramsWithCaptcha.__experimental_legalAccepted = undefined;
+    }
 
     return this._basePost({
       path: this.pathRoot,
@@ -319,9 +321,11 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
     // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
-    params.legalAccepted = params.__experimental_legalAccepted;
-    params.__experimental_legalAccepted = undefined;
+    if (typeof params.__experimental_legalAccepted !== 'undefined') {
+      // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
+      params.legalAccepted = params.__experimental_legalAccepted;
+      params.__experimental_legalAccepted = undefined;
+    }
 
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
