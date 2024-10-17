@@ -515,7 +515,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Already have an account?',
       blockButton__emailSupport: 'Email support',
     },
-    legalConsent: {
+    __experimental_legalConsent: {
       continue: {
         subtitle: 'Please read and accept the terms to continue',
         title: 'Legal consent',
