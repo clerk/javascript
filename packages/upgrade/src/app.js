@@ -1,37 +1,43 @@
 import { MultiSelect, Select, TextInput } from '@inkjs/ui';
 import { Newline, Text } from 'ink';
-import BigText from 'ink-big-text';
-import Gradient from 'ink-gradient';
 import React, { useState } from 'react';
 
+import { Header } from './components/Header.js';
+import { Scan } from './components/Scan.js';
+import { SDKWorkflow } from './components/SDKWorkflow.js';
 import SDKS from './constants/sdks.js';
-import Scan from './scan.js';
-import getClerkMajorVersion from './util/get-clerk-version.js';
+import { getClerkMajorVersion } from './util/get-clerk-version.js';
 import guessFrameworks from './util/guess-framework.js';
 
-export default function App({
-  _fromVersion,
-  _toVersion,
-  _sdk,
-  _dir = false,
-  _ignore = [],
-  _yolo = false,
-  noWarnings = false,
-  disableTelemetry = false,
-}) {
-  const [yolo, setYolo] = useState(_yolo);
-  const [sdks, setSdks] = useState(_sdk ? [_sdk] : []);
+/**
+ * Main CLI application component for handling Clerk SDK upgrades.
+ *
+ * @param {Object} props - The `props` object.
+ * @param {string} [props.dir] - The directory to scan for files.
+ * @param {boolean} [props.disableTelemetry=false] - Flag to disable telemetry.
+ * @param {string} [props.fromVersion] - The current version of the SDK.
+ * @param {Array<string>} [props.ignore] - List of files or directories to ignore.
+ * @param {boolean} [props.noWarnings=false] - Flag to disable warnings.
+ * @param {string} [props.sdk] - The SDK to upgrade.
+ * @param {string} [props.toVersion] - The target version of the SDK.
+ * @param {boolean} [props.yolo=false] - Flag to enable YOLO mode.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
+export default function App(props) {
+  const { noWarnings = false, disableTelemetry = false } = props;
+
+  const [yolo, setYolo] = useState(props.yolo ?? false);
+  const [sdks, setSdks] = useState(props.sdk ? [props.sdk] : []);
   const [sdkGuesses, setSdkGuesses] = useState([]);
   const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
   const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
   // See comments below, can be enabled on next major
-  // eslint-disable-next-line no-unused-vars
-  const [fromVersion, setFromVersion] = useState(_fromVersion);
+  const [fromVersion, setFromVersion] = useState(props.fromVersion);
   const [fromVersionGuessAttempted, setFromVersionGuessAttempted] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [toVersion, setToVersion] = useState(_toVersion);
-  const [dir, setDir] = useState(_dir);
-  const [ignore, setIgnore] = useState(_ignore);
+  const [toVersion, setToVersion] = useState(props.toVersion);
+  const [dir, setDir] = useState(props.dir);
+  const [ignore, setIgnore] = useState(props.ignore);
   const [configComplete, setConfigComplete] = useState(false);
   const [configVerified, setConfigVerified] = useState(false);
   const [uuid, setUuid] = useState();
@@ -42,20 +48,25 @@ export default function App({
     setYolo(false);
   }
 
+  // Handle the individual SDK upgrade
+  if (sdks.length === 1) {
+    return <SDKWorkflow sdk={sdks[0]} />;
+  }
+
   // We try to guess which SDK they are using
   if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
     if (!dir) {
       return setDir(process.cwd());
     }
     const { guesses, _uuid } = guessFrameworks(dir, disableTelemetry);
-    console.log({ guesses, _uuid });
+    // console.log({ guesses, _uuid });
     setUuid(_uuid);
     setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
   }
 
   // We try to guess which version of Clerk they are using
-  if (!fromVersion && !fromVersionGuess && !fromVersionGuessAttempted) {
+  if (isEmpty(sdks) && !fromVersion && !fromVersionGuess && !fromVersionGuessAttempted) {
     fromVersionGuess = getClerkMajorVersion();
     setFromVersionGuessAttempted(true);
   }
@@ -72,20 +83,14 @@ export default function App({
 
   return (
     <>
-      <Gradient name='vice'>
-        <BigText
-          text='Clerk Upgrade'
-          font='tiny'
-        />
-      </Gradient>
+      <Header />
 
       {/* Welcome to the upgrade script! */}
       {!configComplete && (
         <>
           <Text>
-            <Text color='blue'>Hello friend!</Text> We're excited to help you upgrade Clerk
-            {fromVersion ? ` from ${fromVersion}` : ''}
-            {toVersion ? ` to ${toVersion}` : ''}. Before we get started, a couple questions...
+            <Text color='blue'>Hello friend!</Text> We're excited to help you upgrade Clerk modules. Before we get
+            started, a couple questions...
           </Text>
           <Newline />
         </>
@@ -186,7 +191,7 @@ export default function App({
 					/>
 				</>
 			)} */}
-      {!isEmpty(sdks) > 0 && fromVersion && toVersion && !dir && (
+      {!isEmpty(sdks) && fromVersion && toVersion && !dir && (
         <>
           <Text>Where would you like for us to scan for files in your project?</Text>
           <Text color='gray'>(globstar syntax supported)</Text>

@@ -48,11 +48,11 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
  * Constructs a BAPI client that accesses request data within the runtime.
  * Necessary if middleware dynamic keys are used.
  */
-const clerkClientForRequest = () => {
+const clerkClientForRequest = async () => {
   let requestData;
 
   try {
-    const request = buildRequestLike();
+    const request = await buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);
   } catch (err) {
@@ -71,16 +71,14 @@ const clerkClientForRequest = () => {
 };
 
 interface ClerkClientExport extends ClerkClient {
-  (): ClerkClient;
+  (): Promise<ClerkClient>;
 }
 
 // TODO SDK-1839 - Remove `clerkClient` singleton in the next major version of `@clerk/nextjs`
-const clerkClient = new Proxy(Object.assign(clerkClientForRequest, clerkClientSingleton), {
+export const clerkClient = new Proxy(Object.assign(clerkClientForRequest, clerkClientSingleton), {
   get(target, prop: string, receiver) {
     deprecated('clerkClient singleton', 'Use `clerkClient()` as a function instead.');
 
     return Reflect.get(target, prop, receiver);
   },
 }) as ClerkClientExport;
-
-export { clerkClient };

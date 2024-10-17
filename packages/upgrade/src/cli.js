@@ -41,14 +41,14 @@ const cli = meow(
 
 render(
   <App
-    _fromVersion={cli.flags.from}
-    _toVersion={cli.flags.to}
-    _sdk={cli.flags.sdk}
-    _dir={cli.flags.dir}
-    _ignore={cli.flags.ignore}
-    _yolo={cli.flags.yolo}
-    noWarnings={cli.flags.noWarnings}
+    dir={cli.flags.dir}
     disableTelemetry={cli.flags.disableTelemetry}
+    fromVersion={cli.flags.from}
+    ignore={cli.flags.ignore}
+    noWarnings={cli.flags.noWarnings}
+    sdk={cli.flags.sdk}
+    toVersion={cli.flags.to}
+    yolo={cli.flags.yolo}
   />,
   // if having issues with errors being swallowed, uncomment this
   // { debug: true },

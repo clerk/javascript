@@ -102,8 +102,8 @@ export default function Page() {
     await u.po.signUp.goTo();
     await u.po.signUp.waitForMounted();
 
-    await expect(u.page.getByText(/Restricted access/i).first()).toBeVisible();
-    const backToSignIn = u.page.getByRole('link', { name: /Back to sign in/i });
+    await expect(u.page.getByText(/Access restricted/i).first()).toBeVisible();
+    const backToSignIn = u.page.getByRole('link', { name: /Sign in/i });
     await backToSignIn.click();
 
     await u.po.signUp.waitForMounted();
