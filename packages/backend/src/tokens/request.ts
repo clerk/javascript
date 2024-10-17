@@ -629,8 +629,7 @@ ${error.getFullMessage()}`,
         return signedIn(authenticateContext, data.jwtPayload, undefined, data.sessionToken);
       }
 
-      // If there's any error, simply fallback to the handshake flow.
-      console.error('Clerk: unable to refresh token:', error?.message || error);
+      // If there's any error, simply fallback to the handshake flow including the reason as a query parameter.
       if (error?.cause?.reason) {
         refreshError = error.cause.reason;
       } else {
