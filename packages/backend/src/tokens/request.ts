@@ -735,22 +735,6 @@ export function getOrganizationSyncTarget(
     return null;
   }
 
-  // Check for personal account activation
-  if (matchers.PersonalAccountMatcher) {
-    let personalResult: Match<Partial<Record<string, string | string[]>>>;
-    try {
-      personalResult = matchers.PersonalAccountMatcher(url.pathname);
-    } catch (e) {
-      // Intentionally not logging the path to avoid potentially leaking anything sensitive
-      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
-      return null;
-    }
-
-    if (personalResult) {
-      return { type: 'personalAccount' };
-    }
-  }
-
   // Check for organization activation
   if (matchers.OrganizationMatcher) {
     let orgResult: Match<Partial<Record<string, string | string[]>>>;
@@ -774,6 +758,22 @@ export function getOrganizationSyncTarget(
       console.warn(
         'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
       );
+    }
+  }
+
+  // Check for personal account activation
+  if (matchers.PersonalAccountMatcher) {
+    let personalResult: Match<Partial<Record<string, string | string[]>>>;
+    try {
+      personalResult = matchers.PersonalAccountMatcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
+      return null;
+    }
+
+    if (personalResult) {
+      return { type: 'personalAccount' };
     }
   }
   return null;

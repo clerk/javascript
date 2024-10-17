@@ -36,7 +36,7 @@ export type OrganizationSyncOptions = {
    * organization-related fields will be set to null. The server component must detect this and respond
    * with an appropriate error (e.g., notFound()).
    *
-   * If the route also matches the personalAccountPatterns, the personalAccountPattern takes precedence.
+   * If the route also matches the personalAccountPatterns, this takes precedence.
    *
    * Must have a path token named either ":id" (matches a clerk organization ID) or ":slug" (matches a clerk
    * organization slug).
@@ -50,7 +50,7 @@ export type OrganizationSyncOptions = {
 
   /**
    * URL patterns for resources in the context of a clerk personal account (user-specific, outside any organization).
-   * If the route also matches the organizationPattern, this takes precedence.
+   * If the route also matches the organizationPattern, the organizationPatterns takes precedence.
    *
    * Common examples:
    * - ["/user", "/user/(.*)"]
