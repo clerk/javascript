@@ -151,7 +151,7 @@ type _LocalizationResource = {
       actionText: LocalizationValue;
       blockButton__emailSupport: LocalizationValue;
     };
-    legalConsent: {
+    __experimental_legalConsent: {
       continue: {
         title: LocalizationValue;
         subtitle: LocalizationValue;

@@ -20,12 +20,12 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
       variant='body'
       as='span'
     >
-      {t(localizationKeys('signUp.legalConsent.checkbox.label__prefixText'))}
+      {t(localizationKeys('signUp.__experimental_legalConsent.checkbox.label__prefixText'))}
       {props.termsUrl && (
         <>
           {' '}
           <Link
-            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceText')}
+            localizationKey={localizationKeys('signUp.__experimental_legalConsent.checkbox.label__termsOfServiceText')}
             href={props.termsUrl}
             sx={{
               textDecoration: 'underline',
@@ -36,14 +36,14 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
       )}
 
       {props.termsUrl && props.privacyPolicyUrl && (
-        <> {t(localizationKeys('signUp.legalConsent.checkbox.label__conjunctionText'))} </>
+        <> {t(localizationKeys('signUp.__experimental_legalConsent.checkbox.label__conjunctionText'))} </>
       )}
 
       {props.privacyPolicyUrl && (
         <>
           {' '}
           <Link
-            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__privacyPolicyText')}
+            localizationKey={localizationKeys('signUp.__experimental_legalConsent.checkbox.label__privacyPolicyText')}
             href={props.termsUrl}
             sx={{
               textDecoration: 'underline',
