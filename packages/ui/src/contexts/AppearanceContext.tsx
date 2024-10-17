@@ -5,13 +5,35 @@ import React from 'react';
 import { fullTheme } from '~/themes';
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
+type ButtonDescriptorIdentifier =
+  | 'button'
+  | 'buttonPrimary'
+  | 'buttonSecondary'
+  | 'buttonConnection'
+  | 'buttonPrimaryDefault'
+  | 'buttonSecondaryDefault'
+  | 'buttonConnectionDefault'
+  | 'buttonDisabled'
+  | 'buttonBusy'
+  | 'buttonText'
+  | 'buttonTextVisuallyHidden'
+  | 'buttonIcon'
+  | 'buttonIconStart'
+  | 'buttonIconEnd'
+  | 'buttonSpinner';
 type SeparatorDescriptorIdentifier = 'separator';
+type SpinnerDescriptorIdentifier = 'spinner';
 type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
 
 /**
  * Union of all valid descriptors used throughout the components.
  */
-export type DescriptorIdentifier = AlertDescriptorIdentifier | SeparatorDescriptorIdentifier | CardDescriptorIdentifier;
+export type DescriptorIdentifier =
+  | AlertDescriptorIdentifier
+  | ButtonDescriptorIdentifier
+  | SeparatorDescriptorIdentifier
+  | SpinnerDescriptorIdentifier
+  | CardDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.

@@ -58,7 +58,7 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }, 
       if (path.parentPath.node.type === 'ObjectProperty' && path.parentPath.node.key === path.node) {
         return false;
       }
-      if (path.node.value === '') {
+      if (path.node.value === '' || path.node.value === ' ') {
         return false;
       }
       const cn = generateHashedClassName(path.node.value);
