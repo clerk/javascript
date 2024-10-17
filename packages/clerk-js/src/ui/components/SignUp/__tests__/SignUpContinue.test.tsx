@@ -89,7 +89,7 @@ describe('SignUpContinue', () => {
         termsOfService: 'https://clerk.dev/tos',
       });
     });
-    render(<SignUpContinue />, { wrapper });
+    const screen = render(<SignUpContinue />, { wrapper });
     screen.getByText(/missing/i);
     screen.getByText(/Terms Of Service/i);
     screen.getByText(/Privacy Policy/i);
