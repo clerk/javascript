@@ -116,6 +116,13 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             // The 2 events below only runs when View Transitions are enabled
 
             document.addEventListener('astro:before-swap', (e) => {
+              const clerkComponents = document.querySelector('#clerk-components');
+              // Keep the div element added by Clerk
+              if (clerkComponents) {
+                const clonedEl = clerkComponents.cloneNode(true);
+                e.newDocument.body.appendChild(clonedEl);
+              }
+
               e.swap = () => swapDocument(e.newDocument);
             });
 
