@@ -25,6 +25,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonSpinner';
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
+type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
 
 /**
  * Union of all valid descriptors used throughout the components.
@@ -33,7 +34,8 @@ export type DescriptorIdentifier =
   | AlertDescriptorIdentifier
   | ButtonDescriptorIdentifier
   | SeparatorDescriptorIdentifier
-  | SpinnerDescriptorIdentifier;
+  | SpinnerDescriptorIdentifier
+  | CardDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.

@@ -32,6 +32,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
+import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
 import type { __experimental_SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
@@ -701,6 +702,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
       },
       Record<string, any>
     >;
+
+    /**
+     * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
+     */
+    __experimental_router?: ClerkHostRouter;
   };
 
 export interface NavigateOptions {
@@ -836,6 +842,10 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -942,6 +952,10 @@ export type SignUpProps = RoutingOptions & {
    * Initial values that are used to prefill the sign up form.
    */
   initialValues?: SignUpInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
