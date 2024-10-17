@@ -9,7 +9,7 @@ import { Codemod } from './Codemod.js';
 import { Header } from './Header.js';
 
 export function SDKWorkflow(props) {
-  const { sdk } = props;
+  const { packageManager, sdk } = props;
 
   const [done, setDone] = useState(false);
   const [upgradeComplete, setUpgradeComplete] = useState(false);
@@ -23,6 +23,7 @@ export function SDKWorkflow(props) {
         <>
           <UpgradeCommand
             callback={setUpgradeComplete}
+            packageManager={packageManager}
             sdk={sdk}
           />
           {upgradeComplete ? (
@@ -80,7 +81,6 @@ function UpgradeCommand({ sdk, callback }) {
         callback(true);
       })
       .catch(err => {
-        console.error(error);
         setError(err);
       });
   }, [command]);

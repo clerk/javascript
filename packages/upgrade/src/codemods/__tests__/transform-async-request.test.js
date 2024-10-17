@@ -1,7 +1,7 @@
 import { applyTransform } from 'jscodeshift/dist/testUtils';
 import { describe, expect, it } from 'vitest';
 
-import transformer from '../transform-async-request';
+import transformer from '../transform-async-request.cjs';
 import { fixtures } from './__fixtures__/transform-async-request.fixtures';
 
 describe('transform-async-request', () => {

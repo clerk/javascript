@@ -50,7 +50,12 @@ export default function App(props) {
 
   // Handle the individual SDK upgrade
   if (sdks.length === 1) {
-    return <SDKWorkflow sdk={sdks[0]} />;
+    return (
+      <SDKWorkflow
+        packageManager={props.packageManager}
+        sdk={sdks[0]}
+      />
+    );
   }
 
   // We try to guess which SDK they are using

@@ -12,8 +12,8 @@ export function detectPackageManager() {
   }
 }
 
-export function getUpgradeCommand(sdk) {
-  switch (detectPackageManager()) {
+export function getUpgradeCommand(sdk, packageManager) {
+  switch (packageManager || detectPackageManager()) {
     case 'yarn':
       return `yarn add @clerk/${sdk}@latest`;
     case 'pnpm':

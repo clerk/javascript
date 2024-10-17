@@ -25,7 +25,6 @@ export function Codemod(props) {
     if (!glob) {
       return;
     }
-    console.log(glob);
     runCodemod(transform, glob)
       .then(res => {
         setResult(res);
@@ -66,6 +65,10 @@ export function Codemod(props) {
           </Text>
           <Newline />
           <Text bold>Results:</Text>
+          <Text color='red'>{result.error ?? 0} errors</Text>
+          <Text color='green'>{result.ok ?? 0} ok</Text>
+          <Text color='yellow'>{result.skip ?? 0} skipped</Text>
+          <Text color='gray'>{result.nochange ?? 0} unmodified</Text>
           {result.timeElapsed && <Text>Time elapsed: {result.timeElapsed}</Text>}
         </>
       )}

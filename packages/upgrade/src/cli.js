@@ -16,7 +16,8 @@ const cli = meow(
 			--to               Major version number you're upgrading to
 			--sdk              Name of the SDK you're upgrading
 			--dir              Directory you'd like to scan for files
-			--ignore           Any files or directories you'd like to ignore
+      --ignore           Any files or directories you'd like to ignore
+      --packageManager   The package manager you're using (npm, yarn, pnpm)
 			--noWarnings       Do not print warnings, only items that must be fixed
 			--disableTelemetry Do not send anonymous usage telemetry
 
@@ -32,6 +33,7 @@ const cli = meow(
       sdk: { type: 'string', choices: sdks.map(i => i.value) },
       dir: { type: 'string' },
       ignore: { type: 'string', isMultiple: true },
+      packageManager: { type: 'string' },
       yolo: { type: 'boolean' },
       noWarnings: { type: 'boolean' },
       disableTelemetry: { type: 'boolean' },
@@ -46,6 +48,7 @@ render(
     fromVersion={cli.flags.from}
     ignore={cli.flags.ignore}
     noWarnings={cli.flags.noWarnings}
+    packageManager={cli.flags.packageManager}
     sdk={cli.flags.sdk}
     toVersion={cli.flags.to}
     yolo={cli.flags.yolo}

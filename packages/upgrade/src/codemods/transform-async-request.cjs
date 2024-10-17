@@ -7,9 +7,11 @@
  * @param {Object} _options - Additional options (unused)
  * @returns {string|undefined} - The transformed source code if modifications were made, otherwise undefined
  */
-export default function transformAsyncRequest({ _path, source }, { jscodeshift: j }, _options) {
+module.exports = function transformAsyncRequest({ path, source }, { jscodeshift: j }, _options) {
   const root = j(source);
   let dirtyFlag = false;
+
+  console.log('path', path);
 
   // Short-circuit if the import from '@clerk/nextjs/server' is not found
   if (
@@ -142,4 +144,6 @@ export default function transformAsyncRequest({ _path, source }, { jscodeshift: 
   });
 
   return dirtyFlag ? root.toSource() : undefined;
-}
+};
+
+module.exports.parser = 'tsx';

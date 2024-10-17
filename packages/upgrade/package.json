@@ -16,9 +16,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && NODE_ENV=production babel --out-dir=dist src --copy-files",
+    "build": "npm run clean && NODE_ENV=production babel --keep-file-extension --out-dir=dist src --copy-files",
     "clean": "del-cli dist/*",
-    "dev": "babel --out-dir=dist --watch src --copy-files",
+    "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
     "lint": "eslint src/",
     "lint:publint": "publint",
     "test": "vitest"
