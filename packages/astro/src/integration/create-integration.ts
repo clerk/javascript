@@ -109,8 +109,17 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             'page',
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
-            import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(internalParams)});`,
+            import { runInjectionScript, swapDocument } from "${buildImportPath}";
+
+            await runInjectionScript(${JSON.stringify(internalParams)});
+
+            document.addEventListener('astro:before-swap', (e) => {
+              e.swap = () => swapDocument(e.newDocument);
+            });
+
+            document.addEventListener('astro:page-load', async (e) => {
+              await runInjectionScript(${JSON.stringify(internalParams)});
+            })`,
           );
         },
       },
