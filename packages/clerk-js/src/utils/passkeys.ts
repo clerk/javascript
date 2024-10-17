@@ -1,5 +1,6 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
+  CredentialReturn,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsJSON,
@@ -7,16 +8,6 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
-
-type CredentialReturn<T> =
-  | {
-      publicKeyCredential: T;
-      error: null;
-    }
-  | {
-      publicKeyCredential: null;
-      error: ClerkWebAuthnError | Error;
-    };
 
 type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
 type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
