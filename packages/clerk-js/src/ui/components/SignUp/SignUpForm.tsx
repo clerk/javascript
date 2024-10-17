@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
-import { Form } from '../../elements';
+import { Form, LegalCheckbox } from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
@@ -122,7 +122,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         >
           {shouldShow('__experimental_legalAccepted') && (
             <Form.ControlRow elementId='__experimental_legalAccepted'>
-              <Form.LegalCheckbox
+              <LegalCheckbox
                 {...formState.__experimental_legalAccepted.props}
                 isRequired={fields.__experimental_legalAccepted?.required}
               />

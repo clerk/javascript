@@ -10,6 +10,7 @@ import {
   Card,
   Form,
   Header,
+  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -294,7 +295,7 @@ function _SignUpStart(): JSX.Element {
             </SocialButtonsReversibleContainerWithDivider>
             {!shouldShowForm && (
               <Form.ControlRow elementId='__experimental_legalAccepted'>
-                <Form.LegalCheckbox
+                <LegalCheckbox
                   {...formState.__experimental_legalAccepted.props}
                   isRequired={fields.__experimental_legalAccepted?.required}
                 />
