@@ -1,7 +1,6 @@
 {
   "name": "@clerk/ui",
   "version": "0.1.9",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -13,6 +12,9 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     "./contexts": {
       "import": {
@@ -27,13 +29,16 @@
     "./*": {
       "import": {
         "types": "./dist/components/*.d.mts",
+        "browser": "./dist/components/*.mjs",
         "default": "./dist/components/*.mjs"
       },
       "require": {
         "types": "./dist/components/*.d.ts",
+        "browser": "./dist/components/*.js",
         "default": "./dist/components/*.js"
       }
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "main": "index.js",
   "files": [
@@ -47,7 +52,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/clerk-react": "file:../react",
     "@clerk/elements": "file:../elements",
     "@clerk/shared": "file:../shared",
     "@clerk/types": "file:../types",
