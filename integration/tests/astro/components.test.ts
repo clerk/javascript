@@ -458,9 +458,10 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/transitions');
+    // Navigate to sign-in page using link to simulate transition
     await u.page.getByRole('link', { name: /Sign in/i }).click();
 
-    // Components should be rendered on the new document
+    // Components should be mounted on the new document
     // when navigating through links
     await u.page.waitForURL(`${app.serverUrl}/transitions/sign-in`);
     await u.po.signIn.waitForMounted();
