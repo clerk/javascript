@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.3.0
+
+### Minor Changes
+
+- The "Restricted access" screen has been improved for visual consistency and the ability to contact support. The displayed texts have been made more clear and the sign-in button has been moved to the bottom. ([#4335](https://github.com/clerk/javascript/pull/4335)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Remove typos from pl-PL ([#4319](https://github.com/clerk/javascript/pull/4319)) by [@pmichalski98](https://github.com/pmichalski98)
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+
 ## 3.2.1
 
 ### Patch Changes
