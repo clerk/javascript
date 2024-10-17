@@ -3,21 +3,8 @@ import type { FieldId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useState } from 'react';
 
-import { useEnvironment } from '../../ui/contexts';
 import type { LocalizationKey } from '../customizables';
-import {
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Form as FormPrim,
-  FormLabel,
-  Link,
-  localizationKeys,
-  Text,
-  useAppearance,
-  useLocalizations,
-} from '../customizables';
+import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { OTPInputProps } from './CodeControl';
@@ -229,85 +216,6 @@ const Checkbox = (
   );
 };
 
-const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: string }) => {
-  const { t } = useLocalizations();
-  return (
-    <Text
-      variant='body'
-      as='span'
-    >
-      {t(localizationKeys('signUp.legalConsent.checkbox.label__prefixText'))}
-      {props.termsUrl && (
-        <>
-          {' '}
-          <Link
-            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceText')}
-            href={props.termsUrl}
-            sx={{
-              textDecoration: 'underline',
-            }}
-            isExternal
-          />
-        </>
-      )}
-
-      {props.termsUrl && props.privacyPolicyUrl && (
-        <> {t(localizationKeys('signUp.legalConsent.checkbox.label__conjunctionText'))} </>
-      )}
-
-      {props.privacyPolicyUrl && (
-        <>
-          {' '}
-          <Link
-            localizationKey={localizationKeys('signUp.legalConsent.checkbox.label__privacyPolicyText')}
-            href={props.termsUrl}
-            sx={{
-              textDecoration: 'underline',
-              display: 'inline-block',
-            }}
-            isExternal
-          />
-        </>
-      )}
-    </Text>
-  );
-};
-
-const LegalCheckbox = (
-  props: CommonFieldRootProps & {
-    description?: string | LocalizationKey;
-  },
-) => {
-  const { displayConfig } = useEnvironment();
-  const { parsedLayout } = useAppearance();
-
-  const termsLink = parsedLayout.termsPageUrl || displayConfig.termsUrl;
-  const privacyPolicy = parsedLayout.privacyPageUrl || displayConfig.privacyPolicyUrl;
-
-  return (
-    <Field.Root {...props}>
-      <Flex
-        align='center'
-        justify='center'
-      >
-        <Field.CheckboxIndicator />
-        <FormLabel
-          elementDescriptor={descriptors.formFieldRadioLabel}
-          htmlFor={props.itemID}
-          sx={t => ({
-            paddingLeft: t.space.$1x5,
-          })}
-        >
-          <LegalCheckboxLabel
-            termsUrl={termsLink}
-            privacyPolicyUrl={privacyPolicy}
-          />
-        </FormLabel>
-      </Flex>
-    </Field.Root>
-  );
-};
-
 const RadioGroup = (
   props: Omit<PropsOfComponent<typeof Field.Root>, 'infoText' | 'type' | 'validatePassword' | 'label' | 'placeholder'>,
 ) => {
@@ -388,7 +296,6 @@ export const Form = {
   InputGroup,
   RadioGroup,
   Checkbox,
-  LegalCheckbox: LegalCheckbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
