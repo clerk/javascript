@@ -220,7 +220,7 @@ describe('SignUpStart', () => {
       });
       props.setProps({ initialValues: { emailAddress: 'foo@clerk.com' } });
 
-      render(<SignUpStart />, { wrapper });
+      const screen = render(<SignUpStart />, { wrapper });
       screen.getByDisplayValue(/foo@clerk.com/i);
     });
 
@@ -230,7 +230,7 @@ describe('SignUpStart', () => {
       });
       props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
 
-      render(<SignUpStart />, { wrapper });
+      const screen = render(<SignUpStart />, { wrapper });
       screen.getByDisplayValue(/691 1111111/i);
     });
 
@@ -251,8 +251,8 @@ describe('SignUpStart', () => {
         f.withRestrictedMode();
       });
 
-      render(<SignUpStart />, { wrapper });
-      screen.getByText('Access restricted');
+      const screen = render(<SignUpStart />, { wrapper });
+      screen.getByText('Restricted access');
     });
   });
 
@@ -265,7 +265,7 @@ describe('SignUpStart', () => {
         });
       });
 
-      render(<SignUpStart />, { wrapper });
+      const screen = render(<SignUpStart />, { wrapper });
       screen.getByText('Terms of Service');
       screen.getByText('Privacy Policy');
     });
