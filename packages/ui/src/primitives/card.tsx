@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useAppearance } from '~/contexts';
 import { mergeDescriptors, type ParsedElementsFragment } from '~/contexts/AppearanceContext';
 import type { PolymorphicForwardRefExoticComponent, PolymorphicPropsWithoutRef } from '~/types/utils';
+import { applyDescriptors } from '~/utils/dva';
 
 import { ClerkLogo } from './clerk-logo';
 import { Image } from './image';
@@ -19,42 +20,63 @@ type RootOwnProps = {
   banner?: React.ReactNode;
 };
 
+const cardRootLayoutStyle = {
+  cardRoot: {
+    className: [
+      '[--card-banner-height:theme(size.4)]',
+      '[--card-body-px:theme(spacing.10)]',
+      '[--card-body-py:theme(spacing.8)]',
+      '[--card-content-rounded-b:theme(borderRadius.lg)]',
+      'relative w-full max-w-[25rem]',
+    ].join(' '),
+  },
+  cardRootDefault: {},
+  cardRootInner: {},
+};
+const cardRootVisualStyle = {
+  cardRoot: {
+    className: 'bg-gray-2 ring-gray-a3 rounded-xl ring-1',
+  },
+  cardRootDefault: {
+    className: 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+  },
+  cardRootInner: {
+    className: 'overflow-hidden rounded-[inherit]',
+  },
+};
+
 export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof RootDefaultElement> = React.forwardRef(
   function CardRoot<T extends React.ElementType = typeof RootDefaultElement>(
-    { as, banner, children, className, ...props }: PolymorphicPropsWithoutRef<RootOwnProps, T>,
+    { as, banner, children, ...props }: PolymorphicPropsWithoutRef<RootOwnProps, T>,
     forwardedRef: React.ForwardedRef<Element>,
   ) {
+    const { elements } = useAppearance().parsedAppearance;
     const Element: React.ElementType = as || RootDefaultElement;
+    const cardRootDescriptors = applyDescriptors(elements, 'cardRoot');
+    const cardRootDefaultDescriptors = applyDescriptors(elements, 'cardRootDefault');
     return (
       <Element
         ref={forwardedRef}
         {...props}
         className={cx(
-          '[--card-banner-height:theme(size.4)]',
-          '[--card-body-px:theme(spacing.10)]',
-          '[--card-body-py:theme(spacing.8)]',
-          '[--card-content-rounded-b:theme(borderRadius.lg)]',
-          'bg-gray-2 ring-gray-a3 relative w-full max-w-[25rem] rounded-xl ring-1',
+          cardRootDescriptors.className,
           banner
             ? [
                 'mt-[calc(var(--card-banner-height)/2)]',
                 'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
               ]
-            : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
-          className,
+            : cardRootDefaultDescriptors.className,
         )}
       >
         {banner && (
           <div
             className={cx(
               'pointer-events-none absolute inset-x-0 -top-[calc(var(--card-banner-height)/2)] isolate z-[500] flex justify-center',
-              className,
             )}
           >
             <p
               className={cx(
                 'bg-warning pointer-events-auto inline-flex h-[--card-banner-height] items-center rounded-full px-2 text-[0.6875rem] font-medium tracking-[2%] text-white',
-                className,
               )}
               {...props}
             >
@@ -62,7 +84,7 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
             </p>
           </div>
         )}
-        {children && <div className={cx('overflow-hidden rounded-[inherit]', className)}>{children}</div>}
+        {children && <div {...mergeDescriptors(elements.cardRootInner)}>{children}</div>}
       </Element>
     );
   },
@@ -508,6 +530,7 @@ const FooterPageLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttri
 );
 
 export const layoutStyle = {
+  ...cardRootLayoutStyle,
   ...cardHeaderLayoutStyle,
   ...cardContentLayoutStyle,
   ...cardTitleLayoutStyle,
@@ -519,6 +542,7 @@ export const layoutStyle = {
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
+  ...cardRootVisualStyle,
   ...cardHeaderVisualStyle,
   ...cardContentVisualStyle,
   ...cardTitleVisualStyle,

@@ -24,6 +24,9 @@ type ButtonDescriptorIdentifier =
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
 type CardDescriptorIdentifier =
+  | 'cardRoot'
+  | 'cardRootDefault'
+  | 'cardRootInner'
   | 'cardHeader'
   | 'cardContent'
   | 'cardTitle'
