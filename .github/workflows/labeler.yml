@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'blacksmith-4vcpu-ubuntu-2204' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
