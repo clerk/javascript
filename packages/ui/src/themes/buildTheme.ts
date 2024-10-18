@@ -6,7 +6,6 @@ import { DESCRIPTORS } from '~/descriptors';
  */
 export function buildTheme(p: PartialTheme): ParsedElements {
   const theme: Partial<ParsedElements> = {};
-  const suppliedDescriptors = new Set<string>();
 
   // Setup base theme containing empty objects for each descriptor.
   DESCRIPTORS.forEach(descriptor => {
@@ -35,16 +34,7 @@ export function buildTheme(p: PartialTheme): ParsedElements {
       if (style) {
         theme[key]!.style = style;
       }
-
-      suppliedDescriptors.add(descriptor);
     }
-  }
-
-  const missingDescriptors = DESCRIPTORS.filter(d => !suppliedDescriptors.has(d));
-  if (missingDescriptors.length > 0) {
-    console.warn(
-      `Clerk: Missing style configuration for the following descriptors:\n- ${missingDescriptors.join('\n- ')}`,
-    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
