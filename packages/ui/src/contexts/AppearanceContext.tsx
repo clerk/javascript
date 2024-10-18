@@ -32,7 +32,25 @@ type ButtonDescriptorIdentifier =
 type ConnectionDescriptorIdentifier = 'connectionList' | 'connectionListItem';
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
-type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
+type CardDescriptorIdentifier =
+  | 'cardRoot'
+  | 'cardRootDefault'
+  | 'cardRootInner'
+  | 'cardHeader'
+  | 'cardContent'
+  | 'cardTitle'
+  | 'cardDescription'
+  | 'cardBody'
+  | 'cardActions'
+  | 'cardFooter'
+  | 'cardFooterAction'
+  | 'cardFooterActionText'
+  | 'cardFooterActionLink'
+  | 'cardFooterActionButton'
+  | 'cardFooterActionPageLink'
+  | 'cardLogoBox'
+  | 'cardLogoLink'
+  | 'cardLogoImage';
 
 /**
  * Union of all valid descriptors used throughout the components.
