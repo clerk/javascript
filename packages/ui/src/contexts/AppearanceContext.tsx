@@ -212,7 +212,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     Object.entries(b.elements).forEach(([element, config]) => {
       const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
-        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config!);
       } else {
         result.elements![el] = config;
       }
