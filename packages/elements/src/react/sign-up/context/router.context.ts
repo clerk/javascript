@@ -1,10 +1,10 @@
 import type { ActorRefFrom, AnyActorRef, AnyStateMachine, SnapshotFrom } from 'xstate';
 
-import type {
-  TSignUpContinueMachine,
-  TSignUpRouterMachine,
-  TSignUpStartMachine,
-  TSignUpVerificationMachine,
+import {
+  type TSignUpContinueMachine,
+  type TSignUpRouterMachine,
+  type TSignUpStartMachine,
+  type TSignUpVerificationMachine,
 } from '~/internals/machines/sign-up';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 

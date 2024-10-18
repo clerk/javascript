@@ -326,6 +326,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   verified_at_client?: string;
   external_verification_redirect_url?: string | null;
   nonce?: string | null;
+  message?: string | null;
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {
