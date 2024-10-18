@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.15.0
+
+### Minor Changes
+
+- - Added `legalAcceptedAt` on `User` ([#4367](https://github.com/clerk/javascript/pull/4367)) by [@octoper](https://github.com/octoper)
+
+  - Added `legalAcceptedAt` and `skipLegalChecks` on `CreateUserParams` and `UpdateUserParams`
+  - Added `legal_accepted_at` on `UserJSON`
+
+### Patch Changes
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+
 ## 1.14.1
 
 ### Patch Changes
