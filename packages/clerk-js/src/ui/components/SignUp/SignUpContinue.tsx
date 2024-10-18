@@ -73,7 +73,7 @@ function _SignUpContinue() {
     }),
     __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
       type: 'checkbox',
-      label: 'I agree to the Terms of Service and Privacy Policy',
+      label: '',
       defaultChecked: false,
       isRequired: userSettings.signUp.legal_consent_enabled || false,
     }),
