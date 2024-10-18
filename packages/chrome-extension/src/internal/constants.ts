@@ -1,6 +1,6 @@
 export const AUTH_HEADER = {
   PRODUCTION: 'Authorization',
-  DEVELOPMENT: '__clerk_db_jwt',
+  DEVELOPMENT: 'Clerk-Db-Jwt',
 };
 
 export const CLIENT_JWT_KEY = '__client';
