@@ -24,6 +24,6 @@ export default defineConfig(() => {
     bundle: true,
     sourcemap: true,
     format: ['esm'],
-    external: ['astro', 'react', 'react-dom', 'node:async_hooks', '#async-local-storage'],
+    external: ['astro', 'react', 'react-dom', 'node:async_hooks', '#async-local-storage', 'astro:transitions/client'],
   };
 });

@@ -124,8 +124,31 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             'page',
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
-            import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(internalParams)});`,
+            import { runInjectionScript, swapDocument } from "${buildImportPath}";
+            import { navigate, transitionEnabledOnThisPage } from "astro:transitions/client";
+
+            if (transitionEnabledOnThisPage()) {
+              document.addEventListener('astro:before-swap', (e) => {
+                const clerkComponents = document.querySelector('#clerk-components');
+                // Keep the div element added by Clerk
+                if (clerkComponents) {
+                  const clonedEl = clerkComponents.cloneNode(true);
+                  e.newDocument.body.appendChild(clonedEl);
+                }
+
+                e.swap = () => swapDocument(e.newDocument);
+              });
+
+              document.addEventListener('astro:page-load', async (e) => {
+                await runInjectionScript({
+                  ...${JSON.stringify(internalParams)},
+                  routerPush: navigate,
+                  routerReplace: (url) => navigate(url, { history: 'replace' }),
+                });
+              })
+            } else {
+              await runInjectionScript(${JSON.stringify(internalParams)});
+            }`,
           );
         },
       },

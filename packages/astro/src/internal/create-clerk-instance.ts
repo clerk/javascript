@@ -45,9 +45,9 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
   }
 
   initOptions = {
-    ...options,
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
+    ...options,
   };
 
   return clerkJSInstance
