@@ -1,4 +1,4 @@
-import { cva, cx } from 'cva';
+import { cx } from 'cva';
 import * as React from 'react';
 
 import { useAppearance } from '~/contexts';
@@ -326,38 +326,40 @@ export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * CardBanner
+ * CardFooter
  */
-const cardBannerLayoutStyle = {
-  cardBanner: {
-    className: 'pointer-events-none absolute -top-2 isolate z-[500]',
+const cardFooterLayoutStyle = {
+  cardFooter: {
+    className: 'grid',
   },
-  cardBannerText: {},
+  cardFooterAction: {
+    className: 'px-6 py-4',
+  },
+  cardFooterActionText: {},
+  cardFooterActionLink: {},
+  cardFooterActionButton: {},
+  cardFooterActionPageLink: {},
 } satisfies ParsedElementsFragment;
-const cardBannerVisualStyle = {
-  cardBanner: {},
-  cardBannerText: {
-    className: 'pointer-events-auto text-sm font-medium text-orange-500',
+const cardFooterVisualStyle = {
+  cardFooter: {},
+  cardFooterAction: {
+    className: 'border-gray-a3 border-b last-of-type:border-b-transparent',
+  },
+  cardFooterActionText: {
+    className: 'text-gray-a11 text-center text-base',
+  },
+  cardFooterActionLink: {
+    className:
+      'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
+  },
+  cardFooterActionButton: {
+    className:
+      'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
+  },
+  cardFooterActionPageLink: {
+    className: 'text-gray-a11 text-base font-medium hover:underline',
   },
 } satisfies ParsedElementsFragment;
-
-export const Banner = React.forwardRef(function CardBanner(
-  { children, className, ...props }: React.HTMLAttributes<HTMLParagraphElement>,
-  forwardedRef: React.ForwardedRef<HTMLParagraphElement>,
-) {
-  const { elements } = useAppearance().parsedAppearance;
-  return (
-    <div {...mergeDescriptors(elements.cardBanner)}>
-      <p
-        ref={forwardedRef}
-        {...props}
-        {...mergeDescriptors(elements.cardBannerText)}
-      >
-        {children}
-      </p>
-    </div>
-  );
-});
 
 export const Footer = React.forwardRef(function CardFooter(
   {
@@ -376,6 +378,7 @@ export const Footer = React.forwardRef(function CardFooter(
   } & React.HTMLAttributes<HTMLDivElement>,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
   const renderFooter = branded || hasPageLinks || children;
   const renderSubFooter = branded || hasPageLinks;
@@ -385,7 +388,7 @@ export const Footer = React.forwardRef(function CardFooter(
     <div
       ref={forwardedRef}
       {...props}
-      className={cx('grid', className)}
+      {...mergeDescriptors(elements.cardFooter)}
     >
       {children}
 
@@ -427,11 +430,12 @@ export const Footer = React.forwardRef(function CardFooter(
 
 export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   function CardFooterAction({ children, className, ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <div
         ref={forwardedRef}
         {...props}
-        className={cx('border-gray-a3 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
+        {...mergeDescriptors(elements.cardFooterAction)}
       >
         {children}
       </div>
@@ -441,11 +445,12 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
 
 export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   function CardFooterActionText({ children, className, ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <p
         ref={forwardedRef}
         {...props}
-        className={cx('text-gray-a11 text-center text-base', className)}
+        {...mergeDescriptors(elements.cardFooterActionText)}
       >
         {children}
       </p>
@@ -453,19 +458,16 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
-const footerActionButton = cva({
-  base: 'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
-});
-
 export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function CardFooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <button
         ref={forwardedRef}
         // eslint-disable-next-line react/button-has-type
         type={type}
-        className={footerActionButton({ className })}
         {...props}
+        {...mergeDescriptors(elements.cardFooterActionButton)}
       >
         {children}
       </button>
@@ -475,11 +477,12 @@ export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.Butt
 
 export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
   function CardFooterActionLink({ children, className, ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <a
         ref={forwardedRef}
         {...props}
-        className={footerActionButton({ className })}
+        {...mergeDescriptors(elements.cardFooterActionLink)}
       >
         {children}
       </a>
@@ -489,13 +492,14 @@ export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.Anchor
 
 const FooterPageLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
   function CardFooterPageLink({ children, className, ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <a
         ref={forwardedRef}
         {...props}
         target='_blank'
         rel='noopener'
-        className={cx('text-gray-a11 text-sm font-medium hover:underline', className)}
+        {...mergeDescriptors(elements.cardFooterActionPageLink)}
       >
         {children}
       </a>
@@ -510,7 +514,7 @@ export const layoutStyle = {
   ...cardDescriptionLayoutStyle,
   ...cardBodyLayoutStyle,
   ...cardActionsLayoutStyle,
-  ...cardBannerLayoutStyle,
+  ...cardFooterLayoutStyle,
   ...cardLogoLayoutStyle,
 } satisfies ParsedElementsFragment;
 
@@ -521,6 +525,6 @@ export const visualStyle = {
   ...cardDescriptionVisualStyle,
   ...cardBodyVisualStyle,
   ...cardActionsVisualStyle,
-  ...cardBannerVisualStyle,
+  ...cardFooterVisualStyle,
   ...cardLogoVisualStyle,
 } satisfies ParsedElementsFragment;
