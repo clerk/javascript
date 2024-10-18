@@ -2,7 +2,6 @@ import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@cl
 import { constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
-import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
@@ -12,7 +11,13 @@ import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import {
+  authSignatureInvalid,
+  encryptionKeyInvalid,
+  encryptionKeyMissing,
+  missingDomainAndProxy,
+  missingSignInUrlInDev,
+} from './errors';
 import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
@@ -235,12 +240,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
   }
 
   if (requestData.secretKey && !ENCRYPTION_KEY) {
-    // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
-    logger.warnOnce(
-      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
-    );
-
-    return;
+    throw new Error(encryptionKeyMissing);
   }
 
   return AES.encrypt(
