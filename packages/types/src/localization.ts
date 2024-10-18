@@ -157,10 +157,9 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       checkbox: {
-        label__prefixText: LocalizationValue;
-        label__termsOfServiceText: LocalizationValue;
-        label__privacyPolicyText: LocalizationValue;
-        label__conjunctionText: LocalizationValue;
+        label__termsOfServiceAndPrivacyPolicy: LocalizationValue;
+        label__onlyPrivacyPolicy: LocalizationValue;
+        label__onlyTermsOfService: LocalizationValue;
       };
     };
   };
