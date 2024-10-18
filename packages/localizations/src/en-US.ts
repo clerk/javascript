@@ -515,6 +515,18 @@ export const enUS: LocalizationResource = {
       actionText: 'Already have an account?',
       blockButton__emailSupport: 'Email support',
     },
+    __experimental_legalConsent: {
+      continue: {
+        subtitle: 'Please read and accept the terms to continue',
+        title: 'Legal consent',
+      },
+      checkbox: {
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
+      },
+    },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',

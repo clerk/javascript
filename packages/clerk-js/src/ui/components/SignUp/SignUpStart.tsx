@@ -8,7 +8,9 @@ import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts'
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
+  Form,
   Header,
+  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -79,6 +81,12 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
+    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+      type: 'checkbox',
+      label: '',
+      defaultChecked: false,
+      isRequired: userSettings.signUp.legal_consent_enabled || false,
+    }),
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
@@ -102,6 +110,7 @@ function _SignUpStart(): JSX.Element {
     hasEmail,
     activeCommIdentifierType,
     isProgressiveSignUp,
+    legalConsentRequired: userSettings.signUp.legal_consent_enabled,
   });
 
   const handleTokenFlow = () => {
@@ -187,19 +196,17 @@ function _SignUpStart(): JSX.Element {
     e.preventDefault();
 
     type FormStateKey = keyof typeof formState;
-    const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
-      [] as Array<FormControlState>,
-    );
+    const fieldsToSubmit = Object.entries(fields).reduce((acc, [k, v]) => {
+      acc.push(...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : []));
+      return acc;
+    }, [] as Array<FormControlState>);
 
     if (unsafeMetadata) {
       fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
     }
 
     if (fields.ticket) {
-      const noop = () => {
-        //
-      };
+      const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
       fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
     }
@@ -210,8 +217,8 @@ function _SignUpStart(): JSX.Element {
     const phoneNumberProvided = !!(fieldsToSubmit.find(f => f.id === 'phoneNumber')?.value || '');
 
     if (!emailAddressProvided && !phoneNumberProvided && emailOrPhone(attributes, isProgressiveSignUp)) {
-      fieldsToSubmit.push(formState['emailAddress']);
-      fieldsToSubmit.push(formState['phoneNumber']);
+      fieldsToSubmit.push(formState.emailAddress);
+      fieldsToSubmit.push(formState.phoneNumber);
     }
 
     card.setLoading();
@@ -273,6 +280,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
+                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked)}
                 />
               )}
               {shouldShowForm && (
@@ -285,6 +293,14 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && (
+              <Form.ControlRow elementId='__experimental_legalAccepted'>
+                <LegalCheckbox
+                  {...formState.__experimental_legalAccepted.props}
+                  isRequired={fields.__experimental_legalAccepted?.required}
+                />
+              </Form.ControlRow>
+            )}
             {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
