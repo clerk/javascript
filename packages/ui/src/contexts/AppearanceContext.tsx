@@ -243,6 +243,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
         } else {
+          // @ts-ignore - we know that config is an object here
           const { className, ...style } = config;
           if (className) {
             result.elements[el].className = [result.elements[el].className, className].join(' ');
