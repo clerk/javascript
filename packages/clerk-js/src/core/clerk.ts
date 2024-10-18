@@ -842,7 +842,6 @@ export class Clerk implements ClerkInterface {
         this.client.cookieExpiresAt &&
         this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
       ) {
-        console.log('REDIRECTING TO: /v1/client/touch?redirect_url=' + redirectUrl);
         this.navigate(
           this.buildUrlWithAuth(
             this.#fapiClient
