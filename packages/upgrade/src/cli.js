@@ -8,21 +8,21 @@ import sdks from './constants/sdks.js';
 
 const cli = meow(
   `
-		Usage
-		  $ clerk-upgrade
+    Usage
+      $ clerk-upgrade
 
-		Options
-			--from             Major version number you're upgrading from
-			--to               Major version number you're upgrading to
-			--sdk              Name of the SDK you're upgrading
-			--dir              Directory you'd like to scan for files
+    Options
+      --from             Major version number you're upgrading from
+      --to               Major version number you're upgrading to
+      --sdk              Name of the SDK you're upgrading
+      --dir              Directory you'd like to scan for files
       --ignore           Any files or directories you'd like to ignore
       --packageManager   The package manager you're using (npm, yarn, pnpm)
-			--noWarnings       Do not print warnings, only items that must be fixed
-			--disableTelemetry Do not send anonymous usage telemetry
+      --noWarnings       Do not print warnings, only items that must be fixed
+      --disableTelemetry Do not send anonymous usage telemetry
 
-		Examples
-		  $ clerk-upgrade --sdk=nextjs --dir=src/**
+    Examples
+      $ clerk-upgrade --sdk=nextjs --dir=src/**
       $ clerk-upgrade --ignore=**/public/** --ignore=**/dist/**
 	`,
   {
