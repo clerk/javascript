@@ -5,6 +5,9 @@ export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 export const JWKS_CACHE_TTL_MS = 1000 * 60 * 60;
 
+export const EPHEMERAL_MODE_AVAILABLE =
+  process.env.NODE_ENV === 'development' && process.env.CLERK_FEATURE_FLAG_EPHEMERAL_ACCOUNTS === 'true';
+
 const Attributes = {
   AuthToken: '__clerkAuthToken',
   AuthSignature: '__clerkAuthSignature',
@@ -20,6 +23,9 @@ const Cookies = {
   ClientUat: '__client_uat',
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
+  EphemeralExpiresAt: '__clerk_ephemeral_expires_at',
+  EphemeralPublishableKey: '__clerk_ephemeral_publishable_key',
+  EphemeralSecretKey: '__clerk_ephemeral_secret_key',
   RedirectCount: '__clerk_redirect_count',
 } as const;
 
@@ -28,6 +34,9 @@ const QueryParameters = {
   ClerkRedirectUrl: '__clerk_redirect_url',
   // use the reference to Cookies to indicate that it's the same value
   DevBrowser: Cookies.DevBrowser,
+  EphemeralExpiresAt: '__clerk_ephemeral_expires_at',
+  EphemeralPublishableKey: '__clerk_ephemeral_publishable_key',
+  EphemeralSecretKey: '__clerk_ephemeral_secret_key',
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',

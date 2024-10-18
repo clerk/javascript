@@ -14,10 +14,13 @@
 
 // @ts-ignore - These are package subpaths
 import { webcrypto as crypto } from '#crypto';
+// @ts-ignore - These are package subpaths
+import { fetchEphemeralAccount } from '#ephemeral';
 
 type Runtime = {
   crypto: Crypto;
   fetch: typeof globalThis.fetch;
+  fetchEphemeralAccount: typeof fetchEphemeralAccount;
   AbortController: typeof globalThis.AbortController;
   Blob: typeof globalThis.Blob;
   FormData: typeof globalThis.FormData;
@@ -38,6 +41,7 @@ const globalFetch = fetch.bind(globalThis);
 const runtime: Runtime = {
   crypto,
   fetch: globalFetch,
+  fetchEphemeralAccount: fetchEphemeralAccount,
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,
   FormData: globalThis.FormData,

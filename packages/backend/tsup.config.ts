@@ -18,7 +18,7 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${isWatch}`,
     },
-    external: ['#crypto'],
+    external: ['#crypto', '#ephemeral'],
     bundle: true,
     clean: true,
     minify: false,
