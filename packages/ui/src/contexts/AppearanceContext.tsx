@@ -1,67 +1,9 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type {
-  Appearance as CurrentAppearance,
-  Layout as CurrentLayout,
-  OAuthProvider,
-  Web3Provider,
-} from '@clerk/types';
+import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
+import type { DescriptorIdentifier } from '~/descriptors';
 import { fullTheme } from '~/themes';
-
-type Provider = OAuthProvider | Web3Provider;
-
-type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
-type ButtonDescriptorIdentifier =
-  | 'button'
-  | 'buttonPrimary'
-  | 'buttonSecondary'
-  | 'buttonConnection'
-  | 'buttonPrimaryDefault'
-  | 'buttonSecondaryDefault'
-  | 'buttonConnectionDefault'
-  | `buttonConnection__${Provider}`
-  | 'buttonDisabled'
-  | 'buttonBusy'
-  | 'buttonText'
-  | 'buttonTextVisuallyHidden'
-  | 'buttonIcon'
-  | 'buttonIconStart'
-  | 'buttonIconEnd'
-  | 'buttonSpinner';
-type ConnectionDescriptorIdentifier = 'connectionList' | 'connectionListItem';
-type SeparatorDescriptorIdentifier = 'separator';
-type SpinnerDescriptorIdentifier = 'spinner';
-type CardDescriptorIdentifier =
-  | 'cardRoot'
-  | 'cardRootDefault'
-  | 'cardRootInner'
-  | 'cardHeader'
-  | 'cardContent'
-  | 'cardTitle'
-  | 'cardDescription'
-  | 'cardBody'
-  | 'cardActions'
-  | 'cardFooter'
-  | 'cardFooterAction'
-  | 'cardFooterActionText'
-  | 'cardFooterActionLink'
-  | 'cardFooterActionButton'
-  | 'cardFooterActionPageLink'
-  | 'cardLogoBox'
-  | 'cardLogoLink'
-  | 'cardLogoImage';
-
-/**
- * Union of all valid descriptors used throughout the components.
- */
-export type DescriptorIdentifier =
-  | AlertDescriptorIdentifier
-  | ButtonDescriptorIdentifier
-  | ConnectionDescriptorIdentifier
-  | SeparatorDescriptorIdentifier
-  | SpinnerDescriptorIdentifier
-  | CardDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
@@ -76,7 +18,7 @@ export type PartialDescriptor = Omit<Partial<ParsedDescriptor>, 'descriptor'>;
 /**
  * A full theme generated from merging ParsedElementsFragments. Has entries for each descriptor, but they're not complete.
  */
-export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
+export type PartialTheme = Partial<Record<DescriptorIdentifier, PartialDescriptor>>;
 
 /**
  * A subset of a partial theme. This is the type used when authoring style objects within a component.
