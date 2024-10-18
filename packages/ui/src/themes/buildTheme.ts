@@ -17,6 +17,157 @@ export function buildTheme(p: PartialTheme): ParsedElements {
     };
   });
 
+  theme['buttonConnection__apple'] = {
+    descriptor: `cl-buttonConnection__apple`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__atlassian'] = {
+    descriptor: `cl-buttonConnection__atlassian`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__bitbucket'] = {
+    descriptor: `cl-buttonConnection__bitbucket`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__box'] = {
+    descriptor: `cl-buttonConnection__box`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__coinbase_wallet'] = {
+    descriptor: `cl-buttonConnection__coinbase_wallet`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__coinbase'] = {
+    descriptor: `cl-buttonConnection__coinbase`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__discord'] = {
+    descriptor: `cl-buttonConnection__discord`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__dropbox'] = {
+    descriptor: `cl-buttonConnection__dropbox`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__enstall'] = {
+    descriptor: `cl-buttonConnection__enstall`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__facebook'] = {
+    descriptor: `cl-buttonConnection__facebook`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__github'] = {
+    descriptor: `cl-buttonConnection__github`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__gitlab'] = {
+    descriptor: `cl-buttonConnection__gitlab`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__google'] = {
+    descriptor: `cl-buttonConnection__google`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__hubspot'] = {
+    descriptor: `cl-buttonConnection__hubspot`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__huggingface'] = {
+    descriptor: `cl-buttonConnection__huggingface`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__instagram'] = {
+    descriptor: `cl-buttonConnection__instagram`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__line'] = {
+    descriptor: `cl-buttonConnection__line`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__linear'] = {
+    descriptor: `cl-buttonConnection__linear`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__linkedin_oidc'] = {
+    descriptor: `cl-buttonConnection__linkedin_oidc`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__linkedin'] = {
+    descriptor: `cl-buttonConnection__linkedin`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__metamask'] = {
+    descriptor: `cl-buttonConnection__metamask`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__microsoft'] = {
+    descriptor: `cl-buttonConnection__microsoft`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__notion'] = {
+    descriptor: `cl-buttonConnection__notion`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__slack'] = {
+    descriptor: `cl-buttonConnection__slack`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__spotify'] = {
+    descriptor: `cl-buttonConnection__spotify`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__tiktok'] = {
+    descriptor: `cl-buttonConnection__tiktok`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__twitch'] = {
+    descriptor: `cl-buttonConnection__twitch`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__twitter'] = {
+    descriptor: `cl-buttonConnection__twitter`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__x'] = {
+    descriptor: `cl-buttonConnection__x`,
+    className: '',
+    style: {},
+  };
+  theme['buttonConnection__xero'] = {
+    descriptor: `cl-buttonConnection__xero`,
+    className: '',
+    style: {},
+  };
+
   for (const descriptor in p) {
     const key = descriptor as keyof ParsedElements;
 
@@ -47,7 +198,6 @@ export function buildTheme(p: PartialTheme): ParsedElements {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   return theme as ParsedElements;
 }
 
@@ -72,7 +222,41 @@ if (import.meta.vitest) {
   describe('buildTheme', () => {
     it('returns a theme containing all descriptors', () => {
       const theme = buildTheme({});
-      expect(Object.keys(theme).sort()).toStrictEqual([...DESCRIPTORS].sort());
+      expect(Object.keys(theme).sort()).toStrictEqual(
+        [
+          ...DESCRIPTORS,
+          'buttonConnection__apple',
+          'buttonConnection__atlassian',
+          'buttonConnection__bitbucket',
+          'buttonConnection__box',
+          'buttonConnection__coinbase_wallet',
+          'buttonConnection__coinbase',
+          'buttonConnection__discord',
+          'buttonConnection__dropbox',
+          'buttonConnection__enstall',
+          'buttonConnection__facebook',
+          'buttonConnection__github',
+          'buttonConnection__gitlab',
+          'buttonConnection__google',
+          'buttonConnection__hubspot',
+          'buttonConnection__huggingface',
+          'buttonConnection__instagram',
+          'buttonConnection__line',
+          'buttonConnection__linear',
+          'buttonConnection__linkedin_oidc',
+          'buttonConnection__linkedin',
+          'buttonConnection__metamask',
+          'buttonConnection__microsoft',
+          'buttonConnection__notion',
+          'buttonConnection__slack',
+          'buttonConnection__spotify',
+          'buttonConnection__tiktok',
+          'buttonConnection__twitch',
+          'buttonConnection__twitter',
+          'buttonConnection__x',
+          'buttonConnection__xero',
+        ].sort(),
+      );
 
       for (const [k, v] of Object.entries(theme)) {
         expect(v.descriptor).toEqual(`cl-${k}`);
