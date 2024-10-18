@@ -10,43 +10,6 @@ interface PromiseWithResolvers<T> {
   reject: (reason?: any) => void;
 }
 
-// type AssuranceHint = {
-//   // clerk_error: {
-//   //   type: 'forbidden';
-//   //   reason: 'assurance';
-//   // };
-//   clerk_error: {
-//     type: 'forbidden';
-//     reason: 'assurance';
-//     metadata: {
-//       level: __experimental_SessionVerificationLevel;
-//       maxAge: __experimental_SessionVerificationMaxAgeMinutes;
-//     };
-//   };
-// };
-
-// function generateAssuranceHint<Metadata extends Record<string, string>>(metadata?: Metadata): AssuranceHint;
-// function generateAssuranceHint<Metadata extends Record<string, string>>(metadata: Metadata, as: 'response'): Response;
-// function generateAssuranceHint<Metadata extends Record<string, string>>(
-//   metadata?: Metadata,
-//   as?: 'response',
-// ): AssuranceHint | Response {
-//   //@ts-ignore
-//   const obj = {
-//     clerk_error: {
-//       type: 'forbidden',
-//       reason: 'assurance',
-//       metadata,
-//     },
-//   } as AssuranceHint;
-//
-//   if (as === 'response') {
-//     return new Response(JSON.stringify(obj), { status: 403 });
-//   }
-//
-//   return obj;
-// }
-
 async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<typeof reverificationMismatch>> {
   return result
     .then(r => {
@@ -88,15 +51,7 @@ function customPromiseWithResolves() {
 }
 
 // Utility type to exclude anything that contains "clerk_error"
-
-type RemovePropertyIfExists<T, K extends keyof any> = K extends keyof T ? Omit<T, K> : T;
-// type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
-type ExcludeClerkError<T> = Prettify<RemovePropertyIfExists<T, 'clerk_error'>>;
-
-// Applying the utility to type B
-// type WithoutClerkError<T> = ExcludeClerkError<T>;
-
-// type WithoutAssuranceHint<T> = Exclude<T, AssuranceHint>;
+type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 
 const isReverificationHint = (result: any): result is ReturnType<typeof reverificationMismatch> => {
   return (
@@ -111,18 +66,8 @@ const isReverificationHint = (result: any): result is ReturnType<typeof reverifi
 type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
 type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
-// <H extends (...args: InferParameters<H>) => InferReturnType<H>>(handler: H) =>
-//   (...args: InferParameters<H>): InferReturnType<H> => {
-
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-  // eslint-disable-next-line @typescript-eslint/ban-types
-} & {};
-
-function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
-  // function assertAssurance<T, Args>(fetcher: (...args: Args[]) => Promise<T>): (...args: Args[]) => Promise<T> {
-  // function assertAssurance<H extends (...args: InferParameters<H>) => Promise<InferReturnType<H>>>(fetcher: H): H {
-  function assertAssurance<H extends (...args: InferParameters<H>) => InferReturnType<H>>(
+function createReverificationHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
+  function assertReverification<H extends (...args: InferParameters<H>) => InferReturnType<H>>(
     fetcher: H,
   ): (...args: InferParameters<H>) => Promise<ExcludeClerkError<Awaited<InferReturnType<H>>>> {
     // @ts-ignore
@@ -179,16 +124,16 @@ function createAssuranceHandler(params: { onOpenModal: Clerk['__experimental_ope
     return f;
   }
 
-  return assertAssurance;
+  return assertReverification;
 }
 
 const __experimental_useReverification = (): {
-  handleReverification: ReturnType<typeof createAssuranceHandler>;
+  handleReverification: ReturnType<typeof createReverificationHandler>;
 } => {
   const { __experimental_openUserVerification } = useClerk();
   const handleReverification = useMemo(
     () =>
-      createAssuranceHandler({
+      createReverificationHandler({
         onOpenModal: __experimental_openUserVerification,
       }),
     [__experimental_openUserVerification],
