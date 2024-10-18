@@ -1,8 +1,15 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
+import type {
+  Appearance as CurrentAppearance,
+  Layout as CurrentLayout,
+  OAuthProvider,
+  Web3Provider,
+} from '@clerk/types';
 import React from 'react';
 
 import { fullTheme } from '~/themes';
+
+type Provider = OAuthProvider | Web3Provider;
 
 type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
 type ButtonDescriptorIdentifier =
@@ -13,6 +20,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonPrimaryDefault'
   | 'buttonSecondaryDefault'
   | 'buttonConnectionDefault'
+  | `buttonConnection__${Provider}`
   | 'buttonDisabled'
   | 'buttonBusy'
   | 'buttonText'
@@ -21,6 +29,7 @@ type ButtonDescriptorIdentifier =
   | 'buttonIconStart'
   | 'buttonIconEnd'
   | 'buttonSpinner';
+type ConnectionDescriptorIdentifier = 'connectionList' | 'connectionListItem';
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
 type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
@@ -31,6 +40,7 @@ type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
 export type DescriptorIdentifier =
   | AlertDescriptorIdentifier
   | ButtonDescriptorIdentifier
+  | ConnectionDescriptorIdentifier
   | SeparatorDescriptorIdentifier
   | SpinnerDescriptorIdentifier
   | CardDescriptorIdentifier;
@@ -173,7 +183,7 @@ function mergeElementsAppearanceConfig(
   }
 
   if (!result) {
-    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${JSON.stringify(a)} and ${JSON.stringify(b)}`);
   }
 
   return result;
