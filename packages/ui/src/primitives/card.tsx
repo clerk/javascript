@@ -28,7 +28,6 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
     return (
       <Element
         ref={forwardedRef}
-        data-card-root=''
         {...props}
         className={cx(
           '[--card-banner-height:theme(size.4)]',
@@ -47,7 +46,6 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
       >
         {banner && (
           <div
-            data-card-root-banner=''
             className={cx(
               'pointer-events-none absolute inset-x-0 -top-[calc(var(--card-banner-height)/2)] isolate z-[500] flex justify-center',
               className,
@@ -64,14 +62,7 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
             </p>
           </div>
         )}
-        {children && (
-          <div
-            data-card-root-inner=''
-            className={cx('overflow-hidden rounded-[inherit]', className)}
-          >
-            {children}
-          </div>
-        )}
+        {children && <div className={cx('overflow-hidden rounded-[inherit]', className)}>{children}</div>}
       </Element>
     );
   },
@@ -104,7 +95,6 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
   return (
     <div
       ref={forwardedRef}
-      data-card-content=''
       {...props}
       {...mergeDescriptors(elements.cardContent)}
     >
@@ -135,7 +125,6 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   return (
     <div
       ref={forwardedRef}
-      data-card-header=''
       {...props}
       {...mergeDescriptors(elements.cardHeader)}
     >
@@ -184,7 +173,6 @@ export const Logo = React.forwardRef(function CardLogo(
   const img = (
     <Image
       ref={forwardedRef}
-      data-card-logo=''
       src={src}
       size={200}
       {...props}
@@ -229,7 +217,6 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   return (
     <h2
       ref={forwardedRef}
-      data-card-title=''
       {...props}
       {...mergeDescriptors(elements.cardTitle)}
       className={cx('leading-medium text-gray-12 text-lg font-bold', className)}
@@ -291,7 +278,6 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   return (
     <div
       ref={forwardedRef}
-      data-card-body=''
       {...props}
       {...mergeDescriptors(elements.cardBody)}
     >
@@ -329,7 +315,6 @@ export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
   return (
     <div
       ref={forwardedRef}
-      data-card-actions=''
       {...props}
       {...mergeDescriptors(elements.cardActions)}
     >
@@ -362,10 +347,7 @@ export const Banner = React.forwardRef(function CardBanner(
 ) {
   const { elements } = useAppearance().parsedAppearance;
   return (
-    <div
-      data-card-banner=''
-      {...mergeDescriptors(elements.cardBanner)}
-    >
+    <div {...mergeDescriptors(elements.cardBanner)}>
       <p
         ref={forwardedRef}
         {...props}
@@ -402,7 +384,6 @@ export const Footer = React.forwardRef(function CardFooter(
   return renderFooter ? (
     <div
       ref={forwardedRef}
-      data-card-footer=''
       {...props}
       className={cx('grid', className)}
     >
@@ -449,7 +430,6 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
     return (
       <div
         ref={forwardedRef}
-        data-card-footer-action=''
         {...props}
         className={cx('border-gray-a3 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
       >
@@ -464,7 +444,6 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
     return (
       <p
         ref={forwardedRef}
-        data-card-footer-action-text=''
         {...props}
         className={cx('text-gray-a11 text-center text-base', className)}
       >
@@ -483,7 +462,6 @@ export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.Butt
     return (
       <button
         ref={forwardedRef}
-        data-card-footer-action-button=''
         // eslint-disable-next-line react/button-has-type
         type={type}
         className={footerActionButton({ className })}
@@ -500,7 +478,6 @@ export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.Anchor
     return (
       <a
         ref={forwardedRef}
-        data-card-footer-action-link=''
         {...props}
         className={footerActionButton({ className })}
       >
