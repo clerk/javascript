@@ -62,41 +62,7 @@ if (import.meta.vitest) {
   describe('buildTheme', () => {
     it('returns a theme containing all descriptors', () => {
       const theme = buildTheme({});
-      expect(Object.keys(theme).sort()).toStrictEqual(
-        [
-          ...DESCRIPTORS,
-          'buttonConnection__apple',
-          'buttonConnection__atlassian',
-          'buttonConnection__bitbucket',
-          'buttonConnection__box',
-          'buttonConnection__coinbase_wallet',
-          'buttonConnection__coinbase',
-          'buttonConnection__discord',
-          'buttonConnection__dropbox',
-          'buttonConnection__enstall',
-          'buttonConnection__facebook',
-          'buttonConnection__github',
-          'buttonConnection__gitlab',
-          'buttonConnection__google',
-          'buttonConnection__hubspot',
-          'buttonConnection__huggingface',
-          'buttonConnection__instagram',
-          'buttonConnection__line',
-          'buttonConnection__linear',
-          'buttonConnection__linkedin_oidc',
-          'buttonConnection__linkedin',
-          'buttonConnection__metamask',
-          'buttonConnection__microsoft',
-          'buttonConnection__notion',
-          'buttonConnection__slack',
-          'buttonConnection__spotify',
-          'buttonConnection__tiktok',
-          'buttonConnection__twitch',
-          'buttonConnection__twitter',
-          'buttonConnection__x',
-          'buttonConnection__xero',
-        ].sort(),
-      );
+      expect(Object.keys(theme).sort()).toStrictEqual([...DESCRIPTORS].sort());
 
       for (const [k, v] of Object.entries(theme)) {
         expect(v.descriptor).toEqual(`cl-${k}`);
