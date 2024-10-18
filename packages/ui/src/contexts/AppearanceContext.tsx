@@ -23,7 +23,18 @@ type ButtonDescriptorIdentifier =
   | 'buttonSpinner';
 type SeparatorDescriptorIdentifier = 'separator';
 type SpinnerDescriptorIdentifier = 'spinner';
-type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
+type CardDescriptorIdentifier =
+  | 'cardHeader'
+  | 'cardContent'
+  | 'cardTitle'
+  | 'cardDescription'
+  | 'cardBody'
+  | 'cardActions'
+  | 'cardBanner'
+  | 'cardBannerText'
+  | 'cardLogoBox'
+  | 'cardLogoLink'
+  | 'cardLogoImage';
 
 /**
  * Union of all valid descriptors used throughout the components.

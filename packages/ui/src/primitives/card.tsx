@@ -8,6 +8,11 @@ import type { PolymorphicForwardRefExoticComponent, PolymorphicPropsWithoutRef }
 import { ClerkLogo } from './clerk-logo';
 import { Image } from './image';
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardRoot
+ */
 const RootDefaultElement = 'div';
 type RootOwnProps = {
   children?: React.ReactNode;
@@ -72,58 +77,95 @@ export const Root: PolymorphicForwardRefExoticComponent<RootOwnProps, typeof Roo
   },
 );
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardContent
+ */
+const cardContentLayoutStyle = {
+  cardContent: {
+    className: 'relative flex flex-col gap-8 px-[--card-body-px] py-[--card-body-py]',
+  },
+} satisfies ParsedElementsFragment;
+const cardContentVisualStyle = {
+  cardContent: {
+    className: [
+      'bg-gray-surface  rounded-b-[--card-content-rounded-b] rounded-t-none',
+      'ring-gray-a3 shadow-[0px_0px_2px_0px_theme(colors.gray.a4),0px_1px_2px_0px_theme(colors.gray.a3)] ring-1',
+    ].join(' '),
+  },
+} satisfies ParsedElementsFragment;
+
 export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardContent(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       ref={forwardedRef}
       data-card-content=''
       {...props}
-      className={cx(
-        'bg-gray-surface relative flex flex-col gap-8 rounded-b-[--card-content-rounded-b] rounded-t-none px-[--card-body-px] py-[--card-body-py]',
-        'ring-gray-a3 shadow-[0px_0px_2px_0px_theme(colors.gray.a4),0px_1px_2px_0px_theme(colors.gray.a3)] ring-1',
-        className,
-      )}
+      {...mergeDescriptors(elements.cardContent)}
     >
       {children}
     </div>
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardHeader
+ */
+const cardHeaderLayoutStyle = {
+  cardHeader: {
+    className: 'z-1 flex flex-col items-center gap-1 text-center',
+  },
+} satisfies ParsedElementsFragment;
+const cardHeaderVisualStyle = {
+  cardHeader: {},
+} satisfies ParsedElementsFragment;
 
 export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardHeader(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       ref={forwardedRef}
       data-card-header=''
       {...props}
-      className={cx('z-1 flex flex-col items-center gap-1 text-center', className)}
+      {...mergeDescriptors(elements.cardHeader)}
     >
       {children}
     </div>
   );
 });
 
-const logoLayoutStyle = {
-  logoBox: {
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardLogo
+ */
+const cardLogoLayoutStyle = {
+  cardLogoBox: {
     className: 'z-1 mb-5 flex h-8 justify-center',
   },
-  logoLink: {
+  cardLogoLink: {
     className: '-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring',
   },
-  logoImage: {
+  cardLogoImage: {
     className: 'size-full object-contain',
   },
 } satisfies ParsedElementsFragment;
-const logoVisualStyle = {
-  logoBox: {},
-  logoLink: {},
-  logoImage: {},
+const cardLogoVisualStyle = {
+  cardLogoBox: {},
+  cardLogoLink: {},
+  cardLogoImage: {},
 } satisfies ParsedElementsFragment;
+
 export const Logo = React.forwardRef(function CardLogo(
   {
     href,
@@ -146,15 +188,15 @@ export const Logo = React.forwardRef(function CardLogo(
       src={src}
       size={200}
       {...props}
-      {...mergeDescriptors(elements.logoImage)}
+      {...mergeDescriptors(elements.cardLogoImage)}
     />
   );
   return (
-    <div {...mergeDescriptors(elements.logoBox)}>
+    <div {...mergeDescriptors(elements.cardLogoBox)}>
       {href ? (
         <a
           href={href}
-          {...mergeDescriptors(elements.logoLink)}
+          {...mergeDescriptors(elements.cardLogoLink)}
         >
           {img}
         </a>
@@ -165,15 +207,31 @@ export const Logo = React.forwardRef(function CardLogo(
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardTitle
+ */
+const cardTitleLayoutStyle = {
+  cardTitle: {},
+} satisfies ParsedElementsFragment;
+const cardTitleVisualStyle = {
+  cardTitle: {
+    className: 'leading-medium text-gray-12 text-lg font-bold',
+  },
+} satisfies ParsedElementsFragment;
+
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function CardTitle(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <h2
       ref={forwardedRef}
       data-card-title=''
       {...props}
+      {...mergeDescriptors(elements.cardTitle)}
       className={cx('leading-medium text-gray-12 text-lg font-bold', className)}
     >
       {children}
@@ -181,13 +239,28 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardDescription
+ */
+const cardDescriptionLayoutStyle = {
+  cardDescription: {},
+} satisfies ParsedElementsFragment;
+const cardDescriptionVisualStyle = {
+  cardDescription: {
+    className: 'text-gray-a11 text-base',
+  },
+} satisfies ParsedElementsFragment;
+
 export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   function CardDescription({ children, className, ...props }, forwardedRef) {
+    const { elements } = useAppearance().parsedAppearance;
     return (
       <p
         ref={forwardedRef}
         {...props}
-        className={cx('text-gray-a11 text-base', className)}
+        {...mergeDescriptors(elements.cardDescription)}
       >
         {children}
       </p>
@@ -195,58 +268,108 @@ export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttrib
   },
 );
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardBody
+ */
+const cardBodyLayoutStyle = {
+  cardBody: {
+    className: 'z-1 flex flex-col gap-6',
+  },
+} satisfies ParsedElementsFragment;
+const cardBodyVisualStyle = {
+  cardBody: {},
+} satisfies ParsedElementsFragment;
+
 export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardBody(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
+
   return (
     <div
       ref={forwardedRef}
       data-card-body=''
       {...props}
-      className={cx('z-1 flex flex-col gap-6', className)}
+      {...mergeDescriptors(elements.cardBody)}
     >
       {children}
     </div>
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardActions
+ */
+const cardActionsLayoutStyle = {
+  cardActions: {
+    className: [
+      'z-1 flex flex-col gap-3',
+      // Note:
+      // Prevents underline interractions triggering outside of the link text
+      // https://linear.app/clerk/issue/SDKI-192/#comment-ebf943b0
+      '[&_[data-link]]:self-center',
+    ].join(' '),
+  },
+} satisfies ParsedElementsFragment;
+const cardActionsVisualStyle = {
+  cardActions: {},
+} satisfies ParsedElementsFragment;
 
 export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardActions(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
+
   return (
     <div
       ref={forwardedRef}
       data-card-actions=''
       {...props}
-      className={cx(
-        'z-1 flex flex-col gap-3',
-        // Note:
-        // Prevents underline interractions triggering outside of the link text
-        // https://linear.app/clerk/issue/SDKI-192/#comment-ebf943b0
-        '[&_[data-link]]:self-center',
-        className,
-      )}
+      {...mergeDescriptors(elements.cardActions)}
     >
       {children}
     </div>
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * CardBanner
+ */
+const cardBannerLayoutStyle = {
+  cardBanner: {
+    className: 'pointer-events-none absolute -top-2 isolate z-[500]',
+  },
+  cardBannerText: {},
+} satisfies ParsedElementsFragment;
+const cardBannerVisualStyle = {
+  cardBanner: {},
+  cardBannerText: {
+    className: 'pointer-events-auto text-sm font-medium text-orange-500',
+  },
+} satisfies ParsedElementsFragment;
+
 export const Banner = React.forwardRef(function CardBanner(
   { children, className, ...props }: React.HTMLAttributes<HTMLParagraphElement>,
   forwardedRef: React.ForwardedRef<HTMLParagraphElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       data-card-banner=''
-      className={cx('pointer-events-none absolute -top-2 isolate z-[500]', className)}
+      {...mergeDescriptors(elements.cardBanner)}
     >
       <p
         ref={forwardedRef}
-        className={cx('pointer-events-auto text-sm font-medium text-orange-500', className)}
         {...props}
+        {...mergeDescriptors(elements.cardBannerText)}
       >
         {children}
       </p>
@@ -404,9 +527,23 @@ const FooterPageLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttri
 );
 
 export const layoutStyle = {
-  ...logoLayoutStyle,
+  ...cardHeaderLayoutStyle,
+  ...cardContentLayoutStyle,
+  ...cardTitleLayoutStyle,
+  ...cardDescriptionLayoutStyle,
+  ...cardBodyLayoutStyle,
+  ...cardActionsLayoutStyle,
+  ...cardBannerLayoutStyle,
+  ...cardLogoLayoutStyle,
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
-  ...logoVisualStyle,
+  ...cardHeaderVisualStyle,
+  ...cardContentVisualStyle,
+  ...cardTitleVisualStyle,
+  ...cardDescriptionVisualStyle,
+  ...cardBodyVisualStyle,
+  ...cardActionsVisualStyle,
+  ...cardBannerVisualStyle,
+  ...cardLogoVisualStyle,
 } satisfies ParsedElementsFragment;
