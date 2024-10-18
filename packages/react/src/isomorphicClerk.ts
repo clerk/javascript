@@ -103,7 +103,7 @@ type IsomorphicLoadedClerk = Without<
   | 'authenticateWithGoogleOneTap'
   | 'createOrganization'
   | 'getOrganization'
-  | 'joinWaitlist'
+  | '__experimental_joinWaitlist'
   | 'mountUserButton'
   | 'mountOrganizationList'
   | 'mountOrganizationSwitcher'
@@ -131,7 +131,7 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align return type (maybe not possible or correct)
   getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
   // TODO: Align return type
-  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource | void>;
+  __experimental_joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource | void>;
 
   // TODO: Align return type
   buildSignInUrl: (opts?: RedirectOptions) => string | void;
@@ -1140,12 +1140,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  joinWaitlist = async (params: JoinWaitlistParams): Promise<WaitlistResource | void> => {
-    const callback = () => this.clerkjs?.joinWaitlist(params);
+  __experimental_joinWaitlist = async (params: JoinWaitlistParams): Promise<WaitlistResource | void> => {
+    const callback = () => this.clerkjs?.__experimental_joinWaitlist(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<WaitlistResource>;
     } else {
-      this.premountMethodCalls.set('joinWaitlist', callback);
+      this.premountMethodCalls.set('__experimental_joinWaitlist', callback);
     }
   };
 

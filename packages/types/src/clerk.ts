@@ -575,7 +575,7 @@ export interface Clerk {
    */
   handleUnauthenticated: () => Promise<unknown>;
 
-  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+  __experimental_joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -869,7 +869,7 @@ export type SignInProps = RoutingOptions & {
    * Full URL or path to for the waitlist process.
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
-  waitlistUrl?: string;
+  __experimental_waitlistUrl?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -976,6 +976,11 @@ export type SignUpProps = RoutingOptions & {
    * Initial values that are used to prefill the sign up form.
    */
   initialValues?: SignUpInitialValues;
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  __experimental_waitlistUrl?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &

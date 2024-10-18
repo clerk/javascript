@@ -38,6 +38,7 @@ export interface DisplayConfigJSON {
   after_create_organization_url: string;
   google_one_tap_client_id?: string;
   show_devmode_warning: boolean;
+  waitlist_url: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -78,4 +79,5 @@ export interface DisplayConfigResource extends ClerkResource {
   afterCreateOrganizationUrl: string;
   googleOneTapClientId?: string;
   showDevModeWarning: boolean;
+  waitlistUrl: string;
 }

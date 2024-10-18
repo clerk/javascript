@@ -98,7 +98,7 @@ export const useSignUpContext = (): SignUpContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
-  let waitlistUrl = ctx.waitlistUrl || options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
+  let waitlistUrl = ctx.__experimental_waitlistUrl || options.experimental?.waitlistUrl || displayConfig.waitlistUrl;
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
@@ -174,7 +174,7 @@ export const useSignInContext = (): SignInContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
   let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
-  let waitlistUrl = ctx.waitlistUrl || options.experimental?.waitlistUrl || ''; // TODO - fallback from displayConfig
+  let waitlistUrl = ctx.__experimental_waitlistUrl || options.experimental?.waitlistUrl || displayConfig.waitlistUrl;
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });

@@ -1,4 +1,4 @@
-import { useWaitlist } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { JoinWaitlistParams } from '@clerk/types';
 
 import { useWizard, Wizard } from '../../common';
@@ -15,14 +15,13 @@ type WaitlistFormProps = {
 };
 
 export const WaitlistForm = (props: WaitlistFormProps) => {
+  const clerk = useClerk();
   const card = useCardState();
   const status = useLoadingStatus();
   const { navigate } = useRouter();
   const ctx = useWaitlistContext();
   const { formState } = props;
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-
-  const { joinWaitlist } = useWaitlist();
 
   const fields: Fields = {
     emailAddress: {
@@ -39,7 +38,8 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
 
     const joinWaitlistParams: JoinWaitlistParams = { emailAddress: formState.emailAddress.value };
 
-    await joinWaitlist(joinWaitlistParams)
+    await clerk
+      .__experimental_joinWaitlist(joinWaitlistParams)
       .then(() => {
         if (ctx.redirectUrl) {
           void navigate(ctx.redirectUrl);
