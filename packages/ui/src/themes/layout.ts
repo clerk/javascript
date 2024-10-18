@@ -1,15 +1,17 @@
-import { layoutStyle as alertLayoutStyle } from '~/primitives/alert';
-import { layoutStyle as buttonStyle } from '~/primitives/button';
-import { layoutStyle as cardLayoutStyle } from '~/primitives/card';
-import { layoutStyle as separatorStyle } from '~/primitives/separator';
-import { layoutStyle as layoutSpinnerStyle } from '~/primitives/spinner';
+import { layoutStyle as connections } from '~/common/connections';
+import { layoutStyle as alert } from '~/primitives/alert';
+import { layoutStyle as button } from '~/primitives/button';
+import { layoutStyle as card } from '~/primitives/card';
+import { layoutStyle as separator } from '~/primitives/separator';
+import { layoutStyle as spinner } from '~/primitives/spinner';
 
 import { buildTheme } from './buildTheme';
 
 export const layoutTheme = buildTheme({
-  ...alertLayoutStyle,
-  ...buttonStyle,
-  ...cardLayoutStyle,
-  ...separatorStyle,
-  ...layoutSpinnerStyle,
+  ...alert,
+  ...button,
+  ...card,
+  ...connections,
+  ...separator,
+  ...spinner,
 });
