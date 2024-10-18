@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { cloneElement, type ReactElement, useId } from 'react';
 
 import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -7,8 +7,9 @@ import { usePopover } from '../../hooks';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
-const _UserButton = withFloatingTree(() => {
+const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
   const { defaultOpen } = useUserButtonContext();
+
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
     placement: 'bottom-end',
@@ -18,10 +19,7 @@ const _UserButton = withFloatingTree(() => {
   const userButtonMenuId = useId();
 
   return (
-    <Flow.Root
-      flow='userButton'
-      sx={{ display: 'inline-flex' }}
-    >
+    <>
       <UserButtonTrigger
         ref={reference}
         onClick={toggle}
@@ -34,15 +32,34 @@ const _UserButton = withFloatingTree(() => {
         context={context}
         isOpen={isOpen}
       >
-        <UserButtonPopover
-          id={userButtonMenuId}
-          close={toggle}
-          ref={floating}
-          style={{ ...styles }}
-        />
+        {cloneElement(children, {
+          id: userButtonMenuId,
+          close: toggle,
+          ref: floating,
+          style: styles,
+        })}
       </Popover>
-    </Flow.Root>
+    </>
   );
 });
+
+const _UserButton = () => {
+  const { __experimental_asStandalone } = useUserButtonContext();
+
+  return (
+    <Flow.Root
+      flow='userButton'
+      sx={{ display: 'inline-flex' }}
+    >
+      {__experimental_asStandalone ? (
+        <UserButtonPopover />
+      ) : (
+        <UserButtonWithFloatingTree>
+          <UserButtonPopover />
+        </UserButtonWithFloatingTree>
+      )}
+    </Flow.Root>
+  );
+};
 
 export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));

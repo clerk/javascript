@@ -5,6 +5,8 @@ import { ClerkElementsRuntimeError } from '~/internals/errors';
 
 import type { SignUpContinueProps } from './continue';
 import { SignUpContinue } from './continue';
+import type { SignUpRestrictedProps } from './restricted';
+import { SignUpRestricted } from './restricted';
 import type { SignUpStartProps } from './start';
 import { SignUpStart } from './start';
 import type { SignUpVerificationsProps } from './verifications';
@@ -14,6 +16,7 @@ export const SIGN_UP_STEPS = {
   start: 'start',
   continue: 'continue',
   verifications: 'verifications',
+  restricted: 'restricted',
 } as const;
 
 export type TSignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
@@ -22,7 +25,8 @@ type StepWithProps<N extends TSignUpStep, T> = { name: N } & T;
 export type SignUpStepProps =
   | StepWithProps<'start', SignUpStartProps>
   | StepWithProps<'continue', SignUpContinueProps>
-  | StepWithProps<'verifications', SignUpVerificationsProps>;
+  | StepWithProps<'verifications', SignUpVerificationsProps>
+  | StepWithProps<'restricted', SignUpRestrictedProps>;
 
 /**
  * Render different steps of the sign-up flow. Initially the `'start'` step is rendered. Optionally, you can render additional fields in the `'continue'` step. Once a sign-up attempt has been created, `'verifications'` will be displayed.
@@ -50,7 +54,11 @@ export function SignUpStep(props: SignUpStepProps) {
       return <SignUpContinue {...props} />;
     case SIGN_UP_STEPS.verifications:
       return <SignUpVerifications {...props} />;
+    case SIGN_UP_STEPS.restricted:
+      return <SignUpRestricted {...props} />;
     default:
-      throw new ClerkElementsRuntimeError(`Invalid step name. Use 'start', 'continue', or 'verifications'.`);
+      throw new ClerkElementsRuntimeError(
+        `Invalid step name. Use 'start', 'continue', 'verifications', or 'restricted'.`,
+      );
   }
 }

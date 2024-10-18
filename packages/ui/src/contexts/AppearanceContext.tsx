@@ -143,7 +143,7 @@ function mergeElementsAppearanceConfig(
   }
 
   if (!result) {
-    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${JSON.stringify(a)} and ${JSON.stringify(b)}`);
   }
 
   return result;
@@ -172,7 +172,8 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     Object.entries(b.elements).forEach(([element, config]) => {
       const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
-        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config!);
       } else {
         result.elements![el] = config;
       }
@@ -203,7 +204,8 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
         } else {
-          const { className, ...style } = config;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          const { className, ...style } = config!;
           if (className) {
             result.elements[el].className = [result.elements[el].className, className].join(' ');
           }

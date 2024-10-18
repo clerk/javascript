@@ -8,7 +8,6 @@ import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Actions,
-  ExtraSmallAction,
   OrganizationPreview,
   PersonalWorkspacePreview,
   PopoverCard,
@@ -21,12 +20,16 @@ import { useRouter } from '../../router';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
-type OrganizationSwitcherPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
+type OrganizationSwitcherPopoverProps = {
+  close?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+} & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
   (props, ref) => {
-    const { close, ...rest } = props;
+    const { close: unsafeClose, ...rest } = props;
+    const close = () => unsafeClose?.(false);
     const card = useCardState();
+    const { __experimental_asStandalone } = useOrganizationSwitcherContext();
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
@@ -105,20 +108,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       });
     };
 
-    const manageOrganizationSmallIconButton = (
-      <ExtraSmallAction
-        elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
-        elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
-        iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
-        iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
-        iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
-        iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
-        icon={CogFilled}
-        onClick={() => handleItemClick()}
-        trailing={<NotificationCountBadgeManageButton />}
-      />
-    );
-
     const manageOrganizationButton = (
       <SmallAction
         elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
@@ -195,7 +184,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               padding: `${t.space.$4} ${t.space.$5}`,
             })}
           />
-          <Actions role='menu'>{manageOrganizationSmallIconButton}</Actions>
+          <Actions role='menu'>{manageOrganizationButton}</Actions>
         </Flex>
       );
 
@@ -206,6 +195,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           ref={ref}
           role='dialog'
           aria-label={`${currentOrg?.name} is active`}
+          shouldEntryAnimate={!__experimental_asStandalone}
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
