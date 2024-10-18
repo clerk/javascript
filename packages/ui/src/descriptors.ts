@@ -1,4 +1,4 @@
-import type { OAuthProvider, Web3Provider } from '@clerk/types';
+import { OAUTH_PROVIDERS, type OAuthProvider, WEB3_PROVIDERS, type Web3Provider } from '@clerk/types';
 
 export const DESCRIPTORS = [
   // Alert
@@ -23,6 +23,7 @@ export const DESCRIPTORS = [
   'buttonIconStart',
   'buttonIconEnd',
   'buttonSpinner',
+  ...[...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(({ provider }) => `buttonConnection__${provider}`),
 
   // Connection
   'connectionList',
