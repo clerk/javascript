@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.8.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`93dfe7a09`](https://github.com/clerk/javascript/commit/93dfe7a09648f414ee3f50bc8fb3f342d24020cd), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/backend@1.15.0
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+  - @clerk/clerk-react@5.12.1
+
 ## 5.7.5
 
 ### Patch Changes
