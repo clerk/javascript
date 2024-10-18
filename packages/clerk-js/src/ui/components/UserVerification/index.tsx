@@ -1,13 +1,20 @@
 import type { __experimental_UserVerificationModalProps, __experimental_UserVerificationProps } from '@clerk/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { ComponentContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
+import { useUserVerificationSession } from './useUserVerificationSession';
 
 function UserVerificationRoutes(): JSX.Element {
+  const { invalidate } = useUserVerificationSession();
+  useEffect(() => {
+    return () => {
+      invalidate();
+    };
+  }, []);
   return (
     <Flow.Root flow='userVerification'>
       <Switch>
