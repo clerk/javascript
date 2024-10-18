@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "clerk-expo-passkeys",
+    "slug": "clerk-expo-passkeys",
+    "version": "0.1.0",
+    "description": "Passkeys for expo built by clerk team",
+    "sdkVersion": "51.0.0",
+    "platforms": ["ios", "android"]
+  }
+}

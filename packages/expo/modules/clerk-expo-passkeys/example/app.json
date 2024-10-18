@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "clerk-expo-passkeys-example",
+    "slug": "clerk-expo-passkeys-example",
+    "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.0"
+          }
+        }
+      ]
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.clerk.passkeys",
+      "associatedDomains": [
+        "applinks:pro-coyote-6.clerk.accounts.dev",
+        "webcredentials:pro-coyote-6.clerk.accounts.dev"
+      ]
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "compileSdkVersion": 35
+      },
+      "package": "com.alexis_ni.PasskeysTest",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "pro-coyote-6.clerk.accounts.dev"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
