@@ -11,7 +11,5 @@ export async function currentUser(): Promise<User | null> {
     return null;
   }
 
-  const resolvedClerkClient = await clerkClient();
-
-  return resolvedClerkClient.users.getUser(userId);
+  return (await clerkClient()).users.getUser(userId);
 }

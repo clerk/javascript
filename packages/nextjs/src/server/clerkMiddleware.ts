@@ -30,11 +30,13 @@ const CONTROL_FLOW_ERROR = {
 };
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
-  protect: AuthProtect;
   redirectToSignIn: RedirectFun<Response>;
 };
 
-export type ClerkMiddlewareAuth = () => ClerkMiddlewareAuthObject;
+export interface ClerkMiddlewareAuth {
+  (): ClerkMiddlewareAuthObject;
+  protect: AuthProtect;
+}
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
@@ -145,14 +147,17 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
+      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authHandler = () => authObjWithMethods;
+      authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
       try {
         const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
           clerkMiddlewareRequestDataStore,
-          async () => handler?.(() => authObjWithMethods, request, event),
+          async () => handler?.(authHandler, request, event),
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
@@ -233,8 +238,8 @@ const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
-): ClerkMiddlewareAuthObject['protect'] => {
-  return ((params, options) => {
+) => {
+  return (async (params: any, options: any) => {
     const notFound = () => {
       throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
     };
@@ -245,9 +250,8 @@ const createMiddlewareProtect = (
       throw err;
     };
 
-    // @ts-expect-error TS is not happy even though the types are correct
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
-  }) as AuthProtect;
+  }) as unknown as Promise<AuthProtect>;
 };
 
 // Handle errors thrown by protect() and redirectToSignIn() calls,

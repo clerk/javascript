@@ -324,7 +324,7 @@ describe('clerkMiddleware(params)', () => {
     });
   });
 
-  describe('auth().protect()', () => {
+  describe('auth.protect()', () => {
     it('redirects to sign-in url when protect is called, the user is signed out and the request is a page request', async () => {
       const req = mockRequest({
         url: '/protected',
@@ -339,8 +339,9 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect();
+      // @ts-expect-error - FIXME
+      const resp = await clerkMiddleware(async auth => {
+        return auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -362,8 +363,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: 'user-id' }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect();
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
@@ -385,8 +386,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect();
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
@@ -408,8 +409,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: 'user-id', has: () => false }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect({ role: 'random-role' });
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ role: 'random-role' });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
@@ -431,8 +432,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect({ unauthenticatedUrl: 'https://www.clerk.com/hello' });
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ unauthenticatedUrl: 'https://www.clerk.com/hello' });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -455,8 +456,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: 'user-id', has: () => false }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect(
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect(
           { role: 'random-role' },
           {
             unauthorizedUrl: 'https://www.clerk.com/discover',
@@ -487,8 +488,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect();
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -513,8 +514,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect();
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -538,8 +539,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect({
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({
           unauthenticatedUrl: 'https://www.clerk.com/unauthenticatedUrl',
           unauthorizedUrl: 'https://www.clerk.com/unauthorizedUrl',
         });
@@ -565,8 +566,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: 'userId', has: () => false }),
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().protect(
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect(
           { permission: 'random-permission' },
           {
             unauthenticatedUrl: 'https://www.clerk.com/unauthenticatedUrl',
@@ -624,8 +625,8 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
       toAuth: () => ({ userId: null }),
     });
 
-    const resp = await clerkMiddleware(auth => {
-      auth().protect();
+    const resp = await clerkMiddleware(async auth => {
+      await auth.protect();
     })(req, {} as NextFetchEvent);
 
     expect(resp?.status).toEqual(307);
@@ -650,7 +651,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     });
 
     const resp = await clerkMiddleware(async auth => {
-      auth().protect();
+      await auth.protect();
     })(req, {} as NextFetchEvent);
 
     expect(resp?.status).toEqual(307);

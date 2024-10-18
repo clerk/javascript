@@ -13,7 +13,7 @@ export async function ClerkProvider(
 ) {
   const { children, ...rest } = props;
   const state = (await initialState())?.__clerk_ssr_state as InitialState;
-  const cspHeader = await headers().get('Content-Security-Policy');
+  const cspHeader = (await headers()).get('Content-Security-Policy');
 
   return (
     <ClientClerkProvider
