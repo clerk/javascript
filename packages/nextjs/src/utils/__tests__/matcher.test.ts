@@ -9,7 +9,7 @@ const createMatcher = (config: { matcher: string[] }) => (path: string) => {
 describe('nextjs matcher', () => {
   /**
    * 🚨🚨🚨🚨
-   * This is the matcher we document for clerkMiddleware + authMiddleware.
+   * This is the matcher we document for clerkMiddleware.
    * Any change made to the matcher here needs to be reflected in the documentation, the dashboard
    * and vice versa.
    * 🚨🚨🚨🚨
