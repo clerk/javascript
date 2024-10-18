@@ -27,6 +27,45 @@ export function another() {
     `,
   },
   {
+    name: 'Arrow function await transform',
+    source: `
+'use server';
+
+import { patchCommunication, postSMSTemplate } from '@/app/api/instances';
+import { Instance } from '@/app/api/types/instances';
+import { Template } from '@/app/api/types/templates';
+import { auth } from '@clerk/nextjs/server';
+
+export const toggleSMSTemplate = async (
+  instanceId: string,
+  template: Template,
+) => {
+  const { getToken } = auth();
+
+  return await postSMSTemplate(instanceId, template, {
+    token: await getToken(),
+  });
+};`,
+    output: `
+'use server';
+
+import { patchCommunication, postSMSTemplate } from '@/app/api/instances';
+import { Instance } from '@/app/api/types/instances';
+import { Template } from '@/app/api/types/templates';
+import { auth } from '@clerk/nextjs/server';
+
+export const toggleSMSTemplate = async (
+  instanceId: string,
+  template: Template,
+) => {
+  const { getToken } = await auth();
+
+  return await postSMSTemplate(instanceId, template, {
+    token: await getToken(),
+  });
+};`,
+  },
+  {
     name: 'auth().protect -> await auth.protect()',
     source: `
 import { auth } from '@clerk/nextjs/server';
@@ -52,72 +91,72 @@ export async function GET() {
   {
     name: 'Basic clerkMiddleware()',
     source: `
-import {
-    clerkMiddleware,
-    createRouteMatcher
-} from "@clerk/nextjs/server"
+  import {
+      clerkMiddleware,
+      createRouteMatcher
+  } from "@clerk/nextjs/server"
 
-const isPublicRoute = createRouteMatcher(["/", "/contact"])
+  const isPublicRoute = createRouteMatcher(["/", "/contact"])
 
-export default clerkMiddleware((auth, req) => {
-    auth().protect(); // for any other route, require auth
-})
-    `,
+  export default clerkMiddleware((auth, req) => {
+      auth().protect(); // for any other route, require auth
+  })
+      `,
     output: `
-import {
-    clerkMiddleware,
-    createRouteMatcher
-} from "@clerk/nextjs/server"
+  import {
+      clerkMiddleware,
+      createRouteMatcher
+  } from "@clerk/nextjs/server"
 
-const isPublicRoute = createRouteMatcher(["/", "/contact"])
+  const isPublicRoute = createRouteMatcher(["/", "/contact"])
 
-export default clerkMiddleware(async (auth, req) => {
-    await auth.protect(); // for any other route, require auth
-})
-    `,
+  export default clerkMiddleware(async (auth, req) => {
+      await auth.protect(); // for any other route, require auth
+  })
+      `,
   },
   {
     name: 'Complex clerkMiddleware()',
     source: `
-import {
-    clerkMiddleware,
-    createRouteMatcher
-} from "@clerk/nextjs/server"
-import createMiddleware from "next-intl/middleware"
+  import {
+      clerkMiddleware,
+      createRouteMatcher
+  } from "@clerk/nextjs/server"
+  import createMiddleware from "next-intl/middleware"
 
-const intlMiddleware = createMiddleware({
-    locales: ["en", "de"],
-    defaultLocale: "en",
-})
+  const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+  })
 
-const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+  const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
 
-export default clerkMiddleware((auth, request) => {
-    if (isDashboardRoute(request)) auth().protect()
+  export default clerkMiddleware((auth, request) => {
+      if (isDashboardRoute(request)) auth().protect()
 
-    return intlMiddleware(request)
-})
-    `,
+      return intlMiddleware(request)
+  })
+      `,
     output: `
-import {
-    clerkMiddleware,
-    createRouteMatcher
-} from "@clerk/nextjs/server"
-import createMiddleware from "next-intl/middleware"
+  import {
+      clerkMiddleware,
+      createRouteMatcher
+  } from "@clerk/nextjs/server"
+  import createMiddleware from "next-intl/middleware"
 
-const intlMiddleware = createMiddleware({
-    locales: ["en", "de"],
-    defaultLocale: "en",
-})
+  const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+  })
 
-const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+  const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
 
-export default clerkMiddleware(async (auth, request) => {
-    if (isDashboardRoute(request)) await auth.protect()
+  export default clerkMiddleware(async (auth, request) => {
+      if (isDashboardRoute(request)) await auth.protect()
 
-    return intlMiddleware(request)
-})
-`,
+      return intlMiddleware(request)
+  })
+  `,
   },
   {
     name: 'Complex clerkMiddleware() with protect being destructured from auth()',
@@ -139,7 +178,7 @@ export default clerkMiddleware(
   async (auth, req) => {
     const {
       sessionClaims
-    } = auth();
+    } = await auth();
 
     await auth.protect();
   },
@@ -149,13 +188,13 @@ export default clerkMiddleware(
   {
     name: 'Does not transform other imports',
     source: `
-import { auth } from '@some/other/module';
+  import { auth } from '@some/other/module';
 
-export function any() {
-    const { IBauthed } = auth();
-    return new Response(JSON.stringify({ IBauthed }));
-}
-    `,
+  export function any() {
+      const { IBauthed } = auth();
+      return new Response(JSON.stringify({ IBauthed }));
+  }
+      `,
     output: '',
   },
 ];

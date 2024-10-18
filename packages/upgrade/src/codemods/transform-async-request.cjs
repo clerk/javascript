@@ -11,8 +11,6 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
   const root = j(source);
   let dirtyFlag = false;
 
-  console.log('path', path);
-
   // Short-circuit if the import from '@clerk/nextjs/server' is not found
   if (
     root
@@ -24,8 +22,15 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
     return undefined;
   }
 
-  // Find all function expressions
-  root.find(j.FunctionDeclaration).forEach(func => {
+  // Helper function to make a function async
+  function makeFunctionAsync(func) {
+    if (!func.async) {
+      func.async = true;
+      dirtyFlag = true;
+    }
+  }
+
+  function transformFunctions(func) {
     let authCallFound = false;
     let authProtectFound = false;
 
@@ -63,7 +68,11 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
       func.node.async = true;
       dirtyFlag = true;
     }
-  });
+  }
+
+  // Find all function expressions
+  root.find(j.FunctionDeclaration).forEach(transformFunctions);
+  root.find(j.ArrowFunctionExpression).forEach(transformFunctions);
 
   // Find the default export which is a call to clerkMiddleware
   root.find(j.ExportDefaultDeclaration).forEach(path => {
@@ -76,32 +85,7 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
       const middlewareFunction = declaration.arguments[0];
       if (j.FunctionExpression.check(middlewareFunction) || j.ArrowFunctionExpression.check(middlewareFunction)) {
         // Add async keyword to the function
-        if (!middlewareFunction.async) {
-          middlewareFunction.async = true;
-          dirtyFlag = true;
-        }
-
-        // Find auth().protect()
-        j(middlewareFunction.body)
-          .find(j.CallExpression, {
-            callee: {
-              type: 'MemberExpression',
-              object: { type: 'CallExpression', callee: { type: 'Identifier', name: 'auth' } },
-              property: { type: 'Identifier', name: 'protect' },
-            },
-          })
-          .forEach(callPath => {
-            const memberExpr = callPath.node.callee;
-            if (j.MemberExpression.check(memberExpr) && j.CallExpression.check(memberExpr.object)) {
-              // Transform auth().protect() to await auth.protect()
-              callPath.replace(
-                j.awaitExpression(
-                  j.callExpression(j.memberExpression(j.identifier('auth'), j.identifier('protect')), []),
-                ),
-              );
-              dirtyFlag = true;
-            }
-          });
+        makeFunctionAsync(middlewareFunction);
 
         // Find the destructuring assignment and modify it
         j(middlewareFunction.body)
@@ -109,11 +93,10 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
           .forEach(varPath => {
             const id = varPath.node.id;
             const init = varPath.node.init;
+
             if (
-              j.ObjectPattern.check(id) &&
-              j.CallExpression.check(init) &&
-              j.Identifier.check(init.callee) &&
-              init.callee.name === 'auth'
+              (j.CallExpression.check(init) || j.AwaitExpression.check(init)) &&
+              (init.callee?.name === 'auth' || init.argument?.callee?.name === 'auth')
             ) {
               // Remove 'protect' from destructuring
               id.properties = id.properties.filter(prop => {
@@ -143,7 +126,13 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
     }
   });
 
-  return dirtyFlag ? root.toSource() : undefined;
+  if (dirtyFlag) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`changed: ${path}`);
+    }
+    return root.toSource();
+  }
+  return undefined;
 };
 
 module.exports.parser = 'tsx';
