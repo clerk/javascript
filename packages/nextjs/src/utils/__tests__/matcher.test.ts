@@ -1,4 +1,5 @@
 import { pathToRegexp } from '@clerk/shared/pathToRegexp';
+import { describe, expect, it } from 'vitest';
 
 const createMatcher = (config: { matcher: string[] }) => (path: string) => {
   return config.matcher.some(matcher => {
