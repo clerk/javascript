@@ -1,23 +1,26 @@
 import { useSession } from '@clerk/shared/react';
+import { useMemo } from 'react';
 
 import { useUserVerification } from '../../contexts';
 import { LoadingCard } from '../../elements';
 import { useFetch } from '../../hooks';
 
+const useUserVerificationSessionKey = () => {
+  const { level } = useUserVerification();
+  return useMemo(
+    () => ({
+      level: level || 'secondFactor',
+    }),
+    [level],
+  );
+};
+
 const useUserVerificationSession = () => {
   const { session } = useSession();
-  const { level } = useUserVerification();
-  const data = useFetch(
-    session ? session.__experimental_startVerification : undefined,
-    {
-      level: level || 'secondFactor',
-      // TODO(STEP-UP): Figure out if this needs to be a prop
-      maxAgeMinutes: 10,
-    },
-    {
-      throttleTime: 300,
-    },
-  );
+  const key = useUserVerificationSessionKey();
+  const data = useFetch(session ? session.__experimental_startVerification : undefined, key, {
+    throttleTime: 300,
+  });
 
   return { ...data };
 };
@@ -39,4 +42,4 @@ function withUserVerificationSessionGuard<P>(Component: React.ComponentType<P>):
   return Hoc;
 }
 
-export { useUserVerificationSession, withUserVerificationSessionGuard };
+export { useUserVerificationSessionKey, useUserVerificationSession, withUserVerificationSessionGuard };
