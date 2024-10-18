@@ -13,7 +13,7 @@ const isCSPRoute = createRouteMatcher(['/csp']);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    auth().protect();
+    await auth.protect();
   }
 
   if (isCSPRoute(req)) {

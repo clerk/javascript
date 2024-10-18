@@ -21,7 +21,7 @@ test.describe('dynamic keys @nextjs', () => {
 
         export default clerkMiddleware(async (auth, request) => {
           if (isProtectedRoute(request)) {
-            auth().protect();
+            await auth.protect();
           }
 
           if (shouldFetchBapi(request)){
