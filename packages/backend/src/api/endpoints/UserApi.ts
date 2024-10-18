@@ -74,6 +74,8 @@ type CreateUserParams = {
   lastName?: string;
   skipPasswordChecks?: boolean;
   skipPasswordRequirement?: boolean;
+  skipLegalChecks?: boolean;
+  legalAcceptedAt?: Date;
   totpSecret?: string;
   backupCodes?: string[];
   createdAt?: Date;
@@ -95,6 +97,8 @@ type UpdateUserParams = {
   backupCodes?: string[];
   externalId?: string;
   createdAt?: Date;
+  skipLegalChecks?: boolean;
+  legalAcceptedAt?: Date;
   deleteSelfEnabled?: boolean;
   createOrganizationEnabled?: boolean;
   createOrganizationsLimit?: number;
