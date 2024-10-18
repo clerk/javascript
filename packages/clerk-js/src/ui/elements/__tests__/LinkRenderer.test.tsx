@@ -5,7 +5,7 @@ import React from 'react';
 import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { LinkRenderer } from '../LinkRenderer';
 
-const { createFixtures } = bindCreateFixtures('UserProfile');
+const { createFixtures } = bindCreateFixtures('SignUp');
 
 describe('LinkRenderer', () => {
   it('renders a simple link', async () => {
