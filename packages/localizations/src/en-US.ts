@@ -521,10 +521,10 @@ export const enUS: LocalizationResource = {
         title: 'Legal consent',
       },
       checkbox: {
-        label__prefixText: 'I agree to the',
-        label__privacyPolicyText: 'Privacy Policy',
-        label__termsOfServiceText: 'Terms of Service',
-        label__conjunctionText: 'and',
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
       },
     },
   },
