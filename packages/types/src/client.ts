@@ -14,7 +14,7 @@ export interface ClientResource extends ClerkResource {
   removeSessions: () => Promise<ClientResource>;
   clearCache: () => void;
   lastActiveSessionId: string | null;
-  cookieExpiration: Date | null;
+  cookieExpiresAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }

@@ -354,6 +354,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: null,
         beforeEmit: ignoreEventValue(cb),
+        redirectUrl,
       });
     }
 
@@ -364,6 +365,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: null,
         beforeEmit: ignoreEventValue(cb),
+        redirectUrl,
       });
     }
   };
@@ -837,9 +839,10 @@ export class Clerk implements ClerkInterface {
 
     if (redirectUrl) {
       if (
-        this.client.cookieExpiration &&
-        this.client.cookieExpiration.getTime() - Date.now() >= 7 * 24 * 60 * 60 * 1000 // 7 days
+        this.client.cookieExpiresAt &&
+        this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
       ) {
+        console.log('REDIRECTING TO: /v1/client/touch?redirect_url=' + redirectUrl);
         this.navigate(
           this.buildUrlWithAuth(
             this.#fapiClient
