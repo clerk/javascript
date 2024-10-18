@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Bug fix: Always receive an new session verification object when UV mounts.
+Bug fix: Always receive a new session verification object when UserVerification component mounts.
