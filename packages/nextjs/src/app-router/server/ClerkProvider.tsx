@@ -8,10 +8,12 @@ import { ClientClerkProvider } from '../client/ClerkProvider';
 import { initialState } from './auth';
 import { getScriptNonceFromHeader } from './utils';
 
-export function ClerkProvider(props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>) {
+export async function ClerkProvider(
+  props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
+) {
   const { children, ...rest } = props;
-  const state = initialState()?.__clerk_ssr_state as InitialState;
-  const cspHeader = headers().get('Content-Security-Policy');
+  const state = (await initialState())?.__clerk_ssr_state as InitialState;
+  const cspHeader = (await headers()).get('Content-Security-Policy');
 
   return (
     <ClientClerkProvider

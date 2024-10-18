@@ -15,17 +15,17 @@ type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: strin
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
-  (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): SignedInAuthObject;
+  (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 
   (
     params?: (has: CheckAuthorizationWithCustomPermissions) => boolean,
     options?: AuthProtectOptions,
-  ): SignedInAuthObject;
+  ): Promise<SignedInAuthObject>;
 
-  (options?: AuthProtectOptions): SignedInAuthObject;
+  (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 }
 
-export const createProtect = (opts: {
+export function createProtect(opts: {
   request: Request;
   authObject: AuthObject;
   /**
@@ -44,10 +44,10 @@ export const createProtect = (opts: {
    * use this callback to customise the behavior
    */
   redirectToSignIn: RedirectFun<unknown>;
-}): AuthProtect => {
+}): AuthProtect {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
-  return ((...args: any[]) => {
+  return (async (...args: any[]) => {
     const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
     const paramsOrFunction = optionValuesAsParam
       ? undefined
@@ -108,7 +108,7 @@ export const createProtect = (opts: {
 
     return handleUnauthorized();
   }) as AuthProtect;
-};
+}
 
 const isServerActionRequest = (req: Request) => {
   return (

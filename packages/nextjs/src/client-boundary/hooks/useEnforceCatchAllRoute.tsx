@@ -38,7 +38,7 @@ export const useEnforceCatchAllRoute = (
     // because these components are usually protected by the middleware
     // and if the check runs before the session is available, it will fail
     // even if the route is a catch-all route, as the check request will result
-    // in a 404 because of auth().protect();
+    // in a 404 because of auth.protect();
     if (requireSessionBeforeCheck && !session) {
       return;
     }
