@@ -629,8 +629,7 @@ ${error.getFullMessage()}`,
         return signedIn(authenticateContext, data.jwtPayload, undefined, data.sessionToken);
       }
 
-      // If there's any error, simply fallback to the handshake flow.
-      console.error('Clerk: unable to refresh token:', error?.message || error);
+      // If there's any error, simply fallback to the handshake flow including the reason as a query parameter.
       if (error?.cause?.reason) {
         refreshError = error.cause.reason;
       } else {
@@ -735,22 +734,6 @@ export function getOrganizationSyncTarget(
     return null;
   }
 
-  // Check for personal account activation
-  if (matchers.PersonalAccountMatcher) {
-    let personalResult: Match<Partial<Record<string, string | string[]>>>;
-    try {
-      personalResult = matchers.PersonalAccountMatcher(url.pathname);
-    } catch (e) {
-      // Intentionally not logging the path to avoid potentially leaking anything sensitive
-      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
-      return null;
-    }
-
-    if (personalResult) {
-      return { type: 'personalAccount' };
-    }
-  }
-
   // Check for organization activation
   if (matchers.OrganizationMatcher) {
     let orgResult: Match<Partial<Record<string, string | string[]>>>;
@@ -774,6 +757,22 @@ export function getOrganizationSyncTarget(
       console.warn(
         'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
       );
+    }
+  }
+
+  // Check for personal account activation
+  if (matchers.PersonalAccountMatcher) {
+    let personalResult: Match<Partial<Record<string, string | string[]>>>;
+    try {
+      personalResult = matchers.PersonalAccountMatcher(url.pathname);
+    } catch (e) {
+      // Intentionally not logging the path to avoid potentially leaking anything sensitive
+      console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
+      return null;
+    }
+
+    if (personalResult) {
+      return { type: 'personalAccount' };
     }
   }
   return null;
