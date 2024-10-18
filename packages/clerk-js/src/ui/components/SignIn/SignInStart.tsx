@@ -65,7 +65,7 @@ export function _SignInStart(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { navigateAfterSignIn, signUpUrl } = ctx;
+  const { afterSignInUrl, signUpUrl } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -186,7 +186,7 @@ export function _SignInStart(): JSX.Element {
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
-              beforeEmit: navigateAfterSignIn,
+              redirectUrl: afterSignInUrl,
             });
           default: {
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -289,7 +289,7 @@ export function _SignInStart(): JSX.Element {
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,
-            beforeEmit: navigateAfterSignIn,
+            redirectUrl: afterSignInUrl,
           });
         default: {
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -328,7 +328,7 @@ export function _SignInStart(): JSX.Element {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({ session: sid, beforeEmit: navigateAfterSignIn });
+      await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }

@@ -13,6 +13,7 @@ type UseMultisessionActionsParams = {
   navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;
   navigateAfterSwitchSession?: () => any;
+  afterSignInUrl?: string;
   userProfileUrl?: string;
   signInUrl?: string;
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
@@ -68,7 +69,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleSessionClicked = (session: ActiveSessionResource) => async () => {
     card.setLoading();
-    return setActive({ session, beforeEmit: opts.navigateAfterSwitchSession }).finally(() => {
+    return setActive({ session, redirectUrl: opts.afterSignInUrl }).finally(() => {
       card.setIdle();
       opts.actionCompleteCallback?.();
     });

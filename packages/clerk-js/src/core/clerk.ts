@@ -354,6 +354,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: null,
         beforeEmit: ignoreEventValue(cb),
+        redirectUrl,
       });
     }
 
@@ -364,6 +365,7 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: null,
         beforeEmit: ignoreEventValue(cb),
+        redirectUrl,
       });
     }
   };
@@ -746,7 +748,7 @@ export class Clerk implements ClerkInterface {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  public setActive = async ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
+  public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     if (!this.client) {
       throw new Error('setActive is being called before the client is loaded. Wait for init.');
     }
@@ -833,6 +835,29 @@ export class Clerk implements ClerkInterface {
       this.#setTransitiveState();
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
+    }
+
+    if (redirectUrl) {
+      if (
+        this.client.cookieExpiresAt &&
+        this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
+      ) {
+        const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+        this.navigate(
+          this.buildUrlWithAuth(
+            this.#fapiClient
+              .buildUrl({
+                method: 'GET',
+                path: '/client/touch',
+                pathPrefix: 'v1',
+                search: { redirect_url: absoluteRedirectUrl.toString() },
+              })
+              .toString(),
+          ),
+        );
+      } else {
+        this.navigate(redirectUrl);
+      }
     }
 
     //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
@@ -1105,13 +1130,12 @@ export class Clerk implements ClerkInterface {
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
-    const redirectComplete = params.redirectUrlComplete ? () => navigate(params.redirectUrlComplete as string) : noop;
     const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
 
     if (shouldCompleteOnThisDevice) {
       return this.setActive({
         session: newSessionId,
-        beforeEmit: redirectComplete,
+        redirectUrl: params.redirectUrlComplete,
       });
     } else if (shouldContinueOnThisDevice) {
       return redirectContinue();
@@ -1206,8 +1230,6 @@ export class Clerk implements ClerkInterface {
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
-    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl());
-    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl());
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
@@ -1240,7 +1262,7 @@ export class Clerk implements ClerkInterface {
     if (si.status === 'complete') {
       return this.setActive({
         session: si.sessionId,
-        beforeEmit: navigateAfterSignIn,
+        redirectUrl: redirectUrls.getAfterSignInUrl(),
       });
     }
 
@@ -1253,7 +1275,7 @@ export class Clerk implements ClerkInterface {
         case 'complete':
           return this.setActive({
             session: res.createdSessionId,
-            beforeEmit: navigateAfterSignIn,
+            redirectUrl: redirectUrls.getAfterSignInUrl(),
           });
         case 'needs_first_factor':
           return navigateToFactorOne();
@@ -1301,7 +1323,7 @@ export class Clerk implements ClerkInterface {
         case 'complete':
           return this.setActive({
             session: res.createdSessionId,
-            beforeEmit: navigateAfterSignUp,
+            redirectUrl: redirectUrls.getAfterSignUpUrl(),
           });
         case 'missing_requirements':
           return navigateToNextStepSignUp({ missingFields: res.missingFields });
@@ -1313,7 +1335,7 @@ export class Clerk implements ClerkInterface {
     if (su.status === 'complete') {
       return this.setActive({
         session: su.sessionId,
-        beforeEmit: navigateAfterSignUp,
+        redirectUrl: redirectUrls.getAfterSignUpUrl(),
       });
     }
 
@@ -1337,7 +1359,7 @@ export class Clerk implements ClerkInterface {
       if (sessionId) {
         return this.setActive({
           session: sessionId,
-          beforeEmit: navigateAfterSignIn,
+          redirectUrl: redirectUrls.getAfterSignInUrl(),
         });
       }
     }
@@ -1459,12 +1481,7 @@ export class Clerk implements ClerkInterface {
     if (signInOrSignUp.createdSessionId) {
       await this.setActive({
         session: signInOrSignUp.createdSessionId,
-        beforeEmit: () => {
-          if (redirectUrl) {
-            return navigate(redirectUrl);
-          }
-          return Promise.resolve();
-        },
+        redirectUrl,
       });
     }
   };
