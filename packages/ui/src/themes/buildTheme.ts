@@ -47,7 +47,8 @@ export function buildTheme(p: PartialTheme): ParsedElements {
     );
   }
 
-  return theme;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  return theme as ParsedElements;
 }
 
 /**
