@@ -1,4 +1,5 @@
 import { expectTypeOf } from 'expect-type';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { withLogger } from '../debugLogger';
 
@@ -7,9 +8,9 @@ describe('withLogger', () => {
 
   beforeEach(() => {
     logger = {
-      enable: jest.fn(),
-      log: jest.fn(),
-      commit: jest.fn(),
+      enable: vi.fn(),
+      log: vi.fn(),
+      commit: vi.fn(),
     };
   });
 
@@ -116,7 +117,7 @@ describe('withLogger', () => {
     // setup: mock vercel environment, mock console log so we can intercept its value
     process.env.VERCEL = 'true';
     const oldConsoleLog = console.log.bind(console);
-    const log = jest.fn();
+    const log = vi.fn();
     console.log = log;
 
     const veryLongString = new Array(6000).join('a');
