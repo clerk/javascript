@@ -1,5 +1,5 @@
 import { MultiSelect, Select, TextInput } from '@inkjs/ui';
-import { Newline, Text } from 'ink';
+import { Newline, Text, useApp } from 'ink';
 import React, { useState } from 'react';
 
 import { Header } from './components/Header.js';
@@ -26,6 +26,7 @@ import guessFrameworks from './util/guess-framework.js';
  */
 export default function App(props) {
   const { noWarnings = false, disableTelemetry = false } = props;
+  const { exit } = useApp();
 
   const [yolo, setYolo] = useState(props.yolo ?? false);
   const [sdks, setSdks] = useState(props.sdk ? [props.sdk] : []);
@@ -133,6 +134,8 @@ export default function App(props) {
               // if true, we were right so we set the sdk
               if (item === 'yes') {
                 setSdks(sdkGuesses.map(guess => guess.value));
+              } else {
+                setSdkGuesses([]);
               }
             }}
           />
@@ -256,12 +259,12 @@ export default function App(props) {
           <Text>Does this look right?</Text>
           <Select
             options={[
-              { label: 'yes', value: true },
-              { label: 'no - exit, and i will try again', value: false },
+              { label: 'yes', value: 'yes' },
+              { label: 'no - exit, and i will try again', value: 'no' },
             ]}
             onChange={value => {
-              if (!value) {
-                process.exit();
+              if (!value || value === 'no') {
+                exit();
               } else {
                 setConfigVerified(true);
               }

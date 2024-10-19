@@ -1,6 +1,6 @@
-import { Select } from '@inkjs/ui';
+import { Select, Spinner, StatusMessage } from '@inkjs/ui';
 import { execa } from 'execa';
-import { Newline, Text } from 'ink';
+import { Text } from 'ink';
 import React, { useEffect, useState } from 'react';
 
 import { getUpgradeCommand } from '../util/detect-package-manager.js';
@@ -8,6 +8,18 @@ import { getClerkSdkVersion } from '../util/get-clerk-version.js';
 import { Codemod } from './Codemod.js';
 import { Header } from './Header.js';
 
+/**
+ * SDKWorkflow component handles the upgrade process for a given SDK.
+ * It checks the current version of the SDK and provides the necessary steps
+ * to upgrade or run codemods based on the version.
+ *
+ * @component
+ * @param {Object} props
+ * @param {string} props.packageManager - The package manager to use for the upgrade, if needed.
+ * @param {string} props.sdk - The SDK to be upgraded.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
 export function SDKWorkflow(props) {
   const { packageManager, sdk } = props;
 
@@ -16,6 +28,7 @@ export function SDKWorkflow(props) {
 
   const version = getClerkSdkVersion(sdk);
 
+  // Right now, we only have one codemod for the async request transformation
   return (
     <>
       <Header />
@@ -68,9 +81,21 @@ export function SDKWorkflow(props) {
   );
 }
 
-function UpgradeCommand({ sdk, callback }) {
-  const [result, setResult] = useState();
+/**
+ * Component that runs an upgrade command for a given SDK and handles the result.
+ *
+ * @component
+ * @param {Object} props
+ * @param {Function} props.callback - The callback function to be called after the command execution.
+ * @param {string} props.sdk - The SDK for which the upgrade command is run.
+ * @returns {JSX.Element} The rendered component.
+ *
+ * @example
+ * <UpgradeCommand sdk="example-sdk" callback={handleUpgrade} />
+ */
+function UpgradeCommand({ callback, sdk }) {
   const [error, setError] = useState();
+  const [result, setResult] = useState();
 
   const command = getUpgradeCommand(sdk);
 
@@ -87,10 +112,13 @@ function UpgradeCommand({ sdk, callback }) {
 
   return (
     <>
-      <Text>Running upgrade command: {command}</Text>
-      {result && <Text color='green'>Upgrade complete!</Text>}
-      {error && <Text color='red'>Upgrade failed!</Text>}
-      <Newline />
+      {!result && !error && <Spinner label={`Running upgrade command: ${command}`} />}
+      {result && (
+        <StatusMessage variant='success'>
+          <Text bold>@clerk/{sdk}</Text> upgraded successfully to <Text bold>latest!</Text>
+        </StatusMessage>
+      )}
+      {error && <StatusMessage variant='error'>Upgrade failed!</StatusMessage>}
     </>
   );
 }
