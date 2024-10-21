@@ -28,6 +28,14 @@ export function SDKWorkflow(props) {
 
   const version = getClerkSdkVersion(sdk);
 
+  if (sdk !== 'nextjs') {
+    return (
+      <StatusMessage variant='error'>
+        The SDK upgrade functionality is only available for <Text bold>@clerk/nextjs</Text> at the moment.
+      </StatusMessage>
+    );
+  }
+
   // Right now, we only have one codemod for the async request transformation
   return (
     <>
