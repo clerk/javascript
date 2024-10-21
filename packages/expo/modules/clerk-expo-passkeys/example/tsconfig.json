@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "clerk-expo-passkeys": ["../src/index"],
+      "clerk-expo-passkeys/*": ["../src/*"]
+    }
+  }
+}
