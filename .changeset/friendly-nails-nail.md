@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Update pl-PL.ts translations
+pl-PL localization updates
