@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 
-export default function Page() {
-  const { userId, has } = auth();
+export default async function Page() {
+  const { userId, has } = await auth();
   if (!userId || !has({ permission: 'org:posts:manage' })) {
     return <p>User is missing permissions</p>;
   }
