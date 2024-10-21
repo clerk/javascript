@@ -843,6 +843,7 @@ export class Clerk implements ClerkInterface {
         this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
       ) {
         const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+
         this.navigate(
           this.buildUrlWithAuth(
             this.#fapiClient
