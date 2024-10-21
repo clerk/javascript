@@ -1,6 +1,6 @@
 PODS:
   - boost (1.83.0)
-  - ClerkExpoPasskeys (0.1.0):
+  - ClerkExpoPasskeys (1.0.0):
     - ExpoModulesCore
   - DoubleConversion (1.1.6)
   - EXApplication (5.9.1):
@@ -1433,7 +1433,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  ClerkExpoPasskeys: 26030cd6902c28d7c71b2e3515ab21ac59079e71
+  ClerkExpoPasskeys: 4f1e4554f13a35cc2bb13da115bd6af9c2c39d11
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXApplication: c08200c34daca7af7fd76ac4b9d606077410e8ad
   EXConstants: 409690fbfd5afea964e5e9d6c4eb2c2b59222c59

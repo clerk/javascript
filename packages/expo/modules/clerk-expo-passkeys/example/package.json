@@ -15,6 +15,7 @@
     "@clerk/clerk-react": "5.12.1-snapshot.vd00b3bb",
     "@clerk/shared": "2.9.3-snapshot.vd00b3bb",
     "@clerk/types": "4.27.0-snapshot.vd00b3bb",
+    "@expo/metro-runtime": "~3.2.3",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "expo": "~51.0.24",
     "expo-auth-session": "^5.5.2",
@@ -23,7 +24,7 @@
     "expo-web-browser": "^13.0.3",
     "react": "18.2.0",
     "react-native": "0.74.3",
-    "react-native-get-random-values": "^1.11.0"
+    "react-native-web": "~0.19.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

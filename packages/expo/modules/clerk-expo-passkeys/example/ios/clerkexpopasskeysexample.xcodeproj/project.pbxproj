@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0732E0F709A7450EFCC02DC0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 57D6E3E113D51FD20C9AE0A0 /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		3F5769D8FF2D5B769560B51F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C2E87A5127B72DE99F0685E5 /* PrivacyInfo.xcprivacy */; };
-		7DB38085759C40478516B68C /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5105AA15FA45C0A1B672D4 /* noop-file.swift */; };
+		64BB473E97B54B8FA747FE2E /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A4317E91CF48DEBFF6D26F /* noop-file.swift */; };
 		96905EF65AED1B983A6B3ABC /* libPods-clerkexpopasskeysexample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-clerkexpopasskeysexample.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
@@ -25,14 +25,14 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = clerkexpopasskeysexample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = clerkexpopasskeysexample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = clerkexpopasskeysexample/main.m; sourceTree = "<group>"; };
-		4D5105AA15FA45C0A1B672D4 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "clerkexpopasskeysexample/noop-file.swift"; sourceTree = "<group>"; };
+		57D6E3E113D51FD20C9AE0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = clerkexpopasskeysexample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-clerkexpopasskeysexample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-clerkexpopasskeysexample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		61627BCBB1C44F07B04279D5 /* clerkexpopasskeysexample-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "clerkexpopasskeysexample-Bridging-Header.h"; path = "clerkexpopasskeysexample/clerkexpopasskeysexample-Bridging-Header.h"; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-clerkexpopasskeysexample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-clerkexpopasskeysexample.debug.xcconfig"; path = "Target Support Files/Pods-clerkexpopasskeysexample/Pods-clerkexpopasskeysexample.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-clerkexpopasskeysexample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-clerkexpopasskeysexample.release.xcconfig"; path = "Target Support Files/Pods-clerkexpopasskeysexample/Pods-clerkexpopasskeysexample.release.xcconfig"; sourceTree = "<group>"; };
+		84E81275A5BB468D970E8C35 /* clerkexpopasskeysexample-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "clerkexpopasskeysexample-Bridging-Header.h"; path = "clerkexpopasskeysexample/clerkexpopasskeysexample-Bridging-Header.h"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = clerkexpopasskeysexample/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		C2E87A5127B72DE99F0685E5 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = clerkexpopasskeysexample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D6A4317E91CF48DEBFF6D26F /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "clerkexpopasskeysexample/noop-file.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-clerkexpopasskeysexample/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,9 +59,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				4D5105AA15FA45C0A1B672D4 /* noop-file.swift */,
-				61627BCBB1C44F07B04279D5 /* clerkexpopasskeysexample-Bridging-Header.h */,
-				C2E87A5127B72DE99F0685E5 /* PrivacyInfo.xcprivacy */,
+				D6A4317E91CF48DEBFF6D26F /* noop-file.swift */,
+				84E81275A5BB468D970E8C35 /* clerkexpopasskeysexample-Bridging-Header.h */,
+				57D6E3E113D51FD20C9AE0A0 /* PrivacyInfo.xcprivacy */,
 			);
 			name = clerkexpopasskeysexample;
 			sourceTree = "<group>";
@@ -147,13 +147,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "clerkexpopasskeysexample" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				33F2245E9D169B8348BC4D8B /* [Expo] Configure project */,
+				62895C0AFB1F979EF4F523CA /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				269CDCB282F7BC2415A846C6 /* [CP] Embed Pods Frameworks */,
+				3B806198EEACAFC873D40173 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -205,7 +205,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				3F5769D8FF2D5B769560B51F /* PrivacyInfo.xcprivacy in Resources */,
+				0732E0F709A7450EFCC02DC0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,7 +249,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		269CDCB282F7BC2415A846C6 /* [CP] Embed Pods Frameworks */ = {
+		3B806198EEACAFC873D40173 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -267,7 +267,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-clerkexpopasskeysexample/Pods-clerkexpopasskeysexample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		33F2245E9D169B8348BC4D8B /* [Expo] Configure project */ = {
+		62895C0AFB1F979EF4F523CA /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -324,7 +324,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				7DB38085759C40478516B68C /* noop-file.swift in Sources */,
+				64BB473E97B54B8FA747FE2E /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
