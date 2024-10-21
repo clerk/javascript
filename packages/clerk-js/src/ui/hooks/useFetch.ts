@@ -33,14 +33,16 @@ export const clearFetchCache = () => {
 
 const serialize = (key: unknown) => (typeof key === 'string' ? key : JSON.stringify(key));
 
-const useCache = <K = any, V = any>(
+export const useCache = <K = any, V = any>(
   key: K,
+  serializer = serialize,
 ): {
   getCache: () => State<V> | undefined;
   setCache: (state: State<V>) => void;
+  clearCache: () => void;
   subscribeCache: (callback: () => void) => () => void;
 } => {
-  const serializedKey = serialize(key);
+  const serializedKey = serializer(key);
   const get = useCallback(() => requestCache.get(serializedKey), [serializedKey]);
   const set = useCallback(
     (data: State) => {
@@ -49,6 +51,16 @@ const useCache = <K = any, V = any>(
     },
     [serializedKey],
   );
+
+  const clear = useCallback(() => {
+    set({
+      isLoading: false,
+      isValidating: false,
+      data: null,
+      error: null,
+      cachedAt: undefined,
+    });
+  }, [set]);
   const subscribe = useCallback((callback: () => void) => {
     subscribers.add(callback);
     return () => subscribers.delete(callback);
@@ -58,6 +70,7 @@ const useCache = <K = any, V = any>(
     getCache: get,
     setCache: set,
     subscribeCache: subscribe,
+    clearCache: clear,
   };
 };
 
@@ -76,9 +89,9 @@ export const useFetch = <K, T>(
     staleTime?: number;
   },
 ) => {
-  const { subscribeCache, getCache, setCache } = useCache<K, T>(params);
+  const { subscribeCache, getCache, setCache, clearCache } = useCache<K, T>(params);
 
-  const staleTime = options?.staleTime || 1000 * 60 * 2; //cache for 2 minutes by default
+  const staleTime = options?.staleTime ?? 1000 * 60 * 2; //cache for 2 minutes by default
   const throttleTime = options?.throttleTime || 0;
   const fetcherRef = useRef(fetcher);
 
@@ -91,7 +104,7 @@ export const useFetch = <K, T>(
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
     const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) >= staleTime;
-    const isRequestOnGoing = getCache()?.isValidating;
+    const isRequestOnGoing = getCache()?.isValidating ?? false;
 
     if (fetcherMissing || !isCacheStale || isRequestOnGoing) {
       return;
@@ -100,8 +113,8 @@ export const useFetch = <K, T>(
     const d = performance.now();
 
     setCache({
-      data: null,
-      isLoading: !getCache(),
+      data: getCache()?.data ?? null,
+      isLoading: !getCache()?.data,
       isValidating: true,
       error: null,
     });
@@ -126,7 +139,7 @@ export const useFetch = <K, T>(
       })
       .catch(() => {
         setCache({
-          data: null,
+          data: getCache()?.data ?? null,
           isLoading: false,
           isValidating: false,
           error: true,
@@ -138,5 +151,6 @@ export const useFetch = <K, T>(
   return {
     ...cached,
     setCache,
+    invalidate: clearCache,
   };
 };
