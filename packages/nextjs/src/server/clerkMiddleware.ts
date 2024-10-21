@@ -30,11 +30,13 @@ const CONTROL_FLOW_ERROR = {
 };
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
-  protect: AuthProtect;
   redirectToSignIn: RedirectFun<Response>;
 };
 
-export type ClerkMiddlewareAuth = () => ClerkMiddlewareAuthObject;
+export interface ClerkMiddlewareAuth {
+  (): ClerkMiddlewareAuthObject;
+  protect: AuthProtect;
+}
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
@@ -76,7 +78,8 @@ interface ClerkMiddleware {
 const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
 export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
 
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
+// @ts-expect-error TS is not happy here. Will dig into it
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
@@ -105,7 +108,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
 
-      clerkClient().telemetry.record(
+      const resolvedClerkClient = await clerkClient();
+
+      resolvedClerkClient.telemetry.record(
         eventMethodCalled('clerkMiddleware', {
           handler: Boolean(handler),
           satellite: Boolean(options.isSatellite),
@@ -120,7 +125,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
-      const requestState = await clerkClient().authenticateRequest(
+      const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
       );
@@ -142,14 +147,17 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
+      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authHandler = () => authObjWithMethods;
+      authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
       try {
         const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
           clerkMiddlewareRequestDataStore,
-          async () => handler?.(() => authObjWithMethods, request, event),
+          async () => handler?.(authHandler, request, event),
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
@@ -230,8 +238,8 @@ const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
-): ClerkMiddlewareAuthObject['protect'] => {
-  return ((params, options) => {
+) => {
+  return (async (params: any, options: any) => {
     const notFound = () => {
       throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
     };
@@ -242,9 +250,8 @@ const createMiddlewareProtect = (
       throw err;
     };
 
-    // @ts-expect-error TS is not happy even though the types are correct
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
-  }) as AuthProtect;
+  }) as unknown as Promise<AuthProtect>;
 };
 
 // Handle errors thrown by protect() and redirectToSignIn() calls,
