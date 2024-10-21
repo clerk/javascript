@@ -366,6 +366,56 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
+      expect(redirectUrl.pathname).toEqual('/v1/client/touch');
+      expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
+    });
+
+    it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+    });
+
+    it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is not set', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: null,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+    });
+
     mockNativeRuntime(() => {
       it('calls session.touch in a non-standard browser', async () => {
         mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
