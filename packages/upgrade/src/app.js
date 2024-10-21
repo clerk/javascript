@@ -68,7 +68,6 @@ export default function App(props) {
       return setDir(process.cwd());
     }
     const { guesses, _uuid } = guessFrameworks(dir, disableTelemetry);
-    // console.log({ guesses, _uuid });
     setUuid(_uuid);
     setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
@@ -260,7 +259,7 @@ export default function App(props) {
           <Select
             options={[
               { label: 'yes', value: 'yes' },
-              { label: 'no - exit, and i will try again', value: 'no' },
+              { label: 'no - exit, and I will try again', value: 'no' },
             ]}
             onChange={value => {
               if (!value || value === 'no') {
