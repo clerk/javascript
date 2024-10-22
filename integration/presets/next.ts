@@ -45,14 +45,14 @@ const isProtectedRoute = createRouteMatcher(['/protected(.*)', '/user(.*)', '/sw
 const isAdminRoute = createRouteMatcher(['/only-admin(.*)']);
 const isCSPRoute = createRouteMatcher(['/csp']);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    try { auth().protect() }
+    try { await auth.protect() }
     catch (e) { unstable_rethrow(e) }
   }
 
   if(isAdminRoute(req)){
-    try { auth().protect({role: 'admin'}); }
+    try { await auth.protect({role: 'admin'}); }
     catch (e) { unstable_rethrow(e) }
   }
 

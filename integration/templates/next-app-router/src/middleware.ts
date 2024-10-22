@@ -18,7 +18,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (isAdminRoute(req)) {
-    auth().protect({ role: 'admin' });
+    await auth.protect({ role: 'admin' });
   }
 
   if (isCSPRoute(req)) {
