@@ -128,7 +128,8 @@ export default function App(props) {
             </>
           ) : (
             <Text>
-              It looks like you are using the "{sdkGuesses[0].label}" Clerk SDK in your project. Is that right?
+              It looks like you are using the <Text bold>{sdkGuesses[0].label}</Text> Clerk SDK in your project. Is that
+              right?
             </Text>
           )}
 
