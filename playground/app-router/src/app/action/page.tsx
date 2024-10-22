@@ -3,7 +3,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 export default function AddToCart() {
   async function addItem(data: any) {
     'use server';
-    console.log(auth().userId);
+    console.log((await auth()).userId);
     console.log((await currentUser())?.firstName);
     console.log('add item server action', data);
   }

@@ -11,9 +11,9 @@ const csp = `default-src 'self';
 const isProtectedRoute = createRouteMatcher(['/protected(.*)', '/user(.*)', '/switcher(.*)']);
 const isCSPRoute = createRouteMatcher(['/csp']);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    auth().protect();
+    await auth.protect();
   }
 
   if (isCSPRoute(req)) {
