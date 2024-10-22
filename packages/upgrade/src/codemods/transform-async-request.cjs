@@ -126,13 +126,7 @@ module.exports = function transformAsyncRequest({ path, source }, { jscodeshift:
     }
   });
 
-  if (dirtyFlag) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log(`changed: ${path}`);
-    }
-    return root.toSource();
-  }
-  return undefined;
+  return dirtyFlag ? root.toSource() : undefined;
 };
 
 module.exports.parser = 'tsx';

@@ -8,7 +8,8 @@ import React, { useEffect, useState } from 'react';
 
 import ExpandableList from '../util/expandable-list.js';
 
-export function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry }) {
+export function Scan(props) {
+  const { fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry } = props;
   // NOTE: if the difference between fromVersion and toVersion is greater than 1
   // we need to do a little extra work here and import two matchers,
   // sequence them after each other, and clearly mark which version migration
@@ -29,7 +30,7 @@ export function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uu
   // { sdkName: [{ title: 'x', matcher: /x/, slug: 'x', ... }] }
   useEffect(() => {
     setStatus(`Loading data for ${toVersion} migration`);
-    import(`./versions/${toVersion}/index.js`).then(version => {
+    import(`../versions/${toVersion}/index.js`).then(version => {
       setMatchers(
         sdks.reduce((m, sdk) => {
           m[sdk] = version.default[sdk];
@@ -44,22 +45,26 @@ export function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uu
   // result = `files` set to format: ['/filename', '/other/filename']
   useEffect(() => {
     setStatus('Collecting files to scan');
-    ignore.push(
-      'node_modules/**',
-      '**/node_modules/**',
-      '.git/**',
-      'package.json',
-      '**/package.json',
-      'package-lock.json',
-      '**/package-lock.json',
-      'yarn.lock',
-      '**/yarn.lock',
-      'pnpm-lock.yaml',
-      '**/pnpm-lock.yaml',
-      '**/*.(png|webp|svg|gif|jpg|jpeg)+', // common image files
-      '**/*.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)+', // common video files
-    );
-    globby(convertPathToPattern(path.resolve(dir)), { ignore: ignore.filter(Boolean) }).then(files => {
+    const pattern = convertPathToPattern(path.resolve(dir));
+
+    globby(pattern, {
+      ignore: [
+        'node_modules/**',
+        '**/node_modules/**',
+        '.git/**',
+        'package.json',
+        '**/package.json',
+        'package-lock.json',
+        '**/package-lock.json',
+        'yarn.lock',
+        '**/yarn.lock',
+        'pnpm-lock.yaml',
+        '**/pnpm-lock.yaml',
+        '**/*.(png|webp|svg|gif|jpg|jpeg)+',
+        '**/*.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)+',
+        ...ignore,
+      ].filter(Boolean),
+    }).then(files => {
       setFiles(files);
     });
   }, [dir, ignore]);
