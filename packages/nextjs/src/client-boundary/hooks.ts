@@ -1,7 +1,6 @@
 'use client';
 
 export {
-  useAuth,
   useClerk,
   useEmailLink,
   useOrganization,
@@ -21,3 +20,5 @@ export {
   isMetamaskError,
   EmailLinkErrorCode,
 } from '@clerk/clerk-react/errors';
+
+export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';
