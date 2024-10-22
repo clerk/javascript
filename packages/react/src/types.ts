@@ -67,14 +67,17 @@ export interface HeadlessBrowserClerkConstructor {
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };
 
+export interface CustomPortalsRendererProps {
+  customPagesPortals?: any[];
+  customMenuItemsPortals?: any[];
+}
+
 // Clerk object
 export interface MountProps {
   mount: (node: HTMLDivElement, props: any) => void;
   unmount: (node: HTMLDivElement) => void;
   updateProps: (props: any) => void;
   props?: any;
-  customPagesPortals?: any[];
-  customMenuItemsPortals?: any[];
 }
 
 export interface OpenProps {

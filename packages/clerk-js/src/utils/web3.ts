@@ -21,9 +21,7 @@ export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promis
   return (identifiers && identifiers[0]) || '';
 }
 
-type GenerateWeb3SignatureParams = {
-  identifier: string;
-  nonce: string;
+type GenerateWeb3SignatureParams = GenerateSignatureParams & {
   provider: Web3Provider;
 };
 
@@ -55,15 +53,12 @@ type GenerateSignatureParams = {
   nonce: string;
 };
 
-export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'metamask' });
+export async function generateSignatureWithMetamask(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'metamask' });
 }
 
-export async function generateSignatureWithCoinbaseWallet({
-  identifier,
-  nonce,
-}: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'coinbase_wallet' });
+export async function generateSignatureWithCoinbaseWallet(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'coinbase_wallet' });
 }
 
 async function getEthereumProvider(provider: Web3Provider) {

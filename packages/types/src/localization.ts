@@ -148,6 +148,8 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      blockButton__emailSupport: LocalizationValue;
     };
   };
   signIn: {

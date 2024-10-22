@@ -26,6 +26,8 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
       // This ensures @clerk/astro/client is properly processed and bundled,
       // resolving runtime import issues in these components.
       config.optimizeDeps?.include?.push('@clerk/astro/client');
+      // Let astro vite plugin handle this.
+      config.optimizeDeps?.exclude?.push('astro:transitions/client');
     },
     load(id) {
       if (id === resolvedVirtualModuleId) {

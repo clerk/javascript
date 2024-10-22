@@ -13,3 +13,4 @@ const runInjectionScript = createInjectionScriptRunner(createClerkInstance);
 export { runInjectionScript };
 
 export { generateSafeId } from './utils/generateSafeId';
+export { swapDocument } from './swap-document';
