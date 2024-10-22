@@ -6,7 +6,7 @@
  * @param {Object} _options - Additional options (unused)
  * @returns {string|undefined} - The transformed source code if modifications were made, otherwise undefined
  */
-module.exports = function transformClerkProviderDynamic({ path, source }, { jscodeshift: j }, _options) {
+module.exports = function transformClerkProviderDynamic({ _path, source }, { jscodeshift: j }, _options) {
   const root = j(source);
   let dirtyFlag = false;
 
@@ -21,10 +21,27 @@ module.exports = function transformClerkProviderDynamic({ path, source }, { jsco
     return undefined;
   }
 
-  if (dirtyFlag) {
-    return root.toSource();
-  }
-  return undefined;
+  // Find all JSXElements with the name ClerkProvider
+  root
+    .find(j.JSXElement, {
+      openingElement: { name: { name: 'ClerkProvider' } },
+    })
+    .forEach(path => {
+      const openingElement = path.node.openingElement;
+
+      // Check if the dynamic attribute is already present
+      const hasDynamicAttribute = openingElement.attributes.some(attr => {
+        return j.JSXAttribute.check(attr) && attr.name.name === 'dynamic';
+      });
+
+      // If dynamic attribute is not present, add it
+      if (!hasDynamicAttribute) {
+        openingElement.attributes.push(j.jsxAttribute(j.jsxIdentifier('dynamic')));
+        dirtyFlag = true;
+      }
+    });
+
+  return dirtyFlag ? root.toSource() : undefined;
 };
 
 module.exports.parser = 'tsx';
