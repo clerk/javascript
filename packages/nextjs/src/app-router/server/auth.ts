@@ -2,7 +2,6 @@ import type { AuthObject } from '@clerk/backend';
 import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
-import { buildClerkProps } from '../../server/buildClerkProps';
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
@@ -62,7 +61,3 @@ auth.protect = async (...args: any[]) => {
   });
   return protect(...args);
 };
-
-export async function initialState() {
-  return buildClerkProps(await buildRequestLike());
-}
