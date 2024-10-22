@@ -56,7 +56,7 @@ export function PromisifiedAuthProvider({
  * }
  */
 export function usePromisifiedAuth() {
-  const isPagesRouter = !useRouter();
+  const isPagesRouter = useRouter();
   const valueFromContext = React.useContext(PromisifiedAuthContext);
 
   let resolvedData = valueFromContext;
@@ -77,6 +77,7 @@ export function usePromisifiedAuth() {
         'Clerk: useAuth() called in static mode, wrap this component in <ClerkProvider dynamic> to make auth data available during server-side rendering.',
       );
     }
+    console.log(resolvedData);
     // We don't need to deal with Clerk being loaded here
     return useDerivedAuth(resolvedData);
   } else {
