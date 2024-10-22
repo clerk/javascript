@@ -38,6 +38,7 @@ export class User {
     readonly createOrganizationEnabled: boolean,
     readonly createOrganizationsLimit: number | null = null,
     readonly deleteSelfEnabled: boolean,
+    readonly legalAcceptedAt: number | null,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -73,6 +74,7 @@ export class User {
       data.create_organization_enabled,
       data.create_organizations_limit,
       data.delete_self_enabled,
+      data.legal_accepted_at,
     );
   }
 
