@@ -115,8 +115,6 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 
   const authContext = useAuthContext();
 
-  console.log(authContext, initialAuthState);
-
   const [authState, setAuthState] = useState(() => {
     // This indicates the authContext is not available, and so we fallback to the provided initialState
     if (authContext.sessionId === undefined && authContext.userId === undefined) {
