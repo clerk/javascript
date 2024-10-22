@@ -236,7 +236,6 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.cardTitle)}
-      className={cx('leading-medium text-gray-12 text-lg font-bold', className)}
     >
       {children}
     </h2>
