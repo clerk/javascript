@@ -115,6 +115,8 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 
   const authContext = useAuthContext();
 
+  console.log(authContext, initialAuthState);
+
   const [authState, setAuthState] = useState(() => {
     // This indicates the authContext is not available, and so we fallback to the provided initialState
     if (authContext.sessionId === undefined && authContext.userId === undefined) {
@@ -129,6 +131,8 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     }
     setAuthState(authContext);
   }, [authContext]);
+
+  console.log(authContext, initialAuthState, authState);
 
   const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
     authState;
@@ -154,7 +158,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 };
 
 export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject;
+  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject ?? {};
 
   if (sessionId === undefined && userId === undefined) {
     return {
