@@ -101,12 +101,12 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
           void invalidateCacheAction().then(() => res());
         }
       });
+    };
 
-      window.__unstable__onAfterSetActive = () => {
-        if (__unstable_invokeMiddlewareOnAuthStateChange) {
-          return router.refresh();
-        }
-      };
+    window.__unstable__onAfterSetActive = () => {
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        return router.refresh();
+      }
     };
   }, []);
 
