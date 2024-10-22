@@ -10,30 +10,34 @@ import React, { useEffect, useState } from 'react';
  * @param {Object} props
  * @param {Function} props.callback - The callback function to be called after the command execution.
  * @param {string} props.cmd - The command to execute.
+ * @param {string} props.message - The message to display while the command is running.
  * @returns {JSX.Element} The rendered component.
  *
  * @example
  * <Command cmd="echo 'hello world'" />
  */
-export function Command({ cmd, onError, onSuccess }) {
+export function Command({ cmd, message, onError, onSuccess }) {
   const [error, setError] = useState();
   const [result, setResult] = useState();
 
   useEffect(() => {
     execa({ shell: true })`${cmd}`
       .then(res => {
-        console.log('res', res);
         setResult(res);
       })
       .catch(err => {
-        console.error(err);
         setError(err);
       });
   }, []);
 
   return (
     <>
-      {!result && !error && <Spinner label={`Running command: ${cmd}`} />}
+      {!result && !error && (
+        <Loading
+          cmd={cmd}
+          message={message}
+        />
+      )}
       {result ? (
         onSuccess ? (
           onSuccess()
@@ -54,4 +58,8 @@ export function Command({ cmd, onError, onSuccess }) {
       ) : null}
     </>
   );
+}
+
+function Loading({ cmd, message }) {
+  return message ? message : <Spinner label={`Running command: ${cmd}`} />;
 }

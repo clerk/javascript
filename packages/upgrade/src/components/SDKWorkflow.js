@@ -1,5 +1,5 @@
-import { Select, StatusMessage } from '@inkjs/ui';
-import { Text } from 'ink';
+import { Select, Spinner, StatusMessage } from '@inkjs/ui';
+import { Newline, Text } from 'ink';
 import React, { useState } from 'react';
 
 import { getClerkSdkVersion } from '../util/get-clerk-version.js';
@@ -93,10 +93,19 @@ export function SDKWorkflow(props) {
             cmd={
               'grep -rE "import.*\\\\{.*useAuth.*\\\\}.*from.*[\'\\\\\\"]@clerk/nextjs[\'\\\\\\"]" . --exclude-dir={node_modules,dist}'
             }
+            message={<Spinner label={'Checking for `useAuth` usage in your project...'} />}
             onError={() => null}
             onSuccess={() => (
-              <StatusMessage variant='info'>
-                We have detected that your application might be using the `useAuth` hook from `@clerk/nextjs`.{' '}
+              <StatusMessage variant='warning'>
+                <Text>
+                  We have detected that your application might be using the <Text bold>useAuth</Text> hook from{' '}
+                  <Text bold>@clerk/nextjs</Text>.
+                </Text>
+                <Newline />
+                <Text>
+                  If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
+                  prop to your application's root <Text bold>ClerkProvider</Text>.
+                </Text>
               </StatusMessage>
             )}
           />
