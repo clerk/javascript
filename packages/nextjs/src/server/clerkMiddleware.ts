@@ -12,6 +12,14 @@ import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
+import {
+  isNextjsNotFoundError,
+  isNextjsRedirectError,
+  isRedirectToSignInError,
+  nextjsNotFound,
+  nextjsRedirectError,
+  redirectToSignInError,
+} from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
@@ -23,18 +31,14 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
-const CONTROL_FLOW_ERROR = {
-  FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
-  REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
-  REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
-};
-
 export type ClerkMiddlewareAuthObject = AuthObject & {
-  protect: AuthProtect;
   redirectToSignIn: RedirectFun<Response>;
 };
 
-export type ClerkMiddlewareAuth = () => ClerkMiddlewareAuthObject;
+export interface ClerkMiddlewareAuth {
+  (): ClerkMiddlewareAuthObject;
+  protect: AuthProtect;
+}
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
@@ -56,16 +60,19 @@ interface ClerkMiddleware {
    * export default clerkMiddleware((auth, request, event) => { ... }, options);
    */
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptions): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware((auth, request, event) => { ... }, (req) => options);
    */
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptionsCallback): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware(options);
    */
   (options?: ClerkMiddlewareOptions): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware;
@@ -76,7 +83,8 @@ interface ClerkMiddleware {
 const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
 export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
 
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
+// @ts-expect-error TS is not happy here. Will dig into it
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
@@ -105,7 +113,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
 
-      clerkClient().telemetry.record(
+      const resolvedClerkClient = await clerkClient();
+
+      resolvedClerkClient.telemetry.record(
         eventMethodCalled('clerkMiddleware', {
           handler: Boolean(handler),
           satellite: Boolean(options.isSatellite),
@@ -120,7 +130,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
-      const requestState = await clerkClient().authenticateRequest(
+      const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
       );
@@ -142,14 +152,17 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { protect, redirectToSignIn });
+      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authHandler = () => authObjWithMethods;
+      authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
       try {
         const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
           clerkMiddlewareRequestDataStore,
-          async () => handler?.(() => authObjWithMethods, request, event),
+          async () => handler?.(authHandler, request, event),
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
@@ -220,9 +233,8 @@ const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
-    err.returnBackUrl = opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString();
-    throw err;
+    const url = clerkRequest.clerkUrl.toString();
+    redirectToSignInError(url, opts.returnBackUrl);
   };
 };
 
@@ -230,21 +242,17 @@ const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
-): ClerkMiddlewareAuthObject['protect'] => {
-  return ((params, options) => {
-    const notFound = () => {
-      throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
-    };
+) => {
+  return (async (params: any, options: any) => {
+    const notFound = () => nextjsNotFound();
 
-    const redirect = (url: string) => {
-      const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_URL) as any;
-      err.redirectUrl = url;
-      throw err;
-    };
+    const redirect = (url: string) =>
+      nextjsRedirectError(url, {
+        redirectUrl: url,
+      });
 
-    // @ts-expect-error TS is not happy even though the types are correct
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
-  }) as AuthProtect;
+  }) as unknown as Promise<AuthProtect>;
 };
 
 // Handle errors thrown by protect() and redirectToSignIn() calls,
@@ -255,25 +263,28 @@ const createMiddlewareProtect = (
 // This function handles the known errors thrown by the APIs described above,
 // and returns the appropriate response.
 const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
-  switch (e.message) {
-    case CONTROL_FLOW_ERROR.FORCE_NOT_FOUND:
-      // Rewrite to a bogus URL to force not found error
-      return setHeader(
-        NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
-        constants.Headers.AuthReason,
-        'protect-rewrite',
-      );
-    case CONTROL_FLOW_ERROR.REDIRECT_TO_URL:
-      return redirectAdapter(e.redirectUrl);
-    case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
-      return createRedirect({
-        redirectAdapter,
-        baseUrl: clerkRequest.clerkUrl,
-        signInUrl: requestState.signInUrl,
-        signUpUrl: requestState.signUpUrl,
-        publishableKey: requestState.publishableKey,
-      }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
-    default:
-      throw e;
+  if (isNextjsNotFoundError(e)) {
+    // Rewrite to a bogus URL to force not found error
+    return setHeader(
+      NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
+      constants.Headers.AuthReason,
+      'protect-rewrite',
+    );
   }
+
+  if (isRedirectToSignInError(e)) {
+    return createRedirect({
+      redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
+      signInUrl: requestState.signInUrl,
+      signUpUrl: requestState.signUpUrl,
+      publishableKey: requestState.publishableKey,
+    }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+  }
+
+  if (isNextjsRedirectError(e)) {
+    return redirectAdapter(e.redirectUrl);
+  }
+
+  throw e;
 };

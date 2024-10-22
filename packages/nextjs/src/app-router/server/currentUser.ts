@@ -6,10 +6,10 @@ import { auth } from './auth';
 export async function currentUser(): Promise<User | null> {
   require('server-only');
 
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     return null;
   }
 
-  return clerkClient().users.getUser(userId);
+  return (await clerkClient()).users.getUser(userId);
 }

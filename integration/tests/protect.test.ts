@@ -56,6 +56,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.page.goToRelative('/settings/auth-protect');
     await expect(u.page.getByText(/User has access/i)).toBeVisible();
 
+    await u.page.goToRelative('/only-admin');
+    await expect(u.page.getByText(/User is admin/i)).toBeVisible();
+
     // route handler
     await u.page.goToRelative('/api/settings/');
     await expect(u.page.getByText(/userId/i)).toBeVisible();
@@ -89,6 +92,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.po.signIn.waitForMounted();
     await u.page.goToRelative('/page-protected');
     await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/only-admin');
+    await u.po.signIn.waitForMounted();
   });
 
   test('Protect in RSCs and RCCs as `viewer`', async ({ page, context }) => {
@@ -112,6 +117,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.page.goToRelative('/settings/auth-has');
     await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
     await u.page.goToRelative('/settings/auth-protect');
+    await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
+
+    await u.page.goToRelative('/only-admin');
     await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
 
     // Route Handler

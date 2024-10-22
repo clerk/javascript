@@ -46,6 +46,10 @@ You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `
 
 For further information, guides, and examples visit the [Next.js reference documentation](https://clerk.com/docs/references/nextjs/overview?utm_source=github&utm_medium=clerk_nextjs).
 
+## Upgrading
+
+`@clerk/nextjs` supports upgrading through automatic code migration.
+
 ## Support
 
 You can get in touch with us in any of the following ways:

@@ -3,7 +3,7 @@ import { auth, clerkClient, currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
 
 export default async function Page() {
-  const { userId } = auth();
+  const { userId } = await auth();
   const currentUser_ = await currentUser();
   const user = userId ? await clerkClient.users.getUser(userId) : null;
 

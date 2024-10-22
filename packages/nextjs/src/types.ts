@@ -16,4 +16,10 @@ export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey
    * @default true
    */
   __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
+  /**
+   * If set to true, ClerkProvider will opt into dynamic rendering and make auth data available to all wrapper components.
+   *
+   * @default false
+   */
+  dynamic?: boolean;
 };

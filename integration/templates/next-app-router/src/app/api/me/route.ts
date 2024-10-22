@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
-export function GET() {
-  const { userId } = auth();
+export async function GET() {
+  const { userId } = await auth();
   return new Response(JSON.stringify({ userId }));
 }

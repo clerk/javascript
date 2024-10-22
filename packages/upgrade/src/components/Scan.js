@@ -6,9 +6,9 @@ import { Newline, Text } from 'ink';
 import path from 'path';
 import React, { useEffect, useState } from 'react';
 
-import ExpandableList from './util/expandable-list.js';
+import ExpandableList from '../util/expandable-list.js';
 
-export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry }) {
+export function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarnings, uuid, disableTelemetry }) {
   // NOTE: if the difference between fromVersion and toVersion is greater than 1
   // we need to do a little extra work here and import two matchers,
   // sequence them after each other, and clearly mark which version migration

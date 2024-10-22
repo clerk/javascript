@@ -3,7 +3,6 @@
 exports[`/server public exports should not include a breaking change 1`] = `
 [
   "auth",
-  "authMiddleware",
   "buildClerkProps",
   "clerkClient",
   "clerkMiddleware",
@@ -11,8 +10,6 @@ exports[`/server public exports should not include a breaking change 1`] = `
   "createRouteMatcher",
   "currentUser",
   "getAuth",
-  "redirectToSignIn",
-  "redirectToSignUp",
   "verifyToken",
 ]
 `;
