@@ -36,7 +36,7 @@ export type ClerkMiddlewareAuthObject = AuthObject & {
 };
 
 export interface ClerkMiddlewareAuth {
-  (): ClerkMiddlewareAuthObject;
+  (): Promise<ClerkMiddlewareAuthObject>;
   protect: AuthProtect;
 }
 
@@ -155,7 +155,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
-      const authHandler = () => authObjWithMethods;
+      const authHandler = () => Promise.resolve(authObjWithMethods);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
