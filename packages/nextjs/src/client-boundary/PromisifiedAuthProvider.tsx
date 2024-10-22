@@ -56,7 +56,7 @@ export function PromisifiedAuthProvider({
  * }
  */
 export function usePromisifiedAuth() {
-  const isPagesRouter = !useRouter();
+  const isPagesRouter = useRouter();
   const valueFromContext = React.useContext(PromisifiedAuthContext);
 
   let resolvedData = valueFromContext;
