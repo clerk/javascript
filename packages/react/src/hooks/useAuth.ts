@@ -130,8 +130,6 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     setAuthState(authContext);
   }, [authContext]);
 
-  console.log(authContext, initialAuthState, authState);
-
   const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
     authState;
   const isomorphicClerk = useIsomorphicClerkContext();
