@@ -63,10 +63,3 @@ export type {
   Token,
   User,
 } from '@clerk/backend';
-
-/**
- * Deprecated APIs
- * These APIs will be removed in v6
- */
-export { authMiddleware } from './authMiddleware';
-export { redirectToSignIn, redirectToSignUp } from './redirectHelpers';

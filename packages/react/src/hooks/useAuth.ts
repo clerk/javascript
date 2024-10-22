@@ -6,7 +6,7 @@ import type {
   OrganizationCustomRoleKey,
   SignOut,
 } from '@clerk/types';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -72,7 +72,7 @@ type UseAuthReturn =
       getToken: GetToken;
     };
 
-type UseAuth = () => UseAuthReturn;
+type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 
 /**
  * Returns the current auth state, the user and session ids and the `getToken`
@@ -110,11 +110,28 @@ type UseAuth = () => UseAuthReturn;
  *   return <div>...</div>
  * }
  */
-export const useAuth: UseAuth = () => {
+export const useAuth: UseAuth = (initialAuthState = {}) => {
   useAssertWrappedByClerkProvider('useAuth');
 
+  const authContext = useAuthContext();
+
+  const [authState, setAuthState] = useState(() => {
+    // This indicates the authContext is not available, and so we fallback to the provided initialState
+    if (authContext.sessionId === undefined && authContext.userId === undefined) {
+      return initialAuthState ?? {};
+    }
+    return authContext;
+  });
+
+  useEffect(() => {
+    if (authContext.sessionId === undefined && authContext.userId === undefined) {
+      return;
+    }
+    setAuthState(authContext);
+  }, [authContext]);
+
   const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
-    useAuthContext();
+    authState;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -132,6 +149,12 @@ export const useAuth: UseAuth = () => {
     },
     [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
   );
+
+  return useDerivedAuth({ sessionId, userId, actor, orgId, orgSlug, orgRole, getToken, signOut, has });
+};
+
+export function useDerivedAuth(authObject: any): UseAuthReturn {
+  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject;
 
   if (sessionId === undefined && userId === undefined) {
     return {
@@ -198,4 +221,4 @@ export const useAuth: UseAuth = () => {
   }
 
   return errorThrower.throw(invalidStateError);
-};
+}

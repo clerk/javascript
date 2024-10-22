@@ -1,23 +1,20 @@
 import type { AuthObject } from '@clerk/backend';
-import type { RedirectFun } from '@clerk/backend/internal';
-import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
-import { buildClerkProps } from '../../server/buildClerkProps';
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
-import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
-type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
+type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
-export const auth = (): Auth => {
+export async function auth(): Promise<Auth> {
   require('server-only');
 
-  const request = buildRequestLike();
+  const request = await buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
@@ -46,11 +43,21 @@ export const auth = (): Auth => {
     });
   };
 
-  const protect = createProtect({ request, authObject, redirectToSignIn, notFound, redirect });
+  return Object.assign(authObject, { redirectToSignIn });
+}
 
-  return Object.assign(authObject, { protect, redirectToSignIn });
-};
+auth.protect = async (...args: any[]) => {
+  require('server-only');
 
-export const initialState = () => {
-  return buildClerkProps(buildRequestLike());
+  const request = await buildRequestLike();
+  const authObject = await auth();
+
+  const protect = createProtect({
+    request,
+    authObject,
+    redirectToSignIn: authObject.redirectToSignIn,
+    notFound,
+    redirect,
+  });
+  return protect(...args);
 };
