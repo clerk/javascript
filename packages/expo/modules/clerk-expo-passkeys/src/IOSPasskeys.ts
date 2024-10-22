@@ -28,7 +28,12 @@ export class IOSPasskeys {
     }
   }
 
-  public static async autofill() {
-    throw new Error('Autofill is not supported');
+  public static async autofill(credentials: SerializedPublicKeyCredentialRequestOptions) {
+    try {
+      const response = await ClerkExpoPasskeys.autofill(credentials.challenge, credentials.rpId);
+      return { publicKeyCredential: response, error: null };
+    } catch (error) {
+      return { publicKeyCredential: null, error };
+    }
   }
 }

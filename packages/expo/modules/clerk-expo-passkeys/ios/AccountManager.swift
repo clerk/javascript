@@ -92,16 +92,11 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     
     @available(iOS 16.0, *)
     func beginAutoFillAssistedPasskeySignIn(challengeBase64URL: String, rpId: String,  promise: Promise) {
-        if let authController {
-            authController.cancel()
-            self.authController = nil
-        }
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
 
         let challenge = dataFromBase64URL(base64urlString: challengeBase64URL)!
         let assertionRequest = publicKeyCredentialProvider.createCredentialAssertionRequest(challenge: challenge)
 
-        // AutoFill-assisted requests only support ASAuthorizationPlatformPublicKeyCredentialAssertionRequest.
         let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest ] )
        
         authController.delegate = self
@@ -131,6 +126,15 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
             }
         }
     }
+  
+  
+  @available(iOS 16.0, *)
+  func cancelAutoFillAssistedPasskeySignIn() {
+    if authController != nil {
+      self.authController?.cancel()
+        self.authController = nil
+    }
+  }
     
     
 
@@ -174,6 +178,5 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return UIApplication.shared.keyWindow!;
     }
-    
 }
 

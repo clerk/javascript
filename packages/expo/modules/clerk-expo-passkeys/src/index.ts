@@ -159,6 +159,10 @@ export async function get(
   }
 }
 
+// FIX:The autofill function has been implemented for iOS only, but the pop-up is not showing up.
+// This seems to be an issue with Expo that we haven't been able to resolve yet.
+// Further investigation and possibly reaching out to Expo support may be necessary.
+
 export async function autofill(): Promise<AuthenticationResponseJSON | null> {
   if (Platform.OS === 'android') {
     throw new Error('Not supported');
