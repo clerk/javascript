@@ -3,16 +3,16 @@ import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
 import React from 'react';
 
+import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
-import { PromisifiedAuthProvider } from '../client/PromisifiedAuthProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const request = await buildRequestLike();
-  const data = await getDynamicAuthData(request);
+  const data = getDynamicAuthData(request);
 
   return data;
 });

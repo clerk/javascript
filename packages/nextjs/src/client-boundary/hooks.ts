@@ -10,7 +10,6 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  usePromisifiedAuth as useAuth,
 } from '@clerk/clerk-react';
 
 export {
@@ -20,3 +19,5 @@ export {
   isMetamaskError,
   EmailLinkErrorCode,
 } from '@clerk/clerk-react/errors';
+
+export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';
