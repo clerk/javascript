@@ -24,12 +24,13 @@ const cli = meow(
     Examples
       $ clerk-upgrade --sdk=nextjs --dir=src/**
       $ clerk-upgrade --ignore=**/public/** --ignore=**/dist/**
+      $ clerk-upgrade --from=core-1 --to=core-2
 	`,
   {
     importMeta: import.meta,
     flags: {
-      from: { type: 'string', default: 'core-1' },
-      to: { type: 'string', default: 'core-2' },
+      from: { type: 'string' },
+      to: { type: 'string' },
       sdk: { type: 'string', choices: sdks.map(i => i.value) },
       dir: { type: 'string' },
       ignore: { type: 'string', isMultiple: true },

@@ -1,6 +1,6 @@
 import { MultiSelect, Select, TextInput } from '@inkjs/ui';
 import { Newline, Text, useApp } from 'ink';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Header } from './components/Header.js';
 import { Scan } from './components/Scan.js';
@@ -33,15 +33,12 @@ export default function App(props) {
   const [sdkGuesses, setSdkGuesses] = useState([]);
   const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
   const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
-  // See comments below, can be enabled on next major
-
-  // eslint-disable-next-line no-unused-vars
   const [fromVersion, setFromVersion] = useState(props.fromVersion);
   const [fromVersionGuessAttempted, setFromVersionGuessAttempted] = useState(false);
-  // eslint-disable-next-line no-unused-vars
+
   const [toVersion, setToVersion] = useState(props.toVersion);
   const [dir, setDir] = useState(props.dir);
-  const [ignore, setIgnore] = useState(props.ignore);
+  const [ignore, setIgnore] = useState(props.ignore ?? []);
   const [configComplete, setConfigComplete] = useState(false);
   const [configVerified, setConfigVerified] = useState(false);
   const [uuid, setUuid] = useState();
@@ -52,8 +49,20 @@ export default function App(props) {
     setYolo(false);
   }
 
+  useEffect(() => {
+    if (toVersion === 'core-2') {
+      setFromVersion('core-1');
+    }
+  }, [toVersion]);
+
+  useEffect(() => {
+    if (fromVersion === 'core-1') {
+      setToVersion('core-2');
+    }
+  }, [fromVersion]);
+
   // Handle the individual SDK upgrade
-  if (sdks.length === 1) {
+  if (!fromVersion && !toVersion && sdks[0] === 'nextjs') {
     return (
       <SDKWorkflow
         packageManager={props.packageManager}
