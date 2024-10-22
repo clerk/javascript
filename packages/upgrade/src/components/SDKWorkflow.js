@@ -84,7 +84,11 @@ export function SDKWorkflow(props) {
           )}
         </>
       )}
-      {done && <Text>You are done!</Text>}
+      {done && (
+        <StatusMessage variant='success'>
+          Done upgrading <Text bold>@clerk/nextjs</Text>
+        </StatusMessage>
+      )}
     </>
   );
 }

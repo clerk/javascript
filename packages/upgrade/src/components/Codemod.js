@@ -1,5 +1,5 @@
 import { Spinner, StatusMessage, TextInput } from '@inkjs/ui';
-import { Text } from 'ink';
+import { Newline, Text } from 'ink';
 import React, { useEffect, useState } from 'react';
 
 import { runCodemod } from '../codemods/index.js';
@@ -64,13 +64,14 @@ export function Codemod(props) {
           <StatusMessage variant='success'>
             Running <Text bold>@clerk/{sdk}</Text> codemod... {transform} complete!
           </StatusMessage>
-
+          <Newline />
           <Text bold>Codemod results:</Text>
           <Text color='red'>{result.error ?? 0} errors</Text>
           <Text color='green'>{result.ok ?? 0} ok</Text>
           <Text color='yellow'>{result.skip ?? 0} skipped</Text>
           <Text color='gray'>{result.nochange ?? 0} unmodified</Text>
           {result.timeElapsed && <Text>Time elapsed: {result.timeElapsed}</Text>}
+          <Newline />
         </>
       )}
       {error && <Text color='red'>{error.message}</Text>}
