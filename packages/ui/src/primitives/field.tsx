@@ -104,16 +104,23 @@ export const Label = React.forwardRef(function FieldLabel(
  * FieldLabelEnd
  */
 
+const fieldLabelEndLayoutStyle = {
+  fieldLabelEnd: {
+    className: 'flex-grow self-end text-end',
+  },
+};
+
 export const LabelEnd = React.forwardRef(function FieldLabelEnd(
   { className, children, ...props }: React.HTMLAttributes<HTMLSpanElement>,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <span
       data-field-label-end=''
       ref={forwardedRef}
       {...props}
-      className={cx('flex-grow self-end text-end', className)}
+      {...mergeDescriptors(elements.fieldLabelEnd)}
     >
       {children}
     </span>
@@ -126,16 +133,23 @@ export const LabelEnd = React.forwardRef(function FieldLabelEnd(
  * FieldHint
  */
 
+const fieldHintVisualStyle = {
+  fieldLabelEnd: {
+    className: 'text-gray-9 text-sm font-medium',
+  },
+};
+
 export const Hint = React.forwardRef(function FieldHint(
   { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
   forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <LabelEnd
       data-field-hint=''
       ref={forwardedRef}
       {...props}
-      className={cx('text-gray-9 text-sm font-medium', className)}
+      {...mergeDescriptors(elements.fieldHint)}
     >
       {children}
     </LabelEnd>
@@ -148,17 +162,30 @@ export const Hint = React.forwardRef(function FieldHint(
  * FieldCheckbox
  */
 
+const fieldCheckboxLayoutStyle = {
+  fieldCheckbox: {
+    className: 'mt-[0.1875em] size-3',
+  },
+};
+
+const fieldCheckboxVisualStyle = {
+  fieldCheckbox: {
+    className: 'accent-accent-9 cursor-pointer',
+  },
+};
+
 export const Checkbox = React.forwardRef(function FieldCheckbox(
   props: React.InputHTMLAttributes<HTMLInputElement>,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <input
       data-field-checkbox=''
       ref={forwardedRef}
       type='checkbox'
-      className={cx('accent-accent-9 mt-[0.1875em] size-3 cursor-pointer')}
       {...props}
+      {...mergeDescriptors(elements.fieldCheckbox)}
     />
   );
 });
@@ -169,20 +196,23 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
  * FieldInputGroup
  */
 
+const fieldInputGroupLayoutStyle = {
+  fieldInputGroup: {
+    className: 'relative has-[[data-field-input-group-end]]:[--field-input-group-pe:--field-input-group-end-size]',
+  },
+};
+
 export const InputGroup = React.forwardRef(function FieldInputGroup(
   { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       data-field-input-group=''
       ref={ref}
-      className={cx(
-        'has-[[data-field-input-group-end]]:[--field-input-group-pe:--field-input-group-end-size]',
-        'relative',
-        className,
-      )}
       {...props}
+      {...mergeDescriptors(elements.fieldInputGroup)}
     />
   );
 });
@@ -193,16 +223,24 @@ export const InputGroup = React.forwardRef(function FieldInputGroup(
  * FieldInputGroupEnd
  */
 
+const fieldInputGroupEndLayoutStyle = {
+  fieldInputGroupEnd: {
+    className: 'absolute inset-0 start-auto size-[--field-input-group-end-size]',
+  },
+};
+
 export const InputGroupEnd = React.forwardRef(function FieldInputGroupEnd(
   { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       data-field-input-group-end=''
       ref={ref}
-      className={cx('absolute inset-0 start-auto size-[--field-input-group-end-size]', className)}
+      // className={cx('absolute inset-0 start-auto size-[--field-input-group-end-size]', className)}
       {...props}
+      {...mergeDescriptors(elements.fieldInputGroupEnd)}
     />
   );
 });
@@ -351,9 +389,19 @@ export const Message = React.forwardRef<
 export const layoutStyle = {
   ...fieldRootLayoutStyle,
   ...fieldLabelLayoutStyle,
+  ...fieldLabelEndLayoutStyle,
+  // ...fieldHintLayoutStyle,
+  ...fieldCheckboxLayoutStyle,
+  ...fieldInputGroupLayoutStyle,
+  ...fieldInputGroupEndLayoutStyle,
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
   ...fieldRootVisualStyle,
   ...fieldLabelVisualStyle,
+  // ...fieldLabelEndLayoutStyle,
+  ...fieldHintVisualStyle,
+  ...fieldCheckboxVisualStyle,
+  // ...fieldInputGroupVisualStyle,
+  // ...fieldInputGroupEndVisualStyle,
 } satisfies ParsedElementsFragment;
