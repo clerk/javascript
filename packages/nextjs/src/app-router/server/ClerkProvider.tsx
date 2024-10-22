@@ -35,8 +35,8 @@ export async function ClerkProvider(
   const output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={React.use(nonce)}
-      initialState={React.use(statePromise)}
+      nonce={await nonce}
+      initialState={await statePromise}
     >
       {children}
     </ClientClerkProvider>
