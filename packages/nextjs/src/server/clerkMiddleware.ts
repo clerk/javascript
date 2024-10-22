@@ -12,6 +12,14 @@ import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
+import {
+  isNextjsNotFoundError,
+  isNextjsRedirectError,
+  isRedirectToSignInError,
+  nextjsNotFound,
+  nextjsRedirectError,
+  redirectToSignInError,
+} from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
@@ -22,12 +30,6 @@ import {
   redirectAdapter,
   setRequestHeadersOnNextResponse,
 } from './utils';
-
-const CONTROL_FLOW_ERROR = {
-  FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
-  REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
-  REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
-};
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   redirectToSignIn: RedirectFun<Response>;
@@ -58,16 +60,19 @@ interface ClerkMiddleware {
    * export default clerkMiddleware((auth, request, event) => { ... }, options);
    */
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptions): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware((auth, request, event) => { ... }, (req) => options);
    */
   (handler: ClerkMiddlewareHandler, options?: ClerkMiddlewareOptionsCallback): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware(options);
    */
   (options?: ClerkMiddlewareOptions): NextMiddleware;
+
   /**
    * @example
    * export default clerkMiddleware;
@@ -228,9 +233,8 @@ const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
-    const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
-    err.returnBackUrl = opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString();
-    throw err;
+    const url = clerkRequest.clerkUrl.toString();
+    redirectToSignInError(url, opts.returnBackUrl);
   };
 };
 
@@ -240,15 +244,12 @@ const createMiddlewareProtect = (
   redirectToSignIn: RedirectFun<Response>,
 ) => {
   return (async (params: any, options: any) => {
-    const notFound = () => {
-      throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
-    };
+    const notFound = () => nextjsNotFound();
 
-    const redirect = (url: string) => {
-      const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_URL) as any;
-      err.redirectUrl = url;
-      throw err;
-    };
+    const redirect = (url: string) =>
+      nextjsRedirectError(url, {
+        redirectUrl: url,
+      });
 
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
   }) as unknown as Promise<AuthProtect>;
@@ -262,25 +263,28 @@ const createMiddlewareProtect = (
 // This function handles the known errors thrown by the APIs described above,
 // and returns the appropriate response.
 const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
-  switch (e.message) {
-    case CONTROL_FLOW_ERROR.FORCE_NOT_FOUND:
-      // Rewrite to a bogus URL to force not found error
-      return setHeader(
-        NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
-        constants.Headers.AuthReason,
-        'protect-rewrite',
-      );
-    case CONTROL_FLOW_ERROR.REDIRECT_TO_URL:
-      return redirectAdapter(e.redirectUrl);
-    case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
-      return createRedirect({
-        redirectAdapter,
-        baseUrl: clerkRequest.clerkUrl,
-        signInUrl: requestState.signInUrl,
-        signUpUrl: requestState.signUpUrl,
-        publishableKey: requestState.publishableKey,
-      }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
-    default:
-      throw e;
+  if (isNextjsNotFoundError(e)) {
+    // Rewrite to a bogus URL to force not found error
+    return setHeader(
+      NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
+      constants.Headers.AuthReason,
+      'protect-rewrite',
+    );
   }
+
+  if (isRedirectToSignInError(e)) {
+    return createRedirect({
+      redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
+      signInUrl: requestState.signInUrl,
+      signUpUrl: requestState.signUpUrl,
+      publishableKey: requestState.publishableKey,
+    }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+  }
+
+  if (isNextjsRedirectError(e)) {
+    return redirectAdapter(e.redirectUrl);
+  }
+
+  throw e;
 };

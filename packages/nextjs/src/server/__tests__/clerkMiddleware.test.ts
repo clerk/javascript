@@ -496,7 +496,7 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
-    it('forwards headers from authenticateRequest when auth().protect() is called', async () => {
+    it('forwards headers from authenticateRequest when auth.protect() is called', async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),

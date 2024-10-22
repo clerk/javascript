@@ -9,11 +9,16 @@ const csp = `default-src 'self';
 `;
 
 const isProtectedRoute = createRouteMatcher(['/protected(.*)', '/user(.*)', '/switcher(.*)']);
+const isAdminRoute = createRouteMatcher(['/only-admin(.*)']);
 const isCSPRoute = createRouteMatcher(['/csp']);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
     await auth.protect();
+  }
+
+  if (isAdminRoute(req)) {
+    await auth.protect({ role: 'admin' });
   }
 
   if (isCSPRoute(req)) {
