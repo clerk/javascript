@@ -94,7 +94,11 @@ export function SDKWorkflow(props) {
               'grep -rE "import.*\\\\{.*useAuth.*\\\\}.*from.*[\'\\\\\\"]@clerk/nextjs[\'\\\\\\"]" . --exclude-dir={node_modules,dist}'
             }
             onError={() => null}
-            onSuccess={() => <StatusMessage variant='info'>You should do something</StatusMessage>}
+            onSuccess={() => (
+              <StatusMessage variant='info'>
+                We have detected that your application might be using the `useAuth` hook from `@clerk/nextjs`.{' '}
+              </StatusMessage>
+            )}
           />
         </>
       )}
