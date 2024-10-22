@@ -154,7 +154,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 };
 
 export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject;
+  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject ?? {};
 
   if (sessionId === undefined && userId === undefined) {
     return {

@@ -1381,9 +1381,9 @@ const startAppWithOrganizationSyncOptions = async (clerkAPIUrl: string): Promise
 
     export const middleware = (req, evt) => {
       const orgSyncOptions = req.headers.get("x-organization-sync-options")
-      return clerkMiddleware((auth, req) => {
-        if (isProtectedRoute(req) && !auth().userId) {
-          auth().redirectToSignIn()
+      return clerkMiddleware(async (auth, req) => {
+        if (isProtectedRoute(req) && !(await auth()).userId) {
+          (await auth()).redirectToSignIn()
         }
       }, {
         publishableKey: req.headers.get("x-publishable-key"),
