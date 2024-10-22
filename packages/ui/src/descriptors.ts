@@ -37,6 +37,15 @@ export const DESCRIPTORS = [
   'fieldCheckbox',
   'fieldInputGroup',
   'fieldInputGroupEnd',
+  'fieldMessageStart',
+  'fieldMessageCenter',
+  'fieldMessageEnd',
+  'fieldMessage',
+  'fieldMessageIdle',
+  'fieldMessageInfo',
+  'fieldMessageError',
+  'fieldMessageSuccess',
+  'fieldMessageWarning',
 
   // Separator
   'separator',

@@ -3,7 +3,7 @@ import { cx } from 'cva';
 import * as React from 'react';
 
 import { mergeDescriptors, type ParsedElementsFragment, useAppearance } from '~/contexts/AppearanceContext';
-import { applyDescriptors } from '~/utils/dva';
+import { applyDescriptors, dva, type VariantProps } from '~/utils/dva';
 
 import CheckmarkCircleSm from './icons/checkmark-circle-sm';
 import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
@@ -318,7 +318,7 @@ export const Input = React.forwardRef(function FieldInput(
           success: [
             '[--cl-field-input-border:theme(colors.success.DEFAULT)]',
             '[--cl-field-input-border-active:theme(colors.success.DEFAULT)]',
-            '[--cl-field-input-ring:theme(colors.success.DEFAULT/0.25)]', // (optically adjusted ring to 25 opacity)
+            '[--cl-field-input-ring:theme(colors.success.DEFAULT/0.25)]',
           ],
           warning: [
             '[--cl-field-input-border:theme(colors.warning.DEFAULT)]',
@@ -339,35 +339,71 @@ export const Input = React.forwardRef(function FieldInput(
  * FieldMessage
  */
 
+const fieldMessageLayoutStyle = {
+  fieldMessage: {
+    className: 'flex gap-x-1',
+  },
+  fieldMessageStart: {
+    className: 'justify-start',
+  },
+  fieldMessageCenter: {
+    className: 'justify-center',
+  },
+  fieldMessageEnd: {
+    className: 'justify-end',
+  },
+};
+
+const fieldMessageVisualStyle = {
+  fieldMessage: {
+    className: 'text-base',
+  },
+  fieldMessageIdle: {
+    className: 'text-gray-11',
+  },
+  fieldMessageInfo: {
+    className: 'text-gray-11',
+  },
+  fieldMessageError: {
+    className: 'text-danger',
+  },
+  fieldMessageSuccess: {
+    className: 'text-success',
+  },
+  fieldMessageWarning: {
+    className: 'text-warning',
+  },
+};
+
+const message = dva({
+  base: 'fieldMessage',
+  variants: {
+    justify: {
+      start: 'fieldMessageStart',
+      center: 'fieldMessageCenter',
+      end: 'fieldMessageEnd',
+    },
+    intent: {
+      idle: 'fieldMessageIdle',
+      info: 'fieldMessageInfo',
+      error: 'fieldMessageError',
+      success: 'fieldMessageSuccess',
+      warning: 'fieldMessageWarning',
+    },
+  },
+});
+
 export const Message = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    justify?: 'start' | 'center' | 'end';
-    children?: React.ReactNode;
-    intent?: FieldIntent;
-  }
->(function FieldMessage({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
+  VariantProps<typeof message> & React.HTMLAttributes<HTMLDivElement>
+>(function FieldMessage({ descriptor, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <p
       data-field-message=''
       ref={forwardedRef}
       {...props}
-      className={cx(
-        'flex gap-x-1 text-base',
-        {
-          start: 'justify-start',
-          center: 'justify-center',
-          end: 'justify-end',
-        }[justify],
-        {
-          idle: 'text-gray-11',
-          info: 'text-gray-11',
-          error: 'text-danger',
-          success: 'text-success',
-          warning: 'text-warning',
-        }[intent],
-        className,
-      )}
+      {...applyDescriptors(elements, message({ justify, intent, descriptor }))}
     >
       {intent !== 'idle' && (
         <span className='text-icon-sm mt-px'>
@@ -394,6 +430,7 @@ export const layoutStyle = {
   ...fieldCheckboxLayoutStyle,
   ...fieldInputGroupLayoutStyle,
   ...fieldInputGroupEndLayoutStyle,
+  ...fieldMessageLayoutStyle,
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
@@ -404,4 +441,5 @@ export const visualStyle = {
   ...fieldCheckboxVisualStyle,
   // ...fieldInputGroupVisualStyle,
   // ...fieldInputGroupEndVisualStyle,
+  ...fieldMessageVisualStyle,
 } satisfies ParsedElementsFragment;
