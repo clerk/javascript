@@ -31,6 +31,7 @@ export const DESCRIPTORS = [
 
   // Field
   'fieldRoot',
+  'fieldLabel',
 
   // Separator
   'separator',

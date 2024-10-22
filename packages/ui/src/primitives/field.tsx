@@ -3,6 +3,7 @@ import { cx } from 'cva';
 import * as React from 'react';
 
 import { mergeDescriptors, type ParsedElementsFragment, useAppearance } from '~/contexts/AppearanceContext';
+import { applyDescriptors } from '~/utils/dva';
 
 import CheckmarkCircleSm from './icons/checkmark-circle-sm';
 import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
@@ -61,6 +62,19 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
  * FieldLabel
  */
 
+const fieldLabelLayoutStyle = {
+  fieldLabel: {
+    className: 'flex items-center gap-x-1',
+  },
+};
+
+const fieldLabelVisualStyle = {
+  fieldLabel: {
+    className:
+      'text-gray-12  text-base font-medium opacity-[--cl-field-label-opacity,1] cursor-[--cl-field-label-cursor,auto]',
+  },
+};
+
 export const Label = React.forwardRef(function FieldLabel(
   {
     className,
@@ -70,21 +84,14 @@ export const Label = React.forwardRef(function FieldLabel(
   }: React.HTMLAttributes<HTMLLabelElement> & { htmlFor?: string; visuallyHidden?: boolean },
   forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
+  const fieldLabelDescriptors = applyDescriptors(elements, 'fieldLabel');
   return (
     <label
       data-field-label=''
       ref={forwardedRef}
       {...props}
-      className={cx(
-        visuallyHidden
-          ? 'sr-only'
-          : [
-              'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
-              'cursor-[--cl-field-label-cursor,auto]',
-            ],
-
-        className,
-      )}
+      className={cx(visuallyHidden ? 'sr-only' : fieldLabelDescriptors.className)}
     >
       {children}
     </label>
@@ -343,8 +350,10 @@ export const Message = React.forwardRef<
 
 export const layoutStyle = {
   ...fieldRootLayoutStyle,
+  ...fieldLabelLayoutStyle,
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
   ...fieldRootVisualStyle,
+  ...fieldLabelVisualStyle,
 } satisfies ParsedElementsFragment;
