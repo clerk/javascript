@@ -115,7 +115,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 
   const authContext = useAuthContext();
 
-  const [authState, setAuthState] = useState(() => initialAuthState);
+  const [authState, setAuthState] = useState(() => initialAuthState ?? {});
 
   useEffect(() => {
     if (authContext.sessionId === undefined && authContext.userId === undefined) {

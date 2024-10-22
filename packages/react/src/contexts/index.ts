@@ -1,2 +1,2 @@
 export { ClerkProvider } from './ClerkProvider';
-export { PromisifiedAuthProvider, usePromisifiedAuth } from './ClerkDynamicProvider';
+export { PromisifiedAuthProvider, usePromisifiedAuth } from './PromisifiedAuthProvider';

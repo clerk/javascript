@@ -48,7 +48,6 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  usePromisifiedAuth,
 } from './client-boundary/hooks';
 
 /**

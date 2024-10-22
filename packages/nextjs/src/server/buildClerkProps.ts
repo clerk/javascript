@@ -1,4 +1,4 @@
-import type { Organization, Session, User } from '@clerk/backend';
+import type { AuthObject, Organization, Session, User } from '@clerk/backend';
 import { makeAuthObjectSerializable, stripPrivateDataFromObject } from '@clerk/backend/internal';
 
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
@@ -37,5 +37,5 @@ export const buildClerkProps: BuildClerkProps = (req, initialState = {}) => {
 export function getDynamicAuthData(req: RequestLike, initialState = {}) {
   const authObject = getAuthDataFromRequest(req);
 
-  return makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initialState }));
+  return makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initialState })) as AuthObject;
 }

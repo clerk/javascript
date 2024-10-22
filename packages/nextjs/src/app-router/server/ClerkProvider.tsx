@@ -1,4 +1,5 @@
-import type { Without } from '@clerk/types';
+import type { AuthObject } from '@clerk/backend';
+import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
 import React from 'react';
 
@@ -24,7 +25,7 @@ export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
-  let statePromise = Promise.resolve({});
+  let statePromise: Promise<null | AuthObject> = Promise.resolve(null);
   let nonce = Promise.resolve('');
 
   if (dynamic) {
@@ -43,7 +44,12 @@ export async function ClerkProvider(
   );
 
   if (dynamic) {
-    return <PromisifiedAuthProvider authPromise={statePromise}>{output}</PromisifiedAuthProvider>;
+    return (
+      // TODO: fix types so AuthObject is compatible with InitialState
+      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
+        {output}
+      </PromisifiedAuthProvider>
+    );
   }
 
   return output;

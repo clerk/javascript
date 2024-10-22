@@ -1,14 +1,15 @@
+import type { InitialState } from '@clerk/types';
 import React from 'react';
 
 import { useAuth, useDerivedAuth } from '../hooks/useAuth';
 
-const PromisifiedAuthContext = React.createContext<Promise<unknown> | unknown | null>(null);
+const PromisifiedAuthContext = React.createContext<Promise<InitialState> | InitialState | null>(null);
 
 export function PromisifiedAuthProvider({
   authPromise,
   children,
 }: {
-  authPromise: Promise<unknown> | unknown;
+  authPromise: Promise<InitialState> | InitialState;
   children: React.ReactNode;
 }) {
   return <PromisifiedAuthContext.Provider value={authPromise}>{children}</PromisifiedAuthContext.Provider>;
@@ -18,7 +19,6 @@ export function usePromisifiedAuth() {
   const valueFromContext = React.useContext(PromisifiedAuthContext);
 
   let resolvedData = valueFromContext;
-  // @ts-expect-error -- TODO: fixme
   if (valueFromContext && 'then' in valueFromContext) {
     if (!('use' in React)) {
       throw new Error(
@@ -33,14 +33,13 @@ export function usePromisifiedAuth() {
 
   if (typeof window === 'undefined') {
     if (!resolvedData) {
-      throw new Error('useAuth() called in static mode, wrap this component ');
+      throw new Error(
+        'Clerk: useAuth() called in static mode, wrap this component in <ClerkProvider dynamic> to make auth data available during server-side rendering.',
+      );
     }
     // We don't need to deal with Clerk being loaded here
     return useDerivedAuth(resolvedData);
   } else {
     return useAuth(resolvedData);
   }
-
-  // TODO: handle clerk loading state, or just delegate to useAuth()? we know that will be available
-  return {};
 }

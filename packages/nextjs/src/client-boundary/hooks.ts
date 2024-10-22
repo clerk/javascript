@@ -1,7 +1,6 @@
 'use client';
 
 export {
-  useAuth,
   useClerk,
   useEmailLink,
   useOrganization,
@@ -11,7 +10,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  usePromisifiedAuth,
+  usePromisifiedAuth as useAuth,
 } from '@clerk/clerk-react';
 
 export {
