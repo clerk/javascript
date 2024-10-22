@@ -214,7 +214,14 @@ export const { compose, dva, cx } = defineConfig();
 
 export function getDescriptors(elements: ParsedElements, descriptorList: string) {
   const descriptors = descriptorList.split(' ') as (keyof ParsedElements)[];
-  return descriptors.map(d => elements[d]);
+  return descriptors.map(d => {
+    const value = elements[d];
+    if (!value) {
+      console.warn(`Clerk: unable to access style configuration for descriptor: ${d}`);
+    }
+
+    return value;
+  });
 }
 
 export function applyDescriptors(elements: ParsedElements, descriptorList: string) {

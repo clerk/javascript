@@ -65,10 +65,8 @@ export const layoutStyle = {
   },
 };
 
-export const visualStyle = {
-  connectionList: {},
-  connectionListItem: {},
-};
+// Purposefully left blank to prevent confusion.
+export const visualStyle = {};
 
 export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,

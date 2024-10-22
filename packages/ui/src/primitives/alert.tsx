@@ -14,8 +14,6 @@ export const layoutStyle = {
   alert: {
     className: 'border px-4 py-3 flex gap-x-2',
   },
-  alert__warning: {},
-  alert__error: {},
   alertIcon: {
     className: 'shrink-0 size-4 mt-px',
   },
@@ -31,7 +29,6 @@ export const visualStyle = {
   alert__error: {
     className: 'text-danger bg-danger/[0.06] border-danger/[0.12]',
   },
-  alertIcon: {},
 } satisfies ParsedElementsFragment;
 
 export const Alert = React.forwardRef<
