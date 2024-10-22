@@ -1,5 +1,2 @@
 export { ClerkProvider } from './client-boundary/ClerkProvider';
 export { SignedIn, SignedOut, Protect } from './client-boundary/controlComponents';
-export function ClerkDynamicProvider() {
-  throw new Error('ClerkDynamicProvider imported into a client component.');
-}

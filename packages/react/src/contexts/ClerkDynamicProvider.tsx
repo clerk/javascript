@@ -33,7 +33,7 @@ export function usePromisifiedAuth() {
 
   if (typeof window === 'undefined') {
     if (!resolvedData) {
-      throw new Error('useAuth() called without ClerkDynamicProvider');
+      throw new Error('useAuth() called in static mode, wrap this component ');
     }
     // We don't need to deal with Clerk being loaded here
     return useDerivedAuth(resolvedData);

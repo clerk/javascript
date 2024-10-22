@@ -1,38 +1,49 @@
-import type { InitialState, Without } from '@clerk/types';
+import type { Without } from '@clerk/types';
 import { headers } from 'next/headers';
 import React from 'react';
 
+import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
-import { initialState } from './auth';
-import { ClerkDynamicProvider } from './ClerkDynamicProvider';
-import { getScriptNonceFromHeader } from './utils';
+import { PromisifiedAuthProvider } from '../client/PromisifiedAuthProvider';
+import { buildRequestLike, getScriptNonceFromHeader } from './utils';
+
+const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
+  const request = await buildRequestLike();
+  const data = await getDynamicAuthData(request);
+
+  return data;
+});
+
+const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
+  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
+});
 
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
-  let state = {};
-  let nonce = '';
+  let statePromise = Promise.resolve({});
+  let nonce = Promise.resolve('');
 
   if (dynamic) {
-    state = (await initialState())?.__clerk_ssr_state as InitialState;
-    nonce = getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
+    statePromise = getDynamicClerkState();
+    nonce = getNonceFromCSPHeader();
   }
 
   const output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={nonce}
-      initialState={state}
+      nonce={React.use(nonce)}
+      initialState={React.use(statePromise)}
     >
       {children}
     </ClientClerkProvider>
   );
 
   if (dynamic) {
-    return <ClerkDynamicProvider>{output}</ClerkDynamicProvider>;
+    return <PromisifiedAuthProvider authPromise={statePromise}>{output}</PromisifiedAuthProvider>;
   }
 
   return output;
