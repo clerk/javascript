@@ -2,11 +2,18 @@ import { Slot } from '@radix-ui/react-slot';
 import { cx } from 'cva';
 import * as React from 'react';
 
+import type { ParsedElementsFragment } from '~/contexts/AppearanceContext';
+
 import CheckmarkCircleSm from './icons/checkmark-circle-sm';
 import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
 import ExclamationTriangleSm from './icons/exclamation-triangle-sm';
 import InformationCircleSm from './icons/information-circle-sm';
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldRoot
+ */
 type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function FieldRoot(
@@ -33,6 +40,12 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     </div>
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldLabel
+ */
 
 export const Label = React.forwardRef(function FieldLabel(
   {
@@ -64,6 +77,12 @@ export const Label = React.forwardRef(function FieldLabel(
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldLabelEnd
+ */
+
 export const LabelEnd = React.forwardRef(function FieldLabelEnd(
   { className, children, ...props }: React.HTMLAttributes<HTMLSpanElement>,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
@@ -79,6 +98,12 @@ export const LabelEnd = React.forwardRef(function FieldLabelEnd(
     </span>
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldHint
+ */
 
 export const Hint = React.forwardRef(function FieldHint(
   { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
@@ -96,6 +121,12 @@ export const Hint = React.forwardRef(function FieldHint(
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldCheckbox
+ */
+
 export const Checkbox = React.forwardRef(function FieldCheckbox(
   props: React.InputHTMLAttributes<HTMLInputElement>,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
@@ -110,6 +141,12 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
     />
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldInputGroup
+ */
 
 export const InputGroup = React.forwardRef(function FieldInputGroup(
   { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
@@ -129,6 +166,12 @@ export const InputGroup = React.forwardRef(function FieldInputGroup(
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldInputGroupEnd
+ */
+
 export const InputGroupEnd = React.forwardRef(function FieldInputGroupEnd(
   { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -142,6 +185,12 @@ export const InputGroupEnd = React.forwardRef(function FieldInputGroupEnd(
     />
   );
 });
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldInput
+ */
 
 // Note:
 // - To create the overlapping border/shadow effect"
@@ -225,6 +274,12 @@ export const Input = React.forwardRef(function FieldInput(
   );
 });
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * FieldMessage
+ */
+
 export const Message = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
@@ -271,3 +326,7 @@ export const Message = React.forwardRef<
     </p>
   );
 });
+
+export const layoutStyle = {} satisfies ParsedElementsFragment;
+
+export const visualStyle = {} satisfies ParsedElementsFragment;
