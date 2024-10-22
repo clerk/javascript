@@ -53,7 +53,7 @@ export default function App(props) {
   }
 
   // Handle the individual SDK upgrade
-  if (sdks.length === 1) {
+  if (!fromVersion && !toVersion && sdks[0] === 'nextjs') {
     return (
       <SDKWorkflow
         packageManager={props.packageManager}
