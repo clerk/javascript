@@ -2,8 +2,15 @@
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { describe, expect } from '@jest/globals';
+// used to assert the mock
+import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
+
+import { clerkClient } from '../clerkClient';
+import { clerkMiddleware } from '../clerkMiddleware';
+import { createRouteMatcher } from '../routeMatcher';
+import { decryptClerkRequestData } from '../utils';
 
 const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 const authenticateRequestMock = jest.fn().mockResolvedValue({
@@ -22,14 +29,6 @@ jest.mock('../clerkClient', () => {
     }),
   };
 });
-
-// used to assert the mock
-import assert from 'assert';
-
-import { clerkClient } from '../clerkClient';
-import { clerkMiddleware } from '../clerkMiddleware';
-import { createRouteMatcher } from '../routeMatcher';
-import { decryptClerkRequestData } from '../utils';
 
 /**
  * Disable console warnings about config matchers
@@ -88,8 +87,9 @@ describe('ClerkMiddleware type tests', () => {
 
   it('can be used with a handler and an optional options object', () => {
     clerkMiddlewareMock(
-      (auth, request, event) => {
-        auth().getToken();
+      async (auth, request, event) => {
+        const { getToken } = await auth();
+        await getToken();
         request.cookies.clear();
         event.sourcePage;
       },
@@ -98,8 +98,9 @@ describe('ClerkMiddleware type tests', () => {
   });
 
   it('can be used with just a handler and an optional options object', () => {
-    clerkMiddlewareMock((auth, request, event) => {
-      auth().getToken();
+    clerkMiddlewareMock(async (auth, request, event) => {
+      const { getToken } = await auth();
+      await getToken();
       request.cookies.clear();
       event.sourcePage;
     });
@@ -261,8 +262,9 @@ describe('clerkMiddleware(params)', () => {
         appendDevBrowserCookie: true,
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().redirectToSignIn();
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignIn } = await auth();
+        redirectToSignIn();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -277,8 +279,9 @@ describe('clerkMiddleware(params)', () => {
         appendDevBrowserCookie: true,
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().redirectToSignIn();
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignIn } = await auth();
+        redirectToSignIn();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -294,8 +297,9 @@ describe('clerkMiddleware(params)', () => {
         appendDevBrowserCookie: true,
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().redirectToSignIn({ returnBackUrl: 'https://www.clerk.com/hello' });
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignIn } = await auth();
+        redirectToSignIn({ returnBackUrl: 'https://www.clerk.com/hello' });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
@@ -313,8 +317,9 @@ describe('clerkMiddleware(params)', () => {
         appendDevBrowserCookie: true,
       });
 
-      const resp = await clerkMiddleware(auth => {
-        auth().redirectToSignIn({ returnBackUrl: null });
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignIn } = await auth();
+        redirectToSignIn({ returnBackUrl: null });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
