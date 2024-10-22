@@ -301,7 +301,7 @@ ${error.getFullMessage()}`,
           data: null,
           error: {
             message: `Unexpected Server/BAPI error`,
-            cause: { reason: RefreshTokenErrorReason.UnexpectedBAPIError, errors: err },
+            cause: { reason: RefreshTokenErrorReason.UnexpectedBAPIError, errors: [err] },
           },
         };
       }
