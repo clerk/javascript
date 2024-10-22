@@ -251,6 +251,63 @@ export const InputGroupEnd = React.forwardRef(function FieldInputGroupEnd(
  * FieldInput
  */
 
+const fieldInputLayoutStyle = {
+  fieldInput: {
+    className: [
+      'py-[--field-input-py]',
+      'ps-[--field-input-px]',
+      // If an `InputGroup` exists, use the `pe` value, or fallback to the
+      // standard input `px` value
+      'pe-[var(--field-input-group-pe,var(--field-input-px))]',
+      'relative flex min-w-0 items-center',
+      'supports-ios:text-[length:1rem] supports-ios:min-h-[1.875rem]',
+    ].join(' '),
+  },
+};
+
+const fieldInputVisualStyle = {
+  fieldInput: {
+    className: [
+      'text-gray-12 rounded-md bg-white text-base outline-none ring ring-offset-1',
+      'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+    ].join(' '),
+  },
+  fieldInputIdle: {
+    className: [
+      '[--cl-field-input-border:theme(colors.gray.a4)]',
+      '[--cl-field-input-border-active:theme(colors.gray.a7)]',
+    ].join(' '),
+  },
+  fieldInputInfo: {
+    className: [
+      '[--cl-field-input-border:theme(colors.gray.a7)]',
+      '[--cl-field-input-border-active:theme(colors.gray.a7)]',
+    ].join(' '),
+  },
+  fieldInputError: {
+    className: [
+      '[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
+      '[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
+      '[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
+    ].join(' '),
+  },
+  fieldInputSuccess: {
+    className: [
+      '[--cl-field-input-border:theme(colors.success.DEFAULT)]',
+      '[--cl-field-input-border-active:theme(colors.success.DEFAULT)]',
+      '[--cl-field-input-ring:theme(colors.success.DEFAULT/0.25)]',
+    ].join(' '),
+  },
+  fieldInputWarning: {
+    className: [
+      '[--cl-field-input-border:theme(colors.warning.DEFAULT)]',
+      '[--cl-field-input-border-active:theme(colors.warning.DEFAULT)]',
+      '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
+    ].join(' '),
+  },
+};
+
 // Note:
 // - To create the overlapping border/shadow effect"
 //   - `ring` – "focus ring"
@@ -430,6 +487,7 @@ export const layoutStyle = {
   ...fieldCheckboxLayoutStyle,
   ...fieldInputGroupLayoutStyle,
   ...fieldInputGroupEndLayoutStyle,
+  ...fieldInputLayoutStyle,
   ...fieldMessageLayoutStyle,
 } satisfies ParsedElementsFragment;
 
@@ -441,5 +499,6 @@ export const visualStyle = {
   ...fieldCheckboxVisualStyle,
   // ...fieldInputGroupVisualStyle,
   // ...fieldInputGroupEndVisualStyle,
+  ...fieldInputVisualStyle,
   ...fieldMessageVisualStyle,
 } satisfies ParsedElementsFragment;
