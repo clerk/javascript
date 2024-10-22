@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.27.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fix `SignInProps`/`SignUpProps` `__experimental` type to allow for arbitrary properties ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.26.0
 
 ### Minor Changes
