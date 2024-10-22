@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { reverificationMismatch } from '@clerk/shared/authorization-errors';
 
 const logUserIdActionReverification = async () => {
-  const { userId } = auth().protect();
+  const { userId } = await auth.protect();
 
   const config = {
     level: 'secondFactor',
@@ -12,7 +12,7 @@ const logUserIdActionReverification = async () => {
   } as const;
 
   if (
-    !auth().has({
+    !(await auth()).has({
       __experimental_reverification: config,
     })
   ) {
