@@ -21,7 +21,7 @@ export function GET() {
 }
 ```
 
-The `auth`method now becomes asynchronous. You will need to make the following changes to the snippet above to make it compatible.
+The `auth` method now becomes asynchronous. You will need to make the following changes to the snippet above to make it compatible.
 
 ```diff
 - export function GET() {
