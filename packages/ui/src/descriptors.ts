@@ -3,8 +3,8 @@ import { OAUTH_PROVIDERS, type OAuthProvider, WEB3_PROVIDERS, type Web3Provider 
 export const DESCRIPTORS = [
   // Alert
   'alert',
-  'alert__error',
-  'alert__warning',
+  'alertError',
+  'alertWarning',
   'alertIcon',
 
   // Button
@@ -38,6 +38,8 @@ export const DESCRIPTORS = [
   'fieldInputGroup',
   'fieldInputGroupEnd',
   'fieldInput',
+  'fieldInputDefault',
+  'fieldInputOtp',
   'fieldInputIdle',
   'fieldInputInfo',
   'fieldInputError',

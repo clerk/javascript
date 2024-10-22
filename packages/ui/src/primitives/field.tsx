@@ -263,6 +263,8 @@ const fieldInputLayoutStyle = {
       'supports-ios:text-[length:1rem] supports-ios:min-h-[1.875rem]',
     ].join(' '),
   },
+  fieldInputDefault: { className: 'w-full justify-start' },
+  fieldInputOtp: { className: 'aspect-square size-10 justify-center' },
 };
 
 const fieldInputVisualStyle = {
@@ -272,6 +274,9 @@ const fieldInputVisualStyle = {
       'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
       'disabled:cursor-not-allowed disabled:opacity-50',
     ].join(' '),
+  },
+  fieldInputOtp: {
+    className: 'text-[calc(var(--cl-font-size)*1.4)] font-semibold',
   },
   fieldInputIdle: {
     className: [
