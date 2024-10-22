@@ -51,8 +51,8 @@ export default clerkMiddleware(async (auth, req) => {
     catch (e) { unstable_rethrow(e) }
   }
 
-  if(isAdminRoute(req)){
-    try { await auth.protect({role: 'admin'}); }
+  if (isAdminRoute(req)) {
+    try { await auth.protect({role: 'admin'}) }
     catch (e) { unstable_rethrow(e) }
   }
 
