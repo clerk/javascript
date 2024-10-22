@@ -1,5 +1,6 @@
 import { Select, Spinner, StatusMessage } from '@inkjs/ui';
 import { Newline, Text } from 'ink';
+import Link from 'ink-link';
 import React, { useState } from 'react';
 
 import { getClerkSdkVersion } from '../util/get-clerk-version.js';
@@ -105,6 +106,14 @@ export function SDKWorkflow(props) {
                 <Text>
                   If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
                   prop to your application's root <Text bold>ClerkProvider</Text>.
+                </Text>
+                <Newline />
+                <Text>
+                  You can find more information about this change in the Clerk documentation at{' '}
+                  <Link url='https://clerk.com/docs/nextjs/rendering-modes'>
+                    https://clerk.com/docs/nextjs/rendering-modes
+                  </Link>
+                  .
                 </Text>
               </StatusMessage>
             )}
