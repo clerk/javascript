@@ -38,7 +38,7 @@ export default function App(props) {
 
   const [toVersion, setToVersion] = useState(props.toVersion);
   const [dir, setDir] = useState(props.dir);
-  const [ignore, setIgnore] = useState(props.ignore);
+  const [ignore, setIgnore] = useState(props.ignore ?? []);
   const [configComplete, setConfigComplete] = useState(false);
   const [configVerified, setConfigVerified] = useState(false);
   const [uuid, setUuid] = useState();
