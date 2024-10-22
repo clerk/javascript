@@ -11,6 +11,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  usePromisifiedAuth,
 } from '@clerk/clerk-react';
 
 export {
