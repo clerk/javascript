@@ -39,14 +39,10 @@ test.describe('Client handshake @generic', () => {
       .clone()
       .addFile(
         'src/middleware.ts',
-        () => `import { authMiddleware } from '@clerk/nextjs/server';
-
-    // Set the paths that don't require the user to be signed in
-    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+        () => `import { clerkMiddleware } from '@clerk/nextjs/server';
 
     export const middleware = (req, evt) => {
-      return authMiddleware({
-        publicRoutes: publicPaths,
+      return clerkMiddleware({
         publishableKey: req.headers.get("x-publishable-key"),
         secretKey: req.headers.get("x-secret-key"),
         proxyUrl: req.headers.get("x-proxy-url"),
@@ -1256,6 +1252,12 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         redirect: 'manual',
       });
 
+      if (testCase.name === 'Header-based auth should not handshake with expired auth') {
+        console.log(testCase.name);
+        console.log(res.headers.get('x-clerk-auth-status'));
+        console.log(res.headers.get('x-clerk-auth-reason'));
+      }
+
       expect(res.status).toBe(testCase.then.expectStatus);
       const redirectSearchParams = new URLSearchParams(res.headers.get('location'));
       expect(redirectSearchParams.get('organization_id')).toBe(testCase.then.fapiOrganizationIdParamValue);
@@ -1373,14 +1375,17 @@ test.describe('Client handshake with an organization activation avoids infinite 
  */
 const startAppWithOrganizationSyncOptions = async (clerkAPIUrl: string): Promise<Application> => {
   const env = appConfigs.envs.withEmailCodes.clone().setEnvVariable('private', 'CLERK_API_URL', clerkAPIUrl);
+  const middlewareFile = `import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-  const middlewareFile = `import { authMiddleware } from '@clerk/nextjs/server';
-    // Set the paths that don't require the user to be signed in
-    const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
+    const isProtectedRoute = createRouteMatcher(['/organizations(.*)'])
+
     export const middleware = (req, evt) => {
       const orgSyncOptions = req.headers.get("x-organization-sync-options")
-      return authMiddleware({
-        publicRoutes: publicPaths,
+      return clerkMiddleware((auth, req) => {
+        if (isProtectedRoute(req) && !auth().userId) {
+          auth().redirectToSignIn()
+        }
+      }, {
         publishableKey: req.headers.get("x-publishable-key"),
         secretKey: req.headers.get("x-secret-key"),
         proxyUrl: req.headers.get("x-proxy-url"),

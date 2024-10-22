@@ -2,38 +2,8 @@ import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
+import type { DescriptorIdentifier } from '~/descriptors';
 import { fullTheme } from '~/themes';
-
-type AlertDescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertIcon';
-type ButtonDescriptorIdentifier =
-  | 'button'
-  | 'buttonPrimary'
-  | 'buttonSecondary'
-  | 'buttonConnection'
-  | 'buttonPrimaryDefault'
-  | 'buttonSecondaryDefault'
-  | 'buttonConnectionDefault'
-  | 'buttonDisabled'
-  | 'buttonBusy'
-  | 'buttonText'
-  | 'buttonTextVisuallyHidden'
-  | 'buttonIcon'
-  | 'buttonIconStart'
-  | 'buttonIconEnd'
-  | 'buttonSpinner';
-type SeparatorDescriptorIdentifier = 'separator';
-type SpinnerDescriptorIdentifier = 'spinner';
-type CardDescriptorIdentifier = 'logoBox' | 'logoLink' | 'logoImage';
-
-/**
- * Union of all valid descriptors used throughout the components.
- */
-export type DescriptorIdentifier =
-  | AlertDescriptorIdentifier
-  | ButtonDescriptorIdentifier
-  | SeparatorDescriptorIdentifier
-  | SpinnerDescriptorIdentifier
-  | CardDescriptorIdentifier;
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
@@ -48,7 +18,7 @@ export type PartialDescriptor = Omit<Partial<ParsedDescriptor>, 'descriptor'>;
 /**
  * A full theme generated from merging ParsedElementsFragments. Has entries for each descriptor, but they're not complete.
  */
-export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
+export type PartialTheme = Partial<Record<DescriptorIdentifier, PartialDescriptor>>;
 
 /**
  * A subset of a partial theme. This is the type used when authoring style objects within a component.
@@ -173,7 +143,7 @@ function mergeElementsAppearanceConfig(
   }
 
   if (!result) {
-    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${JSON.stringify(a)} and ${JSON.stringify(b)}`);
   }
 
   return result;
@@ -202,7 +172,8 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     Object.entries(b.elements).forEach(([element, config]) => {
       const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
-        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config!);
       } else {
         result.elements![el] = config;
       }
@@ -233,7 +204,8 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
         } else {
-          const { className, ...style } = config;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          const { className, ...style } = config!;
           if (className) {
             result.elements[el].className = [result.elements[el].className, className].join(' ');
           }
