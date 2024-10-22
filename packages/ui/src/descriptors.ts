@@ -29,6 +29,9 @@ export const DESCRIPTORS = [
   'connectionList',
   'connectionListItem',
 
+  // Field
+  'fieldRoot',
+
   // Separator
   'separator',
 

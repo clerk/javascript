@@ -2,7 +2,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cx } from 'cva';
 import * as React from 'react';
 
-import type { ParsedElementsFragment } from '~/contexts/AppearanceContext';
+import { mergeDescriptors, type ParsedElementsFragment, useAppearance } from '~/contexts/AppearanceContext';
 
 import CheckmarkCircleSm from './icons/checkmark-circle-sm';
 import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
@@ -14,27 +14,41 @@ import InformationCircleSm from './icons/information-circle-sm';
 /**
  * FieldRoot
  */
+
+const fieldRootLayoutStyle = {
+  fieldRoot: {
+    className: [
+      '[--field-input-height:1.875rem]',
+      '[--field-input-px:theme(spacing.3)]',
+      'supports-ios:[--field-input-py:theme(spacing.1)] [--field-input-py:theme(spacing[1.5])]',
+      '[--field-input-group-end-size:--field-input-height]',
+      'flex flex-col gap-2',
+    ].join(' '),
+  },
+};
+
+const fieldRootVisualStyle = {
+  fieldRoot: {
+    className: [
+      'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
+      'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
+    ].join(' '),
+  },
+};
+
 type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function FieldRoot(
   { children, className, ...props },
   forwardedRef,
 ) {
+  const { elements } = useAppearance().parsedAppearance;
   return (
     <div
       data-field-root=''
       ref={forwardedRef}
       {...props}
-      className={cx(
-        '[--field-input-height:1.875rem]',
-        '[--field-input-px:theme(spacing.3)]',
-        'supports-ios:[--field-input-py:theme(spacing.1)] [--field-input-py:theme(spacing[1.5])]',
-        '[--field-input-group-end-size:--field-input-height]',
-        'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
-        'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
-        'flex flex-col gap-2',
-        className,
-      )}
+      {...mergeDescriptors(elements.fieldRoot)}
     >
       {children}
     </div>
@@ -327,6 +341,10 @@ export const Message = React.forwardRef<
   );
 });
 
-export const layoutStyle = {} satisfies ParsedElementsFragment;
+export const layoutStyle = {
+  ...fieldRootLayoutStyle,
+} satisfies ParsedElementsFragment;
 
-export const visualStyle = {} satisfies ParsedElementsFragment;
+export const visualStyle = {
+  ...fieldRootVisualStyle,
+} satisfies ParsedElementsFragment;
