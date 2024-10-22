@@ -186,6 +186,31 @@ export default clerkMiddleware(
 `,
   },
   {
+    name: 'Complex clerkMiddleware() without protect()',
+    source: `
+import { clerkMiddleware } from '@clerk/nextjs/server';
+
+export default clerkMiddleware(
+  (auth, req) => {
+    const { redirectToSignIn } = auth();
+
+    redirectToSignIn();
+  },
+);
+`,
+    output: `
+import { clerkMiddleware } from '@clerk/nextjs/server';
+
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { redirectToSignIn } = await auth();
+
+    redirectToSignIn();
+  },
+);
+`,
+  },
+  {
     name: 'Does not transform other imports',
     source: `
   import { auth } from '@some/other/module';
