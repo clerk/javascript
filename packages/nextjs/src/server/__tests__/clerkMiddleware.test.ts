@@ -339,9 +339,8 @@ describe('clerkMiddleware(params)', () => {
         toAuth: () => ({ userId: null }),
       });
 
-      // @ts-expect-error - FIXME
       const resp = await clerkMiddleware(async auth => {
-        return auth.protect();
+        await auth.protect();
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
