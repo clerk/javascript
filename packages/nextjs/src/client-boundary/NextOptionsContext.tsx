@@ -9,7 +9,7 @@ ClerkNextOptionsCtx.displayName = 'ClerkNextOptionsCtx';
 
 const useClerkNextOptions = () => {
   const ctx = React.useContext(ClerkNextOptionsCtx) as { value: ClerkNextContextValue };
-  return ctx.value;
+  return ctx?.value;
 };
 
 const ClerkNextOptionsProvider = (
