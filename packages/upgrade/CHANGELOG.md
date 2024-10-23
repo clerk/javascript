@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.1.1
+
+### Patch Changes
+
+- Adding fallback to properly link up transform ([#4386](https://github.com/clerk/javascript/pull/4386)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.1.0
 
 ### Minor Changes
