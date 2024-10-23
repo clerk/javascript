@@ -1,12 +1,8 @@
-const webpack = require('webpack');
+const rspack = require('@rspack/core');
 const packageJSON = require('./package.json');
 const path = require('path');
 const { merge } = require('webpack-merge');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const ReactRefreshTypeScript = require('react-refresh-typescript');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const TerserPlugin = require('terser-webpack-plugin');
-const { RsdoctorWebpackPlugin } = require('@rsdoctor/webpack-plugin');
+const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -25,7 +21,7 @@ const variantToSourceFile = {
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
 };
 
-/** @returns { import('webpack').Configuration } */
+/** @returns { import('@rspack/cli').Configuration } */
 const common = ({ mode }) => {
   /** @type { import('webpack').Configuration } */
   return {
@@ -36,12 +32,12 @@ const common = ({ mode }) => {
       extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx'],
     },
     plugins: [
-      new webpack.DefinePlugin({
+      new rspack.DefinePlugin({
         __DEV__: isDevelopment(mode),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
       }),
-      new webpack.EnvironmentPlugin({
+      new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
@@ -92,7 +88,7 @@ const common = ({ mode }) => {
             minChunks: 2,
             name: 'common-new',
             chunks(chunk) {
-              return chunk.name?.startsWith('rebuild--');
+              return !!chunk.name?.startsWith('rebuild--');
             },
             priority: 0,
           },
@@ -109,7 +105,7 @@ const common = ({ mode }) => {
   };
 };
 
-/** @type { () => (import('webpack').RuleSetRule) }  */
+/** @type { () => (import('@rspack/core').RuleSetRule) }  */
 const svgLoader = () => {
   return {
     test: /\.svg$/,
@@ -130,44 +126,62 @@ const svgLoader = () => {
   };
 };
 
-/** @type { () => (import('webpack').RuleSetRule) } */
+/** @type { () => (import('@rspack/core').RuleSetRule) } */
 const typescriptLoaderProd = () => {
-  return {
-    test: /\.(js|mjs|jsx|ts|tsx)$/,
-    exclude: /node_modules/,
-    resolve: {
-      fullySpecified: false,
-    },
-    use: [
-      {
-        loader: 'ts-loader',
-        options: { transpileOnly: true },
-      },
-    ],
-  };
-};
-
-/** @type { () => (import('webpack').RuleSetRule) } */
-const typescriptLoaderDev = () => {
-  return {
-    test: /\.(js|mjs|jsx|ts|tsx)$/,
-    exclude: /node_modules/,
-    resolve: {
-      fullySpecified: false,
-    },
-    use: [
-      {
-        loader: 'ts-loader',
+  return [
+    {
+      test: /\.(jsx?|tsx?)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'builtin:swc-loader',
         options: {
-          configFile: 'tsconfig.dev.json',
-          transpileOnly: true,
-          getCustomTransformers: () => ({
-            before: [ReactRefreshTypeScript()],
-          }),
+          jsc: {
+            parser: {
+              syntax: 'typescript',
+              tsx: true,
+            },
+            externalHelpers: true,
+            transform: {
+              react: {
+                runtime: 'automatic',
+                importSource: '@emotion/react',
+                development: false,
+                refresh: false,
+              },
+            },
+          },
         },
       },
-    ],
-  };
+    },
+  ];
+};
+
+/** @type { () => (import('@rspack/core').RuleSetRule) } */
+const typescriptLoaderDev = () => {
+  return [
+    {
+      test: /\.(jsx?|tsx?)$/,
+      exclude: /node_modules/,
+      loader: 'builtin:swc-loader',
+      options: {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          externalHelpers: true,
+          transform: {
+            react: {
+              runtime: 'automatic',
+              importSource: '@emotion/react',
+              development: true,
+              refresh: true,
+            },
+          },
+        },
+      },
+    },
+  ];
 };
 
 /**
@@ -201,7 +215,7 @@ const clerkUICSSSourceLoader = () => {
 const commonForProdChunked = () => {
   return {
     module: {
-      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSLoader()],
+      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSLoader()],
     },
   };
 };
@@ -213,7 +227,7 @@ const commonForProdChunked = () => {
 const commonForProdBundled = () => {
   return {
     module: {
-      rules: [svgLoader(), typescriptLoaderProd(), clerkUICSSSourceLoader()],
+      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSSourceLoader()],
     },
   };
 };
@@ -230,22 +244,7 @@ const commonForProd = () => {
     },
     optimization: {
       minimize: true,
-      minimizer: [
-        compiler => {
-          new TerserPlugin({
-            terserOptions: {
-              compress: {
-                unused: true,
-                dead_code: true,
-                passes: 2,
-              },
-              mangle: {
-                safari10: true,
-              },
-            },
-          }).apply(compiler);
-        },
-      ],
+      minimizer: [new rspack.SwcJsMinimizerRspackPlugin()],
     },
     plugins: [
       // new webpack.optimize.LimitChunkCountPlugin({
@@ -273,7 +272,7 @@ const entryForVariant = variant => {
 };
 
 /** @type { () => (import('webpack').Configuration)[] } */
-const prodConfig = ({ mode }) => {
+const prodConfig = ({ mode, analysis }) => {
   const clerkBrowser = merge(
     entryForVariant(variants.clerkBrowser),
     common({ mode }),
@@ -320,7 +319,7 @@ const prodConfig = ({ mode }) => {
       // Include the lazy chunks in the bundle as well
       // so that the final bundle can be imported and bundled again
       // by a different bundler, eg the webpack instance used by react-scripts
-      new webpack.optimize.LimitChunkCountPlugin({
+      new rspack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
     ],
@@ -335,11 +334,16 @@ const prodConfig = ({ mode }) => {
       // Include the lazy chunks in the bundle as well
       // so that the final bundle can be imported and bundled again
       // by a different bundler, eg the webpack instance used by react-scripts
-      new webpack.optimize.LimitChunkCountPlugin({
+      new rspack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
     ],
   });
+
+  // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
+  if (analysis) {
+    return clerkBrowser;
+  }
 
   return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
 };
@@ -353,12 +357,9 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), typescriptLoaderDev(), clerkUICSSLoader()],
+        rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
       },
-      plugins: [
-        new ReactRefreshWebpackPlugin({ overlay: { sockHost: devUrl.host } }),
-        ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
-      ],
+      plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
       devtool: 'eval-cheap-source-map',
       output: {
         publicPath: `${devUrl.origin}/npm`,
@@ -417,5 +418,7 @@ const devConfig = ({ mode, env }) => {
 
 module.exports = env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig({ mode, env }) : devConfig({ mode, env });
+  const analysis = !!env.analysis;
+
+  return isProduction(mode) ? prodConfig({ mode, env, analysis }) : devConfig({ mode, env });
 };

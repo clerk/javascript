@@ -14,7 +14,7 @@ import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
-import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
+import { removeOptionalCatchAllSegment } from '../utils/path-inference/utils';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -118,8 +118,11 @@ export function SignInRoot({
   routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const inferredPath = usePathnameWithoutCatchAll();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
+  const pathname = router.pathname();
+  const inferredPath = removeOptionalCatchAllSegment(pathname);
   const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
+  const isRootPath = path === pathname;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignInRoot', {
@@ -129,9 +132,6 @@ export function SignInRoot({
       routing,
     }),
   );
-
-  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
-  const isRootPath = path === router.pathname();
 
   return (
     <Router
