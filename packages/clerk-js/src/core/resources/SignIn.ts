@@ -306,6 +306,10 @@ export class SignIn extends BaseResource implements SignInResource {
      */
 
     const _isWebAuthnSupported = SignIn.clerk.__unstable__isWebAuthnSupported || isWebAuthnSupported;
+    const _webAuthnGetCredential = SignIn.clerk.__unstable__getPublicCredentials || webAuthnGetCredential;
+    const _isWebAuthnAutofillSupported =
+      SignIn.clerk.__unstable__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
+
     if (!_isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
@@ -336,21 +340,6 @@ export class SignIn extends BaseResource implements SignInResource {
       clerkMissingWebAuthnPublicKeyOptions('get');
     }
 
-    // Handle the passkey authentication for EXPO apps
-    if (SignIn.clerk.__unstable__getPublicCredentials) {
-      //@ts-expect-error
-      const { publicKeyCredential, error } = await SignIn.clerk.__unstable__getPublicCredentials(publicKeyOptions);
-
-      if (!publicKeyCredential) {
-        throw error;
-      }
-
-      return this.attemptFirstFactor({
-        publicKeyCredential,
-        strategy: 'passkey',
-      });
-    }
-
     let canUseConditionalUI = false;
 
     if (flow === 'autofill') {
@@ -358,11 +347,11 @@ export class SignIn extends BaseResource implements SignInResource {
        * If autofill is not supported gracefully handle the result, we don't need to throw.
        * The caller should always check this before calling this method.
        */
-      canUseConditionalUI = await isWebAuthnAutofillSupported();
+      canUseConditionalUI = await _isWebAuthnAutofillSupported();
     }
 
     // Invoke the navigator.create.get() method.
-    const { publicKeyCredential, error } = await webAuthnGetCredential({
+    const { publicKeyCredential, error } = await _webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
     });

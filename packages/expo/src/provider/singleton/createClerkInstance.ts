@@ -67,6 +67,18 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             ? options?.passkeys?.isSupported()
             : errorThrower.throw('isSupported() for passkeys is missing');
         };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnAutofillSupported = () => {
+          return options?.passkeys?.isAutoFillSupported
+            ? options?.passkeys?.isAutoFillSupported()
+            : errorThrower.throw('isSupported() for passkeys is missing');
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnPlatformAuthenticatorSupported = () => {
+          return Promise.resolve(true);
+        };
       }
 
       // @ts-expect-error - This is an internal API

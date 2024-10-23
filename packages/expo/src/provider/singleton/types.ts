@@ -19,5 +19,6 @@ export type BuildClerkOptions = {
       publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
     ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>;
     isSupported: () => boolean;
+    isAutoFillSupported: () => Promise<boolean>;
   };
 };
