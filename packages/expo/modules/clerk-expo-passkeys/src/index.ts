@@ -119,7 +119,6 @@ export async function get({
 }: {
   publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
 }): Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>> {
-  console.log('publicKeyOptions', publicKeyOptions);
   if (!publicKeyOptions) {
     throw new Error('publicKeyCredential has not been provided');
   }
