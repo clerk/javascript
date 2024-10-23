@@ -9,7 +9,7 @@ export function OTPField({
   label,
   resend,
   ...props
-}: React.ComponentProps<typeof Common.Input> & {
+}: React.ComponentProps<'span'> & {
   /**
    * **Note:** this prop is required as the `label` differs depending on the context (e.g. email code vs. link code)
    */
