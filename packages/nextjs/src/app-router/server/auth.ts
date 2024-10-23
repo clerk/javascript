@@ -66,6 +66,6 @@ auth.protect = async (...args) => {
     redirect,
   });
 
-  // @ts-ignore
+  // @ts-expect-error TS flattens all possible combinations of the for AuthProtect signatures in a union.
   return protect(...args);
 };
