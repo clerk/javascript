@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Buffer } from 'buffer';
 
 export function encodeBase64(data: ArrayLike<number> | ArrayBufferLike) {
@@ -60,49 +60,18 @@ export function base64urlToArrayBuffer(base64url: string) {
 }
 
 export function arrayBufferToBase64Url(buffer) {
-  // Convert ArrayBuffer to a byte array
   const bytes = new Uint8Array(buffer);
   let binary = '';
 
-  // Convert each byte to a binary string
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
 
-  // Base64 encode the binary string
   const base64String = btoa(binary);
 
-  // Convert to Base64URL by replacing characters
-  const base64Url = base64String
-    .replace(/\+/g, '-') // Replace + with -
-    .replace(/\//g, '_') // Replace / with _
-    .replace(/=+$/, ''); // Remove padding (equal signs)
+  const base64Url = base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
   return base64Url;
-}
-
-type ClerkWebAuthnErrorCode =
-  // Generic
-  | 'passkey_not_supported'
-  | 'passkey_pa_not_supported'
-  | 'passkey_invalid_rpID_or_domain'
-  | 'passkey_already_exists'
-  | 'passkey_operation_aborted'
-  // Retrieval
-  | 'passkey_retrieval_cancelled'
-  | 'passkey_retrieval_failed'
-  // Registration
-  | 'passkey_registration_cancelled'
-  | 'passkey_registration_failed';
-
-//TODO THIS NEEDS TO BE IMPORTED FROM JS FILE. We need to first export it from there though.
-export class ClerkWebAuthnError extends ClerkRuntimeError {
-  code: ClerkWebAuthnErrorCode;
-
-  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
-    super(message, { code });
-    this.code = code;
-  }
 }
 
 export function mapNativeErrorToClerkWebAuthnErrorCode(

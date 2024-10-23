@@ -185,5 +185,7 @@ export const passkeys = {
   create,
   get,
   isSupported,
-  isAutoFillSupported: () => Promise.resolve(false),
+  isAutoFillSupported: () => {
+    throw new Error('Not supported');
+  },
 };
