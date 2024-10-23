@@ -136,7 +136,7 @@ export default function App() {
     <ClerkProvider
       publishableKey={publishableKey}
       tokenCache={tokenCache}
-      passkeysFunc={passkeys}
+      passkeys={passkeys}
     >
       <View style={styles.container}>
         <SignedIn>

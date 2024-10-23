@@ -114,16 +114,19 @@ const makeSerializedGetResponse = (
   };
 };
 
-export async function get(
-  publicKeyCredential: PublicKeyCredentialRequestOptionsWithoutExtensions,
-): Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>> {
-  if (!publicKeyCredential) {
+export async function get({
+  publicKeyOptions,
+}: {
+  publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+}): Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>> {
+  console.log('publicKeyOptions', publicKeyOptions);
+  if (!publicKeyOptions) {
     throw new Error('publicKeyCredential has not been provided');
   }
 
   const serializedPublicCredential: SerializedPublicKeyCredentialRequestOptions = {
-    ...publicKeyCredential,
-    challenge: arrayBufferToBase64Url(publicKeyCredential.challenge),
+    ...publicKeyOptions,
+    challenge: arrayBufferToBase64Url(publicKeyOptions.challenge),
   };
 
   const getPasskeyModule = Platform.select({
@@ -183,4 +186,5 @@ export const passkeys = {
   create,
   get,
   isSupported,
+  isAutoFillSupported: () => Promise.resolve(false),
 };
