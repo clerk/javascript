@@ -14,7 +14,6 @@ type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redir
 
 export interface AuthFn {
   (): Promise<Auth>;
-
   protect: AuthProtect;
 }
 
