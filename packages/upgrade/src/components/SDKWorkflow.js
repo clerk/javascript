@@ -67,6 +67,7 @@ export function SDKWorkflow(props) {
             <Codemod
               sdk={sdk}
               callback={setDone}
+              transform='transform-async-request'
             />
           ) : (
             <Select
