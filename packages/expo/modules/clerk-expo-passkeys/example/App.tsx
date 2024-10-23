@@ -4,8 +4,6 @@ import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 
-import { usePasskeys } from './hooks/usePasskeys';
-
 const tokenCache = {
   async getToken(key: string) {
     try {
@@ -35,11 +33,12 @@ const ProtectedView = () => {
   const { user: clerkUser } = useUser();
   const auth = useAuth();
 
-  const passkeys = usePasskeys();
-
-  const handleCreate = async () => {
+  const handleCreatePasskey = async () => {
+    if (!clerkUser) {
+      return null;
+    }
     try {
-      await passkeys?.createPasskey();
+      return await clerkUser.createPasskey();
     } catch (e) {
       console.error(e);
     }
@@ -55,7 +54,7 @@ const ProtectedView = () => {
         padding: 20,
       }}
     >
-      <TouchableOpacity onPress={handleCreate}>
+      <TouchableOpacity onPress={handleCreatePasskey}>
         <Text>Create passkey</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -78,16 +77,22 @@ const ProtectedView = () => {
 };
 
 const PublicView = () => {
-  const { signInWithPasskey } = usePasskeys();
   const { signIn, setActive, isLoaded } = useSignIn();
 
   const [emailAddress, setEmailAddress] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const onSignInWithPasskey = async () => {
+    if (!isLoaded) {
+      return null;
+    }
     try {
-      await signInWithPasskey();
-    } catch (e) {
+      const signinResponse = await signIn.authenticateWithPasskey({
+        flow: 'discoverable',
+      });
+
+      await setActive({ session: signinResponse.createdSessionId });
+    } catch (e: any) {
       if (e.clerkError) {
         console.log(e.errors[0].longMessage);
       }
@@ -106,9 +111,9 @@ const PublicView = () => {
         password,
       });
       await setActive({ session: completeSignIn.createdSessionId });
-    } catch (err) {
-      if (e.clerkError) {
-        console.log(e.errors[0].longMessage);
+    } catch (err: any) {
+      if (err.clerkError) {
+        console.log(err.errors[0].longMessage);
       }
       console.error(err);
     }
