@@ -14,7 +14,7 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
    * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
    */
   tokenCache?: TokenCache;
-  passkeysFunc?: BuildClerkOptions['passkeysFunc'];
+  passkeys?: BuildClerkOptions['passkeys'];
 };
 
 const SDK_METADATA = {
@@ -23,7 +23,7 @@ const SDK_METADATA = {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, publishableKey, passkeysFunc, ...rest } = props;
+  const { children, tokenCache, publishableKey, passkeys, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   if (isWeb()) {
@@ -44,8 +44,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
           ? getClerkInstance({
               publishableKey: pk,
               tokenCache,
-              // passkeysFunc: passkeysFunc ? passkeysFunc : { get, create, isSupported },
-              passkeysFunc,
+              passkeys,
             })
           : null
       }

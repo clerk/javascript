@@ -48,18 +48,24 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         __internal_clerk.__unstable__createPublicCredentials = (
           publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
         ) => {
-          return options?.passkeysFunc?.create(publicKeyCredential);
+          return options?.passkeys?.create
+            ? options?.passkeys?.create(publicKeyCredential)
+            : errorThrower.throw('create() for passkeys is missing');
         };
 
         // @ts-expect-error - This is an internal API
         __internal_clerk.__unstable__getPublicCredentials = (
           publicKeyCredential: PublicKeyCredentialRequestOptionsWithoutExtensions,
         ) => {
-          return options?.passkeysFunc?.get(publicKeyCredential);
+          return options?.passkeys?.get
+            ? options?.passkeys?.get(publicKeyCredential)
+            : errorThrower.throw('get() for passkeys is missing');
         };
         // @ts-expect-error - This is an internal API
         __internal_clerk.__unstable__isWebAuthnSupported = () => {
-          return options?.passkeysFunc?.isSupported();
+          return options?.passkeys?.isSupported
+            ? options?.passkeys?.isSupported()
+            : errorThrower.throw('isSupported() for passkeys is missing');
         };
       }
 
