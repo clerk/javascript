@@ -10,7 +10,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "2.3.0-snapshot.va96a299",
+    "@clerk/clerk-expo": "2.3.0-snapshot.vb92f3ea",
     "@clerk/clerk-js": "5.29.0-snapshot.va96a299",
     "@clerk/clerk-react": "5.13.1-snapshot.va96a299",
     "@clerk/shared": "2.10.1-snapshot.va96a299",
