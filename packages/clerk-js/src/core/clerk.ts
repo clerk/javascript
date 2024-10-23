@@ -862,6 +862,7 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.navigate(redirectUrl);
       }
+
       beforeUnloadTracker?.stopTracking();
     }
 
