@@ -55,7 +55,9 @@ export interface AuthenticationResponseJSON {
 
 // The serialized response of the native module "create" response to be send back to clerk
 export type PublicKeyCredentialWithAuthenticatorAttestationResponse =
-  ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse;
+  ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse & {
+    toJSON: () => any;
+  };
 
 interface AuthenticatorAssertionResponseJSON {
   clientDataJSON: string;
@@ -66,7 +68,9 @@ interface AuthenticatorAssertionResponseJSON {
 
 // The serialized response of the native module "get" response to be send back to clerk
 export type PublicKeyCredentialWithAuthenticatorAssertionResponse =
-  ClerkPublicKeyCredentialWithAuthenticatorAssertionResponse;
+  ClerkPublicKeyCredentialWithAuthenticatorAssertionResponse & {
+    toJSON: () => any;
+  };
 
 interface AuthenticatorAttestationResponseJSON {
   clientDataJSON: string;
