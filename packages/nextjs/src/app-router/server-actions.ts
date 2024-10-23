@@ -7,5 +7,5 @@ import { cookies } from 'next/headers';
 // and the async is no longer required in newer next versions.
 // ref: https://github.com/vercel/next.js/pull/62821
 export async function invalidateCacheAction() {
-  return cookies().delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
+  void (await cookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
 }
