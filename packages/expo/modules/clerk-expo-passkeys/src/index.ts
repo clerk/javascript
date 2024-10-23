@@ -27,6 +27,7 @@ const makeSerializedCreateResponse = (
   },
   type: publicCredential.type,
   authenticatorAttachment: publicCredential.authenticatorAttachment || null,
+  toJSON: () => publicCredential,
 });
 
 export async function create(
@@ -117,6 +118,7 @@ const makeSerializedGetResponse = (
         ? base64urlToArrayBuffer(publicKeyCredential?.response.userHandle)
         : null,
     },
+    toJSON: () => publicKeyCredential,
   };
 };
 
@@ -184,3 +186,9 @@ export function isSupported() {
 
   return false;
 }
+
+export const passkeys = {
+  create,
+  get,
+  isSupported,
+};

@@ -1,5 +1,5 @@
 import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/clerk-expo';
-import { create, get, isSupported } from 'clerk-expo-passkeys';
+import { passkeys } from 'clerk-expo-passkeys';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
@@ -153,21 +153,7 @@ export default function App() {
     <ClerkProvider
       publishableKey={publishableKey}
       tokenCache={tokenCache}
-      passkeysFunc={{
-        get: async (publicKeyOptions: any) => {
-          const publicKeyCredential = await get(publicKeyOptions);
-          console.log(publicKeyCredential);
-          return publicKeyCredential;
-        },
-        create: async (publicKey: string) => {
-          const publicKeyCredential = await create(publicKey);
-          console.log(publicKeyCredential);
-          return publicKeyCredential;
-        },
-        isSupported: () => {
-          return isSupported();
-        },
-      }}
+      passkeysFunc={passkeys}
     >
       <View style={styles.container}>
         <SignedIn>
