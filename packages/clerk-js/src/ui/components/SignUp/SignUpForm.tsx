@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
-import { Form } from '../../elements';
+import { Form, LegalCheckbox } from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
@@ -13,10 +13,18 @@ type SignUpFormProps = {
   formState: Record<Exclude<keyof Fields, 'ticket'>, FormControlState<any>>;
   canToggleEmailPhone: boolean;
   handleEmailPhoneToggle: (type: ActiveIdentifier) => void;
+  onlyLegalAcceptedMissing?: boolean;
 };
 
 export const SignUpForm = (props: SignUpFormProps) => {
-  const { handleSubmit, fields, formState, canToggleEmailPhone, handleEmailPhoneToggle } = props;
+  const {
+    handleSubmit,
+    fields,
+    formState,
+    canToggleEmailPhone,
+    onlyLegalAcceptedMissing = false,
+    handleEmailPhoneToggle,
+  } = props;
   const { showOptionalFields } = useAppearance().parsedLayout;
 
   const shouldShow = (name: keyof typeof fields) => {
@@ -34,80 +42,97 @@ export const SignUpForm = (props: SignUpFormProps) => {
       onSubmit={handleSubmit}
       gap={8}
     >
-      <Col gap={6}>
-        {(shouldShow('firstName') || shouldShow('lastName')) && (
-          <Form.ControlRow
-            elementId='name'
-            sx={{
-              [mqu.sm]: {
-                flexWrap: 'wrap',
-              },
-            }}
-          >
-            {shouldShow('firstName') && (
+      {!onlyLegalAcceptedMissing && (
+        <Col gap={6}>
+          {(shouldShow('firstName') || shouldShow('lastName')) && (
+            <Form.ControlRow
+              elementId='name'
+              sx={{
+                [mqu.sm]: {
+                  flexWrap: 'wrap',
+                },
+              }}
+            >
+              {shouldShow('firstName') && (
+                <Form.PlainInput
+                  {...formState.firstName.props}
+                  isRequired={fields.firstName?.required}
+                  isOptional={!fields.firstName?.required}
+                />
+              )}
+              {shouldShow('lastName') && (
+                <Form.PlainInput
+                  {...formState.lastName.props}
+                  isRequired={fields.lastName?.required}
+                  isOptional={!fields.lastName?.required}
+                />
+              )}
+            </Form.ControlRow>
+          )}
+          {shouldShow('username') && (
+            <Form.ControlRow elementId='username'>
               <Form.PlainInput
-                {...formState.firstName.props}
-                isRequired={fields.firstName!.required}
-                isOptional={!fields.firstName!.required}
+                {...formState.username.props}
+                isRequired={fields.username?.required}
+                isOptional={!fields.username?.required}
               />
-            )}
-            {shouldShow('lastName') && (
+            </Form.ControlRow>
+          )}
+          {shouldShow('emailAddress') && (
+            <Form.ControlRow elementId='emailAddress'>
               <Form.PlainInput
-                {...formState.lastName.props}
-                isRequired={fields.lastName!.required}
-                isOptional={!fields.lastName!.required}
+                {...formState.emailAddress.props}
+                isRequired={fields.emailAddress?.required}
+                isOptional={!fields.emailAddress?.required}
+                isDisabled={fields.emailAddress?.disabled}
+                actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
+                onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
               />
-            )}
-          </Form.ControlRow>
-        )}
-        {shouldShow('username') && (
-          <Form.ControlRow elementId='username'>
-            <Form.PlainInput
-              {...formState.username.props}
-              isRequired={fields.username!.required}
-              isOptional={!fields.username!.required}
-            />
-          </Form.ControlRow>
-        )}
-        {shouldShow('emailAddress') && (
-          <Form.ControlRow elementId='emailAddress'>
-            <Form.PlainInput
-              {...formState.emailAddress.props}
-              isRequired={fields.emailAddress!.required}
-              isOptional={!fields.emailAddress!.required}
-              isDisabled={fields.emailAddress!.disabled}
-              actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
-              onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
-            />
-          </Form.ControlRow>
-        )}
-        {shouldShow('phoneNumber') && (
-          <Form.ControlRow elementId='phoneNumber'>
-            <Form.PhoneInput
-              {...formState.phoneNumber.props}
-              isRequired={fields.phoneNumber!.required}
-              isOptional={!fields.phoneNumber!.required}
-              actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
-              onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
-            />
-          </Form.ControlRow>
-        )}
-        {shouldShow('password') && (
-          <Form.ControlRow elementId='password'>
-            <Form.PasswordInput
-              {...formState.password.props}
-              isRequired={fields.password!.required}
-              isOptional={!fields.password!.required}
-            />
-          </Form.ControlRow>
-        )}
-      </Col>
+            </Form.ControlRow>
+          )}
+          {shouldShow('phoneNumber') && (
+            <Form.ControlRow elementId='phoneNumber'>
+              <Form.PhoneInput
+                {...formState.phoneNumber.props}
+                isRequired={fields.phoneNumber?.required}
+                isOptional={!fields.phoneNumber?.required}
+                actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
+                onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
+              />
+            </Form.ControlRow>
+          )}
+          {shouldShow('password') && (
+            <Form.ControlRow elementId='password'>
+              <Form.PasswordInput
+                {...formState.password.props}
+                isRequired={fields.password?.required}
+                isOptional={!fields.password?.required}
+              />
+            </Form.ControlRow>
+          )}
+        </Col>
+      )}
       <Col center>
         <CaptchaElement />
-        <Form.SubmitButton
-          hasArrow
-          localizationKey={localizationKeys('formButtonPrimary')}
-        />
+        <Col
+          gap={6}
+          sx={{
+            width: '100%',
+          }}
+        >
+          {shouldShow('__experimental_legalAccepted') && (
+            <Form.ControlRow elementId='__experimental_legalAccepted'>
+              <LegalCheckbox
+                {...formState.__experimental_legalAccepted.props}
+                isRequired={fields.__experimental_legalAccepted?.required}
+              />
+            </Form.ControlRow>
+          )}
+          <Form.SubmitButton
+            hasArrow
+            localizationKey={localizationKeys('formButtonPrimary')}
+          />
+        </Col>
       </Col>
     </Form.Root>
   );
