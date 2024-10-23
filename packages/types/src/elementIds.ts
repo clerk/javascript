@@ -20,7 +20,8 @@ export type FieldId =
   | 'deleteOrganizationConfirmation'
   | 'enrollmentMode'
   | 'affiliationEmailAddress'
-  | 'deleteExistingInvitationsSuggestions';
+  | 'deleteExistingInvitationsSuggestions'
+  | '__experimental_legalAccepted';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

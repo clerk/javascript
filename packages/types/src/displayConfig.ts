@@ -38,6 +38,8 @@ export interface DisplayConfigJSON {
   after_create_organization_url: string;
   google_one_tap_client_id?: string;
   show_devmode_warning: boolean;
+  terms_url: string;
+  privacy_policy_url: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -78,4 +80,6 @@ export interface DisplayConfigResource extends ClerkResource {
   afterCreateOrganizationUrl: string;
   googleOneTapClientId?: string;
   showDevModeWarning: boolean;
+  termsUrl: string;
+  privacyPolicyUrl: string;
 }

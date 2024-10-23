@@ -8,7 +8,16 @@ import type { FieldState } from '../../common';
  */
 export type ActiveIdentifier = 'emailAddress' | 'phoneNumber' | null | undefined;
 
-const FieldKeys = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName', 'password', 'ticket'];
+const FieldKeys = [
+  'emailAddress',
+  'phoneNumber',
+  'username',
+  'firstName',
+  'lastName',
+  'password',
+  'ticket',
+  '__experimental_legalAccepted',
+] as const;
 export type FieldKey = (typeof FieldKeys)[number];
 
 export type FormState<T> = {
@@ -34,10 +43,11 @@ type FieldDeterminationProps = {
   hasEmail?: boolean;
   signUp?: SignUpResource | undefined;
   isProgressiveSignUp: boolean;
+  legalConsentRequired?: boolean;
 };
 
 export function determineActiveFields(fieldProps: FieldDeterminationProps): Fields {
-  return FieldKeys.reduce((fields: Fields, fieldKey: string) => {
+  return FieldKeys.reduce((fields: Fields, fieldKey: FieldKey) => {
     const field = getField(fieldKey, fieldProps);
     if (field) {
       fields[fieldKey] = field;
@@ -50,10 +60,11 @@ export function determineActiveFields(fieldProps: FieldDeterminationProps): Fiel
 export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpResource) {
   if (signUp) {
     const hasEmailFilled = !!signUp.emailAddress;
-    const hasVerifiedEmail = signUp.verifications?.emailAddress?.status == 'verified';
-    const hasVerifiedPhone = signUp.verifications?.phoneNumber?.status == 'verified';
-    const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
-    const hasVerifiedWeb3Wallet = signUp.verifications?.web3Wallet?.status == 'verified';
+    const hasVerifiedEmail = signUp.verifications?.emailAddress?.status === 'verified';
+    const hasVerifiedPhone = signUp.verifications?.phoneNumber?.status === 'verified';
+    const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status === 'verified';
+    const hasVerifiedWeb3Wallet = signUp.verifications?.web3Wallet?.status === 'verified';
+    const hasLegalAccepted = signUp.legalAcceptedAt !== null;
 
     if (hasEmailFilled && hasVerifiedEmail) {
       delete fields.emailAddress;
@@ -79,10 +90,14 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
       delete fields.username;
     }
 
+    if (hasLegalAccepted) {
+      delete fields.__experimental_legalAccepted;
+    }
+
     // Hide any non-required fields
     Object.entries(fields).forEach(([k, v]) => {
       if (v && !v.required) {
-        delete fields[k];
+        delete fields[k as FieldKey];
       }
     });
   }
@@ -133,6 +148,8 @@ function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Fiel
       return getPasswordField(fieldProps.attributes);
     case 'ticket':
       return getTicketField(fieldProps.hasTicket);
+    case '__experimental_legalAccepted':
+      return getLegalAcceptedField(fieldProps.legalConsentRequired);
     case 'username':
     case 'firstName':
     case 'lastName':
@@ -174,7 +191,7 @@ function getEmailAddressField({
     (!hasTicket || (hasTicket && hasEmail)) &&
     attributes.email_address.enabled &&
     attributes.email_address.used_for_first_factor &&
-    activeCommIdentifierType == 'emailAddress';
+    activeCommIdentifierType === 'emailAddress';
 
   if (!show) {
     return;
@@ -215,7 +232,7 @@ function getPhoneNumberField({
     !hasTicket &&
     attributes.phone_number.enabled &&
     attributes.phone_number.used_for_first_factor &&
-    activeCommIdentifierType == 'phoneNumber';
+    activeCommIdentifierType === 'phoneNumber';
 
   if (!show) {
     return;
@@ -249,16 +266,26 @@ function getTicketField(hasTicket?: boolean): Field | undefined {
   };
 }
 
+function getLegalAcceptedField(legalConsentRequired?: boolean): Field | undefined {
+  if (!legalConsentRequired) {
+    return;
+  }
+
+  return {
+    required: true,
+  };
+}
+
 function getGenericField(fieldKey: FieldKey, attributes: Attributes): Field | undefined {
   const attrKey = camelToSnake(fieldKey);
 
-  // @ts-ignore
+  // @ts-expect-error - TS doesn't know that the key exists
   if (!attributes[attrKey].enabled) {
     return;
   }
 
   return {
-    // @ts-ignore
+    // @ts-expect-error - TS doesn't know that the key exists
     required: attributes[attrKey].required,
   };
 }

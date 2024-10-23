@@ -54,6 +54,7 @@ export type SignUpData = {
   progressive: boolean;
   captcha_enabled: boolean;
   mode: SignUpModes;
+  legal_consent_enabled: boolean;
 };
 
 export type PasswordSettingsData = {

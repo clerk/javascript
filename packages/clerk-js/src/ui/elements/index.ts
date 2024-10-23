@@ -56,3 +56,4 @@ export * from './ProfileCard';
 export * from './Gauge';
 export * from './Animated';
 export * from './DevModeNotice';
+export * from './LegalConsentCheckbox';

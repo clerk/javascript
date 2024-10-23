@@ -44,6 +44,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   afterCreateOrganizationUrl!: string;
   googleOneTapClientId?: string;
   showDevModeWarning!: boolean;
+  termsUrl!: string;
+  privacyPolicyUrl!: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -87,6 +89,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterCreateOrganizationUrl = data.after_create_organization_url;
     this.googleOneTapClientId = data.google_one_tap_client_id;
     this.showDevModeWarning = data.show_devmode_warning;
+    this.termsUrl = data.terms_url;
+    this.privacyPolicyUrl = data.privacy_policy_url;
     return this;
   }
 }

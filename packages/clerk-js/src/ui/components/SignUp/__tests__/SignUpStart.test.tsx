@@ -256,6 +256,22 @@ describe('SignUpStart', () => {
     });
   });
 
+  describe('Legal consent', () => {
+    it('shows sign up component with legal consent checkbox', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withLegalConsent();
+        f.withTermsPrivacyPolicyUrls({
+          privacyPolicy: 'https://clerk.dev/privacy',
+          termsOfService: 'https://clerk.dev/tos',
+        });
+      });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByText('Terms of Service');
+      screen.getByText('Privacy Policy');
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
