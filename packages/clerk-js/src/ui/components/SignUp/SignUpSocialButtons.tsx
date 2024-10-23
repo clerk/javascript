@@ -11,7 +11,7 @@ import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
-export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean };
+export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean; legalAccepted?: boolean };
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
   const clerk = useClerk();
@@ -35,6 +35,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             redirectUrlComplete,
             strategy,
             unsafeMetadata: ctx.unsafeMetadata,
+            __experimental_legalAccepted: props.legalAccepted,
           })
           .catch(err => handleError(err, [], card.setError));
       }}
@@ -46,6 +47,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             signUpContinueUrl: 'continue',
             unsafeMetadata: ctx.unsafeMetadata,
             strategy,
+            __experimental_legalAccepted: props.legalAccepted,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

@@ -30,8 +30,6 @@ const cardRootLayoutStyle = {
       'relative w-full max-w-[25rem]',
     ].join(' '),
   },
-  cardRootDefault: {},
-  cardRootInner: {},
 };
 const cardRootVisualStyle = {
   cardRoot: {
@@ -135,9 +133,9 @@ const cardHeaderLayoutStyle = {
     className: 'z-1 flex flex-col items-center gap-1 text-center',
   },
 } satisfies ParsedElementsFragment;
-const cardHeaderVisualStyle = {
-  cardHeader: {},
-} satisfies ParsedElementsFragment;
+
+// Purposefully left blank to prevent confusion.
+const cardHeaderVisualStyle = {} satisfies ParsedElementsFragment;
 
 export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardHeader(
   { children, className, ...props },
@@ -171,11 +169,9 @@ const cardLogoLayoutStyle = {
     className: 'size-full object-contain',
   },
 } satisfies ParsedElementsFragment;
-const cardLogoVisualStyle = {
-  cardLogoBox: {},
-  cardLogoLink: {},
-  cardLogoImage: {},
-} satisfies ParsedElementsFragment;
+
+// Purposefully left blank to prevent confusion.
+const cardLogoVisualStyle = {} satisfies ParsedElementsFragment;
 
 export const Logo = React.forwardRef(function CardLogo(
   {
@@ -222,9 +218,8 @@ export const Logo = React.forwardRef(function CardLogo(
 /**
  * CardTitle
  */
-const cardTitleLayoutStyle = {
-  cardTitle: {},
-} satisfies ParsedElementsFragment;
+// Purposefully left blank to prevent confusion.
+const cardTitleLayoutStyle = {} satisfies ParsedElementsFragment;
 const cardTitleVisualStyle = {
   cardTitle: {
     className: 'leading-medium text-gray-12 text-lg font-bold',
@@ -241,7 +236,6 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.cardTitle)}
-      className={cx('leading-medium text-gray-12 text-lg font-bold', className)}
     >
       {children}
     </h2>
@@ -253,9 +247,8 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
 /**
  * CardDescription
  */
-const cardDescriptionLayoutStyle = {
-  cardDescription: {},
-} satisfies ParsedElementsFragment;
+// Purposefully left blank to prevent confusion.
+const cardDescriptionLayoutStyle = {} satisfies ParsedElementsFragment;
 const cardDescriptionVisualStyle = {
   cardDescription: {
     className: 'text-gray-a11 text-base',
@@ -287,9 +280,9 @@ const cardBodyLayoutStyle = {
     className: 'z-1 flex flex-col gap-6',
   },
 } satisfies ParsedElementsFragment;
-const cardBodyVisualStyle = {
-  cardBody: {},
-} satisfies ParsedElementsFragment;
+
+// Purposefully left blank to prevent confusion.
+const cardBodyVisualStyle = {} satisfies ParsedElementsFragment;
 
 export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardBody(
   { children, className, ...props },
@@ -324,9 +317,9 @@ const cardActionsLayoutStyle = {
     ].join(' '),
   },
 } satisfies ParsedElementsFragment;
-const cardActionsVisualStyle = {
-  cardActions: {},
-} satisfies ParsedElementsFragment;
+
+// Purposefully left blank to prevent confusion.
+const cardActionsVisualStyle = {} satisfies ParsedElementsFragment;
 
 export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardActions(
   { children, className, ...props },
@@ -357,13 +350,8 @@ const cardFooterLayoutStyle = {
   cardFooterAction: {
     className: 'px-6 py-4',
   },
-  cardFooterActionText: {},
-  cardFooterActionLink: {},
-  cardFooterActionButton: {},
-  cardFooterActionPageLink: {},
 } satisfies ParsedElementsFragment;
 const cardFooterVisualStyle = {
-  cardFooter: {},
   cardFooterAction: {
     className: 'border-gray-a3 border-b last-of-type:border-b-transparent',
   },

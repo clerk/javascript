@@ -27,9 +27,14 @@ const numeric = (val: Date | number | string, locale?: string) => {
   }
 };
 
+const link = (val: string, label?: string) => {
+  return `[${label}](${val})`;
+};
+
 export const MODIFIERS = {
   titleize,
   timeString,
   weekday,
   numeric,
+  link,
 } as const;

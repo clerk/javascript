@@ -92,15 +92,6 @@ export const setRequestHeadersOnNextResponse = (
   });
 };
 
-export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
-  // Serializing the state on dev env is a temp workaround for the following issue:
-  // https://github.com/vercel/next.js/discussions/11209|Next.js
-  const __clerk_ssr_state = (
-    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject }
-  ) as T;
-  return { ...obj, __clerk_ssr_state };
-};
-
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(
   req: ClerkRequest,
@@ -195,6 +186,14 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
 export const redirectAdapter = (url: string | URL) => {
   return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
+
+export function assertAuthStatus(req: RequestLike, error: string) {
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+
+  if (!authStatus) {
+    throw new Error(error);
+  }
+}
 
 export function assertKey(key: string, onError: () => never): string {
   if (!key) {
