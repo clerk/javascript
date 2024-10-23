@@ -6,7 +6,7 @@ import { run } from 'jscodeshift/src/Runner.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function runCodemod(transform, glob, options) {
+export async function runCodemod(transform = 'transform-async-request', glob, options) {
   if (!transform) {
     throw new Error('No transform provided');
   }
