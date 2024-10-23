@@ -73,8 +73,8 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
     "@rsdoctor/webpack-plugin": "^0.4.4",
-    "@rspack/cli": "^1.0.3",
-    "@rspack/core": "^1.0.3",
+    "@rspack/cli": "^1.0.14",
+    "@rspack/core": "^1.0.14",
     "@rspack/plugin-react-refresh": "^1.0.0",
     "@svgr/webpack": "^6.2.1",
     "@types/react": "*",
