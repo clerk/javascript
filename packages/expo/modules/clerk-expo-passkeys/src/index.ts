@@ -1,6 +1,5 @@
 import { Platform } from 'react-native';
 
-import { AndroidPasskeys } from './AndroidPasskeys';
 import {
   AuthenticationResponseJSON,
   SerializedPublicKeyCredentialCreationOptions,
@@ -12,7 +11,7 @@ import {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   CredentialReturn,
 } from './ClerkExpoPasskeys.types';
-import { IOSPasskeys } from './IOSPasskeys';
+import ClerkExpoPasskeys from './ClerkExpoPasskeysModule';
 import { arrayBufferToBase64Url, base64urlToArrayBuffer, encodeBase64Url, toArrayBuffer } from './utils';
 
 const makeSerializedCreateResponse = (
@@ -58,21 +57,31 @@ export async function create(
     })),
   };
 
-  const passkeyModule = Platform.select({
-    android: AndroidPasskeys,
-    ios: IOSPasskeys,
+  const createPasskeyModule = Platform.select({
+    android: async () => ClerkExpoPasskeys.create(JSON.stringify(createOptions)),
+    ios: async () =>
+      ClerkExpoPasskeys.create(
+        createOptions.challenge,
+        createOptions.rp.id,
+        createOptions.user.id,
+        createOptions.user.displayName,
+      ),
     default: null,
   });
 
-  if (!passkeyModule) {
+  if (!createPasskeyModule) {
     throw new Error('Platform not supported');
   }
 
-  const { publicKeyCredential, error } = await passkeyModule.create(createOptions);
-
-  return error
-    ? { publicKeyCredential: null, error }
-    : { publicKeyCredential: makeSerializedCreateResponse(publicKeyCredential), error: null };
+  try {
+    const response = await createPasskeyModule();
+    return {
+      publicKeyCredential: makeSerializedCreateResponse(typeof response === 'string' ? JSON.parse(response) : response),
+      error: null,
+    };
+  } catch (error) {
+    return { publicKeyCredential: null, error };
+  }
 }
 
 const makeSerializedGetResponse = (
@@ -107,21 +116,25 @@ export async function get(
     challenge: arrayBufferToBase64Url(publicKeyCredential.challenge),
   };
 
-  const passkeyModule = Platform.select({
-    android: AndroidPasskeys,
-    ios: IOSPasskeys,
+  const getPasskeyModule = Platform.select({
+    android: async () => ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential)),
+    ios: async () => ClerkExpoPasskeys.get(serializedPublicCredential.challenge, serializedPublicCredential.rpId),
     default: null,
   });
 
-  if (!passkeyModule) {
+  if (!getPasskeyModule) {
     throw new Error('Platform not supported');
   }
 
-  const { publicKeyCredential: result, error } = await passkeyModule.get(serializedPublicCredential);
-
-  return error
-    ? { publicKeyCredential: null, error }
-    : { publicKeyCredential: makeSerializedGetResponse(result), error: null };
+  try {
+    const response = await getPasskeyModule();
+    return {
+      publicKeyCredential: makeSerializedGetResponse(typeof response === 'string' ? JSON.parse(response) : response),
+      error: null,
+    };
+  } catch (error) {
+    return { publicKeyCredential: null, error };
+  }
 }
 
 export function isSupported() {

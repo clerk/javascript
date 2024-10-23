@@ -37,8 +37,8 @@ const ProtectedView = () => {
     if (!clerkUser) return;
     try {
       return await clerkUser.createPasskey();
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error(e.clerkError ? e.errors[0].longMessage : e.message);
     }
   };
 
