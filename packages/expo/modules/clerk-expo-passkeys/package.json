@@ -31,6 +31,7 @@
     "test": "expo-module test"
   },
   "dependencies": {
+    "@clerk/shared": "2.9.3-snapshot.vd00b3bb",
     "@clerk/types": "4.27.0-snapshot.vd00b3bb"
   },
   "devDependencies": {

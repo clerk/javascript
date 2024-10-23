@@ -12,7 +12,14 @@ import {
   CredentialReturn,
 } from './ClerkExpoPasskeys.types';
 import ClerkExpoPasskeys from './ClerkExpoPasskeysModule';
-import { arrayBufferToBase64Url, base64urlToArrayBuffer, encodeBase64Url, toArrayBuffer } from './utils';
+import {
+  arrayBufferToBase64Url,
+  base64urlToArrayBuffer,
+  encodeBase64Url,
+  toArrayBuffer,
+  ClerkWebAuthnError,
+  mapNativeErrorToClerkWebAuthnErrorCode,
+} from './utils';
 
 const makeSerializedCreateResponse = (
   publicCredential: RegistrationResponseJSON,
@@ -80,7 +87,10 @@ export async function create(
       error: null,
     };
   } catch (error) {
-    return { publicKeyCredential: null, error };
+    return {
+      publicKeyCredential: null,
+      error: mapNativeErrorToClerkWebAuthnErrorCode(error.code, error.message, 'create'),
+    };
   }
 }
 
@@ -123,7 +133,10 @@ export async function get(
   });
 
   if (!getPasskeyModule) {
-    throw new Error('Platform not supported');
+    return {
+      publicKeyCredential: null,
+      error: new ClerkWebAuthnError('Platform is not supported', { code: 'passkey_not_supported' }),
+    };
   }
 
   try {
@@ -133,13 +146,16 @@ export async function get(
       error: null,
     };
   } catch (error) {
-    return { publicKeyCredential: null, error };
+    return {
+      publicKeyCredential: null,
+      error: mapNativeErrorToClerkWebAuthnErrorCode(error.code, error.message, 'get'),
+    };
   }
 }
 
 export function isSupported() {
   if (Platform.OS === 'android') {
-    return Platform.Version > 28;
+    return Platform.Version >= 28;
   }
 
   if (Platform.OS === 'ios') {
@@ -153,15 +169,15 @@ export function isSupported() {
 // This seems to be an issue with Expo that we haven't been able to resolve yet.
 // Further investigation and possibly reaching out to Expo support may be necessary.
 
-export async function autofill(): Promise<AuthenticationResponseJSON | null> {
-  if (Platform.OS === 'android') {
-    throw new Error('Not supported');
-  } else if (Platform.OS === 'ios') {
-    throw new Error('Not supported');
-  } else {
-    throw new Error('Not supported');
-  }
-}
+// async function autofill(): Promise<AuthenticationResponseJSON | null> {
+//   if (Platform.OS === 'android') {
+//     throw new Error('Not supported');
+//   } else if (Platform.OS === 'ios') {
+//     throw new Error('Not supported');
+//   } else {
+//     throw new Error('Not supported');
+//   }
+// }
 
 export const passkeys = {
   create,

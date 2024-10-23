@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { Buffer } from 'buffer';
 
 export function encodeBase64(data: ArrayLike<number> | ArrayBufferLike) {
@@ -78,4 +79,59 @@ export function arrayBufferToBase64Url(buffer) {
     .replace(/=+$/, ''); // Remove padding (equal signs)
 
   return base64Url;
+}
+
+type ClerkWebAuthnErrorCode =
+  // Generic
+  | 'passkey_not_supported'
+  | 'passkey_pa_not_supported'
+  | 'passkey_invalid_rpID_or_domain'
+  | 'passkey_already_exists'
+  | 'passkey_operation_aborted'
+  // Retrieval
+  | 'passkey_retrieval_cancelled'
+  | 'passkey_retrieval_failed'
+  // Registration
+  | 'passkey_registration_cancelled'
+  | 'passkey_registration_failed';
+
+//TODO THIS NEEDS TO BE IMPORTED FROM JS FILE. We need to first export it from there though.
+export class ClerkWebAuthnError extends ClerkRuntimeError {
+  code: ClerkWebAuthnErrorCode;
+
+  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
+    super(message, { code });
+    this.code = code;
+  }
+}
+
+export function mapNativeErrorToClerkWebAuthnErrorCode(
+  code: string,
+  message: string,
+  action: 'get' | 'create',
+): ClerkWebAuthnError {
+  if (code === '1000' || code === '1004' || code === 'CreatePublicKeyCredentialDomException') {
+    return new ClerkWebAuthnError(message, {
+      code: action === 'create' ? 'passkey_registration_failed' : 'passkey_retrieval_failed',
+    });
+  }
+  if (
+    code === '1001' ||
+    code === 'CreateCredentialCancellationException' ||
+    code === 'GetCredentialCancellationException'
+  ) {
+    return new ClerkWebAuthnError(message, { code: 'passkey_registration_cancelled' });
+  }
+
+  if (code === '1002') {
+    return new ClerkWebAuthnError(message, { code: 'passkey_invalid_rpID_or_domain' });
+  }
+
+  if (code === '1003' || code === 'CreateCredentialInterruptedException') {
+    return new ClerkWebAuthnError(message, { code: 'passkey_operation_aborted' });
+  }
+
+  return new ClerkWebAuthnError(message, {
+    code: action === 'create' ? 'passkey_registration_failed' : 'passkey_retrieval_failed',
+  });
 }

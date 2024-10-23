@@ -38,6 +38,9 @@ const ProtectedView = () => {
     try {
       return await clerkUser.createPasskey();
     } catch (e: any) {
+      console.log(JSON.stringify(e));
+      console.log(JSON.stringify(e?.errors?.[0]));
+
       console.error(e.clerkError ? e.errors[0].longMessage : e.message);
     }
   };
@@ -93,7 +96,7 @@ const PublicView = () => {
       });
       await setActive({ session: signInResponse.createdSessionId });
     } catch (err: any) {
-      console.error(err.clerkError ? err.errors[0].longMessage : err);
+      console.error(`With code${err.code}, and message ${err.message}`);
     }
   };
 
