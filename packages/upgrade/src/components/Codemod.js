@@ -35,7 +35,7 @@ export function Codemod(props) {
       .finally(() => {
         callback(true);
       });
-  }, [glob]);
+  }, [callback, glob, transform]);
 
   return (
     <>
