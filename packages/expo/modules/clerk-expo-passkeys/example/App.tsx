@@ -72,21 +72,25 @@ const PublicView = () => {
   const [emailAddress, setEmailAddress] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleSignIn = async (method: 'password' | 'passkey') => {
+  const handlePasswordSignIn = async () => {
     if (!isLoaded) return;
-
     try {
-      let signInResponse;
-      if (method === 'password') {
-        signInResponse = await signIn.create({
-          identifier: emailAddress,
-          password,
-        });
-      } else {
-        signInResponse = await signIn.authenticateWithPasskey({
-          flow: 'discoverable',
-        });
-      }
+      const signInResponse = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+      await setActive({ session: signInResponse.createdSessionId });
+    } catch (err: any) {
+      console.error(err.clerkError ? err.errors[0].longMessage : err);
+    }
+  };
+
+  const handlePasskeySignIn = async () => {
+    if (!isLoaded) return;
+    try {
+      const signInResponse = await signIn.authenticateWithPasskey({
+        flow: 'discoverable',
+      });
       await setActive({ session: signInResponse.createdSessionId });
     } catch (err: any) {
       console.error(err.clerkError ? err.errors[0].longMessage : err);
@@ -114,11 +118,11 @@ const PublicView = () => {
         />
       </View>
 
-      <TouchableOpacity onPress={() => handleSignIn('password')}>
+      <TouchableOpacity onPress={handlePasswordSignIn}>
         <Text>Sign in</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleSignIn('passkey')}>
+      <TouchableOpacity onPress={handlePasskeySignIn}>
         <Text>Sign in with passkey</Text>
       </TouchableOpacity>
     </View>
