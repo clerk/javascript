@@ -5,13 +5,20 @@ import { notFound, redirect } from 'next/navigation';
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
+import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
-export async function auth(): Promise<Auth> {
+export interface AuthFn {
+  (): Promise<Auth>;
+
+  protect: AuthProtect;
+}
+
+export const auth: AuthFn = async () => {
   require('server-only');
 
   const request = await buildRequestLike();
@@ -44,9 +51,9 @@ export async function auth(): Promise<Auth> {
   };
 
   return Object.assign(authObject, { redirectToSignIn });
-}
+};
 
-auth.protect = async (...args: any[]) => {
+auth.protect = async (...args) => {
   require('server-only');
 
   const request = await buildRequestLike();
@@ -59,5 +66,7 @@ auth.protect = async (...args: any[]) => {
     notFound,
     redirect,
   });
+
+  // @ts-ignore
   return protect(...args);
 };
