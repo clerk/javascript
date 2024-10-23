@@ -32,6 +32,8 @@ export const ObjectType = {
   Token: 'token',
   TotalCount: 'total_count',
   TestingToken: 'testing_token',
+  Role: 'role',
+  Permission: 'permission',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -112,6 +114,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   verification: VerificationJSON | null;
+  saml_connection: SamlAccountConnectionJSON | null;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
@@ -312,6 +315,8 @@ export interface UserJSON extends ClerkResourceJSON {
   last_active_at: number | null;
   create_organization_enabled: boolean;
   create_organizations_limit: number | null;
+  delete_self_enabled: boolean;
+  legal_accepted_at: number | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -322,6 +327,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   verified_at_client?: string;
   external_verification_redirect_url?: string | null;
   nonce?: string | null;
+  message?: string | null;
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {
@@ -375,4 +381,38 @@ export interface TestingTokenJSON {
   object: typeof ObjectType.TestingToken;
   token: string;
   expires_at: number;
+}
+
+export interface RoleJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Role;
+  key: string;
+  name: string;
+  description: string;
+  permissions: PermissionJSON[];
+  is_creator_eligible: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface PermissionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Permission;
+  key: string;
+  name: string;
+  description: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  domain: string;
+  active: boolean;
+  provider: string;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }

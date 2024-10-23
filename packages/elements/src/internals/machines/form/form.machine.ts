@@ -1,5 +1,6 @@
-import { isKnownError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
+import type { ClerkAPIError } from '@clerk/types';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
@@ -94,17 +95,22 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
+        const isClerkAPIError = (err: any): err is ClerkAPIError => 'meta' in err;
+
         if (isKnownError(event.error)) {
           const fields: Record<string, ClerkElementsFieldError[]> = {};
           const globalErrors: ClerkElementsError[] = [];
+          const errors = isClerkAPIResponseError(event.error) ? event.error?.errors : [event.error];
 
-          for (const error of event.error.errors || [event.error]) {
-            const name = snakeToCamel(error.meta?.paramName);
+          for (const error of errors) {
+            const name = isClerkAPIError(error) ? snakeToCamel(error.meta?.paramName) : null;
 
-            if (!name) {
+            if (!name || isMetamaskError(error)) {
               globalErrors.push(ClerkElementsError.fromAPIError(error));
               continue;
-            } else if (!fields[name]) {
+            }
+
+            if (!fields[name]) {
               fields[name] = [];
             }
 
@@ -163,7 +169,7 @@ export const FormMachine = setup({
 
           if (field) {
             field.checked = event.field.checked;
-            field.disabled = event.field.disabled || false;
+            field.disabled = event.field.disabled ?? field.disabled;
             field.value = event.field.value;
 
             context.fields.set(event.field.name, field);

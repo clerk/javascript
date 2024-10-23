@@ -4,6 +4,7 @@ import type {
   DisplayConfigJSON,
   DisplayConfigResource,
   DisplayThemeJSON,
+  OAuthStrategy,
   PreferredSignInStrategy,
 } from '@clerk/types';
 
@@ -24,6 +25,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaWidgetType: CaptchaWidgetType = null;
   captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKeyInvisible: string | null = null;
+  captchaOauthBypass: OAuthStrategy[] = [];
   homeUrl!: string;
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
@@ -42,6 +44,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   afterCreateOrganizationUrl!: string;
   googleOneTapClientId?: string;
   showDevModeWarning!: boolean;
+  termsUrl!: string;
+  privacyPolicyUrl!: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -74,6 +78,9 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.captchaWidgetType = data.captcha_widget_type;
     this.captchaProvider = data.captcha_provider;
     this.captchaPublicKeyInvisible = data.captcha_public_key_invisible;
+    // These are the OAuth strategies we used to bypass the captcha for by default
+    // before the introduction of the captcha_oauth_bypass field
+    this.captchaOauthBypass = data.captcha_oauth_bypass || ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.organizationProfileUrl = data.organization_profile_url;
@@ -82,6 +89,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterCreateOrganizationUrl = data.after_create_organization_url;
     this.googleOneTapClientId = data.google_one_tap_client_id;
     this.showDevModeWarning = data.show_devmode_warning;
+    this.termsUrl = data.terms_url;
+    this.privacyPolicyUrl = data.privacy_policy_url;
     return this;
   }
 }

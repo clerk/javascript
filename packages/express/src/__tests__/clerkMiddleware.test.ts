@@ -2,7 +2,6 @@ import type { Request, RequestHandler, Response } from 'express';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
-import { requireAuth } from '../requireAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware } from './helpers';
 
 describe('clerkMiddleware', () => {
@@ -69,12 +68,7 @@ describe('clerkMiddleware', () => {
   it.todo('supports usage without invocation: app.use(clerkMiddleware)');
 
   it('supports usage without parameters: app.use(clerkMiddleware())', async () => {
-    const response = await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
-      200,
-      'Hello world!',
-    );
-
-    assertSignedOutDebugHeaders(response);
+    await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(200, 'Hello world!');
   });
 
   it('supports usage with parameters: app.use(clerkMiddleware(options))', async () => {
@@ -86,48 +80,6 @@ describe('clerkMiddleware', () => {
     );
 
     assertSignedOutDebugHeaders(response);
-  });
-
-  it('supports usage with request handler: app.use(clerkMiddleware(requestHandler))', async () => {
-    const handler: RequestHandler = (_req, res, next) => {
-      res.setHeader('x-clerk-auth-custom', 'custom-value');
-      return next();
-    };
-
-    const response = await runMiddleware(clerkMiddleware(handler), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
-      200,
-      'Hello world!',
-    );
-
-    expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
-    assertSignedOutDebugHeaders(response);
-  });
-
-  it('supports usage with parameters and request handler: app.use(clerkMiddleware(requestHandler, options))', async () => {
-    const handler: RequestHandler = (_req, res, next) => {
-      res.setHeader('x-clerk-auth-custom', 'custom-value');
-      return next();
-    };
-    const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
-
-    const response = await runMiddleware(clerkMiddleware(handler, options), {
-      Cookie: '__clerk_db_jwt=deadbeef;',
-    }).expect(200, 'Hello world!');
-
-    expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
-    assertSignedOutDebugHeaders(response);
-  });
-
-  it('throws error if clerkMiddleware is not executed before requireAuth', async () => {
-    const customMiddleware: RequestHandler = (_request, response, next) => {
-      response.setHeader('x-custom-middleware', 'custom');
-      return next();
-    };
-
-    const response = await runMiddleware([requireAuth, customMiddleware]).expect(500);
-
-    assertNoDebugHeaders(response);
-    expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
   });
 
   it('throws error if clerkMiddleware is not executed before getAuth', async () => {
@@ -143,7 +95,7 @@ describe('clerkMiddleware', () => {
     expect(response.header).not.toHaveProperty('x-clerk-auth-custom', 'custom-value');
   });
 
-  it('supports handshake flow', async () => {
+  it('handshake flow supported by default', async () => {
     const response = await runMiddleware(clerkMiddleware(), {
       Cookie: '__client_uat=1711618859;',
       'Sec-Fetch-Dest': 'document',
@@ -153,7 +105,16 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
-  it('it calls next with an error when request URL is invalid', async () => {
+  it('can disable handshake flow', async () => {
+    const response = await runMiddleware(clerkMiddleware({ enableHandshake: false }), {
+      Cookie: '__client_uat=1711618859;',
+      'Sec-Fetch-Dest': 'document',
+    }).expect(200);
+
+    assertNoDebugHeaders(response);
+  });
+
+  it('calls next with an error when request URL is invalid', () => {
     const req = {
       url: '//',
       cookies: {},
@@ -162,7 +123,7 @@ describe('clerkMiddleware', () => {
     const res = {} as Response;
     const mockNext = jest.fn();
 
-    await clerkMiddleware()[0](req, res, mockNext);
+    clerkMiddleware()(req, res, mockNext);
 
     expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
 

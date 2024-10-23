@@ -12,7 +12,7 @@ import type {
   SignUpContinueContext,
   SignUpContinueEvents,
   SignUpStartContext,
-  SignUpStartRedirectEvent,
+  SignUpStartEvents,
   SignUpVerificationContext,
   SignUpVerificationEvents,
 } from '~/internals/machines/sign-up';
@@ -33,7 +33,7 @@ type SendToLoadingProps = {
     | SignInVerificationEvents
     | SignInResetPasswordEvents
     | ThirdPartyMachineEvent
-    | SignUpStartRedirectEvent
+    | SignUpStartEvents
     | SignUpContinueEvents
     | SignUpVerificationEvents;
 };

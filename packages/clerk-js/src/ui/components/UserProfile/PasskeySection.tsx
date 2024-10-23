@@ -15,6 +15,7 @@ import {
 } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { useAssurance } from '../../hooks/useAssurance';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { getRelativeToNowDateKey, handleError, useFormControl } from '../../utils';
@@ -191,10 +192,14 @@ const AddPasskeyButton = () => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
+  const { handleAssurance } = useAssurance();
 
   const handleCreatePasskey = async () => {
+    if (!user) {
+      return;
+    }
     try {
-      await user?.createPasskey();
+      await handleAssurance(user.createPasskey);
     } catch (e) {
       handleError(e, [], card.setError);
     }

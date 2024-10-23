@@ -1,4 +1,5 @@
 export { arSA } from './ar-SA';
+export { beBY } from './be-BY';
 export { enUS } from './en-US';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
@@ -32,3 +33,4 @@ export { thTH } from './th-TH';
 export { caES } from './ca-ES';
 export { huHU } from './hu-HU';
 export { isIS } from './is-IS';
+export { hrHR } from './hr-HR';

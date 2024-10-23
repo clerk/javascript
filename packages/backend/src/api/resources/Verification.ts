@@ -1,3 +1,5 @@
+import type { OrganizationDomainVerificationJSON } from '@clerk/types';
+
 import type { VerificationJSON } from './JSON';
 
 export class Verification {
@@ -8,6 +10,7 @@ export class Verification {
     readonly attempts: number | null = null,
     readonly expireAt: number | null = null,
     readonly nonce: string | null = null,
+    readonly message: string | null = null,
   ) {}
 
   static fromJSON(data: VerificationJSON): Verification {
@@ -19,5 +22,18 @@ export class Verification {
       data.expire_at,
       data.nonce,
     );
+  }
+}
+
+export class OrganizationDomainVerification {
+  constructor(
+    readonly status: string,
+    readonly strategy: string,
+    readonly attempts: number | null = null,
+    readonly expireAt: number | null = null,
+  ) {}
+
+  static fromJSON(data: OrganizationDomainVerificationJSON): OrganizationDomainVerification {
+    return new OrganizationDomainVerification(data.status, data.strategy, data.attempts, data.expires_at);
   }
 }

@@ -8,6 +8,7 @@ export interface VerificationResource extends ClerkResource {
   expireAt: Date | null;
   externalVerificationRedirectURL: URL | null;
   nonce: string | null;
+  message: string | null;
   status: VerificationStatus | null;
   strategy: string | null;
   verifiedAtClient: string | null;

@@ -12,11 +12,11 @@ import { generateColors, getPreviewStyles } from './generate-colors';
 import { useAppearanceStore } from './stores/appearance-store';
 import { ThemeDialog } from './theme-dialog';
 
-const lightAccentDefault = '#6C47FF';
+const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
 
-const darkAccentDefault = '#6C47FF';
+const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
@@ -87,7 +87,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     <ClerkProvider key={CLERK_PROVIDER_KEY}>
       <AppearanceProvider
         appearance={{
-          layout: {
+          options: {
             unsafe_disableDevelopmentModeWarnings: devMode === 'off',
             animations: animations === 'on' ? true : false,
           },
@@ -151,7 +151,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          <aside className='relative isolate flex h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4'>
+          <aside className='relative isolate hidden h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4 sm:flex'>
             <div className='space-y-4'>
               <AppearanceOptions />
               {appearance === 'light' ? (
@@ -265,10 +265,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </aside>
 
           <figure
-            className={cx('relative isolate grid items-center overflow-y-auto p-8', {
-              'bg-white': appearance === 'light',
-              'dark bg-neutral-950': appearance === 'dark',
-            })}
+            className={cx(
+              'relative isolate flex items-center justify-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]',
+              {
+                'bg-white': appearance === 'light',
+                'dark bg-neutral-950': appearance === 'dark',
+              },
+            )}
+            style={
+              appearance === 'light'
+                ? ({ '--cl-light': 'initial', '--cl-dark': ' ' } as React.CSSProperties)
+                : ({
+                    '--cl-light': ' ',
+                    '--cl-dark': 'initial',
+                  } as React.CSSProperties)
+            }
           >
             <div
               className={cx(

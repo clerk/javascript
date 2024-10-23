@@ -1,7 +1,7 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { ActJWTClaim, OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from '@clerk/types';
 
-export const [AuthContext, useAuthContext] = createContextAndHook<{
+export type AuthContextValue = {
   userId: string | null | undefined;
   sessionId: string | null | undefined;
   actor: ActJWTClaim | null | undefined;
@@ -9,5 +9,7 @@ export const [AuthContext, useAuthContext] = createContextAndHook<{
   orgRole: OrganizationCustomRoleKey | null | undefined;
   orgSlug: string | null | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
-  __experimental_factorVerificationAge: [number | null, number | null];
-}>('AuthContext');
+  __experimental_factorVerificationAge: [number, number] | null;
+};
+
+export const [AuthContext, useAuthContext] = createContextAndHook<AuthContextValue>('AuthContext');

@@ -32,6 +32,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
+import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
 import type { __experimental_SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
@@ -137,6 +138,8 @@ export interface Clerk {
 
   telemetry: TelemetryCollector | undefined;
 
+  __internal_country?: string | null;
+
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
    * @param signOutCallback - Optional A callback that runs after sign out completes.
@@ -241,27 +244,6 @@ export interface Clerk {
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mounts a user reverification flow component at the target element.
-   *
-   * @experimantal This API is still under active development and may change at any moment.
-   * @param targetNode Target node to mount the UserVerification component from.
-   * @param props user verification configuration parameters.
-   */
-  __experimental_mountUserVerification: (
-    targetNode: HTMLDivElement,
-    props?: __experimental_UserVerificationProps,
-  ) => void;
-
-  /**
-   * Unmount a user reverification flow component from the target element.
-   * If there is no component mounted at the target node, results in a noop.
-   *
-   * @experimantal This API is still under active development and may change at any moment.
-   * @param targetNode Target node to unmount the UserVerification component from.
-   */
-  __experimental_unmountUserVerification: (targetNode: HTMLDivElement) => void;
-
-  /**
    * Mounts a sign up flow component at the target element.
    *
    * @param targetNode Target node to mount the SignUp component.
@@ -347,6 +329,14 @@ export interface Clerk {
    * @param targetNode Target node to unmount the OrganizationSwitcher component from.
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Prefetches the data displayed by an organization switcher.
+   * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_prefetchOrganizationSwitcher: () => void;
 
   /**
    * Mount an organization list component at the target element.
@@ -655,13 +645,21 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     localization?: LocalizationResource;
     polling?: boolean;
+    /**
+     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     */
     selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-    /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
+    /**
+     * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
+     */
     standardBrowser?: boolean;
     /**
      * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
      */
     supportEmail?: string;
+    /**
+     * By default, the [FAPI `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     */
     touchSession?: boolean;
     /**
      * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
@@ -704,6 +702,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
       },
       Record<string, any>
     >;
+
+    /**
+     * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
+     */
+    __experimental_router?: ClerkHostRouter;
   };
 
 export interface NavigateOptions {
@@ -839,6 +842,10 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -860,15 +867,20 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
  * @experimantal
  */
 export type __experimental_UserVerificationProps = RoutingOptions & {
-  // TODO(STEP-UP): Verify and write a description
+  /**
+   * Non-awaitable callback for when verification is completed successfully
+   */
   afterVerification?: () => void;
-  // TODO(STEP-UP): Verify and write a description
-  afterVerificationUrl?: string;
+
+  /**
+   * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
+   */
+  afterVerificationCancelled?: () => void;
 
   /**
    * Defines the steps of the verification flow.
-   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
-   * @default `'L2.secondFactor'`
+   * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'secondFactor'`
    */
   level?: __experimental_SessionVerificationLevel;
 
@@ -940,6 +952,10 @@ export type SignUpProps = RoutingOptions & {
    * Initial values that are used to prefill the sign up form.
    */
   initialValues?: SignUpInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
+  __experimental?: Record<string, any> & { newComponents?: boolean };
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1041,6 +1057,15 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Controls the default state of the UserButton
    */
   defaultOpen?: boolean;
+
+  /**
+   * If true the `<UserButton />` will only render the popover.
+   * Enables developers to implement a custom dialog.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_asStandalone?: boolean;
+
   /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
@@ -1101,6 +1126,15 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+
+    /**
+     * If true, `<OrganizationSwitcher />` will only render the popover.
+     * Enables developers to implement a custom dialog.
+     * @experimental This API is experimental and may change at any moment.
+     * @default undefined
+     */
+    __experimental_asStandalone?: boolean;
+
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account
@@ -1253,6 +1287,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithMetamaskParams {
@@ -1260,6 +1295,7 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
@@ -1267,10 +1303,12 @@ export interface AuthenticateWithCoinbaseWalletParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  __experimental_legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {

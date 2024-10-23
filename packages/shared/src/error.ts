@@ -6,6 +6,10 @@ export function isUnauthorizedError(e: any): boolean {
   return code === 'authentication_invalid' && status === 401;
 }
 
+export function isCaptchaError(e: ClerkAPIResponseError): boolean {
+  return ['captcha_invalid', 'captcha_not_enabled', 'captcha_missing_token'].includes(e.errors[0].code);
+}
+
 export function is4xxError(e: any): boolean {
   const status = e?.status;
   return !!status && status >= 400 && status < 500;
@@ -31,7 +35,7 @@ export interface MetamaskError extends Error {
   data?: unknown;
 }
 
-export function isKnownError(error: any) {
+export function isKnownError(error: any): error is ClerkAPIResponseError | ClerkRuntimeError | MetamaskError {
   return isClerkAPIResponseError(error) || isMetamaskError(error) || isClerkRuntimeError(error);
 }
 

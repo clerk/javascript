@@ -1,6 +1,6 @@
 import { describe } from '@jest/globals';
 
-import { render } from '../../../../testUtils';
+import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserButton } from '../UserButton';
 
@@ -19,6 +19,18 @@ describe('UserButton', () => {
     });
     const { queryByRole } = render(<UserButton />, { wrapper });
     expect(queryByRole('button')).not.toBeNull();
+  });
+
+  it('renders popover as standalone when there is a user', async () => {
+    const { wrapper, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    props.setProps({
+      __experimental_asStandalone: true,
+    });
+    const { getByText, queryByRole } = render(<UserButton />, { wrapper });
+    expect(queryByRole('button', { name: 'Open user button' })).toBeNull();
+    getByText('Manage account');
   });
 
   it('opens the user button popover when clicked', async () => {
@@ -139,11 +151,30 @@ describe('UserButton', () => {
 
     it('signs out of the currently active session when clicking "Sign out"', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.signOut.mockReturnValueOnce(Promise.resolve());
+      fixtures.clerk.signOut.mockImplementationOnce(callback => {
+        return Promise.resolve(callback());
+      });
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user button' }));
       await userEvent.click(getByText('Sign out'));
-      expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function), { sessionId: '0' });
+      await waitFor(() => {
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function), { sessionId: '0' });
+        expect(fixtures.clerk.redirectWithAuth).toHaveBeenCalledWith('https://accounts.clerk.com/sign-in/choose');
+      });
+    });
+
+    it('signs out of all currently active session when clicking "Sign out of all accounts"', async () => {
+      const { wrapper, fixtures } = await createFixtures(initConfig);
+      fixtures.clerk.signOut.mockImplementationOnce(callback => {
+        return Promise.resolve(callback());
+      });
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByText('Sign out of all accounts'));
+      await waitFor(() => {
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      });
     });
   });
 

@@ -1,10 +1,8 @@
-import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
-import { deprecated } from '@clerk/shared/deprecated';
 
 import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
-import { clerkMiddlewareRequestDataStore } from './clerkMiddleware';
+import { clerkMiddlewareRequestDataStorage } from './clerkMiddleware';
 import {
   API_URL,
   API_VERSION,
@@ -39,20 +37,14 @@ const createClerkClientWithOptions: typeof createClerkClient = options =>
   createClerkClient({ ...clerkClientDefaultOptions, ...options });
 
 /**
- * @deprecated
- * This singleton is deprecated and will be removed in a future release. Please use `clerkClient()` as a function instead.
- */
-const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
-
-/**
  * Constructs a BAPI client that accesses request data within the runtime.
  * Necessary if middleware dynamic keys are used.
  */
-const clerkClientForRequest = () => {
+const clerkClient = async () => {
   let requestData;
 
   try {
-    const request = buildRequestLike();
+    const request = await buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);
   } catch (err) {
@@ -62,25 +54,12 @@ const clerkClientForRequest = () => {
   }
 
   // Fallbacks between options from middleware runtime and `NextRequest` from application server
-  const options = clerkMiddlewareRequestDataStore.getStore() ?? requestData;
+  const options = clerkMiddlewareRequestDataStorage.getStore()?.get('requestData') ?? requestData;
   if (options?.secretKey || options?.publishableKey) {
     return createClerkClientWithOptions(options);
   }
 
-  return clerkClientSingleton;
+  return createClerkClientWithOptions({});
 };
-
-interface ClerkClientExport extends ClerkClient {
-  (): ClerkClient;
-}
-
-// TODO SDK-1839 - Remove `clerkClient` singleton in the next major version of `@clerk/nextjs`
-const clerkClient = new Proxy(Object.assign(clerkClientForRequest, clerkClientSingleton), {
-  get(target, prop: string, receiver) {
-    deprecated('clerkClient singleton', 'Use `clerkClient()` as a function instead.');
-
-    return Reflect.get(target, prop, receiver);
-  },
-}) as ClerkClientExport;
 
 export { clerkClient };

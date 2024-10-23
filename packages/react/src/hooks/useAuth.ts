@@ -1,3 +1,4 @@
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type {
   ActJWTClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -5,17 +6,17 @@ import type {
   OrganizationCustomRoleKey,
   SignOut,
 } from '@clerk/types';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
-import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors/messages';
+import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
 type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 type UseAuthReturn =
   | {
@@ -53,7 +54,7 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
+      has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -71,7 +72,7 @@ type UseAuthReturn =
       getToken: GetToken;
     };
 
-type UseAuth = () => UseAuthReturn;
+type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 
 /**
  * Returns the current auth state, the user and session ids and the `getToken`
@@ -109,10 +110,28 @@ type UseAuth = () => UseAuthReturn;
  *   return <div>...</div>
  * }
  */
-export const useAuth: UseAuth = () => {
+export const useAuth: UseAuth = (initialAuthState = {}) => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
+  const authContext = useAuthContext();
+
+  const [authState, setAuthState] = useState(() => {
+    // This indicates the authContext is not available, and so we fallback to the provided initialState
+    if (authContext.sessionId === undefined && authContext.userId === undefined) {
+      return initialAuthState ?? {};
+    }
+    return authContext;
+  });
+
+  useEffect(() => {
+    if (authContext.sessionId === undefined && authContext.userId === undefined) {
+      return;
+    }
+    setAuthState(authContext);
+  }, [authContext]);
+
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
+    authState;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -120,26 +139,22 @@ export const useAuth: UseAuth = () => {
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-      if (!params?.permission && !params?.role) {
-        errorThrower.throw(useAuthHasRequiresRoleOrPermission);
-      }
-
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
-        return false;
-      }
-
-      if (params.permission) {
-        return orgPermissions.includes(params.permission);
-      }
-
-      if (params.role) {
-        return orgRole === params.role;
-      }
-
-      return false;
+      return createCheckAuthorization({
+        userId,
+        orgId,
+        orgRole,
+        orgPermissions,
+        __experimental_factorVerificationAge,
+      })(params);
     },
-    [orgId, orgRole, userId, orgPermissions],
+    [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
   );
+
+  return useDerivedAuth({ sessionId, userId, actor, orgId, orgSlug, orgRole, getToken, signOut, has });
+};
+
+export function useDerivedAuth(authObject: any): UseAuthReturn {
+  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject ?? {};
 
   if (sessionId === undefined && userId === undefined) {
     return {
@@ -199,11 +214,11 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      has,
       signOut,
       getToken,
     };
   }
 
   return errorThrower.throw(invalidStateError);
-};
+}

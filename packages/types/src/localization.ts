@@ -144,6 +144,24 @@ type _LocalizationResource = {
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    restrictedAccess: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      blockButton__emailSupport: LocalizationValue;
+    };
+    __experimental_legalConsent: {
+      continue: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      checkbox: {
+        label__termsOfServiceAndPrivacyPolicy: LocalizationValue;
+        label__onlyPrivacyPolicy: LocalizationValue;
+        label__onlyTermsOfService: LocalizationValue;
+      };
+    };
   };
   signIn: {
     start: {
@@ -816,6 +834,7 @@ type UnstableErrors = WithParamName<{
   form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
+  form_param_value_invalid: LocalizationValue;
   passwordComplexity: {
     sentencePrefix: LocalizationValue;
     minimumLength: LocalizationValue;
@@ -865,4 +884,9 @@ type UnstableErrors = WithParamName<{
     };
   };
   form_param_max_length_exceeded: LocalizationValue;
+  organization_minimum_permissions_needed: LocalizationValue;
+  already_a_member_in_organization: LocalizationValue;
+  organization_domain_common: LocalizationValue;
+  organization_domain_blocked: LocalizationValue;
+  organization_membership_quota_exceeded: LocalizationValue;
 }>;

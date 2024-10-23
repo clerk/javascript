@@ -2,7 +2,10 @@ import { Slot } from '@radix-ui/react-slot';
 import { cx } from 'cva';
 import * as React from 'react';
 
-import * as Icon from './icon';
+import CheckmarkCircleSm from './icons/checkmark-circle-sm';
+import ExclamationOctagonSm from './icons/exclamation-octagon-sm';
+import ExclamationTriangleSm from './icons/exclamation-triangle-sm';
+import InformationCircleSm from './icons/information-circle-sm';
 
 type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
@@ -18,7 +21,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       className={cx(
         '[--field-input-height:1.875rem]',
         '[--field-input-px:theme(spacing.3)]',
-        '[--field-input-py:theme(spacing[1.5])]',
+        'supports-ios:[--field-input-py:theme(spacing.1)] [--field-input-py:theme(spacing[1.5])]',
         '[--field-input-group-end-size:--field-input-height]',
         'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
@@ -175,6 +178,7 @@ export const Input = React.forwardRef(function FieldInput(
         'text-gray-12 relative flex min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
         'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
+        'supports-ios:text-[length:1rem] supports-ios:min-h-[1.875rem]',
         // variant
         {
           default: 'w-full justify-start',
@@ -255,10 +259,10 @@ export const Message = React.forwardRef<
         <span className='text-icon-sm mt-px'>
           {
             {
-              error: <Icon.ExclamationOctagonSm />,
-              info: <Icon.InformationCircleSm />,
-              success: <Icon.CheckmarkCircleSm />,
-              warning: <Icon.ExclamationTriangleSm />,
+              error: <ExclamationOctagonSm />,
+              info: <InformationCircleSm />,
+              success: <CheckmarkCircleSm />,
+              warning: <ExclamationTriangleSm />,
             }[intent]
           }
         </span>

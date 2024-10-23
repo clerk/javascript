@@ -2,12 +2,25 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { TokenVerificationErrorReason } from '../../errors';
-import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from '../../fixtures';
+import {
+  mockExpiredJwt,
+  mockInvalidSignatureJwt,
+  mockJwks,
+  mockJwt,
+  mockJwtPayload,
+  mockMalformedJwt,
+} from '../../fixtures';
 import runtime from '../../runtime';
 import { jsonOk } from '../../util/testUtils';
 import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from '../authStatus';
-import { authenticateRequest } from '../request';
-import type { AuthenticateRequestOptions } from '../types';
+import {
+  authenticateRequest,
+  computeOrganizationSyncTargetMatchers,
+  getOrganizationSyncTarget,
+  type OrganizationSyncTarget,
+  RefreshTokenErrorReason,
+} from '../request';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -62,6 +75,7 @@ function assertHandshake(
     signInUrl?: string;
   },
 ) {
+  assert.true(!!requestState.headers.get('cache-control'));
   assert.propContains(requestState, {
     proxyUrl: '',
     status: AuthStatus.Handshake,
@@ -127,8 +141,8 @@ export default (QUnit: QUnit) => {
   };
 
   /* An otherwise bare state on a request. */
-  const mockOptions = (options?) =>
-    ({
+  const mockOptions = (options?) => {
+    return {
       secretKey: 'deadbeef',
       apiUrl: 'https://api.clerk.test',
       apiVersion: 'v1',
@@ -142,7 +156,8 @@ export default (QUnit: QUnit) => {
       afterSignUpUrl: '',
       domain: '',
       ...options,
-    }) satisfies AuthenticateRequestOptions;
+    } satisfies AuthenticateRequestOptions;
+  };
 
   const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
     return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
@@ -156,6 +171,183 @@ export default (QUnit: QUnit) => {
     return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
   };
 
+  // Tests both getOrganizationSyncTarget and the organizationSyncOptions usage patterns
+  // that are recommended for typical use.
+  module('tokens.getOrganizationSyncTarget(url,options)', _ => {
+    type testCase = {
+      name: string;
+      // When the customer app specifies these orgSyncOptions to middleware...
+      whenOrgSyncOptions: OrganizationSyncOptions | undefined;
+      // And the path arrives at this URL path...
+      whenAppRequestPath: string;
+      // A handshake should (or should not) occur:
+      thenExpectActivationEntity: OrganizationSyncTarget | null;
+    };
+
+    const testCases: testCase[] = [
+      {
+        name: 'none activates nothing',
+        whenOrgSyncOptions: undefined,
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: null,
+      },
+      {
+        name: 'Can activate an org by ID (basic)',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id'],
+        },
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'mimatch activates nothing',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id'],
+        },
+        whenAppRequestPath: '/personal-account/my-resource',
+        thenExpectActivationEntity: null,
+      },
+      {
+        name: 'Can activate an org by ID (recommended matchers)',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with a trailing slash',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with a trailing path component',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:id/', '/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/nested-resource',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with many trailing path component',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id/(.*)'],
+        },
+        whenAppRequestPath: '/orgs/org_foo/nested-resource/and/more/deeply/nested/resources',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by ID with an unrelated path token in the prefix',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/unknown-thing/:any/orgs/:id'],
+        },
+        whenAppRequestPath: '/unknown-thing/thing/orgs/org_foo',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'org_foo',
+        },
+      },
+      {
+        name: 'Can activate an org by slug',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:slug'],
+        },
+        whenAppRequestPath: '/orgs/my-org',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationSlug: 'my-org',
+        },
+      },
+      {
+        name: 'Can activate the personal account',
+        whenOrgSyncOptions: {
+          personalAccountPatterns: ['/personal-account'],
+        },
+        whenAppRequestPath: '/personal-account',
+        thenExpectActivationEntity: {
+          type: 'personalAccount',
+        },
+      },
+      {
+        name: 'ID match precedes slug match',
+        whenOrgSyncOptions: {
+          organizationPatterns: ['/orgs/:id', '/orgs/:slug'], // bad practice
+        },
+        whenAppRequestPath: '/orgs/my-org',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationId: 'my-org',
+        },
+      },
+      {
+        name: 'org match match precedes personal account',
+        whenOrgSyncOptions: {
+          personalAccountPatterns: ['/', '/(.*)'], // Personal account captures everything
+          organizationPatterns: ['/orgs/:slug'], // that isn't org scoped
+        },
+        whenAppRequestPath: '/orgs/my-org',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationSlug: 'my-org',
+        },
+      },
+      {
+        name: 'personal account may contain path tokens',
+        whenOrgSyncOptions: {
+          personalAccountPatterns: ['/user/:any', '/user/:any/(.*)'],
+        },
+        whenAppRequestPath: '/user/123/home',
+        thenExpectActivationEntity: {
+          type: 'personalAccount',
+        },
+      },
+      {
+        name: 'All of the config at once',
+        whenOrgSyncOptions: {
+          organizationPatterns: [
+            '/orgs-by-id/:id',
+            '/orgs-by-id/:id/(.*)',
+            '/orgs-by-slug/:slug',
+            '/orgs-by-slug/:slug/(.*)',
+          ],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        whenAppRequestPath: '/orgs-by-slug/org_bar/sub-resource',
+        thenExpectActivationEntity: {
+          type: 'organization',
+          organizationSlug: 'org_bar',
+        },
+      },
+    ];
+
+    testCases.forEach(testCase => {
+      test(testCase.name, assert => {
+        const path = new URL(`http://localhost:3000${testCase.whenAppRequestPath}`);
+        const matchers = computeOrganizationSyncTargetMatchers(testCase.whenOrgSyncOptions);
+        const toActivate = getOrganizationSyncTarget(path, testCase.whenOrgSyncOptions, matchers);
+        assert.deepEqual(toActivate, testCase.thenExpectActivationEntity);
+      });
+    });
+  });
+
   module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;
     let fakeFetch;
@@ -164,6 +356,8 @@ export default (QUnit: QUnit) => {
       fakeClock = sinon.useFakeTimers(new Date(mockJwtPayload.iat * 1000).getTime());
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      // the refresh token flow calls verify twice, so we need to support two calls
+      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
     });
 
     hooks.afterEach(() => {
@@ -227,7 +421,9 @@ export default (QUnit: QUnit) => {
 
       const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.strictEqual(requestState.toAuth(), null);
     });
 
@@ -476,7 +672,7 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -543,7 +739,9 @@ export default (QUnit: QUnit) => {
         mockOptions(),
       );
 
-      assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenOutdated });
+      assertHandshake(assert, requestState, {
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -562,6 +760,115 @@ export default (QUnit: QUnit) => {
 
       assertSignedIn(assert, requestState);
       assertSignedInToAuth(assert, requestState);
+    });
+
+    test('refreshToken: returns signed in with valid refresh token cookie if token is expired and refresh token exists', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+    });
+
+    test('refreshToken: does not try to refresh if refresh token does not exist', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assert.false(refreshSession.called);
+    });
+
+    test('refreshToken: does not try to refresh if refresh exists but token is not expired', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          // client_uat is missing, need to handshake not to refresh
+          { __session: mockJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assert.false(refreshSession.called);
+    });
+
+    test('refreshToken: uses suffixed refresh cookie even if un-suffixed is present', async assert => {
+      // return cookies from endpoint
+      const refreshSession = sinon.fake.resolves({
+        object: 'token',
+        jwt: mockJwt,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          {
+            __client_uat: `12345`,
+            __session: mockExpiredJwt,
+            __refresh_MqCvchyS: 'can_be_anything',
+            __refresh: 'should_not_be_used',
+          },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+      assert.equal(refreshSession.getCall(0).args[1].refresh_token, 'can_be_anything');
     });
   });
 };

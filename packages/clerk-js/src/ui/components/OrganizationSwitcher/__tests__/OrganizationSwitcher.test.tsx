@@ -1,5 +1,6 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
+import { waitFor } from '@testing-library/react';
 
 import { act, render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -119,8 +120,23 @@ describe('OrganizationSwitcher', () => {
 
       props.setProps({ hidePersonal: true });
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button'));
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
       expect(getByText('Create organization')).toBeInTheDocument();
+    });
+
+    it('renders organization switcher popover as standalone', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+      props.setProps({
+        __experimental_asStandalone: true,
+      });
+      const { getByText, queryByRole } = render(<OrganizationSwitcher />, { wrapper });
+      await waitFor(() => {
+        expect(queryByRole('button', { name: 'Open organization switcher' })).toBeNull();
+        expect(getByText('Personal account')).toBeInTheDocument();
+      });
     });
 
     it('lists all organizations the user belongs to', async () => {

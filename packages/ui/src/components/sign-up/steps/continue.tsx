@@ -1,5 +1,6 @@
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
@@ -7,17 +8,21 @@ import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
+import { RouterLink } from '~/common/router-link';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useOptions } from '~/hooks/use-options';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 
 export function SignUpContinue() {
+  const clerk = useClerk();
+  const { signInUrl } = useOptions();
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
@@ -31,8 +36,14 @@ export function SignUpContinue() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='continue'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='continue'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
@@ -43,9 +54,9 @@ export function SignUpContinue() {
                 <GlobalError />
 
                 <Card.Body>
-                  <div className='space-y-4'>
+                  <div className='flex flex-col gap-y-4'>
                     {firstNameEnabled && lastNameEnabled ? (
-                      <div className='flex gap-4'>
+                      <div className='flex gap-4 empty:hidden'>
                         <FirstNameField
                           required={firstNameRequired}
                           disabled={isGlobalLoading}
@@ -94,7 +105,7 @@ export function SignUpContinue() {
                           <Button
                             busy={isSubmitting}
                             disabled={isGlobalLoading}
-                            iconEnd={<Icon.CaretRightLegacy />}
+                            iconEnd={<CaretRightLegacySm />}
                           >
                             {t('formButtonPrimary')}
                           </Button>
@@ -108,7 +119,12 @@ export function SignUpContinue() {
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.continue.actionText')}{' '}
-                    <Card.FooterActionLink href='/sign-in'>{t('signUp.continue.actionLink')}</Card.FooterActionLink>
+                    <RouterLink
+                      asChild
+                      href={clerk.buildUrlWithAuth(signInUrl || '/sign-in')}
+                    >
+                      <Card.FooterActionLink>{t('signUp.continue.actionLink')}</Card.FooterActionLink>
+                    </RouterLink>
                   </Card.FooterActionText>
                 </Card.FooterAction>
               </Card.Footer>

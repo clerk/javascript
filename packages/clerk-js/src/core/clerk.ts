@@ -18,7 +18,6 @@ import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -38,6 +37,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
+  LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -65,6 +65,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
+import { UI } from '../ui/new';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -146,7 +147,12 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
+function clerkIsLoaded(clerk: ClerkInterface): clerk is LoadedClerk {
+  return !!clerk.client;
+}
+
 export class Clerk implements ClerkInterface {
+  public __experimental_ui?: UI;
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -318,6 +324,14 @@ export class Clerk implements ClerkInterface {
     } else {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
+
+    if (clerkIsLoaded(this)) {
+      this.__experimental_ui = new UI({
+        router: this.#options.__experimental_router,
+        clerk: this,
+        options: this.#options,
+      });
+    }
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -331,7 +345,7 @@ export class Clerk implements ClerkInterface {
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      if (this.#options.experimental?.persistClient) {
+      if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
@@ -496,15 +510,19 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
-      controls.mountComponent({
-        name: 'SignIn',
-        appearanceKey: 'signIn',
-        node,
-        props,
-      }),
-    );
+    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+      this.__experimental_ui.mount('SignIn', node, props);
+    } else {
+      this.assertComponentsReady(this.#componentControls);
+      void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+        controls.mountComponent({
+          name: 'SignIn',
+          appearanceKey: 'signIn',
+          node,
+          props,
+        }),
+      );
+    }
     this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
   };
 
@@ -517,48 +535,20 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public __experimental_mountUserVerification = (
-    node: HTMLDivElement,
-    props?: __experimental_UserVerificationProps,
-  ): void => {
-    this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
-          code: 'cannot_render_user_missing',
-        });
-      }
-      return;
-    }
-    void this.#componentControls.ensureMounted({ preloadHint: 'UserVerification' }).then(controls =>
-      controls.mountComponent({
-        name: 'UserVerification',
-        appearanceKey: 'userVerification',
-        node,
-        props,
-      }),
-    );
-  };
-
-  public __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
-      controls.mountComponent({
-        name: 'SignUp',
-        appearanceKey: 'signUp',
-        node,
-        props,
-      }),
-    );
+    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+      this.__experimental_ui.mount('SignUp', node, props);
+    } else {
+      this.assertComponentsReady(this.#componentControls);
+      void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+        controls.mountComponent({
+          name: 'SignUp',
+          appearanceKey: 'signUp',
+          node,
+          props,
+        }),
+      );
+    }
     this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 
@@ -698,6 +688,13 @@ export class Clerk implements ClerkInterface {
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public __experimental_prefetchOrganizationSwitcher = () => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      ?.ensureMounted({ preloadHint: 'OrganizationSwitcher' })
+      .then(controls => controls.prefetch('organizationSwitcher'));
   };
 
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
@@ -969,7 +966,16 @@ export class Clerk implements ClerkInterface {
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
-      return this.buildAfterSignOutUrl();
+      return this.buildUrlWithAuth(
+        buildURL(
+          {
+            base: this.#options.signInUrl
+              ? `${this.#options.signInUrl}/choose`
+              : this.environment?.displayConfig.afterSignOutOneUrl,
+          },
+          { stringify: true },
+        ),
+      );
     }
 
     return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
@@ -1394,6 +1400,7 @@ export class Clerk implements ClerkInterface {
           return this.client?.signUp.create({
             strategy: 'google_one_tap',
             token: params.token,
+            __experimental_legalAccepted: params.__experimental_legalAccepted,
           });
         }
         throw err;
@@ -1414,6 +1421,7 @@ export class Clerk implements ClerkInterface {
     customNavigate,
     unsafeMetadata,
     strategy,
+    __experimental_legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -1436,6 +1444,7 @@ export class Clerk implements ClerkInterface {
           generateSignature,
           unsafeMetadata,
           strategy,
+          __experimental_legalAccepted,
         });
 
         if (

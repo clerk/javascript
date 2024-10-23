@@ -20,13 +20,22 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
         return resolvedVirtualModuleId;
       }
     },
+    config(config) {
+      // While Astro processes <script> tags by default, our control components
+      // which uses <script> tags and imports nanostores will not be processed by Astro.
+      // This ensures @clerk/astro/client is properly processed and bundled,
+      // resolving runtime import issues in these components.
+      config.optimizeDeps?.include?.push('@clerk/astro/client');
+      // Let astro vite plugin handle this.
+      config.optimizeDeps?.exclude?.push('astro:transitions/client');
+    },
     load(id) {
       if (id === resolvedVirtualModuleId) {
         return `
-          export const astroConfig = ${JSON.stringify(astroConfig)};
+          const configOutput = '${astroConfig.output}';
 
           export function isStaticOutput(forceStatic) {
-            if (astroConfig.output === 'hybrid' && forceStatic === undefined) {
+            if (configOutput === 'hybrid' && forceStatic === undefined) {
               // Default page is prerendered in hybrid mode
               return true;
             }
@@ -35,7 +44,7 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
               return forceStatic;
             }
 
-            return astroConfig.output === 'static';
+            return configOutput === 'static';
           }
         `;
       }

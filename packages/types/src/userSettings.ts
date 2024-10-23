@@ -47,10 +47,14 @@ export type SignInData = {
   };
 };
 
+export type SignUpModes = 'public' | 'restricted';
+
 export type SignUpData = {
   allowlist_only: boolean;
   progressive: boolean;
   captcha_enabled: boolean;
+  mode: SignUpModes;
+  legal_consent_enabled: boolean;
 };
 
 export type PasswordSettingsData = {

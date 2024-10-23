@@ -15,6 +15,9 @@ export const createUserButtonPageObject = (testArgs: TestArgs) => {
     waitForPopover: () => {
       return page.waitForSelector('.cl-userButtonPopoverCard', { state: 'visible' });
     },
+    waitForPopoverClosed: () => {
+      return page.waitForSelector('.cl-userButtonPopoverCard', { state: 'detached' });
+    },
     toHaveVisibleMenuItems: async (menuItems: string | RegExp | Array<string | RegExp>) => {
       if (typeof menuItems === 'string' || menuItems instanceof RegExp) {
         menuItems = [menuItems];

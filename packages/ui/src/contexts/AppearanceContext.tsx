@@ -1,13 +1,9 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type { Appearance as CurrentAppearance, Layout } from '@clerk/types';
+import type { Appearance as CurrentAppearance, Layout as CurrentLayout } from '@clerk/types';
 import React from 'react';
 
+import type { DescriptorIdentifier } from '~/descriptors';
 import { fullTheme } from '~/themes';
-
-/**
- * Union of all valid descriptors used throughout the components.
- */
-export type DescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
 
 /**
  * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
@@ -22,7 +18,7 @@ export type PartialDescriptor = Omit<Partial<ParsedDescriptor>, 'descriptor'>;
 /**
  * A full theme generated from merging ParsedElementsFragments. Has entries for each descriptor, but they're not complete.
  */
-export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
+export type PartialTheme = Partial<Record<DescriptorIdentifier, PartialDescriptor>>;
 
 /**
  * A subset of a partial theme. This is the type used when authoring style objects within a component.
@@ -34,13 +30,16 @@ export type ParsedElementsFragment = Partial<PartialTheme>;
  * the main type interacted with within components.
  */
 export type ParsedElements = Record<DescriptorIdentifier, ParsedDescriptor>;
-export type ParsedLayout = Required<Layout>;
+export type ParsedOptions = Omit<CurrentLayout, 'logoPlacement'> & {
+  logoVisibility?: 'visible' | 'hidden';
+};
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
-export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme'> & {
+export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme' | 'layout'> & {
   theme?: ParsedElements;
   elements?: Partial<Record<DescriptorIdentifier, ElementsAppearanceConfig>>;
+  options?: ParsedOptions;
 };
 
 export type AppearanceCascade = {
@@ -55,7 +54,7 @@ export type AppearanceCascade = {
 export type ParsedAppearance = {
   theme: ParsedElements;
   elements: ParsedElements;
-  layout: ParsedLayout;
+  options: ParsedOptions;
 };
 
 type AppearanceContextValue = {
@@ -65,8 +64,8 @@ type AppearanceContextValue = {
    * Example:
    * ```tsx
    * function Help() {
-   *   const { layout } = useAppearance().parsedAppearance;
-   *   return <p>{layout.helpPageUrl}</p>
+   *   const { options } = useAppearance().parsedAppearance;
+   *   return <p>{options.helpPageUrl}</p>
    * }
    * ```
    */
@@ -76,7 +75,7 @@ type AppearanceContextValue = {
 };
 
 /**
- * Used to merge full themes with ParsedElementsFragments. Allows you to combine layoutStyle with multiple visualStyle
+ * Used to merge full themes with ParsedElementsFragments. Allows you to combine optionsStyle with multiple visualStyle
  * elements.
  */
 export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment[]): ParsedElementsFragment {
@@ -144,7 +143,7 @@ function mergeElementsAppearanceConfig(
   }
 
   if (!result) {
-    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${JSON.stringify(a)} and ${JSON.stringify(b)}`);
   }
 
   return result;
@@ -161,7 +160,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     return a;
   }
 
-  const result = { ...a, layout: { ...a.layout, ...b.layout } };
+  const result = { ...a, options: { ...a.options, ...b.options } }; // Ensure options are merged
 
   if (b.theme) {
     result.theme = b.theme;
@@ -173,7 +172,8 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     Object.entries(b.elements).forEach(([element, config]) => {
       const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
-        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config!);
       } else {
         result.elements![el] = config;
       }
@@ -186,7 +186,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
 function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
   const baseTheme = theme ?? fullTheme;
   if (!appearance) {
-    return { theme: baseTheme, elements: structuredClone(baseTheme), layout: defaultAppearance.layout };
+    return { theme: baseTheme, elements: structuredClone(baseTheme), options: defaultAppearance.options };
   }
 
   const result = {
@@ -194,7 +194,7 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
     // because we're going to perform modifications to deeply nested objects, we need to create a structuredClone of
     // the theme or else subsequent usage of the baseTheme will contain our merged changes.
     elements: structuredClone(baseTheme),
-    layout: { ...defaultAppearance.layout, ...appearance.layout },
+    options: { ...defaultAppearance.options, ...appearance.options },
   };
 
   if (appearance.elements) {
@@ -204,7 +204,8 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
         } else {
-          const { className, ...style } = config;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+          const { className, ...style } = config!;
           if (className) {
             result.elements[el].className = [result.elements[el].className, className].join(' ');
           }
@@ -220,8 +221,8 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 export const defaultAppearance: ParsedAppearance = {
   theme: fullTheme,
   elements: fullTheme,
-  layout: {
-    logoPlacement: 'inside',
+  options: {
+    logoVisibility: 'visible',
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'auto',
     logoImageUrl: '',
@@ -277,7 +278,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: 'cl-test-class-one' } };
       const b = { elements: { alertIcon: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: 'cl-test-class-one',
           alertIcon: 'cl-test-class-two',
@@ -291,7 +292,7 @@ if (import.meta.vitest) {
         elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         theme: a.theme,
         elements: {
           alert__warning: 'cl-test-class-one',
@@ -307,7 +308,7 @@ if (import.meta.vitest) {
         elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         theme: b.theme,
         elements: {
           alert__warning: 'cl-test-class-one',
@@ -320,7 +321,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: 'cl-test-class-one' } };
       const b = { elements: { alert__warning: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: 'cl-test-class-one cl-test-class-two',
         },
@@ -331,7 +332,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: { background: 'tomato' } } };
       const b = { elements: { alert__warning: { color: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: { color: 'red', background: 'tomato' },
         },
@@ -342,7 +343,7 @@ if (import.meta.vitest) {
       const a = { elements: { alert__warning: { background: 'tomato' } } };
       const b = { elements: { alert__warning: { background: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
-        layout: {},
+        options: {},
         elements: {
           alert__warning: { background: 'red' },
         },
@@ -417,7 +418,7 @@ if (import.meta.vitest) {
       };
       expect(applyTheme(theme, appearance)).toStrictEqual({
         theme,
-        layout: defaultAppearance.layout,
+        options: defaultAppearance.options,
         elements: {
           ...fullTheme,
           alert__warning: {

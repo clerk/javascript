@@ -1,14 +1,16 @@
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { ERROR_CODES } from '../../../core/constants';
+import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
+  Form,
   Header,
+  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -22,6 +24,7 @@ import { buildRequest, createPasswordError, handleError, useFormControl } from '
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
+import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
@@ -48,6 +51,8 @@ function _SignUpStart(): JSX.Element {
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
+
+  const { mode } = userSettings.signUp;
 
   const formState = {
     firstName: useFormControl('firstName', signUp.firstName || initialValues.firstName || '', {
@@ -76,6 +81,12 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
+    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+      type: 'checkbox',
+      label: '',
+      defaultChecked: false,
+      isRequired: userSettings.signUp.legal_consent_enabled || false,
+    }),
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
@@ -99,6 +110,7 @@ function _SignUpStart(): JSX.Element {
     hasEmail,
     activeCommIdentifierType,
     isProgressiveSignUp,
+    legalConsentRequired: userSettings.signUp.legal_consent_enabled,
   });
 
   const handleTokenFlow = () => {
@@ -184,19 +196,17 @@ function _SignUpStart(): JSX.Element {
     e.preventDefault();
 
     type FormStateKey = keyof typeof formState;
-    const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
-      [] as Array<FormControlState>,
-    );
+    const fieldsToSubmit = Object.entries(fields).reduce((acc, [k, v]) => {
+      acc.push(...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : []));
+      return acc;
+    }, [] as Array<FormControlState>);
 
     if (unsafeMetadata) {
       fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
     }
 
     if (fields.ticket) {
-      const noop = () => {
-        //
-      };
+      const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
       fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
     }
@@ -207,8 +217,8 @@ function _SignUpStart(): JSX.Element {
     const phoneNumberProvided = !!(fieldsToSubmit.find(f => f.id === 'phoneNumber')?.value || '');
 
     if (!emailAddressProvided && !phoneNumberProvided && emailOrPhone(attributes, isProgressiveSignUp)) {
-      fieldsToSubmit.push(formState['emailAddress']);
-      fieldsToSubmit.push(formState['phoneNumber']);
+      fieldsToSubmit.push(formState.emailAddress);
+      fieldsToSubmit.push(formState.phoneNumber);
     }
 
     card.setLoading();
@@ -246,6 +256,10 @@ function _SignUpStart(): JSX.Element {
     (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
 
+  if (mode === SIGN_UP_MODES.RESTRICTED && !hasTicket) {
+    return <SignUpRestrictedAccess />;
+  }
+
   return (
     <Flow.Part part='start'>
       <Card.Root>
@@ -266,6 +280,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
+                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked)}
                 />
               )}
               {shouldShowForm && (
@@ -278,6 +293,14 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && (
+              <Form.ControlRow elementId='__experimental_legalAccepted'>
+                <LegalCheckbox
+                  {...formState.__experimental_legalAccepted.props}
+                  isRequired={fields.__experimental_legalAccepted?.required}
+                />
+              </Form.ControlRow>
+            )}
             {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>

@@ -1,6 +1,6 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
@@ -11,7 +11,8 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
+import PenSm from '~/primitives/icons/pen-sm';
 import { LinkButton } from '~/primitives/link';
 import type { RequireExactlyOne } from '~/types/utils';
 import { parsePhoneString } from '~/utils/phone-number';
@@ -55,8 +56,14 @@ export function SignUpVerifications() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='verifications'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
@@ -75,7 +82,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -119,7 +126,7 @@ export function SignUpVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -147,7 +154,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -191,7 +198,7 @@ export function SignUpVerifications() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -223,7 +230,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PenSm />
+                            <PenSm />
                           </button>
                         </SignUp.Action>
                       </span>

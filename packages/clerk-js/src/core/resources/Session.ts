@@ -1,4 +1,5 @@
 import { runWithExponentialBackOff } from '@clerk/shared';
+import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   __experimental_SessionVerificationJSON,
@@ -39,7 +40,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
-  __experimental_factorVerificationAge: [number | null, number | null] = [null, null];
+  __experimental_factorVerificationAge: [number, number] | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -88,31 +89,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   checkAuthorization: CheckAuthorization = params => {
-    // if there is no active organization user can not be authorized
-    if (!this.lastActiveOrganizationId || !this.user) {
-      return false;
-    }
-
-    // loop through organizationMemberships from client piggybacking
-    const orgMemberships = this.user.organizationMemberships || [];
+    const orgMemberships = this.user?.organizationMemberships || [];
     const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
-
-    // Based on FAPI this should never happen, but we handle it anyway
-    if (!activeMembership) {
-      return false;
-    }
-
-    const activeOrganizationPermissions = activeMembership.permissions;
-    const activeOrganizationRole = activeMembership.role;
-
-    if (params.permission) {
-      return activeOrganizationPermissions.includes(params.permission);
-    }
-    if (params.role) {
-      return activeOrganizationRole === params.role;
-    }
-
-    return false;
+    return createCheckAuthorization({
+      userId: this.user?.id,
+      __experimental_factorVerificationAge: this.__experimental_factorVerificationAge,
+      orgId: activeMembership?.id,
+      orgRole: activeMembership?.role,
+      orgPermissions: activeMembership?.permissions,
+    })(params);
   };
 
   #hydrateCache = (token: TokenResource | null) => {
@@ -129,7 +114,7 @@ export class Session extends BaseResource implements SessionResource {
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
   // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-  #getCacheId(template?: string, organizationId?: string) {
+  #getCacheId(template?: string, organizationId?: string | null) {
     const resolvedOrganizationId =
       typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
     return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
@@ -137,7 +122,6 @@ export class Session extends BaseResource implements SessionResource {
 
   __experimental_startVerification = async ({
     level,
-    maxAge,
   }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
@@ -145,7 +129,6 @@ export class Session extends BaseResource implements SessionResource {
         path: `/client/sessions/${this.id}/verify`,
         body: {
           level,
-          maxAge,
         } as any,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
@@ -263,7 +246,7 @@ export class Session extends BaseResource implements SessionResource {
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
     const organizationId =
-      typeof options?.organizationId === 'undefined' ? Session.clerk.organization?.id : options?.organizationId;
+      typeof options?.organizationId === 'undefined' ? this.lastActiveOrganizationId : options?.organizationId;
 
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
@@ -273,7 +256,7 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
-    const shouldDispatchTokenUpdate = !template && organizationId === Session.clerk.organization?.id;
+    const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;

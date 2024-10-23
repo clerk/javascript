@@ -14,6 +14,61 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  __experimental_userVerification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   backButton: '戻る',
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
@@ -131,7 +186,7 @@ export const jaJP: LocalizationResource = {
       action__invite: '招待',
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
-        tableHeader__actions: '',
+        tableHeader__actions: undefined,
         tableHeader__joined: '参加日時',
         tableHeader__role: '役割',
         tableHeader__user: 'ユーザー',
@@ -215,7 +270,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: '組織プロフィール',
         uploadAction__title: 'ロゴ',
       },
@@ -381,7 +436,7 @@ export const jaJP: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
-      subtitle: '',
+      subtitle: undefined,
       title: '電話を確認してください',
     },
     resetPassword: {
@@ -407,7 +462,7 @@ export const jaJP: LocalizationResource = {
     },
     totpMfa: {
       formTitle: '検証コード',
-      subtitle: '',
+      subtitle: undefined,
       title: '二段階認証',
     },
   },
@@ -467,6 +522,7 @@ export const jaJP: LocalizationResource = {
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       'セキュリティ検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートセンターに連絡した上でサポートを受けてください。',
     captcha_unavailable:
@@ -484,6 +540,7 @@ export const jaJP: LocalizationResource = {
     form_param_max_length_exceeded__last_name: '姓は256文字を超えることはできません。',
     form_param_max_length_exceeded__name: '名前は256文字を超えることはできません。',
     form_param_nil: 'パラメータが存在しません。',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'パスワードが正しくありません。',
     form_password_length_too_short: 'パスワードの長さが短すぎます。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
@@ -497,6 +554,10 @@ export const jaJP: LocalizationResource = {
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access: 'アクセスが許可されていません。',
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
     passkey_pa_not_supported: undefined,
@@ -787,7 +848,7 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: undefined,
         title: 'プロフィール',
       },
       usernameSection: {
@@ -817,6 +878,7 @@ export const jaJP: LocalizationResource = {
       subtitle__unavailableWallets: '利用可能なWeb3ウォレットはありません。',
       successMessage: 'ウォレットがアカウントに追加されました。',
       title: 'Web3ウォレットの追加',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
 } as const;

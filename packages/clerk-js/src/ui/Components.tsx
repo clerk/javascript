@@ -37,6 +37,7 @@ import {
   LazyModalRenderer,
   LazyOneTapRenderer,
   LazyProviders,
+  OrganizationSwitcherPrefetch,
 } from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
 
@@ -84,7 +85,11 @@ export type ComponentControls = {
       | 'organizationProfile'
       | 'createOrganization'
       | 'userVerification',
+    options?: {
+      notify?: boolean;
+    },
   ) => void;
+  prefetch: (component: 'organizationSwitcher') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
 };
@@ -113,6 +118,7 @@ interface ComponentsState {
   userVerificationModal: null | __experimental_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  organizationSwitcherPrefetch: boolean;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -190,6 +196,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
+    organizationSwitcherPrefetch: false,
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -245,17 +252,61 @@ const Components = (props: ComponentsProps) => {
       setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
     };
 
-    componentsControls.closeModal = name => {
+    componentsControls.closeModal = (name, options = {}) => {
+      const { notify = true } = options;
       clearUrlStateParam();
-      setState(s => ({ ...s, [name + 'Modal']: null }));
+      setState(s => {
+        function handleCloseModalForExperimentalUserVerification() {
+          const modal = s[`${name}Modal`] || {};
+          if ('afterVerificationCancelled' in modal && notify) {
+            modal.afterVerificationCancelled?.();
+          }
+        }
+
+        /**
+         * We need this in order for `Clerk.__experimental_closeUserVerification()`
+         * to properly trigger the previously defined `afterVerificationCancelled` callback
+         */
+        handleCloseModalForExperimentalUserVerification();
+
+        return { ...s, [`${name}Modal`]: null };
+      });
     };
 
     componentsControls.openModal = (name, props) => {
-      setState(s => ({ ...s, [name + 'Modal']: props }));
+      function handleCloseModalForExperimentalUserVerification() {
+        if (!('afterVerificationCancelled' in props)) {
+          return;
+        }
+
+        setState(s => ({
+          ...s,
+          [`${name}Modal`]: {
+            ...props,
+            /**
+             * When a UserVerification flow is completed, we need to close the modal without trigger a cancellation callback
+             */
+            afterVerification() {
+              props.afterVerification?.();
+              componentsControls.closeModal(name, { notify: false });
+            },
+          },
+        }));
+      }
+
+      if ('afterVerificationCancelled' in props) {
+        handleCloseModalForExperimentalUserVerification();
+      } else {
+        setState(s => ({ ...s, [`${name}Modal`]: props }));
+      }
     };
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.prefetch = component => {
+      setState(s => ({ ...s, [`${component}Prefetch`]: true }));
     };
 
     props.onComponentsMounted();
@@ -409,6 +460,8 @@ const Components = (props: ComponentsProps) => {
             <ImpersonationFab />
           </LazyImpersonationFabProvider>
         )}
+
+        <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>
     </Suspense>
   );

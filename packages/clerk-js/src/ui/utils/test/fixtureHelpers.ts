@@ -17,6 +17,7 @@ import type {
   VerificationJSON,
 } from '@clerk/types';
 
+import { SIGN_UP_MODES } from '../../../core/constants';
 import type { OrgParams } from '../../../core/test/fixtures';
 import { createUser, getOrganizationId } from '../../../core/test/fixtures';
 import { createUserFixture } from './fixtures';
@@ -261,7 +262,16 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignUpJSON;
   };
 
-  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber };
+  const startSignUpWithMissingLegalAccepted = () => {
+    baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'missing_requirements',
+      legal_accepted_at: null,
+      missing_fields: ['legal_accepted'],
+    } as SignUpJSON;
+  };
+
+  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber, startSignUpWithMissingLegalAccepted };
 };
 
 const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -284,7 +294,15 @@ const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const withPreferredSignInStrategy = (opts: { strategy: DisplayConfigJSON['preferred_sign_in_strategy'] }) => {
     dc.preferred_sign_in_strategy = opts.strategy;
   };
-  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy };
+
+  const withTermsPrivacyPolicyUrls = (opts: {
+    termsOfService?: DisplayConfigJSON['terms_url'];
+    privacyPolicy?: DisplayConfigJSON['privacy_policy_url'];
+  }) => {
+    dc.terms_url = opts.termsOfService || '';
+    dc.privacy_policy_url = opts.privacyPolicy || '';
+  };
+  return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy, withTermsPrivacyPolicyUrls };
 };
 
 const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -296,9 +314,10 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
     os.max_allowed_memberships = max;
   };
 
-  const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[]) => {
+  const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
+    os.domains.default_role = defaultRole ?? null;
   };
   return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
 };
@@ -317,6 +336,11 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     show_zxcvbn: false,
     min_zxcvbn_strength: 0,
   };
+  us.sign_up = {
+    ...us.sign_up,
+    mode: SIGN_UP_MODES.PUBLIC,
+  };
+
   const emptyAttribute = {
     first_factors: [],
     second_factors: [],
@@ -476,6 +500,14 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withRestrictedMode = () => {
+    us.sign_up.mode = SIGN_UP_MODES.RESTRICTED;
+  };
+
+  const withLegalConsent = () => {
+    us.sign_up.legal_consent_enabled = true;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -493,5 +525,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withAuthenticatorApp,
     withPasskey,
     withPasskeySettings,
+    withRestrictedMode,
+    withLegalConsent,
   };
 };

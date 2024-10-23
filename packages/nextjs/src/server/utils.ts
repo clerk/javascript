@@ -16,10 +16,6 @@ import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, miss
 import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
-export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
-  Object.assign(req, { [key]: value });
-}
-
 export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
   // @ts-expect-error - TS doesn't like indexing into RequestLike
   return key in req ? req[key] : undefined;
@@ -30,13 +26,6 @@ export function getAuthKeyFromRequest(
   key: keyof typeof constants.Attributes,
 ): string | null | undefined {
   return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
-}
-
-// TODO: Rename Auth status and align the naming across media
-export function getAuthStatusFromRequest(req: RequestLike): string | null | undefined {
-  return (
-    getCustomAttributeFromRequest(req, constants.Attributes.AuthStatus) || getHeader(req, constants.Headers.AuthStatus)
-  );
 }
 
 export function getHeader(req: RequestLike, name: string): string | null | undefined {
@@ -103,15 +92,6 @@ export const setRequestHeadersOnNextResponse = (
   });
 };
 
-export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
-  // Serializing the state on dev env is a temp workaround for the following issue:
-  // https://github.com/vercel/next.js/discussions/11209|Next.js
-  const __clerk_ssr_state = (
-    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject }
-  ) as T;
-  return { ...obj, __clerk_ssr_state };
-};
-
 // Auth result will be set as both a query param & header when applicable
 export function decorateRequest(
   req: ClerkRequest,
@@ -173,12 +153,6 @@ export const apiEndpointUnauthorizedNextResponse = () => {
   return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
 };
 
-export const isCrossOrigin = (from: string | URL, to: string | URL) => {
-  const fromUrl = new URL(from);
-  const toUrl = new URL(to);
-  return fromUrl.origin !== toUrl.origin;
-};
-
 export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
 
@@ -212,6 +186,14 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
 export const redirectAdapter = (url: string | URL) => {
   return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
+
+export function assertAuthStatus(req: RequestLike, error: string) {
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+
+  if (!authStatus) {
+    throw new Error(error);
+  }
+}
 
 export function assertKey(key: string, onError: () => never): string {
   if (!key) {

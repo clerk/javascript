@@ -1,6 +1,6 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -10,50 +10,70 @@ import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
+import { RouterLink } from '~/common/router-link';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/contexts';
-import { useAttributes } from '~/hooks/use-attributes';
+import { useSignUpAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useOptions } from '~/hooks/use-options';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Icon from '~/primitives/icon';
+import CaretRightLegacySm from '~/primitives/icons/caret-right-legacy-sm';
 import { Separator } from '~/primitives/separator';
 
 export function SignUpStart() {
   const clerk = useClerk();
+  const { signInUrl } = useOptions();
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
   const { t } = useLocalizations();
-  const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
-  const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
-  const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
-  const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
-  const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
-  const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
+  const { required: firstNameRequired, show: showFirstName } = useSignUpAttributes('first_name');
+  const { required: lastNameRequired, show: showLastName } = useSignUpAttributes('last_name');
+  const { enabled: usernameEnabled, required: usernameRequired, show: showUserName } = useSignUpAttributes('username');
+  const {
+    enabled: phoneNumberEnabled,
+    required: phoneNumberRequired,
+    show: showPhoneNumber,
+  } = useSignUpAttributes('phone_number');
+  const {
+    enabled: emailAddressEnabled,
+    required: emailAddressRequired,
+    show: showEmailAddress,
+  } = useSignUpAttributes('email_address');
+  const { required: passwordRequired, show: showPassword } = useSignUpAttributes('password');
   const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const { layout } = useAppearance().parsedAppearance;
+  const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         const connectionsWithSeperator = [
-          <Connections disabled={isGlobalLoading} />,
-          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+          <Connections
+            key='connections'
+            disabled={isGlobalLoading}
+          />,
+          hasConnection && hasIdentifier ? <Separator key='separator'>{t('dividerText')}</Separator> : null,
         ];
         return (
-          <SignUp.Step name='start'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='start'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
@@ -68,11 +88,11 @@ export function SignUpStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
+                  {options.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
-                      {firstNameEnabled && lastNameEnabled ? (
+                      {showFirstName && showLastName ? (
                         <div className='flex gap-4'>
                           <FirstNameField
                             required={firstNameRequired}
@@ -85,7 +105,7 @@ export function SignUpStart() {
                         </div>
                       ) : null}
 
-                      {usernameEnabled ? (
+                      {showUserName ? (
                         <UsernameField
                           required={usernameRequired}
                           disabled={isGlobalLoading}
@@ -99,9 +119,9 @@ export function SignUpStart() {
                         />
                       ) : (
                         <>
-                          <EmailField disabled={isGlobalLoading} />
+                          {showEmailAddress ? <EmailField disabled={isGlobalLoading} /> : null}
 
-                          {phoneNumberEnabled ? (
+                          {showPhoneNumber ? (
                             <PhoneNumberField
                               required={phoneNumberRequired}
                               disabled={isGlobalLoading}
@@ -111,7 +131,7 @@ export function SignUpStart() {
                         </>
                       )}
 
-                      {passwordEnabled && passwordRequired ? (
+                      {showPassword ? (
                         <PasswordField
                           validatePassword
                           label={t('formFieldLabel__password')}
@@ -122,7 +142,7 @@ export function SignUpStart() {
                     </div>
                   ) : null}
 
-                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
+                  {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
 
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
@@ -138,7 +158,7 @@ export function SignUpStart() {
                             <Button
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
+                              iconEnd={<CaretRightLegacySm />}
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -153,7 +173,12 @@ export function SignUpStart() {
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.start.actionText')}{' '}
-                    <Card.FooterActionLink href='/sign-in'>{t('signUp.start.actionLink')}</Card.FooterActionLink>
+                    <RouterLink
+                      asChild
+                      href={clerk.buildUrlWithAuth(signInUrl || '/sign-in')}
+                    >
+                      <Card.FooterActionLink>{t('signUp.start.actionLink')}</Card.FooterActionLink>
+                    </RouterLink>
                   </Card.FooterActionText>
                 </Card.FooterAction>
               </Card.Footer>

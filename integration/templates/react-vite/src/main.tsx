@@ -8,6 +8,9 @@ import Protected from './protected';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 import UserProfile from './user';
+import UserProfileCustom from './custom-user-profile';
+import UserButtonCustom from './custom-user-button';
+import UserButtonCustomTrigger from './custom-user-button-trigger';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -19,7 +22,9 @@ const Root = () => {
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
       experimental={{
-        persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true',
+        persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT
+          ? import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true'
+          : undefined,
       }}
     >
       <Outlet />
@@ -51,6 +56,18 @@ const router = createBrowserRouter([
       {
         path: '/protected',
         element: <Protected />,
+      },
+      {
+        path: '/custom-user-profile/*',
+        element: <UserProfileCustom />,
+      },
+      {
+        path: '/custom-user-button',
+        element: <UserButtonCustom />,
+      },
+      {
+        path: '/custom-user-button-trigger',
+        element: <UserButtonCustomTrigger />,
       },
     ],
   },

@@ -23,6 +23,7 @@ const variantToSourceFile = {
 
 /** @returns { import('@rspack/cli').Configuration } */
 const common = ({ mode }) => {
+  /** @type { import('webpack').Configuration } */
   return {
     mode,
     resolve: {
@@ -40,7 +41,12 @@ const common = ({ mode }) => {
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
-    ],
+      process.env.RSDOCTOR &&
+        new RsdoctorWebpackPlugin({
+          mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
+          disableClientServer: process.env.RSDOCTOR === 'brief',
+        }),
+    ].filter(Boolean),
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
     },
@@ -66,13 +72,32 @@ const common = ({ mode }) => {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => module.resource && !module.resource.includes('/ui/components'),
+            test: module =>
+              module.resource &&
+              !module.resource.includes('/ui/components') &&
+              !module.resource.includes('packages/elements') &&
+              !module.resource.includes('packages/ui'),
           },
           defaultVendors: {
             minChunks: 1,
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             priority: -10,
+          },
+          commonNew: {
+            minChunks: 2,
+            name: 'common-new',
+            chunks(chunk) {
+              return !!chunk.name?.startsWith('rebuild--');
+            },
+            priority: 0,
+          },
+          react: {
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](react-dom|scheduler)[\\/]/,
+            name: 'framework',
+            priority: 40,
+            enforce: true,
           },
         },
       },
@@ -159,13 +184,58 @@ const typescriptLoaderDev = () => {
   ];
 };
 
-/** @type { () => (import('@rspack/cli').Configuration) } */
+/**
+ * Used in outputs that utilize chunking, and returns a URL to the stylesheet.
+ * @type { () => (import('webpack').RuleSetRule) }
+ */
+const clerkUICSSLoader = () => {
+  // This emits a module exporting a URL to the styles.css file.
+  return {
+    test: /packages\/ui\/dist\/styles\.css/,
+    type: 'asset/resource',
+  };
+};
+
+/**
+ * Used in outputs that _do not_ utilize chunking, and returns the contents of the stylesheet.
+ * @type { () => (import('webpack').RuleSetRule) }
+ */
+const clerkUICSSSourceLoader = () => {
+  // This emits a module exporting the contents of the styles.css file.
+  return {
+    test: /packages\/ui\/dist\/styles\.css/,
+    type: 'asset/source',
+  };
+};
+
+/**
+ * Used for production builds that have dynamicly loaded chunks.
+ * @type { () => (import('webpack').Configuration) }
+ * */
+const commonForProdChunked = () => {
+  return {
+    module: {
+      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSLoader()],
+    },
+  };
+};
+
+/**
+ * Used for production builds that combine all files into one single file (such as for Chrome Extensions).
+ * @type { () => (import('webpack').Configuration) }
+ * */
+const commonForProdBundled = () => {
+  return {
+    module: {
+      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSSourceLoader()],
+    },
+  };
+};
+
+/** @type { () => (import('webpack').Configuration) } */
 const commonForProd = () => {
   return {
     devtool: undefined,
-    module: {
-      rules: [svgLoader(), ...typescriptLoaderProd()],
-    },
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
@@ -203,12 +273,18 @@ const entryForVariant = variant => {
 
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode, analysis }) => {
-  const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
+  const clerkBrowser = merge(
+    entryForVariant(variants.clerkBrowser),
+    common({ mode }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
 
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
     commonForProd(),
+    commonForProdChunked(),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
     // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
     // chunking in our browser bundles.
@@ -227,10 +303,11 @@ const prodConfig = ({ mode, analysis }) => {
     entryForVariant(variants.clerkHeadlessBrowser),
     common({ mode }),
     commonForProd(),
+    commonForProdChunked(),
     // externalsForHeadless(),
   );
 
-  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), {
+  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
     experiments: {
       outputModule: true,
     },
@@ -248,11 +325,19 @@ const prodConfig = ({ mode, analysis }) => {
     ],
   });
 
-  const clerkCjs = merge(clerkEsm, {
+  const clerkCjs = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
     output: {
       filename: '[name].js',
       libraryTarget: 'commonjs',
     },
+    plugins: [
+      // Include the lazy chunks in the bundle as well
+      // so that the final bundle can be imported and bundled again
+      // by a different bundler, eg the webpack instance used by react-scripts
+      new rspack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
   });
 
   // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
@@ -272,7 +357,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev()],
+        rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
       },
       plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
       devtool: 'eval-cheap-source-map',

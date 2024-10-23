@@ -16,6 +16,7 @@ const Attributes = {
 
 const Cookies = {
   Session: '__session',
+  Refresh: '__refresh',
   ClientUat: '__client_uat',
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
@@ -30,6 +31,7 @@ const QueryParameters = {
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
+  HandshakeReason: '__clerk_hs_reason',
 } as const;
 
 const Headers = {
@@ -55,6 +57,7 @@ const Headers = {
   ContentType: 'content-type',
   SecFetchDest: 'sec-fetch-dest',
   Location: 'location',
+  CacheControl: 'cache-control',
 } as const;
 
 const ContentTypes = {
