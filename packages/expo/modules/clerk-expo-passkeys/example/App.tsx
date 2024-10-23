@@ -34,9 +34,7 @@ const ProtectedView = () => {
   const auth = useAuth();
 
   const handleCreatePasskey = async () => {
-    if (!clerkUser) {
-      return null;
-    }
+    if (!clerkUser) return;
     try {
       return await clerkUser.createPasskey();
     } catch (e) {
@@ -45,15 +43,7 @@ const ProtectedView = () => {
   };
 
   return (
-    <View
-      style={{
-        gap: 12,
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#1D3D47',
-        padding: 20,
-      }}
-    >
+    <View style={styles.protectedContainer}>
       <TouchableOpacity onPress={handleCreatePasskey}>
         <Text>Create passkey</Text>
       </TouchableOpacity>
@@ -67,8 +57,8 @@ const ProtectedView = () => {
       {clerkUser && (
         <View>
           <Text style={{ color: 'cyan' }}>
-            User with id <Text style={{ fontStyle: 'italic' }}>{clerkUser.id}</Text> and Username{' '}
-            <Text style={{ fontStyle: 'italic' }}>{clerkUser.primaryEmailAddress?.toString()}</Text> is logged in{' '}
+            User with id <Text style={styles.italic}>{clerkUser.id}</Text> and Username{' '}
+            <Text style={styles.userInfo}>{clerkUser.primaryEmailAddress?.toString()}</Text> is logged in{' '}
           </Text>
         </View>
       )}
@@ -82,45 +72,29 @@ const PublicView = () => {
   const [emailAddress, setEmailAddress] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const onSignInWithPasskey = async () => {
-    if (!isLoaded) {
-      return null;
-    }
-    try {
-      const signinResponse = await signIn.authenticateWithPasskey({
-        flow: 'discoverable',
-      });
+  const handleSignIn = async (method: 'password' | 'passkey') => {
+    if (!isLoaded) return;
 
-      await setActive({ session: signinResponse.createdSessionId });
-    } catch (e: any) {
-      if (e.clerkError) {
-        console.log(e.errors[0].longMessage);
+    try {
+      let signInResponse;
+      if (method === 'password') {
+        signInResponse = await signIn.create({
+          identifier: emailAddress,
+          password,
+        });
+      } else {
+        signInResponse = await signIn.authenticateWithPasskey({
+          flow: 'discoverable',
+        });
       }
-      console.error(e);
-    }
-  };
-
-  const onSignInPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      const completeSignIn = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
-      await setActive({ session: completeSignIn.createdSessionId });
+      await setActive({ session: signInResponse.createdSessionId });
     } catch (err: any) {
-      if (err.clerkError) {
-        console.log(err.errors[0].longMessage);
-      }
-      console.error(err);
+      console.error(err.clerkError ? err.errors[0].longMessage : err);
     }
   };
 
   return (
-    <View style={{ marginTop: 100, marginLeft: 10, gap: 15 }}>
+    <View style={styles.publicContainer}>
       <View>
         <TextInput
           autoCapitalize='none'
@@ -140,11 +114,11 @@ const PublicView = () => {
         />
       </View>
 
-      <TouchableOpacity onPress={onSignInPress}>
+      <TouchableOpacity onPress={() => handleSignIn('password')}>
         <Text>Sign in</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={onSignInWithPasskey}>
+      <TouchableOpacity onPress={() => handleSignIn('passkey')}>
         <Text>Sign in with passkey</Text>
       </TouchableOpacity>
     </View>
@@ -178,5 +152,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  protectedContainer: {
+    gap: 12,
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#1D3D47',
+    padding: 20,
+  },
+  publicContainer: {
+    marginTop: 100,
+    marginLeft: 10,
+    gap: 15,
+  },
+  input: {
+    // Add input styles
+  },
+  userInfo: {
+    color: 'cyan',
+  },
+  italic: {
+    fontStyle: 'italic',
   },
 });
