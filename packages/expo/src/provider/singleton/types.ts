@@ -12,9 +12,11 @@ export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
   passkeys?: {
-    get: (
-      publicKeyCredential: PublicKeyCredentialRequestOptionsWithoutExtensions,
-    ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>;
+    get: ({
+      publicKeyOptions,
+    }: {
+      publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+    }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>;
     create: (
       publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
     ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>;
