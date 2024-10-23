@@ -28,12 +28,13 @@ export class IOSPasskeys {
     }
   }
 
-  public static async autofill(credentials: SerializedPublicKeyCredentialRequestOptions) {
-    try {
-      const response = await ClerkExpoPasskeys.autofill(credentials.challenge, credentials.rpId);
-      return { publicKeyCredential: response, error: null };
-    } catch (error) {
-      return { publicKeyCredential: null, error };
-    }
-  }
+  //Not supported yet
+  // public static async autofill(credentials: SerializedPublicKeyCredentialRequestOptions) {
+  //   try {
+  //     const response = await ClerkExpoPasskeys.autofill(credentials.challenge, credentials.rpId);
+  //     return { publicKeyCredential: response, error: null };
+  //   } catch (error) {
+  //     return { publicKeyCredential: null, error };
+  //   }
+  // }
 }

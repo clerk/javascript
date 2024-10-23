@@ -33,31 +33,19 @@ const makeSerializedCreateResponse = (
 export async function create(
   publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions,
 ): Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>> {
-  if (!publicKey) {
-    throw new Error('No public key found');
+  if (!publicKey || !publicKey.rp.id) {
+    throw new Error('Invalid public key or RpID');
   }
-
-  if (!publicKey.rp.id) {
-    throw new Error('No RpID not found');
-  }
-
-  const rp = { id: publicKey.rp.id, name: publicKey.rp.name };
-
-  const userId = encodeBase64Url(toArrayBuffer(publicKey.user.id));
-  const user = {
-    id: userId,
-    displayName: publicKey.user.displayName,
-    name: publicKey.user.name,
-  };
-
-  const pubKeyCredParams = publicKey.pubKeyCredParams;
-  const challenge = encodeBase64Url(toArrayBuffer(publicKey.challenge));
 
   const createOptions: SerializedPublicKeyCredentialCreationOptions = {
-    rp,
-    user,
-    pubKeyCredParams,
-    challenge,
+    rp: { id: publicKey.rp.id, name: publicKey.rp.name },
+    user: {
+      id: encodeBase64Url(toArrayBuffer(publicKey.user.id)),
+      displayName: publicKey.user.displayName,
+      name: publicKey.user.name,
+    },
+    pubKeyCredParams: publicKey.pubKeyCredParams,
+    challenge: encodeBase64Url(toArrayBuffer(publicKey.challenge)),
     authenticatorSelection: {
       authenticatorAttachment: 'platform',
       requireResidentKey: true,
@@ -70,36 +58,21 @@ export async function create(
     })),
   };
 
-  if (Platform.OS === 'android') {
-    const { publicKeyCredential, error } = await AndroidPasskeys.create(createOptions);
+  const passkeyModule = Platform.select({
+    android: AndroidPasskeys,
+    ios: IOSPasskeys,
+    default: null,
+  });
 
-    if (error) {
-      return {
-        publicKeyCredential: null,
-        error,
-      };
-    }
-
-    return {
-      publicKeyCredential: makeSerializedCreateResponse(publicKeyCredential),
-      error,
-    };
-  } else if (Platform.OS === 'ios') {
-    const { publicKeyCredential, error } = await IOSPasskeys.create(createOptions);
-    if (error) {
-      return {
-        publicKeyCredential: null,
-        error,
-      };
-    }
-
-    return {
-      publicKeyCredential: makeSerializedCreateResponse(publicKeyCredential),
-      error,
-    };
-  } else {
-    throw new Error('Not supported');
+  if (!passkeyModule) {
+    throw new Error('Platform not supported');
   }
+
+  const { publicKeyCredential, error } = await passkeyModule.create(createOptions);
+
+  return error
+    ? { publicKeyCredential: null, error }
+    : { publicKeyCredential: makeSerializedCreateResponse(publicKeyCredential), error: null };
 }
 
 const makeSerializedGetResponse = (
@@ -134,31 +107,33 @@ export async function get(
     challenge: arrayBufferToBase64Url(publicKeyCredential.challenge),
   };
 
-  if (Platform.OS === 'android') {
-    const { publicKeyCredential, error } = await AndroidPasskeys.get(serializedPublicCredential);
+  const passkeyModule = Platform.select({
+    android: AndroidPasskeys,
+    ios: IOSPasskeys,
+    default: null,
+  });
 
-    if (error) {
-      return { publicKeyCredential: null, error };
-    } else {
-      return {
-        publicKeyCredential: makeSerializedGetResponse(publicKeyCredential),
-        error: null,
-      };
-    }
-  } else if (Platform.OS === 'ios') {
-    const { publicKeyCredential, error } = await IOSPasskeys.get(serializedPublicCredential);
-
-    if (error) {
-      return { publicKeyCredential: null, error };
-    } else {
-      return {
-        publicKeyCredential: makeSerializedGetResponse(publicKeyCredential),
-        error: null,
-      };
-    }
-  } else {
-    throw new Error('Not supported');
+  if (!passkeyModule) {
+    throw new Error('Platform not supported');
   }
+
+  const { publicKeyCredential: result, error } = await passkeyModule.get(serializedPublicCredential);
+
+  return error
+    ? { publicKeyCredential: null, error }
+    : { publicKeyCredential: makeSerializedGetResponse(result), error: null };
+}
+
+export function isSupported() {
+  if (Platform.OS === 'android') {
+    return Platform.Version > 28;
+  }
+
+  if (Platform.OS === 'ios') {
+    return parseInt(Platform.Version, 10) > 15;
+  }
+
+  return false;
 }
 
 // FIX:The autofill function has been implemented for iOS only, but the pop-up is not showing up.
@@ -173,18 +148,6 @@ export async function autofill(): Promise<AuthenticationResponseJSON | null> {
   } else {
     throw new Error('Not supported');
   }
-}
-
-export function isSupported() {
-  if (Platform.OS === 'android') {
-    return Platform.Version > 28;
-  }
-
-  if (Platform.OS === 'ios') {
-    return parseInt(Platform.Version, 10) > 15;
-  }
-
-  return false;
 }
 
 export const passkeys = {
