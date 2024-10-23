@@ -83,7 +83,7 @@ export function SDKWorkflow(props) {
             <>
               <Text>
                 Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to
-                run the associated codemod?.
+                run the associated codemod?
               </Text>
               <Select
                 options={[
