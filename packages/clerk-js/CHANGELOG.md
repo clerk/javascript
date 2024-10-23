@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.28.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Bug fix: Always receive a new session verification object when UserVerification component mounts. ([#4359](https://github.com/clerk/javascript/pull/4359)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+  - @clerk/localizations@3.3.1
+
 ## 5.27.0
 
 ### Minor Changes
