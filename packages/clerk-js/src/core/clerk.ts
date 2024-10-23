@@ -838,13 +838,16 @@ export class Clerk implements ClerkInterface {
     }
 
     if (redirectUrl) {
+      beforeUnloadTracker?.startTracking();
+      this.#setTransitiveState();
+
       if (
         this.client.cookieExpiresAt &&
         this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
       ) {
         const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
 
-        this.navigate(
+        await this.navigate(
           this.buildUrlWithAuth(
             this.#fapiClient
               .buildUrl({
@@ -857,8 +860,9 @@ export class Clerk implements ClerkInterface {
           ),
         );
       } else {
-        this.navigate(redirectUrl);
+        await this.navigate(redirectUrl);
       }
+      beforeUnloadTracker?.stopTracking();
     }
 
     //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
