@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.15.1
+
+### Patch Changes
+
+- Add the 'session-token-expired-refresh-unexpected-bapi-error' debug handshake reason. ([#4363](https://github.com/clerk/javascript/pull/4363)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5)]:
+  - @clerk/types@4.28.0
+  - @clerk/shared@2.10.1
+
 ## 1.15.0
 
 ### Minor Changes

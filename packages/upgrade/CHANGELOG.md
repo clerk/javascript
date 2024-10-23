@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.1.2
+
+### Patch Changes
+
+- Updating the CLI output to match the DX of core-1 to core-2 migration ([#4393](https://github.com/clerk/javascript/pull/4393)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.1.1
 
 ### Patch Changes

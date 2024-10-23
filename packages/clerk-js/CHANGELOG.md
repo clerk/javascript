@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.29.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`f9d53fe34`](https://github.com/clerk/javascript/commit/f9d53fe3444db5154dba47270a06c6a76dbea69f)]:
+  - @clerk/localizations@3.4.0
+  - @clerk/types@4.28.0
+  - @clerk/ui@0.1.10
+  - @clerk/shared@2.10.1
+
 ## 5.28.0
 
 ### Minor Changes
