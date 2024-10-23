@@ -38,9 +38,6 @@ const ProtectedView = () => {
     try {
       return await clerkUser.createPasskey();
     } catch (e: any) {
-      console.log(JSON.stringify(e));
-      console.log(JSON.stringify(e?.errors?.[0]));
-
       console.error(e.clerkError ? e.errors[0].longMessage : e.message);
     }
   };
