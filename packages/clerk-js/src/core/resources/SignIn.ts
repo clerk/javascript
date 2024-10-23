@@ -1,3 +1,4 @@
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
@@ -41,7 +42,6 @@ import {
   windowNavigate,
 } from '../../utils';
 import {
-  ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential,
