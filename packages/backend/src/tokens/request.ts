@@ -30,6 +30,7 @@ export const RefreshTokenErrorReason = {
   ExpiredSessionTokenMissingSidClaim: 'expired-session-token-missing-sid-claim',
   FetchError: 'fetch-error',
   UnexpectedSDKError: 'unexpected-sdk-error',
+  UnexpectedBAPIError: 'unexpected-bapi-error',
 } as const;
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
@@ -298,7 +299,10 @@ ${error.getFullMessage()}`,
       } else {
         return {
           data: null,
-          error: err,
+          error: {
+            message: `Unexpected Server/BAPI error`,
+            cause: { reason: RefreshTokenErrorReason.UnexpectedBAPIError, errors: [err] },
+          },
         };
       }
     }
