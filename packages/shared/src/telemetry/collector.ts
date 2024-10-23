@@ -128,6 +128,20 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     this.#scheduleFlush();
   }
 
+  async recordAsync(event: TelemetryEventRaw): Promise<void> {
+    const preparedPayload = this.#preparePayload(event.event, event.payload);
+
+    this.#logEvent(preparedPayload.event, preparedPayload);
+
+    if (!this.#shouldRecord(preparedPayload, event.eventSamplingRate)) {
+      return;
+    }
+
+    this.#buffer.push(preparedPayload);
+
+    await this.#flush();
+  }
+
   #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
   }
@@ -148,7 +162,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #scheduleFlush(): void {
     // On the server, we want to flush immediately as we have less guarantees about the lifecycle of the process
     if (typeof window === 'undefined') {
-      this.#flush();
+      void this.#flush();
       return;
     }
 
@@ -160,7 +174,7 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
         const cancel = typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback : clearTimeout;
         cancel(this.#pendingFlush);
       }
-      this.#flush();
+      void this.#flush();
       return;
     }
 
@@ -171,18 +185,18 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
 
     if ('requestIdleCallback' in window) {
       this.#pendingFlush = requestIdleCallback(() => {
-        this.#flush();
+        void this.#flush();
       });
     } else {
       // This is not an ideal solution, but it at least waits until the next tick
       this.#pendingFlush = setTimeout(() => {
-        this.#flush();
+        void this.#flush();
       }, 0);
     }
   }
 
-  #flush(): void {
-    fetch(new URL('/v1/event', this.#config.endpoint), {
+  #flush(): Promise<unknown> {
+    return fetch(new URL('/v1/event', this.#config.endpoint), {
       method: 'POST',
       // TODO: We send an array here with that idea that we can eventually send multiple events.
       body: JSON.stringify({

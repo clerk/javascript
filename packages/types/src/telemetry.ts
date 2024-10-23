@@ -44,5 +44,8 @@ export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
 export interface TelemetryCollector {
   isEnabled: boolean;
   isDebug: boolean;
+
   record(event: TelemetryEventRaw): void;
+
+  recordAsync(event: TelemetryEventRaw): Promise<void>;
 }
