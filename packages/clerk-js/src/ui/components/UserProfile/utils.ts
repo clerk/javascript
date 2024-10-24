@@ -3,6 +3,7 @@ import type {
   EmailAddressResource,
   EnvironmentResource,
   PhoneNumberResource,
+  PrepareEmailAddressVerificationParams,
   UserResource,
 } from '@clerk/types';
 
@@ -76,3 +77,14 @@ export function sortIdentificationBasedOnVerification<T extends Array<EmailAddre
 
   return [...primaryItem, ...verifiedItems, ...unverifiedItems, ...unverifiedItemsWithoutVerification] as T;
 }
+
+export const getVerificationStrategy = (
+  emailAddress: EmailAddressResource | undefined,
+  preferLinks: boolean,
+): PrepareEmailAddressVerificationParams['strategy'] => {
+  if (emailAddress?.matchesEnterpriseConnection) {
+    return 'saml';
+  }
+
+  return preferLinks ? 'email_link' : 'email_code';
+};

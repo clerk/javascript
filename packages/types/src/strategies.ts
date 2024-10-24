@@ -7,6 +7,7 @@ export type PasswordStrategy = 'password';
 export type PhoneCodeStrategy = 'phone_code';
 export type EmailCodeStrategy = 'email_code';
 export type EmailLinkStrategy = 'email_link';
+export type EmailSAMLStrategy = 'saml';
 export type TicketStrategy = 'ticket';
 export type TOTPStrategy = 'totp';
 export type BackupCodeStrategy = 'backup_code';
