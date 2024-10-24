@@ -6,6 +6,7 @@ import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
+import { LegalAcceptedField } from '~/common/legal-accepted';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { RouterLink } from '~/common/router-link';
@@ -14,6 +15,7 @@ import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useOptions } from '~/hooks/use-options';
 import { Button } from '~/primitives/button';
@@ -24,11 +26,15 @@ export function SignUpContinue() {
   const clerk = useClerk();
   const { signInUrl } = useOptions();
   const { t } = useLocalizations();
+  const environment = useEnvironment();
+  const { client } = useClerk();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
+  const legalConsentEnabled =
+    environment.userSettings.signUp.legal_consent_enabled && client.signUp.missingFields.includes('legal_accepted');
   const isDev = useDevModeWarning();
   const { logoProps, footerProps } = useCard();
 
@@ -92,6 +98,8 @@ export function SignUpContinue() {
                         disabled={isGlobalLoading}
                       />
                     ) : null}
+
+                    {legalConsentEnabled && <LegalAcceptedField />}
                   </div>
                 </Card.Body>
                 <Card.Actions>

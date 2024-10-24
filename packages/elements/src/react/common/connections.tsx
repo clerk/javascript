@@ -30,6 +30,7 @@ export const useConnectionContext = () => {
 export interface ConnectionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   name: OAuthProvider | Web3Provider | SamlStrategy;
+  legalAcceptence?: boolean;
 }
 
 /**
