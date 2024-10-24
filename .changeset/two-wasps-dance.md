@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-If Web3 wallet already claimed, preview error on `<UserProfile />`.
+Show an error on `<UserProfile />` if the Web3 wallet is already claimed.
