@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.0.2
+
+### Patch Changes
+
+- Bug fix: Include protect types in `auth` ([#4398](https://github.com/clerk/javascript/pull/4398)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 6.0.1
 
 ### Patch Changes

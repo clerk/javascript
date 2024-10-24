@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.29.1
+
+### Patch Changes
+
+- Move `@clerk/ui` to `devDependencies` ([#4399](https://github.com/clerk/javascript/pull/4399)) by [@dstaley](https://github.com/dstaley)
+
+- Show an error on `<UserProfile />` if the Web3 wallet is already claimed. ([#4389](https://github.com/clerk/javascript/pull/4389)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Fix for legal consent rendered on the <SignUp/> component when only social sign up is enabled ([#4403](https://github.com/clerk/javascript/pull/4403)) by [@octoper](https://github.com/octoper)
+
 ## 5.29.0
 
 ### Minor Changes
