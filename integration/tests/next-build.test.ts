@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 
-test.describe.skip('next build @nextjs', () => {
+test.describe('next build @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
