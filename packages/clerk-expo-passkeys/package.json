@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo-passkeys",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Passkeys library to be used with Clerk for expo",
   "keywords": [
     "react-native",
