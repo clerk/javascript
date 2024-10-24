@@ -1,5 +1,6 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Buffer } from 'buffer';
+export { ClerkWebAuthnError };
 
 export function encodeBase64(data: ArrayLike<number> | ArrayBufferLike) {
   return btoa(String.fromCharCode(...new Uint8Array(data)));
