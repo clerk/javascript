@@ -1,6 +1,7 @@
 import {
   addClerkPrefix,
   ClerkRuntimeError,
+  deprecated,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -833,6 +834,7 @@ export class Clerk implements ClerkInterface {
     if (beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
+      deprecated('beforeEmit', 'Use the `redirectUrl` property instead.');
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
