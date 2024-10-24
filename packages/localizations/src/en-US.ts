@@ -448,6 +448,8 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have an account?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
+      actionText__join_waitlist: 'Want early access?',
+      actionLink__join_waitlist: 'Join waitlist',
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -511,9 +513,11 @@ export const enUS: LocalizationResource = {
     restrictedAccess: {
       title: 'Access restricted',
       subtitle: 'Sign ups are currently disabled. If you believe you should have access, please contact support.',
+      subtitleWaitlist: 'Sign ups are currently disabled. To be the first to know when we launch, join the waitlist.',
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
       blockButton__emailSupport: 'Email support',
+      blockButton__joinWaitlist: 'Join waitlist',
     },
     __experimental_legalConsent: {
       continue: {
@@ -896,6 +900,20 @@ export const enUS: LocalizationResource = {
       successMessage: 'The wallet has been added to your account.',
       title: 'Add web3 wallet',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      title: 'Join the waitlist',
+      subtitle: 'Enter your email address and we’ll let you know when your spot is ready',
+      formButton: 'Join the waitlist',
+      actionText: 'Already has access?',
+      actionLink: 'Sign in',
+    },
+    success: {
+      title: 'Thanks for joining the waitlist!',
+      subtitle: 'We’ll be in touch when your spot is ready',
+      message: 'You will be redirected soon...',
     },
   },
 } as const;

@@ -71,6 +71,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         },
       }}
       {...pageProps}
+      waitlistUrl='/waitlist'
     >
       <AppBar
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}

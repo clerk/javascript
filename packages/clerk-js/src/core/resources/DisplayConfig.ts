@@ -46,6 +46,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   showDevModeWarning!: boolean;
   termsUrl!: string;
   privacyPolicyUrl!: string;
+  waitlistUrl!: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -91,6 +92,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.showDevModeWarning = data.show_devmode_warning;
     this.termsUrl = data.terms_url;
     this.privacyPolicyUrl = data.privacy_policy_url;
+    this.waitlistUrl = data.waitlist_url;
     return this;
   }
 }

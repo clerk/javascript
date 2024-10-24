@@ -40,6 +40,7 @@ export interface DisplayConfigJSON {
   show_devmode_warning: boolean;
   terms_url: string;
   privacy_policy_url: string;
+  waitlist_url: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -82,4 +83,5 @@ export interface DisplayConfigResource extends ClerkResource {
   showDevModeWarning: boolean;
   termsUrl: string;
   privacyPolicyUrl: string;
+  waitlistUrl: string;
 }

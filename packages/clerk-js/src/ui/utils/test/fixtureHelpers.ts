@@ -508,6 +508,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.legal_consent_enabled = true;
   };
 
+  const withWaitlistMode = () => {
+    us.sign_up.mode = SIGN_UP_MODES.WAITLIST;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -527,5 +531,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withPasskeySettings,
     withRestrictedMode,
     withLegalConsent,
+    withWaitlistMode,
   };
 };

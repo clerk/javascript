@@ -2,8 +2,11 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Home.module.css';
+import { useClerk } from '@clerk/nextjs';
 
 const Home: NextPage = () => {
+  const clerk = useClerk();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -48,6 +51,12 @@ const Home: NextPage = () => {
           </li>
           <li>
             <Link href={'/user-examples'}>User examples</Link>
+          </li>
+          <li>
+            <Link href={'/waitlist'}>Waitlist</Link>
+          </li>
+          <li>
+            <button type='button' onClick={() => clerk.redirectToWaitlist()}>Redirect to waitlist</button>
           </li>
         </ul>
       </main>

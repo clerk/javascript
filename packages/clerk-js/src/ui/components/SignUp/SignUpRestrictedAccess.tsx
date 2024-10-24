@@ -1,21 +1,34 @@
 import { useClerk } from '@clerk/shared/react';
 
-import { useSignUpContext } from '../../contexts';
+import { SIGN_UP_MODES } from '../../../core/constants';
+import { useEnvironment, useSignUpContext } from '../../contexts';
 import { Button, Flex, Icon, localizationKeys } from '../../customizables';
 import { Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { Block } from '../../icons';
-
+import { useRouter } from '../../router';
 export const SignUpRestrictedAccess = () => {
   const clerk = useClerk();
   const card = useCardState();
-  const { signInUrl } = useSignUpContext();
+  const { navigate } = useRouter();
+  const { signInUrl, waitlistUrl } = useSignUpContext();
   const supportEmail = useSupportEmail();
+  const { userSettings } = useEnvironment();
+  const { mode } = userSettings.signUp;
 
   const handleEmailSupport = () => {
     window.location.href = `mailto:${supportEmail}`;
   };
+
+  const handleWaitlistNavigate = async () => {
+    await navigate(clerk.buildUrlWithAuth(waitlistUrl));
+  };
+
+  const subtitle =
+    mode === SIGN_UP_MODES.RESTRICTED
+      ? localizationKeys('signUp.restrictedAccess.subtitle')
+      : localizationKeys('signUp.restrictedAccess.subtitleWaitlist');
 
   return (
     <Card.Root>
@@ -30,10 +43,10 @@ export const SignUpRestrictedAccess = () => {
             })}
           />
           <Header.Title localizationKey={localizationKeys('signUp.restrictedAccess.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('signUp.restrictedAccess.subtitle')} />
+          <Header.Subtitle localizationKey={subtitle} />
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
-        {supportEmail && (
+        {mode === SIGN_UP_MODES.RESTRICTED && supportEmail && (
           <Flex
             direction='col'
             gap={4}
@@ -41,7 +54,17 @@ export const SignUpRestrictedAccess = () => {
             <Button
               localizationKey={localizationKeys('signUp.restrictedAccess.blockButton__emailSupport')}
               onClick={handleEmailSupport}
-              hasArrow
+            />
+          </Flex>
+        )}
+        {mode === SIGN_UP_MODES.WAITLIST && (
+          <Flex
+            direction='col'
+            gap={4}
+          >
+            <Button
+              localizationKey={localizationKeys('signUp.restrictedAccess.blockButton__joinWaitlist')}
+              onClick={handleWaitlistNavigate}
             />
           </Flex>
         )}

@@ -62,3 +62,4 @@ export { default as Organization } from './organization.svg';
 export { default as Users } from './users.svg';
 export { default as Fingerprint } from './fingerprint.svg';
 export { default as Block } from './block.svg';
+export { default as SpinnerJumbo } from './spinner-jumbo.svg';
