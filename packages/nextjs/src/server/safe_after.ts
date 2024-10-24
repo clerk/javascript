@@ -3,7 +3,7 @@ import { isNextFetcher } from './nextFetcher';
 export type AfterTask<T = unknown> = Promise<T> | AfterCallback<T>;
 export type AfterCallback<T = unknown> = () => T | Promise<T>;
 
-export async function safe_after<T>(task: AfterTask<T>): Promise<void> {
+export function safe_after<T>(task: AfterTask<T>): void {
   const __fetch = globalThis.fetch;
 
   if (!isNextFetcher(__fetch)) {
@@ -17,8 +17,7 @@ export async function safe_after<T>(task: AfterTask<T>): Promise<void> {
     return;
   }
 
-  // @ts-ignore
-  const { unstable_after } = (await import('next/server.js')) || {};
+  const { unstable_after } = require('next/server') || {};
   if (!unstable_after) {
     // Application uses a nextjs version that does not export the utility
     return;

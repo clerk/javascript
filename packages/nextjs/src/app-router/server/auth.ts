@@ -1,12 +1,15 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { notFound, redirect } from 'next/navigation';
 
+import { clerkClient } from '../../server';
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
+import { safe_after } from '../../server/safe_after';
 import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
@@ -64,6 +67,11 @@ auth.protect = async (...args) => {
     redirectToSignIn: authObject.redirectToSignIn,
     notFound,
     redirect,
+  });
+
+  safe_after(async () => {
+    const resolvedClerkClient = await clerkClient();
+    await resolvedClerkClient.telemetry.recordAsync(eventMethodCalled('page-protect', {}));
   });
 
   // @ts-ignore
