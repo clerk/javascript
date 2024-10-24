@@ -1,5 +1,5 @@
 ---
-"@clerk/clerk-expo-passkeys": patch
+"@clerk/clerk-expo-passkeys": major
 ---
 
 Introduction of the clerk passkeys module, this module will a allow to handle the creation and retrieval of passkeys, can be integrated as follows:
