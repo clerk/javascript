@@ -31,7 +31,7 @@ function _SignUpContinue() {
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
+  const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
@@ -157,7 +157,7 @@ function _SignUpContinue() {
           signUp: res,
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
-          handleComplete: () => clerk.setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
         }),
       )

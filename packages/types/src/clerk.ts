@@ -801,10 +801,17 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
+   * @deprecated use the redirectUrl parameter to redirect a user
+   *
    * Callback run just before the active session and/or organization is set to the passed object.
    * Can be used to hook up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
+
+  /**
+   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   */
+  redirectUrl?: string;
 };
 
 export type SetActive = (params: SetActiveParams) => Promise<void>;

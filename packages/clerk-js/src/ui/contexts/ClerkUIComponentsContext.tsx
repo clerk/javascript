@@ -194,6 +194,8 @@ export const useSignInContext = (): SignInContextType => {
 export type SignOutContextType = {
   navigateAfterSignOut: () => any;
   navigateAfterMultiSessionSingleSignOutUrl: () => any;
+  afterSignOutUrl: string;
+  afterMultiSessionSingleSignOutUrl: string;
 };
 
 export const useSignOutContext = (): SignOutContextType => {
@@ -203,7 +205,12 @@ export const useSignOutContext = (): SignOutContextType => {
   const navigateAfterSignOut = () => navigate(clerk.buildAfterSignOutUrl());
   const navigateAfterMultiSessionSingleSignOutUrl = () => navigate(clerk.buildAfterMultiSessionSingleSignOutUrl());
 
-  return { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl };
+  return {
+    navigateAfterSignOut,
+    navigateAfterMultiSessionSingleSignOutUrl,
+    afterSignOutUrl: clerk.buildAfterSignOutUrl(),
+    afterMultiSessionSingleSignOutUrl: clerk.buildAfterMultiSessionSingleSignOutUrl(),
+  };
 };
 
 type PagesType = {
@@ -335,12 +342,31 @@ export const useOrganizationSwitcherContext = () => {
     organization?: OrganizationResource;
     user?: UserResource;
   }) => {
+    const redirectUrl = getAfterSelectOrganizationOrPersonalUrl({
+      organization,
+      user,
+    });
+
+    if (redirectUrl) {
+      return navigate(redirectUrl);
+    }
+
+    return Promise.resolve();
+  };
+
+  const getAfterSelectOrganizationOrPersonalUrl = ({
+    organization,
+    user,
+  }: {
+    organization?: OrganizationResource;
+    user?: UserResource;
+  }) => {
     if (typeof ctx.afterSelectPersonalUrl === 'function' && user) {
-      return navigate(ctx.afterSelectPersonalUrl(user));
+      return ctx.afterSelectPersonalUrl(user);
     }
 
     if (typeof ctx.afterSelectOrganizationUrl === 'function' && organization) {
-      return navigate(ctx.afterSelectOrganizationUrl(organization));
+      return ctx.afterSelectOrganizationUrl(organization);
     }
 
     if (ctx.afterSelectPersonalUrl && user) {
@@ -348,7 +374,7 @@ export const useOrganizationSwitcherContext = () => {
         urlWithParam: ctx.afterSelectPersonalUrl as string,
         entity: user,
       });
-      return navigate(parsedUrl);
+      return parsedUrl;
     }
 
     if (ctx.afterSelectOrganizationUrl && organization) {
@@ -356,16 +382,20 @@ export const useOrganizationSwitcherContext = () => {
         urlWithParam: ctx.afterSelectOrganizationUrl as string,
         entity: organization,
       });
-      return navigate(parsedUrl);
+      return parsedUrl;
     }
 
-    return Promise.resolve();
+    return;
   };
 
   const navigateAfterSelectOrganization = (organization: OrganizationResource) =>
     navigateAfterSelectOrganizationOrPersonal({ organization });
 
   const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
+
+  const afterSelectOrganizationUrl = (organization: OrganizationResource) =>
+    getAfterSelectOrganizationOrPersonalUrl({ organization });
+  const afterSelectPersonalUrl = (user: UserResource) => getAfterSelectOrganizationOrPersonalUrl({ user });
 
   const organizationProfileMode =
     !!ctx.organizationProfileUrl && !ctx.organizationProfileMode ? 'navigation' : ctx.organizationProfileMode;
@@ -386,6 +416,8 @@ export const useOrganizationSwitcherContext = () => {
     navigateCreateOrganization,
     navigateAfterSelectOrganization,
     navigateAfterSelectPersonal,
+    afterSelectOrganizationUrl,
+    afterSelectPersonalUrl,
     componentName,
   };
 };
