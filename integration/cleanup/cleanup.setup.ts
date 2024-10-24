@@ -5,20 +5,19 @@ import { test as setup } from '@playwright/test';
 import { appConfigs } from '../presets/';
 
 setup('cleanup instances ', async () => {
-  const entries = Object.values(appConfigs.envs)
-    .map(e => e.toJson())
-    .map(json => {
-      const secretKey = json.private['CLERK_SECRET_KEY'];
+  const entries = Array.from(appConfigs.secrets.instanceKeys.values())
+    .map(({ sk }) => {
+      const secretKey = sk;
       if (!secretKey) {
         return null;
       }
-      return { secretKey, apiUrl: json.private['CLERK_API_URL'] };
+      return { secretKey };
     })
     .filter(Boolean);
 
   for (const entry of entries) {
     console.log(`Cleanup for ${entry!.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
-    const clerkClient = createClerkClient({ secretKey: entry!.secretKey, apiUrl: entry?.apiUrl });
+    const clerkClient = createClerkClient({ secretKey: entry!.secretKey });
     const { data: users } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',
