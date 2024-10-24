@@ -103,7 +103,7 @@ function _SignUpStart(): JSX.Element {
   const hasTicket = !!formState.ticket.value;
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
-  const legalConsentEnabled = userSettings.signUp.legal_consent_enabled;
+  const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
 
   const fields = determineActiveFields({
     attributes,
@@ -111,7 +111,7 @@ function _SignUpStart(): JSX.Element {
     hasEmail,
     activeCommIdentifierType,
     isProgressiveSignUp,
-    legalConsentRequired: legalConsentEnabled,
+    legalConsentRequired: isLegalConsentEnabled,
   });
 
   const handleTokenFlow = () => {
@@ -294,7 +294,7 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
-            {!shouldShowForm && legalConsentEnabled && (
+            {!shouldShowForm && isLegalConsentEnabled && (
               <Form.ControlRow elementId='__experimental_legalAccepted'>
                 <LegalCheckbox
                   {...formState.__experimental_legalAccepted.props}
