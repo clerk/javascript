@@ -24,7 +24,7 @@ describe('AppearanceContext', () => {
 
   it('factors in provided element styles', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppearanceProvider appearance={{ elements: { alert__warning: 'class-two' } }}>{children}</AppearanceProvider>
+      <AppearanceProvider appearance={{ elements: { alertWarning: 'class-two' } }}>{children}</AppearanceProvider>
     );
 
     const { result } = renderHook(useAppearance, { wrapper });
@@ -33,9 +33,9 @@ describe('AppearanceContext', () => {
         options: defaultAppearance.options,
         elements: {
           ...fullTheme,
-          alert__warning: {
-            descriptor: 'cl-alert__warning',
-            className: [fullTheme.alert__warning.className, 'class-two'].join(' '),
+          alertWarning: {
+            descriptor: 'cl-alertWarning',
+            className: [fullTheme.alertWarning.className, 'class-two'].join(' '),
             style: {},
           },
         },
@@ -44,7 +44,7 @@ describe('AppearanceContext', () => {
       theme: undefined,
       themelessAppearance: {
         elements: {
-          alert__warning: 'class-two',
+          alertWarning: 'class-two',
         },
       },
     });
@@ -52,8 +52,8 @@ describe('AppearanceContext', () => {
 
   it('merges multiple appearance props', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppearanceProvider appearance={{ elements: { alert__warning: 'class-two' } }}>
-        <AppearanceProvider appearance={{ elements: { alert__warning: 'class-three' } }}>{children}</AppearanceProvider>
+      <AppearanceProvider appearance={{ elements: { alertWarning: 'class-two' } }}>
+        <AppearanceProvider appearance={{ elements: { alertWarning: 'class-three' } }}>{children}</AppearanceProvider>
       </AppearanceProvider>
     );
 
@@ -63,9 +63,9 @@ describe('AppearanceContext', () => {
         options: defaultAppearance.options,
         elements: {
           ...fullTheme,
-          alert__warning: {
-            descriptor: 'cl-alert__warning',
-            className: [fullTheme.alert__warning.className, 'class-two', 'class-three'].join(' '),
+          alertWarning: {
+            descriptor: 'cl-alertWarning',
+            className: [fullTheme.alertWarning.className, 'class-two', 'class-three'].join(' '),
             style: {},
           },
         },
@@ -74,7 +74,7 @@ describe('AppearanceContext', () => {
       theme: undefined,
       themelessAppearance: {
         elements: {
-          alert__warning: 'class-two class-three',
+          alertWarning: 'class-two class-three',
         },
         options: {},
       },
@@ -83,8 +83,8 @@ describe('AppearanceContext', () => {
 
   it('overrides same properties with the nearest provider', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <AppearanceProvider appearance={{ elements: { alert__warning: { background: 'tomato' } } }}>
-        <AppearanceProvider appearance={{ elements: { alert__warning: { background: 'red' } } }}>
+      <AppearanceProvider appearance={{ elements: { alertWarning: { background: 'tomato' } } }}>
+        <AppearanceProvider appearance={{ elements: { alertWarning: { background: 'red' } } }}>
           {children}
         </AppearanceProvider>
       </AppearanceProvider>
@@ -96,9 +96,9 @@ describe('AppearanceContext', () => {
         options: defaultAppearance.options,
         elements: {
           ...fullTheme,
-          alert__warning: {
-            descriptor: 'cl-alert__warning',
-            className: fullTheme.alert__warning.className,
+          alertWarning: {
+            descriptor: 'cl-alertWarning',
+            className: fullTheme.alertWarning.className,
             style: { background: 'red' },
           },
         },
@@ -107,7 +107,7 @@ describe('AppearanceContext', () => {
       theme: undefined,
       themelessAppearance: {
         elements: {
-          alert__warning: {
+          alertWarning: {
             background: 'red',
           },
         },
@@ -118,38 +118,38 @@ describe('AppearanceContext', () => {
 
   it('propogates the provided baseTheme', () => {
     const testTheme = structuredClone(fullTheme);
-    testTheme.alert__warning.className = 'alert-test-classname';
+    testTheme.alertWarning.className = 'alert-test-classname';
 
     const wrapper = ({ children }: { children: ReactNode }) => (
       <AppearanceProvider
         theme={testTheme}
-        appearance={{ elements: { alert__warning: 'class-two' } }}
+        appearance={{ elements: { alertWarning: 'class-two' } }}
       >
-        <AppearanceProvider appearance={{ elements: { alert__warning: 'class-three' } }}>{children}</AppearanceProvider>
+        <AppearanceProvider appearance={{ elements: { alertWarning: 'class-three' } }}>{children}</AppearanceProvider>
       </AppearanceProvider>
     );
 
     const { result } = renderHook(useAppearance, { wrapper });
-    expect(result.current.parsedAppearance.elements.alert__warning.className).toBe(
+    expect(result.current.parsedAppearance.elements.alertWarning.className).toBe(
       'alert-test-classname class-two class-three',
     );
   });
 
   it('overrides the parent baseTheme', () => {
     const testTheme = structuredClone(fullTheme);
-    testTheme.alert__warning.className = 'alert-test-classname';
+    testTheme.alertWarning.className = 'alert-test-classname';
 
     const childTheme = structuredClone(fullTheme);
-    childTheme.alert__warning.className = 'alert-child-classname';
+    childTheme.alertWarning.className = 'alert-child-classname';
 
     const wrapper = ({ children }: { children: ReactNode }) => (
       <AppearanceProvider
         theme={testTheme}
-        appearance={{ elements: { alert__warning: 'class-two' } }}
+        appearance={{ elements: { alertWarning: 'class-two' } }}
       >
         <AppearanceProvider
           theme={childTheme}
-          appearance={{ elements: { alert__warning: 'class-three' } }}
+          appearance={{ elements: { alertWarning: 'class-three' } }}
         >
           {children}
         </AppearanceProvider>
@@ -157,7 +157,7 @@ describe('AppearanceContext', () => {
     );
 
     const { result } = renderHook(useAppearance, { wrapper });
-    expect(result.current.parsedAppearance.elements.alert__warning.className).toBe(
+    expect(result.current.parsedAppearance.elements.alertWarning.className).toBe(
       'alert-child-classname class-two class-three',
     );
   });
