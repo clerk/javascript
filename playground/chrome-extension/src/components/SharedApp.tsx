@@ -8,7 +8,7 @@ import { CurrentUser } from '@/components/CurrentUser';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
-export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncSessionWithTab'> & {
+export type SharedAppProps = Pick<ChromeExtensionClerkProviderProps, 'syncHost'> & {
   className?: string;
 };
 
@@ -28,9 +28,6 @@ export function SharedApp({ className, ...rest }: SharedAppProps) {
       publishableKey={publishableKey}
       routerPush={to => navigate(to)}
       routerReplace={to => navigate(to, { replace: true })}
-      extensionFeatures={{
-        sync: true,
-      }}
       {...rest}
     >
       <div className='container'>
@@ -95,6 +92,7 @@ export function SharedApp({ className, ...rest }: SharedAppProps) {
             href='https://clerk.dev/docs'
             target='_blank'
             className='button invert'
+            rel='noreferrer'
           >
             Learn more about Clerk
           </a>

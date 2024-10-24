@@ -1,5 +1,5 @@
 export const SCOPE = {
-  background: 'background',
+  BACKGROUND: 'background',
 } as const;
 
 export type Scope = (typeof SCOPE)[keyof typeof SCOPE];
