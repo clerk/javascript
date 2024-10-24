@@ -1,4 +1,5 @@
 import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
@@ -40,7 +41,6 @@ import {
   windowNavigate,
 } from '../../utils';
 import {
-  ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential,
@@ -303,7 +303,13 @@ export class SignIn extends BaseResource implements SignInResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-    if (!isWebAuthnSupported()) {
+
+    const _isWebAuthnSupported = SignIn.clerk.__unstable__isWebAuthnSupported || isWebAuthnSupported;
+    const _webAuthnGetCredential = SignIn.clerk.__unstable__getPublicCredentials || webAuthnGetCredential;
+    const _isWebAuthnAutofillSupported =
+      SignIn.clerk.__unstable__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
+
+    if (!_isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
       });
@@ -340,11 +346,11 @@ export class SignIn extends BaseResource implements SignInResource {
        * If autofill is not supported gracefully handle the result, we don't need to throw.
        * The caller should always check this before calling this method.
        */
-      canUseConditionalUI = await isWebAuthnAutofillSupported();
+      canUseConditionalUI = await _isWebAuthnAutofillSupported();
     }
 
     // Invoke the navigator.create.get() method.
-    const { publicKeyCredential, error } = await webAuthnGetCredential({
+    const { publicKeyCredential, error } = await _webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
     });

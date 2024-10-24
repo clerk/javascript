@@ -1,6 +1,11 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
 import type { Clerk } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import type {
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+} from '@clerk/types';
+import { Platform } from 'react-native';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
@@ -37,6 +42,46 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
       __internal_clerk = clerk = new ClerkClass(publishableKey);
+
+      if (Platform.OS === 'ios' || Platform.OS === 'android') {
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__createPublicCredentials = (
+          publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
+        ) => {
+          return options?.passkeys?.create
+            ? options?.passkeys?.create(publicKeyCredential)
+            : errorThrower.throw('create() for passkeys is missing');
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__getPublicCredentials = ({
+          publicKeyOptions,
+        }: {
+          publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+        }) => {
+          return options?.passkeys?.get
+            ? options?.passkeys?.get({ publicKeyOptions })
+            : errorThrower.throw('get() for passkeys is missing');
+        };
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnSupported = () => {
+          return options?.passkeys?.isSupported
+            ? options?.passkeys?.isSupported()
+            : errorThrower.throw('isSupported() for passkeys is missing');
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnAutofillSupported = () => {
+          return options?.passkeys?.isAutoFillSupported
+            ? options?.passkeys?.isAutoFillSupported()
+            : errorThrower.throw('isSupported() for passkeys is missing');
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__unstable__isWebAuthnPlatformAuthenticatorSupported = () => {
+          return Promise.resolve(true);
+        };
+      }
 
       // @ts-expect-error - This is an internal API
       __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
