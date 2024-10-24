@@ -1,6 +1,7 @@
 name: Major Version Check
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, edited, synchronize]
   issue_comment:
