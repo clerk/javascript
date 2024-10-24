@@ -19,3 +19,4 @@ export * from './useDebounce';
 export * from './useScrollLock';
 export * from './useClerkModalStateParams';
 export * from './useNavigateToFlowStart';
+export * from './useEnterpriseConnectionLink';

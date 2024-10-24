@@ -9,8 +9,9 @@ import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
-import { emailLinksEnabledForInstance } from './utils';
+import { emailLinksEnabledForInstance, getVerificationStrategy } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
+import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';
 
 type EmailFormProps = FormProps & {
@@ -23,8 +24,8 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { handleAssurance } = useAssurance();
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
-
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
+  const strategy = getVerificationStrategy(emailAddressRef.current, preferEmailLinks);
   const wizard = useWizard({
     defaultStep: emailAddressRef.current ? 1 : 0,
     onNextStep: () => card.setError(undefined),
@@ -89,18 +90,26 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
               })
         }
       >
-        {preferEmailLinks ? (
+        {strategy === 'email_link' && (
           <VerifyWithLink
             nextStep={onSuccess}
             email={emailAddressRef.current as any}
             onReset={onReset}
           />
-        ) : (
+        )}
+        {strategy === 'email_code' && (
           <VerifyWithCode
             nextStep={onSuccess}
             identification={emailAddressRef.current}
             identifier={emailAddressRef.current?.emailAddress}
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
+            onReset={onReset}
+          />
+        )}
+        {strategy === 'saml' && (
+          <VerifyWithEnterpriseConnection
+            nextStep={onSuccess}
+            email={emailAddressRef.current as any}
             onReset={onReset}
           />
         )}

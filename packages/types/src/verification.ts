@@ -41,3 +41,12 @@ export type CreateEmailLinkFlowReturn<Params, Resource> = {
   startEmailLinkFlow: (params: Params) => Promise<Resource>;
   cancelEmailLinkFlow: () => void;
 };
+
+export interface StartEnterpriseConnectionLinkFlowParams {
+  redirectUrl: string;
+}
+
+export type CreateEnterpriseConnectionLinkFlowReturn<Params, Resource> = {
+  startEnterpriseConnectionLinkFlow: (params: Params) => Promise<Resource>;
+  cancelEnterpriseConnectionLinkFlow: () => void;
+};
