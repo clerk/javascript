@@ -1,5 +1,6 @@
-import { createClerkClient } from '@clerk/backend';
+import { ClerkClient, createClerkClient } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
+import { DeepProxy } from 'proxy-deep';
 
 import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
 import { clerkMiddlewareRequestDataStorage } from './clerkMiddleware';
@@ -40,26 +41,44 @@ const createClerkClientWithOptions: typeof createClerkClient = options =>
  * Constructs a BAPI client that accesses request data within the runtime.
  * Necessary if middleware dynamic keys are used.
  */
-const clerkClient = async () => {
-  let requestData;
+const clerkClient = () => {
+  const promise = new Promise<ReturnType<typeof createClerkClient>>(async (resolve, reject) => {
+    let requestData;
 
-  try {
-    const request = await buildRequestLike();
-    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
-    requestData = decryptClerkRequestData(encryptedRequestData);
-  } catch (err) {
-    if (err && isPrerenderingBailout(err)) {
-      throw err;
+    try {
+      const request = await buildRequestLike();
+      const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+      requestData = decryptClerkRequestData(encryptedRequestData);
+    } catch (err) {
+      if (err && isPrerenderingBailout(err)) {
+        reject(err);
+      }
     }
-  }
 
-  // Fallbacks between options from middleware runtime and `NextRequest` from application server
-  const options = clerkMiddlewareRequestDataStorage.getStore()?.get('requestData') ?? requestData;
-  if (options?.secretKey || options?.publishableKey) {
-    return createClerkClientWithOptions(options);
-  }
+    // Fallbacks between options from middleware runtime and `NextRequest` from application server
+    const options = clerkMiddlewareRequestDataStorage.getStore()?.get('requestData') ?? requestData;
+    if (options?.secretKey || options?.publishableKey) {
+      resolve(createClerkClientWithOptions(options));
+      return;
+    }
 
-  return createClerkClientWithOptions({});
+    resolve(createClerkClientWithOptions({}));
+  });
+
+  return new DeepProxy(promise, {
+    apply(_, __, argumentsList) {
+      return promise.then(client => {
+        const fn = this.path.reduce((result, key) => {
+          // @ts-expect-error -- because the public type is of ClerkClient, we should be able to assume that property access is accurate here.
+          return result[key];
+        }, client) as unknown as (...args: any) => any;
+
+        fn?.(...argumentsList);
+      });
+    },
+  }) as ThenableClerkClient;
 };
+
+type ThenableClerkClient = Promise<ClerkClient> & ClerkClient;
 
 export { clerkClient };
