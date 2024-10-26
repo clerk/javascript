@@ -1,7 +1,7 @@
 import { Select, Spinner, StatusMessage } from '@inkjs/ui';
 import { execa } from 'execa';
 import { existsSync } from 'fs';
-import { Text } from 'ink';
+import { Newline, Text } from 'ink';
 import React, { useEffect, useState } from 'react';
 
 function detectPackageManager() {
@@ -55,10 +55,12 @@ export function UpgradeSDK({ callback, sdk }) {
     execa({ shell: true })`${command}`
       .then(res => {
         setResult(res);
-        callback(true);
       })
       .catch(err => {
         setError(err);
+      })
+      .finally(() => {
+        callback(true);
       });
   }, [command, packageManager, sdk]);
 
@@ -86,7 +88,23 @@ export function UpgradeSDK({ callback, sdk }) {
           <Text bold>@clerk/{sdk}</Text> upgraded successfully to <Text bold>latest!</Text>
         </StatusMessage>
       )}
-      {error && <StatusMessage variant='error'>Upgrade failed!</StatusMessage>}
+      {error && (
+        <>
+          <StatusMessage variant='error'>
+            Running the upgrade command failed:{' '}
+            <Text
+              bold
+              color='red'
+            >
+              {command}
+            </Text>
+          </StatusMessage>
+          <StatusMessage variant='info'>
+            Please manually upgrade <Text bold>@clerk/{sdk}</Text> to <Text bold>latest</Text> in your project.
+          </StatusMessage>
+          <Newline />
+        </>
+      )}
     </>
   );
 }
