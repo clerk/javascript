@@ -1,17 +1,8 @@
-import type { Organization, Session, User } from '@clerk/backend';
-import {
-  AuthStatus,
-  constants,
-  makeAuthObjectSerializable,
-  signedInAuthObject,
-  signedOutAuthObject,
-  stripPrivateDataFromObject,
-} from '@clerk/backend/internal';
-import { decodeJwt } from '@clerk/backend/jwt';
+import type { AuthObject, Organization, Session, User } from '@clerk/backend';
+import { makeAuthObjectSerializable, stripPrivateDataFromObject } from '@clerk/backend/internal';
 
-import { API_URL, API_VERSION, SECRET_KEY } from './constants';
+import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import type { RequestLike } from './types';
-import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader, injectSSRStateIntoObject } from './utils';
 
 type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };
 
@@ -33,34 +24,18 @@ type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; 
  */
 type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) => Record<string, unknown>;
 
-export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-  const authToken = getAuthKeyFromRequest(req, 'AuthToken');
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
+export const buildClerkProps: BuildClerkProps = (req, initialState = {}) => {
+  const sanitizedAuthObject = getDynamicAuthData(req, initialState);
 
-  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
-  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-  const options = {
-    secretKey: decryptedRequestData.secretKey || SECRET_KEY,
-    apiUrl: API_URL,
-    apiVersion: API_VERSION,
-    authStatus,
-    authMessage,
-    authReason,
-  };
-
-  let authObject;
-  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
-    authObject = signedOutAuthObject(options);
-  } else {
-    const jwt = decodeJwt(authToken as string);
-
-    // @ts-expect-error - TODO @nikos: Align types
-    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
-  }
-
-  const sanitizedAuthObject = makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initState }));
-  return injectSSRStateIntoObject({}, sanitizedAuthObject);
+  // Serializing the state on dev env is a temp workaround for the following issue:
+  // https://github.com/vercel/next.js/discussions/11209|Next.js
+  const __clerk_ssr_state =
+    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify(sanitizedAuthObject)) : sanitizedAuthObject;
+  return { __clerk_ssr_state };
 };
+
+export function getDynamicAuthData(req: RequestLike, initialState = {}) {
+  const authObject = getAuthDataFromRequest(req);
+
+  return makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initialState })) as AuthObject;
+}

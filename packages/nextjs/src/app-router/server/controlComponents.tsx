@@ -3,15 +3,15 @@ import React from 'react';
 
 import { auth } from './auth';
 
-export function SignedIn(props: React.PropsWithChildren): React.JSX.Element | null {
+export async function SignedIn(props: React.PropsWithChildren): Promise<React.JSX.Element | null> {
   const { children } = props;
-  const { userId } = auth();
+  const { userId } = await auth();
   return userId ? <>{children}</> : null;
 }
 
-export function SignedOut(props: React.PropsWithChildren): React.JSX.Element | null {
+export async function SignedOut(props: React.PropsWithChildren): Promise<React.JSX.Element | null> {
   const { children } = props;
-  const { userId } = auth();
+  const { userId } = await auth();
   return userId ? null : <>{children}</>;
 }
 
@@ -27,9 +27,9 @@ export function SignedOut(props: React.PropsWithChildren): React.JSX.Element | n
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export function Protect(props: ProtectProps): React.JSX.Element | null {
+export async function Protect(props: ProtectProps): Promise<React.JSX.Element | null> {
   const { children, fallback, ...restAuthorizedParams } = props;
-  const { has, userId } = auth();
+  const { has, userId } = await auth();
 
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
@@ -46,17 +46,11 @@ export function Protect(props: ProtectProps): React.JSX.Element | null {
    * Check against the results of `has` called inside the callback
    */
   if (typeof restAuthorizedParams.condition === 'function') {
-    if (restAuthorizedParams.condition(has)) {
-      return authorized;
-    }
-    return unauthorized;
+    return restAuthorizedParams.condition(has) ? authorized : unauthorized;
   }
 
   if (restAuthorizedParams.role || restAuthorizedParams.permission) {
-    if (has(restAuthorizedParams)) {
-      return authorized;
-    }
-    return unauthorized;
+    return has(restAuthorizedParams) ? authorized : unauthorized;
   }
 
   /**

@@ -15,35 +15,21 @@ export const layoutStyle = {
       'px-3 py-1.5',
       'min-h-[1.875rem]',
       'inline-flex w-full items-center justify-center gap-3',
-      'ring ring-offset-1 rounded-md',
-      '[&:not(:focus-visible)]:ring-transparent',
-      'outline-none',
       '*:min-w-0',
     ].join(' '),
   },
-  buttonPrimary: {},
-  buttonSecondary: {},
-  buttonConnection: {},
-  buttonPrimaryDefault: {},
-  buttonSecondaryDefault: {},
-  buttonConnectionDefault: {},
-  buttonDisabled: {},
-  buttonBusy: {},
-  buttonConnection__google: {},
-  buttonText: {},
-  buttonTextVisuallyHidden: {},
   buttonIcon: {
     className: 'shrink-0',
   },
-  buttonIconStart: {},
-  buttonIconEnd: {},
   buttonSpinner: {
     className: 'shrink-0',
   },
 } satisfies ParsedElementsFragment;
 
 export const visualStyle = {
-  button: {},
+  button: {
+    className: ['ring ring-offset-1 rounded-md', '[&:not(:focus-visible)]:ring-transparent', 'outline-none'].join(' '),
+  },
   buttonPrimary: {
     className: [
       '[--button-icon-color:currentColor]',
@@ -85,7 +71,6 @@ export const visualStyle = {
   buttonBusy: {
     className: 'cursor-wait',
   },
-  buttonConnection__google: {},
   buttonText: {
     className: 'truncate leading-4',
   },
@@ -95,8 +80,6 @@ export const visualStyle = {
   buttonIcon: {
     className: 'text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]',
   },
-  buttonIconStart: {},
-  buttonIconEnd: {},
   buttonSpinner: {
     className: 'text-[length:--button-icon-size] text-[--button-icon-color]',
   },

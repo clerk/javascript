@@ -1,5 +1,44 @@
 # Change Log
 
+## 5.29.1
+
+### Patch Changes
+
+- Move `@clerk/ui` to `devDependencies` ([#4399](https://github.com/clerk/javascript/pull/4399)) by [@dstaley](https://github.com/dstaley)
+
+- Show an error on `<UserProfile />` if the Web3 wallet is already claimed. ([#4389](https://github.com/clerk/javascript/pull/4389)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Fix for legal consent rendered on the <SignUp/> component when only social sign up is enabled ([#4403](https://github.com/clerk/javascript/pull/4403)) by [@octoper](https://github.com/octoper)
+
+## 5.29.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`f9d53fe34`](https://github.com/clerk/javascript/commit/f9d53fe3444db5154dba47270a06c6a76dbea69f)]:
+  - @clerk/localizations@3.4.0
+  - @clerk/types@4.28.0
+  - @clerk/ui@0.1.10
+  - @clerk/shared@2.10.1
+
+## 5.28.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Bug fix: Always receive a new session verification object when UserVerification component mounts. ([#4359](https://github.com/clerk/javascript/pull/4359)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+  - @clerk/localizations@3.3.1
+
 ## 5.27.0
 
 ### Minor Changes

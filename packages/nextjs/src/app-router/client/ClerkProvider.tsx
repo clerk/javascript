@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
-import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
+import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -61,6 +61,12 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
+
+  // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
+  const isNested = Boolean(useClerkNextOptions());
+  if (isNested) {
+    return props.children;
+  }
 
   useEffect(() => {
     if (!isPending) {

@@ -37,6 +37,30 @@ const inputShadowStyles = (
   };
 };
 
+const checkboxShadowStyles = (
+  theme: InternalTheme,
+  colors: { idle1: string; idle2: string; hover1: string; hover2: string; focus: string },
+) => {
+  const idleShadow = [
+    `0px 0px 0px 1px ${colors.idle1}`,
+    theme.shadows.$input.replace('{{color}}', colors.idle2),
+  ].toString();
+  const hoverShadow = [
+    `0px 0px 0px 1px ${colors.hover1}`,
+    theme.shadows.$input.replace('{{color}}', colors.hover2),
+  ].toString();
+
+  return {
+    boxShadow: idleShadow,
+    '&:hover': {
+      boxShadow: hoverShadow,
+    },
+    '&:focus-visible': {
+      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    },
+  };
+};
+
 const inputStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
   ...inputShadowStyles(theme, {
@@ -141,6 +165,29 @@ export const polishedAppearance: Appearance = {
       input: {
         '&[data-variant="default"]': {
           ...inputStyles(theme),
+        },
+      },
+      checkbox: {
+        ...checkboxShadowStyles(theme, {
+          idle1: theme.colors.$neutralAlpha150,
+          idle2: theme.colors.$neutralAlpha100,
+          hover1: theme.colors.$neutralAlpha300,
+          hover2: theme.colors.$neutralAlpha150,
+          focus: theme.colors.$neutralAlpha150,
+        }),
+        padding: theme.space.$1,
+        width: theme.sizes.$3x5,
+        height: theme.sizes.$3x5,
+        appearance: 'none',
+        borderRadius: theme.radii.$sm,
+        border: 'none',
+        '&:checked': {
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.25 8L6.5 9.75L9.75 4.25' stroke='${theme.colors.$whiteAlpha900}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E")`,
+          borderColor: theme.colors.$transparent,
+          backgroundColor: theme.colors.$primary900,
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         },
       },
       tagInputContainer: {

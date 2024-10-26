@@ -15,17 +15,17 @@ type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: strin
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
-  (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): SignedInAuthObject;
+  (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 
   (
     params?: (has: CheckAuthorizationWithCustomPermissions) => boolean,
     options?: AuthProtectOptions,
-  ): SignedInAuthObject;
+  ): Promise<SignedInAuthObject>;
 
-  (options?: AuthProtectOptions): SignedInAuthObject;
+  (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 }
 
-export const createProtect = (opts: {
+export function createProtect(opts: {
   request: Request;
   authObject: AuthObject;
   /**
@@ -44,10 +44,10 @@ export const createProtect = (opts: {
    * use this callback to customise the behavior
    */
   redirectToSignIn: RedirectFun<unknown>;
-}): AuthProtect => {
+}): AuthProtect {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
-  return ((...args: any[]) => {
+  return (async (...args: any[]) => {
     const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
     const paramsOrFunction = optionValuesAsParam
       ? undefined
@@ -108,7 +108,7 @@ export const createProtect = (opts: {
 
     return handleUnauthorized();
   }) as AuthProtect;
-};
+}
 
 const isServerActionRequest = (req: Request) => {
   return (
@@ -134,7 +134,19 @@ const isAppRouterInternalNavigation = (req: Request) =>
 
 const isPagePathAvailable = () => {
   const __fetch = globalThis.fetch;
-  return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath : false);
+
+  if (!isNextFetcher(__fetch)) {
+    return false;
+  }
+
+  const { page, pagePath } = __fetch.__nextGetStaticStore().getStore() || {};
+
+  return Boolean(
+    // available on next@14
+    pagePath ||
+      // available on next@15
+      page,
+  );
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);

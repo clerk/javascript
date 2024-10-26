@@ -14,7 +14,9 @@ vi.mock('@clerk/backend', async importOriginal => {
 
 describe('clerkClient', () => {
   it('should pass version package to userAgent', async () => {
-    await clerkClient().users.getUser('user_test');
+    const resolvedClerkClient = await clerkClient();
+
+    await resolvedClerkClient.users.getUser('user_test');
 
     expect(createClerkClient).toHaveBeenCalledWith({
       apiUrl: 'https://api.clerk.com',

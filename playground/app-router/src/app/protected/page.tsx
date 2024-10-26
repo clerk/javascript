@@ -1,11 +1,13 @@
-import { auth, ClerkLoaded, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { useAuth, ClerkLoaded, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import React from 'react';
 import { ClientSideWrapper } from '@/app/protected/ClientSideWrapper';
 import { headers } from 'next/headers';
 
-export default function Page() {
-  const { userId } = auth();
-  console.log('Auth run in /protected', userId, headers().get('x-clerk-debug'), headers().keys());
+export default async function Page() {
+  const { userId } = useAuth();
+  const resolvedHeaders = await headers().get('x-clerk-debug');
+
+  console.log('Auth run in /protected', userId, resolvedHeaders.get('x-clerk-debug'), resolvedHeaders.keys());
   // console.log(auth());
   return (
     <div>
