@@ -45,12 +45,18 @@ export function UpgradeSDK({ callback, sdk }) {
   const [result, setResult] = useState();
 
   useEffect(() => {
-    if (!packageManager) return;
+    if (!packageManager) {
+      return;
+    }
     setCommand(previous => {
-      if (previous) return previous;
+      if (previous) {
+        return previous;
+      }
       return upgradeCommand(sdk, packageManager);
     });
-    if (!command) return;
+    if (!command) {
+      return;
+    }
 
     execa({ shell: true })`${command}`
       .then(res => {
