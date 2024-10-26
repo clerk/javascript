@@ -58,7 +58,7 @@ export function Codemod(props) {
         </>
       )}
 
-      {!result && !error && glob && <Spinner label={`Running @clerk/${sdk}</Text> codemod... ${transform}`} />}
+      {!result && !error && glob && <Spinner label={`Running @clerk/${sdk} codemod... ${transform}`} />}
       {result && (
         <>
           <StatusMessage variant='success'>
