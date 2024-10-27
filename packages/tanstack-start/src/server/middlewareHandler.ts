@@ -33,8 +33,6 @@ export function createClerkHandler<TRouter extends AnyRouter>(
             ...clerkInitialState,
           },
         });
-
-        await router.load();
       } catch (error) {
         if (error instanceof Response) {
           // returning the response
