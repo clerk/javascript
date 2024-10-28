@@ -1,7 +1,7 @@
-import { Spinner, StatusMessage } from '@inkjs/ui';
+import { Select, Spinner, StatusMessage } from '@inkjs/ui';
 import { execa } from 'execa';
 import { existsSync } from 'fs';
-import { Text } from 'ink';
+import { Newline, Text } from 'ink';
 import React, { useEffect, useState } from 'react';
 
 function detectPackageManager() {
@@ -11,13 +11,12 @@ function detectPackageManager() {
     return 'yarn';
   } else if (existsSync('pnpm-lock.yaml')) {
     return 'pnpm';
-  } else {
-    return 'npm';
   }
+  return undefined;
 }
 
 function upgradeCommand(sdk, packageManager) {
-  switch (packageManager || detectPackageManager()) {
+  switch (packageManager) {
     case 'yarn':
       return `yarn add @clerk/${sdk}@latest`;
     case 'pnpm':
@@ -33,39 +32,85 @@ function upgradeCommand(sdk, packageManager) {
  * @component
  * @param {Object} props
  * @param {Function} props.callback - The callback function to be called after the command execution.
- * @param {string} props.packageManager - The package manager used in the project in case we cannot detect it automatically.
  * @param {string} props.sdk - The SDK for which the upgrade command is run.
  * @returns {JSX.Element} The rendered component.
  *
  * @example
  * <UpgradeCommand sdk="example-sdk" callback={handleUpgrade} />
  */
-export function UpgradeSDK({ callback, packageManager, sdk }) {
+export function UpgradeSDK({ callback, sdk }) {
+  const [command, setCommand] = useState();
   const [error, setError] = useState();
+  const [packageManager, setPackageManager] = useState(detectPackageManager());
   const [result, setResult] = useState();
 
-  const command = upgradeCommand(sdk, packageManager);
-
   useEffect(() => {
+    if (!packageManager) {
+      return;
+    }
+    setCommand(previous => {
+      if (previous) {
+        return previous;
+      }
+      return upgradeCommand(sdk, packageManager);
+    });
+    if (!command) {
+      return;
+    }
+
     execa({ shell: true })`${command}`
       .then(res => {
         setResult(res);
-        callback(true);
       })
       .catch(err => {
         setError(err);
+      })
+      .finally(() => {
+        callback(true);
       });
-  }, [command]);
+  }, [command, packageManager, sdk]);
 
   return (
     <>
-      {!result && !error && <Spinner label={`Running upgrade command: ${command}`} />}
+      {packageManager ? null : (
+        <>
+          <Text>
+            We could not detect the package manager used in your project. Please select the package manager you are
+            using
+          </Text>
+          <Select
+            options={[
+              { label: 'npm', value: 'npm' },
+              { label: 'pnpm', value: 'pnpm' },
+              { label: 'yarn', value: 'yarn' },
+            ]}
+            onChange={setPackageManager}
+          />
+        </>
+      )}
+      {packageManager && !result && !error && <Spinner label={`Running upgrade command: ${command}`} />}
       {result && (
         <StatusMessage variant='success'>
           <Text bold>@clerk/{sdk}</Text> upgraded successfully to <Text bold>latest!</Text>
         </StatusMessage>
       )}
-      {error && <StatusMessage variant='error'>Upgrade failed!</StatusMessage>}
+      {error && (
+        <>
+          <StatusMessage variant='error'>
+            Running the upgrade command failed:{' '}
+            <Text
+              bold
+              color='red'
+            >
+              {command}
+            </Text>
+          </StatusMessage>
+          <StatusMessage variant='info'>
+            Please manually upgrade <Text bold>@clerk/{sdk}</Text> to <Text bold>latest</Text> in your project.
+          </StatusMessage>
+          <Newline />
+        </>
+      )}
     </>
   );
 }
