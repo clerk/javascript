@@ -15,7 +15,6 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 ) {
   return (
     <div
-      data-field-root=''
       ref={forwardedRef}
       {...props}
       className={cx(
@@ -45,7 +44,6 @@ export const Label = React.forwardRef(function FieldLabel(
 ) {
   return (
     <label
-      data-field-label=''
       ref={forwardedRef}
       {...props}
       className={cx(
@@ -70,7 +68,6 @@ export const LabelEnd = React.forwardRef(function FieldLabelEnd(
 ) {
   return (
     <span
-      data-field-label-end=''
       ref={forwardedRef}
       {...props}
       className={cx('flex-grow self-end text-end', className)}
@@ -86,7 +83,6 @@ export const Hint = React.forwardRef(function FieldHint(
 ) {
   return (
     <LabelEnd
-      data-field-hint=''
       ref={forwardedRef}
       {...props}
       className={cx('text-gray-9 text-sm font-medium', className)}
@@ -102,7 +98,6 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
 ) {
   return (
     <input
-      data-field-checkbox=''
       ref={forwardedRef}
       type='checkbox'
       className={cx('accent-accent-9 mt-[0.1875em] size-3 cursor-pointer')}
@@ -117,7 +112,6 @@ export const InputGroup = React.forwardRef(function FieldInputGroup(
 ) {
   return (
     <div
-      data-field-input-group=''
       ref={ref}
       className={cx(
         'has-[[data-field-input-group-end]]:[--field-input-group-pe:--field-input-group-end-size]',
@@ -152,8 +146,6 @@ export const Input = React.forwardRef(function FieldInput(
     asChild,
     className,
     intent = 'idle',
-    state = 'native',
-    variant = 'default',
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     asChild?: boolean;
@@ -167,9 +159,9 @@ export const Input = React.forwardRef(function FieldInput(
 
   return (
     <Comp
-      data-field-input=''
       ref={forwardedRef}
       className={cx(
+        'w-full justify-start',
         'py-[--field-input-py]',
         'ps-[--field-input-px]',
         // If an `InputGroup` exists, use the `pe` value, or fallback to the
@@ -177,22 +169,9 @@ export const Input = React.forwardRef(function FieldInput(
         'pe-[var(--field-input-group-pe,var(--field-input-px))]',
         'text-gray-12 relative flex min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
         'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
+        'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.light)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'supports-ios:text-[length:1rem] supports-ios:min-h-[1.875rem]',
-        // variant
-        {
-          default: 'w-full justify-start',
-          'otp-digit': 'aspect-square size-10 justify-center text-[calc(var(--cl-font-size)*1.4)] font-semibold',
-        }[variant],
-        // state
-        {
-          native:
-            'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.light)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
-          hover: 'ring-transparent ring-offset-[--cl-field-input-border-active]',
-          'focus-visible':
-            'ring-[--cl-field-input-ring,theme(ringColor.light)] ring-offset-[--cl-field-input-border-active]',
-        }[state],
-        // intent
         {
           idle: [
             '[--cl-field-input-border:theme(colors.gray.a4)]',
@@ -235,7 +214,6 @@ export const Message = React.forwardRef<
 >(function FieldMessage({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
-      data-field-message=''
       ref={forwardedRef}
       {...props}
       className={cx(
