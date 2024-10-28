@@ -3,6 +3,7 @@ const packageJSON = require('./package.json');
 const path = require('path');
 const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
+const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -42,9 +43,12 @@ const common = ({ mode }) => {
         NODE_ENV: mode,
       }),
       process.env.RSDOCTOR &&
-        new RsdoctorWebpackPlugin({
+        new RsdoctorRspackPlugin({
           mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
           disableClientServer: process.env.RSDOCTOR === 'brief',
+          supports: {
+            generateTileGraph: true,
+          },
         }),
     ].filter(Boolean),
     output: {
