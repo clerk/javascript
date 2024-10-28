@@ -38,12 +38,12 @@ export const svSE: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'Verifieringskod',
-      resendButton: "Fick du ingen kod? Skicka igen",
+      resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
     },
     noAvailableMethods: {
-      message: "Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.",
+      message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte verifiera ditt konto',
     },
@@ -54,13 +54,13 @@ export const svSE: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'Verifieringskod',
-      resendButton: "Fick du ingen kod? Skicka igen",
+      resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din telefon',
     },
     phoneCodeMfa: {
       formTitle: 'Verifieringskod',
-      resendButton: "Fick du ingen kod? Skicka igen",
+      resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som skickats till din telefon',
       title: 'Kontrollera din telefon',
     },
@@ -150,7 +150,7 @@ export const svSE: LocalizationResource = {
     action__signOut: 'Logga ut',
     title: 'Inloggad som {{identifier}}',
   },
-  maintenanceMode: "Vi genomför för närvarande underhåll, men oroa dig inte, det bör inte ta mer än några minuter.",
+  maintenanceMode: 'Vi genomför för närvarande underhåll, men oroa dig inte, det bör inte ta mer än några minuter.',
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gäst',
@@ -418,7 +418,8 @@ export const svSE: LocalizationResource = {
       title: 'Kan inte logga in',
     },
     passkey: {
-      subtitle: "Att använda din passkey bekräftar att det är du. Din enhet kan be om ditt fingeravtryck, ansikte eller skärmlås.",
+      subtitle:
+        'Att använda din passkey bekräftar att det är du. Din enhet kan be om ditt fingeravtryck, ansikte eller skärmlås.',
       title: 'Använd din passkey',
     },
     password: {
@@ -534,8 +535,8 @@ export const svSE: LocalizationResource = {
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
       'Registrering misslyckades på grund av misslyckad bot-validering. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
-    form_code_incorrect: "Koden är felaktig",
-    form_identifier_exists: "Identifieraren finns redan",
+    form_code_incorrect: 'Koden är felaktig',
+    form_identifier_exists: 'Identifieraren finns redan',
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
