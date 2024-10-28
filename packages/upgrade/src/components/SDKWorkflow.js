@@ -16,13 +16,12 @@ import { UpgradeSDK } from './UpgradeSDK.js';
  *
  * @component
  * @param {Object} props
- * @param {string} props.packageManager - The package manager to use for the upgrade, if needed.
  * @param {string} props.sdk - The SDK to be upgraded.
  *
  * @returns {JSX.Element} The rendered component.
  */
 export function SDKWorkflow(props) {
-  const { packageManager, sdk } = props;
+  const { sdk } = props;
 
   const [done, setDone] = useState(false);
   const [runCodemod, setRunCodemod] = useState(false);
@@ -59,7 +58,6 @@ export function SDKWorkflow(props) {
         <>
           <UpgradeSDK
             callback={setUpgradeComplete}
-            packageManager={packageManager}
             sdk={sdk}
           />
           {upgradeComplete ? (
