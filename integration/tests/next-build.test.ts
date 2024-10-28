@@ -58,7 +58,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   });
 
   test('When <ClerkProvider /> is used as a client component, builds successfully and does not force dynamic rendering', () => {
-    const dynamicIndicator = 'λ';
+    // Get the static indicator from the build output
+    const staticIndicator = app.buildOutput
+      .split('\n')
+      .find(msg => msg.includes('(Static)'))
+      .split(' ')[0];
 
     /**
      * Using /_not-found as it is an internal page that should statically render by default.
@@ -66,6 +70,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
      */
     const notFoundPageLine = app.buildOutput.split('\n').find(msg => msg.includes('/_not-found'));
 
-    expect(notFoundPageLine).not.toContain(dynamicIndicator);
+    expect(notFoundPageLine).toContain(staticIndicator);
   });
 });
