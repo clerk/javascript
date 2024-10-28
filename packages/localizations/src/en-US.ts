@@ -509,9 +509,23 @@ export const enUS: LocalizationResource = {
       title: 'Create your account',
     },
     restrictedAccess: {
-      title: 'Restricted access',
-      subtitle: 'Access to this app is limited, and an invitation is required to sign up.',
-      actionLink: 'Back to sign in',
+      title: 'Access restricted',
+      subtitle: 'Sign ups are currently disabled. If you believe you should have access, please contact support.',
+      actionLink: 'Sign in',
+      actionText: 'Already have an account?',
+      blockButton__emailSupport: 'Email support',
+    },
+    __experimental_legalConsent: {
+      continue: {
+        subtitle: 'Please read and accept the terms to continue',
+        title: 'Legal consent',
+      },
+      checkbox: {
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
+      },
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',

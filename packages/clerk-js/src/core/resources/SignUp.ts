@@ -1,4 +1,5 @@
 import { Poller } from '@clerk/shared';
+import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -69,6 +70,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdSessionId: string | null = null;
   createdUserId: string | null = null;
   abandonAt: number | null = null;
+  legalAcceptedAt: number | null = null;
 
   constructor(data: SignUpJSON | null = null) {
     super();
@@ -108,6 +110,12 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
       paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+    }
+
+    // TODO(@vaggelis): Remove this once the legalAccepted is stable
+    if (typeof params.__experimental_legalAccepted !== 'undefined') {
+      paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
+      paramsWithCaptcha.__experimental_legalAccepted = undefined;
     }
 
     return this._basePost({
@@ -189,9 +197,18 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   public authenticateWithWeb3 = async (
-    params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
+    params: AuthenticateWithWeb3Params & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+      __experimental_legalAccepted?: boolean;
+    },
   ): Promise<SignUpResource> => {
-    const { generateSignature, identifier, unsafeMetadata, strategy = 'web3_metamask_signature' } = params || {};
+    const {
+      generateSignature,
+      identifier,
+      unsafeMetadata,
+      strategy = 'web3_metamask_signature',
+      __experimental_legalAccepted,
+    } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     if (!(typeof generateSignature === 'function')) {
@@ -199,17 +216,17 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata });
+    await this.create({ web3Wallet, unsafeMetadata, __experimental_legalAccepted: __experimental_legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
 
-    const { nonce } = this.verifications.web3Wallet;
-    if (!nonce) {
+    const { message } = this.verifications.web3Wallet;
+    if (!message) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
     }
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider });
     } catch (err) {
       // There is a chance that as a first time visitor when you try to setup and use the
       // Coinbase Wallet from scratch in order to authenticate, the initial generate
@@ -219,7 +236,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce, provider });
+        signature = await generateSignature({ identifier, nonce: message, provider });
       } else {
         throw err;
       }
@@ -228,18 +245,25 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptWeb3WalletVerification({ signature, strategy });
   };
 
-  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+  public authenticateWithMetamask = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      __experimental_legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
+      __experimental_legalAccepted: params?.__experimental_legalAccepted,
     });
   };
 
   public authenticateWithCoinbaseWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params,
+    params?: SignUpAuthenticateWithWeb3Params & {
+      __experimental_legalAccepted?: boolean;
+    },
   ): Promise<SignUpResource> => {
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
@@ -247,6 +271,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
+      __experimental_legalAccepted: params?.__experimental_legalAccepted,
     });
   };
 
@@ -257,18 +282,31 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
+    __experimental_legalAccepted,
   }: AuthenticateWithRedirectParams & {
     unsafeMetadata?: SignUpUnsafeMetadata;
   }): Promise<void> => {
-    const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
-      continueSignUp && this.id ? this.update(args) : this.create(args);
+    const authenticateFn = () => {
+      const params = {
+        strategy,
+        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+        unsafeMetadata,
+        emailAddress,
+        __experimental_legalAccepted,
+      };
+      return continueSignUp && this.id ? this.update(params) : this.create(params);
+    };
 
-    const { verifications } = await authenticateFn({
-      strategy,
-      redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
-      actionCompleteRedirectUrl: redirectUrlComplete,
-      unsafeMetadata,
-      emailAddress,
+    const { verifications } = await authenticateFn().catch(async e => {
+      // If captcha verification failed because the environment has changed, we need
+      // to reload the environment and try again one more time with the new environment.
+      // If this fails again, we will let the caller handle the error accordingly.
+      if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+        await SignUp.clerk.__unstable__environment!.reload();
+        return authenticateFn();
+      }
+      throw e;
     });
 
     const { externalAccount } = verifications;
@@ -282,6 +320,13 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
+    // TODO(@vaggelis): Remove this once the legalAccepted is stable
+    if (typeof params.__experimental_legalAccepted !== 'undefined') {
+      // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
+      params.legalAccepted = params.__experimental_legalAccepted;
+      params.__experimental_legalAccepted = undefined;
+    }
+
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
@@ -316,6 +361,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.createdUserId = data.created_user_id;
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
+      this.legalAcceptedAt = data.legal_accepted_at;
     }
     return this;
   }
@@ -324,18 +370,19 @@ export class SignUp extends BaseResource implements SignUpResource {
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
-    if (
-      params.strategy === 'oauth_google' ||
-      params.strategy === 'oauth_microsoft' ||
-      params.strategy === 'oauth_apple'
-    ) {
+    if (!params.strategy) {
+      return false;
+    }
+
+    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+
+    if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
     }
+
     if (
       params.transfer &&
-      (SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_google' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_microsoft' ||
-        SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_apple')
+      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
       return true;
     }

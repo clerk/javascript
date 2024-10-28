@@ -1,5 +1,63 @@
 # Change Log
 
+## 2.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`1c7e105a3`](https://github.com/clerk/javascript/commit/1c7e105a32fd492cc175ef9fd1c1fa0428c259dc)]:
+  - @clerk/types@4.28.0
+  - @clerk/backend@1.15.1
+  - @clerk/shared@2.10.1
+
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`93dfe7a09`](https://github.com/clerk/javascript/commit/93dfe7a09648f414ee3f50bc8fb3f342d24020cd), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/backend@1.15.0
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`e1a26547a`](https://github.com/clerk/javascript/commit/e1a26547a9c65f4c79c2bbd4dc386ddf67c2fbee)]:
+  - @clerk/backend@1.14.1
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`752ce9bfa`](https://github.com/clerk/javascript/commit/752ce9bfa47a8eebd38cd272eeb58ae26fea3371), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`fb7ba1f34`](https://github.com/clerk/javascript/commit/fb7ba1f3485abdeac5e504cce6c2d84d3f3e4ffc), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+  - @clerk/shared@2.9.2
+  - @clerk/backend@1.14.0
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`d64e54c40`](https://github.com/clerk/javascript/commit/d64e54c40c9cf001b25e45a1b8939c9f7e80c6d6), [`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/shared@2.9.1
+  - @clerk/types@4.25.1
+  - @clerk/backend@1.13.10
+
+## 2.0.0
+
+### Major Changes
+
+- Recently Fastify released its v5 and along with it came some breaking changes. Read their [migration guide](https://fastify.dev/docs/latest/Guides/Migration-Guide-V5/) to learn more. ([#4270](https://github.com/clerk/javascript/pull/4270)) by [@LekoArts](https://github.com/LekoArts)
+
+  In order to support Fastify v5 a new major version of `@clerk/fastify` is required as Fastify's Node.js requirement is now `>=20`. Previously `@clerk/fastify` allowed `>=18.17.0`.
+
+  `@clerk/fastify@2.0.0` only supports Fastify v5 or later, if you want/need to continue using Fastify v4, please stick with your current version. The `@clerk/fastify@2.0.0` upgrade itself doesn't have any required code changes as only internal dependencies and requirements were updated.
+
+### Patch Changes
+
+- Updated dependencies [[`358be296a`](https://github.com/clerk/javascript/commit/358be296a8181bb256fc1e15f878932c741b8743)]:
+  - @clerk/backend@1.13.9
+
 ## 1.0.51
 
 ### Patch Changes

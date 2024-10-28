@@ -252,7 +252,23 @@ describe('SignUpStart', () => {
       });
 
       render(<SignUpStart />, { wrapper });
-      screen.getByText('Restricted access');
+      screen.getByText('Access restricted');
+    });
+  });
+
+  describe('Legal consent', () => {
+    it('shows sign up component with legal consent checkbox', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withLegalConsent();
+        f.withTermsPrivacyPolicyUrls({
+          privacyPolicy: 'https://clerk.dev/privacy',
+          termsOfService: 'https://clerk.dev/tos',
+        });
+      });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByText('Terms of Service');
+      screen.getByText('Privacy Policy');
     });
   });
 

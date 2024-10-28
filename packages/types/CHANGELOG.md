@@ -1,5 +1,49 @@
 # Change Log
 
+## 4.28.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+## 4.27.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fix `SignInProps`/`SignUpProps` `__experimental` type to allow for arbitrary properties ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.26.0
+
+### Minor Changes
+
+- Drop `maxAgeMinutes` from `__experimental_startVerification`. ([#4338](https://github.com/clerk/javascript/pull/4338)) by [@panteliselef](https://github.com/panteliselef)
+
+  Drop types `__experimental_SessionVerificationConfig` and `__experimental_SessionVerificationMaxAgeMinutes`.
+
+- The "Restricted access" screen has been improved for visual consistency and the ability to contact support. The displayed texts have been made more clear and the sign-in button has been moved to the bottom. ([#4335](https://github.com/clerk/javascript/pull/4335)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Add experimental standalone mode for `<UserButton />` and `<OrganizationSwitcher />`. ([#4042](https://github.com/clerk/javascript/pull/4042)) by [@panteliselef](https://github.com/panteliselef)
+
+  When `__experimental_asStandalone: true` the component will not render its trigger, and instead it will render only the contents of the popover in place.
+
+  APIs that changed:
+
+  - (For internal usage) Added `__experimental_prefetchOrganizationSwitcher` as a way to mount an internal component that will render the `useOrganizationList()` hook and prefetch the necessary data for the popover of `<OrganizationSwitcher />`. This enhances the UX since no loading state will be visible and keeps CLS to the minimum.
+  - New property for `mountOrganizationSwitcher(node, { __experimental_asStandalone: true })`
+  - New property for `mountUserButton(node, { __experimental_asStandalone: true })`
+
+- Use EIP-4361 message spec for Web3 wallets sign in signature requests ([#4334](https://github.com/clerk/javascript/pull/4334)) by [@chanioxaris](https://github.com/chanioxaris)
+
+## 4.25.1
+
+### Patch Changes
+
+- Bypass captcha for providers dynamically provided in environment ([#4322](https://github.com/clerk/javascript/pull/4322)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.25.0
 
 ### Minor Changes

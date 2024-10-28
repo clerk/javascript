@@ -1,5 +1,172 @@
 # Change Log
 
+## 6.0.2
+
+### Patch Changes
+
+- Bug fix: Include protect types in `auth` ([#4398](https://github.com/clerk/javascript/pull/4398)) by [@panteliselef](https://github.com/panteliselef)
+
+## 6.0.1
+
+### Patch Changes
+
+- Await usage of cookies() and ensure the return value of the server action is valid. ([#4396](https://github.com/clerk/javascript/pull/4396)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`1c7e105a3`](https://github.com/clerk/javascript/commit/1c7e105a32fd492cc175ef9fd1c1fa0428c259dc)]:
+  - @clerk/types@4.28.0
+  - @clerk/backend@1.15.1
+  - @clerk/clerk-react@5.13.1
+  - @clerk/shared@2.10.1
+
+## 6.0.0
+
+### Major Changes
+
+- Stop `<ClerkProvider>` from opting applications into dynamic rendering. A new prop, `<ClerkProvider dynamic>` can be used to opt-in to dynamic rendering and make auth data available during server-side rendering. The RSC `auth()` helper should be preferred for accessing auth data during dynamic rendering. ([#4366](https://github.com/clerk/javascript/pull/4366)) by [@jacekradko](https://github.com/jacekradko)
+
+- @clerk/nextjs: Converting auth() and clerkClient() interfaces to be async ([#4366](https://github.com/clerk/javascript/pull/4366)) by [@jacekradko](https://github.com/jacekradko)
+
+  @clerk/upgrade: Adding required codemod for @clerk/nextjs breaking changes
+
+  # Migration guide
+
+  ## `auth()` is now async
+
+  Previously the `auth()` method from `@clerk/nextjs/server` was synchronous.
+
+  ```typescript
+  import { auth } from "@clerk/nextjs/server";
+
+  export function GET() {
+    const { userId } = auth();
+    return new Response(JSON.stringify({ userId }));
+  }
+  ```
+
+  The `auth` method now becomes asynchronous. You will need to make the following changes to the snippet above to make it compatible.
+
+  ```diff
+  - export function GET() {
+  + export async function GET() {
+  -   const { userId } = auth();
+  +   const { userId } = await auth();
+    return new Response(JSON.stringify({ userId }));
+  }
+  ```
+
+  ## Clerk middleware auth is now async
+
+  ```typescript
+  import { clerkClient, clerkMiddleware } from '@clerk/nextjs/server';
+  import { NextResponse } from 'next/server';
+
+  export default clerkMiddleware(async (auth, request) => {
+    const resolvedAuth = await auth();
+
+    const count = await resolvedAuth.users.getCount();
+
+    if (count) {
+      return NextResponse.redirect(new URL('/new-url', request.url));
+    }
+  });
+
+  export const config = {
+    matcher: [...],
+  };
+  ```
+
+  ## clerkClient() is now async
+
+  Previously the `clerkClient()` method from `@clerk/nextjs/server` was synchronous.
+
+  ```typescript
+  import { clerkClient, clerkMiddleware } from '@clerk/nextjs/server';
+  import { NextResponse } from 'next/server';
+
+  export default clerkMiddleware((auth, request) => {
+    const client = clerkClient();
+
+    const count = await client.users?.getCount();
+
+    if (count) {
+      return NextResponse.redirect(new URL('/new-url', request.url));
+    }
+  });
+
+  export const config = {
+    matcher: [...],
+  };
+  ```
+
+  The method now becomes async. You will need to make the following changes to the snippet above to make it compatible.
+
+  ```diff
+  - export default clerkMiddleware((auth, request) => {
+  - const client = clerkClient();
+  + export default clerkMiddleware(async (auth, request) => {
+  + const client = await clerkClient();
+    const count = await client.users?.getCount();
+
+    if (count) {
+  }
+  ```
+
+- Support `unstable_rethrow` inside `clerkMiddleware`. ([#4366](https://github.com/clerk/javascript/pull/4366)) by [@jacekradko](https://github.com/jacekradko)
+
+  We changed the errors thrown by `protect()` inside `clerkMiddleware` in order for `unstable_rethrow` to recognise them and rethrow them.
+
+- Removes deprecated APIs: `authMiddleware()`, `redirectToSignIn()`, and `redirectToSignUp()`. See the migration guide to learn how to update your usage. ([#4366](https://github.com/clerk/javascript/pull/4366)) by [@jacekradko](https://github.com/jacekradko)
+
+### Minor Changes
+
+- Bug fix: Correctly redirect to sign in page in Next 15. ([#4383](https://github.com/clerk/javascript/pull/4383)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`93dfe7a09`](https://github.com/clerk/javascript/commit/93dfe7a09648f414ee3f50bc8fb3f342d24020cd), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`a0204a8e8`](https://github.com/clerk/javascript/commit/a0204a8e8742b63aea92d67e7d66fe0bc86a166f), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/backend@1.15.0
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+  - @clerk/clerk-react@5.13.0
+
+## 5.7.5
+
+### Patch Changes
+
+- Updated dependencies [[`e1a26547a`](https://github.com/clerk/javascript/commit/e1a26547a9c65f4c79c2bbd4dc386ddf67c2fbee)]:
+  - @clerk/backend@1.14.1
+
+## 5.7.4
+
+### Patch Changes
+
+- Updated dependencies [[`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`752ce9bfa`](https://github.com/clerk/javascript/commit/752ce9bfa47a8eebd38cd272eeb58ae26fea3371), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`fb7ba1f34`](https://github.com/clerk/javascript/commit/fb7ba1f3485abdeac5e504cce6c2d84d3f3e4ffc), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/clerk-react@5.12.0
+  - @clerk/types@4.26.0
+  - @clerk/shared@2.9.2
+  - @clerk/backend@1.14.0
+
+## 5.7.3
+
+### Patch Changes
+
+- Updated dependencies [[`d64e54c40`](https://github.com/clerk/javascript/commit/d64e54c40c9cf001b25e45a1b8939c9f7e80c6d6), [`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/shared@2.9.1
+  - @clerk/types@4.25.1
+  - @clerk/backend@1.13.10
+  - @clerk/clerk-react@5.11.1
+
+## 5.7.2
+
+### Patch Changes
+
+- Introduces `organizationSyncOptions` option to `clerkMiddleware`, which syncs an active organization or personal account from a URL to the Clerk session. ([#3977](https://github.com/clerk/javascript/pull/3977)) by [@izaaklauer](https://github.com/izaaklauer)
+
+- Updated dependencies [[`358be296a`](https://github.com/clerk/javascript/commit/358be296a8181bb256fc1e15f878932c741b8743)]:
+  - @clerk/backend@1.13.9
+
 ## 5.7.1
 
 ### Patch Changes

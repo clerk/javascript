@@ -2,11 +2,11 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import type { ClerkHostRouter } from '@clerk/shared/router';
 import { ClerkHostRouterContext } from '@clerk/shared/router';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
-import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
+import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -27,16 +27,13 @@ declare global {
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-export const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
+const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
 
 /**
  * Clerk router integration with Next.js's router.
  */
-export const useNextRouter = (): ClerkHostRouter => {
+const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
-  const pathname = usePathname();
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- The order doesn't differ between renders as we're checking the execution environment.
-  const searchParams = typeof window === 'undefined' ? new URLSearchParams() : useSearchParams();
 
   // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
   // preserve internal state between steps.
@@ -52,8 +49,8 @@ export const useNextRouter = (): ClerkHostRouter => {
     shallowPush(path: string) {
       canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
     },
-    pathname: () => pathname,
-    searchParams: () => searchParams,
+    pathname: () => window.location.pathname,
+    searchParams: () => new URLSearchParams(window.location.search),
   };
 };
 
@@ -64,6 +61,12 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
+
+  // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
+  const isNested = Boolean(useClerkNextOptions());
+  if (isNested) {
+    return props.children;
+  }
 
   useEffect(() => {
     if (!isPending) {
@@ -113,6 +116,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
+    __experimental_router: clerkRouter,
     routerPush: push,
     routerReplace: replace,
   });

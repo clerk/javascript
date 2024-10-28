@@ -97,6 +97,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   created_session_id: string | null;
   created_user_id: string | null;
   abandon_at: number | null;
+  legal_accepted_at: number | null;
   verifications: SignUpVerificationsJSON | null;
 }
 
@@ -233,6 +234,7 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organization_enabled: boolean;
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
+  legal_accepted_at: number | null;
   updated_at: number;
   created_at: number;
 }
@@ -261,6 +263,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   verified_at_client: string;
   strategy: string;
   nonce?: string;
+  message?: string;
   external_verification_redirect_url?: string;
   attempts: number;
   expire_at: number;

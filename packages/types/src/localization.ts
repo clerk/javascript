@@ -148,6 +148,19 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      blockButton__emailSupport: LocalizationValue;
+    };
+    __experimental_legalConsent: {
+      continue: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      checkbox: {
+        label__termsOfServiceAndPrivacyPolicy: LocalizationValue;
+        label__onlyPrivacyPolicy: LocalizationValue;
+        label__onlyTermsOfService: LocalizationValue;
+      };
     };
   };
   signIn: {

@@ -1,5 +1,53 @@
 # Change Log
 
+## 3.4.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5)]:
+  - @clerk/types@4.28.0
+
+## 3.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/types@4.27.0
+
+## 3.3.0
+
+### Minor Changes
+
+- The "Restricted access" screen has been improved for visual consistency and the ability to contact support. The displayed texts have been made more clear and the sign-in button has been moved to the bottom. ([#4335](https://github.com/clerk/javascript/pull/4335)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Remove typos from pl-PL ([#4319](https://github.com/clerk/javascript/pull/4319)) by [@pmichalski98](https://github.com/pmichalski98)
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/types@4.25.1
+
+## 3.2.0
+
+### Minor Changes
+
+- Add be-BY translation ([#4280](https://github.com/clerk/javascript/pull/4280)) by [@NikitaRadzkov](https://github.com/NikitaRadzkov)
+
+### Patch Changes
+
+- Update `de-DE` translation to be GDPR-compliant ([#4195](https://github.com/clerk/javascript/pull/4195)) by [@serbanradulescu](https://github.com/serbanradulescu)
+
 ## 3.1.2
 
 ### Patch Changes

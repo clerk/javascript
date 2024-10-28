@@ -1,5 +1,117 @@
 # Change Log
 
+## 5.29.1
+
+### Patch Changes
+
+- Move `@clerk/ui` to `devDependencies` ([#4399](https://github.com/clerk/javascript/pull/4399)) by [@dstaley](https://github.com/dstaley)
+
+- Show an error on `<UserProfile />` if the Web3 wallet is already claimed. ([#4389](https://github.com/clerk/javascript/pull/4389)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Fix for legal consent rendered on the <SignUp/> component when only social sign up is enabled ([#4403](https://github.com/clerk/javascript/pull/4403)) by [@octoper](https://github.com/octoper)
+
+## 5.29.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`f9d53fe34`](https://github.com/clerk/javascript/commit/f9d53fe3444db5154dba47270a06c6a76dbea69f)]:
+  - @clerk/localizations@3.4.0
+  - @clerk/types@4.28.0
+  - @clerk/ui@0.1.10
+  - @clerk/shared@2.10.1
+
+## 5.28.0
+
+### Minor Changes
+
+- Add experimental support for new UI components ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Bug fix: Always receive a new session verification object when UserVerification component mounts. ([#4359](https://github.com/clerk/javascript/pull/4359)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+  - @clerk/localizations@3.3.1
+
+## 5.27.0
+
+### Minor Changes
+
+- Drop `maxAgeMinutes` from `__experimental_startVerification`. ([#4338](https://github.com/clerk/javascript/pull/4338)) by [@panteliselef](https://github.com/panteliselef)
+
+  Drop types `__experimental_SessionVerificationConfig` and `__experimental_SessionVerificationMaxAgeMinutes`.
+
+- The "Restricted access" screen has been improved for visual consistency and the ability to contact support. The displayed texts have been made more clear and the sign-in button has been moved to the bottom. ([#4335](https://github.com/clerk/javascript/pull/4335)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Add experimental standalone mode for `<UserButton />` and `<OrganizationSwitcher />`. ([#4042](https://github.com/clerk/javascript/pull/4042)) by [@panteliselef](https://github.com/panteliselef)
+
+  When `__experimental_asStandalone: true` the component will not render its trigger, and instead it will render only the contents of the popover in place.
+
+  APIs that changed:
+
+  - (For internal usage) Added `__experimental_prefetchOrganizationSwitcher` as a way to mount an internal component that will render the `useOrganizationList()` hook and prefetch the necessary data for the popover of `<OrganizationSwitcher />`. This enhances the UX since no loading state will be visible and keeps CLS to the minimum.
+  - New property for `mountOrganizationSwitcher(node, { __experimental_asStandalone: true })`
+  - New property for `mountUserButton(node, { __experimental_asStandalone: true })`
+
+- Use EIP-4361 message spec for Web3 wallets sign in signature requests ([#4334](https://github.com/clerk/javascript/pull/4334)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Retry with exponential backoff if loadScript fails to load the script ([#4349](https://github.com/clerk/javascript/pull/4349)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add the `?render=explicit` query parameter to the Turnstile script. ([#4332](https://github.com/clerk/javascript/pull/4332)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`e81d45b72`](https://github.com/clerk/javascript/commit/e81d45b72c81403c7c206dac5454de1fef6bec57), [`752ce9bfa`](https://github.com/clerk/javascript/commit/752ce9bfa47a8eebd38cd272eeb58ae26fea3371), [`0a9bf8ef4`](https://github.com/clerk/javascript/commit/0a9bf8ef4902606f06b371e11c7ae84d493eda6c), [`99cdf9b67`](https://github.com/clerk/javascript/commit/99cdf9b67d1e99e66cc73d8a5bfce1f1f8df1b83), [`ce40ff6f0`](https://github.com/clerk/javascript/commit/ce40ff6f0d3bc79e33375be6dd5e03f140a07000), [`2102052c0`](https://github.com/clerk/javascript/commit/2102052c017065ab511339870fcebaa6719f2702)]:
+  - @clerk/types@4.26.0
+  - @clerk/shared@2.9.2
+  - @clerk/localizations@3.3.0
+
+## 5.26.5
+
+### Patch Changes
+
+- Only retry the OAuth flow if the captcha check failed. ([#4329](https://github.com/clerk/javascript/pull/4329)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Improve bot detection by loading the Turnstile SDK directly from CloudFlare. ([#4321](https://github.com/clerk/javascript/pull/4321)) by [@anagstef](https://github.com/anagstef)
+
+  If loading fails due to CSP rules, load it through FAPI instead.
+
+- Bypass captcha for providers dynamically provided in environment ([#4322](https://github.com/clerk/javascript/pull/4322)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`d64e54c40`](https://github.com/clerk/javascript/commit/d64e54c40c9cf001b25e45a1b8939c9f7e80c6d6), [`2ba2fd148`](https://github.com/clerk/javascript/commit/2ba2fd1483b7561d7df9a1952ead0ee15e422131)]:
+  - @clerk/shared@2.9.1
+  - @clerk/types@4.25.1
+  - @clerk/localizations@3.2.1
+
+## 5.26.4
+
+### Patch Changes
+
+- Correctly handle malformed or protocol-relative URLs before navigating to cross-origin URLs ([#4317](https://github.com/clerk/javascript/pull/4317)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.26.3
+
+### Patch Changes
+
+- Update `OrganizationSwitcher` popover action to include label ([#4304](https://github.com/clerk/javascript/pull/4304)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 5.26.2
+
+### Patch Changes
+
+- Handle gracefully Coinbase Wallet use of existing Passkey ([#4302](https://github.com/clerk/javascript/pull/4302)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updates webpack to address CVE-2024-43788. ([#4287](https://github.com/clerk/javascript/pull/4287)) by [@dependabot](https://github.com/apps/dependabot)
+
+- Updated dependencies [[`e29a8061d`](https://github.com/clerk/javascript/commit/e29a8061d4106b9192837056e5f505c05f3c3a64), [`00a9ddb5b`](https://github.com/clerk/javascript/commit/00a9ddb5bd566fea7f22182047ae2c02e28e2ddc)]:
+  - @clerk/localizations@3.2.0
+
 ## 5.26.1
 
 ### Patch Changes
