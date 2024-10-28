@@ -108,7 +108,7 @@ export const frFR: LocalizationResource = {
   formFieldHintText__slug:
     'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Supprimer ce compte',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Supprimer le compte',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
