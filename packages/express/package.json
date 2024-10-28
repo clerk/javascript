@@ -33,11 +33,13 @@
         "default": "./dist/index.js"
       }
     },
+    "./env": "./env.d.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "env.d.ts"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
