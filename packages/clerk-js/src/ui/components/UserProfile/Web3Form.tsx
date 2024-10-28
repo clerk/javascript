@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/types';
 
 import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
-import { descriptors, Image, localizationKeys } from '../../customizables';
+import { descriptors, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { getFieldError, handleError } from '../../utils';
@@ -20,6 +20,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
 
   const connect = async (strategy: Web3Strategy) => {
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    card.setError(undefined);
 
     try {
       card.setLoading(strategy);
@@ -51,37 +52,50 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
   }
 
   return (
-    <ProfileSection.ActionMenu
-      id='web3Wallets'
-      triggerLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
-    >
-      {unconnectedStrategies.map(strategy => (
-        <ProfileSection.ActionMenuItem
-          key={strategy}
-          id={strategyToDisplayData[strategy].id}
-          onClick={() => connect(strategy)}
-          isLoading={card.loadingMetadata === strategy}
-          isDisabled={card.isLoading}
-          localizationKey={localizationKeys('userProfile.web3WalletPage.web3WalletButtonsBlockButton', {
-            provider: strategyToDisplayData[strategy].name,
-          })}
+    <>
+      <ProfileSection.ActionMenu
+        id='web3Wallets'
+        triggerLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
+      >
+        {unconnectedStrategies.map(strategy => (
+          <ProfileSection.ActionMenuItem
+            key={strategy}
+            id={strategyToDisplayData[strategy].id}
+            onClick={() => connect(strategy)}
+            isLoading={card.loadingMetadata === strategy}
+            isDisabled={card.isLoading}
+            localizationKey={localizationKeys('userProfile.web3WalletPage.web3WalletButtonsBlockButton', {
+              provider: strategyToDisplayData[strategy].name,
+            })}
+            sx={t => ({
+              justifyContent: 'start',
+              gap: t.space.$2,
+            })}
+            leftIcon={
+              <Image
+                elementDescriptor={descriptors.providerIcon}
+                elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                src={strategyToDisplayData[strategy].iconUrl}
+                alt={`Connect ${strategyToDisplayData[strategy].name}`}
+                sx={theme => ({ width: theme.sizes.$5 })}
+              />
+            }
+          />
+        ))}
+      </ProfileSection.ActionMenu>
+      {card.error && (
+        <Text
+          colorScheme='danger'
           sx={t => ({
-            justifyContent: 'start',
-            gap: t.space.$2,
+            padding: t.sizes.$1x5,
+            paddingLeft: t.sizes.$8x5,
           })}
-          leftIcon={
-            <Image
-              elementDescriptor={descriptors.providerIcon}
-              elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
-              isLoading={card.loadingMetadata === strategy}
-              isDisabled={card.isLoading}
-              src={strategyToDisplayData[strategy].iconUrl}
-              alt={`Connect ${strategyToDisplayData[strategy].name}`}
-              sx={theme => ({ width: theme.sizes.$5 })}
-            />
-          }
-        />
-      ))}
-    </ProfileSection.ActionMenu>
+        >
+          {card.error}
+        </Text>
+      )}
+    </>
   );
 });
