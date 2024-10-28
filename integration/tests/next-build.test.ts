@@ -85,6 +85,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 });
 
 test.describe('next build - dynamic options @nextjs', () => {
+  // These tests are not setup to support Next.js 13. Due to the way we are creating a Promise to pass into a context, but not awaiting it, in the dynamic
+  // ClerkProvider, Next.js 13 throws this error: "DynamicServerError: Dynamic server usage: Page couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"
+  if (process.env.E2E_NEXTJS_VERSION === '13') {
+    return;
+  }
+
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
