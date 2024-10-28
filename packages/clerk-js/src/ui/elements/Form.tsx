@@ -201,6 +201,8 @@ const InputGroup = (
 const Checkbox = (
   props: CommonFieldRootProps & {
     description?: string | LocalizationKey;
+    termsLink?: string;
+    privacyLink?: string;
   },
 ) => {
   return (

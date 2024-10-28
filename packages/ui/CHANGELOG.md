@@ -1,5 +1,16 @@
 # @clerk/ui
 
+## 0.1.10
+
+### Patch Changes
+
+- Update internal dependencies to use public version ranges instead of file-based paths ([#4397](https://github.com/clerk/javascript/pull/4397)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5)]:
+  - @clerk/types@4.28.0
+  - @clerk/elements@0.17.1
+  - @clerk/shared@2.10.1
+
 ## 0.1.9
 
 ### Patch Changes

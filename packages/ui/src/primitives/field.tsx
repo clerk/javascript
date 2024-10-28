@@ -46,7 +46,6 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   const { elements } = useAppearance().parsedAppearance;
   return (
     <div
-      data-field-root=''
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.fieldRoot)}
@@ -88,7 +87,6 @@ export const Label = React.forwardRef(function FieldLabel(
   const fieldLabelDescriptors = applyDescriptors(elements, 'fieldLabel');
   return (
     <label
-      data-field-label=''
       ref={forwardedRef}
       {...props}
       className={cx(visuallyHidden ? 'sr-only' : fieldLabelDescriptors.className)}
@@ -117,7 +115,6 @@ export const LabelEnd = React.forwardRef(function FieldLabelEnd(
   const { elements } = useAppearance().parsedAppearance;
   return (
     <span
-      data-field-label-end=''
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.fieldLabelEnd)}
@@ -146,7 +143,6 @@ export const Hint = React.forwardRef(function FieldHint(
   const { elements } = useAppearance().parsedAppearance;
   return (
     <LabelEnd
-      data-field-hint=''
       ref={forwardedRef}
       {...props}
       {...mergeDescriptors(elements.fieldHint)}
@@ -181,7 +177,6 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
   const { elements } = useAppearance().parsedAppearance;
   return (
     <input
-      data-field-checkbox=''
       ref={forwardedRef}
       type='checkbox'
       {...props}
@@ -209,7 +204,6 @@ export const InputGroup = React.forwardRef(function FieldInputGroup(
   const { elements } = useAppearance().parsedAppearance;
   return (
     <div
-      data-field-input-group=''
       ref={ref}
       {...props}
       {...mergeDescriptors(elements.fieldInputGroup)}
@@ -322,8 +316,6 @@ export const Input = React.forwardRef(function FieldInput(
     asChild,
     className,
     intent = 'idle',
-    state = 'native',
-    variant = 'default',
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     asChild?: boolean;
@@ -337,9 +329,9 @@ export const Input = React.forwardRef(function FieldInput(
 
   return (
     <Comp
-      data-field-input=''
       ref={forwardedRef}
       className={cx(
+        'w-full justify-start',
         'py-[--field-input-py]',
         'ps-[--field-input-px]',
         // If an `InputGroup` exists, use the `pe` value, or fallback to the
@@ -347,22 +339,9 @@ export const Input = React.forwardRef(function FieldInput(
         'pe-[var(--field-input-group-pe,var(--field-input-px))]',
         'text-gray-12 relative flex min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
         'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
+        'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.light)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'supports-ios:text-[length:1rem] supports-ios:min-h-[1.875rem]',
-        // variant
-        {
-          default: 'w-full justify-start',
-          'otp-digit': 'aspect-square size-10 justify-center text-[calc(var(--cl-font-size)*1.4)] font-semibold',
-        }[variant],
-        // state
-        {
-          native:
-            'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.light)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
-          hover: 'ring-transparent ring-offset-[--cl-field-input-border-active]',
-          'focus-visible':
-            'ring-[--cl-field-input-ring,theme(ringColor.light)] ring-offset-[--cl-field-input-border-active]',
-        }[state],
-        // intent
         {
           idle: [
             '[--cl-field-input-border:theme(colors.gray.a4)]',
@@ -462,7 +441,6 @@ export const Message = React.forwardRef<
   const { elements } = useAppearance().parsedAppearance;
   return (
     <p
-      data-field-message=''
       ref={forwardedRef}
       {...props}
       {...applyDescriptors(elements, message({ justify, intent, descriptor }))}

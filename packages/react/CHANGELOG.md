@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5)]:
+  - @clerk/types@4.28.0
+  - @clerk/shared@2.10.1
+
+## 5.13.0
+
+### Minor Changes
+
+- Internal changes to support `<ClerkProvider dynamic>` ([#4366](https://github.com/clerk/javascript/pull/4366)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
+  - @clerk/shared@2.10.0
+  - @clerk/types@4.27.0
+
 ## 5.12.0
 
 ### Minor Changes

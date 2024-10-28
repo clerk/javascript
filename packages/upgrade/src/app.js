@@ -63,12 +63,7 @@ export default function App(props) {
 
   // Handle the individual SDK upgrade
   if (!fromVersion && !toVersion && sdks[0] === 'nextjs') {
-    return (
-      <SDKWorkflow
-        packageManager={props.packageManager}
-        sdk={sdks[0]}
-      />
-    );
+    return <SDKWorkflow sdk={sdks[0]} />;
   }
 
   // We try to guess which SDK they are using
@@ -128,7 +123,8 @@ export default function App(props) {
             </>
           ) : (
             <Text>
-              It looks like you are using the "{sdkGuesses[0].label}" Clerk SDK in your project. Is that right?
+              It looks like you are using the <Text bold>{sdkGuesses[0].label}</Text> Clerk SDK in your project. Is that
+              right?
             </Text>
           )}
 
