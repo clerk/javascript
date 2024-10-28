@@ -83,6 +83,17 @@ export class Client extends BaseResource implements ClientResource {
     return !!this.cookieExpiresAt && this.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000; // 8 days
   }
 
+  buildTouchUrl({ redirectUrl }: { redirectUrl: URL }) {
+    return BaseResource.fapiClient
+      .buildUrl({
+        method: 'GET',
+        path: '/client/touch',
+        pathPrefix: 'v1',
+        search: { redirect_url: redirectUrl.toString() },
+      })
+      .toString();
+  }
+
   fromJSON(data: ClientJSON | null): this {
     if (data) {
       this.id = data.id;

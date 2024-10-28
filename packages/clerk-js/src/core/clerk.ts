@@ -846,18 +846,7 @@ export class Clerk implements ClerkInterface {
       if (this.client.isEligibleForTouch()) {
         const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
 
-        await this.navigate(
-          this.buildUrlWithAuth(
-            this.#fapiClient
-              .buildUrl({
-                method: 'GET',
-                path: '/client/touch',
-                pathPrefix: 'v1',
-                search: { redirect_url: absoluteRedirectUrl.toString() },
-              })
-              .toString(),
-          ),
-        );
+        await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
       } else {
         await this.navigate(redirectUrl);
       }

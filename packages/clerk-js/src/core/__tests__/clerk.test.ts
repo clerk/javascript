@@ -373,6 +373,8 @@ describe('Clerk singleton', () => {
           activeSessions: [mockSession],
           cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
           isEligibleForTouch: () => true,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
         }),
       );
 
@@ -392,6 +394,8 @@ describe('Clerk singleton', () => {
           activeSessions: [mockSession],
           cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
           isEligibleForTouch: () => false,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
         }),
       );
 
@@ -409,6 +413,8 @@ describe('Clerk singleton', () => {
           activeSessions: [mockSession],
           cookieExpiresAt: null,
           isEligibleForTouch: () => false,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
         }),
       );
 
