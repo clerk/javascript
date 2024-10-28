@@ -110,10 +110,10 @@
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.14.0"
   },
-  "packageManager": "npm@10.7.0",
+  "packageManager": "npm@10.9.0",
   "engines": {
     "node": ">=18.17.0",
-    "npm": ">=8.5.0"
+    "npm": ">=10.9.0"
   },
   "overrides": {
     "jest": "^29.7.0"
