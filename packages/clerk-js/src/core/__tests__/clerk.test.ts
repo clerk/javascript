@@ -372,6 +372,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [mockSession],
           cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+          isEligibleForTouch: () => true,
         }),
       );
 
@@ -390,6 +391,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [mockSession],
           cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+          isEligibleForTouch: () => false,
         }),
       );
 
@@ -406,6 +408,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [mockSession],
           cookieExpiresAt: null,
+          isEligibleForTouch: () => false,
         }),
       );
 
@@ -1204,6 +1207,7 @@ describe('Clerk singleton', () => {
               },
             },
           } as any as SignUpJSON),
+          isEligibleForTouch: () => false,
         }),
       );
 
@@ -1264,6 +1268,7 @@ describe('Clerk singleton', () => {
               },
             },
           } as any as SignUpJSON),
+          isEligibleForTouch: () => false,
         }),
       );
 

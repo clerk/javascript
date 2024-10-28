@@ -13,6 +13,7 @@ export interface ClientResource extends ClerkResource {
   destroy: () => Promise<void>;
   removeSessions: () => Promise<ClientResource>;
   clearCache: () => void;
+  isEligibleForTouch: () => boolean;
   lastActiveSessionId: string | null;
   cookieExpiresAt: Date | null;
   createdAt: Date | null;

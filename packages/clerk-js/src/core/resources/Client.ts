@@ -78,6 +78,11 @@ export class Client extends BaseResource implements ClientResource {
     return this.sessions.forEach(s => s.clearCache());
   }
 
+  // isEligibleForTouch returns true if the client cookie is due to expire in 8 days or less
+  isEligibleForTouch(): boolean {
+    return !!this.cookieExpiresAt && this.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000; // 8 days
+  }
+
   fromJSON(data: ClientJSON | null): this {
     if (data) {
       this.id = data.id;

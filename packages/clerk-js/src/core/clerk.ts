@@ -843,10 +843,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
-      if (
-        this.client.cookieExpiresAt &&
-        this.client.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000 // 8 days
-      ) {
+      if (this.client.isEligibleForTouch()) {
         const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
 
         await this.navigate(
