@@ -1,24 +1,24 @@
 import { Platform } from 'react-native';
 
-import {
+import type {
   AuthenticationResponseJSON,
-  SerializedPublicKeyCredentialCreationOptions,
-  SerializedPublicKeyCredentialRequestOptions,
-  RegistrationResponseJSON,
-  PublicKeyCredentialWithAuthenticatorAssertionResponse,
-  PublicKeyCredentialWithAuthenticatorAttestationResponse,
+  CredentialReturn,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
-  CredentialReturn,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
+  RegistrationResponseJSON,
+  SerializedPublicKeyCredentialCreationOptions,
+  SerializedPublicKeyCredentialRequestOptions,
 } from './ClerkExpoPasskeys.types';
 import ClerkExpoPasskeys from './ClerkExpoPasskeysModule';
 import {
   arrayBufferToBase64Url,
   base64urlToArrayBuffer,
-  encodeBase64Url,
-  toArrayBuffer,
   ClerkWebAuthnError,
+  encodeBase64Url,
   mapNativeErrorToClerkWebAuthnErrorCode,
+  toArrayBuffer,
 } from './utils';
 
 const makeSerializedCreateResponse = (

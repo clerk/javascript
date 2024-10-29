@@ -1,9 +1,9 @@
-import {
+import type {
   CredentialReturn,
-  PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
-  PublicKeyCredentialWithAuthenticatorAttestationResponse as ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse as ClerkPublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse as ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
 export type {

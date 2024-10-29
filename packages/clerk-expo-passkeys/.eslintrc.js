@@ -1,5 +1,7 @@
 module.exports = {
   root: true,
-  extends: ['universe/native', 'universe/web'],
-  ignorePatterns: ['build'],
+  extends: ['@clerk/custom/node', '@clerk/custom/typescript', '@clerk/custom/react'],
+  settings: {
+    'import/ignore': ['node_modules/react-native/index\\.js$'],
+  },
 };
