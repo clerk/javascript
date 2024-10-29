@@ -221,6 +221,7 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
       focusRing={false}
       sx={t => ({
         width: 'fit-content',
+        flexShrink: 0,
         marginTop: t.space.$0x5,
       })}
     />
