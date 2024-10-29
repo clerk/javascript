@@ -139,6 +139,9 @@ const typescriptLoaderProd = () => {
       use: {
         loader: 'builtin:swc-loader',
         options: {
+          env: {
+            targets: packageJSON.browserslist,
+          },
           jsc: {
             parser: {
               syntax: 'typescript',
@@ -168,6 +171,9 @@ const typescriptLoaderDev = () => {
       exclude: /node_modules/,
       loader: 'builtin:swc-loader',
       options: {
+        env: {
+          targets: 'last 0.25 years',
+        },
         jsc: {
           parser: {
             syntax: 'typescript',
@@ -248,7 +254,20 @@ const commonForProd = () => {
     },
     optimization: {
       minimize: true,
-      minimizer: [new rspack.SwcJsMinimizerRspackPlugin()],
+      minimizer: [
+        new rspack.SwcJsMinimizerRspackPlugin({
+          minimizerOptions: {
+            compress: {
+              unused: true,
+              dead_code: true,
+              passes: 2,
+            },
+            mangle: {
+              safari10: true,
+            },
+          },
+        }),
+      ],
     },
     plugins: [
       // new webpack.optimize.LimitChunkCountPlugin({
@@ -327,6 +346,9 @@ const prodConfig = ({ mode, analysis }) => {
         maxChunks: 1,
       }),
     ],
+    optimization: {
+      splitChunks: false,
+    },
   });
 
   const clerkCjs = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
@@ -342,6 +364,9 @@ const prodConfig = ({ mode, analysis }) => {
         maxChunks: 1,
       }),
     ],
+    optimization: {
+      splitChunks: false,
+    },
   });
 
   // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
