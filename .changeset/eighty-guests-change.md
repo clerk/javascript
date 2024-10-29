@@ -5,4 +5,5 @@
 "@clerk/clerk-react": patch
 ---
 
-Introduce redirectUrl property on setActive as a replacement for beforeEmit
+Introduce `redirectUrl` property on `setActive` as a replacement for `beforeEmit`.
+- Deprecates `beforeEmit` property on `setActive`.
