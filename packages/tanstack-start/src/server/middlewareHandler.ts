@@ -31,7 +31,7 @@ export function createClerkHandler<TRouter extends AnyRouter>(
           context: { ...router.options.context, ...clerkInitialState },
         });
 
-        await router.load();
+        // await router.load();
       } catch (error) {
         if (error instanceof Response) {
           // returning the response
