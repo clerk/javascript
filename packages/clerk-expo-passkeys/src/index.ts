@@ -21,7 +21,6 @@ import {
   mapNativeErrorToClerkWebAuthnErrorCode,
 } from './utils';
 
-
 const makeSerializedCreateResponse = (
   publicCredential: RegistrationResponseJSON,
 ): PublicKeyCredentialWithAuthenticatorAttestationResponse => ({
