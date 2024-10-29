@@ -12,7 +12,14 @@ type RenderingModeTestCase = {
 function getIndicator(buildOutput: string, type: 'Static' | 'Dynamic') {
   return buildOutput
     .split('\n')
-    .find(msg => msg.includes(`(${type})`))
+    .find(msg => {
+      const isTypeFound = msg.includes(`(${type})`);
+
+      if (type === 'Dynamic') {
+        return isTypeFound || msg.includes(`(Server)`);
+      }
+      return isTypeFound;
+    })
     .split(' ')[0];
 }
 
@@ -85,12 +92,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 });
 
 test.describe('next build - dynamic options @nextjs', () => {
-  // These tests are not setup to support Next.js 13. Due to the way we are creating a Promise to pass into a context, but not awaiting it, in the dynamic
-  // ClerkProvider, Next.js 13 throws this error: "DynamicServerError: Dynamic server usage: Page couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error"
-  if (process.env.E2E_NEXTJS_VERSION === '13') {
-    return;
-  }
-
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
@@ -161,7 +162,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   });
 
   test.afterAll(async () => {
-    await app.teardown();
+    // await app.teardown();
   });
 
   (
