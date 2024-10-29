@@ -9,11 +9,11 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SignOutAllActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
-type UserButtonPopoverProps = { close?: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
+type UserButtonPopoverProps = { close?: (open: boolean) => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
   const { close: unsafeClose, ...rest } = props;
-  const close = () => unsafeClose?.();
+  const close = () => unsafeClose?.(false);
   const { session } = useSession() as { session: ActiveSessionResource };
   const { __experimental_asStandalone } = useUserButtonContext();
   const { authConfig } = useEnvironment();

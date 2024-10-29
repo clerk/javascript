@@ -1071,7 +1071,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
-  __experimental_asStandalone?: boolean;
+  __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
    * Full URL or path to navigate after sign out is complete
@@ -1140,7 +1140,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * @experimental This API is experimental and may change at any moment.
      * @default undefined
      */
-    __experimental_asStandalone?: boolean;
+    __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
     /**
      * By default, users can switch between organization and their personal account.
