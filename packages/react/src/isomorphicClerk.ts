@@ -434,7 +434,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
+      } else if (!__OMIT_REMOTE_HOSTED_CODE__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
           await loadClerkJsScript({

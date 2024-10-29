@@ -1,6 +1,6 @@
 import type { Clerk } from '@clerk/clerk-js';
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
-import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react/browser-extension';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react/browser-extension';
 import React from 'react';
 
 import { createClerkClient } from '../internal/clerk';

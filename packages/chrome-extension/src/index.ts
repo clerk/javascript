@@ -1,4 +1,4 @@
-export * from '@clerk/clerk-react';
+export * from '@clerk/clerk-react/browser-extension';
 export type { StorageCache } from './internal/utils/storage';
 
 // The order matters since we want override @clerk/clerk-react ClerkProvider

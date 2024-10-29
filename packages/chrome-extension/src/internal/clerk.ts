@@ -1,5 +1,5 @@
 import { Clerk } from '@clerk/clerk-js';
-import { DEV_BROWSER_JWT_KEY } from '@clerk/shared';
+import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
