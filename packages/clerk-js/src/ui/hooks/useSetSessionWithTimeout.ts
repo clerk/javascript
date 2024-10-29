@@ -7,7 +7,7 @@ import { useRouter } from '../router';
 export const useSetSessionWithTimeout = (delay = 2000) => {
   const { queryString } = useRouter();
   const { setActive } = useClerk();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { afterSignInUrl } = useSignInContext();
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -15,7 +15,7 @@ export const useSetSessionWithTimeout = (delay = 2000) => {
     const createdSessionId = queryParams.get('createdSessionId');
     if (createdSessionId) {
       timeoutId = setTimeout(() => {
-        void setActive({ session: createdSessionId, beforeEmit: navigateAfterSignIn });
+        void setActive({ session: createdSessionId, redirectUrl: afterSignInUrl });
       }, delay);
     }
 
@@ -24,5 +24,5 @@ export const useSetSessionWithTimeout = (delay = 2000) => {
         clearTimeout(timeoutId);
       }
     };
-  }, [setActive, navigateAfterSignIn, queryString]);
+  }, [setActive, afterSignInUrl, queryString]);
 };
