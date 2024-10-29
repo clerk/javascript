@@ -33,14 +33,14 @@
         "default": "./dist/index.js"
       }
     },
-    "./internal": {
+    "./browser-extension": {
       "import": {
-        "types": "./dist/internal.d.mts",
-        "default": "./dist/internal.mjs"
+        "types": "./dist/browser-extension.d.mts",
+        "default": "./dist/browser-extension.mjs"
       },
       "require": {
-        "types": "./dist/internal.d.ts",
-        "default": "./dist/internal.js"
+        "types": "./dist/browser-extension.d.ts",
+        "default": "./dist/browser-extension.js"
       }
     },
     "./errors": {
@@ -53,13 +53,24 @@
         "default": "./dist/errors.js"
       }
     },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.mts",
+        "default": "./dist/internal.mjs"
+      },
+      "require": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
+    "browser-extension",
     "dist",
-    "internal",
-    "errors"
+    "errors",
+    "internal"
   ],
   "scripts": {
     "build": "tsup",
