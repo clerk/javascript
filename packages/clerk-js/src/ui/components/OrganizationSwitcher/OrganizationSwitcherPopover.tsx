@@ -48,8 +48,9 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       afterCreateOrganizationUrl,
       navigateCreateOrganization,
       navigateOrganizationProfile,
-      navigateAfterSelectPersonal,
-      navigateAfterSelectOrganization,
+      afterSelectOrganizationUrl,
+      afterSelectPersonalUrl,
+
       organizationProfileProps,
       skipInvitationScreen,
       hideSlug,
@@ -72,7 +73,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         .runAsync(() =>
           setActive({
             organization,
-            beforeEmit: () => navigateAfterSelectOrganization(organization),
+            redirectUrl: afterSelectOrganizationUrl(organization),
           }),
         )
         .then(close);
@@ -80,7 +81,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     const handlePersonalWorkspaceClicked = () => {
       return card
-        .runAsync(() => setActive({ organization: null, beforeEmit: () => navigateAfterSelectPersonal(user) }))
+        .runAsync(() => setActive({ organization: null, redirectUrl: afterSelectPersonalUrl(user) }))
         .then(close);
     };
 
