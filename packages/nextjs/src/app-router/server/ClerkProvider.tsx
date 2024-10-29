@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
+import nextPkg from 'next/package.json';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
@@ -9,6 +10,8 @@ import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
+
+const isNext13 = nextPkg.version.startsWith('13.');
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const request = await buildRequestLike();
@@ -29,8 +32,17 @@ export async function ClerkProvider(
   let nonce = Promise.resolve('');
 
   if (dynamic) {
-    statePromise = getDynamicClerkState();
-    nonce = getNonceFromCSPHeader();
+    if (isNext13) {
+      /**
+       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+       * Without the await here, Next will throw a DynamicServerError during build.
+       */
+      statePromise = Promise.resolve(await getDynamicClerkState());
+      nonce = Promise.resolve(await getNonceFromCSPHeader());
+    } else {
+      statePromise = getDynamicClerkState();
+      nonce = getNonceFromCSPHeader();
+    }
   }
 
   const output = (
