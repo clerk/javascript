@@ -1,10 +1,9 @@
 import { Clerk } from '@clerk/clerk-js';
-import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
 import { SCOPE, type Scope } from '../types';
-import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
+import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION, DEV_BROWSER_JWT_KEY } from './constants';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
 import { validateManifest } from './utils/manifest';
