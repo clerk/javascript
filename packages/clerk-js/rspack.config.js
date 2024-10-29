@@ -245,7 +245,7 @@ const commonForProdBundled = () => {
 /** @type { () => (import('webpack').Configuration) } */
 const commonForProd = () => {
   return {
-    devtool: undefined,
+    devtool: false,
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
