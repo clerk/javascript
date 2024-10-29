@@ -18,6 +18,7 @@ module.exports = {
 
   globals: {
     __DEV__: true,
+    __OMIT_REMOTE_HOSTED_CODE__: false,
     PACKAGE_NAME: name,
     PACKAGE_VERSION: version,
   },
