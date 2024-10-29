@@ -1,4 +1,5 @@
 import * as Common from '@clerk/elements/common';
+import { cx } from 'cva';
 import React from 'react';
 
 import { useAppearance } from '~/contexts';
@@ -8,7 +9,10 @@ import * as Field from '~/primitives/field';
 
 import { LinkRenderer } from './link-renderer';
 
-export function LegalAcceptedField(props: Omit<React.ComponentProps<CheckboxField>, 'type'>) {
+export function LegalAcceptedField({
+  className,
+  ...restProps
+}: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t } = useLocalizations();
   const { displayConfig } = useEnvironment();
   const { parsedAppearance } = useAppearance();
@@ -38,21 +42,24 @@ export function LegalAcceptedField(props: Omit<React.ComponentProps<CheckboxFiel
       asChild
     >
       <Field.Root>
-        <div className='flex gap-2'>
+        <div className='flex justify-center gap-2'>
           <Common.Input
             type='checkbox'
             asChild
-            {...props}
+            className={cx('flex-shrink-0', className)}
+            {...restProps}
           >
             <Field.Checkbox />
           </Common.Input>
 
           <Common.Label asChild>
-            <Field.Label className='!block'>
-              <LinkRenderer
-                text={localizedText || ''}
-                className='underline underline-offset-2'
-              />
+            <Field.Label>
+              <span>
+                <LinkRenderer
+                  text={localizedText || ''}
+                  className='underline underline-offset-2'
+                />
+              </span>
             </Field.Label>
           </Common.Label>
         </div>
