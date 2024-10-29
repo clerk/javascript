@@ -138,11 +138,11 @@ export const Button = React.forwardRef(function Button(
   return (
     <button
       ref={forwardedRef}
-      {...applyDescriptors(elements, button({ busy, disabled, intent, descriptor }))}
       disabled={busy || disabled}
       // eslint-disable-next-line react/button-has-type
       type={type}
       {...props}
+      {...applyDescriptors(elements, button({ busy, disabled, intent, descriptor }))}
     >
       {busy && intent === 'primary' ? (
         spinner
