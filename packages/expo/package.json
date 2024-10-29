@@ -73,7 +73,7 @@
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.73.9",
+    "react-native": "^0.76.1",
     "typescript": "*"
   },
   "peerDependencies": {

@@ -30,10 +30,15 @@
   },
   "dependencies": {
     "@babel/parser": "^7.24.5",
+    "colord": "^2.9.3",
     "cssnano": "7.0.5",
     "postcss": "^8.4.38",
     "postcss-value-parser": "^4.2.0",
     "recast": "^0.23.7",
     "tailwindcss": "^3.4.3"
+  },
+  "devDependencies": {
+    "caniuse-api": "^3.0.0",
+    "caniuse-lite": "^1.0.30001674"
   }
 }
