@@ -19,7 +19,7 @@ type SignInFactorTwoBackupCodeCardProps = {
 export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCardProps) => {
   const { onShowAlternativeMethodsClicked } = props;
   const signIn = useCoreSignIn();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { afterSignInUrl } = useSignInContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
@@ -47,7 +47,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
               queryParams.set('createdSessionId', res.createdSessionId);
               return navigate(`../reset-password-success?${queryParams.toString()}`);
             }
-            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
+            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

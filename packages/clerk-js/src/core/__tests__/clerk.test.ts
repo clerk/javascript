@@ -366,6 +366,65 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+          isEligibleForTouch: () => true,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
+      expect(redirectUrl.pathname).toEqual('/v1/client/touch');
+      expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
+    });
+
+    it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+          isEligibleForTouch: () => false,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+    });
+
+    it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is not set', async () => {
+      mockSession.touch.mockReturnValue(Promise.resolve());
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession],
+          cookieExpiresAt: null,
+          isEligibleForTouch: () => false,
+          buildTouchUrl: () =>
+            `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = jest.fn();
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, redirectUrl: '/redirect-url-path' });
+      expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+    });
+
     mockNativeRuntime(() => {
       it('calls session.touch in a non-standard browser', async () => {
         mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
@@ -496,6 +555,7 @@ describe('Clerk singleton', () => {
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
           beforeEmit: expect.any(Function),
+          redirectUrl: '/',
         });
       });
     });
@@ -518,7 +578,11 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(mockClientRemoveSessions).toHaveBeenCalled();
         expect(mockSession1.remove).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
+        expect(sut.setActive).toHaveBeenCalledWith({
+          session: null,
+          beforeEmit: expect.any(Function),
+          redirectUrl: '/',
+        });
       });
     });
 
@@ -561,7 +625,11 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
+        expect(sut.setActive).toHaveBeenCalledWith({
+          session: null,
+          beforeEmit: expect.any(Function),
+          redirectUrl: '/',
+        });
       });
     });
 
@@ -582,7 +650,11 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({ session: null, beforeEmit: expect.any(Function) });
+        expect(sut.setActive).toHaveBeenCalledWith({
+          session: null,
+          beforeEmit: expect.any(Function),
+          redirectUrl: '/after-sign-out',
+        });
         expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
@@ -1096,6 +1168,16 @@ describe('Clerk singleton', () => {
     });
 
     it('redirects the user to the signInForceRedirectUrl if one was provided', async () => {
+      const sessionId = 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe';
+      const mockSession = {
+        id: sessionId,
+        remove: jest.fn(),
+        status: 'active',
+        user: {},
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1110,6 +1192,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          sessions: [mockSession],
           activeSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
@@ -1124,24 +1207,19 @@ describe('Clerk singleton', () => {
                   long_message: "You're already signed in",
                   message: "You're already signed in",
                   meta: {
-                    session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',
+                    session_id: sessionId,
                   },
                 },
               },
             },
           } as any as SignUpJSON),
+          isEligibleForTouch: () => false,
         }),
       );
 
-      const mockSetActive = jest.fn(async (setActiveOpts: any) => {
-        await setActiveOpts.beforeEmit();
-      });
-
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive as any;
-
-      sut.handleRedirectCallback({
+      await sut.handleRedirectCallback({
         signInForceRedirectUrl: '/custom-sign-in',
       });
 
@@ -1151,6 +1229,16 @@ describe('Clerk singleton', () => {
     });
 
     it('gives priority to signInForceRedirectUrl if signInForceRedirectUrl and signInFallbackRedirectUrl were provided ', async () => {
+      const sessionId = 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe';
+      const mockSession = {
+        id: sessionId,
+        remove: jest.fn(),
+        status: 'active',
+        user: {},
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1165,6 +1253,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          sessions: [mockSession],
           activeSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
@@ -1179,24 +1268,20 @@ describe('Clerk singleton', () => {
                   long_message: "You're already signed in",
                   message: "You're already signed in",
                   meta: {
-                    session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',
+                    session_id: sessionId,
                   },
                 },
               },
             },
           } as any as SignUpJSON),
+          isEligibleForTouch: () => false,
         }),
       );
 
-      const mockSetActive = jest.fn(async (setActiveOpts: any) => {
-        await setActiveOpts.beforeEmit();
-      });
-
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
-      sut.setActive = mockSetActive as any;
 
-      sut.handleRedirectCallback({
+      await sut.handleRedirectCallback({
         signInForceRedirectUrl: '/custom-sign-in',
         signInFallbackRedirectUrl: '/redirect-to',
       } as any);
@@ -1654,7 +1739,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({
           session: createdSessionId,
-          beforeEmit: expect.any(Function),
+          redirectUrl: redirectUrlComplete,
         });
       });
     });
@@ -1714,7 +1799,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalledWith({
           session: createdSessionId,
-          beforeEmit: expect.any(Function),
+          redirectUrl: redirectUrlComplete,
         });
       });
     });

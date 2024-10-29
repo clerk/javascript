@@ -625,9 +625,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
+  setActive = ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.setActive({ session, organization, beforeEmit });
+      return this.clerkjs.setActive({ session, organization, beforeEmit, redirectUrl });
     } else {
       return Promise.reject();
     }

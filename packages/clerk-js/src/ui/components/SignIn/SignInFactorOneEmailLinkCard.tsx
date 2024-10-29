@@ -27,7 +27,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const signInContext = useSignInContext();
   const { signInUrl } = signInContext;
   const { navigate } = useRouter();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { afterSignInUrl } = useSignInContext();
   const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
@@ -73,7 +73,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     if (si.status === 'complete') {
       return setActive({
         session: si.createdSessionId,
-        beforeEmit: navigateAfterSignIn,
+        redirectUrl: afterSignInUrl,
       });
     } else if (si.status === 'needs_second_factor') {
       return navigate('../factor-two');

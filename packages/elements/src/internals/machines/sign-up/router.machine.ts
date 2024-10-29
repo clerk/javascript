@@ -79,9 +79,10 @@ export const SignUpRouterMachine = setup({
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
         ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
-      const beforeEmit = () =>
-        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl());
-      void context.clerk.setActive({ session, beforeEmit });
+      void context.clerk.setActive({
+        session,
+        redirectUrl: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+      });
     },
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     setError: assign({
