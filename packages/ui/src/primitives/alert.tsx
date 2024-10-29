@@ -23,10 +23,10 @@ export const visualStyle = {
   alert: {
     className: 'leading-small rounded-md text-base',
   },
-  alert__warning: {
+  alertWarning: {
     className: 'text-warning bg-warning/[0.06] border-warning/[0.12]',
   },
-  alert__error: {
+  alertError: {
     className: 'text-danger bg-danger/[0.06] border-danger/[0.12]',
   },
 } satisfies ParsedElementsFragment;
@@ -46,8 +46,8 @@ export const Alert = React.forwardRef<
       {...props}
       {...mergeDescriptors(
         elements.alert,
-        intent === 'error' && elements.alert__error,
-        intent === 'warning' && elements.alert__warning,
+        intent === 'error' && elements.alertError,
+        intent === 'warning' && elements.alertWarning,
         ...(descriptors ?? []),
       )}
     >

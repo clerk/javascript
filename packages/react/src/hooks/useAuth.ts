@@ -137,8 +137,40 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
-  const has = useCallback(
+  return useDerivedAuth({
+    sessionId,
+    userId,
+    actor,
+    orgId,
+    orgSlug,
+    orgRole,
+    getToken,
+    signOut,
+    orgPermissions,
+    __experimental_factorVerificationAge,
+  });
+};
+
+export function useDerivedAuth(authObject: any): UseAuthReturn {
+  const {
+    sessionId,
+    userId,
+    actor,
+    orgId,
+    orgSlug,
+    orgRole,
+    has,
+    signOut,
+    getToken,
+    orgPermissions,
+    __experimental_factorVerificationAge,
+  } = authObject ?? {};
+
+  const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+      if (has) {
+        return has(params);
+      }
       return createCheckAuthorization({
         userId,
         orgId,
@@ -149,12 +181,6 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     },
     [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
   );
-
-  return useDerivedAuth({ sessionId, userId, actor, orgId, orgSlug, orgRole, getToken, signOut, has });
-};
-
-export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject ?? {};
 
   if (sessionId === undefined && userId === undefined) {
     return {
@@ -198,7 +224,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      has,
+      has: derivedHas,
       signOut,
       getToken,
     };
@@ -214,7 +240,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has,
+      has: derivedHas,
       signOut,
       getToken,
     };

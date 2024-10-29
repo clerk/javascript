@@ -73,6 +73,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_up: SignUpJSON | null;
   sign_in: SignInJSON | null;
   last_active_session_id: string | null;
+  cookie_expires_at: number | null;
   created_at: number;
   updated_at: number;
 }

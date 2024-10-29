@@ -275,19 +275,19 @@ if (import.meta.vitest) {
 
   describe('mergeAppearance', () => {
     it('retains keys from both appearances', () => {
-      const a = { elements: { alert__warning: 'cl-test-class-one' } };
+      const a = { elements: { alertWarning: 'cl-test-class-one' } };
       const b = { elements: { alertIcon: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         options: {},
         elements: {
-          alert__warning: 'cl-test-class-one',
+          alertWarning: 'cl-test-class-one',
           alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('retains the theme prop', () => {
-      const a = { theme: fullTheme, elements: { alert__warning: 'cl-test-class-one' } };
+      const a = { theme: fullTheme, elements: { alertWarning: 'cl-test-class-one' } };
       const b = {
         elements: { alertIcon: 'cl-test-class-two' },
       };
@@ -295,14 +295,14 @@ if (import.meta.vitest) {
         options: {},
         theme: a.theme,
         elements: {
-          alert__warning: 'cl-test-class-one',
+          alertWarning: 'cl-test-class-one',
           alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('overrides the theme prop', () => {
-      const a = { theme: fullTheme, elements: { alert__warning: 'cl-test-class-one' } };
+      const a = { theme: fullTheme, elements: { alertWarning: 'cl-test-class-one' } };
       const b = {
         theme: { ...fullTheme, alertIcon: { descriptor: 'test', className: 'cl-test-class', style: {} } },
         elements: { alertIcon: 'cl-test-class-two' },
@@ -311,41 +311,41 @@ if (import.meta.vitest) {
         options: {},
         theme: b.theme,
         elements: {
-          alert__warning: 'cl-test-class-one',
+          alertWarning: 'cl-test-class-one',
           alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('merges string values for the same element', () => {
-      const a = { elements: { alert__warning: 'cl-test-class-one' } };
-      const b = { elements: { alert__warning: 'cl-test-class-two' } };
+      const a = { elements: { alertWarning: 'cl-test-class-one' } };
+      const b = { elements: { alertWarning: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         options: {},
         elements: {
-          alert__warning: 'cl-test-class-one cl-test-class-two',
+          alertWarning: 'cl-test-class-one cl-test-class-two',
         },
       });
     });
 
     it('merges object values for the same element', () => {
-      const a = { elements: { alert__warning: { background: 'tomato' } } };
-      const b = { elements: { alert__warning: { color: 'red' } } };
+      const a = { elements: { alertWarning: { background: 'tomato' } } };
+      const b = { elements: { alertWarning: { color: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         options: {},
         elements: {
-          alert__warning: { color: 'red', background: 'tomato' },
+          alertWarning: { color: 'red', background: 'tomato' },
         },
       });
     });
 
     it('overrides same style properties', () => {
-      const a = { elements: { alert__warning: { background: 'tomato' } } };
-      const b = { elements: { alert__warning: { background: 'red' } } };
+      const a = { elements: { alertWarning: { background: 'tomato' } } };
+      const b = { elements: { alertWarning: { background: 'red' } } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         options: {},
         elements: {
-          alert__warning: { background: 'red' },
+          alertWarning: { background: 'red' },
         },
       });
     });
@@ -409,19 +409,19 @@ if (import.meta.vitest) {
     it('adds classNames from theme', () => {
       const appearance = {
         elements: {
-          alert__warning: 'cl-test-1',
+          alertWarning: 'cl-test-1',
         },
       };
       const theme = {
         ...fullTheme,
-        alert__warning: { descriptor: 'test', className: 'cl-test-class', style: { color: 'red' } },
+        alertWarning: { descriptor: 'test', className: 'cl-test-class', style: { color: 'red' } },
       };
       expect(applyTheme(theme, appearance)).toStrictEqual({
         theme,
         options: defaultAppearance.options,
         elements: {
           ...fullTheme,
-          alert__warning: {
+          alertWarning: {
             className: 'cl-test-class cl-test-1',
             descriptor: 'test',
             style: { color: 'red' },
