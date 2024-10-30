@@ -27,6 +27,12 @@ const disabledRules = {
   // TODO: All rules below should be set to their defaults
   // when we're able to make the appropriate changes.
   '@typescript-eslint/await-thenable': 'warn',
+  '@typescript-eslint/no-unused-vars': 'warn',
+  '@typescript-eslint/no-empty-object-type': 'warn',
+  '@typescript-eslint/only-throw-error': 'warn',
+  '@typescript-eslint/no-unused-expressions': 'warn',
+  '@typescript-eslint/no-require-imports': 'off',
+  '@typescript-eslint/prefer-promise-reject-errors': 'warn',
   '@typescript-eslint/no-duplicate-type-constituents': 'off',
   '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/no-misused-promises': 'warn',

@@ -1,6 +1,7 @@
 // Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
 import type { ClerkRequest } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
+// eslint-disable-next-line import/no-unresolved
 import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { NextResponse } from 'next/server';

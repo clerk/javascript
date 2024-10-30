@@ -1,5 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+// eslint-disable-next-line import/no-unresolved
 import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
