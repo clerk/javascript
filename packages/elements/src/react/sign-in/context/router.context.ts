@@ -11,10 +11,7 @@ import { createContextFromActorRef } from '~/react/utils/create-context-from-act
 
 export type SnapshotState = SnapshotFrom<TSignInRouterMachine>;
 
-// This fixes the error: "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
-type SignInRouterCtxType = ReturnType<typeof createContextFromActorRef<TSignInRouterMachine>>;
-
-export const SignInRouterCtx: SignInRouterCtxType = createContextFromActorRef<TSignInRouterMachine>('SignInRouterCtx');
+export const SignInRouterCtx = createContextFromActorRef<TSignInRouterMachine>('SignInRouterCtx');
 
 function useSignInStep<M extends AnyStateMachine, T = ActorRefFrom<M>>(name: string) {
   return SignInRouterCtx.useSelector(state => state.children[name] as AnyActorRef) as T;
