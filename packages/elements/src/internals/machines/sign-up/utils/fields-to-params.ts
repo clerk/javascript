@@ -35,7 +35,6 @@ export function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdate
     }
   });
 
-  console.log(params);
 
   return params;
 }
