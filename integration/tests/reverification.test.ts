@@ -54,16 +54,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.po.organizationSwitcher.waitForMounted();
         await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-        const startTime = performance.mark('startTime');
-
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        performance.mark('endTime');
-        const delay = performance.measure('dwa', startTime, 'endTime');
-
-        const total = 1000 * 120 - delay.duration;
+        const total = 1000 * 120;
         await page.waitForTimeout(total / 3);
         await page.waitForTimeout(total / 3);
         await u.po.userProfile.goTo();
@@ -90,16 +85,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.po.organizationSwitcher.waitForMounted();
         await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-        const startTime = performance.mark('startTime');
-
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        performance.mark('endTime');
-        const delay = performance.measure('dwa', startTime, 'endTime');
-
-        const total = 1000 * 120 - delay.duration;
+        const total = 1000 * 120;
         await page.waitForTimeout(total / 3);
         await page.waitForTimeout(total / 3);
         await u.po.userProfile.goTo();
