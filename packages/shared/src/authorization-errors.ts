@@ -11,7 +11,7 @@ type ReverificationMismatchError<M extends { metadata?: any } = { metadata: unkn
   } & M
 >;
 
-const reverificationMismatch = <MC extends __experimental_ReverificationConfig>(missingConfig?: MC) =>
+const __experimental_reverificationMismatch = <MC extends __experimental_ReverificationConfig>(missingConfig?: MC) =>
   ({
     clerk_error: {
       type: 'forbidden',
@@ -22,12 +22,16 @@ const reverificationMismatch = <MC extends __experimental_ReverificationConfig>(
     },
   }) satisfies ReverificationMismatchError;
 
-const reverificationMismatchResponse = (...args: Parameters<typeof reverificationMismatch>) =>
-  new Response(JSON.stringify(reverificationMismatch(...args)), {
+const __experimental_reverificationMismatchResponse = (
+  ...args: Parameters<typeof __experimental_reverificationMismatch>
+) =>
+  new Response(JSON.stringify(__experimental_reverificationMismatch(...args)), {
     status: 403,
   });
 
-const isReverificationHint = (result: any): result is ReturnType<typeof reverificationMismatch> => {
+const __experimental_isReverificationHint = (
+  result: any,
+): result is ReturnType<typeof __experimental_reverificationMismatch> => {
   return (
     result &&
     typeof result === 'object' &&
@@ -37,4 +41,8 @@ const isReverificationHint = (result: any): result is ReturnType<typeof reverifi
   );
 };
 
-export { reverificationMismatch, reverificationMismatchResponse, isReverificationHint };
+export {
+  __experimental_reverificationMismatch,
+  __experimental_reverificationMismatchResponse,
+  __experimental_isReverificationHint,
+};

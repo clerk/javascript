@@ -1,13 +1,15 @@
 import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
-import { isReverificationHint, reverificationMismatch } from '../../authorization-errors';
+import { __experimental_isReverificationHint, __experimental_reverificationMismatch } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
-async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<typeof reverificationMismatch>> {
+async function resolveResult<T>(
+  result: Promise<T>,
+): Promise<T | ReturnType<typeof __experimental_reverificationMismatch>> {
   return result
     .then(r => {
       if (r instanceof Response) {
@@ -18,7 +20,7 @@ async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<type
     .catch(e => {
       // Treat fapi assurance as an assurance hint
       if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return reverificationMismatch();
+        return __experimental_reverificationMismatch();
       }
 
       // rethrow
@@ -33,7 +35,7 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
     return async (...args) => {
       let result = await resolveResult(fetcher(...args));
 
-      if (isReverificationHint(result)) {
+      if (__experimental_isReverificationHint(result)) {
         /**
          * Create a promise
          */
