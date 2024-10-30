@@ -43,6 +43,8 @@ export async function ClerkProvider(
       statePromise = getDynamicClerkState();
       nonce = getNonceFromCSPHeader();
     }
+  } else {
+    nonce = getNonceFromCSPHeader();
   }
 
   const output = (
