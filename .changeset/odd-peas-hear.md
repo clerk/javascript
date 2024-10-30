@@ -2,4 +2,4 @@
 "@clerk/elements": minor
 ---
 
-Adding support for legal consent
+Added support for `__experimental_legalAccepted` field
