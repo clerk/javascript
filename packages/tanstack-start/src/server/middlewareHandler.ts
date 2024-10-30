@@ -26,10 +26,12 @@ export function createClerkHandler<TRouter extends AnyRouter>(
 
         const clerkInitialState = getResponseClerkState(requestState, loadedOptions);
 
-        // Merging the TanStack router context with the Clerk context and loading the router
+        // Updating the TanStack router context with the Clerk context and loading the router
         router.update({
-          context: { ...router.options.context, ...clerkInitialState },
+          context: clerkInitialState,
         });
+
+        await router.load();
       } catch (error) {
         if (error instanceof Response) {
           // returning the response
