@@ -32,7 +32,8 @@ export async function createClerkClient({
   storageCache = BrowserStorageCache,
   syncHost,
 }: CreateClerkClientOptions): Promise<Clerk> {
-  if (clerk) {
+  // Don't cache background scripts as it can result in out-of-sync client information.
+  if (clerk && scope !== SCOPE.BACKGROUND) {
     return clerk;
   }
 
