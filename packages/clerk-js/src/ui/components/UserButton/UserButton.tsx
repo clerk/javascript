@@ -52,7 +52,9 @@ const _UserButton = () => {
       sx={{ display: 'inline-flex' }}
     >
       {__experimental_asStandalone ? (
-        <UserButtonPopover />
+        <UserButtonPopover
+          close={typeof __experimental_asStandalone === 'function' ? __experimental_asStandalone : undefined}
+        />
       ) : (
         <UserButtonWithFloatingTree>
           <UserButtonPopover />

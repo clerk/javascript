@@ -13,6 +13,7 @@ export class Client extends BaseResource implements ClientResource {
   signUp: SignUpResource = new SignUp();
   signIn: SignInResource = new SignIn();
   lastActiveSessionId: string | null = null;
+  cookieExpiresAt: Date | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 
@@ -61,6 +62,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(null);
       this.signIn = new SignIn(null);
       this.lastActiveSessionId = null;
+      this.cookieExpiresAt = null;
       this.createdAt = null;
       this.updatedAt = null;
     });
@@ -76,6 +78,22 @@ export class Client extends BaseResource implements ClientResource {
     return this.sessions.forEach(s => s.clearCache());
   }
 
+  // isEligibleForTouch returns true if the client cookie is due to expire in 8 days or less
+  isEligibleForTouch(): boolean {
+    return !!this.cookieExpiresAt && this.cookieExpiresAt.getTime() - Date.now() <= 8 * 24 * 60 * 60 * 1000; // 8 days
+  }
+
+  buildTouchUrl({ redirectUrl }: { redirectUrl: URL }) {
+    return BaseResource.fapiClient
+      .buildUrl({
+        method: 'GET',
+        path: '/client/touch',
+        pathPrefix: 'v1',
+        search: { redirect_url: redirectUrl.toString() },
+      })
+      .toString();
+  }
+
   fromJSON(data: ClientJSON | null): this {
     if (data) {
       this.id = data.id;
@@ -83,6 +101,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
+      this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
     }
