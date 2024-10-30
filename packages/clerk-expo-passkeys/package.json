@@ -27,8 +27,7 @@
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
     "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
-    "test": "expo-module test"
+    "prepublishOnly": "expo-module prepublishOnly"
   },
   "dependencies": {
     "@clerk/shared": "2.10.1-snapshot.va96a299",
