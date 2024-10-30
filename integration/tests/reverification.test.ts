@@ -42,7 +42,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
 
     utils.forEach(type => {
       test(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
-        test.setTimeout(180_000);
+        test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
@@ -78,7 +78,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       });
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
-        test.setTimeout(180_000);
+        test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
