@@ -24,7 +24,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   const [createEmailAddress] = useReverification(() => {
     if (!user) {
-      return Promise.reject();
+      return Promise.resolve(undefined);
     }
     return user.createEmailAddress({ email: emailField.value });
   });

@@ -1,4 +1,4 @@
-import { __experimental_useReverification, useClerk, useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useClerk, useUser } from '@clerk/shared/react';
 
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -16,9 +16,9 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
   const { setActive } = useClerk();
-  const [deleteUserWithReverification] = __experimental_useReverification(() => {
+  const [deleteUserWithReverification] = useReverification(() => {
     if (!user) {
-      throw Error('user is not defined');
+      return Promise.resolve(undefined);
     }
 
     return user.delete();
