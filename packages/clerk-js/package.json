@@ -48,7 +48,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
-  "browserslist": "last 2 years",
+  "browserslist": "last 2 years, Safari > 12, iOS > 12",
   "dependencies": {
     "@clerk/localizations": "3.4.0",
     "@clerk/shared": "2.10.1",
