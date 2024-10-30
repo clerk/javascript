@@ -15,11 +15,10 @@ function DeleteAccount() {
   const { handleReverification } = useReverification();
   const { user } = useUser();
 
-  const deleteUserAccount = async () => {
+  const deleteUserAccount = handleReverification(() => {
     if (!user) return;
-    const verifyAndDelete = handleReverification(user.delete);
-    return verifyAndDelete();
-  };
+    return user.delete()
+  })
   
   return <>
       <button

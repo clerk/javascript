@@ -110,28 +110,5 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.po.userVerification.waitForMounted();
       });
     });
-
-    utils.forEach(type => {
-      test.skip(`protect${capitalize(type)} returned values as ${'`signed-out user`'}`, async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
-
-        const routes = [
-          `/protect-${type}/signed-out`,
-          `/protect-${type}/signed-out-with-role`,
-          `/protect-${type}/signed-out-with-reverification`,
-          `/protect-${type}/signed-out-with-all`,
-        ];
-
-        for (const route of routes) {
-          await u.page.goToRelative(route);
-          await u.page.getByRole('button', { name: /LogUserId/i }).click();
-          await expect(
-            u.page.getByText(
-              /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"unauthorized"\s*,\s*"reason"\s*:\s*"signed-out"\s*\}\s*\}/i,
-            ),
-          ).toBeVisible();
-        }
-      });
-    });
   },
 );

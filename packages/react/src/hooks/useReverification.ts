@@ -1,14 +1,9 @@
-import { reverificationMismatch } from '@clerk/shared/authorization-errors';
+import { createDeferredPromise } from '@clerk/shared';
+import { isReverificationHint, reverificationMismatch } from '@clerk/shared/authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { __experimental_ReverificationConfig, Clerk } from '@clerk/types';
+import type { Clerk } from '@clerk/types';
 import { useMemo } from 'react';
-
-interface PromiseWithResolvers<T> {
-  promise: Promise<T>;
-  resolve: (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any) => void;
-}
 
 async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<typeof reverificationMismatch>> {
   return result
@@ -21,7 +16,7 @@ async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<type
     .catch(e => {
       // Treat fapi assurance as an assurance hint
       if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return reverificationMismatch({} as __experimental_ReverificationConfig);
+        return reverificationMismatch();
       }
 
       // rethrow
@@ -29,50 +24,14 @@ async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<type
     });
 }
 
-/**
- * Polyfill for Promise.withResolvers()
- */
-function customPromiseWithResolves() {
-  let resolve: PromiseWithResolvers<unknown>['resolve'];
-  let reject: PromiseWithResolvers<unknown>['reject'];
-
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-
-  return {
-    promise,
-    // @ts-ignore
-    resolve,
-    // @ts-ignore
-    reject,
-  };
-}
-
 // Utility type to exclude anything that contains "clerk_error"
 type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 
-const isReverificationHint = (result: any): result is ReturnType<typeof reverificationMismatch> => {
-  return (
-    result &&
-    typeof result === 'object' &&
-    'clerk_error' in result &&
-    result.clerk_error?.type === 'forbidden' &&
-    result.clerk_error?.reason === 'reverification-mismatch'
-  );
-};
-
-type InferParameters<T> = T extends (...args: infer P) => any ? P : never;
-type InferReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-
 function createReverificationHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
-  function assertReverification<H extends (...args: InferParameters<H>) => InferReturnType<H>>(
+  function assertReverification<H extends (...args: Parameters<H>) => Promise<any>>(
     fetcher: H,
-  ): (...args: InferParameters<H>) => Promise<ExcludeClerkError<Awaited<InferReturnType<H>>>> {
-    // @ts-ignore
-    const f = async (...args) => {
-      // @ts-ignore
+  ): (...args: Parameters<H>) => Promise<ExcludeClerkError<Awaited<ReturnType<H>>>> {
+    return async (...args: Parameters<H>) => {
       let result = await resolveResult(fetcher(...args));
 
       try {
@@ -80,7 +39,7 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
           /**
            * Create a promise
            */
-          const resolvers = customPromiseWithResolves();
+          const resolvers = createDeferredPromise();
 
           /**
            * On success resolve the pending promise
@@ -108,7 +67,6 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
           /**
            * After the promise resolved successfully try the original request one more time
            */
-          // @ts-ignore
           result = await resolveResult(fetcher(...args));
         }
       } catch (e) {
@@ -117,11 +75,8 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
         }
       }
 
-      return result as InferReturnType<H>;
+      return result as ExcludeClerkError<Awaited<ReturnType<H>>>;
     };
-
-    // @ts-ignore
-    return f;
   }
 
   return assertReverification;
