@@ -4,18 +4,18 @@ import { auth } from '@clerk/nextjs/server';
 import { reverificationMismatch } from '@clerk/shared/authorization-errors';
 
 const logUserIdActionReverification = async () => {
-  const { userId } = await auth.protect();
+  const { userId, has } = await auth.protect();
 
   const config = {
     level: 'secondFactor',
     afterMinutes: 1,
   } as const;
 
-  if (
-    !(await auth()).has({
-      __experimental_reverification: config,
-    })
-  ) {
+  const userNeedsReverification = !has({
+    __experimental_reverification: config,
+  });
+
+  if (userNeedsReverification) {
     return reverificationMismatch(config);
   }
 

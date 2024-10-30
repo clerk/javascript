@@ -11,14 +11,14 @@ Upon completion, the original request that previously failed, will be retried (o
 
 Example with clerk-js methods.
 ```tsx
-function DeleteAccount() {
-  const { handleReverification } = useReverification();
-  const { user } = useUser();
+import { __experimental_useReverification as useReverification } from '@clerk/nextjs';
 
-  const deleteUserAccount = handleReverification(() => {
+function DeleteAccount() {
+  const { user } = useUser();
+  const [deleteUserAccount] = useReverification(() => {
     if (!user) return;
     return user.delete()
-  })
+  });
   
   return <>
       <button

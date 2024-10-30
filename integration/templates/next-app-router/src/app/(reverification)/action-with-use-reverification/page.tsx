@@ -4,7 +4,7 @@ import { __experimental_useReverification as useReverification } from '@clerk/ne
 import { logUserIdActionReverification } from '@/app/(reverification)/actions';
 
 function Page() {
-  const { handleReverification } = useReverification();
+  const [logUserWithReverification] = useReverification(logUserIdActionReverification);
   const [pending, startTransition] = useTransition();
   const [res, setRes] = useState(null);
 
@@ -13,9 +13,8 @@ function Page() {
       <button
         disabled={pending}
         onClick={() => {
-          const fetcher = handleReverification(logUserIdActionReverification);
           startTransition(async () => {
-            await fetcher().then(e => {
+            await logUserWithReverification().then(e => {
               setRes(e as any);
             });
           });
