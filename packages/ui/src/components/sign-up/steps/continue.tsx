@@ -28,13 +28,21 @@ export function SignUpContinue() {
   const { t } = useLocalizations();
   const environment = useEnvironment();
   const { client } = useClerk();
+  const { missingFields } = client.signUp;
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const legalConsentEnabled =
-    environment.userSettings.signUp.legal_consent_enabled && client.signUp.missingFields.includes('legal_accepted');
+  const legalConsentEnabled = environment.userSettings.signUp.legal_consent_enabled;
+  const legalConsentMissing = missingFields.includes('legal_accepted');
+  const showFirstName = firstNameEnabled && firstNameRequired && missingFields.includes('first_name');
+  const showLastName = lastNameEnabled && lastNameRequired && missingFields.includes('last_name');
+  const showUserName = usernameEnabled && usernameRequired && missingFields.includes('username');
+  const showPhoneNumber = phoneNumberEnabled && phoneNumberRequired && missingFields.includes('phone_number');
+  const showPassword = passwordEnabled && passwordRequired && missingFields.includes('password');
+  const showEmail = missingFields.includes('email_address');
+  const showLegalConsent = legalConsentEnabled && legalConsentMissing;
   const isDev = useDevModeWarning();
   const { logoProps, footerProps } = useCard();
 
@@ -61,7 +69,7 @@ export function SignUpContinue() {
 
                 <Card.Body>
                   <div className='flex flex-col gap-y-4'>
-                    {firstNameEnabled && lastNameEnabled ? (
+                    {showFirstName && showLastName ? (
                       <div className='flex gap-4 empty:hidden'>
                         <FirstNameField
                           required={firstNameRequired}
@@ -74,23 +82,23 @@ export function SignUpContinue() {
                       </div>
                     ) : null}
 
-                    {usernameEnabled ? (
+                    {showUserName ? (
                       <UsernameField
                         required={usernameRequired}
                         disabled={isGlobalLoading}
                       />
                     ) : null}
 
-                    {phoneNumberEnabled ? (
+                    {showPhoneNumber ? (
                       <PhoneNumberField
                         required={phoneNumberRequired}
                         disabled={isGlobalLoading}
                       />
                     ) : null}
 
-                    <EmailField disabled={isGlobalLoading} />
+                    {showEmail && <EmailField disabled={isGlobalLoading} />}
 
-                    {passwordEnabled && passwordRequired ? (
+                    {showPassword ? (
                       <PasswordField
                         validatePassword
                         label={t('formFieldLabel__password')}
@@ -99,7 +107,7 @@ export function SignUpContinue() {
                       />
                     ) : null}
 
-                    {legalConsentEnabled && <LegalAcceptedField />}
+                    {showLegalConsent && <LegalAcceptedField />}
                   </div>
                 </Card.Body>
                 <Card.Actions>

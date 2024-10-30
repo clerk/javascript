@@ -11,6 +11,7 @@ import { LinkRenderer } from './link-renderer';
 
 export function LegalAcceptedField({
   className,
+  checked = false,
   ...restProps
 }: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t } = useLocalizations();
@@ -47,6 +48,7 @@ export function LegalAcceptedField({
             type='checkbox'
             asChild
             className={cx('flex-shrink-0', className)}
+            checked={checked}
             {...restProps}
           >
             <Field.Checkbox />

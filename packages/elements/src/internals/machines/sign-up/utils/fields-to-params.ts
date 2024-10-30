@@ -25,15 +25,17 @@ export function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdate
 ): Pick<T, SignUpAdditionalKeys> {
   const params: SignUpUpdateParams = {};
 
-  fields.forEach(({ value, checked }, key) => {
+  fields.forEach(({ value, checked, type }, key) => {
     if (isSignUpParam(key) && value !== undefined) {
       params[key] = value as string;
     }
 
-    if (isSignUpParam(key) && checked !== undefined) {
+    if (isSignUpParam(key) && type === 'checkbox') {
       params[key] = checked as boolean;
     }
   });
+
+  console.log(params);
 
   return params;
 }
