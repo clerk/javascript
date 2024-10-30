@@ -3,6 +3,7 @@ import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
+import type { GuardPredicate } from 'xstate/guards';
 
 import {
   CHOOSE_SESSION_PATH_ROUTE,
@@ -27,6 +28,14 @@ import type {
 } from './router.types';
 import { SignInStartMachine } from './start.machine';
 import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
+
+/**
+ *  This line is added to fix the error The inferred type of 'SignInRouterMachine' cannot be named without a reference to
+ * '../../../../../../node_modules/xstate/dist/declarations/src/guards'.
+ * This is likely not portable. A type annotation is necessary.|
+ * An explanation of this solution can be found here https://github.com/microsoft/TypeScript/pull/58176#issuecomment-2052698294
+ */
+export { GuardPredicate };
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
