@@ -1,10 +1,11 @@
 import { auth } from '@clerk/nextjs/server';
 
-export default async function Home({ params }: { params: { id: string } }) {
+export default async function Home({ params }: { params: Promise<{ id: string }> }) {
   const { orgId } = await auth();
+  const paramsId = (await params).id;
 
-  if (params.id != orgId) {
-    console.log('Mismatch - returning nothing for now...', params.id, orgId);
+  if (paramsId != orgId) {
+    console.log('Mismatch - returning nothing for now...', paramsId, orgId);
   }
 
   console.log("I'm the server and I got this id: ", orgId);
