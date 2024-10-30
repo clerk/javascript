@@ -1,5 +1,4 @@
 import * as Common from '@clerk/elements/common';
-import { cx } from 'cva';
 import React from 'react';
 
 import { useAppearance } from '~/contexts';
@@ -47,7 +46,6 @@ export function LegalAcceptedField({
           <Common.Input
             type='checkbox'
             asChild
-            className={cx('flex-shrink-0', className)}
             checked={checked}
             {...restProps}
           >
