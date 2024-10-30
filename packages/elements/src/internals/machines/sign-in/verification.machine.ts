@@ -109,11 +109,13 @@ const SignInVerificationMachine = setup({
       if (process.env.NODE_ENV === 'development') {
         if (
           clerk.client.signIn.supportedFirstFactors &&
-          !clerk.client.signIn.supportedFirstFactors.every(factor => context.registeredStrategies.has(factor.strategy))
+          !clerk.client.signIn.supportedFirstFactors.every((factor: { strategy: SignInStrategyName }) =>
+            context.registeredStrategies.has(factor.strategy),
+          )
         ) {
           console.warn(
             `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
-              .map(factor => factor.strategy)
+              .map((factor: { strategy: any }) => factor.strategy)
               .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
               ', ',
             )}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
@@ -122,11 +124,13 @@ const SignInVerificationMachine = setup({
 
         if (
           clerk.client.signIn.supportedSecondFactors &&
-          !clerk.client.signIn.supportedSecondFactors.every(factor => context.registeredStrategies.has(factor.strategy))
+          !clerk.client.signIn.supportedSecondFactors.every((factor: { strategy: SignInStrategyName }) =>
+            context.registeredStrategies.has(factor.strategy),
+          )
         ) {
           console.warn(
             `Clerk: Your instance is configured to support these 2FA strategies: ${clerk.client.signIn.supportedSecondFactors
-              .map(f => f.strategy)
+              .map((f: { strategy: SignInStrategyName }) => f.strategy)
               .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
               ', ',
             )}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
@@ -134,7 +138,10 @@ const SignInVerificationMachine = setup({
         }
 
         const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
-          strategy => !clerk.client.signIn.supportedFirstFactors?.some(supported => supported.strategy === strategy),
+          strategy =>
+            !clerk.client.signIn.supportedFirstFactors?.some(
+              (supported: { strategy: SignInStrategyName }) => supported.strategy === strategy,
+            ),
         );
 
         if (strategiesUsedButNotActivated.length > 0) {
