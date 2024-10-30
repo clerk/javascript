@@ -68,10 +68,7 @@ export const LegalCheckbox = (
 
   return (
     <Field.Root {...props}>
-      <Flex
-        align='center'
-        justify='center'
-      >
+      <Flex justify='center'>
         <Field.CheckboxIndicator />
         <FormLabel
           elementDescriptor={descriptors.formFieldRadioLabel}

@@ -41,6 +41,9 @@ export const common = ({ page }: TestArgs) => {
     getPasswordInput: () => {
       return page.locator('input[name=password]');
     },
+    getLegalAccepted: () => {
+      return page.locator('input[name=__experimental_legalAccepted]');
+    },
     getFirstNameInput: () => {
       return page.locator('input[name=firstName]');
     },

@@ -101,6 +101,12 @@ const withRestrictedMode = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk);
 
+const withLegalConsent = base
+  .clone()
+  .setId('withLegalConsent')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-legal-consent').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-legal-consent').pk);
+
 export const envs = {
   base,
   withEmailCodes,
@@ -115,4 +121,5 @@ export const envs = {
   withAPCore2ClerkV4,
   withDynamicKeys,
   withRestrictedMode,
+  withLegalConsent,
 } as const;
