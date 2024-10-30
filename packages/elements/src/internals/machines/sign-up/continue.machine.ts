@@ -63,9 +63,9 @@ export const SignUpContinueMachine = setup({
     sendToLoading,
   },
   guards: {
-    isMissingRequirements: ({ context }) =>
+    isStatusMissingRequirements: ({ context }) =>
       context.parent.getSnapshot().context.clerk?.client?.signUp?.status === 'missing_requirements',
-    requirementsMet: ({ context }) => {
+    hasMetPreviousMissingRequirements: ({ context }) => {
       const signUp = context.parent.getSnapshot().context.clerk.client.signUp;
 
       const fields = context.formRef.getSnapshot().context.fields;
@@ -97,7 +97,7 @@ export const SignUpContinueMachine = setup({
       description: 'Waiting for user input',
       on: {
         SUBMIT: {
-          guard: or(['requirementsMet', not('isMissingRequirements')]),
+          guard: or(['hasMetPreviousMissingRequirements', not('isStatusMissingRequirements')]),
           target: 'Attempting',
           reenter: true,
         },
