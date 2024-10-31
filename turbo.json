@@ -25,8 +25,7 @@
     "VITE_CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
     "REACT_APP_CLERK_*",
-    "NEXT_PHASE",
-    "E2E_NEXTJS_VERSION"
+    "NEXT_PHASE"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
   "tasks": {
