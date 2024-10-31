@@ -20,7 +20,8 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "expo-module build",
+    "build": "EXPO_NONINTERACTIVE=1 expo-module build",
+    "build:watch": "expo-module build",
     "clean": "expo-module clean",
     "expo-module": "expo-module",
     "lint": "expo-module lint",
