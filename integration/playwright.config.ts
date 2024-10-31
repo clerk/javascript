@@ -13,7 +13,7 @@ export const common: PlaywrightTestConfig = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  timeout: 90000,
+  timeout: 90_000,
   maxFailures: process.env.CI ? 1 : undefined,
   workers: process.env.CI ? '50%' : '70%',
   reporter: process.env.CI ? 'line' : 'list',
