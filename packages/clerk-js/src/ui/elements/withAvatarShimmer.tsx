@@ -13,7 +13,6 @@ export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component:
     const { parsedLayout } = useAppearance();
 
     return (
-      // @ts-expect-error
       <Component
         {...props}
         ref={ref}
