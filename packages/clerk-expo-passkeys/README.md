@@ -1,39 +1,58 @@
 # Running the Example Project with Clerk on Your iOS Simulator or Device
 
+## Prerequisites
+
+- Ensure you have Xcode installed and access to an Apple Developer Account.
+
 ## Steps
 
-### Before executing this steps you will need to have XCode installed and have an Apple Developer Account
+### 1. Install Project Dependencies
 
-1. **Install module deps**  
-   Run `npm i` on the root of the project.
+In the project root, run:
 
-2. **Navigate to the Example Folder**  
-   Open your terminal and move into the `example` folder of the project.
+```bash
+   npm install
+```
 
-3. **Set Up Environment Variables**  
-   Add the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `.env` file in the root of your project.
+### 2. Navigate to the Example Folder
 
-4. **Configure Associated Domains**
+```bash
+   cd example
+```
 
-   - Go to the iOS Application tab on the Clerk Dashboard. For testing purposes, it’s recommended to use a development instance.
-   - Set up your associated domain file, which requires an Apple Developer account,You can find you App id prefix and Bundle ID at `https://developer.apple.com/account/resources/identifiers/list`
-   - Replace the `associatedDomains` entry in `app.json` with the front end api provided by Clerk e.x `coyote-6.clerk.accounts.dev` .
-   - Configure also the `bundleIdentifier` in `app.json` to match the bundle id that can be found at `https://developer.apple.com/account/resources/identifiers/list`
+### 3. Set Up Environment Variables
 
-5. **Install Dependencies**  
-   Run `npm install`.
+Add the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `.env`.
 
-6. **Prebuild the Project**  
-   Run `npx expo prebuild --clean`.
+### 4. Configure Associated Domains for iOS
 
-7. **Run the Project on iOS**  
-   Run `npm run ios`
+1. Log into your Clerk Dashboard, open the iOS Application tab, and, for testing purposes, consider using a development instance.
+2. Set up your Associated Domains. To do this, you'll need:
+   - An Apple Developer account
+   - Your App ID Prefix and Bundle ID, available at Apple's Developer portal
+3. In `app.json`, replace the `associatedDomains` entry with the front-end API domain provided by Clerk (e.g., `coyote-6.clerk.accounts.dev`).
+4. Also update the `bundleIdentifier` in `app.json` to match your Bundle ID from the Apple Developer portal.
 
-8. **How to use the example**
+### 5. Install Example Dependencies
 
-- Navigate to Dashboard and enable the passkeys attribute at Email, Phone, Username page.
-- Navigate to dashboard and create a new user from the Users tab, use only email and password as authentication attributes.
-- Open your the device that you application is running and sign in with the user that you just created.
-- After signing in you will see a screen that has an option to create a Passkey, press that option and register your passkey.
-- Sign out
-- In the sign in screen select the option sign in with passkey
+Run `npm install` within the example folder.
+
+### 6. Prebuild the Project
+
+```bash
+   npx expo prebuild --clean
+```
+
+### 7. Run the Project on iOS
+
+```bash
+  npm run ios
+```
+
+## Testing the Passkey Feature
+
+1. Go to your Clerk Dashboard and enable Passkeys in the Email, Phone, Username settings.
+2. Create a user in the Users tab on the dashboard, using email and password as the authentication attributes.
+3. Open the app on your device or simulator, sign in with the user you just created.
+4. After signing in, select the option to Create a Passkey and follow the prompts to register your passkey.
+5. Sign out, and on the login screen, choose the Sign in with Passkey option to test the feature.
