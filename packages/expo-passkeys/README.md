@@ -1,58 +1,100 @@
-# Running the Example Project with Clerk on Your iOS Simulator or Device
+<p align="center">
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_expo_passkeys" target="_blank" rel="noopener noreferrer">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
+      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    </picture>
+  </a>
+  <br />
+  <h1 align="center">@clerk/expo-passkeys</h1>
+</p>
 
-## Prerequisites
+<div align="center">
 
-- Ensure you have Xcode installed and access to an Apple Developer Account.
+[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=expo_passkeys)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-## Steps
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/expo-passkeys/CHANGELOG.md)
+·
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+·
+[Request a Feature](https://feedback.clerk.com/roadmap)
+·
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=expo_passkeys)
 
-### 1. Install Project Dependencies
+</div>
 
-In the project root, run:
+### Prerequisites
 
-```bash
-   npm install
+- Expo 51 or later
+- React 18.0.2 or later
+- React Native 0.73 or later
+- Node.js `>=18.17.0` or later
+- An existing Expo application.
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=expo_passkeys).
+- [Passkeys to be enabled ](https://clerk.com/docs/custom-flows/passkeys#enable-passkeys)
+
+## Usage
+
+```tsx
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { passkeys } from '@clerk/clerk-expo/passkeys';
+
+<ClerkProvider passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
 ```
 
-### 2. Navigate to the Example Folder
+### 🔑 Creating a Passkey
 
-```bash
-   cd example
+```tsx
+const { user } = useUser();
+
+const handleCreatePasskey = async () => {
+  if (!user) return;
+  try {
+    return await user.createPasskey();
+  } catch (e: any) {
+    // handle error
+  }
+};
 ```
 
-### 3. Set Up Environment Variables
+### 🔓 Authenticating with a Passkey
 
-Add the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `.env`.
+```tsx
+const { signIn, setActive } = useSignIn();
 
-### 4. Configure Associated Domains for iOS
-
-1. Log into your Clerk Dashboard, open the iOS Application tab, and, for testing purposes, consider using a development instance.
-2. Set up your Associated Domains. To do this, you'll need:
-   - An Apple Developer account
-   - Your App ID Prefix and Bundle ID, available at Apple's Developer portal
-3. In `app.json`, replace the `associatedDomains` entry with the front-end API domain provided by Clerk (e.g., `coyote-6.clerk.accounts.dev`).
-4. Also update the `bundleIdentifier` in `app.json` to match your Bundle ID from the Apple Developer portal.
-
-### 5. Install Example Dependencies
-
-Run `npm install` within the example folder.
-
-### 6. Prebuild the Project
-
-```bash
-   npx expo prebuild --clean
+const handlePasskeySignIn = async () => {
+  try {
+    const signInResponse = await signIn.authenticateWithPasskey();
+    await setActive({ session: signInResponse.createdSessionId });
+  } catch (err: any) {
+    // handle error
+  }
+};
 ```
 
-### 7. Run the Project on iOS
+## Support
 
-```bash
-  npm run ios
-```
+You can get in touch with us in any of the following ways:
 
-## Testing the Passkey Feature
+- Join our official community [Discord server](https://clerk.com/discord)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=expo_passkeys)
 
-1. Go to your Clerk Dashboard and enable Passkeys in the Email, Phone, Username settings.
-2. Create a user in the Users tab on the dashboard, using email and password as the authentication attributes.
-3. Open the app on your device or simulator, sign in with the user you just created.
-4. After signing in, select the option to Create a Passkey and follow the prompts to register your passkey.
-5. Sign out, and on the login screen, choose the Sign in with Passkey option to test the feature.
+## Contributing
+
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
+
+## Security
+
+`@clerk/expo-passkeys` follows good practices of security, but 100% security cannot be assured.
+
+`@clerk/expo-passkeys` is provided **"as is"** without any **warranty**. Use at your own risk.
+
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+
+## License
+
+This project is licensed under the **MIT license**.
+
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/expo-passkeys/LICENSE) for more information.
