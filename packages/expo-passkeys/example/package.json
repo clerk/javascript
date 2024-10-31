@@ -1,5 +1,5 @@
 {
-  "name": "clerk-expo-passkeys-example",
+  "name": "xpo-passkeys-example",
   "version": "1.0.0",
   "private": true,
   "main": "expo/AppEntry.js",

@@ -1,8 +1,9 @@
 import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/clerk-expo';
-import { passkeys } from 'clerk-expo-passkeys';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+import { passkeys } from '../src';
 
 const tokenCache = {
   async getToken(key: string) {
@@ -34,7 +35,9 @@ const ProtectedView = () => {
   const auth = useAuth();
 
   const handleCreatePasskey = async () => {
-    if (!clerkUser) return;
+    if (!clerkUser) {
+      return;
+    }
     try {
       return await clerkUser.createPasskey();
     } catch (e: any) {
@@ -73,7 +76,9 @@ const PublicView = () => {
   const [password, setPassword] = React.useState('');
 
   const handlePasswordSignIn = async () => {
-    if (!isLoaded) return;
+    if (!isLoaded) {
+      return;
+    }
     try {
       const signInResponse = await signIn.create({
         identifier: emailAddress,
@@ -86,7 +91,9 @@ const PublicView = () => {
   };
 
   const handlePasskeySignIn = async () => {
-    if (!isLoaded) return;
+    if (!isLoaded) {
+      return;
+    }
     try {
       const signInResponse = await signIn.authenticateWithPasskey({
         flow: 'discoverable',

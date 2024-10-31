@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const createConfigAsync = require('@expo/webpack-config');
 const path = require('path');
 
@@ -7,7 +6,7 @@ module.exports = async (env, argv) => {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ['clerk-expo-passkeys'],
+        dangerouslyAddModulePathsToTranspile: ['expo-passkeys'],
       },
     },
     argv,

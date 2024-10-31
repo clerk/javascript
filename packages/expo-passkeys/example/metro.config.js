@@ -2,7 +2,6 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 
-// eslint-disable-next-line no-undef
 const config = getDefaultConfig(__dirname);
 
 // npm v7+ will install ../node_modules/react and ../node_modules/react-native because of peerDependencies.
@@ -15,17 +14,15 @@ config.resolver.blockList = [
 ];
 
 config.resolver.nodeModulesPaths = [
-  // eslint-disable-next-line no-undef
   path.resolve(__dirname, './node_modules'),
-  // eslint-disable-next-line no-undef
+
   path.resolve(__dirname, '../node_modules'),
 ];
 
 config.resolver.extraNodeModules = {
-  'clerk-expo-passkeys': '..',
+  'expo-passkeys': '..',
 };
 
-// eslint-disable-next-line no-undef
 config.watchFolders = [path.resolve(__dirname, '..')];
 
 config.transformer.getTransformOptions = async () => ({

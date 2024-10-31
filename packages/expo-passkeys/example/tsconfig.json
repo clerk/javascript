@@ -3,8 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "clerk-expo-passkeys": ["../src/index"],
-      "clerk-expo-passkeys/*": ["../src/*"]
+      "expo-passkeys": ["../src/index"],
+      "expo-passkeys/*": ["../src/*"]
     }
   }
 }
