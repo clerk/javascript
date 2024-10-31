@@ -77,7 +77,6 @@
     "logger",
     "webauthn",
     "router",
-    "pathToRegexp",
     "object"
   ],
   "scripts": {
