@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
@@ -7,7 +7,6 @@ import type { LocalizationKey } from '../../customizables';
 import { Button, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 
@@ -50,7 +49,12 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
-  const { handleAssurance } = useAssurance();
+  const [createPhoneNumber] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+    return user.createPhoneNumber({ phoneNumber: phoneField.value });
+  });
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
@@ -66,7 +70,7 @@ export const AddPhone = (props: AddPhoneProps) => {
     if (!user) {
       return;
     }
-    return handleAssurance(() => user.createPhoneNumber({ phoneNumber: phoneField.value }))
+    return createPhoneNumber()
       .then(res => {
         resourceRef.current = res;
         onSuccess();

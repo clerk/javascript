@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
@@ -7,7 +7,6 @@ import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
@@ -20,9 +19,15 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { emailId: id, onSuccess, onReset } = props;
   const card = useCardState();
   const { user } = useUser();
-  const { handleAssurance } = useAssurance();
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
+
+  const [createEmailAddress] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+    return user.createEmailAddress({ email: emailField.value });
+  });
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const wizard = useWizard({
@@ -44,7 +49,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     if (!user) {
       return;
     }
-    return handleAssurance(() => user.createEmailAddress({ email: emailField.value }))
+    return createEmailAddress()
       .then(res => {
         emailAddressRef.current = res;
         wizard.nextStep();

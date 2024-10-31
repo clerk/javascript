@@ -16,3 +16,4 @@ packages/*/examples
 package-lock.json
 **/integration/templates/**/*
 commitlint.config.ts
+vitest.workspace.mjs

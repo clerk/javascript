@@ -77,10 +77,17 @@ export const ThirdPartyMachine = setup({
         input: ({ context, event }) => {
           assertEvent(event, 'REDIRECT');
 
+          const legalAcceptedField = context.formRef
+            .getSnapshot()
+            .context.fields.get('__experimental_legalAccepted')?.checked;
+
           return {
             basePath: context.basePath,
             flow: context.flow,
-            params: event.params,
+            params: {
+              ...event.params,
+              __experimental_legalAccepted: legalAcceptedField || undefined,
+            },
             parent: context.parent,
           };
         },

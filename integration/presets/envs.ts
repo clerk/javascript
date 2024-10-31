@@ -51,6 +51,13 @@ const withCustomRoles = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk);
 
+const withReverification = base
+  .clone()
+  .setId('withReverification')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-reverification').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-reverification').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
+
 const withEmailCodesQuickstart = withEmailCodes
   .clone()
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
@@ -106,6 +113,7 @@ export const envs = {
   withEmailCodes_destroy_client,
   withEmailLinks,
   withCustomRoles,
+  withReverification,
   withEmailCodesQuickstart,
   withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
