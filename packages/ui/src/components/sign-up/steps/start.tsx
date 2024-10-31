@@ -146,7 +146,7 @@ export function SignUpStart() {
 
                   {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
 
-                  {!(hasConnection && hasIdentifier && legalConsentEnabled) && <LegalAcceptedField />}
+                  {legalConsentEnabled && hasConnection && !hasIdentifier && <LegalAcceptedField />}
 
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
