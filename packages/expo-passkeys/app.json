@@ -2,7 +2,7 @@
   "expo": {
     "name": "expo-passkeys",
     "slug": "expo-passkeys",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "Passkeys for expo built by Clerk team",
     "sdkVersion": "51.0.0",
     "platforms": ["ios", "android"]
