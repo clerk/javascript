@@ -112,12 +112,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
-    // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    if (typeof params.__experimental_legalAccepted !== 'undefined') {
-      paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
-      paramsWithCaptcha.__experimental_legalAccepted = undefined;
-    }
-
     return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(paramsWithCaptcha),
@@ -199,7 +193,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   public authenticateWithWeb3 = async (
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
     const {
@@ -207,7 +201,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       identifier,
       unsafeMetadata,
       strategy = 'web3_metamask_signature',
-      __experimental_legalAccepted,
+      legalAccepted,
     } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -216,7 +210,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata, __experimental_legalAccepted: __experimental_legalAccepted });
+    await this.create({ web3Wallet, unsafeMetadata, legalAccepted: legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
 
     const { message } = this.verifications.web3Wallet;
@@ -247,7 +241,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   public authenticateWithMetamask = async (
     params?: SignUpAuthenticateWithWeb3Params & {
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
@@ -256,13 +250,13 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
-      __experimental_legalAccepted: params?.__experimental_legalAccepted,
+      legalAccepted: params?.legalAccepted,
     });
   };
 
   public authenticateWithCoinbaseWallet = async (
     params?: SignUpAuthenticateWithWeb3Params & {
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
     const identifier = await getCoinbaseWalletIdentifier();
@@ -271,7 +265,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
-      __experimental_legalAccepted: params?.__experimental_legalAccepted,
+      legalAccepted: params?.legalAccepted,
     });
   };
 
@@ -282,7 +276,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
-    __experimental_legalAccepted,
+    legalAccepted,
   }: AuthenticateWithRedirectParams & {
     unsafeMetadata?: SignUpUnsafeMetadata;
   }): Promise<void> => {
@@ -293,7 +287,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
-        __experimental_legalAccepted,
+        legalAccepted,
       };
       return continueSignUp && this.id ? this.update(params) : this.create(params);
     };
@@ -320,13 +314,6 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
-    // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    if (typeof params.__experimental_legalAccepted !== 'undefined') {
-      // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
-      params.legalAccepted = params.__experimental_legalAccepted;
-      params.__experimental_legalAccepted = undefined;
-    }
-
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });

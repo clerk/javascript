@@ -38,7 +38,7 @@ export function LegalAcceptedField({
 
   return (
     <Common.Field
-      name='__experimental_legalAccepted'
+      name='legalAccepted'
       asChild
     >
       <Field.Root>

@@ -75,7 +75,7 @@ export const FormMachine = setup({
         }
 
         const fieldsNameMap: Record<string, string> = {
-          legalAccepted: '__experimental_legalAccepted',
+          legalAccepted: 'legalAccepted',
         };
         const fieldName = fieldsNameMap[params.name] || params.name;
 

@@ -71,7 +71,7 @@ function _SignUpContinue() {
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       validatePassword: true,
     }),
-    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+    legalAccepted: useFormControl('legalAccepted', '', {
       type: 'checkbox',
       label: '',
       defaultChecked: false,
