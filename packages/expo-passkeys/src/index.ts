@@ -155,13 +155,16 @@ export async function get({
   }
 }
 
+const ANDROID_9 = 28;
+const IOS_15 = 15;
+
 export function isSupported() {
   if (Platform.OS === 'android') {
-    return Platform.Version >= 28;
+    return Platform.Version >= ANDROID_9;
   }
 
   if (Platform.OS === 'ios') {
-    return parseInt(Platform.Version, 10) > 15;
+    return parseInt(Platform.Version, 10) > IOS_15;
   }
 
   return false;
