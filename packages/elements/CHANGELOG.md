@@ -1,5 +1,21 @@
 # @clerk/elements
 
+## 0.18.0
+
+### Minor Changes
+
+- Added support for `__experimental_legalAccepted` field ([#4427](https://github.com/clerk/javascript/pull/4427)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- - Introduce `redirectUrl` property on `setActive` as a replacement for `beforeEmit`. ([#4312](https://github.com/clerk/javascript/pull/4312)) by [@issuedat](https://github.com/issuedat)
+
+  - Deprecates `beforeEmit` property on `setActive`.
+
+- Updated dependencies [[`f875463da`](https://github.com/clerk/javascript/commit/f875463da9692f2d173b6d5388743cf720750ae3), [`5be7ca9fd`](https://github.com/clerk/javascript/commit/5be7ca9fd239c937cc88e20ce8f5bfc9f3b84f22), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`434b432f8`](https://github.com/clerk/javascript/commit/434b432f8c114825120eef0f2c278b8142ed1563)]:
+  - @clerk/types@4.29.0
+  - @clerk/shared@2.11.0
+
 ## 0.17.1
 
 ### Patch Changes

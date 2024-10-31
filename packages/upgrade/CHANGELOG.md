@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.2.0
+
+### Minor Changes
+
+- Enhancing error handling throughout the SDK upgrade flow ([#4410](https://github.com/clerk/javascript/pull/4410)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.1.2
 
 ### Patch Changes

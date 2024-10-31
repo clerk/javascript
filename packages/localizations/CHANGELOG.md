@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.4.1
+
+### Patch Changes
+
+- pl-PL localization updates ([#4370](https://github.com/clerk/javascript/pull/4370)) by [@mic0ishere](https://github.com/mic0ishere)
+
+- Fix formatting of `sv-SE` ([#4419](https://github.com/clerk/javascript/pull/4419)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `frFR` confirmDeletionUserAccount text to ensure button text is enabled properly when the values match. ([#4420](https://github.com/clerk/javascript/pull/4420)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update the 'sv-SE' localization. ([#4292](https://github.com/clerk/javascript/pull/4292)) by [@MarcusT96](https://github.com/MarcusT96)
+
+- Updated dependencies [[`f875463da`](https://github.com/clerk/javascript/commit/f875463da9692f2d173b6d5388743cf720750ae3), [`5be7ca9fd`](https://github.com/clerk/javascript/commit/5be7ca9fd239c937cc88e20ce8f5bfc9f3b84f22), [`434b432f8`](https://github.com/clerk/javascript/commit/434b432f8c114825120eef0f2c278b8142ed1563)]:
+  - @clerk/types@4.29.0
+
 ## 3.4.0
 
 ### Minor Changes

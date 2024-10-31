@@ -1,5 +1,58 @@
 # Change Log
 
+## 6.1.0
+
+### Minor Changes
+
+- Bug fix: For next>=14 applications resolve `__unstable__onBeforeSetActive` once `invalidateCacheAction` resolves. ([#4362](https://github.com/clerk/javascript/pull/4362)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a new experimental hook called `useReverification` that makes it easy to handle reverification errors. ([#4362](https://github.com/clerk/javascript/pull/4362)) by [@panteliselef](https://github.com/panteliselef)
+
+  It returns a high order function (HOF) and allows developers to wrap any function that triggers a fetch request which might fail due to a user's session verification status.
+  When such error is returned, the recommended UX is to offer a way to the user to recover by re-verifying their credentials.
+  This helper will automatically handle this flow in the developer's behalf, by displaying a modal the end-user can interact with.
+  Upon completion, the original request that previously failed, will be retried (only once).
+
+  Example with clerk-js methods.
+
+  ```tsx
+  import { __experimental_useReverification as useReverification } from "@clerk/nextjs";
+
+  function DeleteAccount() {
+    const { user } = useUser();
+    const [deleteUserAccount] = useReverification(() => {
+      if (!user) return;
+      return user.delete();
+    });
+
+    return (
+      <>
+        <button
+          onClick={async () => {
+            await deleteUserAccount();
+          }}
+        >
+          Delete account
+        </button>
+      </>
+    );
+  }
+  ```
+
+- Replace `next/headers` with `ezheaders` ([#4392](https://github.com/clerk/javascript/pull/4392)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes a bug where `<ClerkProvider dynamic>` would error when rendered in a Next.js 13 application using the App Router. ([#4421](https://github.com/clerk/javascript/pull/4421)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updating peerDependencies for correct ranges ([#4436](https://github.com/clerk/javascript/pull/4436)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`69c8f4f21`](https://github.com/clerk/javascript/commit/69c8f4f21410b3db95ac11a23a2b3d1277981bcf), [`f875463da`](https://github.com/clerk/javascript/commit/f875463da9692f2d173b6d5388743cf720750ae3), [`41f2ede56`](https://github.com/clerk/javascript/commit/41f2ede56c82c97df509c5a28b7637862121b935), [`5be7ca9fd`](https://github.com/clerk/javascript/commit/5be7ca9fd239c937cc88e20ce8f5bfc9f3b84f22), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`24cd77989`](https://github.com/clerk/javascript/commit/24cd77989adb45a11db12627daa3f31e8d9338e4), [`434b432f8`](https://github.com/clerk/javascript/commit/434b432f8c114825120eef0f2c278b8142ed1563)]:
+  - @clerk/clerk-react@5.14.0
+  - @clerk/types@4.29.0
+  - @clerk/shared@2.11.0
+  - @clerk/backend@1.15.2
+
 ## 6.0.2
 
 ### Patch Changes
