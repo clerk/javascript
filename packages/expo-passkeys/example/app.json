@@ -4,10 +4,8 @@
     "slug": "clerk-expo-passkeys-example",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -35,9 +33,6 @@
           "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     }
   }
 }
