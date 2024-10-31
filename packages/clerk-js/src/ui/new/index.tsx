@@ -37,7 +37,6 @@ export class UI {
     this.register('SignIn', {
       type: 'component',
       load: () =>
-        // eslint-disable-next-line import/no-unresolved
         import(/* webpackChunkName: "rebuild--sign-in" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({
           default: SignIn,
         })),
@@ -45,7 +44,6 @@ export class UI {
     this.register('SignUp', {
       type: 'component',
       load: () =>
-        // eslint-disable-next-line import/no-unresolved
         import(/* webpackChunkName: "rebuild--sign-up" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({
           default: SignUp,
         })),

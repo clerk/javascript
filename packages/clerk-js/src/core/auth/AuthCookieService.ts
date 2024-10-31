@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource } from '@clerk/types';
