@@ -1,10 +1,9 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useClerk, useUser } from '@clerk/shared/react';
 
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { handleError, useFormControl } from '../../utils';
 
@@ -17,7 +16,13 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
   const { setActive } = useClerk();
-  const { handleAssurance } = useAssurance();
+  const [deleteUserWithReverification] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+
+    return user.delete();
+  });
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -36,11 +41,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
     }
 
     try {
-      if (!user) {
-        throw Error('user is not defined');
-      }
-
-      await handleAssurance(user.delete);
+      await deleteUserWithReverification();
       const redirectUrl = otherSessions.length === 0 ? afterSignOutUrl : afterMultiSessionSingleSignOutUrl;
 
       return await setActive({

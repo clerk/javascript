@@ -281,7 +281,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
-                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked)}
+                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked) || undefined}
                 />
               )}
               {shouldShowForm && (

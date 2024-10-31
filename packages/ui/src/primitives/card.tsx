@@ -309,7 +309,7 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 const cardActionsLayoutStyle = {
   cardActions: {
     className: [
-      'z-1 flex flex-col gap-3',
+      'z-1 flex flex-col gap-6',
       // Note:
       // Prevents underline interractions triggering outside of the link text
       // https://linear.app/clerk/issue/SDKI-192/#comment-ebf943b0
