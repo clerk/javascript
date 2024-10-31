@@ -29,10 +29,8 @@ async function resolveResult<T>(
 }
 
 function createReverificationHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
-  function assertReverification<Fetcher extends (...args: Parameters<Fetcher>) => Promise<any>>(
-    fetcher: Fetcher,
-  ): (...args: Parameters<Fetcher>) => Promise<Awaited<ReturnType<Fetcher>>> {
-    return async (...args) => {
+  function assertReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): Fetcher {
+    return (async (...args) => {
       let result = await resolveResult(fetcher(...args));
 
       if (__experimental_isReverificationHint(result)) {
@@ -70,30 +68,29 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
       }
 
       return result;
-    };
+    }) as Fetcher;
   }
 
   return assertReverification;
 }
 
-const __experimental_useReverification = <Fetcher extends (...args: Parameters<Fetcher>) => Promise<any>>(
-  fetcher: Fetcher,
-): [(...args: Parameters<Fetcher>) => Promise<Awaited<ReturnType<Fetcher>>>] => {
+function __experimental_useReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): readonly [Fetcher] {
   const { __experimental_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
-  const handleReverification = useMemo(
-    () =>
-      createReverificationHandler({
-        onOpenModal: __experimental_openUserVerification,
-      })(fetcherRef.current),
-    [__experimental_openUserVerification, fetcherRef.current],
-  );
 
+  const handleReverification = useMemo(() => {
+    const handler = createReverificationHandler({
+      onOpenModal: __experimental_openUserVerification,
+    })(fetcherRef.current);
+    return [handler] as const;
+  }, [__experimental_openUserVerification, fetcherRef.current]);
+
+  // Keep fetcher ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
   });
 
-  return [handleReverification];
-};
+  return handleReverification;
+}
 
 export { __experimental_useReverification };
