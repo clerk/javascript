@@ -69,9 +69,12 @@ export const LegalCheckbox = (
   return (
     <Field.Root {...props}>
       <Flex justify='center'>
-        <Field.CheckboxIndicator />
+        <Field.CheckboxIndicator
+          elementDescriptor={descriptors.formFieldCheckboxInput}
+          elementId={descriptors.formFieldInput.setId('__experimental_legalAccepted')}
+        />
         <FormLabel
-          elementDescriptor={descriptors.formFieldRadioLabel}
+          elementDescriptor={descriptors.formFieldCheckboxLabel}
           htmlFor={props.itemID}
           sx={t => ({
             paddingLeft: t.space.$1x5,

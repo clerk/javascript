@@ -210,6 +210,8 @@ export type ElementsConfig = {
   formFieldRadioLabel: WithOptions<FieldId, ControlState>;
   formFieldRadioLabelTitle: WithOptions<FieldId, ControlState>;
   formFieldRadioLabelDescription: WithOptions<FieldId, ControlState>;
+  formFieldCheckboxInput: WithOptions<FieldId, ControlState>;
+  formFieldCheckboxLabel: WithOptions<FieldId, ControlState>;
   formFieldAction: WithOptions<FieldId, ControlState>;
   formFieldInput: WithOptions<FieldId, ControlState>;
   formFieldErrorText: WithOptions<FieldId, ControlState>;

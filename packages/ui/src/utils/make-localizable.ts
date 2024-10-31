@@ -161,11 +161,16 @@ const numeric = (val: Date | number | string, locale?: string) => {
   }
 };
 
+const link = (val: string, label?: string) => {
+  return `[${label}](${val})`;
+};
+
 const MODIFIERS = {
   titleize,
   timeString,
   weekday,
   numeric,
+  link,
 } as const;
 
 const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {

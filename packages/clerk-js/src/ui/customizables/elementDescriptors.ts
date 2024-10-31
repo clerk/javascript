@@ -91,6 +91,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldRadioLabel',
   'formFieldRadioLabelTitle',
   'formFieldRadioLabelDescription',
+  'formFieldCheckboxInput',
+  'formFieldCheckboxLabel',
   'formFieldAction',
   'formFieldInput',
   'formFieldErrorText',
