@@ -72,6 +72,7 @@
     "@clerk/shared": "2.10.1",
     "@clerk/types": "4.28.0",
     "crypto-js": "4.2.0",
+    "ezheaders": "0.1.0",
     "server-only": "0.0.1",
     "tslib": "2.4.1"
   },
