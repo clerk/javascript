@@ -14,6 +14,7 @@ import { createUserButtonPageObject } from './userButtonPageObject';
 import { createUserProfileComponentPageObject } from './userProfilePageObject';
 import type { FakeOrganization, FakeUser } from './usersService';
 import { createUserService } from './usersService';
+import { createUserVerificationComponentPageObject } from './userVerificationPageObject';
 
 export type { FakeUser, FakeOrganization };
 const createClerkClient = (app: Application) => {
@@ -91,6 +92,7 @@ export const createTestUtils = <
     userProfile: createUserProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
+    userVerification: createUserVerificationComponentPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     clerk: createClerkUtils(testArgs),
   };

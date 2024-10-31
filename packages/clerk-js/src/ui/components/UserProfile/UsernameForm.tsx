@@ -1,39 +1,44 @@
-import { useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;
 
 export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => {
   const { onSuccess, onReset } = props;
-  const { handleAssurance } = useAssurance();
   const { user } = useUser();
 
-  if (!user) {
-    return null;
-  }
+  const [updateUsername] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+    return user.update({ username: usernameField.value });
+  });
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
-  const usernameField = useFormControl('username', user.username || '', {
+  const usernameField = useFormControl('username', user?.username || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
   });
+
+  if (!user) {
+    return null;
+  }
 
   const isUsernameRequired = userSettings.attributes.username.required;
 
   const canSubmit =
     (isUsernameRequired ? usernameField.value.length > 0 : true) && user.username !== usernameField.value;
 
-  const updatePassword = async () => {
+  const submitUpdate = async () => {
     try {
-      await handleAssurance(() => user.update({ username: usernameField.value }));
+      await updateUsername();
       onSuccess();
     } catch (e) {
       handleError(e, [usernameField], card.setError);
@@ -48,7 +53,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
           : localizationKeys('userProfile.usernamePage.title__set')
       }
     >
-      <Form.Root onSubmit={updatePassword}>
+      <Form.Root onSubmit={submitUpdate}>
         <Form.ControlRow elementId={usernameField.id}>
           <Form.PlainInput
             {...usernameField.props}

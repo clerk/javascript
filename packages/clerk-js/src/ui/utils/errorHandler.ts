@@ -80,7 +80,8 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
     return handleClerkApiError(err, fieldStates, setGlobalError);
   }
 
-  if (isClerkRuntimeError(err) && err.code === 'assurance_cancelled') {
+  if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
+    // Don't log or display an error for cancelled reverification, the user simply closed the modal.
     return;
   }
 
