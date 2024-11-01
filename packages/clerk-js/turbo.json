@@ -8,10 +8,8 @@
         "headless/**",
         "src/**",
         "tsconfig.json",
-        "tsconfig.build.json",
         "tsconfig.declarations.json",
-        "tsup.config.ts",
-        "webpack.config.js",
+        "rspack.config.js",
 
         "!**/*.test.*",
         "!**/test/**",
