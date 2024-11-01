@@ -1,24 +1,39 @@
 import { useClerkRouter } from '@clerk/shared/router';
-import { Slot } from '@radix-ui/react-slot';
+import React from 'react';
 
 export interface LinkProps extends React.ButtonHTMLAttributes<HTMLAnchorElement> {
   asChild?: boolean;
-  href: string;
+  href?: string;
 }
 
-export function Link({ asChild, href, ...rest }: LinkProps) {
+export function Link({ asChild, href, children, ...rest }: LinkProps) {
   const router = useClerkRouter();
-  const Comp = asChild ? Slot : 'a';
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (router) {
+      e.preventDefault();
+      const childHref = (React.isValidElement(children) && children.props.href) || href;
+      if (childHref) {
+        router.push(childHref);
+      }
+    }
+  };
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement, {
+      onClick: handleClick,
+      href: (children as React.ReactElement).props.href || href,
+      ...rest,
+    });
+  }
+
   return (
-    <Comp
-      onClick={e => {
-        if (router) {
-          e.preventDefault();
-          router.push(href);
-        }
-      }}
+    <a
+      onClick={handleClick}
       href={href}
       {...rest}
-    />
+    >
+      {children}
+    </a>
   );
 }
