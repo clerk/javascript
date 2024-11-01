@@ -65,7 +65,7 @@
     "@clerk/eslint-config-custom": "*",
     "@clerk/tailwindcss-transformer": "*",
     "@testing-library/react": "^16.0.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
     "bundlewatch": "^0.4.0",
     "concurrently": "^8.2.2",
     "jsdom": "^24.1.1"
