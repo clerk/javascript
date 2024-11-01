@@ -1,0 +1,39 @@
+{
+  "name": "xpo-passkeys-example",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "start": "expo start",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@clerk/clerk-expo": "2.3.0-snapshot.vaa1630d",
+    "@clerk/clerk-js": "5.29.0-snapshot.va96a299",
+    "@clerk/clerk-react": "5.13.1-snapshot.va96a299",
+    "@clerk/shared": "2.10.1-snapshot.va96a299",
+    "@clerk/types": "4.28.0-snapshot.va96a299",
+    "@expo/metro-runtime": "~3.2.3",
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "expo": "~51.0.24",
+    "expo-auth-session": "^5.5.2",
+    "expo-build-properties": "^0.12.5",
+    "expo-secure-store": "^13.0.2",
+    "expo-web-browser": "^13.0.3",
+    "react": "18.2.0",
+    "react-native": "0.74.3",
+    "react-native-web": "~0.19.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "typescript": "^5.1.3"
+  },
+  "expo": {
+    "autolinking": {
+      "nativeModulesDir": ".."
+    }
+  }
+}

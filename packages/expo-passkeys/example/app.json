@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "clerk-expo-passkeys-example",
+    "slug": "clerk-expo-passkeys-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "${YOUR_BUNDLE_IDENTIFIER}",
+      "associatedDomains": ["applinks:${YOUR_DOMAIN}", "webcredentials:${YOUR_DOMAIN}"]
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "compileSdkVersion": 35
+      },
+      "package": "${PACKAGE_NAME}",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "${YOUR_DOMAIN}"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    }
+  }
+}
