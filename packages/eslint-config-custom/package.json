@@ -20,7 +20,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-turbo": "^2.0.3",
     "eslint-plugin-playwright": "^0.22.0",
-    "eslint-plugin-qunit": "^8.1.2",
     "eslint-plugin-regex": "^1.10.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-unused-imports": "^3.2.0"
