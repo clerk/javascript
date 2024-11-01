@@ -1,6 +1,6 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import {
-  isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnPlatformAuthenticatorSupported as isWebAuthnPlatformAuthenticatorSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
 } from '@clerk/shared/webauthn';
 import type {
@@ -14,7 +14,10 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { serializePublicKeyCredential, webAuthnCreateCredential } from '../../utils/passkeys';
+import {
+  serializePublicKeyCredential,
+  webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
+} from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 
@@ -60,9 +63,11 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
     const isWebAuthnSupported = Passkey.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnSupportedOnWindow;
-    const _webAuthnCreateCredential = Passkey.clerk.__internal__createPublicCredentials || webAuthnCreateCredential;
-    const _isWebAuthnPlatformAuthenticatorSupported =
-      Passkey.clerk.__internal__isWebAuthnPlatformAuthenticatorSupported || isWebAuthnPlatformAuthenticatorSupported;
+    const webAuthnCreateCredential =
+      Passkey.clerk.__internal__createPublicCredentials || webAuthnCreateCredentialOnWindow;
+    const isWebAuthnPlatformAuthenticatorSupported =
+      Passkey.clerk.__internal__isWebAuthnPlatformAuthenticatorSupported ||
+      isWebAuthnPlatformAuthenticatorSupportedOnWindow;
 
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {
@@ -82,7 +87,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }
 
     if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
-      if (!(await _isWebAuthnPlatformAuthenticatorSupported())) {
+      if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
         throw new ClerkWebAuthnError(
           'Registration requires a platform authenticator but the device does not support it.',
           {
@@ -93,7 +98,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }
 
     // Invoke the WebAuthn create() method.
-    const { publicKeyCredential, error } = await _webAuthnCreateCredential(publicKey);
+    const { publicKeyCredential, error } = await webAuthnCreateCredential(publicKey);
 
     if (!publicKeyCredential) {
       throw error;

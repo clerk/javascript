@@ -2,7 +2,7 @@ import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
 import {
-  isWebAuthnAutofillSupported,
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
 } from '@clerk/shared/webauthn';
 import type {
@@ -47,7 +47,7 @@ import {
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
@@ -309,9 +309,9 @@ export class SignIn extends BaseResource implements SignInResource {
      */
 
     const isWebAuthnSupported = SignIn.clerk.__internal__isWebAuthnSupported || isWebAuthnSupportedOnWindow;
-    const _webAuthnGetCredential = SignIn.clerk.__internal__getPublicCredentials || webAuthnGetCredential;
-    const _isWebAuthnAutofillSupported =
-      SignIn.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
+    const webAuthnGetCredential = SignIn.clerk.__internal__getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
 
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
@@ -350,11 +350,11 @@ export class SignIn extends BaseResource implements SignInResource {
        * If autofill is not supported gracefully handle the result, we don't need to throw.
        * The caller should always check this before calling this method.
        */
-      canUseConditionalUI = await _isWebAuthnAutofillSupported();
+      canUseConditionalUI = await isWebAuthnAutofillSupported();
     }
 
     // Invoke the navigator.create.get() method.
-    const { publicKeyCredential, error } = await _webAuthnGetCredential({
+    const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
     });
