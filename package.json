@@ -117,6 +117,7 @@
     "npm": ">=8.5.0"
   },
   "overrides": {
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "jest-snapshot-prettier": "npm:prettier@^3"
   }
 }
