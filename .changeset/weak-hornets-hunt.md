@@ -5,4 +5,4 @@
 '@clerk/types': patch
 ---
 
-Expose internal `getOption` method from Clerk.
+Expose internal `__internal_getOption` method from Clerk.
