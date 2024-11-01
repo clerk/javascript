@@ -1,36 +1,37 @@
+import { useClerk } from '@clerk/shared/react';
 import { useClerkRouter } from '@clerk/shared/router';
+import type { ClerkOptions } from '@clerk/types';
 import React from 'react';
 
-export interface LinkProps extends React.ButtonHTMLAttributes<HTMLAnchorElement> {
-  asChild?: boolean;
-  href?: string;
+type Destination = 'sign-in' | 'sign-up';
+export interface LinkProps extends Omit<React.HTMLAttributes<HTMLAnchorElement>, 'children'> {
+  navigate: Destination;
+  children: React.ReactNode | ((url: string) => React.ReactNode);
 }
 
-export function Link({ asChild, href, children, ...rest }: LinkProps) {
+const paths: Record<Destination, keyof Pick<ClerkOptions, 'signInUrl' | 'signUpUrl'>> = {
+  'sign-in': 'signInUrl',
+  'sign-up': 'signUpUrl',
+};
+
+export function Link({ navigate, children, ...rest }: LinkProps) {
   const router = useClerkRouter();
+  const clerk = useClerk();
+  const destiationUrl = router.makeDestinationUrlWithPreservedQueryParameters(clerk.getOption(paths[navigate])!);
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (router) {
-      e.preventDefault();
-      const childHref = (React.isValidElement(children) && children.props.href) || href;
-      if (childHref) {
-        router.push(childHref);
-      }
-    }
-  };
-
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement, {
-      onClick: handleClick,
-      href: (children as React.ReactElement).props.href || href,
-      ...rest,
-    });
+  if (typeof children === 'function') {
+    return children(destiationUrl);
   }
 
   return (
     <a
-      onClick={handleClick}
-      href={href}
+      onClick={e => {
+        if (router) {
+          e.preventDefault();
+          router.push(destiationUrl);
+        }
+      }}
+      href={destiationUrl}
       {...rest}
     >
       {children}

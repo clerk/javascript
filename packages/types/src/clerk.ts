@@ -104,6 +104,8 @@ export interface Clerk {
    */
   loaded: boolean;
 
+  getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+
   frontendApi: string;
 
   /** Clerk Publishable Key string. */

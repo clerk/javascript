@@ -8,6 +8,7 @@ export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up
  * Internal Clerk router, used by Clerk components to interact with the host's router.
  */
 export type ClerkRouter = {
+  makeDestinationUrlWithPreservedQueryParameters: (path: string) => string;
   /**
    * The basePath the router is currently mounted on.
    */
@@ -132,6 +133,7 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
   }
 
   return {
+    makeDestinationUrlWithPreservedQueryParameters,
     child,
     match,
     mode: router.mode,
