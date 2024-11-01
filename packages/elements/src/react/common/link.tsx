@@ -14,6 +14,24 @@ const paths: Record<Destination, keyof Pick<ClerkOptions, 'signInUrl' | 'signUpU
   'sign-up': 'signUpUrl',
 };
 
+/**
+ * The `<Link>` component is used to navigate between sign-in and sign-up flows.
+ *
+ * @param {Destination} navigate - The destination to navigate to.
+ *
+ * @example
+ * ```tsx
+ * <Link navigate="sign-in">Sign in</Link>
+ * ```
+ * @example
+ * ```tsx
+ * <Link navigate="sign-in">
+ *  {({ url }) => (
+ *    <NextLink href={url}>Sign in</NextLink>
+ *  )}
+ * </Link>
+ */
+
 export function Link({ navigate, children, ...rest }: LinkProps) {
   const router = useClerkRouter();
   const clerk = useClerk();
