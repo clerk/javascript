@@ -59,7 +59,6 @@ const Portal = defineComponent((props: MountProps) => {
 
 export const UserProfile = defineComponent((props: UserProfileProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountUserProfile,
@@ -71,7 +70,6 @@ export const UserProfile = defineComponent((props: UserProfileProps) => {
 
 export const UserButton = defineComponent((props: UserButtonProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountUserButton,
@@ -83,7 +81,6 @@ export const UserButton = defineComponent((props: UserButtonProps) => {
 
 export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: () => clerk.value?.openGoogleOneTap(props),
@@ -93,7 +90,6 @@ export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
 
 export const SignIn = defineComponent((props: SignInProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountSignIn,
@@ -105,7 +101,6 @@ export const SignIn = defineComponent((props: SignInProps) => {
 
 export const SignUp = defineComponent((props: SignUpProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountSignUp,
@@ -117,7 +112,6 @@ export const SignUp = defineComponent((props: SignUpProps) => {
 
 export const CreateOrganization = defineComponent((props: CreateOrganizationProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountCreateOrganization,
@@ -129,7 +123,6 @@ export const CreateOrganization = defineComponent((props: CreateOrganizationProp
 
 export const OrganizationSwitcher = defineComponent((props: OrganizationSwitcherProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountOrganizationSwitcher,
@@ -141,7 +134,6 @@ export const OrganizationSwitcher = defineComponent((props: OrganizationSwitcher
 
 export const OrganizationList = defineComponent((props: OrganizationListProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountOrganizationList,
@@ -153,7 +145,6 @@ export const OrganizationList = defineComponent((props: OrganizationListProps) =
 
 export const OrganizationProfile = defineComponent((props: OrganizationProfileProps) => {
   const clerk = useClerk();
-
   return () =>
     h(Portal, {
       mount: clerk.value?.mountOrganizationProfile,
