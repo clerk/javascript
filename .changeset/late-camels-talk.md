@@ -6,7 +6,7 @@
 "@clerk/expo-passkeys": patch
 ---
 
-feat: Add support for passkeys in Expo projects (iOS, Android, and Web).
+Introduce support for passkeys in Expo (iOS, Android, and Web).
 
 To use passkeys in Expo projects, we need to pass the `passkeys` object, which can be imported from `@clerk/clerk-expo-passkeys`, to the `ClerkProvider` component:
 
