@@ -14,7 +14,7 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
    * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
    */
   tokenCache?: TokenCache;
-  passkeys?: BuildClerkOptions['passkeys'];
+  passkeys?: BuildClerkOptions['__experimental__passkeys'];
 };
 
 const SDK_METADATA = {
