@@ -37,3 +37,6 @@ export const SIGN_UP_MODES: Record<string, SignUpModes> = {
   PUBLIC: 'public',
   RESTRICTED: 'restricted',
 };
+
+// This is the currently support version of the Frontend API
+export const SUPPORTED_FAPI_VERSION = '2024-10-01';
