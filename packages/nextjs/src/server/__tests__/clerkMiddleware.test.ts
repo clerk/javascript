@@ -1,11 +1,11 @@
 // There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
 import { AuthStatus, constants } from '@clerk/backend/internal';
-import { describe, expect } from '@jest/globals';
 // used to assert the mock
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
@@ -13,7 +13,7 @@ import { createRouteMatcher } from '../routeMatcher';
 import { decryptClerkRequestData } from '../utils';
 
 const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
-const authenticateRequestMock = jest.fn().mockResolvedValue({
+const authenticateRequestMock = vi.fn().mockResolvedValue({
   toAuth: () => ({
     debug: (d: any) => d,
   }),
@@ -21,11 +21,11 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
   publishableKey,
 });
 
-jest.mock('../clerkClient', () => {
+vi.mock('../clerkClient', () => {
   return {
     clerkClient: () => ({
       authenticateRequest: authenticateRequestMock,
-      telemetry: { record: jest.fn() },
+      telemetry: { record: vi.fn() },
     }),
   };
 });
@@ -37,8 +37,8 @@ const consoleWarn = console.warn;
 const consoleLog = console.log;
 
 beforeAll(() => {
-  global.console.warn = jest.fn();
-  global.console.log = jest.fn();
+  global.console.warn = vi.fn();
+  global.console.log = vi.fn();
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
@@ -47,11 +47,13 @@ afterAll(() => {
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('../constants', () => {
+vi.mock(import('../constants.js'), async importOriginal => {
+  const actual = await importOriginal();
   return {
+    ...actual,
+    ENCRYPTION_KEY: 'encryption-key',
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-    ENCRYPTION_KEY: 'encryption-key',
   };
 });
 
@@ -74,7 +76,7 @@ const mockRequest = (params: MockRequestParams) => {
 describe('ClerkMiddleware type tests', () => {
   // create a copy to test the types only
   // running this function does nothing, it is used purely for type checking
-  const clerkMiddlewareMock = jest.fn() as typeof clerkMiddleware;
+  const clerkMiddlewareMock = vi.fn() as typeof clerkMiddleware;
   it('can receive the appropriate keys', () => {
     clerkMiddlewareMock({ publishableKey: '', secretKey: '' });
     clerkMiddlewareMock({ secretKey: '' });
@@ -589,7 +591,7 @@ describe('clerkMiddleware(params)', () => {
 
   describe('debug', () => {
     beforeEach(() => {
-      (global.console.log as jest.Mock).mockClear();
+      global.console.log.mockClear();
     });
 
     it('outputs debug logs when used with only params', async () => {

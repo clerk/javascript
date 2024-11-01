@@ -2,7 +2,15 @@ import type { SignUpCreateParams, SignUpUpdateParams } from '@clerk/types';
 
 import type { FormFields } from '~/internals/machines/form';
 
-const SignUpAdditionalKeys = ['firstName', 'lastName', 'emailAddress', 'username', 'password', 'phoneNumber'] as const;
+const SignUpAdditionalKeys = [
+  'firstName',
+  'lastName',
+  'emailAddress',
+  'username',
+  'password',
+  'phoneNumber',
+  '__experimental_legalAccepted',
+] as const;
 
 type SignUpAdditionalKeys = (typeof SignUpAdditionalKeys)[number];
 
@@ -17,9 +25,15 @@ export function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdate
 ): Pick<T, SignUpAdditionalKeys> {
   const params: SignUpUpdateParams = {};
 
-  fields.forEach(({ value }, key) => {
-    if (isSignUpParam(key) && value !== undefined) {
+  fields.forEach(({ value, checked, type }, key) => {
+    if (isSignUpParam(key) && value !== undefined && type !== 'checkbox') {
+      // @ts-expect-error - Type is not narrowed to string
       params[key] = value as string;
+    }
+
+    if (isSignUpParam(key) && checked !== undefined && type === 'checkbox') {
+      // @ts-expect-error - Type is not narrowed to boolean
+      params[key] = checked as boolean;
     }
   });
 

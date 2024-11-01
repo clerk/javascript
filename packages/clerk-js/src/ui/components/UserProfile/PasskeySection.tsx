@@ -1,4 +1,4 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useClerk, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
@@ -15,7 +15,6 @@ import {
 } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useAssurance } from '../../hooks/useAssurance';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { getRelativeToNowDateKey, handleError, useFormControl } from '../../utils';
@@ -192,14 +191,19 @@ const AddPasskeyButton = () => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
-  const { handleAssurance } = useAssurance();
+  const [createPasskey] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+    return user.createPasskey();
+  });
 
   const handleCreatePasskey = async () => {
     if (!user) {
       return;
     }
     try {
-      await handleAssurance(user.createPasskey);
+      await createPasskey();
     } catch (e) {
       handleError(e, [], card.setError);
     }

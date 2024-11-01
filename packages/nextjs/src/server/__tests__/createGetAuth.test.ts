@@ -1,6 +1,7 @@
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextRequest } from 'next/server';
+import { describe, expect, it } from 'vitest';
 
 import { createGetAuth, getAuth } from '../createGetAuth';
 

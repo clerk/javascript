@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`/client public exports should not include a breaking change 1`] = `
+exports[`/client public exports > should not include a breaking change 1`] = `
 {
   "ClerkProvider": [Function],
 }

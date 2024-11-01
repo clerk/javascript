@@ -1,4 +1,4 @@
-import { useSession, useUser } from '@clerk/shared/react';
+import { __experimental_useReverification as useReverification, useSession, useUser } from '@clerk/shared/react';
 import { useRef } from 'react';
 
 import { useEnvironment } from '../../contexts';
@@ -14,7 +14,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
-import { useAssurance } from '../../hooks/useAssurance';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
@@ -37,7 +36,19 @@ type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
   const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const { handleAssurance } = useAssurance();
+  const [updatePasswordWithReverification] = useReverification(() => {
+    if (!user) {
+      return Promise.resolve(undefined);
+    }
+
+    const opts = {
+      newPassword: passwordField.value,
+      signOutOfOtherSessions: sessionsField.checked,
+      currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
+    } satisfies Parameters<typeof user.updatePassword>[0];
+
+    return user.updatePassword(opts);
+  });
 
   if (!user) {
     return null;
@@ -105,12 +116,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   const updatePassword = async () => {
-    const opts = {
-      newPassword: passwordField.value,
-      signOutOfOtherSessions: sessionsField.checked,
-      currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
-    } satisfies Parameters<typeof user.updatePassword>[0];
-
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled
@@ -119,7 +124,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
-      await handleAssurance(() => user.updatePassword(opts));
+      await updatePasswordWithReverification();
       onSuccess();
     } catch (e) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
