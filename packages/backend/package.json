@@ -97,9 +97,9 @@
   "dependencies": {
     "@clerk/shared": "2.11.0",
     "@clerk/types": "4.29.0",
-    "cookie": "0.7.0",
-    "snakecase-keys": "5.4.4",
-    "tslib": "2.4.1"
+    "cookie": "0.7.2",
+    "snakecase-keys": "5.5.0",
+    "tslib": "2.8.0"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
