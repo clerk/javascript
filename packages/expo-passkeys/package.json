@@ -31,8 +31,8 @@
     "prepublishOnly": "expo-module prepublishOnly"
   },
   "dependencies": {
-    "@clerk/shared": "2.10.1-snapshot.va96a299",
-    "@clerk/types": "4.28.0-snapshot.va96a299"
+    "@clerk/shared": "2.11.0",
+    "@clerk/types": "4.29.0"
   },
   "devDependencies": {
     "expo-module-scripts": "^3.5.2",
