@@ -6,7 +6,7 @@ import React from 'react';
 type Destination = 'sign-in' | 'sign-up';
 export interface LinkProps extends Omit<React.HTMLAttributes<HTMLAnchorElement>, 'children'> {
   navigate: Destination;
-  children: React.ReactNode | ((url: string) => React.ReactNode);
+  children: React.ReactNode | ((props: { url: string }) => React.ReactNode);
 }
 
 const paths: Record<Destination, keyof Pick<ClerkOptions, 'signInUrl' | 'signUpUrl'>> = {
@@ -22,7 +22,7 @@ export function Link({ navigate, children, ...rest }: LinkProps) {
   );
 
   if (typeof children === 'function') {
-    return children(destinationUrl);
+    return children({ url: destinationUrl });
   }
 
   return (
