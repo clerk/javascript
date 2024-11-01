@@ -22,7 +22,7 @@ export function Link({ navigate, children, ...rest }: LinkProps) {
   );
 
   if (typeof children === 'function') {
-    return children(destiationUrl);
+    return children(destinationUrl);
   }
 
   return (
@@ -30,10 +30,10 @@ export function Link({ navigate, children, ...rest }: LinkProps) {
       onClick={e => {
         if (router) {
           e.preventDefault();
-          router.push(destiationUrl);
+          router.push(destinationUrl);
         }
       }}
-      href={destiationUrl}
+      href={destinationUrl}
       {...rest}
     >
       {children}
