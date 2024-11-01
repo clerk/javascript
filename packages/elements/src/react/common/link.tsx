@@ -17,7 +17,7 @@ const paths: Record<Destination, keyof Pick<ClerkOptions, 'signInUrl' | 'signUpU
 export function Link({ navigate, children, ...rest }: LinkProps) {
   const router = useClerkRouter();
   const clerk = useClerk();
-  const destiationUrl = router.makeDestinationUrlWithPreservedQueryParameters(
+  const destinationUrl = router.makeDestinationUrlWithPreservedQueryParameters(
     clerk.__internal_getOption(paths[navigate])!,
   );
 
