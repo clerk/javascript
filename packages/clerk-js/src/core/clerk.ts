@@ -190,13 +190,13 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
 
-  public __unstable__createPublicCredentials:
+  public __internal__createPublicCredentials:
     | ((
         publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions,
       ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>)
     | undefined;
 
-  public __unstable__getPublicCredentials:
+  public __internal__getPublicCredentials:
     | (({
         publicKeyOptions,
       }: {
@@ -204,9 +204,9 @@ export class Clerk implements ClerkInterface {
       }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
     | undefined;
 
-  public __unstable__isWebAuthnSupported: (() => boolean) | undefined;
-  public __unstable__isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
-  public __unstable__isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
+  public __internal__isWebAuthnSupported: (() => boolean) | undefined;
+  public __internal__isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
+  public __internal__isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
   get publishableKey(): string {
     return this.#publishableKey;

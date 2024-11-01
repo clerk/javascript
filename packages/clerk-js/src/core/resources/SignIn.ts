@@ -305,10 +305,10 @@ export class SignIn extends BaseResource implements SignInResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
 
-    const _isWebAuthnSupported = SignIn.clerk.__unstable__isWebAuthnSupported || isWebAuthnSupported;
-    const _webAuthnGetCredential = SignIn.clerk.__unstable__getPublicCredentials || webAuthnGetCredential;
+    const _isWebAuthnSupported = SignIn.clerk.__internal__isWebAuthnSupported || isWebAuthnSupported;
+    const _webAuthnGetCredential = SignIn.clerk.__internal__getPublicCredentials || webAuthnGetCredential;
     const _isWebAuthnAutofillSupported =
-      SignIn.clerk.__unstable__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
+      SignIn.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
 
     if (!_isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {

@@ -56,10 +56,10 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-    const _isWebAuthnSupported = Passkey.clerk.__unstable__isWebAuthnSupported || isWebAuthnSupported;
-    const _webAuthnCreateCredential = Passkey.clerk.__unstable__createPublicCredentials || webAuthnCreateCredential;
+    const _isWebAuthnSupported = Passkey.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnSupported;
+    const _webAuthnCreateCredential = Passkey.clerk.__internal__createPublicCredentials || webAuthnCreateCredential;
     const _isWebAuthnPlatformAuthenticatorSupported =
-      Passkey.clerk.__unstable__isWebAuthnPlatformAuthenticatorSupported || isWebAuthnPlatformAuthenticatorSupported;
+      Passkey.clerk.__internal__isWebAuthnPlatformAuthenticatorSupported || isWebAuthnPlatformAuthenticatorSupported;
 
     if (!_isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {

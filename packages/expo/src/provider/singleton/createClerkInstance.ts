@@ -45,40 +45,40 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__unstable__createPublicCredentials = (
+        __internal_clerk.__internal__createPublicCredentials = (
           publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,
         ) => {
-          return options?.passkeys?.create
-            ? options?.passkeys?.create(publicKeyCredential)
+          return options?.__experimental__passkeys?.create
+            ? options?.__experimental__passkeys?.create(publicKeyCredential)
             : errorThrower.throw('create() for passkeys is missing');
         };
 
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__unstable__getPublicCredentials = ({
+        __internal_clerk.__internal__getPublicCredentials = ({
           publicKeyOptions,
         }: {
           publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
         }) => {
-          return options?.passkeys?.get
-            ? options?.passkeys?.get({ publicKeyOptions })
+          return options?.__experimental__passkeys?.get
+            ? options?.__experimental__passkeys?.get({ publicKeyOptions })
             : errorThrower.throw('get() for passkeys is missing');
         };
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__unstable__isWebAuthnSupported = () => {
-          return options?.passkeys?.isSupported
-            ? options?.passkeys?.isSupported()
+        __internal_clerk.__internal__isWebAuthnSupported = () => {
+          return options?.__experimental__passkeys?.isSupported
+            ? options?.__experimental__passkeys?.isSupported()
             : errorThrower.throw('isSupported() for passkeys is missing');
         };
 
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__unstable__isWebAuthnAutofillSupported = () => {
-          return options?.passkeys?.isAutoFillSupported
-            ? options?.passkeys?.isAutoFillSupported()
+        __internal_clerk.__internal__isWebAuthnAutofillSupported = () => {
+          return options?.__experimental__passkeys?.isAutoFillSupported
+            ? options?.__experimental__passkeys?.isAutoFillSupported()
             : errorThrower.throw('isSupported() for passkeys is missing');
         };
 
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__unstable__isWebAuthnPlatformAuthenticatorSupported = () => {
+        __internal_clerk.__internal__isWebAuthnPlatformAuthenticatorSupported = () => {
           return Promise.resolve(true);
         };
       }

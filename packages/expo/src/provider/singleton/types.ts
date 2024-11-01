@@ -11,7 +11,11 @@ import type { TokenCache } from '../../cache/types';
 export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
-  passkeys?: {
+  /**
+   * This is an experimental prop that is being used from expo apps,
+   * this feature is only available for private beta users.
+   */
+  __experimental__passkeys?: {
     get: ({
       publicKeyOptions,
     }: {
