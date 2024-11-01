@@ -1,5 +1,8 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
-import { isWebAuthnPlatformAuthenticatorSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import {
+  isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 import type {
   DeletedObjectJSON,
   DeletedObjectResource,
@@ -56,12 +59,12 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-    const _isWebAuthnSupported = Passkey.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnSupported;
+    const isWebAuthnSupported = Passkey.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnSupportedOnWindow;
     const _webAuthnCreateCredential = Passkey.clerk.__internal__createPublicCredentials || webAuthnCreateCredential;
     const _isWebAuthnPlatformAuthenticatorSupported =
       Passkey.clerk.__internal__isWebAuthnPlatformAuthenticatorSupported || isWebAuthnPlatformAuthenticatorSupported;
 
-    if (!_isWebAuthnSupported()) {
+    if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {
         code: 'passkey_not_supported',
       });

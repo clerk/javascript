@@ -1,7 +1,10 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import {
+  isWebAuthnAutofillSupported,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -305,12 +308,12 @@ export class SignIn extends BaseResource implements SignInResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
 
-    const _isWebAuthnSupported = SignIn.clerk.__internal__isWebAuthnSupported || isWebAuthnSupported;
+    const isWebAuthnSupported = SignIn.clerk.__internal__isWebAuthnSupported || isWebAuthnSupportedOnWindow;
     const _webAuthnGetCredential = SignIn.clerk.__internal__getPublicCredentials || webAuthnGetCredential;
     const _isWebAuthnAutofillSupported =
       SignIn.clerk.__internal__isWebAuthnAutofillSupported || isWebAuthnAutofillSupported;
 
-    if (!_isWebAuthnSupported()) {
+    if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
       });
