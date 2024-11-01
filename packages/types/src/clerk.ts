@@ -104,7 +104,7 @@ export interface Clerk {
    */
   loaded: boolean;
 
-  getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+  __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   frontendApi: string;
 

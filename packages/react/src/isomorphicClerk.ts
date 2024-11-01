@@ -242,8 +242,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#proxyUrl || '';
   }
 
-  public getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
-    return this.clerkjs?.getOption(key);
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
+    return this.clerkjs?.__internal_getOption(key);
   }
 
   constructor(options: IsomorphicClerkOptions) {

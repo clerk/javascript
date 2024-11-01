@@ -257,7 +257,7 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  public getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
     return this.#options[key];
   }
 
