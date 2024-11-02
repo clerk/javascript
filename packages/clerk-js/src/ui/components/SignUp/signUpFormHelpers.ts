@@ -1,4 +1,4 @@
-import { camelToSnake } from '@clerk/shared';
+import { camelToSnake } from '@clerk/shared/underscore';
 import type { Attributes, SignUpResource, UserSettingsResource } from '@clerk/types';
 
 import type { FieldState } from '../../common';

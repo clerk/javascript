@@ -1,4 +1,4 @@
-import { isProductionEnvironment } from '@clerk/shared';
+import { isProductionEnvironment } from '@clerk/shared/utils';
 import type { RoutingStrategy } from '@clerk/types';
 import React from 'react';
 

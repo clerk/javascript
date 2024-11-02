@@ -40,6 +40,26 @@
         "default": "./dist/react/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      }
+    },
+    "./workerTimers": {
+      "import": {
+        "types": "./dist/workerTimers/index.d.mts",
+        "default": "./dist/workerTimers/index.mjs"
+      },
+      "require": {
+        "types": "./dist/workerTimers/index.d.ts",
+        "default": "./dist/workerTimers/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -77,7 +97,10 @@
     "logger",
     "webauthn",
     "router",
-    "pathToRegexp"
+    "pathToRegexp",
+    "utils",
+    "workerTimers",
+    "devBrowser"
   ],
   "scripts": {
     "build": "tsup",

@@ -1,4 +1,4 @@
-import { noop } from '@clerk/shared';
+import { noop } from '@clerk/shared/utils';
 import type { PasswordSettingsData, PasswordValidation, ValidatePasswordCallbacks } from '@clerk/types';
 
 import { loadZxcvbn } from '../zxcvbn';

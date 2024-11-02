@@ -1,7 +1,7 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_UserVerificationModalProps,
   __experimental_UserVerificationProps,

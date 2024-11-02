@@ -1,4 +1,4 @@
-import { handleValueOrFn } from '../handleValueOrFn';
+import { handleValueOrFn } from '../utils/handleValueOrFn';
 
 const url = new URL('https://example.com');
 
