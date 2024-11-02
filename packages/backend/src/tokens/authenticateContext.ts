@@ -2,7 +2,7 @@ import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
 import { decodeJwt } from '../jwt/verifyJwt';
-import runtime from '../runtime';
+import { runtime } from '../runtime';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';

@@ -1,7 +1,3 @@
-declare global {
-  const PACKAGE_NAME: string;
-  const PACKAGE_VERSION: string;
-  const __DEV__: boolean;
-}
-
-export {};
+declare const PACKAGE_NAME: string;
+declare const PACKAGE_VERSION: string;
+declare const __DEV__: boolean;
