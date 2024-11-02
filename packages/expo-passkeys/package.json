@@ -21,10 +21,10 @@
   "types": "build/index.d.ts",
   "scripts": {
     "_build": "EXPO_NONINTERACTIVE=1 expo-module build",
+    "_lint": "expo-module lint",
     "build:watch": "expo-module build",
     "clean": "expo-module clean",
     "expo-module": "expo-module",
-    "_lint": "expo-module lint",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
     "prepare": "expo-module prepare",
