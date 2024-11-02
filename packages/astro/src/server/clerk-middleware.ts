@@ -1,8 +1,10 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { handleValueOrFn, isDevelopmentFromSecretKey, isHttpOrHttps } from '@clerk/shared';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import type { APIContext } from 'astro';
 
 // @ts-ignore

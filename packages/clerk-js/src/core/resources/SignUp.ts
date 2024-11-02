@@ -1,5 +1,5 @@
-import { Poller } from '@clerk/shared';
 import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,

@@ -1,4 +1,6 @@
-import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
+import { isBrowserOnline } from '@clerk/shared/browser';
+import { camelToSnake } from '@clerk/shared/underscore';
+import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';

@@ -1,5 +1,5 @@
-import { createDeferredPromise } from '@clerk/shared';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __experimental_UserVerificationProps,
   Appearance,

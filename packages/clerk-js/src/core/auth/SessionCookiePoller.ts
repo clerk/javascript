@@ -1,4 +1,4 @@
-import { createWorkerTimers } from '@clerk/shared';
+import { createWorkerTimers } from '@clerk/shared/workerTimers';
 
 import { SafeLock } from './safeLock';
 
