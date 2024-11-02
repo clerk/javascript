@@ -99,7 +99,8 @@
     "router",
     "pathToRegexp",
     "utils",
-    "workerTimers"
+    "workerTimers",
+    "devBrowser"
   ],
   "scripts": {
     "build": "tsup",
