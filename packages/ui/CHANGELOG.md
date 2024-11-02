@@ -1,5 +1,13 @@
 # @clerk/ui
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [[`8506fdd8fb33f0572157d1adae37e0b6911001bc`](https://github.com/clerk/javascript/commit/8506fdd8fb33f0572157d1adae37e0b6911001bc), [`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
+  - @clerk/elements@0.18.1
+  - @clerk/shared@2.11.1
+
 ## 0.1.11
 
 ### Patch Changes

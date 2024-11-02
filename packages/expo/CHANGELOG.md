@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.2.31
+
+### Patch Changes
+
+- Updated dependencies [[`8506fdd8fb33f0572157d1adae37e0b6911001bc`](https://github.com/clerk/javascript/commit/8506fdd8fb33f0572157d1adae37e0b6911001bc), [`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
+  - @clerk/clerk-js@5.30.1
+  - @clerk/shared@2.11.1
+  - @clerk/clerk-react@5.14.1
+
 ## 2.2.30
 
 ### Patch Changes
@@ -380,7 +389,7 @@
   You can access the components from the `/web` subpath import like so:
 
   ```tsx
-  import { SignUp } from "@clerk/clerk-expo/web";
+  import { SignUp } from '@clerk/clerk-expo/web';
 
   export default function Page() {
     return <SignUp />;
@@ -1342,29 +1351,24 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
     // After
-    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 
     // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from "@clerk/clerk-react";
-    // After
-    import {
-      isClerkAPIResponseError,
-      isEmailLinkError,
-      isKnownError,
-      isMetamaskError,
-    } from "@clerk/clerk-react/errors";
+    } from '@clerk/clerk-react/errors';
 
     // Before
-    import { MultisessionAppSupport } from "@clerk/clerk-react";
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
     // After
-    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:

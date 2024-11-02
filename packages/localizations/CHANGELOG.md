@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.4.2
+
+### Patch Changes
+
+- Updates missing Russian translations ([#4431](https://github.com/clerk/javascript/pull/4431)) by [@jonasboardwalker](https://github.com/jonasboardwalker)
+
 ## 3.4.1
 
 ### Patch Changes
