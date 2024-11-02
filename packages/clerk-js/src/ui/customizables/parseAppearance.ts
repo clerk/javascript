@@ -1,4 +1,4 @@
-import { fastDeepMergeAndReplace } from '@clerk/shared';
+import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';

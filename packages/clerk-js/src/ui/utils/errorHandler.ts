@@ -1,4 +1,4 @@
-import { snakeToCamel } from '@clerk/shared';
+import { snakeToCamel } from '@clerk/shared/underscore';
 import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 
 import {

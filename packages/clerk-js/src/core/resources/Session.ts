@@ -1,6 +1,6 @@
-import { runWithExponentialBackOff } from '@clerk/shared';
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
+import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type {
   __experimental_SessionVerificationJSON,
   __experimental_SessionVerificationResource,

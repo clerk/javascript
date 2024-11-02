@@ -1,8 +1,8 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
 import type { IncomingMessage } from 'http';
 

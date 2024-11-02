@@ -1,4 +1,5 @@
-import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { Poller } from '@clerk/shared/poller';
+import { deepSnakeToCamel } from '@clerk/shared/underscore';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,

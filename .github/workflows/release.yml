@@ -126,7 +126,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [20] # NOTE: 18 is cached in the main release workflow
+        version: [22] # NOTE: 18 is cached in the main release workflow
 
     steps:
       - name: Checkout Repo

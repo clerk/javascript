@@ -1,5 +1,6 @@
-import { logErrorInDevMode, without } from '@clerk/shared';
+import { without } from '@clerk/shared/object';
 import { isDeeplyEqual } from '@clerk/shared/react';
+import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   CreateOrganizationProps,
   GoogleOneTapProps,

@@ -1,4 +1,4 @@
-import { titleize } from '@clerk/shared';
+import { titleize } from '@clerk/shared/underscore';
 import type {
   ExternalAccountJSON,
   ExternalAccountResource,

@@ -1,5 +1,5 @@
-import { createDeferredPromise } from '@clerk/shared';
 import type { ClerkHostRouter } from '@clerk/shared/router';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import type { ClerkOptions, LoadedClerk } from '@clerk/types';
 
 import type { init } from './renderer';
