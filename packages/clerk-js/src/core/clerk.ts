@@ -1,22 +1,13 @@
-import {
-  addClerkPrefix,
-  ClerkRuntimeError,
-  deprecated,
-  handleValueOrFn,
-  inBrowser as inClientSide,
-  is4xxError,
-  isClerkAPIResponseError,
-  isHttpOrHttps,
-  isValidBrowserOnline,
-  isValidProxyUrl,
-  LocalStorageBroadcastChannel,
-  noop,
-  parsePublishableKey,
-  proxyUrlToAbsoluteURL,
-  stripScheme,
-} from '@clerk/shared';
+import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
+import { deprecated } from '@clerk/shared/deprecated';
+import { ClerkRuntimeError, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
+import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
+import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
+import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_UserVerificationModalProps,
   ActiveSessionResource,
