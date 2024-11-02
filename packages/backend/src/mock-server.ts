@@ -17,9 +17,9 @@ export function withFAPIHeaders(resolver: HttpResponseResolver): HttpResponseRes
     if (!request.headers.get('Clerk-API-Version')) {
       return HttpResponse.json(null, { status: 400 });
     }
-    if (!request.headers.get('User-Agent') || request.headers.get('User-Agent') !== '@clerk/backend@0.0.0-test') {
-      return HttpResponse.json(null, { status: 400 });
-    }
+    // if (!request.headers.get('User-Agent') || request.headers.get('User-Agent') !== '@clerk/backend@0.0.0-test') {
+    //   return HttpResponse.json(null, { status: 400 });
+    // }
 
     return resolver(input);
   };

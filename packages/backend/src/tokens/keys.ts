@@ -1,4 +1,4 @@
-import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS, SUPPORTED_BAPI_VERSION } from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -166,6 +166,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const response = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
+      'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'Content-Type': 'application/json',
     },
   });
