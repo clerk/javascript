@@ -1,4 +1,4 @@
-1; /** The following files are not exported on purpose:
+/** The following files are not exported on purpose:
  * - cookie.ts
  * - globs.ts
  *
