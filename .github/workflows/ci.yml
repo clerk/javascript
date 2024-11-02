@@ -36,7 +36,6 @@ jobs:
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          node-version: 20
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
@@ -91,7 +90,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [18,22]
 
     steps:
       - name: Checkout Repo

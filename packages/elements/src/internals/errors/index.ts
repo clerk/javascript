@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import type { MetamaskError } from '@clerk/shared';
 import type { ClerkAPIError } from '@clerk/types';
 

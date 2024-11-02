@@ -1,7 +1,8 @@
 // Middleware runs on the server side, before clerk-js is loaded, that's why we need Cookies.
 import type { AuthenticateRequestOptions, ClerkRequest } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
-import { DEV_BROWSER_JWT_KEY, isDevelopmentFromSecretKey, setDevBrowserJWTInURL } from '@clerk/shared';
+import { DEV_BROWSER_JWT_KEY, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 
 import { getSafeEnv } from './get-safe-env';
 import type { AstroMiddlewareContextParam } from './types';

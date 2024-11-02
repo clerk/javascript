@@ -1,8 +1,8 @@
 ---
-"@clerk/expo-passkeys": major
+"@clerk/expo-passkeys": patch
 ---
 
-Introduction of the Clerk passkeys module, this module will a allow to handle the creation and retrieval of passkeys, can be integrated as follows:
+Introduction of the Clerk passkeys module, this module allows the creation and retrieval of passkeys, can be integrated as follows:
 
 ```tsx
 import { ClerkProvider } from '@clerk/clerk-expo';
