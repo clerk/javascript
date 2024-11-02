@@ -5,7 +5,6 @@ import { createFapiClient } from '../fapiClient';
 
 const mockedClerkInstance = {
   frontendApi: 'clerk.example.com',
-  frontEnvApiVersion: '',
   version: '42.0.0',
   session: {
     id: 'deadbeef',
