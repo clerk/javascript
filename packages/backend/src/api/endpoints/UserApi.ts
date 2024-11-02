@@ -1,6 +1,6 @@
 import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 
-import runtime from '../../runtime';
+import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
