@@ -3,9 +3,7 @@ import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
 import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
-// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
-// For more information refer to https://sinonjs.org/how-to/stub-dependency/
-import runtime from '../runtime';
+import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
@@ -88,7 +86,8 @@ export function buildRequest(options: BuildRequestOptions) {
     let res: Response | undefined;
     try {
       if (formData) {
-        res = await runtime.fetch(finalUrl.href, {
+        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
+        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
           method,
           headers,
           body: formData,
@@ -100,7 +99,8 @@ export function buildRequest(options: BuildRequestOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        res = await runtime.fetch(finalUrl.href, {
+        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
+        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
           method,
           headers,
           ...body,
