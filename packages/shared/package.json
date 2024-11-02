@@ -40,6 +40,16 @@
         "default": "./dist/react/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -77,7 +87,8 @@
     "logger",
     "webauthn",
     "router",
-    "pathToRegexp"
+    "pathToRegexp",
+    "utils"
   ],
   "scripts": {
     "build": "tsup",

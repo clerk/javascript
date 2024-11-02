@@ -27,18 +27,6 @@ const extensions = [
 module.exports = {
   extends: extensions,
   rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          {
-            group: ['@emotion/*'],
-            message:
-              'Please do not import emotion directly. Import helpers from ./design-system or ./primitives instead.',
-          },
-        ],
-      },
-    ],
     'react/button-has-type': 'warn',
     'react/function-component-definition': 'off',
     'react/hook-use-state': 'warn',
