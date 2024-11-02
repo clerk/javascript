@@ -1,56 +1,52 @@
-import type QUnit from 'qunit';
+import { describe, expect, it } from 'vitest';
 
 import { handshake, signedIn, signedOut } from '../authStatus';
 
-export default (QUnit: QUnit) => {
-  const { module, test } = QUnit;
-
-  module('signed-in', () => {
-    test('does not include debug headers', assert => {
-      const authObject = signedIn({} as any, {} as any, undefined, 'token');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-status'), null);
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), null);
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), null);
-    });
-
-    test('authObject returned by toAuth() returns the token passed', async assert => {
-      const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
-      const token = await signedInAuthObject.getToken();
-      assert.strictEqual(token, 'token');
-    });
+describe('signed-in', () => {
+  it('does not include debug headers', () => {
+    const authObject = signedIn({} as any, {} as any, undefined, 'token');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-message')).toBeNull();
   });
 
-  module('signed-out', () => {
-    test('includes debug headers', assert => {
-      const headers = new Headers({ 'custom-header': 'value' });
-      const authObject = signedOut({} as any, 'auth-reason', 'auth-message', headers);
+  it('authObject returned by toAuth() returns the token passed', async () => {
+    const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
+    const token = await signedInAuthObject.getToken();
+    expect(token).toBe('token');
+  });
+});
 
-      assert.strictEqual(authObject.headers.get('custom-header'), 'value');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-status'), 'signed-out');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), 'auth-reason');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), 'auth-message');
-    });
+describe('signed-out', () => {
+  it('includes debug headers', () => {
+    const headers = new Headers({ 'custom-header': 'value' });
+    const authObject = signedOut({} as any, 'auth-reason', 'auth-message', headers);
 
-    test('handles debug headers containing invalid unicode characters without throwing', assert => {
-      const headers = new Headers({ 'custom-header': 'value' });
-      const authObject = signedOut({} as any, 'auth-reason+RR�56', 'auth-message+RR�56', headers);
-
-      assert.strictEqual(authObject.headers.get('custom-header'), 'value');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-status'), 'signed-out');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), null);
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), null);
-    });
+    expect(authObject.headers.get('custom-header')).toBe('value');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBe('signed-out');
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+    expect(authObject.headers.get('x-clerk-auth-message')).toBe('auth-message');
   });
 
-  module('handshake', () => {
-    test('includes debug headers', assert => {
-      const headers = new Headers({ location: '/' });
-      const authObject = handshake({} as any, 'auth-reason', 'auth-message', headers);
+  it('handles debug headers containing invalid unicode characters without throwing', () => {
+    const headers = new Headers({ 'custom-header': 'value' });
+    const authObject = signedOut({} as any, 'auth-reason+RR�56', 'auth-message+RR�56', headers);
 
-      assert.strictEqual(authObject.headers.get('location'), '/');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-status'), 'handshake');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), 'auth-reason');
-      assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), 'auth-message');
-    });
+    expect(authObject.headers.get('custom-header')).toBe('value');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBe('signed-out');
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-message')).toBeNull();
   });
-};
+});
+
+describe('handshake', () => {
+  it('includes debug headers', () => {
+    const headers = new Headers({ location: '/' });
+    const authObject = handshake({} as any, 'auth-reason', 'auth-message', headers);
+
+    expect(authObject.headers.get('location')).toBe('/');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBe('handshake');
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+    expect(authObject.headers.get('x-clerk-auth-message')).toBe('auth-message');
+  });
+});

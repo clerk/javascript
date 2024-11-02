@@ -21,6 +21,19 @@
         "request": "launch",
         "command": "npm start",
         "cwd": "${workspaceFolder}/playground/express"
+      },
+      {
+        "name": "Debug Vitest",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/scripts/vitest-debug.mjs",
+        "args": ["${file}"],
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "autoAttachChildProcesses": true,
+        "smartStep": true,
+        "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
       }
     ]
   }

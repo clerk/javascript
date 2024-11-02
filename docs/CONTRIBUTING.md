@@ -37,7 +37,6 @@ The current monorepo setup is based on:
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
 - [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
 - [Jest](https://jestjs.io/), used for running unit tests.
-- [QUnit](https://qunitjs.com/), used for tests inside `@clerk/backend`.
 - [Playwright](https://playwright.dev/), used for running the [integration](../integration/) test suite.
 
 All packages of the monorepo are inside [packages](../packages). For package specific details on installation, architecture and usage, you can refer to the package's README file.
