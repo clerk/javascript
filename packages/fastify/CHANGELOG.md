@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`f067a41ea08d499aaad2e823e5fc3d8b6e6f2bd1`](https://github.com/clerk/javascript/commit/f067a41ea08d499aaad2e823e5fc3d8b6e6f2bd1)]:
+  - @clerk/shared@2.11.2
+  - @clerk/backend@1.15.4
+
 ## 2.0.6
 
 ### Patch Changes
@@ -524,7 +532,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -561,34 +569,28 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 - 02976d494: (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/fastify` directly. If not, you can safely ignore this change.)
 
   Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/fastify";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/fastify';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/fastify";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/fastify';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 ### Minor Changes
@@ -1152,7 +1154,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1191,19 +1193,13 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 
 ### Patch Changes
@@ -1229,15 +1225,15 @@
   Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/fastify";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/fastify';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/fastify";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/fastify';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 ### Patch Changes
