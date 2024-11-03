@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import userJson from '../../fixtures/user.json';
-import { server, withFAPIHeaders } from '../../mock-server';
+import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
 
 describe('api.client', () => {
@@ -15,7 +15,7 @@ describe('api.client', () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users/user_deadbeef`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(userJson);
         }),
       ),
@@ -35,13 +35,13 @@ describe('api.client', () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json([userJson]);
         }),
       ),
       http.get(
         `https://api.clerk.test/v1/users/count`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json({ object: 'total_count', total_count: 2 });
         }),
       ),
@@ -62,7 +62,7 @@ describe('api.client', () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users/user_123/organization_memberships`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json({
             data: [{ id: '1' }],
             total_count: 3,
@@ -86,7 +86,7 @@ describe('api.client', () => {
     server.use(
       http.post(
         `https://api.clerk.test/v1/users`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(userJson);
         }),
       ),
@@ -117,7 +117,7 @@ describe('api.client', () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users/user_deadbeef`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(
             { errors: [mockErrorPayload], clerk_trace_id: traceId },
             { status: 422, headers: { 'cf-ray': traceId } },
@@ -140,7 +140,7 @@ describe('api.client', () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users/user_deadbeef`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json({ errors: [] }, { status: 500, headers: { 'cf-ray': 'mock_cf_ray' } });
         }),
       ),
@@ -157,7 +157,7 @@ describe('api.client', () => {
     server.use(
       http.delete(
         `https://api.clerk.test/v1/domains/${DOMAIN_ID}`,
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json({
             object: 'domain',
             id: DOMAIN_ID,
@@ -175,7 +175,7 @@ describe('api.client', () => {
       http.get(
         'https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google',
         // @ts-expect-error FIXME: type this correctly
-        withFAPIHeaders(({ request }) => {
+        validateHeaders(({ request }) => {
           const paginated = new URL(request.url).searchParams.get('paginated');
 
           if (!paginated) {

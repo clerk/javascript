@@ -11,7 +11,7 @@ import {
   mockRsaJwk,
   mockRsaJwkKid,
 } from '../../fixtures';
-import { server, withFAPIHeaders } from '../../mock-server';
+import { server, validateHeaders } from '../../mock-server';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
 
 describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
@@ -50,7 +50,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
@@ -68,7 +68,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.test/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
@@ -88,7 +88,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
@@ -111,7 +111,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json({}, { status: 503 });
         }),
       ),
@@ -141,7 +141,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
@@ -163,7 +163,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),

@@ -7,7 +7,7 @@ const globalHandlers: any[] = [];
 export const server = setupServer(...globalHandlers);
 
 // A higher-order response resolver that validates the request headers before proceeding
-export function withFAPIHeaders(resolver: HttpResponseResolver): HttpResponseResolver<PathParams, DefaultBodyType> {
+export function validateHeaders(resolver: HttpResponseResolver): HttpResponseResolver<PathParams, DefaultBodyType> {
   return input => {
     const { request } = input;
 

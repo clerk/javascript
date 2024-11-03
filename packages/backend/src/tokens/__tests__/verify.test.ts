@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
-import { server, withFAPIHeaders } from '../../mock-server';
+import { server, validateHeaders } from '../../mock-server';
 import { verifyToken } from '../verify';
 
 describe('tokens.verify(token, options)', () => {
@@ -18,7 +18,7 @@ describe('tokens.verify(token, options)', () => {
     server.use(
       http.get(
         'https://api.clerk.test/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
@@ -38,7 +38,7 @@ describe('tokens.verify(token, options)', () => {
     server.use(
       http.get(
         'https://api.clerk.com/v1/jwks',
-        withFAPIHeaders(() => {
+        validateHeaders(() => {
           return HttpResponse.json(mockJwks);
         }),
       ),
