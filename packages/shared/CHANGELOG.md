@@ -1,11 +1,5 @@
 # Change Log
 
-## 2.11.2
-
-### Patch Changes
-
-- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
 ## 2.11.0
 
 ### Minor Changes
@@ -123,8 +117,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: 'L2.secondFactor',
-      maxAge: 'A1.10min',
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
     },
   });
   ```
