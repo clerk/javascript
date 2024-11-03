@@ -1,13 +1,5 @@
 # Change Log
 
-## 1.3.5
-
-### Patch Changes
-
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
-  - @clerk/backend@1.15.3
-
 ## 1.3.4
 
 ### Patch Changes
@@ -51,7 +43,7 @@
 - Export [`authenticateRequest` method](https://clerk.com/docs/references/backend/authenticate-request) from `@clerk/express` (in case you want to go low-level and implement flows to your specific needs). You can use it like so: ([#4340](https://github.com/clerk/javascript/pull/4340)) by [@jescalan](https://github.com/jescalan)
 
   ```ts
-  import { authenticateRequest } from '@clerk/express';
+  import { authenticateRequest } from "@clerk/express";
   ```
 
   This function is adapted to Express' Request wrapper and as such notably different to the exported function from `@clerk/backend`. If you need to use it, be sure to import from `@clerk/express`.
