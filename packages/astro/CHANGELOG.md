@@ -1,14 +1,14 @@
 # @clerk/astro
 
-## 1.4.3
+## 1.4.5
 
 ### Patch Changes
 
-- Refactor imports from @clerk/shared to improve treeshaking support ([#4462](https://github.com/clerk/javascript/pull/4462)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
-  - @clerk/backend@1.15.3
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/backend@1.15.5
 
 ## 1.4.2
 

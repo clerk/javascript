@@ -1,16 +1,16 @@
 # Change Log
 
-## 5.30.1
+## 5.30.3
 
 ### Patch Changes
 
-- `clerk-js` is now built with [Rspack](https://rspack.dev) instead of Webpack. This is an internal tooling change that shouldn't affect consumers. ([#4106](https://github.com/clerk/javascript/pull/4106)) by [@BRKalow](https://github.com/BRKalow)
+- `clerk-js` is now built with [Rspack](https://rspack.dev) instead of Webpack. This is an internal tooling change that shouldn't affect consumers. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Refactor imports from @clerk/shared to improve treeshaking support ([#4462](https://github.com/clerk/javascript/pull/4462)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015), [`5ad1f6c829a30e8efd2d4e7da310a9116c8005db`](https://github.com/clerk/javascript/commit/5ad1f6c829a30e8efd2d4e7da310a9116c8005db)]:
-  - @clerk/shared@2.11.1
-  - @clerk/localizations@3.4.2
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc), [`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/localizations@3.4.4
 
 ## 5.30.0
 

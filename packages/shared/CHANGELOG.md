@@ -1,10 +1,10 @@
 # Change Log
 
-## 2.11.1
+## 2.11.3
 
 ### Patch Changes
 
-- Refactor imports from @clerk/shared to improve treeshaking support ([#4462](https://github.com/clerk/javascript/pull/4462)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 ## 2.11.0
 

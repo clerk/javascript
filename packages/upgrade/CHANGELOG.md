@@ -1,10 +1,10 @@
 # @clerk/upgrade
 
-## 1.2.1
+## 1.2.3
 
 ### Patch Changes
 
-- Updates broken Clerk documentation references ([#4459](https://github.com/clerk/javascript/pull/4459)) by [@LauraBeatris](https://github.com/LauraBeatris)
+- Updates broken Clerk documentation references by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 ## 1.2.0
 

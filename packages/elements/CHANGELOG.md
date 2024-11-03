@@ -1,13 +1,13 @@
 # @clerk/elements
 
-## 0.18.1
+## 0.18.3
 
 ### Patch Changes
 
-- Use host router instead of directly calling Next's `useRouter` hook ([#4106](https://github.com/clerk/javascript/pull/4106)) by [@BRKalow](https://github.com/BRKalow)
+- Use host router instead of directly calling Next's `useRouter` hook by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
 
 ## 0.18.0
 
