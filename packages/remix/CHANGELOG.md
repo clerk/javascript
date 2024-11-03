@@ -1,14 +1,5 @@
 # Change Log
 
-## 4.2.43
-
-### Patch Changes
-
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
-  - @clerk/backend@1.15.3
-  - @clerk/clerk-react@5.14.1
-
 ## 4.2.42
 
 ### Patch Changes
@@ -689,7 +680,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -704,15 +695,15 @@
   Remove the named `Clerk` import from `@clerk/remix` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from '@clerk/remix';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/remix";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/remix';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/remix";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 - 1ad910eb9: Changes in exports of `@clerk/backend`:
@@ -742,13 +733,19 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 - 9a1fe3728: Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`.
 - e1f7eae87: Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason
@@ -1311,7 +1308,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1350,13 +1347,19 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 
 ### Patch Changes
@@ -1381,24 +1384,29 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
     // After
-    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
 
     // Before
-    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from "@clerk/clerk-react";
     // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from '@clerk/clerk-react/errors';
+    } from "@clerk/clerk-react/errors";
 
     // Before
-    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    import { MultisessionAppSupport } from "@clerk/clerk-react";
     // After
-    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
@@ -1415,15 +1423,15 @@
   Remove the named `Clerk` import from `@clerk/remix` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from '@clerk/remix';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/remix";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/remix';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/remix";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 ### Patch Changes

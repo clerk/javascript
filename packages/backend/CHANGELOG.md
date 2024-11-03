@@ -1,12 +1,5 @@
 # Change Log
 
-## 1.15.3
-
-### Patch Changes
-
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
-
 ## 1.15.2
 
 ### Patch Changes
@@ -168,8 +161,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: 'L2.secondFactor',
-      maxAge: 'A1.10min',
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
     },
   });
   ```
@@ -339,7 +332,7 @@
 - Export the type `AuthObject`. You can now use it like so: ([#3844](https://github.com/clerk/javascript/pull/3844)) by [@kduprey](https://github.com/kduprey)
 
   ```ts
-  import type { AuthObject } from '@clerk/backend';
+  import type { AuthObject } from "@clerk/backend";
   ```
 
 - Updated dependencies [[`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
@@ -532,13 +525,13 @@
   The below code now works as expected: (requires CLERK_SECRET_KEY env var to have been set)
 
   ```ts
-  import { clerkClient } from '@clerk/clerk-sdk-node';
+  import { clerkClient } from "@clerk/clerk-sdk-node";
 
   // Use the default settings from the already instanciated clerkClient
   clerkClient.verifyToken(token);
   // or provide overrides the options
   clerkClient.verifyToken(token, {
-    secretKey: 'xxxx',
+    secretKey: "xxxx",
   });
   ```
 
@@ -724,15 +717,15 @@
   Inside your code, search for occurrences like these:
 
   ```js
-  import { Clerk } from '@clerk/backend';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/backend";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/backend';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/backend";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 - 8e5c881c4: The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier:
@@ -751,10 +744,11 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from '@clerk/backend';
-  import { ClerkAPIResponseError } from '@clerk/shared/error';
+  import { users } from "@clerk/backend";
+  import { ClerkAPIResponseError } from "@clerk/shared/error";
 
-  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
+  const { data, errors, clerkTraceId, status, statusText } =
+    await users.getUser("user_deadbeef");
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,
@@ -861,7 +855,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -923,18 +917,29 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 - f58a9949b: Changes in exports of `@clerk/backend`:
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    import {
+      decodeJwt,
+      hasValidSignature,
+      signJwt,
+      verifyJwt,
+    } from "@clerk/backend/jwt";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -955,14 +960,20 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from '@clerk/backend/errors';
+    } from "@clerk/backend/errors";
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorReason,
+    } from "@clerk/backend";
     // After
-    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorReason,
+    } from "@clerk/backend/errors";
     ```
 - e602d6c1f: Drop unused SearchParams.AuthStatus constant
 - 6fffd3b54: Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency).
@@ -1023,17 +1034,18 @@
   Example:
 
   ```typescript
-  import { Clerk } from '@clerk/backend';
+  import { Clerk } from "@clerk/backend";
 
-  const clerkClient = Clerk({ secretKey: '...' });
+  const clerkClient = Clerk({ secretKey: "..." });
 
   // current
   const { data } = await clerkClient.organizations.getOrganizationList();
-  console.log('totalCount: ', data.length);
+  console.log("totalCount: ", data.length);
 
   // new
-  const { data, totalCount } = await clerkClient.organizations.getOrganizationList();
-  console.log('totalCount: ', totalCount);
+  const { data, totalCount } =
+    await clerkClient.organizations.getOrganizationList();
+  console.log("totalCount: ", totalCount);
   ```
 
 - c7e6d00f5: Experimental support for `<Gate/>` with role checks.
@@ -1734,7 +1746,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1773,20 +1785,31 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 
 - Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
 
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    import {
+      decodeJwt,
+      hasValidSignature,
+      signJwt,
+      verifyJwt,
+    } from "@clerk/backend/jwt";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1807,14 +1830,20 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from '@clerk/backend/errors';
+    } from "@clerk/backend/errors";
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorReason,
+    } from "@clerk/backend";
     // After
-    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorReason,
+    } from "@clerk/backend/errors";
     ```
 
 ### Minor Changes
@@ -1843,15 +1872,15 @@
   Inside your code, search for occurrences like these:
 
   ```js
-  import { Clerk } from '@clerk/backend';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/backend";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/backend';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/backend";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 - - Refactor the `authenticateRequest()` flow to use the new client handshake endpoint. This replaces the previous "interstitial"-based flow. This should improve performance and overall reliability of Clerk's server-side request authentication functionality. ([#2300](https://github.com/clerk/javascript/pull/2300)) by [@BRKalow](https://github.com/BRKalow)
@@ -1934,17 +1963,18 @@
   Example:
 
   ```typescript
-  import { Clerk } from '@clerk/backend';
+  import { Clerk } from "@clerk/backend";
 
-  const clerkClient = Clerk({ secretKey: '...' });
+  const clerkClient = Clerk({ secretKey: "..." });
 
   // current
   const { data } = await clerkClient.organizations.getOrganizationList();
-  console.log('totalCount: ', data.length);
+  console.log("totalCount: ", data.length);
 
   // new
-  const { data, totalCount } = await clerkClient.organizations.getOrganizationList();
-  console.log('totalCount: ', totalCount);
+  const { data, totalCount } =
+    await clerkClient.organizations.getOrganizationList();
+  console.log("totalCount: ", totalCount);
   ```
 
 - Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
@@ -2034,10 +2064,11 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from '@clerk/backend';
-  import { ClerkAPIResponseError } from '@clerk/shared/error';
+  import { users } from "@clerk/backend";
+  import { ClerkAPIResponseError } from "@clerk/shared/error";
 
-  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
+  const { data, errors, clerkTraceId, status, statusText } =
+    await users.getUser("user_deadbeef");
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,
