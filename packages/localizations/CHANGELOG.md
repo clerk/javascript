@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.4.3
+
+### Patch Changes
+
+- Updates missing Russian translations by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.4.1
 
 ### Patch Changes
