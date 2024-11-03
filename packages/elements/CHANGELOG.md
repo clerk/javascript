@@ -1,5 +1,14 @@
 # @clerk/elements
 
+## 0.18.2
+
+### Patch Changes
+
+- Use host router instead of directly calling Next's `useRouter` hook by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6f562876315750bbe066efe25e2257fdbfcf1b73`](https://github.com/clerk/javascript/commit/6f562876315750bbe066efe25e2257fdbfcf1b73)]:
+  - @clerk/shared@2.11.2
+
 ## 0.18.0
 
 ### Minor Changes
@@ -201,13 +210,12 @@
   Example:
 
   ```tsx
-  <SignIn.Step name="choose-session">
+  <SignIn.Step name='choose-session'>
     <SignIn.SessionList>
       <SignIn.SessionListItem>
         {({ session }) => (
           <>
-            {session.identifier} |{" "}
-            <SignIn.Action setActiveSession>Switch...</SignIn.Action>
+            {session.identifier} | <SignIn.Action setActiveSession>Switch...</SignIn.Action>
           </>
         )}
       </SignIn.SessionListItem>
@@ -475,11 +483,9 @@
   - `<SignIn.Action passkey />`
 
     ```tsx
-    <SignIn.Step name="start">
+    <SignIn.Step name='start'>
       <SignIn.Passkey>
-        <Clerk.Loading>
-          {(isLoading) => (isLoading ? <Spinner /> : "Use passkey instead")}.
-        </Clerk.Loading>
+        <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}.</Clerk.Loading>
       </SignIn.Passkey>
     </SignIn.Step>
     ```
@@ -487,7 +493,10 @@
   - `<SignIn.SupportedStrategy name='passkey'>`
 
     ```tsx
-    <SignIn.SupportedStrategy asChild name="passkey">
+    <SignIn.SupportedStrategy
+      asChild
+      name='passkey'
+    >
       <Button>use passkey</Button>
     </SignIn.SupportedStrategy>
     ```
@@ -495,8 +504,8 @@
   - `<SignIn.Strategy name='passkey'>`
 
     ```tsx
-    <SignIn.Strategy name="passkey">
-      <p className="text-sm">
+    <SignIn.Strategy name='passkey'>
+      <p className='text-sm'>
         Welcome back <SignIn.Salutation />!
       </p>
 
@@ -506,12 +515,12 @@
 
   - Passkey Autofill
     ```tsx
-    <SignIn.Step name="start">
-      <Clerk.Field name="identifier">
-        <Clerk.Label className="sr-only">Email</Clerk.Label>
+    <SignIn.Step name='start'>
+      <Clerk.Field name='identifier'>
+        <Clerk.Label className='sr-only'>Email</Clerk.Label>
         <Clerk.Input
-          autoComplete="webauthn"
-          placeholder="Enter your email address"
+          autoComplete='webauthn'
+          placeholder='Enter your email address'
         />
         <Clerk.FieldError />
       </Clerk.Field>
@@ -922,7 +931,7 @@
 - Add `<Step>` component which can be used instead of `<Start>`, `<Continue>` and `<Verifications>` like this:
   ```tsx
   // You can also use name="continue" or name="verifications"
-  <Step name="start">Contents</Step>
+  <Step name='start'>Contents</Step>
   ```
 
 ## 0.1.10
