@@ -8,8 +8,6 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
 
-console.log('API_URL', SUPPORTED_BAPI_VERSION);
-
 export type ClerkBackendApiRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   queryParams?: Record<string, unknown>;
