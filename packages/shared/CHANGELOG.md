@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.11.1
+
+### Patch Changes
+
+- Refactor imports from @clerk/shared to improve treeshaking support ([#4462](https://github.com/clerk/javascript/pull/4462)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.11.0
 
 ### Minor Changes
@@ -117,8 +123,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: "L2.secondFactor",
-      maxAge: "A1.10min",
+      level: 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
   });
   ```
