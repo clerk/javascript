@@ -1,17 +1,5 @@
 # Change Log
 
-## 5.30.2
-
-### Patch Changes
-
-- `clerk-js` is now built with [Rspack](https://rspack.dev) instead of Webpack. This is an internal tooling change that shouldn't affect consumers. by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
-- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
-- Updated dependencies [[`6f562876315750bbe066efe25e2257fdbfcf1b73`](https://github.com/clerk/javascript/commit/6f562876315750bbe066efe25e2257fdbfcf1b73), [`6f562876315750bbe066efe25e2257fdbfcf1b73`](https://github.com/clerk/javascript/commit/6f562876315750bbe066efe25e2257fdbfcf1b73)]:
-  - @clerk/shared@2.11.2
-  - @clerk/localizations@3.4.3
-
 ## 5.30.0
 
 ### Minor Changes
@@ -335,8 +323,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: 'L2.secondFactor',
-      maxAge: 'A1.10min',
+      level: "L2.secondFactor",
+      maxAge: "A1.10min",
     },
   });
   ```
@@ -693,24 +681,13 @@
   ```jsx
   <UserButton>
     <UserButton.MenuItems>
-      <UserButton.Link
-        label='Terms'
-        labelIcon={<Icon />}
-        href='/terms'
-      />
+      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
+      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
+      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
+      custom page to have been set in `/help`)
+      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
       <UserButton.Action
-        label='Help'
-        labelIcon={<Icon />}
-        open='help'
-      />{' '}
-      // Navigate to `/help` page when UserProfile opens as a modal. (Requires a custom page to have been set in
-      `/help`)
-      <UserButton.Action
-        label='manageAccount'
-        labelIcon={<Icon />}
-      />
-      <UserButton.Action
-        label='Chat Modal'
+        label="Chat Modal"
         labelIcon={<Icon />}
         onClick={() => setModal(true)}
       />
@@ -955,7 +932,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
+    callback: async (response) => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -970,11 +947,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
+    callback: async (response) => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === 'complete') {
+      if (signInOrUp.status === "complete") {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -1045,8 +1022,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=''
-    signUpForceRedirectUrl=''
+    signInForceRedirectUrl=""
+    signUpForceRedirectUrl=""
   />
   ```
 
@@ -1181,10 +1158,7 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn
-    routing='hash'
-    path='/sign-in'
-  />
+  <SignIn routing="hash" path="/sign-in" />
   ```
 
 - c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
@@ -1418,8 +1392,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -2372,8 +2346,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -2530,10 +2504,7 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn
-    routing='hash'
-    path='/sign-in'
-  />
+  <SignIn routing="hash" path="/sign-in" />
   ```
 
 ### Minor Changes
@@ -2797,19 +2768,15 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link
-      label='External'
-      url='/home'
-      labelIcon={<Icon />}
-    />
-    <UserProfile.Page label='account' />
-    <UserProfile.Page label='security' />
+    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
+    <UserProfile.Page label="account" />
+    <UserProfile.Page label="security" />
   </UserProfile>
   ```
 
@@ -2822,19 +2789,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label='External'
-      url='/home'
+      label="External"
+      url="/home"
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label='members' />
-    <OrganizationProfile.Page label='settings' />
+    <OrganizationProfile.Page label="members" />
+    <OrganizationProfile.Page label="settings" />
   </OrganizationProfile>
   ```
 
