@@ -1,5 +1,9 @@
+# This workflow exists as a security measure for handling fork PRs.
+# Since GitHub doesn't share repository secrets with fork PRs (for security),
+# this workflow acts as a manual approval mechanism where Clerk org members can
+# trigger integration tests on fork PRs by commenting '!run-integration-tests'
 name: Run Integration Tests
-run-name: Allowed by ${{ github.actor }}
+run-name: Executed by ${{ github.actor }}
 
 on:
   issue_comment:
