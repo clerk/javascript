@@ -69,6 +69,7 @@ export const ptBR: LocalizationResource = {
       title: undefined,
     },
   },
+  // Testando
   backButton: 'Voltar',
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
