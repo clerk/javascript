@@ -92,6 +92,9 @@ describe('isRelativeUrl(url,base)', () => {
     ['/test?clerk=true', true],
     ['/?clerk=true', true],
     ['https://www.clerk.com/', false],
+    ['//evil.com', false],
+    ['..//evil.com', false],
+    ['/good.com', true],
   ];
 
   test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
@@ -478,6 +481,7 @@ describe('isAllowedRedirectOrigin', () => {
     ['http//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['https//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['..//evil.com', ['https://www.clerk.com'], false],
   ];
 
   const warnMock = jest.spyOn(logger, 'warnOnce');

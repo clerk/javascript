@@ -258,7 +258,13 @@ export function isRelativeUrl(val: string): boolean {
   } catch (e) {
     try {
       // If this does not throw, it's a valid relative URL
-      new URL(val, DUMMY_URL_BASE);
+      const derivedPath = new URL(val, DUMMY_URL_BASE).pathname;
+
+      if (derivedPath.startsWith('//')) {
+        // Guard against directory-traversal attacks paired with protocol-relative URLs
+        return false;
+      }
+
       return true;
     } catch (e) {
       // Invalid URL case
