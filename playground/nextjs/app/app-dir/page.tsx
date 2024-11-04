@@ -41,6 +41,7 @@ export default async function Page() {
           <div>{JSON.stringify(user)}</div>
           <div>{JSON.stringify(currentUser_)}</div>
         </SignedIn>
+        {/* @ts-ignore */}
         <SignedOut>
           <SignIn routing='hash' />
         </SignedOut>
