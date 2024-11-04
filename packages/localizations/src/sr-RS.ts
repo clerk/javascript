@@ -515,6 +515,17 @@ export const srRS: LocalizationResource = {
         title: 'Uspešno verifikovan e-mail',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Unesi verifikacioni kod poslat na tvoj telefonski broj',
       formTitle: 'Verifikacioni kod',

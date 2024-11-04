@@ -511,6 +511,17 @@ export const koKR: LocalizationResource = {
         title: '이메일 인증 성공',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: '휴대폰 번호로 전송된 인증 코드를 입력하세요.',
       formTitle: '인증 코드',

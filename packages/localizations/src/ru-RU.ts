@@ -527,6 +527,17 @@ export const ruRU: LocalizationResource = {
         title: 'Почта верифицирована',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Введите верификационный код, отправленный на Ваш телефон',
       formTitle: 'Верификационный код',

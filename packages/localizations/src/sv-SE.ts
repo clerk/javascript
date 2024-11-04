@@ -519,6 +519,17 @@ export const svSE: LocalizationResource = {
         title: 'E-posten har verifierats',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Ange verifieringskoden som skickades till ditt telefonnummer',
       formTitle: 'Verifieringskod',

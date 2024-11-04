@@ -518,6 +518,17 @@ export const roRO: LocalizationResource = {
         title: 'E-mail verificat cu succes',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Introduceți codul de verificare trimis la numărul dvs. de telefon',
       formTitle: 'Cod de verificare',

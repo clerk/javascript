@@ -516,6 +516,17 @@ export const nbNO: LocalizationResource = {
         title: 'E-posten ble verifisert',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Skriv inn verifiseringskoden som er sendt til telefonnummeret ditt',
       formTitle: 'Verifiseringskode',

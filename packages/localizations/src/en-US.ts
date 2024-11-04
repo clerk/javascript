@@ -507,6 +507,18 @@ export const enUS: LocalizationResource = {
         title: 'Successfully verified email',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+      },
+      continue: {
+        subtitle: 'Please read and accept the terms to continue',
+        title: 'Legal consent',
+      },
+    },
     phoneCode: {
       formSubtitle: 'Enter the verification code sent to your phone number',
       formTitle: 'Verification code',

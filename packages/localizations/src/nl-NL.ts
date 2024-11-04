@@ -516,6 +516,17 @@ export const nlNL: LocalizationResource = {
         title: 'E-mail bevestigd',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Voer de verificatiecode in die verzonden is naar je telefoonnummer',
       formTitle: 'Verificatiecode',

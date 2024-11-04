@@ -19,19 +19,16 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
   let localizationKey: LocalizationKey | undefined;
 
   if (termsUrl && privacyPolicyUrl) {
-    localizationKey = localizationKeys(
-      'signUp.__experimental_legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy',
-      {
-        termsOfServiceLink: props.termsUrl,
-        privacyPolicyLink: props.privacyPolicyUrl,
-      },
-    );
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
+      termsOfServiceLink: props.termsUrl,
+      privacyPolicyLink: props.privacyPolicyUrl,
+    });
   } else if (termsUrl) {
-    localizationKey = localizationKeys('signUp.__experimental_legalConsent.checkbox.label__onlyTermsOfService', {
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyTermsOfService', {
       termsOfServiceLink: props.termsUrl,
     });
   } else if (privacyPolicyUrl) {
-    localizationKey = localizationKeys('signUp.__experimental_legalConsent.checkbox.label__onlyPrivacyPolicy', {
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyPrivacyPolicy', {
       privacyPolicyLink: props.privacyPolicyUrl,
     });
   }

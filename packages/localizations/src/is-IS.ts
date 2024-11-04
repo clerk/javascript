@@ -519,6 +519,17 @@ export const isIS: LocalizationResource = {
         title: 'Tókst að staðfesta netfang',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       formTitle: 'Staðfestingarkóði',

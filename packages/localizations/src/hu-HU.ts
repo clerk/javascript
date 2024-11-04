@@ -516,6 +516,17 @@ export const huHU: LocalizationResource = {
         title: 'Sikeresen megerősítetted az email címed',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Írd be a visszaigazoló kódot, amit a telefondra kaptál',
       formTitle: 'Visszaigazoló kód',

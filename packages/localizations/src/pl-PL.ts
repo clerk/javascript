@@ -515,6 +515,17 @@ export const plPL: LocalizationResource = {
         title: 'Adres e-mail został pomyślnie zweryfikowany',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na Twój numer telefonu',
       formTitle: 'Kod weryfikacyjny',

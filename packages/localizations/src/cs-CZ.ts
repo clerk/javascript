@@ -514,6 +514,17 @@ export const csCZ: LocalizationResource = {
         title: 'Email úspěšně ověřen',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Zadejte ověřovací kód poslaný na vaše telefonní číslo',
       formTitle: 'Ověřovací kód',

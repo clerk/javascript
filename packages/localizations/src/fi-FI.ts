@@ -517,6 +517,17 @@ export const fiFI: LocalizationResource = {
         title: 'Rekisteröitynyt toiseen välilehteen',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Syötä puhelimeesi lähetetty koodi',
       formTitle: 'Vahvistuskoodi',

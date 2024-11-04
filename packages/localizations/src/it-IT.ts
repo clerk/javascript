@@ -516,6 +516,17 @@ export const itIT: LocalizationResource = {
         title: 'Email verificata con successo',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Inserisci il codice di verifica inviato al tuo numero di telefono',
       formTitle: 'Codice di verifica',

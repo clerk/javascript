@@ -22,16 +22,16 @@ export function LegalAcceptedField({
   let localizedText: string | undefined;
 
   if (termsUrl && privacyPolicyUrl) {
-    localizedText = t('signUp.__experimental_legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
+    localizedText = t('signUp.legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
       termsOfServiceLink: termsUrl,
       privacyPolicyLink: privacyPolicyUrl,
     });
   } else if (termsUrl) {
-    localizedText = t('signUp.__experimental_legalConsent.checkbox.label__onlyTermsOfService', {
+    localizedText = t('signUp.legalConsent.checkbox.label__onlyTermsOfService', {
       termsOfServiceLink: termsUrl,
     });
   } else if (privacyPolicyUrl) {
-    localizedText = t('signUp.__experimental_legalConsent.checkbox.label__onlyPrivacyPolicy', {
+    localizedText = t('signUp.legalConsent.checkbox.label__onlyPrivacyPolicy', {
       privacyPolicyLink: privacyPolicyUrl,
     });
   }

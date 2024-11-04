@@ -512,6 +512,17 @@ export const thTH: LocalizationResource = {
         title: 'ยืนยันอีเมลสำเร็จ',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'ใส่รหัสยืนยันที่ส่งไปยังหมายเลขโทรศัพท์ของคุณ',
       formTitle: 'รหัสยืนยัน',

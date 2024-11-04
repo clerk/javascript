@@ -505,6 +505,17 @@ export const zhCN: LocalizationResource = {
         title: '成功验证电子邮件',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: '输入发送到您的电话号码的验证码',
       formTitle: '验证码',

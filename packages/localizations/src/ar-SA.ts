@@ -515,6 +515,17 @@ export const arSA: LocalizationResource = {
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'أدخل رمز التحقق المرسل إلى هاتفك',
       formTitle: 'رمز التحقق',

@@ -16,7 +16,8 @@ export type ClerkFieldId =
   | 'newPassword'
   | 'password'
   | 'phoneNumber'
-  | 'username';
+  | 'username'
+  | 'legalAccepted';
 
 /**
  * Possible types for the Clerk input element, several 'special' input types are included.

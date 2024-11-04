@@ -74,11 +74,7 @@ export const FormMachine = setup({
           throw new Error('Field name is required');
         }
 
-        const fieldsNameMap: Record<string, string> = {
-          legalAccepted: 'legalAccepted',
-        };
-        const fieldName = fieldsNameMap[params.name] || params.name;
-
+        const fieldName = params.name;
         if (context.fields.has(fieldName)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           context.fields.get(fieldName)!.feedback = params.feedback;

@@ -514,6 +514,17 @@ export const ukUA: LocalizationResource = {
         title: 'Успішно перевірено email',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Введіть код підтвердження, надісланий на ваш номер телефону',
       formTitle: 'Код підтвердження',

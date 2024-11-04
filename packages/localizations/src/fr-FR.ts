@@ -519,6 +519,17 @@ export const frFR: LocalizationResource = {
         title: 'Courriel vérifié avec succès',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Entrez le code de vérification envoyé à votre numéro de téléphone',
       formTitle: 'Le code de vérification',

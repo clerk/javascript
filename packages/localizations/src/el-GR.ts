@@ -516,6 +516,17 @@ export const elGR: LocalizationResource = {
         title: 'Επιτυχής επαλήθευση email',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Εισαγάγετε τον κωδικό επαλήθευσης που απεστάλη στον αριθμό τηλεφώνου σας',
       formTitle: 'Κωδικός επαλήθευσης',

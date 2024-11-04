@@ -514,6 +514,17 @@ export const viVN: LocalizationResource = {
         title: 'Xác minh email thành công',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Nhập mã xác minh đã được gửi đến số điện thoại của bạn',
       formTitle: 'Mã xác minh',

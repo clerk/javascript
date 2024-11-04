@@ -517,6 +517,17 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Таны утасны дугаар руу илгээсэн баталгаажуулах кодыг оруулна уу',
       formTitle: 'Баталгаажуулах код',

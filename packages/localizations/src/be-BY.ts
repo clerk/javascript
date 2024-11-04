@@ -519,6 +519,17 @@ export const beBY: LocalizationResource = {
         title: 'Пошта верыфікавана',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Увядзіце верыфікацыйны код, адправлены на Ваш тэлефон',
       formTitle: 'Верыфікацыйны код',

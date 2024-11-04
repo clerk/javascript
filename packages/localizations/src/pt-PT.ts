@@ -514,6 +514,17 @@ export const ptPT: LocalizationResource = {
         title: 'E-mail verificado com sucesso',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Insira o código enviado para o seu telemóvel',
       formTitle: 'Código de verificação',

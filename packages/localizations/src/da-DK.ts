@@ -515,6 +515,17 @@ export const daDK: LocalizationResource = {
         title: 'E-mail er bekræftet',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Indtast bekræftelseskoden sendt til dit telefonnummer',
       formTitle: 'Bekræftelseskode',
