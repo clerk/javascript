@@ -11,6 +11,7 @@ import type {
   AuthenticateWithMetamaskParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
+  ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -252,6 +253,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return errorThrower.throw(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#proxyUrl || '';
+  }
+
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
+    return this.clerkjs?.__internal_getOption(key);
   }
 
   constructor(options: IsomorphicClerkOptions) {

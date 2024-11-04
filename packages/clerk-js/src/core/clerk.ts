@@ -252,6 +252,10 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
+    return this.#options[key];
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
