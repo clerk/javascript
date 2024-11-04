@@ -133,6 +133,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
+    # Skip for fork PRs since secrets are not shared to prevent security vulnerabilities.
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event.name == 'workflow_dispatch' }}
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}

@@ -1,8 +1,11 @@
 name: Approve Integration Tests
 
 on:
-  issue_comment:
-    types: [created]
+  push:
+    branches:
+      - LauraBeatris:laura/sdk-1253-share-vars-with-forked-repos-so-lint-and-unit-tests-run-test-2
+    paths:
+      - '.github/workflows/**'
 
 permissions:
   pull-requests: write
