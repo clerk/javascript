@@ -100,7 +100,8 @@
     "pathToRegexp",
     "utils",
     "workerTimers",
-    "devBrowser"
+    "devBrowser",
+    "object"
   ],
   "scripts": {
     "build": "tsup",

@@ -454,12 +454,14 @@ export const beBY: LocalizationResource = {
     },
     start: {
       actionLink: 'Зарэгістравацца',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Выкарыстаць пошту',
       actionLink__use_email_username: 'Выкарыстаць пошту або імя карыстальніка',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Выкарыстаць нумар тэлефона',
       actionLink__use_username: 'Выкарыстаць імя карыстальніка',
       actionText: 'Няма ўліковага запісу?',
+      actionText__join_waitlist: undefined,
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увайсці',
     },
@@ -471,6 +473,17 @@ export const beBY: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Увядзіце ваш пароль',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Увайсці',
       actionText: 'Ужо ёсць уліковы запіс?',
@@ -512,6 +525,15 @@ export const beBY: LocalizationResource = {
       resendButton: 'Пераадправіць код',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Верыфікуйце Ваш нумар тэлефона',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Увайсці',
@@ -789,7 +811,6 @@ export const beBY: LocalizationResource = {
       successMessage: 'Ваш профіль быў абноўлены.',
       title: 'Абнавіць профіль',
     },
-
     start: {
       activeDevicesSection: {
         destructiveAction: 'Выйсці з прылады',
@@ -891,6 +912,20 @@ export const beBY: LocalizationResource = {
       successMessage: 'Кашалёк быў дададзены да вашага ўліковага запісу.',
       title: 'Дадаць web3 кашалёк',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

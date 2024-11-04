@@ -250,9 +250,20 @@ describe('SignUpStart', () => {
       const { wrapper } = await createFixtures(f => {
         f.withRestrictedMode();
       });
+      render(<SignUpStart />, { wrapper });
+      screen.getByText('Access restricted');
+    });
+  });
+
+  describe('Waitlist signup', () => {
+    it('shows the restricted component with waitlist mode', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withWaitlistMode();
+      });
 
       render(<SignUpStart />, { wrapper });
       screen.getByText('Access restricted');
+      screen.getByText('Join waitlist');
     });
   });
 
