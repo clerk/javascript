@@ -7,10 +7,13 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html lang='en'>
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
+    <>
+      {/* @ts-ignore */}
+      <ClerkProvider dynamic>
+        <html lang='en'>
+          <body>{children}</body>
+        </html>
+      </ClerkProvider>
+    </>
   );
 }
