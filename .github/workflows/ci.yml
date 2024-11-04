@@ -255,3 +255,19 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
           path: integration/test-results
           retention-days: 1
+
+  check-fork-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '👋 This PR is from a forked repository. Integration tests are skipped by default for security reasons.\n\nA maintainer can trigger the integration tests by commenting `/approve-integration-tests` on this PR.'
+            });
