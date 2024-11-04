@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.30.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.29.0
 
 ### Minor Changes
@@ -152,8 +168,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: "L2.secondFactor",
-      maxAge: "A1.10min",
+      level: 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
   });
   ```
@@ -362,13 +378,24 @@
   ```jsx
   <UserButton>
     <UserButton.MenuItems>
-      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
-      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
-      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
-      custom page to have been set in `/help`)
-      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Link
+        label='Terms'
+        labelIcon={<Icon />}
+        href='/terms'
+      />
       <UserButton.Action
-        label="Chat Modal"
+        label='Help'
+        labelIcon={<Icon />}
+        open='help'
+      />{' '}
+      // Navigate to `/help` page when UserProfile opens as a modal. (Requires a custom page to have been set in
+      `/help`)
+      <UserButton.Action
+        label='manageAccount'
+        labelIcon={<Icon />}
+      />
+      <UserButton.Action
+        label='Chat Modal'
         labelIcon={<Icon />}
         onClick={() => setModal(true)}
       />
@@ -476,7 +503,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -491,11 +518,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === "complete") {
+      if (signInOrUp.status === 'complete') {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -533,8 +560,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=""
-    signUpForceRedirectUrl=""
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
   />
   ```
 
@@ -775,8 +802,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1115,8 +1142,8 @@
   export {};
 
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1385,15 +1412,19 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
-    <UserProfile.Page label="account" />
-    <UserProfile.Page label="security" />
+    <UserProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <UserProfile.Page label='account' />
+    <UserProfile.Page label='security' />
   </UserProfile>
   ```
 
@@ -1406,19 +1437,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label="External"
-      url="/home"
+      label='External'
+      url='/home'
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label="members" />
-    <OrganizationProfile.Page label="settings" />
+    <OrganizationProfile.Page label='members' />
+    <OrganizationProfile.Page label='settings' />
   </OrganizationProfile>
   ```
 

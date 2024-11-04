@@ -1,5 +1,30 @@
 # @clerk/elements
 
+## 0.18.4
+
+### Patch Changes
+
+- Add Elements `<Link />` component. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  import * as Clerk from '@clerk/elements/common';
+  import NextLink from 'next/link';
+
+  function SignInPage() {
+    return (
+      <>
+        <Clerk.Link navigate='sign-up'>Sign up</Clerk.Link>
+
+        <Clerk.Link navigate='sign-up'>{url => <NextLink href={url}>Sign up</NextLink>}</Clerk.Link>
+      </>
+    );
+  }
+  ```
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+
 ## 0.18.3
 
 ### Patch Changes
