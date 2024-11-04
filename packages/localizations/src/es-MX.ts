@@ -455,12 +455,14 @@ export const esMX: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrarse',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilizar correo electrónico',
       actionLink__use_email_username: 'Utilizar correo electrónico o nombre de usuario',
       actionLink__use_passkey: 'Usar llave de acceso',
       actionLink__use_phone: 'Utilizar teléfono',
       actionLink__use_username: 'Utilizar nombre de usuario',
       actionText: '¿No tiene cuenta?',
+      actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Iniciar sesión',
     },
@@ -472,6 +474,17 @@ export const esMX: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Entrar',
       actionText: '¿Tiene una cuenta?',
@@ -513,6 +526,15 @@ export const esMX: LocalizationResource = {
       resendButton: 'Reenviar código',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Verifique su teléfono',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Acceder',
@@ -890,6 +912,20 @@ export const esMX: LocalizationResource = {
       successMessage: 'La billetera ha sido agregada a su cuenta.',
       title: 'Añadir web3 billetera',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

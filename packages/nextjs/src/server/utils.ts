@@ -1,9 +1,9 @@
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';

@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.3.27
+
+### Patch Changes
+
+- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc), [`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/clerk-js@5.30.3
+  - @clerk/shared@2.11.3
+  - @clerk/clerk-react@5.14.3
+
 ## 1.3.24
 
 ### Patch Changes
@@ -285,9 +296,9 @@
   Example Usage:
 
   ```ts
-  import { __unstable__createClerkClient } from "@clerk/chrome-extension/background";
+  import { __unstable__createClerkClient } from '@clerk/chrome-extension/background';
 
-  const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "";
+  const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
   async function getToken() {
     const clerk = await __unstable__createClerkClient({
@@ -299,7 +310,7 @@
   // NOTE: A runtime listener cannot be async.
   //       It must return true, in order to keep the connection open and send a response later.
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    getToken().then((token) => sendResponse({ token }));
+    getToken().then(token => sendResponse({ token }));
     return true;
   });
   ```
@@ -1308,29 +1319,24 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
     // After
-    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 
     // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from "@clerk/clerk-react";
-    // After
-    import {
-      isClerkAPIResponseError,
-      isEmailLinkError,
-      isKnownError,
-      isMetamaskError,
-    } from "@clerk/clerk-react/errors";
+    } from '@clerk/clerk-react/errors';
 
     // Before
-    import { MultisessionAppSupport } from "@clerk/clerk-react";
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
     // After
-    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:

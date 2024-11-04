@@ -1,4 +1,4 @@
-import { deepSnakeToCamel } from '@clerk/shared';
+import { deepSnakeToCamel } from '@clerk/shared/underscore';
 import type {
   __experimental_SessionVerificationFirstFactor,
   __experimental_SessionVerificationJSON,

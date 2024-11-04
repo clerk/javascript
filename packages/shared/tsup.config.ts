@@ -10,7 +10,13 @@ export default defineConfig(overrideOptions => {
   const isWatch = !!overrideOptions.watch;
 
   return {
-    entry: ['./src/*.{ts,tsx}', './src/react/index.ts', '!./src/**/*.test.{ts,tsx}'],
+    entry: [
+      './src/*.{ts,tsx}',
+      './src/react/index.ts',
+      './src/utils/index.ts',
+      './src/workerTimers/index.ts',
+      '!./src/**/*.test.{ts,tsx}',
+    ],
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,

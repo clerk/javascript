@@ -1,9 +1,7 @@
 import type { Jwt, JwtPayload } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
-// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
-// For more information refer to https://sinonjs.org/how-to/stub-dependency/
-import runtime from '../runtime';
+import { runtime } from '../runtime';
 import { base64url } from '../util/rfc4648';
 import { getCryptoAlgorithm } from './algorithms';
 import {

@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.2.3
+
+### Patch Changes
+
+- Updates broken Clerk documentation references by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.2.0
 
 ### Minor Changes
@@ -33,7 +39,7 @@
   Previously the `auth()` method from `@clerk/nextjs/server` was synchronous.
 
   ```typescript
-  import { auth } from "@clerk/nextjs/server";
+  import { auth } from '@clerk/nextjs/server';
 
   export function GET() {
     const { userId } = auth();

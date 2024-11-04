@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Home.module.css';
 
+
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
@@ -48,6 +49,9 @@ const Home: NextPage = () => {
           </li>
           <li>
             <Link href={'/user-examples'}>User examples</Link>
+          </li>
+          <li>
+            <Link href={'/waitlist'}>Waitlist</Link>
           </li>
         </ul>
       </main>

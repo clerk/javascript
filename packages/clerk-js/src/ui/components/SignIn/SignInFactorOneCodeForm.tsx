@@ -1,4 +1,4 @@
-import { isUserLockedError } from '@clerk/shared';
+import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';

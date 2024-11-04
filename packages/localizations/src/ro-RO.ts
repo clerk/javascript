@@ -453,12 +453,14 @@ export const roRO: LocalizationResource = {
     },
     start: {
       actionLink: 'Înscrieți-vă',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilizați e-mailul',
       actionLink__use_email_username: 'Utilizați e-mail sau nume de utilizator',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utilizați telefonul',
       actionLink__use_username: 'Utilizați numele de utilizator',
       actionText: 'Nu aveți cont?',
+      actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Conectați-vă',
     },
@@ -470,6 +472,17 @@ export const roRO: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Introduceți parola dvs',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Conectați-vă',
       actionText: 'Aveți un cont?',
@@ -511,6 +524,15 @@ export const roRO: LocalizationResource = {
       resendButton: 'Nu ați primit un cod? Trimiteți din nou',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verificarea telefonului dvs',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Conectați-vă',
@@ -892,6 +914,20 @@ export const roRO: LocalizationResource = {
       successMessage: 'Portofelul a fost adăugat în contul dumneavoastră.',
       title: 'Adăugați portofelul web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;
