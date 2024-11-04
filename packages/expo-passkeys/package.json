@@ -27,7 +27,6 @@
     "expo-module": "expo-module",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
-    "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly"
   },
   "dependencies": {
