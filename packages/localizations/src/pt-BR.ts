@@ -212,7 +212,6 @@ export const ptBR: LocalizationResource = {
           headerTitle: 'Sugestões automáticas',
           primaryButton: 'Gerenciar domínios verificados',
         },
-        // Testando
         menuAction__approve: 'Aprovar',
         menuAction__reject: 'Rejeitar',
         tableHeader__requested: 'Acesso solicitado',

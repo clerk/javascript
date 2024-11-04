@@ -4,16 +4,27 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  pull-requests: write
+  contents: write
+  actions: write  # Needed to trigger other workflows
+
 jobs:
   approve-integration-tests:
     name: Approve Integration Tests
-    # Only run if comment is on a PR and contains the approval command
+    # Add some debug logging to check conditions
     if: |
       github.event.issue.pull_request &&
       contains(github.event.comment.body, '/approve-integration-tests')
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug info
+        run: |
+          echo "Comment body: ${{ github.event.comment.body }}"
+          echo "Is PR: ${{ github.event.issue.pull_request != null }}"
+          echo "Commenter: ${{ github.event.comment.user.login }}"
+
       - name: Check if commenter has write access
         id: check-permission
         uses: actions/github-script@v7
