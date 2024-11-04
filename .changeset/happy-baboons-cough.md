@@ -1,3 +1,2 @@
 ---
-"@clerk/localizations": patch
 ---

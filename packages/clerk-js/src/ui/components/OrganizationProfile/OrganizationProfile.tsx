@@ -13,8 +13,6 @@ import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
   const { organization } = useOrganization();
 
-  console.log('test');
-
   if (!organization) {
     return null;
   }
