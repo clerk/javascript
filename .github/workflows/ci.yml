@@ -205,7 +205,7 @@ jobs:
         run: cd packages/astro && npm run copy:components
 
       - name: Write all ENV certificates to files in integration/certs
-        if: ${{ steps.task-status.outputs.affected == '1' }}
+        if: ${{ steps.task-status.outputs.affected == '1' }} && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         env:
           INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
@@ -230,7 +230,12 @@ jobs:
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
-        run: sudo --preserve-env npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        run: |
+          if [ -z "${{ secrets.INTEGRATION_INSTANCE_KEYS }}" ]; then
+            echo "Skipping integration tests - required secrets not available"
+            exit 0
+          fi
+          sudo --preserve-env npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
