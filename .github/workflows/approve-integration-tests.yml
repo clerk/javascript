@@ -1,0 +1,76 @@
+name: Approve Integration Tests
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  approve-integration-tests:
+    name: Approve Integration Tests
+    # Only run if comment is on a PR and contains the approval command
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/approve-integration-tests')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if commenter has write access
+        id: check-permission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.payload.comment.user.login,
+            });
+            const hasWriteAccess = ['admin', 'write'].includes(response.data.permission);
+            return hasWriteAccess;
+
+      - name: Trigger integration tests
+        if: steps.check-permission.outputs.result == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.issue.number;
+
+            // Get PR details
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number,
+            });
+
+            // Trigger the CI workflow
+            await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: 'ci.yml',
+              ref: pr.data.head.ref,
+              inputs: {
+                pr_number: pull_number.toString()
+              }
+            });
+
+            // Add comment to PR
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pull_number,
+              body: '✅ Integration tests have been approved and triggered.'
+            });
+
+      - name: Comment on insufficient permissions
+        if: steps.check-permission.outputs.result != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: '❌ Only repository maintainers can approve integration tests.'
+            });
