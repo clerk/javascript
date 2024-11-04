@@ -26,6 +26,7 @@ export default async function Page() {
       <div>
         <h1>Hello, Next.js!</h1>
         {userId ? <h3>Signed in as: {userId}</h3> : <h3>Signed out</h3>}
+        {/* @ts-ignore */}
         <SignedIn>
           <UserButton
             userProfileMode='navigation'
