@@ -4,7 +4,13 @@ import React from 'react';
 
 import { Clerk as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
-import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
+import {
+  ComponentContext,
+  componentContextWrapper,
+  CoreClerkContextWrapper,
+  EnvironmentProvider,
+  OptionsProvider,
+} from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
@@ -84,21 +90,24 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
+
+      const ContextProvider = componentContextWrapper({ componentName });
       return (
         <CoreClerkContextWrapper
           clerk={clerkMock}
           // Clear swr cache
           swrConfig={{ provider: () => new Map() }}
         >
+          <ComponentContext.Provider value={{ componentName: 'GoogleOneTap' }} />
           <EnvironmentProvider value={environmentMock}>
             <OptionsProvider value={optionsMock}>
               <RouteContext.Provider value={routerMock}>
                 <AppearanceProvider appearanceKey={'signIn'}>
                   <FlowMetadataProvider flow={componentName as any}>
                     <InternalThemeProvider>
-                      <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
+                      <ContextProvider.Provider value={{ ...componentContextProps, componentName }}>
                         {children}
-                      </ComponentContext.Provider>
+                      </ContextProvider.Provider>
                     </InternalThemeProvider>
                   </FlowMetadataProvider>
                 </AppearanceProvider>

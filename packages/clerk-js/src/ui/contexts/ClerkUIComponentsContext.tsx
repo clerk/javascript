@@ -36,6 +36,21 @@ const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
+export function componentContextWrapper({ componentName }: { componentName: 'SignIn' }): typeof SignInContext;
+export function componentContextWrapper({ componentName }: { componentName: string }): typeof ComponentContext;
+export function componentContextWrapper({
+  componentName,
+}: {
+  componentName: string;
+}): typeof SignInContext | typeof ComponentContext {
+  switch (componentName) {
+    case 'SignIn':
+      return SignInContext;
+    default:
+      return ComponentContext;
+  }
+}
+
 const getInitialValuesFromQueryParams = (queryString: string, params: string[]) => {
   const props: Record<string, string> = {};
   const searchParams = new URLSearchParams(queryString);
@@ -131,13 +146,21 @@ export type SignInContextType = SignInCtx & {
   transferable: boolean;
 };
 
+export const SignInContext = React.createContext<SignInCtx | null>(null);
+
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
+  const context = React.useContext(SignInContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
+
+  if (context === null || context.componentName !== 'SignIn') {
+    throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
+  }
+
+  const { componentName, ...ctx } = context;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
@@ -153,10 +176,6 @@ export const useSignInContext = (): SignInContextType => {
     },
     queryParams,
   );
-
-  if (componentName !== 'SignIn') {
-    throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
-  }
 
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
   const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
