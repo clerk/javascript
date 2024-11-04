@@ -11,8 +11,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "beta",
-    "@clerk/themes": "beta",
+    "@clerk/nextjs": "canary",
+    "@clerk/themes": "canary",
     "next": "^14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
