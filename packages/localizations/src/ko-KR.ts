@@ -446,12 +446,14 @@ export const koKR: LocalizationResource = {
     },
     start: {
       actionLink: '회원가입',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: '이메일 사용하기',
       actionLink__use_email_username: '이메일 또는 사용자 이름 사용하기',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '휴대폰 번호 사용하기',
       actionLink__use_username: '사용자 이름 사용하기',
       actionText: '계정이 없으신가요?',
+      actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       title: '{{applicationName}}에 로그인',
     },
@@ -463,6 +465,17 @@ export const koKR: LocalizationResource = {
   },
   signInEnterPasswordTitle: '비밀번호를 입력하세요',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: '로그인',
       actionText: '계정이 있으신가요?',
@@ -504,6 +517,15 @@ export const koKR: LocalizationResource = {
       resendButton: '코드 재전송',
       subtitle: '휴대폰으로 전송된 인증 코드를 입력하세요',
       title: '휴대폰 번호 인증',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: '로그인하기',
@@ -870,6 +892,20 @@ export const koKR: LocalizationResource = {
       successMessage: '지갑이 계정에 추가되었습니다ß.',
       title: 'web3 지갑 추가',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

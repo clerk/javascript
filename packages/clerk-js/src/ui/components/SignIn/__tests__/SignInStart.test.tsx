@@ -134,6 +134,17 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('Waitlist mode', () => {
+    it('shows the waitlist message', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withWaitlistMode();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText('Join waitlist');
+    });
+  });
+
   describe('Social OAuth', () => {
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
       const { wrapper } = await createFixtures(f => {

@@ -453,12 +453,14 @@ export const svSE: LocalizationResource = {
     },
     start: {
       actionLink: 'Skapa konto',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
       actionLink__use_passkey: 'Använd passkey istället',
       actionLink__use_phone: 'Använd telefon',
       actionLink__use_username: 'Använd användarnamn',
       actionText: 'Har du inget konto?',
+      actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Logga in',
     },
@@ -470,6 +472,17 @@ export const svSE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Logga in',
       actionText: 'Har du redan ett konto?',
@@ -513,6 +526,15 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Verifiera din telefon',
     },
+    restrictedAccess: {
+      actionLink: 'Tillbaka till inloggning',
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: 'Åtkomst till denna app är begränsad och en inbjudan krävs för att registrera sig.',
+      subtitleWaitlist: undefined,
+      title: 'Begränsad åtkomst',
+    },
     start: {
       actionLink: 'Logga in',
       actionLink__use_email: 'Använd e-post istället',
@@ -520,11 +542,6 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
-    },
-    restrictedAccess: {
-      title: 'Begränsad åtkomst',
-      subtitle: 'Åtkomst till denna app är begränsad och en inbjudan krävs för att registrera sig.',
-      actionLink: 'Tillbaka till inloggning',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -890,6 +907,20 @@ export const svSE: LocalizationResource = {
       successMessage: 'Plånboken har lagts till i ditt konto.',
       title: 'Lägg till web3-plånbok',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

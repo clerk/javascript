@@ -451,12 +451,14 @@ export const elGR: LocalizationResource = {
     },
     start: {
       actionLink: 'Εγγραφή',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Χρήση email',
       actionLink__use_email_username: 'Χρήση email ή ονόματος χρήστη',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Χρήση τηλεφώνου',
       actionLink__use_username: 'Χρήση ονόματος χρήστη',
       actionText: 'Δεν έχετε λογαριασμό;',
+      actionText__join_waitlist: undefined,
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Σύνδεση',
     },
@@ -468,6 +470,17 @@ export const elGR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Σύνδεση',
       actionText: 'Έχετε ήδη λογαριασμό;',
@@ -509,6 +522,15 @@ export const elGR: LocalizationResource = {
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Επαληθεύστε το τηλέφωνό σας',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Σύνδεση',
@@ -890,6 +912,20 @@ export const elGR: LocalizationResource = {
       successMessage: 'Το πορτοφόλι έχει προστεθεί στον λογαριασμό σας.',
       title: 'Προσθήκη web3 πορτοφολιού',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

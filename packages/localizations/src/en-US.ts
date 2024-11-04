@@ -440,12 +440,14 @@ export const enUS: LocalizationResource = {
     },
     start: {
       actionLink: 'Sign up',
+      actionLink__join_waitlist: 'Join waitlist',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
       actionLink__use_passkey: 'Use passkey instead',
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Don’t have an account?',
+      actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
     },
@@ -457,6 +459,18 @@ export const enUS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+      },
+      continue: {
+        subtitle: 'Please read and accept the terms to continue',
+        title: 'Legal consent',
+      },
+    },
     continue: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -500,6 +514,15 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
     },
+    restrictedAccess: {
+      actionLink: 'Sign in',
+      actionText: 'Already have an account?',
+      blockButton__emailSupport: 'Email support',
+      blockButton__joinWaitlist: 'Join waitlist',
+      subtitle: 'Sign ups are currently disabled. If you believe you should have access, please contact support.',
+      subtitleWaitlist: 'Sign ups are currently disabled. To be the first to know when we launch, join the waitlist.',
+      title: 'Access restricted',
+    },
     start: {
       actionLink: 'Sign in',
       actionLink__use_email: 'Use email instead',
@@ -507,25 +530,6 @@ export const enUS: LocalizationResource = {
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
-    },
-    restrictedAccess: {
-      title: 'Access restricted',
-      subtitle: 'Sign ups are currently disabled. If you believe you should have access, please contact support.',
-      actionLink: 'Sign in',
-      actionText: 'Already have an account?',
-      blockButton__emailSupport: 'Email support',
-    },
-    __experimental_legalConsent: {
-      continue: {
-        subtitle: 'Please read and accept the terms to continue',
-        title: 'Legal consent',
-      },
-      checkbox: {
-        label__termsOfServiceAndPrivacyPolicy:
-          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
-        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
-        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
-      },
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -896,6 +900,20 @@ export const enUS: LocalizationResource = {
       successMessage: 'The wallet has been added to your account.',
       title: 'Add web3 wallet',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: 'Sign in',
+      actionText: 'Already have access?',
+      formButton: 'Join the waitlist',
+      subtitle: 'Enter your email address and we’ll let you know when your spot is ready',
+      title: 'Join the waitlist',
+    },
+    success: {
+      message: 'You will be redirected soon...',
+      subtitle: 'We’ll be in touch when your spot is ready',
+      title: 'Thanks for joining the waitlist!',
     },
   },
 } as const;

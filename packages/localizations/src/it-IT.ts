@@ -451,12 +451,14 @@ export const itIT: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrati',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Usa email',
       actionLink__use_email_username: 'Usa email o username',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Usa telefono',
       actionLink__use_username: 'Usa username',
       actionText: 'Non hai un account?',
+      actionText__join_waitlist: undefined,
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Accedi',
     },
@@ -468,6 +470,17 @@ export const itIT: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Inserisci la tua password',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Accedi',
       actionText: 'Hai un account?',
@@ -509,6 +522,15 @@ export const itIT: LocalizationResource = {
       resendButton: 'Rinvia codice',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Verifica il tuo numero di telefono',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Accedi',
@@ -886,6 +908,20 @@ export const itIT: LocalizationResource = {
       successMessage: 'Il wallet é stato aggiunto al tuo account.',
       title: 'Aggiungi web3 wallet',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

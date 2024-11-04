@@ -453,12 +453,14 @@ export const isIS: LocalizationResource = {
     },
     start: {
       actionLink: 'Skrá sig',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Nota netfang',
       actionLink__use_email_username: 'Nota netfang eða notendanafn',
       actionLink__use_passkey: 'Nota lykil í staðinn',
       actionLink__use_phone: 'Nota síma',
       actionLink__use_username: 'Nota notendanafn',
       actionText: 'Ertu ekki með reikning?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
       title: 'Skrá inn í {{applicationName}}',
     },
@@ -470,6 +472,17 @@ export const isIS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Skrá inn',
       actionText: 'Ertu með reikning?',
@@ -512,6 +525,15 @@ export const isIS: LocalizationResource = {
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       title: 'Staðfesta símanúmer',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Skrá inn',
@@ -890,6 +912,20 @@ export const isIS: LocalizationResource = {
       successMessage: 'Veskið hefur verið bætt við reikninginn þinn.',
       title: 'Bæta við web3 veski',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

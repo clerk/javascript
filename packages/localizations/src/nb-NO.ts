@@ -451,12 +451,14 @@ export const nbNO: LocalizationResource = {
     },
     start: {
       actionLink: 'Opprett konto',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Bruk e-post',
       actionLink__use_email_username: 'Bruk e-post eller brukernavn',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Bruk telefon',
       actionLink__use_username: 'Bruk brukernavn',
       actionText: 'Ingen konto?',
+      actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
     },
@@ -468,6 +470,17 @@ export const nbNO: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Skriv inn passordet ditt',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Logg inn',
       actionText: 'Har du allerede en konto?',
@@ -509,6 +522,15 @@ export const nbNO: LocalizationResource = {
       resendButton: 'Send kode på nytt',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Verifiser telefonen din',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Logg inn',
@@ -884,6 +906,20 @@ export const nbNO: LocalizationResource = {
       successMessage: 'Lommeboken har blitt lagt til kontoen din.',
       title: 'Legg til web3-lommebok',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

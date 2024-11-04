@@ -452,12 +452,14 @@ export const mnMN: LocalizationResource = {
     },
     start: {
       actionLink: 'Бүртгүүлэх',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Имэйл ашиглах',
       actionLink__use_email_username: 'Имэйл эсвэл хэрэглэгчийн нэр ашиглах',
       actionLink__use_passkey: 'Passkey ашиглах',
       actionLink__use_phone: 'Утсаа ашиглах',
       actionLink__use_username: 'Хэрэглэгчийн нэрийг ашиглах',
       actionText: 'Бүртгэлгүй юу?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       title: '{{applicationName}} руу нэвтрэх',
     },
@@ -469,6 +471,17 @@ export const mnMN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Нэвтрэх',
       actionText: 'Бүртгэлтэй юу?',
@@ -510,6 +523,15 @@ export const mnMN: LocalizationResource = {
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'Таны утсанд илгээсэн баталгаажуулах кодыг оруулна уу',
       title: 'Утсаар баталгаажуулах',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Нэвтрэх',
@@ -885,6 +907,20 @@ export const mnMN: LocalizationResource = {
       successMessage: 'Таны бүртгэлд web3 wallet нэмэгдлээ.',
       title: 'Web3 wallet нэмэх',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

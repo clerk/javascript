@@ -454,12 +454,14 @@ export const frFR: LocalizationResource = {
     },
     start: {
       actionLink: "S'inscrire",
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utiliser e-mail',
       actionLink__use_email_username: "Utiliser l'e-mail ou le nom d'utilisateur",
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utiliser téléphone',
       actionLink__use_username: "Utiliser le nom d'utilisateur",
       actionText: "Vous n'avez pas encore de compte ?",
+      actionText__join_waitlist: undefined,
       subtitle: 'pour continuer vers {{applicationName}}',
       title: "S'identifier",
     },
@@ -471,6 +473,17 @@ export const frFR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: "S'identifier",
       actionText: 'Vous avez déjà un compte ?',
@@ -512,6 +525,15 @@ export const frFR: LocalizationResource = {
       resendButton: 'Renvoyer le code',
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre téléphone',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: "S'identifier",
@@ -890,6 +912,20 @@ export const frFR: LocalizationResource = {
       successMessage: 'Le portefeuille a été ajouté à votre compte.',
       title: 'Ajouter un portefeuille Web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

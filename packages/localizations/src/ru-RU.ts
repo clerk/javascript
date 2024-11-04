@@ -460,12 +460,14 @@ export const ruRU: LocalizationResource = {
     },
     start: {
       actionLink: 'Зарегистрироваться',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Использовать почту',
       actionLink__use_email_username: 'Использовать почту или имя пользователя',
       actionLink__use_passkey: 'Использовать ключ доступа вместо этого',
       actionLink__use_phone: 'Использовать номер телефона',
       actionLink__use_username: 'Использовать имя пользователя',
       actionText: 'Нет учетной записи?',
+      actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Войти',
     },
@@ -477,6 +479,18 @@ export const ruRU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'Я согласен с {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
+        label__onlyTermsOfService: 'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }} и {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
+      },
+      continue: {
+        subtitle: 'Пожалуйста, прочитайте и примите условия, чтобы продолжить.',
+        title: 'Юридическое согласие',
+      },
+    },
     continue: {
       actionLink: 'Войти',
       actionText: 'Уже есть учетная запись?',
@@ -520,6 +534,16 @@ export const ruRU: LocalizationResource = {
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Верифицируйте Ваш номер телефона',
     },
+    restrictedAccess: {
+      actionLink: 'Войти',
+      actionText: 'Уже есть учетная запись?',
+      blockButton__emailSupport: 'Написать в поддержку',
+      blockButton__joinWaitlist: undefined,
+      subtitle:
+        'Регистрация в данный момент отключена. Если вы считаете, что у вас должен быть доступ, пожалуйста, свяжитесь с поддержкой.',
+      subtitleWaitlist: undefined,
+      title: 'Доступ ограничен',
+    },
     start: {
       actionLink: 'Войти',
       actionLink__use_email: 'Использовать электронную почту вместо этого',
@@ -527,26 +551,6 @@ export const ruRU: LocalizationResource = {
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
-    },
-    restrictedAccess: {
-      title: 'Доступ ограничен',
-      subtitle:
-        'Регистрация в данный момент отключена. Если вы считаете, что у вас должен быть доступ, пожалуйста, свяжитесь с поддержкой.',
-      actionLink: 'Войти',
-      actionText: 'Уже есть учетная запись?',
-      blockButton__emailSupport: 'Написать в поддержку',
-    },
-    __experimental_legalConsent: {
-      continue: {
-        subtitle: 'Пожалуйста, прочитайте и примите условия, чтобы продолжить.',
-        title: 'Юридическое согласие',
-      },
-      checkbox: {
-        label__termsOfServiceAndPrivacyPolicy:
-          'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }} и {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
-        label__onlyTermsOfService: 'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }}',
-        label__onlyPrivacyPolicy: 'Я согласен с {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
-      },
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -919,6 +923,20 @@ export const ruRU: LocalizationResource = {
       successMessage: 'Кошелек был добавлен к вашей учетной записи.',
       title: 'Добавить web3 кошелек',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

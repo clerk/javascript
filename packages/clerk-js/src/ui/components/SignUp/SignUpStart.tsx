@@ -257,7 +257,7 @@ function _SignUpStart(): JSX.Element {
     (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
 
-  if (mode === SIGN_UP_MODES.RESTRICTED && !hasTicket) {
+  if (mode !== SIGN_UP_MODES.PUBLIC && !hasTicket) {
     return <SignUpRestrictedAccess />;
   }
 

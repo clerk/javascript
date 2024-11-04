@@ -452,12 +452,14 @@ export const fiFI: LocalizationResource = {
     },
     start: {
       actionLink: 'Rekisteröidy',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Käytä sähköpostia',
       actionLink__use_email_username: 'Käytä sähköpostia tai käyttäjänimeä',
       actionLink__use_passkey: 'Käytä pääsyavainta',
       actionLink__use_phone: 'Käytä puhelinta',
       actionLink__use_username: 'Käytä käyttäjänimeä',
       actionText: 'Eikö sinulla ole tiliä?',
+      actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Kirjaudu sisään',
     },
@@ -469,6 +471,17 @@ export const fiFI: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
@@ -510,6 +523,15 @@ export const fiFI: LocalizationResource = {
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Syötä puhelimeesi lähetetty koodi jatkaaksesi.',
       title: 'Tarkista puhelimesi',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Kirjaudu sisään',
@@ -886,6 +908,20 @@ export const fiFI: LocalizationResource = {
       successMessage: 'Web3-lompakko on lisätty tilillesi.',
       title: 'Lisää web3-lompakko',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

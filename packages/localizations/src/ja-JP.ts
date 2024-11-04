@@ -451,12 +451,14 @@ export const jaJP: LocalizationResource = {
     },
     start: {
       actionLink: 'サインアップ',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
+      actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'サインイン',
     },
@@ -468,6 +470,17 @@ export const jaJP: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'パスワードを入力してください',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'サインイン',
       actionText: 'アカウントをお持ちですか？',
@@ -509,6 +522,15 @@ export const jaJP: LocalizationResource = {
       resendButton: 'コードを再送信',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: '電話番号を確認',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'サインイン',
@@ -879,6 +901,20 @@ export const jaJP: LocalizationResource = {
       successMessage: 'ウォレットがアカウントに追加されました。',
       title: 'Web3ウォレットの追加',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

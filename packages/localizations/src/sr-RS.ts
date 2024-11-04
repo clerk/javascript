@@ -450,12 +450,14 @@ export const srRS: LocalizationResource = {
     },
     start: {
       actionLink: 'Registruj se',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Koristi e-mail',
       actionLink__use_email_username: 'Koristi e-mail ili korisničko ime',
       actionLink__use_passkey: 'Koristi ključ za prolaz umesto toga',
       actionLink__use_phone: 'Koristi telefon',
       actionLink__use_username: 'Koristi korisničko ime',
       actionText: 'Nemaš nalog?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
       title: 'Prijavi se na {{applicationName}}',
     },
@@ -467,6 +469,17 @@ export const srRS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Unesi svoju lozinku',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Prijavi se',
       actionText: 'Već imaš nalog?',
@@ -508,6 +521,15 @@ export const srRS: LocalizationResource = {
       resendButton: 'Nisi primio kod? Pošalji ponovo',
       subtitle: 'Unesi verifikacioni kod poslat na tvoj telefon',
       title: 'Verifikuj svoj telefon',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Prijavi se',
@@ -883,6 +905,20 @@ export const srRS: LocalizationResource = {
       successMessage: 'Novčanik je dodat na tvoj nalog.',
       title: 'Dodaj web3 novčanik',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

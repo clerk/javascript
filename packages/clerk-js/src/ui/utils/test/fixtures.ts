@@ -189,6 +189,7 @@ const createBaseUserSettings = (): UserSettingsJSON => {
       progressive: true,
       captcha_enabled: false,
       disable_hibp: false,
+      mode: 'public',
     },
     restrictions: {
       allowlist: {

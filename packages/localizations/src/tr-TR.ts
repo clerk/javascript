@@ -452,12 +452,14 @@ export const trTR: LocalizationResource = {
     },
     start: {
       actionLink: 'Kayıt ol',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'E-posta kullan',
       actionLink__use_email_username: 'E-posta veya kullanıcı adı kullan',
       actionLink__use_passkey: 'Bunun yerine geçiş anahtarını kullanın',
       actionLink__use_phone: 'Telefon kullan',
       actionLink__use_username: 'Kullanıcı adı kullan',
       actionText: 'Hesabınız yok mu?',
+      actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Giriş yap',
     },
@@ -469,6 +471,17 @@ export const trTR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Giriş yap',
       actionText: 'Hesabınız var mı?',
@@ -510,6 +523,15 @@ export const trTR: LocalizationResource = {
       resendButton: 'Kodu tekrar gönder',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Telefon numaranızı doğrulayın',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Giriş yap',
@@ -885,6 +907,20 @@ export const trTR: LocalizationResource = {
       successMessage: 'Web3 cüzdanınız hesabınıza eklendi.',
       title: 'Web3 cüzdanı ekle',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;
