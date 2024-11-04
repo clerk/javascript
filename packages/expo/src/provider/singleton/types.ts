@@ -12,8 +12,10 @@ export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
   /**
-   * This is an experimental prop that is being used from expo apps,
-   * this feature is only available for private beta users.
+   * Note: Passkey support in Expo is currently in a limited rollout phase.
+   * If you're interested in using this feature, please contact us for early access or additional details.
+   *
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_passkeys?: {
     get: ({
