@@ -1,17 +1,17 @@
 # Change Log
 
-## 6.1.1
+## 6.1.3
 
 ### Patch Changes
 
-- Fix static analysis warnings warning during production NextJS builds ([#4462](https://github.com/clerk/javascript/pull/4462)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Fix static analysis warnings warning during production NextJS builds by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Updates broken Clerk documentation references ([#4459](https://github.com/clerk/javascript/pull/4459)) by [@LauraBeatris](https://github.com/LauraBeatris)
+- Updates broken Clerk documentation references by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Updated dependencies [[`bfe4620155b16f71c44247e845c8040230355015`](https://github.com/clerk/javascript/commit/bfe4620155b16f71c44247e845c8040230355015)]:
-  - @clerk/shared@2.11.1
-  - @clerk/backend@1.15.3
-  - @clerk/clerk-react@5.14.1
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/backend@1.15.5
+  - @clerk/clerk-react@5.14.3
 
 ## 6.1.0
 

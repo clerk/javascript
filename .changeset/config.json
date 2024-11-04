@@ -12,7 +12,6 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@clerk/expo-passkeys"],
   "snapshot": {
     "useCalculatedVersion": true,
     "prereleaseTemplate": "{tag}.v{commit}"
