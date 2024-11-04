@@ -49,8 +49,9 @@ const useNextRouter = (): ClerkHostRouter => {
     shallowPush(path: string) {
       canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
     },
-    pathname: () => window.location.pathname,
-    searchParams: () => new URLSearchParams(window.location.search),
+    pathname: () => (typeof window !== 'undefined' ? window.location.pathname : ''),
+    searchParams: () =>
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams(),
   };
 };
 
