@@ -59,35 +59,38 @@ function MyApp({ Component, pageProps }: AppProps) {
   const C = Component as FunctionComponent;
 
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
-        variables: {
-          colorPrimary: primaryColor,
-        },
-        layout: {
-          animations,
-          unsafe_disableDevelopmentModeWarnings: disableDevMode,
-        },
-      }}
-      {...pageProps}
-      waitlistUrl='/waitlist'
-    >
-      <AppBar
-        onChangeTheme={e => setSelectedTheme(e.target.value as any)}
-        onToggleDark={onToggleDark}
-        onToggleSmooth={onToggleSmooth}
-        onResetStyles={() => setStyleReset(s => !s)}
-        onToggleAnimations={onToggleAnimations}
-        devMode={disableDevMode}
-        onToggleDevMode={onToggleDevMode}
-        animations={animations}
-        styleReset={styleReset}
-        smooth={selectedSmoothing}
-        onPrimaryColorChange={setPrimaryColor}
-      />
-      <C {...pageProps} />
-    </ClerkProvider>
+    <>
+      {/* @ts-ignore */}
+      <ClerkProvider
+        appearance={{
+          baseTheme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
+          variables: {
+            colorPrimary: primaryColor,
+          },
+          layout: {
+            animations,
+            unsafe_disableDevelopmentModeWarnings: disableDevMode,
+          },
+        }}
+        {...pageProps}
+        waitlistUrl='/waitlist'
+      >
+        <AppBar
+          onChangeTheme={e => setSelectedTheme(e.target.value as any)}
+          onToggleDark={onToggleDark}
+          onToggleSmooth={onToggleSmooth}
+          onResetStyles={() => setStyleReset(s => !s)}
+          onToggleAnimations={onToggleAnimations}
+          devMode={disableDevMode}
+          onToggleDevMode={onToggleDevMode}
+          animations={animations}
+          styleReset={styleReset}
+          smooth={selectedSmoothing}
+          onPrimaryColorChange={setPrimaryColor}
+        />
+        <C {...pageProps} />
+      </ClerkProvider>
+    </>
   );
 }
 
@@ -152,10 +155,12 @@ const AppBar = (props: AppBarProps) => {
       />
       <UserButton />
 
+      {/* @ts-ignore */}
       <SignedIn>
         <SignOutButton />
       </SignedIn>
 
+      {/* @ts-ignore */}
       <SignedOut>
         <SignInButton mode={'modal'} />
       </SignedOut>
