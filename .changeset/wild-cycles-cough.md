@@ -2,4 +2,4 @@
 '@clerk/shared': patch
 ---
 
-Fix issue with shared package
+Correctly publish shim for `@clerk/shared/object` module as it is required by the metro bundler
