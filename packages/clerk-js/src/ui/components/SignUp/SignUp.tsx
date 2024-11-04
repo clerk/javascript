@@ -92,6 +92,7 @@ export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGua
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
+    waitlistUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/waitlist`,
     ...props,
   };
 

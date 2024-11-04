@@ -451,12 +451,14 @@ export const huHU: LocalizationResource = {
     },
     start: {
       actionLink: 'Regisztráció',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Email használata',
       actionLink__use_email_username: 'Használd az emailded vagy a felhasználóneved',
       actionLink__use_passkey: 'Passkey használata',
       actionLink__use_phone: 'Telefon használata',
       actionLink__use_username: 'Felhasználónév használata',
       actionText: 'Nincs fiókod?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
     },
@@ -468,6 +470,17 @@ export const huHU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Bejelentkezés',
       actionText: 'Van már fiókod?',
@@ -509,6 +522,15 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be a visszaigazoló kódot, amit a telefonodra kaptál',
       title: 'Erősítsd meg a telefonszámod',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Bejelentkezés',
@@ -887,6 +909,20 @@ export const huHU: LocalizationResource = {
       successMessage: 'A tárca sikeresen hozzáadva a fiókodhoz.',
       title: 'Web3 tárca hozzáadása',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

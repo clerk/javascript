@@ -18,3 +18,4 @@ export * from './Token';
 export * from './User';
 export * from './Verification';
 export * from './Web3Wallet';
+export * from './Waitlist';

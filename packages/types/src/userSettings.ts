@@ -47,7 +47,7 @@ export type SignInData = {
   };
 };
 
-export type SignUpModes = 'public' | 'restricted';
+export type SignUpModes = 'public' | 'restricted' | 'waitlist';
 
 export type SignUpData = {
   allowlist_only: boolean;

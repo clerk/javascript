@@ -446,12 +446,14 @@ export const zhTW: LocalizationResource = {
     },
     start: {
       actionLink: '註冊',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: '使用電子郵件',
       actionLink__use_email_username: '使用電子郵件或使用者名稱',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '使用電話',
       actionLink__use_username: '使用使用者名稱',
       actionText: '還沒有帳戶？',
+      actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
       title: '登錄',
     },
@@ -463,6 +465,17 @@ export const zhTW: LocalizationResource = {
   },
   signInEnterPasswordTitle: '輸入您的密碼',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: '登錄',
       actionText: '已經有帳戶了？',
@@ -504,6 +517,15 @@ export const zhTW: LocalizationResource = {
       resendButton: '重新發送驗證碼',
       subtitle: '繼續使用 {{applicationName}}',
       title: '驗證您的電話',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: '登錄',
@@ -865,6 +887,20 @@ export const zhTW: LocalizationResource = {
       successMessage: '錢包已被添加到您的帳戶。',
       title: '添加web3錢包',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

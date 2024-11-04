@@ -449,12 +449,14 @@ export const viVN: LocalizationResource = {
     },
     start: {
       actionLink: 'Đăng ký',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Sử dụng email',
       actionLink__use_email_username: 'Sử dụng email hoặc tên đăng nhập',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Sử dụng số điện thoại',
       actionLink__use_username: 'Sử dụng tên đăng nhập',
       actionText: 'Chưa có tài khoản?',
+      actionText__join_waitlist: undefined,
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Đăng nhập',
     },
@@ -466,6 +468,17 @@ export const viVN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu của bạn',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có tài khoản?',
@@ -507,6 +520,15 @@ export const viVN: LocalizationResource = {
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Xác minh số điện thoại của bạn',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Đăng nhập',
@@ -881,6 +903,20 @@ export const viVN: LocalizationResource = {
       successMessage: 'Ví đã được thêm vào tài khoản của bạn.',
       title: 'Thêm ví web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

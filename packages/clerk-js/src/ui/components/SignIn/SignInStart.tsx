@@ -65,7 +65,7 @@ export function _SignInStart(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -417,6 +417,15 @@ export function _SignInStart(): JSX.Element {
               <Card.ActionLink
                 localizationKey={localizationKeys('signIn.start.actionLink')}
                 to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Card.Action>
+          )}
+          {userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText__join_waitlist')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink__join_waitlist')}
+                to={clerk.buildUrlWithAuth(waitlistUrl)}
               />
             </Card.Action>
           )}
