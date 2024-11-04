@@ -24,6 +24,7 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
   UserVerificationCtx,
+  WaitlistCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
 import {
@@ -57,6 +58,7 @@ export type SignUpContextType = SignUpCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  waitlistUrl: string;
 };
 
 export const useSignUpContext = (): SignUpContextType => {
@@ -96,10 +98,12 @@ export const useSignUpContext = (): SignUpContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
+  let waitlistUrl = ctx.waitlistUrl || options.waitlistUrl || displayConfig.waitlistUrl;
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -109,6 +113,7 @@ export const useSignUpContext = (): SignUpContextType => {
     componentName,
     signInUrl,
     signUpUrl,
+    waitlistUrl,
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
@@ -129,6 +134,7 @@ export type SignInContextType = SignInCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   transferable: boolean;
+  waitlistUrl: string;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -168,10 +174,12 @@ export const useSignInContext = (): SignInContextType => {
   // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
   let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
+  let waitlistUrl = ctx.waitlistUrl || options.waitlistUrl || displayConfig.waitlistUrl;
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
@@ -181,6 +189,7 @@ export const useSignInContext = (): SignInContextType => {
     componentName,
     signUpUrl,
     signInUrl,
+    waitlistUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,
@@ -654,5 +663,25 @@ export const useGoogleOneTapContext = () => {
     ...ctx,
     componentName,
     generateCallbackUrls,
+  };
+};
+
+export type WaitlistContextType = WaitlistCtx & {
+  signInUrl: string;
+  redirectUrl?: string;
+};
+
+export const useWaitlistContext = (): WaitlistContextType => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as WaitlistCtx;
+  const { displayConfig } = useEnvironment();
+  const options = useOptions();
+
+  let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
+  signInUrl = buildURL({ base: signInUrl }, { stringify: true });
+
+  return {
+    ...ctx,
+    componentName,
+    signInUrl,
   };
 };

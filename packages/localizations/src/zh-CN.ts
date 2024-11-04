@@ -440,12 +440,14 @@ export const zhCN: LocalizationResource = {
     },
     start: {
       actionLink: '注册',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: '使用电子邮件',
       actionLink__use_email_username: '使用电子邮件或用户名',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '使用电话',
       actionLink__use_username: '使用用户名',
       actionText: '还没有账户？',
+      actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
       title: '登录',
     },
@@ -457,6 +459,17 @@ export const zhCN: LocalizationResource = {
   },
   signInEnterPasswordTitle: '输入您的密码',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: '登录',
       actionText: '已经有账户了？',
@@ -498,6 +511,15 @@ export const zhCN: LocalizationResource = {
       resendButton: '重新发送验证码',
       subtitle: '继续使用 {{applicationName}}',
       title: '验证您的电话',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: '登录',
@@ -855,6 +877,20 @@ export const zhCN: LocalizationResource = {
       successMessage: '钱包已被添加到您的账户。',
       title: '添加web3钱包',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

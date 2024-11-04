@@ -449,12 +449,14 @@ export const ukUA: LocalizationResource = {
     },
     start: {
       actionLink: 'Зареєструватися',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Використовувати пошту',
       actionLink__use_email_username: "Використовувати пошту або ім'я користувача",
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Використовувати номер телефону',
       actionLink__use_username: "Використовувати ім'я користувача",
       actionText: 'Немає акаунта?',
+      actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Увійти',
     },
@@ -466,6 +468,17 @@ export const ukUA: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Увійти',
       actionText: 'Уже є акаунт?',
@@ -507,6 +520,15 @@ export const ukUA: LocalizationResource = {
       resendButton: 'Не отримали код? Повторно відправити',
       subtitle: 'продовжити з {{applicationName}}',
       title: 'Підтвердіть свій телефон',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Увійти',
@@ -881,6 +903,20 @@ export const ukUA: LocalizationResource = {
       successMessage: 'Гаманець було додано до вашого облікового запису.',
       title: 'Додати web3 гаманець',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

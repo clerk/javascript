@@ -450,12 +450,14 @@ export const plPL: LocalizationResource = {
     },
     start: {
       actionLink: 'Zarejestruj się',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Użyj adresu e-mail',
       actionLink__use_email_username: 'Użyj adresu e-mail lub nazwy użytkownika',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Użyj numeru telefonu',
       actionLink__use_username: 'Użyj nazwy użytkownika',
       actionText: 'Nie masz konta?',
+      actionText__join_waitlist: undefined,
       subtitle: 'aby przejść do {{applicationName}}',
       title: 'Zaloguj się',
     },
@@ -467,6 +469,17 @@ export const plPL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Wprowadź swoje hasło',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Zaloguj się',
       actionText: 'Masz już konto?',
@@ -513,7 +526,9 @@ export const plPL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
       blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
       subtitle: undefined,
+      subtitleWaitlist: undefined,
       title: undefined,
     },
     start: {
@@ -890,6 +905,20 @@ export const plPL: LocalizationResource = {
       successMessage: 'Portfel został dodany do Twojego konta.',
       title: 'Dodaj portfel web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

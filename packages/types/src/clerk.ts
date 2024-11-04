@@ -11,6 +11,7 @@ import type {
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
+  WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -40,6 +41,7 @@ import type { SignUpResource } from './signUp';
 import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Contains information about the SDK that the host application is using.
@@ -229,6 +231,17 @@ export interface Clerk {
   closeCreateOrganization: () => void;
 
   /**
+   * Opens the Clerk Waitlist modal.
+   * @param props Optional props that will be passed to the Waitlist component.
+   */
+  openWaitlist: (props?: WaitlistProps) => void;
+
+  /**
+   * Closes the Clerk Waitlist modal.
+   */
+  closeWaitlist: () => void;
+
+  /**
    * Mounts a sign in flow component at the target element.
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
@@ -352,6 +365,19 @@ export interface Clerk {
   unmountOrganizationList: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a waitlist at the target element.
+   * @param targetNode Target to mount the Waitlist component.
+   * @param props Configuration parameters.
+   */
+  mountWaitlist: (targetNode: HTMLDivElement, props?: WaitlistProps) => void;
+
+  /**
+   * Unmount the Waitlist component from the target node.
+   * @param targetNode Target node to unmount the Waitlist component from.
+   */
+  unmountWaitlist: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -435,6 +461,11 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
+   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   */
+  buildWaitlistUrl(): string;
+
+  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -485,6 +516,11 @@ export interface Clerk {
    * Redirects to the configured afterSignOut URL.
    */
   redirectToAfterSignOut: () => void;
+
+  /**
+   * Redirects to the configured URL where <Waitlist/> is mounted.
+   */
+  redirectToWaitlist: () => void;
 
   /**
    * Completes a Google One Tap redirection flow started by
@@ -549,6 +585,8 @@ export interface Clerk {
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
    */
   handleUnauthenticated: () => Promise<unknown>;
+
+  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -692,7 +730,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;
-
+    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    waitlistUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
@@ -853,6 +892,11 @@ export type SignInProps = RoutingOptions & {
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
   __experimental?: Record<string, any> & { newComponents?: boolean };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -963,6 +1007,11 @@ export type SignUpProps = RoutingOptions & {
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
   __experimental?: Record<string, any> & { newComponents?: boolean };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1255,6 +1304,25 @@ export type OrganizationListProps = {
   hideSlug?: boolean;
 };
 
+export type WaitlistProps = {
+  /**
+   * Full URL or path to navigate after successful waitlist submission.
+   */
+  redirectUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: WaitlistTheme;
+  /**
+   * Full URL or path where the SignIn component is mounted.
+   */
+  signInUrl?: string;
+};
+
+export type WaitlistModalProps = WaitlistProps;
+
 export interface HandleEmailLinkVerificationParams {
   /**
    * Full URL or path to navigate after successful magic link verification
@@ -1296,6 +1364,10 @@ export interface ClerkAuthenticateWithWeb3Params {
   strategy: Web3Strategy;
   __experimental_legalAccepted?: boolean;
 }
+
+export type JoinWaitlistParams = {
+  emailAddress: string;
+};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;
