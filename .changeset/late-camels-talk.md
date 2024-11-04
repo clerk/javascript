@@ -8,14 +8,14 @@
 
 Introduce support for passkeys in Expo (iOS, Android, and Web).
 
-To use passkeys in Expo projects, pass the `__experimental__passkeys` object, which can be imported from `@clerk/clerk-expo/passkeys`, to the `ClerkProvider` component:
+To use passkeys in Expo projects, pass the `__experimental_passkeys` object, which can be imported from `@clerk/clerk-expo/passkeys`, to the `ClerkProvider` component:
 
 ```tsx
 
 import { ClerkProvider } from '@clerk/clerk-expo';
 import { passkeys } from '@clerk/clerk-expo/passkeys';
 
-<ClerkProvider __experimental__passkeys={passkeys}>
+<ClerkProvider __experimental_passkeys={passkeys}>
   {/* Your app here */}
 </ClerkProvider>
 ```

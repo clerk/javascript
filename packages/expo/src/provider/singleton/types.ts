@@ -15,7 +15,7 @@ export type BuildClerkOptions = {
    * This is an experimental prop that is being used from expo apps,
    * this feature is only available for private beta users.
    */
-  __experimental__passkeys?: {
+  __experimental_passkeys?: {
     get: ({
       publicKeyOptions,
     }: {
