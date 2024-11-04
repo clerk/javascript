@@ -64,6 +64,8 @@ describe('isValidUrl(url,base)', () => {
     ['/test', true],
     ['/test?clerk=true', true],
     ['/?clerk=true', true],
+    ['..//evil.com', false],
+    ['//evil.com', false],
   ];
 
   test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {

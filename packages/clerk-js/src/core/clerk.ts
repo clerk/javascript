@@ -21,8 +21,8 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
-  Clerk as ClerkInterface,
   ClerkAPIError,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
@@ -68,6 +68,7 @@ import { completeSignUpFlow } from '../ui/components/SignUp/util';
 import {
   appendAsQueryParams,
   buildURL,
+  createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createCookieHandler,
   createPageLifecycle,
@@ -332,6 +333,11 @@ export default class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
+      this.#options.allowedRedirectOrigins,
+      this.frontendApi,
+    );
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();
