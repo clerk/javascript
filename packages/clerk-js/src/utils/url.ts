@@ -270,8 +270,16 @@ export function isValidUrl(val: unknown, opts?: { includeRelativeUrls?: boolean 
     return false;
   }
 
+  if ((val as string).startsWith('//') || (val as string).startsWith('http/') || (val as string).startsWith('https/')) {
+    // Protocol-relative URL; consider it absolute.
+    return false;
+  }
+
   try {
-    new URL(val as string, includeRelativeUrls ? DUMMY_URL_BASE : undefined);
+    const url = new URL(val as string, includeRelativeUrls ? DUMMY_URL_BASE : undefined);
+    if (url.pathname.startsWith('//')) {
+      return false;
+    }
     return true;
   } catch (e) {
     return false;
