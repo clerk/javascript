@@ -8,6 +8,9 @@ import type {
   UserResource,
 } from '@clerk/types';
 
+/**
+ * Derives authentication state based on the current rendering context (SSR or client-side).
+ */
 export const deriveState = (clerkLoaded: boolean, state: Resources, initialState: InitialState | undefined) => {
   if (!clerkLoaded && initialState) {
     return deriveFromSsrInitialState(initialState);
@@ -26,6 +29,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const orgPermissions = initialState.orgPermissions as OrganizationCustomPermissionKey[];
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
+  const __experimental_factorVerificationAge = initialState.__experimental_factorVerificationAge;
 
   return {
     userId,
@@ -38,6 +42,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     orgPermissions,
     orgSlug,
     actor,
+    __experimental_factorVerificationAge,
   };
 };
 
@@ -46,6 +51,9 @@ const deriveFromClientSideState = (state: Resources) => {
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
+  const __experimental_factorVerificationAge: [number, number] | null = state.session
+    ? state.session.__experimental_factorVerificationAge
+    : null;
   const actor = session?.actor;
   const organization = state.organization;
   const orgId: string | null | undefined = state.organization ? state.organization.id : state.organization;
@@ -67,5 +75,6 @@ const deriveFromClientSideState = (state: Resources) => {
     orgSlug,
     orgPermissions,
     actor,
+    __experimental_factorVerificationAge,
   };
 };
