@@ -94,7 +94,7 @@ describe('isProblematicUrl(url)', () => {
     ['/\\@evil.com', false],
 
     // 2. Path traversal attempts
-    ['../evil.com', false],
+    ['..//evil.com', true],
     ['/../evil.com', false],
     ['../../', false],
     ['/../../', false],
