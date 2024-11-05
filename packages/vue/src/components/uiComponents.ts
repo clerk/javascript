@@ -8,6 +8,7 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  WaitlistProps,
 } from '@clerk/types';
 import { defineComponent, h, ref, watchEffect } from 'vue';
 
@@ -130,6 +131,16 @@ export const OrganizationProfile = defineComponent((props: OrganizationProfilePr
     h(Portal, {
       mount: clerk.value?.mountOrganizationProfile,
       unmount: clerk.value?.unmountOrganizationProfile,
+      props,
+    });
+});
+
+export const Waitlist = defineComponent((props: WaitlistProps) => {
+  const clerk = useClerk();
+  return () =>
+    h(Portal, {
+      mount: clerk.value?.mountWaitlist,
+      unmount: clerk.value?.unmountWaitlist,
       props,
     });
 });
