@@ -9,10 +9,26 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
+  Without,
 } from '@clerk/types';
-import { computed, defineComponent, h, onScopeDispose, ref, watchEffect } from 'vue';
+import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, Teleport, watchEffect } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
+import {
+  OrganizationProfileInjectionKey,
+  UserButtonInjectionKey,
+  UserButtonMenuItemsInjectionKey,
+  UserProfileInjectionKey,
+} from '../keys';
+import type {
+  CustomPortalsRendererProps,
+  UserButtonActionProps,
+  UserButtonLinkProps,
+  UserProfileLinkProps,
+  UserProfilePageProps,
+} from '../types';
+import { useUserButtonCustomMenuItems } from '../utils/useCustomMenuItems';
+import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils/useCustomPages';
 import { ClerkLoaded } from './controlComponents';
 
 type AnyObject = Record<string, any>;
@@ -57,30 +73,165 @@ const Portal = defineComponent((props: MountProps) => {
   return () => h(ClerkLoaded, () => h('div', { ref: portalRef }));
 });
 
-export const UserProfile = defineComponent((props: UserProfileProps) => {
+const CustomPortalsRenderer = defineComponent((props: CustomPortalsRendererProps) => {
+  return () => [
+    ...Array.from(props?.customPagesPortals ?? new Map(), ([el, slot]) => {
+      return h(Teleport, { to: el }, slot());
+    }),
+    ...Array.from(props?.customMenuItemsPortals ?? new Map(), ([el, slot]) => {
+      return h(Teleport, { to: el }, slot());
+    }),
+  ];
+});
+
+const _UserProfile = defineComponent((props: UserProfileProps, { slots }) => {
   const clerk = useClerk();
-  return () =>
+  const { customPages, customPagesPortals, addCustomPage } = useUserProfileCustomPages();
+
+  const finalProps = computed(() => ({
+    ...props,
+    customPages: customPages.value,
+  }));
+
+  provide(UserProfileInjectionKey, {
+    addCustomPage,
+  });
+
+  return () => [
     h(Portal, {
       mount: clerk.value?.mountUserProfile,
       unmount: clerk.value?.unmountUserProfile,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
-    });
+      props: finalProps.value,
+    }),
+    h(CustomPortalsRenderer, { customPagesPortals: customPagesPortals.value }),
+    slots.default?.(),
+  ];
 });
 
-export const UserButton = defineComponent((props: UserButtonProps) => {
+const UserProfilePage = defineComponent((props: UserProfilePageProps, { slots }) => {
+  const ctx = inject(UserProfileInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomPage({
+    customPage: props,
+    defaultSlot: slots.default,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+const UserProfileLink = defineComponent((props: UserProfileLinkProps, { slots }) => {
+  const ctx = inject(UserProfileInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomPage({
+    customPage: props,
+    defaultSlot: slots.default,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+export const UserProfile = Object.assign(_UserProfile, {
+  Page: UserProfilePage,
+  Link: UserProfileLink,
+});
+
+type UserButtonPropsWithoutCustomMenuItems = Without<UserButtonProps, 'customMenuItems'>;
+
+const _UserButton = defineComponent((props: UserButtonPropsWithoutCustomMenuItems, { slots }) => {
   const clerk = useClerk();
-  return () =>
+
+  const { customMenuItems, customMenuItemsPortals, addCustomMenuItem } = useUserButtonCustomMenuItems();
+  const { customPages, customPagesPortals, addCustomPage } = useUserProfileCustomPages();
+
+  const finalProps = computed<UserButtonProps>(() => ({
+    ...props,
+    userProfileProps: {
+      ...(props.userProfileProps || {}),
+      customPages: customPages.value,
+    },
+    customMenuItems: customMenuItems.value,
+  }));
+
+  provide(UserButtonInjectionKey, {
+    addCustomMenuItem,
+  });
+  provide(UserProfileInjectionKey, {
+    addCustomPage,
+  });
+
+  return () => [
     h(Portal, {
       mount: clerk.value?.mountUserButton,
       unmount: clerk.value?.unmountUserButton,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
-    });
+      props: finalProps.value,
+    }),
+    h(CustomPortalsRenderer, {
+      customPagesPortals: customPagesPortals.value,
+      customMenuItemsPortals: customMenuItemsPortals.value,
+    }),
+    slots.default?.(),
+  ];
+});
+
+const MenuItems = defineComponent((_, { slots }) => {
+  const ctx = inject(UserButtonInjectionKey);
+
+  if (!ctx) {
+    throw new Error('UserButton.MenuItems must be used inside a UserButton component');
+  }
+
+  provide(UserButtonMenuItemsInjectionKey, ctx);
+  return () => slots.default?.();
+});
+
+const MenuAction = defineComponent((props: UserButtonActionProps, { slots }) => {
+  const ctx = inject(UserButtonMenuItemsInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomMenuItem?.({
+    customMenuItem: props,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+const MenuLink = defineComponent((props: UserButtonLinkProps, { slots }) => {
+  const ctx = inject(UserButtonMenuItemsInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomMenuItem?.({
+    customMenuItem: props,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+export const UserButton = Object.assign(_UserButton, {
+  MenuItems,
+  Action: MenuAction,
+  Link: MenuLink,
+  UserProfilePage,
 });
 
 export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: () => clerk.value?.openGoogleOneTap(props),
@@ -90,6 +241,7 @@ export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
 
 export const SignIn = defineComponent((props: SignInProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: clerk.value?.mountSignIn,
@@ -101,6 +253,7 @@ export const SignIn = defineComponent((props: SignInProps) => {
 
 export const SignUp = defineComponent((props: SignUpProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: clerk.value?.mountSignUp,
@@ -112,6 +265,7 @@ export const SignUp = defineComponent((props: SignUpProps) => {
 
 export const CreateOrganization = defineComponent((props: CreateOrganizationProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: clerk.value?.mountCreateOrganization,
@@ -123,6 +277,7 @@ export const CreateOrganization = defineComponent((props: CreateOrganizationProp
 
 export const OrganizationSwitcher = defineComponent((props: OrganizationSwitcherProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: clerk.value?.mountOrganizationSwitcher,
@@ -134,6 +289,7 @@ export const OrganizationSwitcher = defineComponent((props: OrganizationSwitcher
 
 export const OrganizationList = defineComponent((props: OrganizationListProps) => {
   const clerk = useClerk();
+
   return () =>
     h(Portal, {
       mount: clerk.value?.mountOrganizationList,
@@ -143,15 +299,64 @@ export const OrganizationList = defineComponent((props: OrganizationListProps) =
     });
 });
 
-export const OrganizationProfile = defineComponent((props: OrganizationProfileProps) => {
+const _OrganizationProfile = defineComponent((props: OrganizationProfileProps, { slots }) => {
   const clerk = useClerk();
-  return () =>
+  const { customPages, customPagesPortals, addCustomPage } = useOrganizationProfileCustomPages();
+
+  const finalProps = computed(() => ({
+    ...props,
+    customPages: customPages.value,
+  }));
+
+  provide(OrganizationProfileInjectionKey, {
+    addCustomPage,
+  });
+
+  return () => [
     h(Portal, {
       mount: clerk.value?.mountOrganizationProfile,
       unmount: clerk.value?.unmountOrganizationProfile,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
-    });
+      props: finalProps.value,
+    }),
+    h(CustomPortalsRenderer, { customPagesPortals: customPagesPortals.value }),
+    slots.default?.(),
+  ];
+});
+
+const OrganizationProfilePage = defineComponent((props: UserProfilePageProps, { slots }) => {
+  const ctx = inject(OrganizationProfileInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomPage({
+    customPage: props,
+    defaultSlot: slots.default,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+const OrganizationProfileLink = defineComponent((props: UserProfileLinkProps, { slots }) => {
+  const ctx = inject(OrganizationProfileInjectionKey);
+  if (!ctx) {
+    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+  }
+
+  ctx.addCustomPage({
+    customPage: props,
+    defaultSlot: slots.default,
+    iconSlot: slots.labelIcon,
+  });
+
+  return () => null;
+});
+
+export const OrganizationProfile = Object.assign(_OrganizationProfile, {
+  Page: OrganizationProfilePage,
+  Link: OrganizationProfileLink,
 });
 
 export const Waitlist = defineComponent((props: WaitlistProps) => {
@@ -162,16 +367,6 @@ export const Waitlist = defineComponent((props: WaitlistProps) => {
       mount: clerk.value?.mountWaitlist,
       unmount: clerk.value?.unmountWaitlist,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
-    });
-});
-
-export const Waitlist = defineComponent((props: WaitlistProps) => {
-  const clerk = useClerk();
-  return () =>
-    h(Portal, {
-      mount: clerk.value?.mountWaitlist,
-      unmount: clerk.value?.unmountWaitlist,
       props,
     });
 });
