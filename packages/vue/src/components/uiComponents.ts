@@ -165,3 +165,13 @@ export const Waitlist = defineComponent((props: WaitlistProps) => {
       props,
     });
 });
+
+export const Waitlist = defineComponent((props: WaitlistProps) => {
+  const clerk = useClerk();
+  return () =>
+    h(Portal, {
+      mount: clerk.value?.mountWaitlist,
+      unmount: clerk.value?.unmountWaitlist,
+      props,
+    });
+});
