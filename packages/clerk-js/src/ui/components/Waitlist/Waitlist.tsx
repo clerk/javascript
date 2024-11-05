@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { WaitlistModalProps } from '@clerk/types';
 
-import { ComponentContext, useWaitlistContext } from '../../contexts';
+import { useWaitlistContext, WaitlistContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { Card, withCardStateProvider } from '../../elements';
 import { Route, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
@@ -52,11 +52,11 @@ export const WaitlistModal = (props: WaitlistModalProps): JSX.Element => {
 
   return (
     <Route path='waitlist'>
-      <ComponentContext.Provider value={{ ...waitlistProps, componentName: 'Waitlist', mode: 'modal' }}>
+      <WaitlistContext.Provider value={{ ...waitlistProps, componentName: 'Waitlist', mode: 'modal' }}>
         <div>
           <Waitlist />
         </div>
-      </ComponentContext.Provider>
+      </WaitlistContext.Provider>
     </Route>
   );
 };

@@ -5,16 +5,16 @@ import ReactDOM from 'react-dom';
 import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
 import { normalizeRoutingOptions } from '../../utils/normalizeRoutingOptions';
-import { ComponentContext, componentContextWrapper } from '../contexts';
+import { ComponentContextProvider } from '../contexts';
 import { HashRouter, PathRouter, VirtualRouter } from '../router';
-import type { AvailableComponentCtx } from '../types';
+import type { AvailableComponentCtx, AvailableComponentName } from '../types';
 
 type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
   node: HTMLDivElement;
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   // Aligning this with props attributes of ComponentControls
   props?: PropsType & RoutingOptions;
-} & Pick<CtxType, 'componentName'>;
+} & { componentName: AvailableComponentName };
 
 export function Portal<CtxType extends AvailableComponentCtx>({
   props,
@@ -24,13 +24,15 @@ export function Portal<CtxType extends AvailableComponentCtx>({
 }: PortalProps<CtxType>) {
   const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props?.routing, path: props?.path }) };
 
-  const ComponentContextProvider = componentContextWrapper({ componentName });
   const el = (
-    <ComponentContextProvider.Provider value={{ componentName: componentName, ...normalizedProps } as CtxType}>
+    <ComponentContextProvider
+      componentName={componentName}
+      props={normalizedProps}
+    >
       <Suspense fallback={''}>
         {React.createElement(component, normalizedProps as PortalProps<CtxType>['props'])}
       </Suspense>
-    </ComponentContextProvider.Provider>
+    </ComponentContextProvider>
   );
 
   if (normalizedProps?.routing === 'path') {
@@ -56,7 +58,7 @@ type VirtualBodyRootPortalProps<CtxType extends AvailableComponentCtx, PropsType
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   props?: PropsType;
   startPath: string;
-} & Pick<CtxType, 'componentName'>;
+} & { componentName: AvailableComponentName };
 
 export class VirtualBodyRootPortal<CtxType extends AvailableComponentCtx> extends React.PureComponent<
   VirtualBodyRootPortalProps<CtxType>
@@ -76,9 +78,12 @@ export class VirtualBodyRootPortal<CtxType extends AvailableComponentCtx> extend
 
     return ReactDOM.createPortal(
       <VirtualRouter startPath={startPath}>
-        <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
+        <ComponentContextProvider
+          componentName={componentName}
+          props={props ?? {}}
+        >
           <Suspense fallback={''}>{React.createElement(component, props as PortalProps<CtxType>['props'])}</Suspense>
-        </ComponentContext.Provider>
+        </ComponentContextProvider>
       </VirtualRouter>,
       this.elRef,
     );

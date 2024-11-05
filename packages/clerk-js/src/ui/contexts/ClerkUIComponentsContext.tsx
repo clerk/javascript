@@ -1,7 +1,13 @@
 import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import { useClerk } from '@clerk/shared/react';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { HandleOAuthCallbackParams, OrganizationResource, UserResource } from '@clerk/types';
+import type {
+  HandleOAuthCallbackParams,
+  OrganizationResource,
+  UserButtonProps,
+  UserResource,
+  WaitlistProps,
+} from '@clerk/types';
 import React, { useCallback, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
@@ -13,7 +19,8 @@ import type { NavbarRoute } from '../elements';
 import type { ParsedQueryString } from '../router';
 import { useRouter } from '../router';
 import type {
-  AvailableComponentCtx,
+  AvailableComponentName,
+  AvailableComponentProps,
   CreateOrganizationCtx,
   GoogleOneTapCtx,
   OrganizationListCtx,
@@ -35,26 +42,70 @@ import {
 
 const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
-export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
-
-export function componentContextWrapper({ componentName }: { componentName: 'SignIn' }): typeof SignInContext;
-export function componentContextWrapper({ componentName }: { componentName: 'SignUp' }): typeof SignUpContext;
-export function componentContextWrapper({ componentName }: { componentName: 'UserProfile' }): typeof UserProfileContext;
-export function componentContextWrapper({ componentName }: { componentName: string }): typeof ComponentContext;
-export function componentContextWrapper({
+export function ComponentContextProvider({
   componentName,
+  props,
+  children,
 }: {
-  componentName: string;
-}): typeof SignInContext | typeof SignUpContext | typeof UserProfileContext | typeof ComponentContext {
+  componentName: AvailableComponentName;
+  props: AvailableComponentProps;
+  children: React.ReactNode;
+}) {
   switch (componentName) {
     case 'SignIn':
-      return SignInContext;
+      return <SignInContext.Provider value={{ componentName, ...props }}>{children}</SignInContext.Provider>;
     case 'SignUp':
-      return SignUpContext;
+      return <SignUpContext.Provider value={{ componentName, ...props }}>{children}</SignUpContext.Provider>;
     case 'UserProfile':
-      return UserProfileContext;
+      return <UserProfileContext.Provider value={{ componentName, ...props }}>{children}</UserProfileContext.Provider>;
+    case 'UserVerification':
+      return (
+        <UserVerificationContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </UserVerificationContext.Provider>
+      );
+    case 'UserButton':
+      return (
+        <UserButtonContext.Provider value={{ componentName, ...(props as UserButtonProps) }}>
+          {children}
+        </UserButtonContext.Provider>
+      );
+    case 'OrganizationSwitcher':
+      return (
+        <OrganizationSwitcherContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </OrganizationSwitcherContext.Provider>
+      );
+    case 'OrganizationList':
+      return (
+        <OrganizationListContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </OrganizationListContext.Provider>
+      );
+    case 'OrganizationProfile':
+      return (
+        <OrganizationProfileContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </OrganizationProfileContext.Provider>
+      );
+    case 'CreateOrganization':
+      return (
+        <CreateOrganizationContext.Provider value={{ componentName, ...props }}>
+          {children}
+        </CreateOrganizationContext.Provider>
+      );
+    case 'GoogleOneTap':
+      return (
+        <GoogleOneTapContext.Provider value={{ componentName, ...props }}>{children}</GoogleOneTapContext.Provider>
+      );
+    case 'Waitlist':
+      return (
+        <WaitlistContext.Provider value={{ componentName, ...(props as WaitlistProps) }}>
+          {children}
+        </WaitlistContext.Provider>
+      );
     default:
-      return ComponentContext;
+      throw new Error(`Unknown component context: ${componentName}`);
   }
 }
 
@@ -291,12 +342,16 @@ export const useUserProfileContext = (): UserProfileContextType => {
 
 export type UserVerificationContextType = UserVerificationCtx;
 
-export const useUserVerification = (): UserVerificationContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserVerificationCtx;
+export const UserVerificationContext = React.createContext<UserVerificationCtx | null>(null);
 
-  if (componentName !== 'UserVerification') {
+export const useUserVerification = (): UserVerificationContextType => {
+  const context = React.useContext(UserVerificationContext);
+
+  if (!context || context.componentName !== 'UserVerification') {
     throw new Error('Clerk: useUserVerificationContext called outside of the mounted UserVerification component.');
   }
+
+  const { componentName, ...ctx } = context;
 
   return {
     ...ctx,
@@ -304,16 +359,20 @@ export const useUserVerification = (): UserVerificationContextType => {
   };
 };
 
+export const UserButtonContext = React.createContext<UserButtonCtx | null>(null);
+
 export const useUserButtonContext = () => {
-  const { componentName, customMenuItems, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
+  const context = React.useContext(UserButtonContext);
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
 
-  if (componentName !== 'UserButton') {
+  if (!context || context.componentName !== 'UserButton') {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
+
+  const { componentName, customMenuItems, ...ctx } = context;
 
   const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
@@ -361,14 +420,18 @@ export const useUserButtonContext = () => {
   };
 };
 
+export const OrganizationSwitcherContext = React.createContext<OrganizationSwitcherCtx | null>(null);
+
 export const useOrganizationSwitcherContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationSwitcherCtx;
+  const context = React.useContext(OrganizationSwitcherContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'OrganizationSwitcher') {
+  if (!context || context.componentName !== 'OrganizationSwitcher') {
     throw new Error('Clerk: useOrganizationSwitcherContext called outside OrganizationSwitcher.');
   }
+
+  const { componentName, ...ctx } = context;
 
   const afterCreateOrganizationUrl = ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl;
   const afterLeaveOrganizationUrl = ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl;
@@ -464,14 +527,18 @@ export const useOrganizationSwitcherContext = () => {
   };
 };
 
+export const OrganizationListContext = React.createContext<OrganizationListCtx | null>(null);
+
 export const useOrganizationListContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as unknown as OrganizationListCtx;
+  const context = React.useContext(OrganizationListContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'OrganizationList') {
+  if (!context || context.componentName !== 'OrganizationList') {
     throw new Error('Clerk: useOrganizationListContext called outside OrganizationList.');
   }
+
+  const { componentName, ...ctx } = context;
 
   const afterCreateOrganizationUrl = ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl;
 
@@ -550,15 +617,19 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isGeneralPageRoot: boolean;
 };
 
+export const OrganizationProfileContext = React.createContext<OrganizationProfileCtx | null>(null);
+
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+  const context = React.useContext(OrganizationProfileContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const clerk = useClerk();
 
-  if (componentName !== 'OrganizationProfile') {
+  if (!context || context.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
+
+  const { componentName, customPages, ...ctx } = context;
 
   const pages = useMemo(() => createOrganizationProfileCustomPages(customPages || [], clerk), [customPages]);
 
@@ -581,14 +652,18 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   };
 };
 
+export const CreateOrganizationContext = React.createContext<CreateOrganizationCtx | null>(null);
+
 export const useCreateOrganizationContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as CreateOrganizationCtx;
+  const context = React.useContext(CreateOrganizationContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'CreateOrganization') {
+  if (!context || context.componentName !== 'CreateOrganization') {
     throw new Error('Clerk: useCreateOrganizationContext called outside CreateOrganization.');
   }
+
+  const { componentName, ...ctx } = context;
 
   const navigateAfterCreateOrganization = (organization: OrganizationResource) => {
     if (typeof ctx.afterCreateOrganizationUrl === 'function') {
@@ -615,15 +690,19 @@ export const useCreateOrganizationContext = () => {
   };
 };
 
+export const GoogleOneTapContext = React.createContext<GoogleOneTapCtx | null>(null);
+
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
+  const context = React.useContext(GoogleOneTapContext);
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
-  if (componentName !== 'GoogleOneTap') {
+  if (!context || context.componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
+
+  const { componentName, ...ctx } = context;
 
   const generateCallbackUrls = useCallback(
     (returnBackUrl: string): HandleOAuthCallbackParams => {
@@ -704,10 +783,18 @@ export type WaitlistContextType = WaitlistCtx & {
   redirectUrl?: string;
 };
 
+export const WaitlistContext = React.createContext<WaitlistCtx | null>(null);
+
 export const useWaitlistContext = (): WaitlistContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as WaitlistCtx;
+  const context = React.useContext(WaitlistContext);
   const { displayConfig } = useEnvironment();
   const options = useOptions();
+
+  if (!context || context.componentName !== 'Waitlist') {
+    throw new Error('Clerk: useWaitlistContext called outside Waitlist.');
+  }
+
+  const { componentName, ...ctx } = context;
 
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   signInUrl = buildURL({ base: signInUrl }, { stringify: true });
