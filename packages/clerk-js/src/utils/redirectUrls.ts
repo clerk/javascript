@@ -146,7 +146,9 @@ export class RedirectUrls {
       // @ts-expect-error
       res[key] = obj[key];
     });
-    return this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean)));
+    return applyFunctionToObj(this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean))), val =>
+      val.toString(),
+    );
   }
 
   #parseSearchParams(obj: any) {
@@ -156,7 +158,9 @@ export class RedirectUrls {
       res[key] = obj[camelToSnake(key)];
     });
     res['redirectUrl'] = obj.redirect_url;
-    return this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean)));
+    return applyFunctionToObj(this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean))), val =>
+      val.toString(),
+    );
   }
 
   #toAbsoluteUrls(obj: RedirectOptions) {
