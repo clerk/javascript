@@ -47,7 +47,7 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
-export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean; skipAccountless?: boolean };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
 
@@ -94,16 +94,23 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
       let resolvedClerkClient = await clerkClient();
-      // let accountless: AccountlessApplication | undefined;
-      let accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
-      console.log('------accountless read', accountless);
-      // let accountless = await resolvedClerkClient.accountlessApplications.read();
+      let accountless: any;
+      const { skipAccountless = false } = resolvedParams;
 
-      if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
-        accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
-        request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
-        console.log('------accountless new', accountless);
-        // await resolvedClerkClient.accountlessApplications.store(accountless);
+      if (!skipAccountless) {
+        // let accountless: AccountlessApplication | undefined;
+        accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
+        console.log('------accountless read', accountless);
+        // let accountless = await resolvedClerkClient.accountlessApplications.read();
+
+        if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
+          accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
+          request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
+          console.log('------accountless new', accountless);
+          // await resolvedClerkClient.accountlessApplications.store(accountless);
+        }
+
+        console.log('-lolol', process.env.CLERK_SECRET_KEY, process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
       }
 
       const publishableKey = assertKey(
@@ -156,11 +163,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        const res = new NextResponse(null, { status: 307, headers: requestState.headers });
-        res.cookies.set('__clerk_accountless', JSON.stringify(accountless));
-        // NextResponse.redirect()
-        // return new Response(null, { status: 307, headers: requestState.headers });
-        return res;
+        if (!skipAccountless) {
+          const res = new NextResponse(null, { status: 307, headers: requestState.headers });
+          res.cookies.set('__clerk_accountless', JSON.stringify(accountless));
+          return res;
+        }
+
+        return new Response(null, { status: 307, headers: requestState.headers });
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }

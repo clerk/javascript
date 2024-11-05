@@ -124,7 +124,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     routerReplace: replace,
   });
 
-  console.log('---mergedProps', mergedProps);
+  // console.log('---mergedProps', mergedProps);
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
