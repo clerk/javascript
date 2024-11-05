@@ -241,14 +241,30 @@ export function relativeToAbsoluteUrl(url: string, origin: string | URL): string
   return new URL(url, origin).href;
 }
 
-export function isRelativeUrl(val: string): boolean {
-  if (val !== val && !val) {
+export function isRelativeUrl(_val: string): boolean {
+  if (_val !== _val && !_val) {
     return false;
   }
 
-  if (val.startsWith('//') || val.startsWith('http/') || val.startsWith('https/')) {
-    // Protocol-relative URL; consider it absolute.
-    return false;
+  const val = decodeURI(_val.replace(/\s/g, ''));
+
+  // Regular expression to detect disallowed patterns
+  const disallowedPatterns = [
+    /\\/, // Backslashes
+    /\s/, // Whitespace characters
+    /\0/, // Null bytes
+    // eslint-disable-next-line no-control-regex
+    /[\x00-\x1F]/, // Control characters
+    /\.\./, // Parent directory references
+    /\/\/(?!\/)/, // Double slashes not at the beginning (excluding '///')
+    /^[a-zA-Z][a-zA-Z\d+\-.]*:/, // URLs starting with a scheme (e.g., 'http:') or protocol-relative URLs
+  ];
+
+  // Check against disallowed patterns
+  for (const pattern of disallowedPatterns) {
+    if (pattern.test(val)) {
+      return false;
+    }
   }
 
   try {
@@ -363,12 +379,13 @@ export const isAllowedRedirectOrigin =
     if (!allowedRedirectOrigins) {
       return true;
     }
-
+    debugger;
     if (isRelativeUrl(_url)) {
       return true;
     }
 
     const url = new URL(_url, DUMMY_URL_BASE);
+    console.log('???????', _url, url.href);
     const isAllowed = allowedRedirectOrigins
       .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
       .some(origin => origin.test(trimTrailingSlash(url.origin)));
