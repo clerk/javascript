@@ -8,11 +8,11 @@ import {
   getSearchParameterFromHash,
   hasBannedProtocol,
   hasExternalAccountSignUpError,
-  isAllowedRedirectOrigin,
+  isAllowedRedirect,
   isDataUri,
   isDevAccountPortalOrigin,
+  isProblematicUrl,
   isRedirectForFAPIInitiatedFlow,
-  isRelativeUrl,
   isValidUrl,
   mergeFragmentIntoUrl,
   relativeToAbsoluteUrl,
@@ -84,26 +84,8 @@ describe('isValidUrl(url,base)', () => {
   });
 });
 
-describe('isRelativeUrl(url,base)', () => {
+describe('isProblematicUrl(url)', () => {
   const cases: Array<[string, boolean]> = [
-    ['', true],
-    ['/', true],
-    ['/test', true],
-    ['/test?clerk=true', true],
-    ['/?clerk=true', true],
-    ['https://www.clerk.com/', false],
-    ['//evil.com', false],
-    ['..//evil.com', false],
-    ['/good.com', true],
-    ['relative/path', true],
-    ['./relative/path', true],
-    ['http:evil.com', false],
-    ['https:evil.com', false],
-    ['http//evil.com', false],
-    ['https//evil.com', false],
-    ['//evil.com', false],
-    ['..//evil.com', false],
-
     // 1. URLs with backslashes instead of forward slashes
     ['\\evil.com', false],
     ['/\\evil.com', false],
@@ -111,77 +93,29 @@ describe('isRelativeUrl(url,base)', () => {
     ['/..\\evil.com', false],
     ['/\\@evil.com', false],
 
-    // 2. Encoded characters that may bypass our checks
-    // ['%2F%2Fevil.com', false], // @TODO
-    // ['/%2F%2Fevil.com', false], // @TODO
-    ['%5C%5Cevil.com', false],
-    ['/%5C%5Cevil.com', false],
-    ['/%2e%2e/evil.com', false],
-    ['/%2e%2e//evil.com', false],
-
     // 3. Path traversal attempts
     ['../evil.com', false],
     ['/../evil.com', false],
     ['../../', false],
     ['/../../', false],
-    ['/%2e%2e/%2e%2e/evil.com', false],
-
-    // 4. URLs with scheme but missing slashes
-    ['http:test', false],
-    ['https:test', false],
-    ['http:/evil.com', false],
-    ['https:/evil.com', false],
-    ['https:\\evil.com', false],
-
-    // 5. URLs starting with multiple slashes
-    ['///evil.com', false],
-    ['////evil.com', false],
-
-    // 6. Protocol-relative URLs with user info
-    ['//user@evil.com', false],
-    ['//user:pass@evil.com', false],
-
-    // 7. IP addresses and localhost
-    ['//127.0.0.1', false],
-    ['//[::1]', false],
-    ['//localhost', false],
 
     // 8. URLs with different schemes
-    ['javascript:alert(1)', false],
-    ['data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==', false],
-    ['file:///etc/passwd', false],
-    ['mailto:admin@example.com', false],
-    ['ftp://evil.com', false],
+    ['javascript:alert(1)', true],
 
     // 9. URLs with control characters and whitespace
-    ['\t//evil.com', false],
-    ['\n//evil.com', false],
-    ['%00//evil.com', false], // Null byte
-    ['/test ', true],
-    [' /test', true],
-    ['/test\n', true],
+    ['/test ', false],
+    [' /test', false],
+    ['/test\n', false],
 
     // 10. Fragment identifiers and query parameters
-    ['/#/evil.com', true],
-    // ['/path#//evil.com', true], // @TODO
-    ['/evil.com?redirect=evil.com', true],
-    // ['/evil.com?redirect=https://evil.com', true], // @TODO
-
-    // 12. Miscellaneous edge cases
-    ['//', false],
-    ['//:', false],
-    ['http://', false],
-    ['https://', false],
-    ['/....//evil.com', false],
-    ['//evil.com#good.com', false],
-
-    // 11. Edge cases that cannot be exploited
-    // ['%2e%2e/', false],
-    // ['/%00/eval.com', false],
+    ['/#/evil.com', false],
+    ['/path#//evil.com', false],
+    ['/evil.com?redirect=evil.com', false],
+    ['/evil.com?redirect=https://evil.com', false],
   ];
 
-  test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
-    expect(isRelativeUrl(a)).toBe(expected);
+  test.each(cases)('.isProblematicUrl(%s,%s)', (a, expected) => {
+    expect(isProblematicUrl(new URL(a, 'https://clerk.dummy'))).toBe(expected);
   });
 });
 
@@ -527,7 +461,7 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
   });
 });
 
-describe('isAllowedRedirectOrigin', () => {
+describe('isAllowedRedirect', () => {
   const cases: [string, Array<string | RegExp> | undefined, boolean][] = [
     // base cases
     ['https://clerk.com', ['https://www.clerk.com'], false],
@@ -549,7 +483,7 @@ describe('isAllowedRedirectOrigin', () => {
     // empty origins list for relative routes
     ['/', [], true],
     // empty origins list for absolute routes
-    ['https://www.clerk.com/', [], false],
+    ['https://www.example.com/', [], false],
     //undefined origins
     ['https://www.clerk.com/', undefined, true],
     // query params
@@ -561,8 +495,6 @@ describe('isAllowedRedirectOrigin', () => {
     // malformed or protocol-relative URLs
     ['http:evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
-    ['http//evil.com', [/https:\/\/www\.clerk\.com/], false],
-    ['https//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['..//evil.com', ['https://www.clerk.com'], false],
   ];
@@ -572,8 +504,8 @@ describe('isAllowedRedirectOrigin', () => {
   beforeEach(() => warnMock.mockClear());
   afterAll(() => warnMock.mockRestore());
 
-  test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
-    expect(isAllowedRedirectOrigin(allowedOrigins)(url)).toEqual(expected);
+  test.each(cases)('isAllowedRedirect("%s","%s") === %s', (url, allowedOrigins, expected) => {
+    expect(isAllowedRedirect(allowedOrigins, 'https://www.clerk.com')(url)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
   });
 });
@@ -619,6 +551,6 @@ describe('relativeToAbsoluteUrl', () => {
   ];
 
   test.each(cases)('relativeToAbsoluteUrl(%s, %s) === %s', (origin, relative, expected) => {
-    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(expected);
+    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(new URL(expected));
   });
 });
