@@ -88,7 +88,6 @@ export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
     h(Portal, {
       mount: () => clerk.value?.openGoogleOneTap(props),
       unmount: clerk.value?.closeGoogleOneTap,
-      updateProps: (clerk.value as any)?.__unstable__updateProps,
     });
 });
 
