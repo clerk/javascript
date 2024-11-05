@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.11.4
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Correctly publish shim for `@clerk/shared/object` module as it is required by the metro bundler ([#4475](https://github.com/clerk/javascript/pull/4475)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301)]:
+  - @clerk/types@4.30.0
+
 ## 2.11.3
 
 ### Patch Changes
