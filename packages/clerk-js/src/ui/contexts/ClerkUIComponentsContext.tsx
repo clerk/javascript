@@ -38,15 +38,21 @@ const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
 export function componentContextWrapper({ componentName }: { componentName: 'SignIn' }): typeof SignInContext;
+export function componentContextWrapper({ componentName }: { componentName: 'SignUp' }): typeof SignUpContext;
+export function componentContextWrapper({ componentName }: { componentName: 'UserProfile' }): typeof UserProfileContext;
 export function componentContextWrapper({ componentName }: { componentName: string }): typeof ComponentContext;
 export function componentContextWrapper({
   componentName,
 }: {
   componentName: string;
-}): typeof SignInContext | typeof ComponentContext {
+}): typeof SignInContext | typeof SignUpContext | typeof UserProfileContext | typeof ComponentContext {
   switch (componentName) {
     case 'SignIn':
       return SignInContext;
+    case 'SignUp':
+      return SignUpContext;
+    case 'UserProfile':
+      return UserProfileContext;
     default:
       return ComponentContext;
   }
@@ -76,8 +82,10 @@ export type SignUpContextType = SignUpCtx & {
   waitlistUrl: string;
 };
 
+export const SignUpContext = React.createContext<SignUpCtx | null>(null);
+
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
+  const context = React.useContext(SignUpContext);
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -89,6 +97,12 @@ export const useSignUpContext = (): SignUpContextType => {
     [],
   );
 
+  if (!context || context.componentName !== 'SignUp') {
+    throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
+  }
+
+  const { componentName, ...ctx } = context;
+
   const redirectUrls = new RedirectUrls(
     options,
     {
@@ -98,10 +112,6 @@ export const useSignUpContext = (): SignUpContextType => {
     },
     queryParams,
   );
-
-  if (componentName !== 'SignUp') {
-    throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
-  }
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
@@ -253,14 +263,18 @@ export type UserProfileContextType = UserProfileCtx & {
   pages: PagesType;
 };
 
+export const UserProfileContext = React.createContext<UserProfileCtx | null>(null);
+
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
+  const context = React.useContext(UserProfileContext);
   const { queryParams } = useRouter();
   const clerk = useClerk();
 
-  if (componentName !== 'UserProfile') {
+  if (!context || context.componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
+
+  const { componentName, customPages, ...ctx } = context;
 
   const pages = useMemo(() => {
     return createUserProfileCustomPages(customPages || [], clerk);
