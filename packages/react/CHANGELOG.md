@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.15.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+
+## 5.14.3
+
+### Patch Changes
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+
 ## 5.14.0
 
 ### Minor Changes
@@ -14,7 +41,7 @@
   Example with clerk-js methods.
 
   ```tsx
-  import { __experimental_useReverification as useReverification } from "@clerk/nextjs";
+  import { __experimental_useReverification as useReverification } from '@clerk/nextjs';
 
   function DeleteAccount() {
     const { user } = useUser();
@@ -85,8 +112,14 @@
   Example usage:
 
   ```tsx
-  <UserButton __experimental_asProvider afterSignOutUrl="/">
-    <UserButton.UserProfilePage label="Custom Page" url="/custom-page">
+  <UserButton
+    __experimental_asProvider
+    afterSignOutUrl='/'
+  >
+    <UserButton.UserProfilePage
+      label='Custom Page'
+      url='/custom-page'
+    >
       <h1> This is my page available to all children </h1>
     </UserButton.UserProfilePage>
     <UserButton.__experimental_Outlet __experimental_asStandalone />
@@ -94,10 +127,13 @@
   ```
 
   ```tsx
-  <OrganizationSwitcher __experimental_asProvider afterSignOutUrl="/">
+  <OrganizationSwitcher
+    __experimental_asProvider
+    afterSignOutUrl='/'
+  >
     <OrganizationSwitcher.OrganizationProfilePage
-      label="Custom Page"
-      url="/custom-page"
+      label='Custom Page'
+      url='/custom-page'
     >
       <h1> This is my page available to all children </h1>
     </OrganizationSwitcher.OrganizationProfilePage>
@@ -198,8 +234,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: "L2.secondFactor",
-      maxAge: "A1.10min",
+      level: 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
   });
   ```
@@ -400,13 +436,24 @@
   ```jsx
   <UserButton>
     <UserButton.MenuItems>
-      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
-      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
-      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
-      custom page to have been set in `/help`)
-      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Link
+        label='Terms'
+        labelIcon={<Icon />}
+        href='/terms'
+      />
       <UserButton.Action
-        label="Chat Modal"
+        label='Help'
+        labelIcon={<Icon />}
+        open='help'
+      />{' '}
+      // Navigate to `/help` page when UserProfile opens as a modal. (Requires a custom page to have been set in
+      `/help`)
+      <UserButton.Action
+        label='manageAccount'
+        labelIcon={<Icon />}
+      />
+      <UserButton.Action
+        label='Chat Modal'
         labelIcon={<Icon />}
         onClick={() => setModal(true)}
       />
@@ -533,7 +580,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -548,11 +595,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === "complete") {
+      if (signInOrUp.status === 'complete') {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -650,13 +697,13 @@
   Before:
 
   ```jsx
-  import { SignOutButton } from "@clerk/clerk-react";
+  import { SignOutButton } from '@clerk/clerk-react';
 
   export const Signout = () => {
     return (
       <SignOutButton
         signOutCallback={() => {
-          window.location.href = "/your-path";
+          window.location.href = '/your-path';
         }}
       >
         <button>Sign Out</button>
@@ -668,11 +715,11 @@
   After:
 
   ```jsx
-  import { SignOutButton } from "@clerk/clerk-react";
+  import { SignOutButton } from '@clerk/clerk-react';
 
   export const Signout = () => {
     return (
-      <SignOutButton redirectUrl="/your-path">
+      <SignOutButton redirectUrl='/your-path'>
         <button>Sign Out</button>
       </SignOutButton>
     );
@@ -844,8 +891,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1346,8 +1393,8 @@
   export {};
 
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1380,13 +1427,13 @@
   Before:
 
   ```jsx
-  import { SignOutButton } from "@clerk/clerk-react";
+  import { SignOutButton } from '@clerk/clerk-react';
 
   export const Signout = () => {
     return (
       <SignOutButton
         signOutCallback={() => {
-          window.location.href = "/your-path";
+          window.location.href = '/your-path';
         }}
       >
         <button>Sign Out</button>
@@ -1398,11 +1445,11 @@
   After:
 
   ```jsx
-  import { SignOutButton } from "@clerk/clerk-react";
+  import { SignOutButton } from '@clerk/clerk-react';
 
   export const Signout = () => {
     return (
-      <SignOutButton redirectUrl="/your-path">
+      <SignOutButton redirectUrl='/your-path'>
         <button>Sign Out</button>
       </SignOutButton>
     );
@@ -1427,29 +1474,24 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
     // After
-    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 
     // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from "@clerk/clerk-react";
-    // After
-    import {
-      isClerkAPIResponseError,
-      isEmailLinkError,
-      isKnownError,
-      isMetamaskError,
-    } from "@clerk/clerk-react/errors";
+    } from '@clerk/clerk-react/errors';
 
     // Before
-    import { MultisessionAppSupport } from "@clerk/clerk-react";
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
     // After
-    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
@@ -1745,15 +1787,19 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
-    <UserProfile.Page label="account" />
-    <UserProfile.Page label="security" />
+    <UserProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <UserProfile.Page label='account' />
+    <UserProfile.Page label='security' />
   </UserProfile>
   ```
 
@@ -1766,19 +1812,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label="External"
-      url="/home"
+      label='External'
+      url='/home'
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label="members" />
-    <OrganizationProfile.Page label="settings" />
+    <OrganizationProfile.Page label='members' />
+    <OrganizationProfile.Page label='settings' />
   </OrganizationProfile>
   ```
 

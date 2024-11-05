@@ -1,5 +1,39 @@
 # @clerk/elements
 
+## 0.18.4
+
+### Patch Changes
+
+- Add Elements `<Link />` component. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  import * as Clerk from '@clerk/elements/common';
+  import NextLink from 'next/link';
+
+  function SignInPage() {
+    return (
+      <>
+        <Clerk.Link navigate='sign-up'>Sign up</Clerk.Link>
+
+        <Clerk.Link navigate='sign-up'>{url => <NextLink href={url}>Sign up</NextLink>}</Clerk.Link>
+      </>
+    );
+  }
+  ```
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+
+## 0.18.3
+
+### Patch Changes
+
+- Use host router instead of directly calling Next's `useRouter` hook by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+
 ## 0.18.0
 
 ### Minor Changes
@@ -201,13 +235,12 @@
   Example:
 
   ```tsx
-  <SignIn.Step name="choose-session">
+  <SignIn.Step name='choose-session'>
     <SignIn.SessionList>
       <SignIn.SessionListItem>
         {({ session }) => (
           <>
-            {session.identifier} |{" "}
-            <SignIn.Action setActiveSession>Switch...</SignIn.Action>
+            {session.identifier} | <SignIn.Action setActiveSession>Switch...</SignIn.Action>
           </>
         )}
       </SignIn.SessionListItem>
@@ -475,11 +508,9 @@
   - `<SignIn.Action passkey />`
 
     ```tsx
-    <SignIn.Step name="start">
+    <SignIn.Step name='start'>
       <SignIn.Passkey>
-        <Clerk.Loading>
-          {(isLoading) => (isLoading ? <Spinner /> : "Use passkey instead")}.
-        </Clerk.Loading>
+        <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}.</Clerk.Loading>
       </SignIn.Passkey>
     </SignIn.Step>
     ```
@@ -487,7 +518,10 @@
   - `<SignIn.SupportedStrategy name='passkey'>`
 
     ```tsx
-    <SignIn.SupportedStrategy asChild name="passkey">
+    <SignIn.SupportedStrategy
+      asChild
+      name='passkey'
+    >
       <Button>use passkey</Button>
     </SignIn.SupportedStrategy>
     ```
@@ -495,8 +529,8 @@
   - `<SignIn.Strategy name='passkey'>`
 
     ```tsx
-    <SignIn.Strategy name="passkey">
-      <p className="text-sm">
+    <SignIn.Strategy name='passkey'>
+      <p className='text-sm'>
         Welcome back <SignIn.Salutation />!
       </p>
 
@@ -506,12 +540,12 @@
 
   - Passkey Autofill
     ```tsx
-    <SignIn.Step name="start">
-      <Clerk.Field name="identifier">
-        <Clerk.Label className="sr-only">Email</Clerk.Label>
+    <SignIn.Step name='start'>
+      <Clerk.Field name='identifier'>
+        <Clerk.Label className='sr-only'>Email</Clerk.Label>
         <Clerk.Input
-          autoComplete="webauthn"
-          placeholder="Enter your email address"
+          autoComplete='webauthn'
+          placeholder='Enter your email address'
         />
         <Clerk.FieldError />
       </Clerk.Field>
@@ -922,7 +956,7 @@
 - Add `<Step>` component which can be used instead of `<Start>`, `<Continue>` and `<Verifications>` like this:
   ```tsx
   // You can also use name="continue" or name="verifications"
-  <Step name="start">Contents</Step>
+  <Step name='start'>Contents</Step>
   ```
 
 ## 0.1.10

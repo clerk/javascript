@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: 'The node version to use'
     required: false
-    default: '18'
+    default: '22'
   playwright-enabled:
     description: 'Enable Playwright?'
     required: false

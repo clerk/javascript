@@ -125,8 +125,8 @@ export function SDKWorkflow(props) {
                 <Newline />
                 <Text>
                   You can find more information about this change in the Clerk documentation at{' '}
-                  <Link url='https://clerk.com/docs/nextjs/rendering-modes'>
-                    https://clerk.com/docs/nextjs/rendering-modes
+                  <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
+                    https://clerk.com/docs/references/nextjs/rendering-modes
                   </Link>
                   .
                 </Text>

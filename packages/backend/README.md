@@ -44,6 +44,12 @@ You'll learn how to install `@clerk/backend` and how to use `createClerkClient()
 
 For further information, guides, and examples visit the [JavaScript Backend SDK reference documentation](https://clerk.com/docs/references/backend/overview?utm_source=github&utm_medium=clerk_backend). It lists all the available APIs and methods.
 
+## Testing
+
+This project uses [vitest](https://vitest.dev/) as the unit test runner and [msw](https://mswjs.io/) for mocking network requests.
+
+If you need to see which requests are being intercepted by `msw`, you can run the test suite with the following env: `DEBUG_MOCK_REQUESTS=true`
+
 ## Support
 
 You can get in touch with us in any of the following ways:

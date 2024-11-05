@@ -1,4 +1,4 @@
-import { noop } from '@clerk/shared';
+import { noop } from '@clerk/shared/utils';
 import type { PasswordValidation } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 

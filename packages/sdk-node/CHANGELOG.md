@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.0.59
+
+### Patch Changes
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+  - @clerk/backend@1.15.6
+
+## 5.0.58
+
+### Patch Changes
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/backend@1.15.5
+
 ## 5.0.55
 
 ### Patch Changes
@@ -440,13 +457,13 @@
   The below code now works as expected: (requires CLERK_SECRET_KEY env var to have been set)
 
   ```ts
-  import { clerkClient } from "@clerk/clerk-sdk-node";
+  import { clerkClient } from '@clerk/clerk-sdk-node';
 
   // Use the default settings from the already instanciated clerkClient
   clerkClient.verifyToken(token);
   // or provide overrides the options
   clerkClient.verifyToken(token, {
-    secretKey: "xxxx",
+    secretKey: 'xxxx',
   });
   ```
 
@@ -500,23 +517,23 @@
   Remove the named `Clerk` import from `@clerk/clerk-sdk-node` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/clerk-sdk-node";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/clerk-sdk-node';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/clerk-sdk-node";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/clerk-sdk-node';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 - 9b02c1aae: Drop all pre-instantiated Backend API resources (`allowlistIdentifiers`, `clients`, `emailAddresses`, `emails`, `invitations`, `organizations`, `phoneNumbers`, `redirectUrls`, `sessions`, `signInTokens`, `users`, `domains`). Use the `clerkClient` import instead.
   ```typescript
   // Before
-  import { users } from "@clerk/clerk-sdk-node";
+  import { users } from '@clerk/clerk-sdk-node';
   // After
-  import { clerkClient } from "@clerk/clerk-sdk-node";
+  import { clerkClient } from '@clerk/clerk-sdk-node';
   clerkClient.users;
   ```
 - 71663c568: Internal update default apiUrl domain from clerk.dev to clerk.com
@@ -524,11 +541,10 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from "@clerk/backend";
-  import { ClerkAPIResponseError } from "@clerk/shared/error";
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
 
-  const { data, errors, clerkTraceId, status, statusText } =
-    await users.getUser("user_deadbeef");
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,
@@ -601,7 +617,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -638,29 +654,18 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 - f58a9949b: Changes in exports of `@clerk/backend`:
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import {
-      decodeJwt,
-      hasValidSignature,
-      signJwt,
-      verifyJwt,
-    } from "@clerk/backend/jwt";
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -680,20 +685,14 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    } from '@clerk/backend/errors';
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
     // After
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
     ```
 
 ### Minor Changes
@@ -1160,9 +1159,9 @@
 
   ```typescript
   // Before
-  import { users } from "@clerk/clerk-sdk-node";
+  import { users } from '@clerk/clerk-sdk-node';
   // After
-  import { clerkClient } from "@clerk/clerk-sdk-node";
+  import { clerkClient } from '@clerk/clerk-sdk-node';
   clerkClient.users;
   ```
 
@@ -1183,7 +1182,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1222,31 +1221,20 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 
 - Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
 
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import {
-      decodeJwt,
-      hasValidSignature,
-      signJwt,
-      verifyJwt,
-    } from "@clerk/backend/jwt";
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1267,20 +1255,14 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    } from '@clerk/backend/errors';
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
     // After
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
     ```
 
 ### Minor Changes
@@ -1309,15 +1291,15 @@
   Remove the named `Clerk` import from `@clerk/clerk-sdk-node` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/clerk-sdk-node";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/clerk-sdk-node';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/clerk-sdk-node";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/clerk-sdk-node';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 ### Patch Changes
@@ -1440,11 +1422,10 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from "@clerk/backend";
-  import { ClerkAPIResponseError } from "@clerk/shared/error";
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
 
-  const { data, errors, clerkTraceId, status, statusText } =
-    await users.getUser("user_deadbeef");
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,

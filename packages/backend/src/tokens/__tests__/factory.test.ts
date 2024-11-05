@@ -1,96 +1,87 @@
-import type QUnit from 'qunit';
+import { describe, expect, it } from 'vitest';
 
 import type { ApiClient } from '../../api';
 import { createAuthenticateRequest } from '../factory';
 
 const TEST_PK = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 
-export default (QUnit: QUnit) => {
-  const { module, test } = QUnit;
+describe('createAuthenticateRequest({ options, apiClient })', () => {
+  it('fallbacks to build-time options', async () => {
+    const buildTimeOptions = {
+      secretKey: 'sk',
+      jwtKey: 'jwtKey',
+      apiUrl: 'apiUrl',
+      apiVersion: 'apiVersion',
+      proxyUrl: 'proxyUrl',
+      publishableKey: TEST_PK,
+      isSatellite: false,
+      domain: 'domain',
+      audience: 'domain',
+    };
 
-  module('createAuthenticateRequest({ options, apiClient })', hooks => {
-    let fakeAuthenticateRequest;
-    hooks.afterEach(() => {
-      fakeAuthenticateRequest?.restore();
+    const { authenticateRequest } = createAuthenticateRequest({
+      options: buildTimeOptions,
+      apiClient: {} as ApiClient,
     });
 
-    test('fallbacks to build-time options', async assert => {
-      const buildTimeOptions = {
-        secretKey: 'sk',
-        jwtKey: 'jwtKey',
-        apiUrl: 'apiUrl',
-        apiVersion: 'apiVersion',
-        proxyUrl: 'proxyUrl',
-        publishableKey: TEST_PK,
-        isSatellite: false,
-        domain: 'domain',
-        audience: 'domain',
-      };
+    const requestState = await authenticateRequest(new Request('http://example.com/'));
+    expect(requestState.toAuth()?.debug()).toMatchObject(buildTimeOptions);
+  });
 
-      const { authenticateRequest } = createAuthenticateRequest({
-        options: buildTimeOptions,
-        apiClient: {} as ApiClient,
-      });
+  it('overrides build-time options with runtime options', async () => {
+    const buildTimeOptions = {
+      secretKey: 'sk',
+      jwtKey: 'jwtKey',
+      apiUrl: 'apiUrl',
+      apiVersion: 'apiVersion',
+      proxyUrl: 'proxyUrl',
+      publishableKey: TEST_PK,
+      isSatellite: false,
+      domain: 'domain',
+      audience: 'domain',
+    };
 
-      const requestState = await authenticateRequest(new Request('http://example.com/'));
-      assert.propContains(requestState.toAuth()?.debug(), buildTimeOptions);
+    const { authenticateRequest } = createAuthenticateRequest({
+      options: buildTimeOptions,
+      apiClient: {} as ApiClient,
     });
 
-    test('overrides build-time options with runtime options', async assert => {
-      const buildTimeOptions = {
-        secretKey: 'sk',
-        jwtKey: 'jwtKey',
-        apiUrl: 'apiUrl',
-        apiVersion: 'apiVersion',
-        proxyUrl: 'proxyUrl',
-        publishableKey: TEST_PK,
-        isSatellite: false,
-        domain: 'domain',
-        audience: 'domain',
-      };
-
-      const { authenticateRequest } = createAuthenticateRequest({
-        options: buildTimeOptions,
-        apiClient: {} as ApiClient,
-      });
-
-      const overrides = {
-        secretKey: 'r-sk',
-        publishableKey: TEST_PK,
-      };
-      const requestState = await authenticateRequest(new Request('http://example.com/'), {
-        ...overrides,
-      });
-      assert.propContains(requestState.toAuth()?.debug(), {
-        ...buildTimeOptions,
-        ...overrides,
-      });
+    const overrides = {
+      secretKey: 'r-sk',
+      publishableKey: TEST_PK,
+    };
+    const requestState = await authenticateRequest(new Request('http://example.com/'), {
+      ...overrides,
     });
-
-    test('ignore runtime apiUrl and apiVersion options', async assert => {
-      const buildTimeOptions = {
-        secretKey: 'sk',
-        jwtKey: 'jwtKey',
-        apiUrl: 'apiUrl',
-        apiVersion: 'apiVersion',
-        proxyUrl: 'proxyUrl',
-        publishableKey: TEST_PK,
-        isSatellite: false,
-        domain: 'domain',
-        audience: 'domain',
-      };
-
-      const { authenticateRequest } = createAuthenticateRequest({
-        options: buildTimeOptions,
-        apiClient: {} as ApiClient,
-      });
-
-      const requestState = await authenticateRequest(new Request('http://example.com/'), {
-        // @ts-expect-error is used to check runtime code
-        apiUrl: 'r-apiUrl',
-        apiVersion: 'r-apiVersion',
-      });
-      assert.propContains(requestState.toAuth()?.debug(), buildTimeOptions);
+    expect(requestState.toAuth()?.debug()).toMatchObject({
+      ...buildTimeOptions,
+      ...overrides,
     });
   });
-};
+
+  it('ignore runtime apiUrl and apiVersion options', async () => {
+    const buildTimeOptions = {
+      secretKey: 'sk',
+      jwtKey: 'jwtKey',
+      apiUrl: 'apiUrl',
+      apiVersion: 'apiVersion',
+      proxyUrl: 'proxyUrl',
+      publishableKey: TEST_PK,
+      isSatellite: false,
+      domain: 'domain',
+      audience: 'domain',
+    };
+
+    const { authenticateRequest } = createAuthenticateRequest({
+      options: buildTimeOptions,
+      apiClient: {} as ApiClient,
+    });
+
+    const requestState = await authenticateRequest(new Request('http://example.com/'), {
+      // @ts-expect-error is used to check runtime code
+      apiUrl: 'r-apiUrl',
+      apiVersion: 'r-apiVersion',
+    });
+    expect(requestState.toAuth()?.debug()).toMatchObject(buildTimeOptions);
+  });
+});
