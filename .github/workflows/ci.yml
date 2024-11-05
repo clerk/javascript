@@ -2,6 +2,11 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      run_integration_tests:
+        description: 'Run integration tests'
+        type: boolean
+        default: false
   merge_group:
   pull_request:
     branches:
@@ -133,6 +138,10 @@ jobs:
 
   integration-tests:
     name: Integration Tests
+    # Skip for fork PRs to prevent security vulnerabilities (no secrets)
+    # Runs if it comes from the root repo or once it gets approved by a maintainer
+    if: |
+      github.event.inputs.run_integration_tests == 'true' || github.event.pull_request.head.repo.full_name == github.repository
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}

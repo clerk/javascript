@@ -1,0 +1,90 @@
+# This workflow exists as a security measure for handling fork PRs.
+# Since GitHub doesn't share repository secrets with fork PRs (for security),
+# this workflow acts as a manual approval mechanism where Clerk org members can
+# trigger integration tests on fork PRs by commenting '!run-integration-tests'
+name: Run Integration Tests
+run-name: Executed by ${{ github.actor }}
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.actor }}
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+    if: ${{ startsWith(github.event.comment.body, '!run-integration-tests') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Limit action to Clerk members
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const isMember = await github.rest.orgs.checkMembershipForUser({
+              org: 'clerk',
+              username: context.actor
+            });
+            if (!isMember) {
+              core.setFailed(`@${actor} is not a member of the Clerk organization`);
+            }
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+
+      - name: Ensure the PR hasn't changed since initiating the !run-integration-tests command
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const commentCreated = new Date(context.payload.comment.created_at);
+
+            const pr = await github.rest.pulls.get({
+              owner: 'clerk',
+              repo: 'javascript',
+              pull_number: context.issue.number,
+            });
+
+            const prLastUpdated = new Date(pr.updated_at);
+
+            if (prLastUpdated > commentCreated) {
+              core.setFailed("The PR has been updated since !run-integration-tests was initiated. Please review the changes and re-run the !run-integration-tests command.");
+            }
+
+      - name: Trigger Integration Tests
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'clerk',
+              repo: 'javascript',
+              workflow_id: 'ci.yml',
+              ref: context.payload.pull_request.head.ref,
+              inputs: {
+                run_integration_tests: 'true'
+              }
+            });
+
+      - name: Update Comment
+        uses: peter-evans/create-or-update-comment@v3.0.0
+        with:
+          token: ${{ secrets.CLERK_COOKIE_PAT }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: heart
