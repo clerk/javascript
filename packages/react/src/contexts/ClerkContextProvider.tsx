@@ -1,10 +1,10 @@
+import { deriveState } from '@clerk/shared/deriveState';
 import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
-import { deriveState } from '../utils/deriveState';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
