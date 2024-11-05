@@ -93,7 +93,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const resolvedClerkClient = await clerkClient();
+      let resolvedClerkClient = await clerkClient();
       // let accountless: AccountlessApplication | undefined;
       let accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
       console.log('------accountless read', accountless);
@@ -102,7 +102,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
         accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
         request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
-        console.log('wowow', accountless);
+        console.log('------accountless new', accountless);
         // await resolvedClerkClient.accountlessApplications.store(accountless);
       }
 
@@ -126,6 +126,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
+      resolvedClerkClient = await clerkClient();
 
       resolvedClerkClient.telemetry.record(
         eventMethodCalled('clerkMiddleware', {
@@ -155,7 +156,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        return new Response(null, { status: 307, headers: requestState.headers });
+        const res = new NextResponse(null, { status: 307, headers: requestState.headers });
+        res.cookies.set('__clerk_accountless', JSON.stringify(accountless));
+        // NextResponse.redirect()
+        // return new Response(null, { status: 307, headers: requestState.headers });
+        return res;
       } else if (requestState.status === AuthStatus.Handshake) {
         throw new Error('Clerk: handshake status without redirect');
       }
@@ -198,7 +203,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams);
+      decorateRequest(clerkRequest, handlerResult, requestState, { ...resolvedParams, ...options });
 
       return handlerResult;
     });

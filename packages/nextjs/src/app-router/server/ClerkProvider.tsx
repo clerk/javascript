@@ -1,4 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
+import { constants } from '@clerk/backend/internal';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
 import nextPkg from 'next/package.json';
@@ -6,6 +7,7 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { decryptClerkRequestData, getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
@@ -18,6 +20,13 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const data = getDynamicAuthData(request);
 
   return data;
+});
+
+const getDynamicPK = React.cache(async function getDynamicClerkState() {
+  const request = await buildRequestLike();
+  const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+
+  return decryptClerkRequestData(encryptedRequestData).publishableKey;
 });
 
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
@@ -55,7 +64,7 @@ export async function ClerkProvider(
 
   const output = (
     <ClientClerkProvider
-      {...mergeNextClerkPropsWithEnv(rest)}
+      {...mergeNextClerkPropsWithEnv({ ...rest, publishableKey: rest.publishableKey || (await getDynamicPK()) })}
       nonce={await nonce}
       initialState={await statePromise}
     >
