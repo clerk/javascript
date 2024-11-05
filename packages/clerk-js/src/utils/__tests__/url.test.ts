@@ -93,21 +93,21 @@ describe('isProblematicUrl(url)', () => {
     ['/..\\evil.com', false],
     ['/\\@evil.com', false],
 
-    // 3. Path traversal attempts
+    // 2. Path traversal attempts
     ['../evil.com', false],
     ['/../evil.com', false],
     ['../../', false],
     ['/../../', false],
 
-    // 8. URLs with different schemes
+    // 3. URLs with different schemes
     ['javascript:alert(1)', true],
 
-    // 9. URLs with control characters and whitespace
+    // 4. URLs with control characters and whitespace
     ['/test ', false],
     [' /test', false],
     ['/test\n', false],
 
-    // 10. Fragment identifiers and query parameters
+    // 5. Fragment identifiers and query parameters
     ['/#/evil.com', false],
     ['/path#//evil.com', false],
     ['/evil.com?redirect=evil.com', false],
