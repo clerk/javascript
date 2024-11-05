@@ -13,6 +13,7 @@ import {
   TestingTokenAPI,
   UserAPI,
 } from './endpoints';
+import { AccountlessApplicationAPI } from './endpoints/AccountlessApplicationsAPI';
 import { buildRequest } from './request';
 
 export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
@@ -23,6 +24,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
   const request = buildRequest(options);
 
   return {
+    accountlessApplications: new AccountlessApplicationAPI(buildRequest({ ...options, allowAccountless: true })),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),

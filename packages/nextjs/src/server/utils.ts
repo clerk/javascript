@@ -195,7 +195,7 @@ export function assertAuthStatus(req: RequestLike, error: string) {
   }
 }
 
-export function assertKey(key: string, onError: () => never): string {
+export function assertKey(key: string | undefined, onError: () => never): string {
   if (!key) {
     onError();
   }

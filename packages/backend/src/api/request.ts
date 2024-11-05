@@ -51,13 +51,24 @@ type BuildRequestOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
+
+  allowAccountless?: boolean;
 };
+
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
+    const {
+      secretKey,
+      apiUrl = API_URL,
+      apiVersion = API_VERSION,
+      userAgent = USER_AGENT,
+      allowAccountless = true,
+    } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
-    assertValidSecretKey(secretKey);
+    if (!allowAccountless) {
+      assertValidSecretKey(secretKey);
+    }
 
     const url = joinPaths(apiUrl, apiVersion, path);
 

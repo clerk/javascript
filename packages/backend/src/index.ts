@@ -87,6 +87,7 @@ export type {
  * Resources
  */
 export type {
+  AccountlessApplication,
   AllowlistIdentifier,
   Client,
   EmailAddress,

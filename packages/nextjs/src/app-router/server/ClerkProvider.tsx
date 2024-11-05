@@ -31,6 +31,14 @@ export async function ClerkProvider(
   let statePromise: Promise<null | AuthObject> = Promise.resolve(null);
   let nonce = Promise.resolve('');
 
+  // if (PHASE_DEVELOPMENT_SERVER) {
+  //   const resolvedClient = await clerkClient();
+  //   await resolvedClient.accountlessApplications.store({
+  //     publishableKey: props.publishableKey,
+  //     secretKey: props.se
+  //   })
+  // }
+
   if (dynamic) {
     if (isNext13) {
       /**

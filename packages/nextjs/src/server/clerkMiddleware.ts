@@ -37,6 +37,7 @@ export type ClerkMiddlewareAuthObject = AuthObject & {
 
 export interface ClerkMiddlewareAuth {
   (): Promise<ClerkMiddlewareAuthObject>;
+
   protect: AuthProtect;
 }
 
@@ -92,11 +93,24 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
+      const resolvedClerkClient = await clerkClient();
+      // let accountless: AccountlessApplication | undefined;
+      let accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
+      console.log('------accountless read', accountless);
+      // let accountless = await resolvedClerkClient.accountlessApplications.read();
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
+      if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
+        accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
+        request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
+        console.log('wowow', accountless);
+        // await resolvedClerkClient.accountlessApplications.store(accountless);
+      }
+
+      const publishableKey = assertKey(
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishable_key,
+        () => errorThrower.throwMissingPublishableKeyError(),
       );
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secret_key, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -112,8 +126,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
-
-      const resolvedClerkClient = await clerkClient();
 
       resolvedClerkClient.telemetry.record(
         eventMethodCalled('clerkMiddleware', {

@@ -46,6 +46,7 @@ export type {
   OrganizationMembershipRole,
   // Webhook event types
   // Resources
+  AccountlessApplication,
   AllowlistIdentifier,
   Client,
   OrganizationMembership,
