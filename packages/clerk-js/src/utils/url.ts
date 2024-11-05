@@ -379,13 +379,11 @@ export const isAllowedRedirectOrigin =
     if (!allowedRedirectOrigins) {
       return true;
     }
-    debugger;
     if (isRelativeUrl(_url)) {
       return true;
     }
 
     const url = new URL(_url, DUMMY_URL_BASE);
-    console.log('???????', _url, url.href);
     const isAllowed = allowedRedirectOrigins
       .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
       .some(origin => origin.test(trimTrailingSlash(url.origin)));

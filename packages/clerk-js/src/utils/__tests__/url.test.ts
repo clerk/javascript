@@ -84,10 +84,8 @@ describe('isValidUrl(url,base)', () => {
   });
 });
 
-describe.only('isRelativeUrl(url,base)', () => {
-  const cases: Array<[string, boolean]> = [['/%2e%2e/%2e%2e/evil.com', false]];
-
-  const cases1: Array<[string, boolean]> = [
+describe('isRelativeUrl(url,base)', () => {
+  const cases: Array<[string, boolean]> = [
     ['', true],
     ['/', true],
     ['/test', true],
@@ -182,7 +180,7 @@ describe.only('isRelativeUrl(url,base)', () => {
     // ['/%00/eval.com', false],
   ];
 
-  test.each(cases1)('.isRelativeUrl(%s,%s)', (a, expected) => {
+  test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
     expect(isRelativeUrl(a)).toBe(expected);
   });
 });
@@ -531,7 +529,42 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
 
 describe('isAllowedRedirectOrigin', () => {
   const cases: [string, Array<string | RegExp> | undefined, boolean][] = [
-    ['/%2e%2e/%2e%2e/evil.com', ['https://www.clerk.com'], true],
+    // base cases
+    ['https://clerk.com', ['https://www.clerk.com'], false],
+    ['https://www.clerk.com', ['https://www.clerk.com'], true],
+    // glob patterns
+    ['https://clerk.com', ['https://*.clerk.com'], false],
+    ['https://www.clerk.com', ['https://*.clerk.com'], true],
+    // trailing slashes
+    ['https://www.clerk.com/', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/test', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/test', ['https://www.clerk.com/'], true],
+    // multiple origins
+    ['https://www.clerk.com', ['https://www.test.dev', 'https://www.clerk.com'], true],
+    // relative urls
+    ['/relative', ['https://www.clerk.com'], true],
+    ['/relative/test', ['https://www.clerk.com'], true],
+    ['/', ['https://www.clerk.com'], true],
+    // empty origins list for relative routes
+    ['/', [], true],
+    // empty origins list for absolute routes
+    ['https://www.clerk.com/', [], false],
+    //undefined origins
+    ['https://www.clerk.com/', undefined, true],
+    // query params
+    ['https://www.clerk.com/foo?hello=1', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/foo?hello=1', ['https://www.clerk.com/'], true],
+    // regexp
+    ['https://www.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], true],
+    ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
+    // malformed or protocol-relative URLs
+    ['http:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['http//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['https//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['..//evil.com', ['https://www.clerk.com'], false],
   ];
 
   const warnMock = jest.spyOn(logger, 'warnOnce');
