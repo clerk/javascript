@@ -2,6 +2,7 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
 import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import type { ClerkHostRouter } from '@clerk/shared/router';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -25,6 +26,8 @@ const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
  */
 const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
   // preserve internal state between steps.
@@ -40,9 +43,8 @@ const useNextRouter = (): ClerkHostRouter => {
     shallowPush(path: string) {
       canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
     },
-    pathname: () => (typeof window !== 'undefined' ? window.location.pathname : ''),
-    searchParams: () =>
-      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams(),
+    pathname: () => pathname,
+    searchParams: () => searchParams,
   };
 };
 
