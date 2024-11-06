@@ -19,6 +19,9 @@
   "author": "Clerk",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "EXPO_NONINTERACTIVE=1 expo-module build && expo-module prepare",
     "build:watch": "expo-module build",
