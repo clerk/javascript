@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.15.1
+
+### Patch Changes
+
+- Use shared `deriveState` function ([#4490](https://github.com/clerk/javascript/pull/4490)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8a04ae47b8305f994b348301fd8134d5baf02943`](https://github.com/clerk/javascript/commit/8a04ae47b8305f994b348301fd8134d5baf02943)]:
+  - @clerk/shared@2.11.5
+
 ## 5.15.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -52,8 +52,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/elements": "0.18.4",
-    "@clerk/shared": "2.11.4",
+    "@clerk/elements": "0.18.5",
+    "@clerk/shared": "2.11.5",
     "@clerk/types": "4.30.0",
     "@formkit/auto-animate": "^0.8.2",
     "@radix-ui/react-slot": "^1.1.0",

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -81,8 +81,8 @@
     "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.15.6",
-    "@clerk/shared": "2.11.4",
+    "@clerk/backend": "1.15.7",
+    "@clerk/shared": "2.11.5",
     "@clerk/types": "4.30.0",
     "nanoid": "5.0.7",
     "nanostores": "0.11.3"
