@@ -95,6 +95,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       const resolvedParams = typeof params === 'function' ? params(request) : params;
       let resolvedClerkClient = await clerkClient();
       let accountless: any;
+      let toWrite = false;
       const { skipAccountless = false } = resolvedParams;
 
       if (!skipAccountless) {
@@ -106,6 +107,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
           accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
           request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
+          toWrite = true;
           console.log('------accountless new', accountless);
           // await resolvedClerkClient.accountlessApplications.store(accountless);
         }
@@ -163,7 +165,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const locationHeader = requestState.headers.get(constants.Headers.Location);
       if (locationHeader) {
-        if (!skipAccountless) {
+        if (toWrite) {
           const res = new NextResponse(null, { status: 307, headers: requestState.headers });
           res.cookies.set('__clerk_accountless', JSON.stringify(accountless));
           return res;

@@ -64,7 +64,10 @@ export async function ClerkProvider(
 
   const output = (
     <ClientClerkProvider
-      {...mergeNextClerkPropsWithEnv({ ...rest, publishableKey: rest.publishableKey || (await getDynamicPK()) })}
+      {...mergeNextClerkPropsWithEnv({
+        ...rest,
+        publishableKey: rest.publishableKey || (await getDynamicPK()),
+      })}
       nonce={await nonce}
       initialState={await statePromise}
     >
