@@ -11,6 +11,7 @@ import {
   isAllowedRedirectOrigin,
   isDataUri,
   isDevAccountPortalOrigin,
+  isProblematicUrl,
   isRedirectForFAPIInitiatedFlow,
   isValidUrl,
   mergeFragmentIntoUrl,
@@ -448,6 +449,12 @@ describe('isAllowedRedirectOrigin', () => {
     // regexp
     ['https://www.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], true],
     ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
+    // malformed or protocol-relative URLs
+    ['http:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['..//evil.com', ['https://www.clerk.com'], false],
+    ['https://www.example.com/', [], false],
   ];
 
   const warnMock = jest.spyOn(global.console, 'warn').mockImplementation();
@@ -458,5 +465,40 @@ describe('isAllowedRedirectOrigin', () => {
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
     expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
+  });
+});
+
+describe('isProblematicUrl(url)', () => {
+  const cases: Array<[string, boolean]> = [
+    // 1. URLs with backslashes instead of forward slashes
+    ['\\evil.com', false],
+    ['/\\evil.com', false],
+    ['\\\\evil.com', false],
+    ['/..\\evil.com', false],
+    ['/\\@evil.com', false],
+
+    // 2. Path traversal attempts
+    ['..//evil.com', true],
+    ['/../evil.com', false],
+    ['../../', false],
+    ['/../../', false],
+
+    // 3. URLs with different schemes
+    ['javascript:alert(1)', true],
+
+    // 4. URLs with control characters and whitespace
+    ['/test ', false],
+    [' /test', false],
+    ['/test\n', false],
+
+    // 5. Fragment identifiers and query parameters
+    ['/#/evil.com', false],
+    ['/path#//evil.com', false],
+    ['/evil.com?redirect=evil.com', false],
+    ['/evil.com?redirect=https://evil.com', false],
+  ];
+
+  test.each(cases)('.isProblematicUrl(%s,%s)', (a, expected) => {
+    expect(isProblematicUrl(new URL(a, 'https://clerk.dummy'))).toBe(expected);
   });
 });
