@@ -8,11 +8,11 @@ import {
   getSearchParameterFromHash,
   hasBannedProtocol,
   hasExternalAccountSignUpError,
-  isAllowedRedirectOrigin,
+  isAllowedRedirect,
   isDataUri,
   isDevAccountPortalOrigin,
+  isProblematicUrl,
   isRedirectForFAPIInitiatedFlow,
-  isRelativeUrl,
   isValidUrl,
   mergeFragmentIntoUrl,
   relativeToAbsoluteUrl,
@@ -84,18 +84,38 @@ describe('isValidUrl(url,base)', () => {
   });
 });
 
-describe('isRelativeUrl(url,base)', () => {
+describe('isProblematicUrl(url)', () => {
   const cases: Array<[string, boolean]> = [
-    ['', true],
-    ['/', true],
-    ['/test', true],
-    ['/test?clerk=true', true],
-    ['/?clerk=true', true],
-    ['https://www.clerk.com/', false],
+    // 1. URLs with backslashes instead of forward slashes
+    ['\\evil.com', false],
+    ['/\\evil.com', false],
+    ['\\\\evil.com', false],
+    ['/..\\evil.com', false],
+    ['/\\@evil.com', false],
+
+    // 2. Path traversal attempts
+    ['..//evil.com', true],
+    ['/../evil.com', false],
+    ['../../', false],
+    ['/../../', false],
+
+    // 3. URLs with different schemes
+    ['javascript:alert(1)', true],
+
+    // 4. URLs with control characters and whitespace
+    ['/test ', false],
+    [' /test', false],
+    ['/test\n', false],
+
+    // 5. Fragment identifiers and query parameters
+    ['/#/evil.com', false],
+    ['/path#//evil.com', false],
+    ['/evil.com?redirect=evil.com', false],
+    ['/evil.com?redirect=https://evil.com', false],
   ];
 
-  test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
-    expect(isRelativeUrl(a)).toBe(expected);
+  test.each(cases)('.isProblematicUrl(%s,%s)', (a, expected) => {
+    expect(isProblematicUrl(new URL(a, 'https://clerk.dummy'))).toBe(expected);
   });
 });
 
@@ -441,7 +461,7 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
   });
 });
 
-describe('isAllowedRedirectOrigin', () => {
+describe('isAllowedRedirect', () => {
   const cases: [string, Array<string | RegExp> | undefined, boolean][] = [
     // base cases
     ['https://clerk.com', ['https://www.clerk.com'], false],
@@ -463,7 +483,7 @@ describe('isAllowedRedirectOrigin', () => {
     // empty origins list for relative routes
     ['/', [], true],
     // empty origins list for absolute routes
-    ['https://www.clerk.com/', [], false],
+    ['https://www.example.com/', [], false],
     //undefined origins
     ['https://www.clerk.com/', undefined, true],
     // query params
@@ -475,9 +495,8 @@ describe('isAllowedRedirectOrigin', () => {
     // malformed or protocol-relative URLs
     ['http:evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
-    ['http//evil.com', [/https:\/\/www\.clerk\.com/], false],
-    ['https//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
+    ['..//evil.com', ['https://www.clerk.com'], false],
   ];
 
   const warnMock = jest.spyOn(logger, 'warnOnce');
@@ -485,8 +504,8 @@ describe('isAllowedRedirectOrigin', () => {
   beforeEach(() => warnMock.mockClear());
   afterAll(() => warnMock.mockRestore());
 
-  test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
-    expect(isAllowedRedirectOrigin(allowedOrigins)(url)).toEqual(expected);
+  test.each(cases)('isAllowedRedirect("%s","%s") === %s', (url, allowedOrigins, expected) => {
+    expect(isAllowedRedirect(allowedOrigins, 'https://www.clerk.com')(url)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
   });
 });
@@ -532,6 +551,6 @@ describe('relativeToAbsoluteUrl', () => {
   ];
 
   test.each(cases)('relativeToAbsoluteUrl(%s, %s) === %s', (origin, relative, expected) => {
-    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(expected);
+    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(new URL(expected));
   });
 });
