@@ -106,3 +106,5 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx;
+
+export type AvailableComponentName = AvailableComponentCtx['componentName'];

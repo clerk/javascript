@@ -3,7 +3,7 @@ import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
@@ -98,7 +98,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
 
   return (
     <Route path='sign-up'>
-      <ComponentContext.Provider
+      <SignUpContext.Provider
         value={{
           componentName: 'SignUp',
           ...signUpProps,
@@ -112,7 +112,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
             routing='virtual'
           />
         </div>
-      </ComponentContext.Provider>
+      </SignUpContext.Provider>
     </Route>
   );
 };

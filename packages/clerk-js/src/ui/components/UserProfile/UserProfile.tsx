@@ -1,7 +1,7 @@
 import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
-import { ComponentContext, withCoreUserGuard } from '../../contexts';
+import { UserProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -54,12 +54,12 @@ export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {
 
   return (
     <Route path='user'>
-      <ComponentContext.Provider value={userProfileProps}>
+      <UserProfileContext.Provider value={userProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
           <UserProfile {...userProfileProps} />
         </div>
-      </ComponentContext.Provider>
+      </UserProfileContext.Provider>
     </Route>
   );
 };
