@@ -470,17 +470,6 @@ export const nlNL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Inloggen',
       actionText: 'Heb je een account?',

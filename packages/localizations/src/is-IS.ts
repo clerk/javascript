@@ -472,17 +472,6 @@ export const isIS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Skrá inn',
       actionText: 'Ertu með reikning?',

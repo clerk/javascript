@@ -474,17 +474,6 @@ export const esMX: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Entrar',
       actionText: '¿Tiene una cuenta?',

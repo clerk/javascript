@@ -468,17 +468,6 @@ export const csCZ: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Přihlásit se',
       actionText: 'Máte účet?',

@@ -470,17 +470,6 @@ export const nbNO: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Skriv inn passordet ditt',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Logg inn',
       actionText: 'Har du allerede en konto?',

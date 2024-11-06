@@ -468,17 +468,6 @@ export const ukUA: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Увійти',
       actionText: 'Уже є акаунт?',

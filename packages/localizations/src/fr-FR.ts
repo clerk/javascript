@@ -473,17 +473,6 @@ export const frFR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: "S'identifier",
       actionText: 'Vous avez déjà un compte ?',

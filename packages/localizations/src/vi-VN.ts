@@ -468,17 +468,6 @@ export const viVN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu của bạn',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có tài khoản?',

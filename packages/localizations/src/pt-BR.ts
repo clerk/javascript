@@ -470,17 +470,6 @@ export const ptBR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Insira sua senha',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Entrar',
       actionText: 'Possui uma conta?',

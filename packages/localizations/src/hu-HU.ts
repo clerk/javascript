@@ -470,17 +470,6 @@ export const huHU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Bejelentkezés',
       actionText: 'Van már fiókod?',

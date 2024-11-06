@@ -465,17 +465,6 @@ export const zhTW: LocalizationResource = {
   },
   signInEnterPasswordTitle: '輸入您的密碼',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: '登錄',
       actionText: '已經有帳戶了？',
