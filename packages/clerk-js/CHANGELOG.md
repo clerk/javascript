@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.31.2
+
+### Patch Changes
+
+- Re-init window.Clerk options when `ClerkProvider` props change in `@clerk/clerk-react` ([#4498](https://github.com/clerk/javascript/pull/4498)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.31.1
 
 ### Patch Changes
