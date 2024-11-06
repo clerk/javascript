@@ -9,7 +9,7 @@
         "!CHANGELOG.md",
         "!coverage/**",
         "!build/**",
-        "!examples/**",
+        "!example/**",
         "!node_modules/**"
       ],
       "outputLogs": "new-only",
