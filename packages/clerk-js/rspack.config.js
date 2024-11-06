@@ -171,10 +171,8 @@ const typescriptLoaderDev = () => {
       exclude: /node_modules/,
       loader: 'builtin:swc-loader',
       options: {
-        env: {
-          targets: 'last 0.25 years',
-        },
         jsc: {
+          target: 'esnext',
           parser: {
             syntax: 'typescript',
             tsx: true,
