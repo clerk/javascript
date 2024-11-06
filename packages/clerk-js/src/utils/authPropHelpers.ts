@@ -62,7 +62,6 @@ export const pickRedirectionProp = (
   if (!isValidUrl(url, { includeRelativeUrls: true }) || hasBannedProtocol(url)) {
     return '';
   }
-
   return url;
 };
 

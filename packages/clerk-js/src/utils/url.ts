@@ -363,25 +363,62 @@ export function requiresUserInput(redirectUrl: string): boolean {
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
 }
 
+export function relativeToAbsoluteUrl(url: string, origin: string | URL): URL {
+  try {
+    return new URL(url);
+  } catch (e) {
+    return new URL(url, origin);
+  }
+}
+
+// Regular expression to detect disallowed patterns
+const disallowedPatterns = [
+  /\0/, // Null bytes
+  /^\/\//, // Protocol-relative
+  // eslint-disable-next-line no-control-regex
+  /[\x00-\x1F]/, // Control characters
+];
+
+/**
+ * Check for potentially problematic URLs that could have been crafted to intentionally bypass the origin check. Note that the URLs passed to this
+ * function are assumed to be from an "allowed origin", so we are not executing origin-specific checks here.
+ */
+export function isProblematicUrl(url: URL): boolean {
+  if (hasBannedProtocol(url)) {
+    return true;
+  }
+  // Check against disallowed patterns
+  for (const pattern of disallowedPatterns) {
+    if (pattern.test(url.pathname)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Array<string | RegExp> | undefined) => {
+  const currentOrigin = window.location.origin;
+  const url = typeof _url === 'string' ? relativeToAbsoluteUrl(_url, currentOrigin) : _url;
+
   if (!allowedRedirectOrigins) {
     return true;
   }
 
-  const url = new URL(_url, DUMMY_URL_BASE);
-  const isRelativeUrl = url.origin === DUMMY_URL_BASE;
-  if (isRelativeUrl) {
-    return true;
-  }
+  const isSameOrigin = currentOrigin === url.origin;
 
-  const isAllowed = allowedRedirectOrigins
-    .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-    .some(origin => origin.test(trimTrailingSlash(url.origin)));
+  const isAllowed =
+    !isProblematicUrl(url) &&
+    (isSameOrigin ||
+      allowedRedirectOrigins
+        .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
+        .some(origin => origin.test(trimTrailingSlash(url.origin))));
 
   if (!isAllowed) {
     console.warn(
       `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
     );
   }
+
   return isAllowed;
 };
