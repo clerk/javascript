@@ -32,6 +32,10 @@
       "types": "./dist/web/index.d.ts",
       "default": "./dist/web/index.js"
     },
+    "./passkeys": {
+      "types": "./dist/passkeys/index.d.ts",
+      "default": "./dist/passkeys/index.js"
+    },
     "./local-credentials": {
       "types": "./dist/local-credentials/index.d.ts",
       "default": "./dist/local-credentials/index.js"
@@ -43,7 +47,8 @@
   "files": [
     "dist",
     "web",
-    "local-credentials"
+    "local-credentials",
+    "passkeys"
   ],
   "scripts": {
     "build": "tsup",
@@ -65,6 +70,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
+    "@clerk/expo-passkeys": "0.0.1",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "*",
