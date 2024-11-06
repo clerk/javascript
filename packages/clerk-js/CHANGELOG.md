@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.11
+
+### Patch Changes
+
+- Fix an issue where protocol relative URLs were not properly detected as non-relative. ([#4496](https://github.com/clerk/javascript/pull/4496)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.73.10
 
 ### Patch Changes
