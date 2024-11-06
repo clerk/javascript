@@ -8,7 +8,6 @@ import {
   ComponentContextProvider,
   CoreClerkContextWrapper,
   EnvironmentProvider,
-  GoogleOneTapContext,
   OptionsProvider,
 } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
@@ -108,7 +107,6 @@ const unboundCreateFixtures = (
           // Clear swr cache
           swrConfig={{ provider: () => new Map() }}
         >
-          <GoogleOneTapContext.Provider value={{ componentName: 'GoogleOneTap' }} />
           <EnvironmentProvider value={environmentMock}>
             <OptionsProvider value={optionsMock}>
               <RouteContext.Provider value={routerMock}>
