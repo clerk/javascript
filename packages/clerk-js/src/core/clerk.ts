@@ -294,10 +294,7 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    this.#options = {
-      ...defaultOptions,
-      ...options,
-    };
+    this.#options = this.#initOptions(options);
 
     assertNoLegacyProp(this.#options);
 
@@ -313,11 +310,6 @@ export class Clerk implements ClerkInterface {
         ...this.#options.telemetry,
       });
     }
-
-    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
-      this.#options.allowedRedirectOrigins,
-      this.frontendApi,
-    );
 
     if (this.#options.standardBrowser) {
       this.#loaded = await this.#loadInStandardBrowser();
@@ -1602,9 +1594,14 @@ export class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
-  __unstable__updateProps = (props: any) => {
-    // The expect-error directive below is safe since `updateAppearanceProp` is only used
-    // in the v4 build. This will be removed when v4 becomes the main stable version
+  __unstable__updateProps = (_props: any) => {
+    // We need to re-init the options here in order to keep the options passed to ClerkProvider
+    // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
+    // 1. User renders <ClerkProvider propA={undefined} propB={1} />
+    // 2. clerk-js initializes propA with a default value
+    // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
+    // 4. If we don't merge the new props with the current options, propA will be reset to undefined
+    const props = { ..._props, options: this.#initOptions({ ...this.#options, ..._props.options }) };
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
@@ -1974,6 +1971,14 @@ export class Clerk implements ClerkInterface {
 
     await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
+  };
+
+  #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    return {
+      ...defaultOptions,
+      ...options,
+      allowedRedirectOrigins: createAllowedRedirectOrigins(options?.allowedRedirectOrigins, this.frontendApi),
+    };
   };
 
   /**
