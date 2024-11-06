@@ -5,7 +5,7 @@ import type {
   OrganizationCustomRoleKey,
   RedirectOptions,
 } from '@clerk/types';
-import { defineComponent, watchEffect } from 'vue';
+import { defineComponent } from 'vue';
 
 import { useAuth } from '../composables/useAuth';
 import { useClerk } from '../composables/useClerk';
@@ -96,14 +96,8 @@ type HandleOAuthCallbackParams = Omit<HandleOAuthCallbackParamsOriginal, 'transf
 };
 
 export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOAuthCallbackParams) => {
-  const clerk = useClerk();
-
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
-    void clerk.value.handleRedirectCallback(props);
+  useClerkLoaded(clerk => {
+    void clerk.handleRedirectCallback(props);
   });
 
   return () => null;
