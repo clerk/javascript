@@ -1,7 +1,7 @@
 {
   "extends": ["//"],
   "tasks": {
-    "test": {
+    "build": {
       "dependsOn": ["build"],
       "inputs": [
         "$TURBO_DEFAULT$",
