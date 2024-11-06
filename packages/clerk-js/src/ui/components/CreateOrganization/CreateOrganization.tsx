@@ -1,6 +1,6 @@
 import type { CreateOrganizationModalProps } from '@clerk/types';
 
-import { ComponentContext, withCoreUserGuard } from '../../contexts';
+import { CreateOrganizationContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -37,11 +37,11 @@ export const CreateOrganizationModal = (props: CreateOrganizationModalProps): JS
 
   return (
     <Route path='createOrganization'>
-      <ComponentContext.Provider value={createOrganizationProps}>
+      <CreateOrganizationContext.Provider value={createOrganizationProps}>
         <div>
           <CreateOrganization />
         </div>
-      </ComponentContext.Provider>
+      </CreateOrganizationContext.Provider>
     </Route>
   );
 };
