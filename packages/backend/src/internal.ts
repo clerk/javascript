@@ -19,3 +19,8 @@ export { decorateObjectWithResources, stripPrivateDataFromObject } from './util/
 
 export { createClerkRequest } from './tokens/clerkRequest';
 export type { ClerkRequest } from './tokens/clerkRequest';
+
+export {
+  __experimental_reverificationMismatch,
+  __experimental_reverificationMismatchResponse,
+} from '@clerk/shared/authorization-errors';

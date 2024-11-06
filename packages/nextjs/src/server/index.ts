@@ -63,3 +63,11 @@ export type {
   Token,
   User,
 } from '@clerk/backend';
+
+/**
+ * Utilities for reverification
+ */
+export {
+  __experimental_reverificationMismatchResponse,
+  __experimental_reverificationMismatch,
+} from '@clerk/backend/internal';

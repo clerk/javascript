@@ -2,6 +2,8 @@
 
 exports[`/server public exports > should not include a breaking change 1`] = `
 [
+  "__experimental_reverificationMismatch",
+  "__experimental_reverificationMismatchResponse",
   "auth",
   "buildClerkProps",
   "clerkClient",
