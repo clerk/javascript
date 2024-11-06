@@ -45,6 +45,10 @@ export class Client extends BaseResource implements ClientResource {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   }
 
+  get pendingSessions(): PendingSession[] {
+    return this.sessions.filter(s => s.status === 'pending') as PendingSession[];
+  }
+
   create(): Promise<this> {
     return this._basePut();
   }
