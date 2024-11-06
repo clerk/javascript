@@ -33,11 +33,7 @@ export function getAuthDataFromRequest(
     accountlessCookie = JSON.parse(getCookie(req, accountlessCookieName) || 'null');
   }
 
-  console.log('--encryptedRequestData', encryptedRequestData);
-
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-  console.log('--getAuthDataFromRequest', decryptedRequestData);
 
   const options = {
     secretKey: opts?.secretKey || accountlessCookie.secret_key || decryptedRequestData.secretKey || SECRET_KEY,

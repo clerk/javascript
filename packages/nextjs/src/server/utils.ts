@@ -241,7 +241,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>, sk?: string) {
+export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
   if (!requestData || !Object.values(requestData).length) {
     return;
   }
@@ -257,7 +257,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
 
   return AES.encrypt(
     JSON.stringify(requestData),
-    ENCRYPTION_KEY || assertKey(sk || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
+    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
   ).toString();
 }
 
@@ -267,14 +267,13 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
-  sk?: string,
 ): Partial<AuthenticateRequestOptions> {
   if (!encryptedRequestData) {
     return {};
   }
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || sk || SECRET_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {

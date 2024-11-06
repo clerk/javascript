@@ -119,8 +119,6 @@ export async function loadClerkJWKFromRemote({
     const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
     const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
 
-    console.log('---fetchJWKSFromBAPI', keys);
-
     if (!keys || !keys.length) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
