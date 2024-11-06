@@ -3,9 +3,10 @@ import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
+import { getAccountlessCookie } from '../accountless';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import type { RequestLike } from '../types';
-import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../utils';
+import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getCookie, getHeader } from '../utils';
 
 /**
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
@@ -25,6 +26,13 @@ export function getAuthDataFromRequest(
 
   const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
 
+  const accountlessCookieName = getAccountlessCookie();
+
+  let accountlessCookie;
+  if (accountlessCookieName) {
+    accountlessCookie = JSON.parse(getCookie(req, accountlessCookieName) || 'null');
+  }
+
   console.log('--encryptedRequestData', encryptedRequestData);
 
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
@@ -32,8 +40,8 @@ export function getAuthDataFromRequest(
   console.log('--getAuthDataFromRequest', decryptedRequestData);
 
   const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+    secretKey: opts?.secretKey || accountlessCookie.secret_key || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: accountlessCookie.publishable_key || decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,

@@ -48,7 +48,6 @@ export async function verifyHandshakeToken(
   const { secretKey, apiUrl, apiVersion, jwksCacheTtlInMs, jwtKey, skipJwksCache } = options;
 
   const { data, errors } = decodeJwt(token);
-  console.log('--decodeJwt', data, errors);
   if (errors) {
     throw errors[0];
   }

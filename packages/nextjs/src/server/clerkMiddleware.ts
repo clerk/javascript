@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
+import { getAccountlessCookie } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -50,7 +51,6 @@ type ClerkMiddlewareHandler = (
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
   tryAccountless?: boolean;
-  tryAccountlessFile?: boolean;
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
@@ -94,81 +94,30 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, params] = parseHandlerAndOptions(args);
 
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
-    // @ts-ignore
-    const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
       let resolvedClerkClient = await clerkClient();
       let accountless: any;
       let toWrite: string | undefined;
-      const { tryAccountless = false, tryAccountlessFile = false } = resolvedParams;
+      const { tryAccountless = false } = resolvedParams;
 
-      if (tryAccountless) {
-        // let accountless: AccountlessApplication | undefined;
-        accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
-        console.log('------accountless read', accountless);
-        // let accountless = await resolvedClerkClient.accountlessApplications.read();
+      const accountlessCookieName = await getAccountlessCookie();
+
+      if (tryAccountless && accountlessCookieName) {
+        accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || 'null');
 
         if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless)) {
           accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
-          // request.cookies.set('__clerk_accountless', JSON.stringify(accountless));
-          toWrite = '__clerk_accountless';
-          console.log('------accountless new', accountless);
-          // await resolvedClerkClient.accountlessApplications.store(accountless);
-        }
-
-        console.log('-lolol', process.env.CLERK_SECRET_KEY, process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-      }
-
-      const _pk = request.cookies.get('acc-pk')?.value;
-      const _sk = request.cookies.get('acc-sk')?.value;
-
-      if (tryAccountlessFile) {
-        console.log('------tryAccountlessFile');
-        console.log({
-          ephemeralAccount: {
-            _sk,
-            _pk,
-          },
-        });
-        // accountless = JSON.parse(request.cookies.get('__clerk_tmp')?.value || 'null');
-        // console.log('------accountless read', accountless);
-        // let accountless = await resolvedClerkClient.accountlessApplications.read();
-
-        if (!(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless || _sk || _pk)) {
-          const res = NextResponse.next();
-
-          setRequestHeadersOnNextResponse(res, request, {
-            [constants.Headers.AuthStatus]: 'signed-out',
-            'clerk-create-accountless': 'true',
-            // [constants.Headers.AuthToken]: token || '',
-            // [constants.Headers.AuthSignature]: token
-            //   ? createTokenSignature(token, requestData?.secretKey ?? SECRET_KEY)
-            //   : '',
-            // [constants.Headers.AuthMessage]: message || '',
-            // [constants.Headers.AuthReason]: reason || '',
-            // [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
-            // ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
-          });
-
-          return res;
-
-          // accountless = await resolvedClerkClient.accountlessApplications.createAccountlessApplication();
-          // // request.cookies.set({
-          // //   name: '__clerk_tmp',
-          // //   value: JSON.stringify(accountless),
-          // // });
-          // toWrite = '__clerk_tmp';
-          // console.log('------accountless new', accountless);
-          // await resolvedClerkClient.accountlessApplications.store(accountless);
+          toWrite = accountlessCookieName;
         }
       }
 
       const publishableKey = assertKey(
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishable_key || _pk,
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishable_key,
         () => errorThrower.throwMissingPublishableKeyError(),
       );
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secret_key || _sk, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secret_key, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -216,11 +165,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       if (locationHeader) {
         if (toWrite) {
           const res = new NextResponse(null, { status: 307, headers: requestState.headers });
-          // res.cookies.set(toWrite, JSON.stringify(accountless));
+          const oneYearLater = new Date();
+          oneYearLater.setFullYear(new Date().getFullYear() + 1);
           res.cookies.set({
             name: toWrite,
             value: JSON.stringify(accountless),
-            expires: 1000,
+            expires: oneYearLater,
+            secure: true,
+            sameSite: 'lax',
+            httpOnly: true,
           });
           return res;
         }
@@ -268,49 +221,32 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, { ...resolvedParams, ...options });
+      function sanitizePublicData() {
+        const { publishableKey, proxyUrl, signUpUrl, signInUrl, isSatellite, domain, afterSignInUrl, afterSignUpUrl } =
+          options;
+
+        return {
+          publishableKey,
+          proxyUrl,
+          signUpUrl,
+          signInUrl,
+          isSatellite,
+          domain,
+          afterSignInUrl,
+          afterSignUpUrl,
+        };
+      }
+
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        { ...resolvedParams, ...options },
+        sanitizePublicData(),
+      );
 
       return handlerResult;
     });
-
-    const nextMiddleware: NextMiddleware = async (request, event) => {
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const { tryAccountlessFile } = resolvedParams;
-      if (!tryAccountlessFile) {
-        return baseNextMiddleware(request, event);
-      }
-
-      const ephemeralParams = unpackEphemeralQueryParams(request);
-
-      if (ephemeralParams) {
-        const response = new NextResponse(null, {
-          status: 307,
-          headers: { location: `${request.nextUrl.protocol}//${request.nextUrl.host}` },
-        });
-
-        // const options = {
-        //   expires: 1000000,
-        // };
-        //
-        // response.cookies.set(constants.Cookies.EphemeralExpiresAt, ephemeralAccount.expiresAt.toString(), options);
-        response.cookies.set('acc-pk', ephemeralParams.publishableKey);
-        response.cookies.set('acc-sk', ephemeralParams.secretKey);
-
-        return response;
-      }
-
-      try {
-        const handlerResult = await baseNextMiddleware(request, event);
-
-        return handlerResult;
-      } catch (e: any) {
-        // And this is a clerkKeyError, return a no-op to allow the ClerkProvider to fetch the keys
-        if (isClerkKeyError(e)) {
-          return null;
-        }
-        throw e;
-      }
-    };
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
@@ -408,40 +344,4 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
   }
 
   throw e;
-};
-
-export function isClerkKeyError(err: any) {
-  const message = String(err);
-  return (
-    message.includes('Missing publishableKey') ||
-    message.includes('Missing secretKey') ||
-    message.includes("Clerk can't detect usage of clerkMiddleware()")
-  );
-}
-
-const unpackEphemeralQueryParams = (request: NextMiddlewareRequestParam): EphemeralAccount | undefined => {
-  const params = Object.fromEntries(request.nextUrl.searchParams.entries());
-
-  const ephemeralParams = {
-    // expiresAt: params[constants.QueryParameters.EphemeralExpiresAt],
-    publishableKey: params['acc-pk'],
-    secretKey: params['acc-sk'],
-  };
-
-  const maybeEphemeral = Object.fromEntries(
-    Object.entries(ephemeralParams).filter(([_, v]) => v != null),
-  ) as Partial<EphemeralAccount>;
-
-  if (Object.keys(maybeEphemeral).length === Object.keys(ephemeralParams).length) {
-    // @ts-ignore
-    return maybeEphemeral;
-  } else {
-    return undefined;
-  }
-};
-
-export type EphemeralAccount = {
-  publishableKey: string;
-  secretKey: string;
-  // expiresAt: number;
 };

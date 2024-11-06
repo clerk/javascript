@@ -97,7 +97,19 @@ export function decorateRequest(
   req: ClerkRequest,
   res: Response,
   requestState: RequestState,
-  requestData?: AuthenticateRequestOptions,
+  requestData: AuthenticateRequestOptions,
+  publicRequestDate: Pick<
+    AuthenticateRequestOptions,
+    | 'publishableKey'
+    | 'domain'
+    | 'isSatellite'
+    | 'proxyUrl'
+    | 'signInUrl'
+    | 'signUpUrl'
+    | 'afterSignInUrl'
+    | 'afterSignUpUrl'
+    | 'organizationSyncOptions'
+  >,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -142,6 +154,7 @@ export function decorateRequest(
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
       ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
+      ...(publicRequestDate ? { [constants.Headers.ClerkPublicRequestConfig]: JSON.stringify(publicRequestDate) } : {}),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
@@ -228,7 +241,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
+export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>, sk?: string) {
   if (!requestData || !Object.values(requestData).length) {
     return;
   }
@@ -244,7 +257,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
 
   return AES.encrypt(
     JSON.stringify(requestData),
-    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
+    ENCRYPTION_KEY || assertKey(sk || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
   ).toString();
 }
 
@@ -254,13 +267,14 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
+  sk?: string,
 ): Partial<AuthenticateRequestOptions> {
   if (!encryptedRequestData) {
     return {};
   }
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || sk || SECRET_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {
