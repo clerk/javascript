@@ -1,9 +1,8 @@
 import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/clerk-expo';
+import { passkeys } from '@clerk/clerk-expo/passkeys';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
-import { passkeys } from '../src';
 
 const tokenCache = {
   async getToken(key: string) {
@@ -143,7 +142,7 @@ export default function App() {
     <ClerkProvider
       publishableKey={publishableKey}
       tokenCache={tokenCache}
-      passkeys={passkeys}
+      __experimental_passkeys={passkeys}
     >
       <View style={styles.container}>
         <SignedIn>

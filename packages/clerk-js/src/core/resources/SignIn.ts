@@ -1,6 +1,10 @@
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import {
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -41,10 +45,9 @@ import {
   windowNavigate,
 } from '../../utils';
 import {
-  ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
@@ -304,6 +307,12 @@ export class SignIn extends BaseResource implements SignInResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
+
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal_isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
+
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',

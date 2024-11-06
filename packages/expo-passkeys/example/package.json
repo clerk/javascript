@@ -1,5 +1,5 @@
 {
-  "name": "xpo-passkeys-example",
+  "name": "expo-passkeys-example",
   "version": "1.0.0",
   "private": true,
   "main": "expo/AppEntry.js",
@@ -10,11 +10,12 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "2.3.0-snapshot.vaa1630d",
-    "@clerk/clerk-js": "5.29.0-snapshot.va96a299",
-    "@clerk/clerk-react": "5.13.1-snapshot.va96a299",
-    "@clerk/shared": "2.10.1-snapshot.va96a299",
-    "@clerk/types": "4.28.0-snapshot.va96a299",
+    "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo",
+    "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
+    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/expo-passkeys": "file:.yalc/@clerk/expo-passkeys",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
+    "@clerk/types": "file:.yalc/@clerk/types",
     "@expo/metro-runtime": "~3.2.3",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "expo": "~51.0.24",

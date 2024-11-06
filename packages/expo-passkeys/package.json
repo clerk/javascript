@@ -20,19 +20,18 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "_build": "EXPO_NONINTERACTIVE=1 expo-module build",
-    "_lint": "expo-module lint",
+    "build": "EXPO_NONINTERACTIVE=1 expo-module build && expo-module prepare",
     "build:watch": "expo-module build",
     "clean": "expo-module clean",
     "expo-module": "expo-module",
+    "lint": "expo-module lint",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
-    "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly"
   },
   "dependencies": {
-    "@clerk/shared": "2.10.1-snapshot.va96a299",
-    "@clerk/types": "4.28.0-snapshot.va96a299"
+    "@clerk/shared": "2.11.5",
+    "@clerk/types": "4.30.0"
   },
   "devDependencies": {
     "expo-module-scripts": "^3.5.2",

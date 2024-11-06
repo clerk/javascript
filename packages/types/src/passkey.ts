@@ -43,3 +43,13 @@ export type PublicKeyCredentialWithAuthenticatorAssertionResponse = Omit<
 > & {
   response: AuthenticatorAssertionResponse;
 };
+
+export type CredentialReturn<T> =
+  | {
+      publicKeyCredential: T;
+      error: null;
+    }
+  | {
+      publicKeyCredential: null;
+      error: Error;
+    };

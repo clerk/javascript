@@ -1,5 +1,7 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import type { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import type {
+  CredentialReturn,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsJSON,
@@ -8,32 +10,8 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
-type CredentialReturn<T> =
-  | {
-      publicKeyCredential: T;
-      error: null;
-    }
-  | {
-      publicKeyCredential: null;
-      error: ClerkWebAuthnError | Error;
-    };
-
 type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
 type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
-
-type ClerkWebAuthnErrorCode =
-  // Generic
-  | 'passkey_not_supported'
-  | 'passkey_pa_not_supported'
-  | 'passkey_invalid_rpID_or_domain'
-  | 'passkey_already_exists'
-  | 'passkey_operation_aborted'
-  // Retrieval
-  | 'passkey_retrieval_cancelled'
-  | 'passkey_retrieval_failed'
-  // Registration
-  | 'passkey_registration_cancelled'
-  | 'passkey_registration_failed';
 
 class Base64Converter {
   static encode(buffer: ArrayBuffer): string {
@@ -242,18 +220,6 @@ function serializePublicKeyCredentialAssertion(pkc: PublicKeyCredentialWithAuthe
 
 const bufferToBase64Url = Base64Converter.encode.bind(Base64Converter);
 const base64UrlToBuffer = Base64Converter.decode.bind(Base64Converter);
-
-export class ClerkWebAuthnError extends ClerkRuntimeError {
-  /**
-   * A unique code identifying the error, can be used for localization.
-   */
-  code: ClerkWebAuthnErrorCode;
-
-  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
-    super(message, { code });
-    this.code = code;
-  }
-}
 
 export {
   base64UrlToBuffer,

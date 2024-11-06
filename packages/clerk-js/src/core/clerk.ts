@@ -21,6 +21,7 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  CredentialReturn,
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
@@ -36,6 +37,10 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
   SDKMetadata,
@@ -184,6 +189,24 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+
+  public __internal_createPublicCredentials:
+    | ((
+        publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions,
+      ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>)
+    | undefined;
+
+  public __internal_getPublicCredentials:
+    | (({
+        publicKeyOptions,
+      }: {
+        publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+      }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
+    | undefined;
+
+  public __internal_isWebAuthnSupported: (() => boolean) | undefined;
+  public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
+  public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
   get publishableKey(): string {
     return this.#publishableKey;
