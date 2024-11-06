@@ -1,16 +1,31 @@
 import type { LoadedClerk } from '@clerk/types';
-import { watchEffect } from 'vue';
+import { watch } from 'vue';
 
 import { useClerk } from '../composables';
 
+/**
+ * Executes a callback when Clerk is loaded.
+ *
+ * @param callback - Function to execute once Clerk is loaded
+ * @example
+ * ```ts
+ * useClerkLoaded((clerk) => {
+ *   clerk.redirectToSignUp(props);
+ * });
+ * ```
+ */
 export const useClerkLoaded = (callback: (clerk: LoadedClerk) => void) => {
   const clerk = useClerk();
 
-  watchEffect(() => {
-    if (!clerk.value?.loaded) {
-      return;
-    }
+  watch(
+    clerk,
+    unwrappedClerk => {
+      if (!unwrappedClerk?.loaded) {
+        return;
+      }
 
-    callback(clerk.value as LoadedClerk);
-  });
+      callback(clerk.value as LoadedClerk);
+    },
+    { immediate: true },
+  );
 };
