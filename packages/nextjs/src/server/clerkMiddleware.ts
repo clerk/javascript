@@ -47,7 +47,7 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
-export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean; skipAccountless?: boolean };
+export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean; tryAccountless?: boolean };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
 
@@ -96,9 +96,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       let resolvedClerkClient = await clerkClient();
       let accountless: any;
       let toWrite = false;
-      const { skipAccountless = false } = resolvedParams;
+      const { tryAccountless = false } = resolvedParams;
 
-      if (!skipAccountless) {
+      if (tryAccountless) {
         // let accountless: AccountlessApplication | undefined;
         accountless = JSON.parse(request.cookies.get('__clerk_accountless')?.value || 'null');
         console.log('------accountless read', accountless);
