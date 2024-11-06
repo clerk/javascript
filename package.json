@@ -14,6 +14,7 @@
     "changeset": "changeset",
     "changeset:empty": "npm run changeset -- --empty",
     "clean": "turbo clean",
+    "dependencies": "node scripts/patch-incorrect-lockfile.mjs",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/tailwindcss-transformer --filter=!@clerk/remix --filter=!@clerk/ui --filter=!@clerk/chrome-extension",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "format": "prettier --write .",
