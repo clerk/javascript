@@ -35,6 +35,8 @@ describe('subpath /internal exports', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
         "AuthStatus",
+        "__experimental_reverificationMismatch",
+        "__experimental_reverificationMismatchResponse",
         "constants",
         "createAuthenticateRequest",
         "createClerkRequest",
