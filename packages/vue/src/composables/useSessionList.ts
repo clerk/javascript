@@ -1,9 +1,9 @@
 import type { SessionResource, SetActive } from '@clerk/types';
 import { computed } from 'vue';
 
+import type { ToComputedRefs } from '../utils';
+import { toComputedRefs } from '../utils';
 import { useClerkContext } from './useClerkContext';
-import type { ToComputedRefs } from './utils';
-import { toComputedRefs } from './utils';
 
 type UseSessionListReturn =
   | { isLoaded: false; sessions: undefined; setActive: undefined }

@@ -2,7 +2,7 @@ import type { SignUpProps } from '@clerk/types';
 import { defineComponent, h } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
-import { assertSingleChild, normalizeWithDefaultValue } from './utils';
+import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;

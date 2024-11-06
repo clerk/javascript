@@ -2,9 +2,9 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignUpResource } from '@clerk/types';
 import { computed, watch } from 'vue';
 
+import type { ToComputedRefs } from '../utils';
+import { toComputedRefs } from '../utils';
 import { useClerkContext } from './useClerkContext';
-import type { ToComputedRefs } from './utils';
-import { toComputedRefs } from './utils';
 
 type UseSignUpReturn =
   | { isLoaded: false; signUp: undefined; setActive: undefined }

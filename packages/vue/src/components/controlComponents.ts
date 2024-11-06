@@ -10,6 +10,7 @@ import { defineComponent, watchEffect } from 'vue';
 import { useAuth } from '../composables/useAuth';
 import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
+import { useClerkLoaded } from '../utils/useClerkLoaded';
 
 export const SignedIn = defineComponent((_, { slots }) => {
   const { userId } = useAuth();
@@ -37,19 +38,14 @@ export const ClerkLoading = defineComponent((_, { slots }) => {
 
 export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
   const { sessionCtx, clientCtx } = useClerkContext();
-  const clerk = useClerk();
 
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
+  useClerkLoaded(clerk => {
     const hasActiveSessions = clientCtx.value?.activeSessions && clientCtx.value.activeSessions.length > 0;
 
     if (sessionCtx.value === null && hasActiveSessions) {
-      void clerk.value.redirectToAfterSignOut();
+      void clerk.redirectToAfterSignOut();
     } else {
-      void clerk.value.redirectToSignIn(props);
+      void clerk.redirectToSignIn(props);
     }
   });
 
@@ -57,56 +53,32 @@ export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
 });
 
 export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
-  const clerk = useClerk();
-
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
-    void clerk.value.redirectToSignUp(props);
+  useClerkLoaded(clerk => {
+    void clerk.redirectToSignUp(props);
   });
 
   return () => null;
 });
 
 export const RedirectToUserProfile = defineComponent(() => {
-  const clerk = useClerk();
-
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
-    void clerk.value.redirectToUserProfile();
+  useClerkLoaded(clerk => {
+    void clerk.redirectToUserProfile();
   });
 
   return () => null;
 });
 
 export const RedirectToOrganizationProfile = defineComponent(() => {
-  const clerk = useClerk();
-
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
-    void clerk.value.redirectToOrganizationProfile();
+  useClerkLoaded(clerk => {
+    void clerk.redirectToOrganizationProfile();
   });
 
   return () => null;
 });
 
 export const RedirectToCreateOrganization = defineComponent(() => {
-  const clerk = useClerk();
-
-  watchEffect(() => {
-    if (!clerk.value) {
-      return;
-    }
-
-    void clerk.value.redirectToCreateOrganization();
+  useClerkLoaded(clerk => {
+    void clerk.redirectToCreateOrganization();
   });
 
   return () => null;
