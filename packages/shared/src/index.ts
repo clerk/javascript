@@ -24,8 +24,6 @@ export { handleValueOrFn } from './utils/handleValueOrFn';
 export { isomorphicAtob } from './isomorphicAtob';
 export { isomorphicBtoa } from './isomorphicBtoa';
 export * from './keys';
-export * from './loadClerkJsScript';
-export { loadScript } from './loadScript';
 export { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
 export * from './poller';
 export * from './proxy';

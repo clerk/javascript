@@ -1,4 +1,4 @@
-import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
+// import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/types';
 
 import { $clerkStore } from '../stores/external';
@@ -10,7 +10,7 @@ import { runOnce } from './run-once';
 
 let initOptions: ClerkOptions | undefined;
 
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+// setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 function createNavigationHandler(
   windowNav: typeof window.history.pushState | typeof window.history.replaceState,
@@ -32,7 +32,7 @@ const createClerkInstance = runOnce(createClerkInstanceInternal);
 async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    await loadClerkJsScript(options);
+    // await loadClerkJsScript(options);
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');

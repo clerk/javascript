@@ -1,27 +1,27 @@
-import { useClerk } from '@clerk/clerk-react';
-import { buildClerkJsScriptAttributes, clerkJsScriptUrl } from '@clerk/clerk-react/internal';
+// import { useClerk } from '@clerk/clerk-react';
+
 import NextScript from 'next/script';
 import React from 'react';
 
-import { useClerkNextOptions } from '../client-boundary/NextOptionsContext';
+// import { useClerkNextOptions } from '../client-boundary/NextOptionsContext';
 
 type ClerkJSScriptProps = {
   router: 'app' | 'pages';
 };
 
 function ClerkJSScript(props: ClerkJSScriptProps) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce } = useClerkNextOptions();
-  const { domain, proxyUrl } = useClerk();
-  const options = {
-    domain,
-    proxyUrl,
-    publishableKey: publishableKey!,
-    clerkJSUrl,
-    clerkJSVersion,
-    clerkJSVariant,
-    nonce,
-  };
-  const scriptUrl = clerkJsScriptUrl(options);
+  // const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce } = useClerkNextOptions();
+  // const { domain, proxyUrl } = useClerk();
+  // const options = {
+  //   domain,
+  //   proxyUrl,
+  //   publishableKey: publishableKey!,
+  //   clerkJSUrl,
+  //   clerkJSVersion,
+  //   clerkJSVariant,
+  //   nonce,
+  // };
+  // const scriptUrl = clerkJsScriptUrl(options);
 
   /**
    * Notes:
@@ -33,14 +33,14 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
 
   return (
     <Script
-      src={scriptUrl}
+      // src={scriptUrl}
       data-clerk-js-script
       async
       // `nextjs/script` will add defer by default and does not get removed when we async is true
       defer={props.router === 'pages' ? false : undefined}
       crossOrigin='anonymous'
       strategy={props.router === 'pages' ? 'beforeInteractive' : undefined}
-      {...buildClerkJsScriptAttributes(options)}
+      // {...buildClerkJsScriptAttributes(options)}
     />
   );
 }

@@ -1,6 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
-import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import type { ClerkHostRouter } from '@clerk/shared/router';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -14,7 +14,7 @@ import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv'
 import { removeBasePath } from '../utils/removeBasePath';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
-setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+// setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
