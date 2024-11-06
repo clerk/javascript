@@ -3,7 +3,7 @@ import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkOptions, RedirectOptions } from '@clerk/types';
 
 import { assertNoLegacyProp, warnForNewPropShadowingLegacyProp } from './assertNoLegacyProp';
-import { isAllowedRedirectOrigin, relativeToAbsoluteUrl } from './url';
+import { isAllowedRedirect, relativeToAbsoluteUrl } from './url';
 
 export class RedirectUrls {
   private static keys: (keyof RedirectOptions)[] = [
@@ -146,7 +146,9 @@ export class RedirectUrls {
       // @ts-expect-error
       res[key] = obj[key];
     });
-    return this.#toAbsoluteUrls(this.#filterOrigins(res));
+    return applyFunctionToObj(this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean))), val =>
+      val.toString(),
+    );
   }
 
   #parseSearchParams(obj: any) {
@@ -156,14 +158,16 @@ export class RedirectUrls {
       res[key] = obj[camelToSnake(key)];
     });
     res['redirectUrl'] = obj.redirect_url;
-    return this.#toAbsoluteUrls(this.#filterOrigins(res));
+    return applyFunctionToObj(this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean))), val =>
+      val.toString(),
+    );
   }
 
   #toAbsoluteUrls(obj: RedirectOptions) {
     return applyFunctionToObj(obj, (url: string) => relativeToAbsoluteUrl(url, window.location.origin));
   }
 
-  #filterOrigins = (obj: RedirectOptions) => {
-    return filterProps(obj, isAllowedRedirectOrigin(this.options?.allowedRedirectOrigins));
+  #filterRedirects = (obj: RedirectOptions) => {
+    return filterProps(obj, isAllowedRedirect(this.options?.allowedRedirectOrigins, window.location.origin));
   };
 }

@@ -234,37 +234,38 @@ export function isValidUrl(val: unknown): val is string {
   }
 }
 
-export function relativeToAbsoluteUrl(url: string, origin: string | URL): string {
-  if (isValidUrl(url)) {
-    return url;
+export function relativeToAbsoluteUrl(url: string, origin: string | URL): URL {
+  try {
+    return new URL(url);
+  } catch (e) {
+    return new URL(url, origin);
   }
-  return new URL(url, origin).href;
 }
 
-export function isRelativeUrl(val: string): boolean {
-  if (val !== val && !val) {
-    return false;
-  }
+// Regular expression to detect disallowed patterns
+const disallowedPatterns = [
+  /\0/, // Null bytes
+  /^\/\//, // Protocol-relative
+  // eslint-disable-next-line no-control-regex
+  /[\x00-\x1F]/, // Control characters
+];
 
-  if (val.startsWith('//') || val.startsWith('http/') || val.startsWith('https/')) {
-    // Protocol-relative URL; consider it absolute.
-    return false;
+/**
+ * Check for potentially problematic URLs that could have been crafted to intentionally bypass the origin check. Note that the URLs passed to this
+ * function are assumed to be from an "allowed origin", so we are not executing origin-specific checks here.
+ */
+export function isProblematicUrl(url: URL): boolean {
+  if (hasBannedProtocol(url)) {
+    return true;
   }
-
-  try {
-    // If this does not throw, it's a valid absolute URL
-    new URL(val);
-    return false;
-  } catch (e) {
-    try {
-      // If this does not throw, it's a valid relative URL
-      new URL(val, DUMMY_URL_BASE);
+  // Check against disallowed patterns
+  for (const pattern of disallowedPatterns) {
+    if (pattern.test(url.pathname)) {
       return true;
-    } catch (e) {
-      // Invalid URL case
-      return false;
     }
   }
+
+  return false;
 }
 
 export function isDataUri(val?: string): val is string {
@@ -352,20 +353,25 @@ export function requiresUserInput(redirectUrl: string): boolean {
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
 }
 
-export const isAllowedRedirectOrigin =
-  (allowedRedirectOrigins: Array<string | RegExp> | undefined) => (_url: string) => {
+export const isAllowedRedirect =
+  (allowedRedirectOrigins: Array<string | RegExp> | undefined, currentOrigin: string) => (_url: URL | string) => {
+    let url = _url;
+    if (typeof url === 'string') {
+      url = relativeToAbsoluteUrl(url, currentOrigin);
+    }
+
     if (!allowedRedirectOrigins) {
       return true;
     }
 
-    if (isRelativeUrl(_url)) {
-      return true;
-    }
+    const isSameOrigin = currentOrigin === url.origin;
 
-    const url = new URL(_url, DUMMY_URL_BASE);
-    const isAllowed = allowedRedirectOrigins
-      .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-      .some(origin => origin.test(trimTrailingSlash(url.origin)));
+    const isAllowed =
+      !isProblematicUrl(url) &&
+      (isSameOrigin ||
+        allowedRedirectOrigins
+          .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
+          .some(origin => origin.test(trimTrailingSlash(url.origin))));
 
     if (!isAllowed) {
       logger.warnOnce(

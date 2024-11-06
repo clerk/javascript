@@ -227,7 +227,7 @@ describe('redirectUrls', () => {
       expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}sign-up-force-redirect-url`);
     });
 
-    it('prioritizes redirect_url from searchParamsover fallback urls', () => {
+    it('prioritizes redirect_url from searchParams over fallback urls', () => {
       const redirectUrls = new RedirectUrls(
         {
           signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
