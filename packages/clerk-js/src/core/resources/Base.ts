@@ -1,4 +1,5 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
 import { clerkMissingFapiClientInResources } from '../errors';
@@ -67,8 +68,22 @@ export abstract class BaseResource {
     }
 
     if (status >= 400) {
-      throw new ClerkAPIResponseError(statusText, {
-        data: payload?.errors as ClerkAPIErrorJSON[],
+      const errors = payload?.errors as ClerkAPIErrorJSON[];
+      const safeErrorMessage = errors?.[0]?.long_message;
+
+      if (errors?.[0]?.code === 'origin_invalid' && isProductionFromPublishableKey(BaseResource.clerk.publishableKey)) {
+        const prodDomain = BaseResource.clerk.frontendApi.replace('clerk.', '');
+        throw new ClerkAPIResponseError(
+          `Clerk: Production Keys are only allowed for domain "${prodDomain}". \nAPI Error: ${safeErrorMessage}`,
+          {
+            data: errors,
+            status: status,
+          },
+        );
+      }
+
+      throw new ClerkAPIResponseError(safeErrorMessage || statusText, {
+        data: errors,
         status: status,
       });
     }
