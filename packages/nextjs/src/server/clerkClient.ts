@@ -62,4 +62,4 @@ const clerkClient = async () => {
   return createClerkClientWithOptions({});
 };
 
-export { clerkClient };
+export { clerkClient, createClerkClientWithOptions };

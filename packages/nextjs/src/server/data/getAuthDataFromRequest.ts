@@ -28,7 +28,7 @@ export function getAuthDataFromRequest(
 
   const accountlessCookieName = getAccountlessCookie();
 
-  let accountlessCookie;
+  let accountlessCookie: Record<string, any> | null = null;
   if (accountlessCookieName) {
     accountlessCookie = JSON.parse(getCookie(req, accountlessCookieName) || 'null');
   }
@@ -36,8 +36,8 @@ export function getAuthDataFromRequest(
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
   const options = {
-    secretKey: opts?.secretKey || accountlessCookie.secret_key || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: accountlessCookie.publishable_key || decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+    secretKey: opts?.secretKey || accountlessCookie?.secret_key || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: accountlessCookie?.publishable_key || decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,
