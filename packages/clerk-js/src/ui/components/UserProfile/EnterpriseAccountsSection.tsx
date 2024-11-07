@@ -15,7 +15,9 @@ import { ProfileSection } from '../../elements';
 
 const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.startsWith('saml');
 
-const isOAuthProvider = (provider: EnterpriseProvider): provider is GoogleOauthProvider | MicrosoftOauthProvider =>
+const isOAuthBuiltInProvider = (
+  provider: EnterpriseProvider,
+): provider is GoogleOauthProvider | MicrosoftOauthProvider =>
   OAUTH_PROVIDERS.some(oauth_provider => oauth_provider.provider == provider);
 
 const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: EnterpriseAccountResource) => {
@@ -23,7 +25,7 @@ const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: En
     return SAML_IDPS[provider]?.name;
   }
 
-  if (isOAuthProvider(provider)) {
+  if (isOAuthBuiltInProvider(provider)) {
     return getOAuthProviderData({ provider })?.name;
   }
 
@@ -52,21 +54,26 @@ export const EnterpriseAccountsSection = () => {
 };
 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
-  const providerLogoUrl = iconImageUrl(account.provider) ?? account.enterpriseConnection?.logoPublicUrl;
+  const { provider } = account;
   const providerName = getEnterpriseAccountProviderName(account);
 
-  return providerLogoUrl ? (
-    <Image
-      elementDescriptor={[descriptors.providerIcon]}
-      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
-      alt={providerName}
-      src={providerLogoUrl}
-      sx={theme => ({ width: theme.sizes.$4 })}
-    />
-  ) : (
+  if (isOAuthBuiltInProvider(provider) || isSamlProvider(provider)) {
+    return (
+      <Image
+        elementDescriptor={[descriptors.providerIcon]}
+        elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+        alt={providerName}
+        src={iconImageUrl(provider)}
+        sx={theme => ({ width: theme.sizes.$4 })}
+      />
+    );
+  }
+
+  return (
     <ProviderInitialIcon
-      id={account.provider}
-      value={providerName}
+      id={provider}
+      value={providerName ?? provider}
+      aria-label={`${providerName}'s icon`}
     />
   );
 };
