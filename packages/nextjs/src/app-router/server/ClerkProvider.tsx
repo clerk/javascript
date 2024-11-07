@@ -1,13 +1,10 @@
-import fs from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import nextPkg from 'next/package.json';
 import React from 'react';
 
@@ -20,30 +17,66 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
-const getPath = () => path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
+const getClerkPath = () => path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
+const getEnvPath = () => path.join(process.cwd(), '.env.local');
 
-function updateGitignore() {
-  const gitignorePath = path.join(process.cwd(), '.gitignore');
+// function parseEnvToMap(content: string): Map<string, string> {
+//   const config = new Map<string, string>();
+//
+//   // Split content into lines
+//   const lines = content.split('\n');
+//
+//   for (const line of lines) {
+//     // Trim whitespace
+//     const trimmedLine = line.trim();
+//
+//     // Ignore empty lines and comments (lines that start with #)
+//     if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+//       continue;
+//     }
+//
+//     // Split the line by the first '='
+//     const separatorIndex = trimmedLine.indexOf('=');
+//     if (separatorIndex === -1) {
+//       continue; // Skip lines without '='
+//     }
+//
+//     const key = trimmedLine.slice(0, separatorIndex).trim();
+//     let value = trimmedLine.slice(separatorIndex + 1).trim();
+//
+//     // Remove surrounding quotes from the value if they exist
+//     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+//       value = value.slice(1, -1);
+//     }
+//
+//     config.set(key, value);
+//   }
+//
+//   return config;
+// }
 
-  if (!fs.existsSync(gitignorePath)) {
-    fs.writeFileSync(gitignorePath, '');
-    console.log('.gitignore created.');
-  } else {
-    console.log('.gitignore found.');
-  }
-
-  // Check if `.clerk/` entry exists in .gitignore
-  const gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
-  if (!gitignoreContent.includes('.clerk/')) {
-    fs.appendFileSync(gitignorePath, '\n.clerk/\n');
-    console.log('.clerk/ added to .gitignore.');
-  } else {
-    console.log('.clerk/ is already ignored.');
-  }
-  // } else {
-  //   console.log('.git directory not found. Skipping .gitignore update.');
-  // }
-}
+// function updateGitignore() {
+//   const gitignorePath = path.join(process.cwd(), '.gitignore');
+//
+//   if (!fs.existsSync(gitignorePath)) {
+//     fs.writeFileSync(gitignorePath, '');
+//     console.log('.gitignore created.');
+//   } else {
+//     console.log('.gitignore found.');
+//   }
+//
+//   // Check if `.clerk/` entry exists in .gitignore
+//   const gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
+//   if (!gitignoreContent.includes('.env.local')) {
+//     fs.appendFileSync(gitignorePath, '\n.env.local\n');
+//     console.log('.env.local added to .gitignore.');
+//   } else {
+//     console.log('.env.local is already ignored.');
+//   }
+//   // } else {
+//   //   console.log('.git directory not found. Skipping .gitignore update.');
+//   // }
+// }
 const isNext13 = nextPkg.version.startsWith('13.');
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -92,57 +125,77 @@ export async function ClerkProvider(
 
   let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
 
-  if (!publishableKey) {
+  let clerkFileAsString: string | null = null;
+  try {
+    clerkFileAsString = readFileSync(getClerkPath(), { encoding: 'utf-8' });
+  } catch {
+    clerkFileAsString = null;
+  }
+
+  console.log('PROVIDER', publishableKey, clerkFileAsString);
+
+  if (!publishableKey && !clerkFileAsString) {
     // this can be without access to headers
     // const resolvedClient = await clerkClient();
-    const resolvedCookies = await cookies();
+    // const resolvedCookies = await cookies();
     let res: any;
     try {
-      const PATH = getPath();
-      await mkdir(path.dirname(PATH), { recursive: true });
-      updateGitignore();
+      const ENV_PATH = getEnvPath();
+      const CLERK_TMP_PATH = getClerkPath();
+      mkdirSync(path.dirname(ENV_PATH), { recursive: true });
+      mkdirSync(path.dirname(CLERK_TMP_PATH), { recursive: true });
+      writeFileSync(CLERK_TMP_PATH, '', {
+        encoding: 'utf8',
+        mode: '0777',
+        flag: 'w',
+      });
 
-      const one = await readFile(PATH, { encoding: 'utf-8' }).catch(() => 'null');
+      // updateGitignore();
 
-      res = JSON.parse(one);
+      // const clerkFileConfig = JSON.parse(clerkFileAsString);
+      // const fileAsString = await readFile(ENV_PATH, { encoding: 'utf-8' }).catch(() => '');
 
-      console.log('-----config', res, PATH);
+      // const envVarsMap = parseEnvToMap(fileAsString);
 
-      if (!res) {
+      // res = JSON.parse(one);
+      //
+      // console.log('-----config', res, PATH);
+
+      /**
+       * Maybe the server has not restarted yet
+       */
+      if (!clerkFileAsString) {
         const client = createClerkClientWithOptions({});
 
         res = await client.accountlessApplications.createAccountlessApplication();
 
-        await writeFile(PATH, JSON.stringify(res), {
+        writeFileSync(CLERK_TMP_PATH, JSON.stringify(res), {
           encoding: 'utf8',
           mode: '0777',
           flag: 'w',
         });
+
+        writeFileSync(
+          ENV_PATH,
+          `\nNEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${res.publishable_key}
+          \nCLERK_SECRET_KEY=${res.secret_key}
+          `,
+          {
+            encoding: 'utf8',
+            mode: '0777',
+            flag: 'a',
+          },
+        );
+
+        publishableKey = res.publishable_key;
 
         console.log('---CREATED', res);
       }
     } catch (e) {
       console.log('--dwadawda', e);
     }
-    // const accountless = await resolvedClient.accountlessApplications.createAccountlessApplication();
-    const cookiePublishableKey = resolvedCookies.get('acc-pk')?.value;
-    const cookieSecretKey = resolvedCookies.get('acc-sk')?.value;
-
-    const stale =
-      // cookieExpiresAt !== String(ephemeralAccount.expiresAt) ||
-      cookiePublishableKey !== res.publishable_key || cookieSecretKey !== res.secret_key;
-
-    if (stale) {
-      const params = new URLSearchParams({
-        // [constants.QueryParameters.EphemeralExpiresAt]: String(ephemeralAccount.expiresAt),
-        ['acc-pk']: res.publishable_key,
-        ['acc-sk']: res.secret_key,
-      });
-
-      redirect(`?${params}`);
-    }
-
-    publishableKey = cookiePublishableKey;
+  } else {
+    // rmSync('.clerk', { recursive: true, force: true });
   }
 
   const output = (

@@ -300,24 +300,24 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         return baseNextMiddleware(request, event);
       }
 
-      const ephemeralParams = unpackEphemeralQueryParams(request);
-
-      if (ephemeralParams) {
-        const response = new NextResponse(null, {
-          status: 307,
-          headers: { location: `${request.nextUrl.protocol}//${request.nextUrl.host}` },
-        });
-
-        // const options = {
-        //   expires: 1000000,
-        // };
-        //
-        // response.cookies.set(constants.Cookies.EphemeralExpiresAt, ephemeralAccount.expiresAt.toString(), options);
-        response.cookies.set('acc-pk', ephemeralParams.publishableKey);
-        response.cookies.set('acc-sk', ephemeralParams.secretKey);
-
-        return response;
-      }
+      // const ephemeralParams = unpackEphemeralQueryParams(request);
+      //
+      // if (ephemeralParams) {
+      //   const response = new NextResponse(null, {
+      //     status: 307,
+      //     headers: { location: `${request.nextUrl.protocol}//${request.nextUrl.host}` },
+      //   });
+      //
+      //   // const options = {
+      //   //   expires: 1000000,
+      //   // };
+      //   //
+      //   // response.cookies.set(constants.Cookies.EphemeralExpiresAt, ephemeralAccount.expiresAt.toString(), options);
+      //   response.cookies.set('acc-pk', ephemeralParams.publishableKey);
+      //   response.cookies.set('acc-sk', ephemeralParams.secretKey);
+      //
+      //   return response;
+      // }
 
       try {
         const handlerResult = await baseNextMiddleware(request, event);
@@ -439,29 +439,29 @@ export function isClerkKeyError(err: any) {
   );
 }
 
-const unpackEphemeralQueryParams = (request: NextMiddlewareRequestParam): EphemeralAccount | undefined => {
-  const params = Object.fromEntries(request.nextUrl.searchParams.entries());
+// const unpackEphemeralQueryParams = (request: NextMiddlewareRequestParam): EphemeralAccount | undefined => {
+//   const params = Object.fromEntries(request.nextUrl.searchParams.entries());
+//
+//   const ephemeralParams = {
+//     // expiresAt: params[constants.QueryParameters.EphemeralExpiresAt],
+//     publishableKey: params['acc-pk'],
+//     secretKey: params['acc-sk'],
+//   };
+//
+//   const maybeEphemeral = Object.fromEntries(
+//     Object.entries(ephemeralParams).filter(([_, v]) => v != null),
+//   ) as Partial<EphemeralAccount>;
+//
+//   if (Object.keys(maybeEphemeral).length === Object.keys(ephemeralParams).length) {
+//     // @ts-ignore
+//     return maybeEphemeral;
+//   } else {
+//     return undefined;
+//   }
+// };
 
-  const ephemeralParams = {
-    // expiresAt: params[constants.QueryParameters.EphemeralExpiresAt],
-    publishableKey: params['acc-pk'],
-    secretKey: params['acc-sk'],
-  };
-
-  const maybeEphemeral = Object.fromEntries(
-    Object.entries(ephemeralParams).filter(([_, v]) => v != null),
-  ) as Partial<EphemeralAccount>;
-
-  if (Object.keys(maybeEphemeral).length === Object.keys(ephemeralParams).length) {
-    // @ts-ignore
-    return maybeEphemeral;
-  } else {
-    return undefined;
-  }
-};
-
-export type EphemeralAccount = {
-  publishableKey: string;
-  secretKey: string;
-  // expiresAt: number;
-};
+// export type EphemeralAccount = {
+//   publishableKey: string;
+//   secretKey: string;
+//   // expiresAt: number;
+// };
