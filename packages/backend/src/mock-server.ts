@@ -12,7 +12,7 @@ export function validateHeaders<
   ResponseBodyType extends DefaultBodyType,
 >(
   resolver: HttpResponseResolver<Params, RequestBodyType, ResponseBodyType>,
-): HttpResponseResolver<Params, RequestBodyType, any> {
+): HttpResponseResolver<Params, RequestBodyType, ResponseBodyType | Record<string, string>> {
   return async ({ request, requestId, params, cookies }) => {
     if (!request.headers.get('Authorization')) {
       return HttpResponse.json(
