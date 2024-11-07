@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import { useClerkHostRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
@@ -10,7 +9,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
@@ -116,7 +115,7 @@ export function SignUpRoot({
   routing = ROUTING.path,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
   const pathname = router.pathname();
   const inferredPath = router.inferredBasePath?.();
   const path = pathProp || inferredPath || SIGN_UP_DEFAULT_BASE_PATH;

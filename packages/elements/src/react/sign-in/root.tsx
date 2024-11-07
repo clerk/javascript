@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import { useClerkHostRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -10,7 +9,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
@@ -117,7 +116,7 @@ export function SignInRoot({
   routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
   const pathname = router.pathname();
   const inferredPath = router.inferredBasePath?.();
   const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
