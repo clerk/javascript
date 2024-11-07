@@ -15,6 +15,7 @@ const componentImportPaths = {
   GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
+  AccountlessPrompt: () => import(/* webpackChunkName: "accountlessPrompt" */ './../components/AccountlessPrompt'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -78,6 +79,9 @@ export const WaitlistModal = lazy(() =>
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
+export const AccountlessPrompt = lazy(() =>
+  componentImportPaths.AccountlessPrompt().then(module => ({ default: module.AccountlessPrompt })),
+);
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
@@ -102,6 +106,7 @@ export const ClerkComponents = {
   GoogleOneTap,
   Waitlist,
   WaitlistModal,
+  AccountlessPrompt,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

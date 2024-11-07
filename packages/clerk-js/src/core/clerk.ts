@@ -1819,6 +1819,7 @@ export class Clerk implements ClerkInterface {
     this.#clearHandshakeFromUrl();
 
     this.#handleImpersonationFab();
+    this.#handleAccountlessPrompt();
     return true;
   };
 
@@ -1946,6 +1947,14 @@ export class Clerk implements ClerkInterface {
         void this.#componentControls?.ensureMounted().then(controls => controls.mountImpersonationFab());
       }
     });
+  };
+
+  #handleAccountlessPrompt = () => {
+    if (this.#options.claimAccountlessKeysUrl) {
+      void this.#componentControls
+        ?.ensureMounted()
+        .then(controls => controls.mountAccountlessPrompt(this.#options.claimAccountlessKeysUrl));
+    }
   };
 
   #buildUrl = (
