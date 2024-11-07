@@ -6,4 +6,6 @@
 '@clerk/ui': patch
 ---
 
-Make legal consent feature stable
+The Legal consent feature is now stable.
+
+Removed the `__experimental_` preffix.
