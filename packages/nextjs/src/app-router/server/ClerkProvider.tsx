@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { AuthObject } from '@clerk/backend';
@@ -17,66 +17,41 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
-const getClerkPath = () => path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
-const getEnvPath = () => path.join(process.cwd(), '.env.local');
+function parseEnvToMap(content: string): Map<string, string> {
+  const config = new Map<string, string>();
 
-// function parseEnvToMap(content: string): Map<string, string> {
-//   const config = new Map<string, string>();
-//
-//   // Split content into lines
-//   const lines = content.split('\n');
-//
-//   for (const line of lines) {
-//     // Trim whitespace
-//     const trimmedLine = line.trim();
-//
-//     // Ignore empty lines and comments (lines that start with #)
-//     if (trimmedLine === '' || trimmedLine.startsWith('#')) {
-//       continue;
-//     }
-//
-//     // Split the line by the first '='
-//     const separatorIndex = trimmedLine.indexOf('=');
-//     if (separatorIndex === -1) {
-//       continue; // Skip lines without '='
-//     }
-//
-//     const key = trimmedLine.slice(0, separatorIndex).trim();
-//     let value = trimmedLine.slice(separatorIndex + 1).trim();
-//
-//     // Remove surrounding quotes from the value if they exist
-//     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-//       value = value.slice(1, -1);
-//     }
-//
-//     config.set(key, value);
-//   }
-//
-//   return config;
-// }
+  // Split content into lines
+  const lines = content.split('\n');
 
-// function updateGitignore() {
-//   const gitignorePath = path.join(process.cwd(), '.gitignore');
-//
-//   if (!fs.existsSync(gitignorePath)) {
-//     fs.writeFileSync(gitignorePath, '');
-//     console.log('.gitignore created.');
-//   } else {
-//     console.log('.gitignore found.');
-//   }
-//
-//   // Check if `.clerk/` entry exists in .gitignore
-//   const gitignoreContent = fs.readFileSync(gitignorePath, 'utf-8');
-//   if (!gitignoreContent.includes('.env.local')) {
-//     fs.appendFileSync(gitignorePath, '\n.env.local\n');
-//     console.log('.env.local added to .gitignore.');
-//   } else {
-//     console.log('.env.local is already ignored.');
-//   }
-//   // } else {
-//   //   console.log('.git directory not found. Skipping .gitignore update.');
-//   // }
-// }
+  for (const line of lines) {
+    // Trim whitespace
+    const trimmedLine = line.trim();
+
+    // Ignore empty lines and comments (lines that start with #)
+    if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+      continue;
+    }
+
+    // Split the line by the first '='
+    const separatorIndex = trimmedLine.indexOf('=');
+    if (separatorIndex === -1) {
+      continue; // Skip lines without '='
+    }
+
+    const key = trimmedLine.slice(0, separatorIndex).trim();
+    let value = trimmedLine.slice(separatorIndex + 1).trim();
+
+    // Remove surrounding quotes from the value if they exist
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+
+    config.set(key, value);
+  }
+
+  return config;
+}
+
 const isNext13 = nextPkg.version.startsWith('13.');
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -99,6 +74,71 @@ const getDynamicConfig = React.cache(async function getDynamicClerkState() {
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
   return getScriptNonceFromHeader((await header('Content-Security-Policy')) || '') || '';
 });
+
+const CLERK_LOCK = 'clerk.lock';
+const getEnvPath = () => path.join(process.cwd(), '.env.local');
+
+let isCreatingFile = false;
+
+export async function createAccountlessKeys(publishableKey: string | undefined): Promise<void> {
+  if (publishableKey) {
+    return;
+  }
+
+  if (isCreatingFile) {
+    return;
+  }
+
+  if (existsSync(CLERK_LOCK)) {
+    return;
+  }
+
+  isCreatingFile = true;
+
+  writeFileSync(CLERK_LOCK, 'You can delete this file.', {
+    encoding: 'utf8',
+    mode: '0777',
+    flag: 'w',
+  });
+
+  let res: any;
+
+  const ENV_PATH = getEnvPath();
+  mkdirSync(path.dirname(ENV_PATH), { recursive: true });
+
+  const fileAsString = readFileSync(ENV_PATH, { encoding: 'utf-8' });
+  const envVarsMap = parseEnvToMap(fileAsString);
+
+  if (envVarsMap.has('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY')) {
+    isCreatingFile = false;
+    rmSync(CLERK_LOCK, { force: true, recursive: true });
+    return;
+  }
+
+  /**
+   * Maybe the server has not restarted yet
+   */
+
+  const client = createClerkClientWithOptions({});
+
+  // eslint-disable-next-line prefer-const
+  res = await client.accountlessApplications.createAccountlessApplication();
+
+  writeFileSync(
+    ENV_PATH,
+    `\nNEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${res.publishable_key}\nCLERK_SECRET_KEY=${res.secret_key}\nNEXT_PUBLIC_CLERK_ACC_CLAIM_TOKEN=${res.claim_token}`,
+    {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'a',
+    },
+  );
+
+  rmSync(CLERK_LOCK, { force: true, recursive: true });
+
+  isCreatingFile = false;
+  return res.publishable_key;
+}
 
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
@@ -124,79 +164,7 @@ export async function ClerkProvider(
   const dynamicConfig = await getDynamicConfig();
 
   let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
-
-  let clerkFileAsString: string | null = null;
-  try {
-    clerkFileAsString = readFileSync(getClerkPath(), { encoding: 'utf-8' });
-  } catch {
-    clerkFileAsString = null;
-  }
-
-  console.log('PROVIDER', publishableKey, clerkFileAsString);
-
-  if (!publishableKey && !clerkFileAsString) {
-    // this can be without access to headers
-    // const resolvedClient = await clerkClient();
-    // const resolvedCookies = await cookies();
-    let res: any;
-    try {
-      const ENV_PATH = getEnvPath();
-      const CLERK_TMP_PATH = getClerkPath();
-      mkdirSync(path.dirname(ENV_PATH), { recursive: true });
-      mkdirSync(path.dirname(CLERK_TMP_PATH), { recursive: true });
-      writeFileSync(CLERK_TMP_PATH, '', {
-        encoding: 'utf8',
-        mode: '0777',
-        flag: 'w',
-      });
-
-      // updateGitignore();
-
-      // const clerkFileConfig = JSON.parse(clerkFileAsString);
-      // const fileAsString = await readFile(ENV_PATH, { encoding: 'utf-8' }).catch(() => '');
-
-      // const envVarsMap = parseEnvToMap(fileAsString);
-
-      // res = JSON.parse(one);
-      //
-      // console.log('-----config', res, PATH);
-
-      /**
-       * Maybe the server has not restarted yet
-       */
-      if (!clerkFileAsString) {
-        const client = createClerkClientWithOptions({});
-
-        res = await client.accountlessApplications.createAccountlessApplication();
-
-        writeFileSync(CLERK_TMP_PATH, JSON.stringify(res), {
-          encoding: 'utf8',
-          mode: '0777',
-          flag: 'w',
-        });
-
-        writeFileSync(
-          ENV_PATH,
-          `\nNEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${res.publishable_key}
-          \nCLERK_SECRET_KEY=${res.secret_key}
-          `,
-          {
-            encoding: 'utf8',
-            mode: '0777',
-            flag: 'a',
-          },
-        );
-
-        publishableKey = res.publishable_key;
-
-        console.log('---CREATED', res);
-      }
-    } catch (e) {
-      console.log('--dwadawda', e);
-    }
-  } else {
-    // rmSync('.clerk', { recursive: true, force: true });
-  }
+  publishableKey = await createAccountlessKeys(publishableKey);
 
   const output = (
     <ClientClerkProvider
