@@ -1,5 +1,41 @@
 # Change Log
 
+## 5.31.2
+
+### Patch Changes
+
+- Re-init window.Clerk options when `ClerkProvider` props change in `@clerk/clerk-react` ([#4498](https://github.com/clerk/javascript/pull/4498)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.31.1
+
+### Patch Changes
+
+- Fix an issue where protocol relative URLs were not properly detected as non-relative. ([#4483](https://github.com/clerk/javascript/pull/4483)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`8a04ae47b8305f994b348301fd8134d5baf02943`](https://github.com/clerk/javascript/commit/8a04ae47b8305f994b348301fd8134d5baf02943)]:
+  - @clerk/shared@2.11.5
+
+## 5.31.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/localizations@3.5.0
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+
 ## 5.30.3
 
 ### Patch Changes

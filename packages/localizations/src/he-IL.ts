@@ -444,12 +444,14 @@ export const heIL: LocalizationResource = {
     },
     start: {
       actionLink: 'הרשמה',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'השתמש בדוא"ל',
       actionLink__use_email_username: 'השתמש בדוא"ל או שם משתמש',
       actionLink__use_passkey: 'השתמש במפתח סיסמה במקום',
       actionLink__use_phone: 'השתמש בטלפון',
       actionLink__use_username: 'השתמש בשם משתמש',
       actionText: 'אין לך חשבון?',
+      actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'התחבר',
     },
@@ -461,6 +463,17 @@ export const heIL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'התחבר',
       actionText: 'יש לך חשבון?',
@@ -502,6 +515,15 @@ export const heIL: LocalizationResource = {
       resendButton: 'שלח קוד שוב',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'אמת את מספר הטלפון שלך',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'התחבר',
@@ -864,6 +886,20 @@ export const heIL: LocalizationResource = {
       successMessage: 'הארנק התווסף לחשבון שלך.',
       title: 'הוסף ארנק web3',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

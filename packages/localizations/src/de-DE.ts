@@ -456,12 +456,14 @@ export const deDE: LocalizationResource = {
     },
     start: {
       actionLink: 'Anmelden',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'E-mail nutzen',
       actionLink__use_email_username: 'E-mail oder Benutzernamen nutzen',
       actionLink__use_passkey: 'Passkey nutzen',
       actionLink__use_phone: 'Mobiltelefon nutzen',
       actionLink__use_username: 'Benutzername nutzen',
       actionText: 'Kein Account?',
+      actionText__join_waitlist: undefined,
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Einloggen',
     },
@@ -474,6 +476,18 @@ export const deDE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'Ich stimme der {{ privacyPolicyLink || link("Datenschutzerklärung") }} zu',
+        label__onlyTermsOfService: 'Ich stimme den {{ termsOfServiceLink || link("Nutzungsbedingungen") }} zu',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Ich stimme den {{ termsOfServiceLink || link("Nutzungsbedingungen") }} und der {{ privacyPolicyLink || link("Datenschutzerklärung") }} zu',
+      },
+      continue: {
+        subtitle: 'Bitte lesen und akzeptieren Sie die Bedingungen, um fortzufahren',
+        title: 'Rechtliche Einwilligung',
+      },
+    },
     continue: {
       actionLink: 'Einloggen',
       actionText: 'Haben Sie ein Konto?',
@@ -515,6 +529,15 @@ export const deDE: LocalizationResource = {
       resendButton: 'Code erneut senden',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Verifizieren Sie Ihre Telefonnummer',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Einloggen',
@@ -896,6 +919,20 @@ export const deDE: LocalizationResource = {
       successMessage: 'Die Brieftasche wurde Ihrem Konto hinzugefügt.',
       title: 'Web3-Wallet hinzufügen',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

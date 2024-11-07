@@ -36,4 +36,5 @@ export const DEBOUNCE_MS = 350;
 export const SIGN_UP_MODES: Record<string, SignUpModes> = {
   PUBLIC: 'public',
   RESTRICTED: 'restricted',
+  WAITLIST: 'waitlist',
 };

@@ -41,7 +41,7 @@
 import { ClerkProvider } from '@clerk/clerk-expo';
 import { passkeys } from '@clerk/clerk-expo/passkeys';
 
-<ClerkProvider passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
+<ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
 ```
 
 ### 🔑 Creating a Passkey

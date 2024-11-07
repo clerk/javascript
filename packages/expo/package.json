@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.2.33",
+  "version": "2.2.36",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -32,6 +32,10 @@
       "types": "./dist/web/index.d.ts",
       "default": "./dist/web/index.js"
     },
+    "./passkeys": {
+      "types": "./dist/passkeys/index.d.ts",
+      "default": "./dist/passkeys/index.js"
+    },
     "./local-credentials": {
       "types": "./dist/local-credentials/index.d.ts",
       "default": "./dist/local-credentials/index.js"
@@ -43,7 +47,8 @@
   "files": [
     "dist",
     "web",
-    "local-credentials"
+    "local-credentials",
+    "passkeys"
   ],
   "scripts": {
     "build": "tsup",
@@ -55,16 +60,17 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.30.3",
-    "@clerk/clerk-react": "5.14.3",
-    "@clerk/shared": "2.11.3",
-    "@clerk/types": "4.29.0",
+    "@clerk/clerk-js": "5.31.2",
+    "@clerk/clerk-react": "5.15.1",
+    "@clerk/shared": "2.11.5",
+    "@clerk/types": "4.30.0",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
+    "@clerk/expo-passkeys": "0.0.1",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "*",

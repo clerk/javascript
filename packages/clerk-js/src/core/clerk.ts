@@ -21,6 +21,7 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  CredentialReturn,
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
@@ -28,6 +29,7 @@ import type {
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
+  JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
   NavigateOptions,
@@ -35,6 +37,10 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
   SDKMetadata,
@@ -53,6 +59,8 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  WaitlistProps,
+  WaitlistResource,
   Web3Provider,
 } from '@clerk/types';
 
@@ -111,6 +119,7 @@ import {
   EmailLinkErrorCode,
   Environment,
   Organization,
+  Waitlist,
 } from './resources/internal';
 import { warnings } from './warnings';
 
@@ -181,6 +190,24 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
 
+  public __internal_createPublicCredentials:
+    | ((
+        publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions,
+      ) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>>)
+    | undefined;
+
+  public __internal_getPublicCredentials:
+    | (({
+        publicKeyOptions,
+      }: {
+        publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+      }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
+    | undefined;
+
+  public __internal_isWebAuthnSupported: (() => boolean) | undefined;
+  public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
+  public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
+
   get publishableKey(): string {
     return this.#publishableKey;
   }
@@ -248,6 +275,10 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
+    return this.#options[key];
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -286,10 +317,7 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    this.#options = {
-      ...defaultOptions,
-      ...options,
-    };
+    this.#options = this.#initOptions(options);
 
     assertNoLegacyProp(this.#options);
 
@@ -305,11 +333,6 @@ export class Clerk implements ClerkInterface {
         ...this.#options.telemetry,
       });
     }
-
-    this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
-      this.#options.allowedRedirectOrigins,
-      this.frontendApi,
-    );
 
     if (this.#options.standardBrowser) {
       this.#loaded = await this.#loadInStandardBrowser();
@@ -501,6 +524,18 @@ export class Clerk implements ClerkInterface {
   public closeCreateOrganization = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('createOrganization'));
+  };
+
+  public openWaitlist = (props?: WaitlistProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'Waitlist' })
+      .then(controls => controls.openModal('waitlist', props || {}));
+  };
+
+  public closeWaitlist = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('waitlist'));
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
@@ -733,6 +768,25 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountWaitlist = (node: HTMLDivElement, props?: WaitlistProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted({ preloadHint: 'Waitlist' }).then(controls =>
+      controls.mountComponent({
+        name: 'Waitlist',
+        appearanceKey: 'waitlist',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props));
+  };
+
+  public unmountWaitlist = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
@@ -974,6 +1028,16 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
   }
 
+  public buildWaitlistUrl(): string {
+    if (!this.environment || !this.environment.displayConfig) {
+      return '';
+    }
+
+    const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
+
+    return buildURL({ base: waitlistUrl }, { stringify: true });
+  }
+
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
       return this.buildUrlWithAuth(
@@ -1084,6 +1148,13 @@ export class Clerk implements ClerkInterface {
   public redirectToAfterSignOut = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildAfterSignOutUrl());
+    }
+    return;
+  };
+
+  public redirectToWaitlist = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildWaitlistUrl());
     }
     return;
   };
@@ -1481,6 +1552,9 @@ export class Clerk implements ClerkInterface {
   public getOrganization = async (organizationId: string): Promise<OrganizationResource> =>
     Organization.get(organizationId);
 
+  public joinWaitlist = async ({ emailAddress }: JoinWaitlistParams): Promise<WaitlistResource> =>
+    Waitlist.join({ emailAddress });
+
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
     this.#authService?.setEnvironment(environment);
@@ -1543,9 +1617,14 @@ export class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
-  __unstable__updateProps = (props: any) => {
-    // The expect-error directive below is safe since `updateAppearanceProp` is only used
-    // in the v4 build. This will be removed when v4 becomes the main stable version
+  __unstable__updateProps = (_props: any) => {
+    // We need to re-init the options here in order to keep the options passed to ClerkProvider
+    // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
+    // 1. User renders <ClerkProvider propA={undefined} propB={1} />
+    // 2. clerk-js initializes propA with a default value
+    // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
+    // 4. If we don't merge the new props with the current options, propA will be reset to undefined
+    const props = { ..._props, options: this.#initOptions({ ...this.#options, ..._props.options }) };
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
@@ -1915,6 +1994,14 @@ export class Clerk implements ClerkInterface {
 
     await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
+  };
+
+  #initOptions = (options?: ClerkOptions): ClerkOptions => {
+    return {
+      ...defaultOptions,
+      ...options,
+      allowedRedirectOrigins: createAllowedRedirectOrigins(options?.allowedRedirectOrigins, this.frontendApi),
+    };
   };
 
   /**

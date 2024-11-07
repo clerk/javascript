@@ -27,6 +27,7 @@ exports[`public exports should not include a breaking change 1`] = `
   "SignedOut",
   "UserButton",
   "UserProfile",
+  "Waitlist",
   "__experimental_useReverification",
   "useAuth",
   "useClerk",

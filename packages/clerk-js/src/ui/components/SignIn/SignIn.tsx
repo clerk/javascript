@@ -3,7 +3,7 @@ import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { SignInContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { ResetPassword } from './ResetPassword';
@@ -80,12 +80,13 @@ export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGua
 export const SignInModal = (props: SignInModalProps): JSX.Element => {
   const signInProps = {
     signUpUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-up`,
+    waitlistUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/waitlist`,
     ...props,
   };
 
   return (
     <Route path='sign-in'>
-      <ComponentContext.Provider
+      <SignInContext.Provider
         value={{
           componentName: 'SignIn',
           ...signInProps,
@@ -99,7 +100,7 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
             routing='virtual'
           />
         </div>
-      </ComponentContext.Provider>
+      </SignInContext.Provider>
     </Route>
   );
 };

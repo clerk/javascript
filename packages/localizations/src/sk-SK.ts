@@ -449,12 +449,14 @@ export const skSK: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrovať sa',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Použiť email',
       actionLink__use_email_username: 'Použiť email alebo užívateľské meno',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Použiť telefón',
       actionLink__use_username: 'Použiť užívateľské meno',
       actionText: 'Nemáte účet?',
+      actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Prihlásiť sa',
     },
@@ -466,6 +468,17 @@ export const skSK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
+    __experimental_legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     continue: {
       actionLink: 'Prihlásiť sa',
       actionText: 'Máte účet?',
@@ -507,6 +520,15 @@ export const skSK: LocalizationResource = {
       resendButton: 'Znovu poslať kód',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Overte svoj telefón',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Prihlásiť sa',
@@ -880,6 +902,20 @@ export const skSK: LocalizationResource = {
       successMessage: 'Peňaženka bola pridaná k vášmu účtu.',
       title: 'Pridať web3 peňaženku',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;
