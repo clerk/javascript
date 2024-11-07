@@ -12,7 +12,7 @@ import { UserProfileSection } from './UserProfileSection';
 import { Web3Section } from './Web3Section';
 
 export const AccountPage = withCardStateProvider(() => {
-  const { attributes, saml, social } = useEnvironment().userSettings;
+  const { attributes, social } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
 
@@ -20,11 +20,11 @@ export const AccountPage = withCardStateProvider(() => {
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
-  const showSamlAccounts = saml && saml.enabled && user && user.samlAccounts.length > 0;
+  const showEnterpriseAccounts = user && user.enterpriseAccounts.length > 0;
   const showWeb3 = attributes.web3_wallet.enabled;
 
   const shouldAllowIdentificationCreation =
-    !showSamlAccounts ||
+    !showEnterpriseAccounts ||
     !user?.samlAccounts?.some(
       samlAccount => samlAccount.active && samlAccount.samlConnection?.disableAdditionalIdentifications,
     );
@@ -55,7 +55,7 @@ export const AccountPage = withCardStateProvider(() => {
         {showConnectedAccounts && <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />}
 
         {/*TODO-STEP-UP: Verify that these work as expected*/}
-        {showSamlAccounts && <EnterpriseAccountsSection />}
+        {showEnterpriseAccounts && <EnterpriseAccountsSection />}
         {showWeb3 && <Web3Section shouldAllowCreation={shouldAllowIdentificationCreation} />}
       </Col>
     </Col>
