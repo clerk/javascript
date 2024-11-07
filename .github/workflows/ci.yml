@@ -184,6 +184,13 @@ jobs:
           # We must first verify the user permissions before checking out PR code
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Check Secret Access
+        run: |
+          if [[ -z "${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}" ]]; then
+            echo "No access to required secrets. A maintainer must re-run the CI."
+            exit 1
+          fi
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
