@@ -25,7 +25,7 @@ export function wrapperInit({
     return (
       <ClerkInstanceContext.Provider value={{ value: clerk }}>
         <OptionsContext.Provider value={options}>
-          <ClerkHostRouterContext.Provider value={router}>{children}</ClerkHostRouterContext.Provider>
+          <ClerkHostRouterContext.Provider value={() => router}>{children}</ClerkHostRouterContext.Provider>
         </OptionsContext.Provider>
       </ClerkInstanceContext.Provider>
     );
