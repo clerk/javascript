@@ -1,11 +1,8 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import type { ClerkHostRouter } from '@clerk/shared/router';
-import { ClerkHostRouterContext } from '@clerk/shared/router';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
-import { usePathnameWithoutCatchAll } from '../../client-boundary/hooks/usePathnameWithoutCatchAll';
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
@@ -25,39 +22,6 @@ declare global {
     };
   }
 }
-
-// The version that Next added support for the window.history.pushState and replaceState APIs.
-// ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
-
-/**
- * Clerk router integration with Next.js's router.
- */
-const useNextRouter = (): ClerkHostRouter => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const inferredBasePath = usePathnameWithoutCatchAll();
-
-  // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
-  // preserve internal state between steps.
-  const canUseWindowHistoryAPIs =
-    typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
-
-  return {
-    mode: 'path',
-    name: 'NextRouter',
-    push: (path: string) => router.push(path),
-    replace: (path: string) =>
-      canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
-    shallowPush(path: string) {
-      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
-    },
-    pathname: () => pathname,
-    searchParams: () => searchParams,
-    inferredBasePath: () => inferredBasePath,
-  };
-};
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
@@ -130,7 +94,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <ClerkJSScript router='app' />
-        <ClerkHostRouterContext.Provider value={useNextRouter}>{children}</ClerkHostRouterContext.Provider>
+        {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );

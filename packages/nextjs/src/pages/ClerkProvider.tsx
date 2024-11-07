@@ -1,7 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
 import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
-import type { ClerkHostRouter } from '@clerk/shared/router';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -16,40 +15,9 @@ import { removeBasePath } from '../utils/removeBasePath';
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
-// The version that Next added support for the window.history.pushState and replaceState APIs.
-// ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
-
-/**
- * Clerk router integration with Next.js's router.
- */
-const useNextRouter = (): ClerkHostRouter => {
-  const router = useRouter();
-
-  // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
-  // preserve internal state between steps.
-  const canUseWindowHistoryAPIs =
-    typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
-
-  return {
-    mode: 'path',
-    name: 'NextRouter',
-    push: (path: string) => router.push(path),
-    replace: (path: string) =>
-      canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
-    shallowPush(path: string) {
-      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
-    },
-    pathname: () => (typeof window !== 'undefined' ? window.location.pathname : ''),
-    searchParams: () =>
-      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams(),
-  };
-};
-
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
   const { push, replace } = useRouter();
-  const clerkRouter = useNextRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   useSafeLayoutEffect(() => {
@@ -71,7 +39,6 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
   const replaceNavigate = (to: string) => replace(removeBasePath(to));
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    __experimental_router: clerkRouter,
     routerPush: navigate,
     routerReplace: replaceNavigate,
   });
