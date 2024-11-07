@@ -13,6 +13,8 @@ import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
   const { organization } = useOrganization();
 
+  console.log('Testing fork');
+
   if (!organization) {
     return null;
   }
