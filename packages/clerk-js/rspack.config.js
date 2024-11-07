@@ -1,3 +1,4 @@
+//@ts-check
 const rspack = require('@rspack/core');
 const packageJSON = require('./package.json');
 const path = require('path');
@@ -22,9 +23,13 @@ const variantToSourceFile = {
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
 };
 
-/** @returns { import('@rspack/cli').Configuration } */
+/**
+ *
+ * @param {object} config
+ * @param {'development'|'production'} config.mode
+ * @returns { import('@rspack/cli').Configuration }
+ */
 const common = ({ mode }) => {
-  /** @type { import('webpack').Configuration } */
   return {
     mode,
     resolve: {
@@ -130,7 +135,7 @@ const svgLoader = () => {
   };
 };
 
-/** @type { () => (import('@rspack/core').RuleSetRule) } */
+/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
 const typescriptLoaderProd = () => {
   return [
     {
@@ -163,7 +168,7 @@ const typescriptLoaderProd = () => {
   ];
 };
 
-/** @type { () => (import('@rspack/core').RuleSetRule) } */
+/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
 const typescriptLoaderDev = () => {
   return [
     {
@@ -194,7 +199,7 @@ const typescriptLoaderDev = () => {
 
 /**
  * Used in outputs that utilize chunking, and returns a URL to the stylesheet.
- * @type { () => (import('webpack').RuleSetRule) }
+ * @type { () => (import('@rspack/core').RuleSetRule) }
  */
 const clerkUICSSLoader = () => {
   // This emits a module exporting a URL to the styles.css file.
@@ -206,7 +211,7 @@ const clerkUICSSLoader = () => {
 
 /**
  * Used in outputs that _do not_ utilize chunking, and returns the contents of the stylesheet.
- * @type { () => (import('webpack').RuleSetRule) }
+ * @type { () => (import('@rspack/core').RuleSetRule) }
  */
 const clerkUICSSSourceLoader = () => {
   // This emits a module exporting the contents of the styles.css file.
@@ -218,7 +223,7 @@ const clerkUICSSSourceLoader = () => {
 
 /**
  * Used for production builds that have dynamicly loaded chunks.
- * @type { () => (import('webpack').Configuration) }
+ * @type { () => (import('@rspack/core').Configuration) }
  * */
 const commonForProdChunked = () => {
   return {
@@ -230,7 +235,7 @@ const commonForProdChunked = () => {
 
 /**
  * Used for production builds that combine all files into one single file (such as for Chrome Extensions).
- * @type { () => (import('webpack').Configuration) }
+ * @type { () => (import('@rspack/core').Configuration) }
  * */
 const commonForProdBundled = () => {
   return {
@@ -240,7 +245,7 @@ const commonForProdBundled = () => {
   };
 };
 
-/** @type { () => (import('webpack').Configuration) } */
+/** @type { () => (import('@rspack/core').Configuration) } */
 const commonForProd = () => {
   return {
     devtool: false,
@@ -288,11 +293,22 @@ const commonForProd = () => {
 //   };
 // };
 
+/**
+ *
+ * @param {string} variant
+ * @returns {import('@rspack/core').Configuration}
+ */
 const entryForVariant = variant => {
   return { entry: { [variant]: variantToSourceFile[variant] } };
 };
 
-/** @type { () => (import('webpack').Configuration)[] } */
+/**
+ *
+ * @param {object} config
+ * @param {'development'|'production'} config.mode
+ * @param {boolean} config.analysis
+ * @returns {(import('@rspack/core').Configuration)[]}
+ */
 const prodConfig = ({ mode, analysis }) => {
   const clerkBrowser = merge(
     entryForVariant(variants.clerkBrowser),
@@ -369,24 +385,32 @@ const prodConfig = ({ mode, analysis }) => {
 
   // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
   if (analysis) {
-    return clerkBrowser;
+    return [clerkBrowser];
   }
 
   return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
 };
 
+/**
+ *
+ * @param {object} config
+ * @param {'development'|'production'} config.mode
+ * @param {object} config.env
+ * @returns
+ */
 const devConfig = ({ mode, env }) => {
   const variant = env.variant || variants.clerkBrowser;
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
 
+  /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
     return {
       module: {
         rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
       },
-      plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
+      plugins: [new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } }))],
       devtool: 'eval-cheap-source-map',
       output: {
         publicPath: `${devUrl.origin}/npm`,
@@ -447,5 +471,5 @@ module.exports = env => {
   const mode = env.production ? 'production' : 'development';
   const analysis = !!env.analysis;
 
-  return isProduction(mode) ? prodConfig({ mode, env, analysis }) : devConfig({ mode, env });
+  return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig({ mode, env });
 };

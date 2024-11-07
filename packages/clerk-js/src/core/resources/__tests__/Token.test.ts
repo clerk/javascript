@@ -1,3 +1,4 @@
+import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
 import { mockDevClerkInstance, mockFetch, mockNetworkFailedFetch } from '../../test/fixtures';
 import { BaseResource } from '../internal';
@@ -20,7 +21,7 @@ describe('Token', () => {
       });
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://clerk.example.com/v1/path/to/tokens?_clerk_js_version=test-0.0.0',
+        `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test-0.0.0`,
         // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
         expect.objectContaining({
           method: 'POST',
@@ -57,7 +58,7 @@ describe('Token', () => {
         const token = await Token.create('/path/to/tokens');
 
         expect(global.fetch).toHaveBeenCalledWith(
-          'https://clerk.example.com/v1/path/to/tokens?_clerk_js_version=test-0.0.0',
+          `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test-0.0.0`,
           // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
           expect.objectContaining({
             method: 'POST',
@@ -77,13 +78,12 @@ describe('Token', () => {
         mockNetworkFailedFetch();
         BaseResource.clerk = { getFapiClient: () => createFapiClient(mockDevClerkInstance) } as any;
 
-        await expect(Token.create('/path/to/tokens')).rejects.toMatchObject({
-          message:
-            'ClerkJS: Network error at "https://clerk.example.com/v1/path/to/tokens?_clerk_js_version=test-0.0.0" - TypeError: Failed to fetch. Please try again.',
-        });
+        await expect(Token.create('/path/to/tokens')).rejects.toThrow(
+          `ClerkJS: Network error at "https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test-0.0.0" - TypeError: Failed to fetch. Please try again.`,
+        );
 
         expect(global.fetch).toHaveBeenCalledWith(
-          'https://clerk.example.com/v1/path/to/tokens?_clerk_js_version=test-0.0.0',
+          `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test-0.0.0`,
           // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
           expect.objectContaining({
             method: 'POST',
