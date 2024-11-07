@@ -9,7 +9,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
+import { ClerkHostRouterContext, Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
@@ -131,19 +131,18 @@ export function SignUpRoot({
   );
 
   return (
-    <Router
-      basePath={path}
-      router={router}
-    >
-      <FormStoreProvider>
-        <SignUpFlowProvider
-          exampleMode={exampleMode}
-          fallback={fallback}
-          isRootPath={isRootPath}
-        >
-          {children}
-        </SignUpFlowProvider>
-      </FormStoreProvider>
-    </Router>
+    <ClerkHostRouterContext.Provider value={router}>
+      <Router basePath={path}>
+        <FormStoreProvider>
+          <SignUpFlowProvider
+            exampleMode={exampleMode}
+            fallback={fallback}
+            isRootPath={isRootPath}
+          >
+            {children}
+          </SignUpFlowProvider>
+        </FormStoreProvider>
+      </Router>
+    </ClerkHostRouterContext.Provider>
   );
 }

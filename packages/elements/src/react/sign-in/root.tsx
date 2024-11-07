@@ -9,7 +9,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
+import { ClerkHostRouterContext, Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
@@ -132,19 +132,18 @@ export function SignInRoot({
   );
 
   return (
-    <Router
-      basePath={path}
-      router={router}
-    >
-      <FormStoreProvider>
-        <SignInFlowProvider
-          exampleMode={exampleMode}
-          fallback={fallback}
-          isRootPath={isRootPath}
-        >
-          {children}
-        </SignInFlowProvider>
-      </FormStoreProvider>
-    </Router>
+    <ClerkHostRouterContext.Provider value={router}>
+      <Router basePath={path}>
+        <FormStoreProvider>
+          <SignInFlowProvider
+            exampleMode={exampleMode}
+            fallback={fallback}
+            isRootPath={isRootPath}
+          >
+            {children}
+          </SignInFlowProvider>
+        </FormStoreProvider>
+      </Router>
+    </ClerkHostRouterContext.Provider>
   );
 }
