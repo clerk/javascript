@@ -5,24 +5,26 @@ import type { VerificationResource } from 'verification';
 
 import type { ClerkResource } from './resource';
 
-type EnterpriseProtocol = 'saml' | 'oauth';
+export type EnterpriseProtocol = 'saml' | 'oauth';
 
-type EnterpriseProvider = SamlIdpSlug | GoogleOauthProvider | MicrosoftOauthProvider | CustomOAuthStrategy;
+export type EnterpriseProvider = SamlIdpSlug | GoogleOauthProvider | MicrosoftOauthProvider | CustomOAuthStrategy;
 
 export interface EnterpriseAccountResource extends ClerkResource {
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
   active: boolean;
   emailAddress: string;
   firstName: string;
   lastName: string;
   providerUserId: string | null;
-  publicMetadata: Record<string, unknown>;
+  publicMetadata: Record<string, unknown> | null;
   verification: VerificationResource | null;
   enterpriseConnection: EnterpriseAccountConnectionResource | null;
-  protocol: EnterpriseProtocol;
-  provider: EnterpriseProvider;
 }
 
 export interface EnterpriseAccountConnectionResource extends ClerkResource {
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
   name: string;
   logoPublicUrl: string;
   domain: string;
@@ -31,6 +33,4 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   disableAdditionalIdentifications: boolean;
   allowSubdomains: boolean;
   allowIdpInitiated: boolean;
-  protocol: EnterpriseProtocol;
-  provider: EnterpriseProvider;
 }

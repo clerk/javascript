@@ -60,8 +60,6 @@ export type {
   EmailJSON,
   EmailAddressJSON,
   ExternalAccountJSON,
-  EnterpriseAccountJSON,
-  EnterpriseAccountConnectionJSON,
   IdentificationLinkJSON,
   InvitationJSON,
   OauthAccessTokenJSON,

@@ -2,6 +2,8 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { EnterpriseProtocol, EnterpriseProvider } from 'enterpriseAccount';
+
 import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
@@ -190,6 +192,35 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   public_metadata: Record<string, unknown>;
   label: string;
   verification?: VerificationJSON;
+}
+
+export interface EnterpriseAccountJSON extends ClerkResourceJSON {
+  object: 'enterprise_account';
+  provider: EnterpriseProvider;
+  protocol: EnterpriseProtocol;
+  active: boolean;
+  email_address: string;
+  first_name: string | null;
+  last_name: string | null;
+  provider_user_id: string | null;
+  public_metadata?: Record<string, unknown> | null;
+  verification: VerificationJSON | null;
+  enterprise_connection: EnterpriseAccountConnectionJSON | null;
+}
+
+export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
+  provider: EnterpriseProvider;
+  protocol: EnterpriseProtocol;
+  name: string;
+  domain: string;
+  active: boolean;
+  logo_public_url: string | null;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
