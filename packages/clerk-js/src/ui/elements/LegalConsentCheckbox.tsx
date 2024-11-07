@@ -1,4 +1,5 @@
 import { useEnvironment } from '../../ui/contexts';
+import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
@@ -16,6 +17,8 @@ import { LinkRenderer } from './LinkRenderer';
 const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: string }) => {
   const { termsUrl, privacyPolicyUrl } = props;
   const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
   let localizationKey: LocalizationKey | undefined;
 
   if (termsUrl && privacyPolicyUrl) {
@@ -34,19 +37,29 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
   }
 
   return (
-    <Text
-      variant='body'
-      as='span'
+    <FormLabel
+      elementDescriptor={descriptors.formFieldCheckboxLabel}
+      htmlFor={inputProps.itemID}
+      isDisabled={inputProps.isDisabled}
+      sx={t => ({
+        paddingLeft: t.space.$1x5,
+        textAlign: 'left',
+      })}
     >
-      <LinkRenderer
-        text={t(localizationKey)}
-        isExternal
-        sx={t => ({
-          textDecoration: 'underline',
-          textUnderlineOffset: t.space.$1,
-        })}
-      />
-    </Text>
+      <Text
+        variant='body'
+        as='span'
+      >
+        <LinkRenderer
+          text={t(localizationKey)}
+          isExternal
+          sx={t => ({
+            textDecoration: 'underline',
+            textUnderlineOffset: t.space.$1,
+          })}
+        />
+      </Text>
+    </FormLabel>
   );
 };
 
@@ -70,19 +83,10 @@ export const LegalCheckbox = (
           elementDescriptor={descriptors.formFieldCheckboxInput}
           elementId={descriptors.formFieldInput.setId('legalAccepted')}
         />
-        <FormLabel
-          elementDescriptor={descriptors.formFieldCheckboxLabel}
-          htmlFor={props.itemID}
-          sx={t => ({
-            paddingLeft: t.space.$1x5,
-            textAlign: 'left',
-          })}
-        >
-          <LegalCheckboxLabel
-            termsUrl={termsLink}
-            privacyPolicyUrl={privacyPolicy}
-          />
-        </FormLabel>
+        <LegalCheckboxLabel
+          termsUrl={termsLink}
+          privacyPolicyUrl={privacyPolicy}
+        />
       </Flex>
     </Field.Root>
   );
