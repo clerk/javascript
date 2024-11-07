@@ -2,17 +2,20 @@ import type { CustomMenuItem } from '@clerk/types';
 import type { Slot } from 'vue';
 import { ref } from 'vue';
 
-import type { MenuItemWithoutMountHandlers } from '../types';
+import type { AddCustomMenuItemParams } from '../types';
 
 export const useUserButtonCustomMenuItems = () => {
   const customMenuItems = ref<CustomMenuItem[]>([]);
   const customMenuItemsPortals = ref(new Map<HTMLDivElement, Slot>());
   const reorderItemsLabels = ['manageAccount', 'signOut'];
 
-  function addCustomMenuItem(item: MenuItemWithoutMountHandlers, iconSlot: Slot | undefined) {
+  function addCustomMenuItem(params: AddCustomMenuItemParams) {
+    const { customMenuItem, iconSlot } = params;
+    const { label, onClick, open, href } = customMenuItem;
+
     // Reorder item
-    if (reorderItemsLabels.includes(item.label)) {
-      customMenuItems.value.push({ label: item.label });
+    if (reorderItemsLabels.includes(label)) {
+      customMenuItems.value.push({ label });
       return;
     }
 
@@ -21,7 +24,7 @@ export const useUserButtonCustomMenuItems = () => {
     }
 
     const baseItem: CustomMenuItem = {
-      label: item.label,
+      label,
       mountIcon(el) {
         customMenuItemsPortals.value.set(el, iconSlot);
       },
@@ -33,20 +36,20 @@ export const useUserButtonCustomMenuItems = () => {
     };
 
     // Action
-    if (item.onClick || item.open) {
+    if (onClick || open) {
       customMenuItems.value.push({
         ...baseItem,
-        onClick: item.onClick,
-        open: item.open,
+        onClick,
+        open,
       });
       return;
     }
 
     // Link
-    if (item.href) {
+    if (href) {
       customMenuItems.value.push({
         ...baseItem,
-        href: item.href,
+        href,
       });
     }
   }

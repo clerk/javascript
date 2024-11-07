@@ -1,13 +1,14 @@
-import type { InjectionKey, Slot } from 'vue';
+import type { InjectionKey } from 'vue';
 
-import type { MenuItemWithoutMountHandlers, VueClerkInjectionKeyType } from './types';
+import type { AddCustomMenuItemParams, AddUserProfileCustomPagesParams, VueClerkInjectionKeyType } from './types';
 
 export const ClerkInjectionKey = Symbol('clerk') as InjectionKey<VueClerkInjectionKeyType>;
 
 export const UserButtonRootKey = Symbol('UserButtonRoot') as InjectionKey<{
-  addCustomMenuItem(item: MenuItemWithoutMountHandlers, iconSlot: Slot | undefined): void;
+  addCustomMenuItem(params: AddCustomMenuItemParams): void;
+  addCustomPage(params: AddUserProfileCustomPagesParams): void;
 }>;
 
 export const UserButtonMenuItemsKey = Symbol('UserButtonMenuItems') as InjectionKey<{
-  addCustomMenuItem(item: MenuItemWithoutMountHandlers, iconSlot: Slot | undefined): void;
+  addCustomMenuItem(params: AddCustomMenuItemParams): void;
 }>;

@@ -13,14 +13,14 @@ describe('useUserButtonCustomMenuItems', () => {
   it('should process valid action items', async () => {
     const { customMenuItems, addCustomMenuItem } = useUserButtonCustomMenuItems();
 
-    addCustomMenuItem(
-      {
+    addCustomMenuItem({
+      customMenuItem: {
         label: 'Custom Action',
         onClick() {},
-        // @ts-expect-error: todo
       },
-      h('div', 'Icon'),
-    );
+      // @ts-expect-error: todo
+      iconSlot: h('div', 'Icon'),
+    });
 
     expect(customMenuItems.value).toHaveLength(1);
     expect(customMenuItems.value[0].label).toBe('Custom Action');
@@ -31,14 +31,14 @@ describe('useUserButtonCustomMenuItems', () => {
   it('should process valid link items', async () => {
     const { customMenuItems, addCustomMenuItem } = useUserButtonCustomMenuItems();
 
-    addCustomMenuItem(
-      {
+    addCustomMenuItem({
+      customMenuItem: {
         label: 'Custom Link',
         href: 'https://example.com',
-        // @ts-expect-error: todo
       },
-      h('div', 'Icon'),
-    );
+      // @ts-expect-error: todo
+      iconSlot: h('div', 'Icon'),
+    });
 
     expect(customMenuItems.value).toHaveLength(1);
     expect(customMenuItems.value[0].label).toBe('Custom Link');
@@ -48,9 +48,16 @@ describe('useUserButtonCustomMenuItems', () => {
 
   it('should process reorder items', async () => {
     const { customMenuItems, addCustomMenuItem } = useUserButtonCustomMenuItems();
-
-    addCustomMenuItem({ label: 'manageAccount' }, undefined);
-    addCustomMenuItem({ label: 'signOut' }, undefined);
+    addCustomMenuItem({
+      customMenuItem: {
+        label: 'manageAccount',
+      },
+    });
+    addCustomMenuItem({
+      customMenuItem: {
+        label: 'signOut',
+      },
+    });
 
     expect(customMenuItems.value).toHaveLength(2);
     expect(customMenuItems.value[0].label).toBe('manageAccount');
@@ -62,14 +69,14 @@ describe('useUserButtonCustomMenuItems', () => {
     const mockOnClick = vi.fn();
     const { customMenuItems, addCustomMenuItem } = useUserButtonCustomMenuItems();
 
-    addCustomMenuItem(
-      {
+    addCustomMenuItem({
+      customMenuItem: {
         label: 'Custom Action',
         onClick: mockOnClick,
-        // @ts-expect-error: todo
       },
-      h('div', 'Icon'),
-    );
+      // @ts-expect-error: todo
+      iconSlot: h('div', 'Icon'),
+    });
 
     expect(customMenuItems.value).toHaveLength(1);
 
