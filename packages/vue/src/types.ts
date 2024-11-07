@@ -4,6 +4,7 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  CustomMenuItem,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
@@ -40,6 +41,8 @@ export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
 }
+
+export type MenuItemWithoutMountHandlers = Without<CustomMenuItem, 'mount' | 'unmount' | 'mountIcon' | 'unmountIcon'>;
 
 declare global {
   interface Window {
