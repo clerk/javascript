@@ -6,7 +6,7 @@ import React, { createContext, useContext } from 'react';
 import type { ClerkHostRouter, ClerkRouter } from './router';
 import { createClerkRouter } from './router';
 
-export const ClerkHostRouterContext = createContext<ClerkHostRouter | null>(null);
+export const ClerkHostRouterContext = createContext<(() => ClerkHostRouter) | null>(null);
 export const ClerkRouterContext = createContext<ClerkRouter | null>(null);
 
 export function useClerkHostRouter() {
@@ -18,7 +18,7 @@ export function useClerkHostRouter() {
     );
   }
 
-  return ctx;
+  return ctx();
 }
 
 export function useClerkRouter() {

@@ -14,7 +14,6 @@ import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
-import { removeOptionalCatchAllSegment } from '../utils/path-inference/utils';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -120,7 +119,7 @@ export function SignInRoot({
   const clerk = useClerk();
   const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
   const pathname = router.pathname();
-  const inferredPath = removeOptionalCatchAllSegment(pathname);
+  const inferredPath = router.inferredBasePath?.();
   const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
   const isRootPath = path === pathname;
 

@@ -2,9 +2,10 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import type { ClerkHostRouter } from '@clerk/shared/router';
 import { ClerkHostRouterContext } from '@clerk/shared/router';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
+import { usePathnameWithoutCatchAll } from '../../client-boundary/hooks/usePathnameWithoutCatchAll';
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
@@ -34,6 +35,9 @@ const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
  */
 const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const inferredBasePath = usePathnameWithoutCatchAll();
 
   // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
   // preserve internal state between steps.
@@ -49,16 +53,15 @@ const useNextRouter = (): ClerkHostRouter => {
     shallowPush(path: string) {
       canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
     },
-    pathname: () => (typeof window !== 'undefined' ? window.location.pathname : ''),
-    searchParams: () =>
-      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams(),
+    pathname: () => pathname,
+    searchParams: () => searchParams,
+    inferredBasePath: () => inferredBasePath,
   };
 };
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
-  const clerkRouter = useNextRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
@@ -119,7 +122,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    __experimental_router: clerkRouter,
     routerPush: push,
     routerReplace: replace,
   });
@@ -128,7 +130,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <ClerkJSScript router='app' />
-        <ClerkHostRouterContext.Provider value={clerkRouter}>{children}</ClerkHostRouterContext.Provider>
+        <ClerkHostRouterContext.Provider value={useNextRouter}>{children}</ClerkHostRouterContext.Provider>
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );
