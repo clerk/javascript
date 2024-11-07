@@ -2,9 +2,8 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import type { EnterpriseProtocol, EnterpriseProvider } from 'enterpriseAccount';
-
 import type { DisplayConfigJSON } from './displayConfig';
+import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
@@ -196,29 +195,29 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
 
 export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   object: 'enterprise_account';
-  provider: EnterpriseProvider;
-  protocol: EnterpriseProtocol;
   active: boolean;
   email_address: string;
-  first_name: string | null;
-  last_name: string | null;
-  provider_user_id: string | null;
-  public_metadata?: Record<string, unknown> | null;
-  verification: VerificationJSON | null;
   enterprise_connection: EnterpriseAccountConnectionJSON | null;
+  first_name: string;
+  last_name: string;
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
+  provider_user_id: string | null;
+  public_metadata: Record<string, unknown>;
+  verification: VerificationJSON | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
-  provider: EnterpriseProvider;
-  protocol: EnterpriseProtocol;
-  name: string;
-  domain: string;
   active: boolean;
-  logo_public_url: string | null;
-  sync_user_attributes: boolean;
-  allow_subdomains: boolean;
   allow_idp_initiated: boolean;
+  allow_subdomains: boolean;
   disable_additional_identifications: boolean;
+  domain: string;
+  logo_public_url: string | null;
+  name: string;
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
+  sync_user_attributes: boolean;
   created_at: number;
   updated_at: number;
 }
@@ -249,6 +248,7 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
+  enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
   saml_accounts: SamlAccountJSON[];
 

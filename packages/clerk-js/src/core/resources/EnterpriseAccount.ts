@@ -12,11 +12,11 @@ import { Verification } from './Verification';
 
 export class EnterpriseAccount extends BaseResource implements EnterpriseAccountResource {
   id!: string;
-  protocol: EnterpriseAccountResource['protocol'];
-  provider: EnterpriseAccountResource['provider'];
+  protocol!: EnterpriseAccountResource['protocol'];
+  provider!: EnterpriseAccountResource['provider'];
   providerUserId: string | null = null;
   active!: boolean;
-  emailAddress!: string;
+  emailAddress = '';
   firstName = '';
   lastName = '';
   publicMetadata = {};
@@ -59,16 +59,16 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
 
 export class EnterpriseAccountConnection extends BaseResource implements EnterpriseAccountConnectionResource {
   id!: string;
-  name!: string;
-  domain!: string;
   active!: boolean;
-  logoPublicUrl: string;
-  protocol: EnterpriseAccountResource['protocol'];
-  provider: EnterpriseAccountResource['provider'];
-  syncUserAttributes!: boolean;
-  allowSubdomains!: boolean;
   allowIdpInitiated!: boolean;
+  allowSubdomains!: boolean;
   disableAdditionalIdentifications!: boolean;
+  domain!: string;
+  logoPublicUrl: string | null = '';
+  name!: string;
+  protocol!: EnterpriseAccountResource['protocol'];
+  provider!: EnterpriseAccountResource['provider'];
+  syncUserAttributes!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
 

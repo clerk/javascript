@@ -1,6 +1,7 @@
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
+import type { EnterpriseAccountResource } from './enterpriseAccount';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -68,6 +69,7 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+  enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
   samlAccounts: SamlAccountResource[];
 
