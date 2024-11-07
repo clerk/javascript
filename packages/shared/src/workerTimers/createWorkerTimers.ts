@@ -67,7 +67,10 @@ export const createWorkerTimers = () => {
   const setTimeout: WorkerSetTimeout = (cb, ms) => {
     init();
     const id = generateId();
-    callbacks.set(id, cb);
+    callbacks.set(id, () => {
+      cb();
+      callbacks.delete(id);
+    });
     post(worker, { type: 'setTimeout', id, ms });
     return id;
   };

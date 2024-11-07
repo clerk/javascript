@@ -16,6 +16,7 @@ self.addEventListener('message', e => {
     case 'setTimeout':
       workerToTabIds[data.id] = setTimeout(() => {
         respond({ id: data.id });
+        delete workerToTabIds[data.id];
       }, data.ms) as unknown as WorkerTimerId;
       break;
     case 'clearTimeout':
