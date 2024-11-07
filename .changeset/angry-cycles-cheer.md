@@ -2,4 +2,4 @@
 '@clerk/backend': minor
 ---
 
-Seding BAPI version through request headers
+Send API version through request headers.
