@@ -478,13 +478,14 @@ export const deDE: LocalizationResource = {
   signUp: {
     __experimental_legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Ich stimme der {{ privacyPolicyLink || link("Datenschutzerklärung") }} zu',
+        label__onlyTermsOfService: 'Ich stimme den {{ termsOfServiceLink || link("Nutzungsbedingungen") }} zu',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Ich stimme den {{ termsOfServiceLink || link("Nutzungsbedingungen") }} und der {{ privacyPolicyLink || link("Datenschutzerklärung") }} zu',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Bitte lesen und akzeptieren Sie die Bedingungen, um fortzufahren',
+        title: 'Rechtliche Einwilligung',
       },
     },
     continue: {
