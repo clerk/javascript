@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import userJson from '../../fixtures/user.json';
-import { server } from '../../mock-server';
+import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
 
 describe('api.client', () => {
@@ -13,9 +13,12 @@ describe('api.client', () => {
 
   it('executes a successful backend API request for a single resource and parses the response', async () => {
     server.use(
-      http.get(`https://api.clerk.test/v1/users/user_deadbeef`, () => {
-        return HttpResponse.json(userJson);
-      }),
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(userJson);
+        }),
+      ),
     );
 
     const response = await apiClient.users.getUser('user_deadbeef');
@@ -30,12 +33,18 @@ describe('api.client', () => {
 
   it('executes 2 backend API request for users.getUserList()', async () => {
     server.use(
-      http.get(`https://api.clerk.test/v1/users`, () => {
-        return HttpResponse.json([userJson]);
-      }),
-      http.get(`https://api.clerk.test/v1/users/count`, () => {
-        return HttpResponse.json({ object: 'total_count', total_count: 2 });
-      }),
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(() => {
+          return HttpResponse.json({ object: 'total_count', total_count: 2 });
+        }),
+      ),
     );
     const { data, totalCount } = await apiClient.users.getUserList({
       offset: 2,
@@ -51,12 +60,15 @@ describe('api.client', () => {
 
   it('executes a successful backend API request for a paginated response', async () => {
     server.use(
-      http.get(`https://api.clerk.test/v1/users/user_123/organization_memberships`, () => {
-        return HttpResponse.json({
-          data: [{ id: '1' }],
-          total_count: 3,
-        });
-      }),
+      http.get(
+        `https://api.clerk.test/v1/users/user_123/organization_memberships`,
+        validateHeaders(() => {
+          return HttpResponse.json({
+            data: [{ id: '1' }],
+            total_count: 3,
+          });
+        }),
+      ),
     );
 
     const { data: response, totalCount } = await apiClient.users.getOrganizationMembershipList({
@@ -72,9 +84,12 @@ describe('api.client', () => {
 
   it('executes a successful backend API request to create a new resource', async () => {
     server.use(
-      http.post(`https://api.clerk.test/v1/users`, () => {
-        return HttpResponse.json(userJson);
-      }),
+      http.post(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json(userJson);
+        }),
+      ),
     );
 
     const response = await apiClient.users.createUser({
@@ -100,12 +115,15 @@ describe('api.client', () => {
     const traceId = 'trace_id_123';
 
     server.use(
-      http.get(`https://api.clerk.test/v1/users/user_deadbeef`, () => {
-        return HttpResponse.json(
-          { errors: [mockErrorPayload], clerk_trace_id: traceId },
-          { status: 422, headers: { 'cf-ray': traceId } },
-        );
-      }),
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(
+            { errors: [mockErrorPayload], clerk_trace_id: traceId },
+            { status: 422, headers: { 'cf-ray': traceId } },
+          );
+        }),
+      ),
     );
 
     const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
@@ -120,9 +138,12 @@ describe('api.client', () => {
 
   it('executes a failed backend API request and include cf ray id when trace not present', async () => {
     server.use(
-      http.get(`https://api.clerk.test/v1/users/user_deadbeef`, () => {
-        return HttpResponse.json({ errors: [] }, { status: 500, headers: { 'cf-ray': 'mock_cf_ray' } });
-      }),
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json({ errors: [] }, { status: 500, headers: { 'cf-ray': 'mock_cf_ray' } });
+        }),
+      ),
     );
 
     const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
@@ -134,13 +155,16 @@ describe('api.client', () => {
   it('executes a successful backend API request to delete a domain', async () => {
     const DOMAIN_ID = 'dmn_123';
     server.use(
-      http.delete(`https://api.clerk.test/v1/domains/${DOMAIN_ID}`, () => {
-        return HttpResponse.json({
-          object: 'domain',
-          id: DOMAIN_ID,
-          deleted: true,
-        });
-      }),
+      http.delete(
+        `https://api.clerk.test/v1/domains/${DOMAIN_ID}`,
+        validateHeaders(() => {
+          return HttpResponse.json({
+            object: 'domain',
+            id: DOMAIN_ID,
+            deleted: true,
+          });
+        }),
+      ),
     );
 
     await apiClient.domains.deleteDomain(DOMAIN_ID);
@@ -148,28 +172,31 @@ describe('api.client', () => {
 
   it('successfully retrieves user access tokens from backend API for a specific provider', async () => {
     server.use(
-      http.get('https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google', ({ request }) => {
-        const paginated = new URL(request.url).searchParams.get('paginated');
+      http.get(
+        'https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google',
+        validateHeaders(({ request }): any => {
+          const paginated = new URL(request.url).searchParams.get('paginated');
 
-        if (!paginated) {
-          return new HttpResponse(null, { status: 404 });
-        }
+          if (!paginated) {
+            return new HttpResponse(null, { status: 404 });
+          }
 
-        return HttpResponse.json({
-          data: [
-            {
-              external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
-              object: 'oauth_access_token',
-              token: '<token>',
-              provider: 'oauth_google',
-              public_metadata: {},
-              label: null,
-              scopes: ['email', 'profile'],
-            },
-          ],
-          total_count: 1,
-        });
-      }),
+          return HttpResponse.json({
+            data: [
+              {
+                external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
+                object: 'oauth_access_token',
+                token: '<token>',
+                provider: 'oauth_google',
+                public_metadata: {},
+                label: null,
+                scopes: ['email', 'profile'],
+              },
+            ],
+            total_count: 1,
+          });
+        }),
+      ),
     );
 
     const { data } = await apiClient.users.getUserOauthAccessToken('user_deadbeef', 'oauth_google');

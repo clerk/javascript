@@ -5,6 +5,7 @@ import { handshake, signedIn, signedOut } from '../authStatus';
 describe('signed-in', () => {
   it('does not include debug headers', () => {
     const authObject = signedIn({} as any, {} as any, undefined, 'token');
+
     expect(authObject.headers.get('x-clerk-auth-status')).toBeNull();
     expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
     expect(authObject.headers.get('x-clerk-auth-message')).toBeNull();
@@ -13,6 +14,7 @@ describe('signed-in', () => {
   it('authObject returned by toAuth() returns the token passed', async () => {
     const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
     const token = await signedInAuthObject.getToken();
+
     expect(token).toBe('token');
   });
 });

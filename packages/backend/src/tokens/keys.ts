@@ -1,4 +1,10 @@
-import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import {
+  API_URL,
+  API_VERSION,
+  MAX_CACHE_LAST_UPDATED_AT_SECONDS,
+  SUPPORTED_BAPI_VERSION,
+  USER_AGENT,
+} from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -162,11 +168,12 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
-  // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-  const response = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(url.href, {
+  const response = await runtime.fetch(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
+      'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
     },
   });
 

@@ -33,9 +33,13 @@ type Runtime = {
 //
 // https://github.com/supabase/supabase/issues/4417
 const globalFetch = fetch.bind(globalThis);
+
 export const runtime: Runtime = {
   crypto,
-  fetch: globalFetch,
+  get fetch() {
+    // We need to use the globalFetch for Cloudflare Workers but the fetch for testing
+    return process.env.NODE_ENV === 'test' ? fetch : globalFetch;
+  },
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,
   FormData: globalThis.FormData,
