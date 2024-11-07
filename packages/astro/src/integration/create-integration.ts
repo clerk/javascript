@@ -111,6 +111,9 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { runInjectionScript, swapDocument } from "${buildImportPath}";
 
+            // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
+            // Importing it directly from astro:transitions/client breaks custom client-side routing
+            // even when View Transitions is disabled.
             const transitionEnabledOnThisPage = () => {
               return !!document.querySelector('[name="astro-view-transitions-enabled"]');
             }
