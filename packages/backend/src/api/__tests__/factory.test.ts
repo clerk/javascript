@@ -174,8 +174,7 @@ describe('api.client', () => {
     server.use(
       http.get(
         'https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google',
-        // @ts-expect-error FIXME: type this correctly
-        validateHeaders(({ request }) => {
+        validateHeaders(({ request }): any => {
           const paginated = new URL(request.url).searchParams.get('paginated');
 
           if (!paginated) {
