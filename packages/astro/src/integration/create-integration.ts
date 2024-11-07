@@ -110,9 +110,14 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { runInjectionScript, swapDocument } from "${buildImportPath}";
-            import { navigate, transitionEnabledOnThisPage } from "astro:transitions/client";
+
+            const transitionEnabledOnThisPage = () => {
+              return !!document.querySelector('[name="astro-view-transitions-enabled"]');
+            }
 
             if (transitionEnabledOnThisPage()) {
+              const { navigate, swapFunctions } = await import('astro:transitions/client');
+
               document.addEventListener('astro:before-swap', (e) => {
                 const clerkComponents = document.querySelector('#clerk-components');
                 // Keep the div element added by Clerk
@@ -121,7 +126,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                   e.newDocument.body.appendChild(clonedEl);
                 }
 
-                e.swap = () => swapDocument(e.newDocument);
+                e.swap = () => swapDocument(swapFunctions, e.newDocument);
               });
 
               document.addEventListener('astro:page-load', async (e) => {

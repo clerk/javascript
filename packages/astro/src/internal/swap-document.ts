@@ -1,8 +1,8 @@
-// eslint-disable-next-line import/no-unresolved
-import { swapFunctions } from 'astro:transitions/client';
-
 const PERSIST_ATTR = 'data-astro-transition-persist';
 const EMOTION_ATTR = 'data-emotion';
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type SwapFunctions = typeof import('astro:transitions/client').swapFunctions;
 
 /**
  * @internal
@@ -11,7 +11,7 @@ const EMOTION_ATTR = 'data-emotion';
  *
  * See https://docs.astro.build/en/guides/view-transitions/#building-a-custom-swap-function
  */
-export function swapDocument(doc: Document) {
+export function swapDocument(swapFunctions: SwapFunctions, doc: Document) {
   swapFunctions.deselectScripts(doc);
   swapFunctions.swapRootAttributes(doc);
 
