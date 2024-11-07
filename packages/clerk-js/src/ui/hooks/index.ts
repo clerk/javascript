@@ -1,5 +1,4 @@
 export * from './useDelayedVisibility';
-export * from './useSaml';
 export * from './useWindowEventListener';
 export * from './useEmailLink';
 export * from './useClipboard';
