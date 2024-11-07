@@ -136,8 +136,8 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "react": "^18 || ^19.0.0-0",
+    "react-dom": "^18 || ^19.0.0-0"
   },
   "peerDependenciesMeta": {
     "react": {
