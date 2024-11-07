@@ -35,6 +35,7 @@ if (typeof window !== 'undefined') {
 
   global.__PKG_NAME__ = '';
   global.__PKG_VERSION__ = '';
+  global.BUILD_ENABLE_NEW_COMPONENTS = '';
 
   //@ts-expect-error
   global.IntersectionObserver = class IntersectionObserver {
