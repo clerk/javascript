@@ -2,13 +2,9 @@ name: CI
 
 on:
   workflow_dispatch:
-    inputs:
-      run_integration_tests:
-        description: 'Run integration tests'
-        type: boolean
-        default: false
   merge_group:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize]
     branches:
       - main
       - release/v4
@@ -18,8 +14,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Prevents PRs from forks from accessing secrets by default
+  # so that they can’t exfiltrate secrets and use them for malicious purposes
+  check-user-permissions:
+    name: "Check user permissions"
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+
+    steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
+      - name: Check Secret Access
+        run: |
+          if [[ -z "${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}" ]]; then
+            echo "No access to required secrets. A maintainer must re-run the CI."
+            exit 1
+          fi
+
   formatting-linting:
     name: Formatting, linting & changeset checks
+    needs: check-user-permissions
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -159,23 +186,6 @@ jobs:
             next-version: '15'
 
     steps:
-      # Skip integration tests from fork PRs to prevent secret exfiltration
-      - name: Get User Permission
-        id: checkAccess
-        uses: actions-cool/check-user-permission@v2
-        with:
-          require: write
-          username: ${{ github.triggering_actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check User Permission
-        if: steps.checkAccess.outputs.require-result == 'false'
-        run: |
-          echo "${{ github.triggering_actor }} does not have permissions on this repo."
-          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
-          echo "Job originally triggered by ${{ github.actor }}"
-          exit 1
-
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
@@ -183,13 +193,6 @@ jobs:
           show-progress: false
           # We must first verify the user permissions before checking out PR code
           ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Check Secret Access
-        run: |
-          if [[ -z "${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}" ]]; then
-            echo "No access to required secrets. A maintainer must re-run the CI."
-            exit 1
-          fi
 
       - name: Setup
         id: config
