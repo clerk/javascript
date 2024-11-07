@@ -210,7 +210,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata, legalAccepted: legalAccepted });
+    await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
 
     const { message } = this.verifications.web3Wallet;
