@@ -39,7 +39,7 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
   return (
     <FormLabel
       elementDescriptor={descriptors.formFieldCheckboxLabel}
-      htmlFor={inputProps.itemID}
+      htmlFor={inputProps.id}
       isDisabled={inputProps.isDisabled}
       sx={t => ({
         paddingLeft: t.space.$1x5,
