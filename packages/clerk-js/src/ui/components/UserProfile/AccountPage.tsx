@@ -25,8 +25,9 @@ export const AccountPage = withCardStateProvider(() => {
 
   const shouldAllowIdentificationCreation =
     !showEnterpriseAccounts ||
-    !user?.samlAccounts?.some(
-      samlAccount => samlAccount.active && samlAccount.samlConnection?.disableAdditionalIdentifications,
+    !user.enterpriseAccounts.some(
+      enterpriseAccount =>
+        enterpriseAccount.active && enterpriseAccount.enterpriseConnection?.disableAdditionalIdentifications,
     );
 
   return (
