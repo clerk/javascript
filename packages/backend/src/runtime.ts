@@ -32,10 +32,13 @@ type Runtime = {
 // The globalThis object is supported for Node >= 12.0.
 //
 // https://github.com/supabase/supabase/issues/4417
+const globalFetch = fetch.bind(globalThis);
+
 export const runtime: Runtime = {
   crypto,
   get fetch() {
-    return process.env.NODE_ENV === 'test' ? fetch : fetch.bind(globalThis);
+    // We need to use the globalFetch for Cloudflare Workers but the fetch for testing
+    return process.env.NODE_ENV === 'test' ? fetch : globalFetch;
   },
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,
