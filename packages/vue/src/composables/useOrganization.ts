@@ -30,7 +30,6 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  * along with loading states and membership information.
  *
  * @example
- * A simple example:
  *
  * <script setup>
  * import { useOrganization } from '@clerk/vue'

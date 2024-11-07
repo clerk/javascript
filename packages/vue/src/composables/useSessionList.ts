@@ -16,7 +16,6 @@ type UseSessionList = () => ToComputedRefs<UseSessionListReturn>;
  * registered on the client device.
  *
  * @example
- * A simple example:
  *
  * <script setup>
  * import { useSessionList } from '@clerk/vue'

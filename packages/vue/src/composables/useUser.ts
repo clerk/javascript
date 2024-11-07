@@ -16,7 +16,6 @@ type UseUser = () => ToComputedRefs<UseUserReturn>;
  * Returns the current user's [`User`](https://clerk.com/docs/references/javascript/user/user) object along with loading states.
  *
  * @example
- * A simple example:
  *
  * <script setup>
  * import { useUser } from '@clerk/vue'

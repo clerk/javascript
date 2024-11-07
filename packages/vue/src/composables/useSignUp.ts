@@ -17,7 +17,6 @@ type UseSignUp = () => ToComputedRefs<UseSignUpReturn>;
  * methods and state for managing the sign-up flow.
  *
  * @example
- * A simple example:
  *
  * <script setup>
  * import { useSignUp } from '@clerk/vue'

@@ -17,7 +17,6 @@ type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
  * methods and state for managing the sign-in flow.
  *
  * @example
- * A simple example:
  *
  * <script setup>
  * import { useSignIn } from '@clerk/vue'
