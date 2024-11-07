@@ -4,7 +4,7 @@ import { ref } from 'vue';
 
 import type { MenuItemWithoutMountHandlers } from '../types';
 
-export const useCustomMenuItems = () => {
+export const useUserButtonCustomMenuItems = () => {
   const customMenuItems = ref<CustomMenuItem[]>([]);
   const customMenuItemsPortals = ref(new Map<HTMLDivElement, Slot>());
   const reorderItemsLabels = ['manageAccount', 'signOut'];
