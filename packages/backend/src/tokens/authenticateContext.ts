@@ -23,7 +23,6 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   sessionTokenInCookie: string | undefined;
   refreshTokenInCookie: string | undefined;
   clientUat: number;
-  suffixedCookies: boolean;
   // handshake-related values
   devBrowserToken: string | undefined;
   handshakeToken: string | undefined;
@@ -68,78 +67,7 @@ class AuthenticateContext {
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
 
-  private initPublishableKeyValues(options: AuthenticateRequestOptions) {
-    assertValidPublishableKey(options.publishableKey);
-    this.publishableKey = options.publishableKey;
-
-    const pk = parsePublishableKey(this.publishableKey, {
-      fatal: true,
-      proxyUrl: options.proxyUrl,
-      domain: options.domain,
-    });
-    this.instanceType = pk.instanceType;
-    this.frontendApi = pk.frontendApi;
-  }
-
-  private initHeaderValues() {
-    this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
-    this.origin = this.getHeader(constants.Headers.Origin);
-    this.host = this.getHeader(constants.Headers.Host);
-    this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
-    this.forwardedProto =
-      this.getHeader(constants.Headers.CloudFrontForwardedProto) || this.getHeader(constants.Headers.ForwardedProto);
-    this.referrer = this.getHeader(constants.Headers.Referrer);
-    this.userAgent = this.getHeader(constants.Headers.UserAgent);
-    this.secFetchDest = this.getHeader(constants.Headers.SecFetchDest);
-    this.accept = this.getHeader(constants.Headers.Accept);
-  }
-
-  private initCookieValues() {
-    // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
-    this.suffixedCookies = this.shouldUseSuffixed();
-    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
-    this.refreshTokenInCookie = this.getSuffixedCookie(constants.Cookies.Refresh);
-    this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
-  }
-
-  private initHandshakeValues() {
-    this.devBrowserToken =
-      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
-      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.DevBrowser);
-    // Using getCookie since we don't suffix the handshake token cookie
-    this.handshakeToken =
-      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
-    this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
-  }
-
-  private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
-    return authValue?.replace('Bearer ', '');
-  }
-
-  private getQueryParam(name: string) {
-    return this.clerkRequest.clerkUrl.searchParams.get(name);
-  }
-
-  private getHeader(name: string) {
-    return this.clerkRequest.headers.get(name) || undefined;
-  }
-
-  private getCookie(name: string) {
-    return this.clerkRequest.cookies.get(name) || undefined;
-  }
-
-  private getSuffixedCookie(name: string) {
-    return this.getCookie(getSuffixedCookieName(name, this.cookieSuffix)) || undefined;
-  }
-
-  private getSuffixedOrUnSuffixedCookie(cookieName: string) {
-    if (this.suffixedCookies) {
-      return this.getSuffixedCookie(cookieName);
-    }
-    return this.getCookie(cookieName);
-  }
-
-  private shouldUseSuffixed(): boolean {
+  public usesSuffixedCookies(): boolean {
     const suffixedClientUat = this.getSuffixedCookie(constants.Cookies.ClientUat);
     const clientUat = this.getCookie(constants.Cookies.ClientUat);
     const suffixedSession = this.getSuffixedCookie(constants.Cookies.Session) || '';
@@ -158,7 +86,7 @@ class AuthenticateContext {
       return true;
     }
 
-    // If there is no suffixed cookies use un-suffixed
+    // If there are no suffixed cookies use un-suffixed
     if (!suffixedClientUat && !suffixedSession) {
       return false;
     }
@@ -226,6 +154,76 @@ class AuthenticateContext {
     }
 
     return true;
+  }
+
+  private initPublishableKeyValues(options: AuthenticateRequestOptions) {
+    assertValidPublishableKey(options.publishableKey);
+    this.publishableKey = options.publishableKey;
+
+    const pk = parsePublishableKey(this.publishableKey, {
+      fatal: true,
+      proxyUrl: options.proxyUrl,
+      domain: options.domain,
+    });
+    this.instanceType = pk.instanceType;
+    this.frontendApi = pk.frontendApi;
+  }
+
+  private initHeaderValues() {
+    this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.origin = this.getHeader(constants.Headers.Origin);
+    this.host = this.getHeader(constants.Headers.Host);
+    this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
+    this.forwardedProto =
+      this.getHeader(constants.Headers.CloudFrontForwardedProto) || this.getHeader(constants.Headers.ForwardedProto);
+    this.referrer = this.getHeader(constants.Headers.Referrer);
+    this.userAgent = this.getHeader(constants.Headers.UserAgent);
+    this.secFetchDest = this.getHeader(constants.Headers.SecFetchDest);
+    this.accept = this.getHeader(constants.Headers.Accept);
+  }
+
+  private initCookieValues() {
+    // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
+    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
+    this.refreshTokenInCookie = this.getSuffixedCookie(constants.Cookies.Refresh);
+    this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
+  }
+
+  private initHandshakeValues() {
+    this.devBrowserToken =
+      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
+      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.DevBrowser);
+    // Using getCookie since we don't suffix the handshake token cookie
+    this.handshakeToken =
+      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
+    this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
+  }
+
+  private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
+    return authValue?.replace('Bearer ', '');
+  }
+
+  private getQueryParam(name: string) {
+    return this.clerkRequest.clerkUrl.searchParams.get(name);
+  }
+
+  private getHeader(name: string) {
+    return this.clerkRequest.headers.get(name) || undefined;
+  }
+
+  private getCookie(name: string) {
+    return this.clerkRequest.cookies.get(name) || undefined;
+  }
+
+  private getSuffixedCookie(name: string) {
+    return this.getCookie(getSuffixedCookieName(name, this.cookieSuffix)) || undefined;
+  }
+
+  private getSuffixedOrUnSuffixedCookie(cookieName: string) {
+    if (this.usesSuffixedCookies()) {
+      return this.getSuffixedCookie(cookieName);
+    }
+    return this.getCookie(cookieName);
   }
 
   private tokenHasIssuer(token: string): boolean {
