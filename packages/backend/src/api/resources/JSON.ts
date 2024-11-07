@@ -12,6 +12,7 @@ export const ObjectType = {
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
+  EnterpriseAccount: 'enterprise_account',
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
@@ -103,6 +104,35 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
   verification: VerificationJSON | null;
+}
+
+export interface EnterpriseAccountJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.EnterpriseAccount;
+  provider: string;
+  protocol: string;
+  active: boolean;
+  email_address: string;
+  first_name: string | null;
+  last_name: string | null;
+  provider_user_id: string | null;
+  public_metadata?: Record<string, unknown> | null;
+  verification: VerificationJSON | null;
+  enterprise_connection: EnterpriseAccountConnectionJSON | null;
+}
+
+export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
+  provider: string;
+  protocol: string;
+  name: string;
+  domain: string;
+  active: boolean;
+  logo_public_url: string | null;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
