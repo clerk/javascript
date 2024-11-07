@@ -32,10 +32,11 @@ type Runtime = {
 // The globalThis object is supported for Node >= 12.0.
 //
 // https://github.com/supabase/supabase/issues/4417
-const globalFetch = fetch.bind(globalThis);
 export const runtime: Runtime = {
   crypto,
-  fetch: globalFetch,
+  get fetch() {
+    return process.env.NODE_ENV === 'test' ? fetch : fetch.bind(globalThis);
+  },
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,
   FormData: globalThis.FormData,

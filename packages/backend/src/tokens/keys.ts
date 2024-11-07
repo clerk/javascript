@@ -168,8 +168,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
-  // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-  const response = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(url.href, {
+  const response = await runtime.fetch(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,

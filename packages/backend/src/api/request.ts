@@ -87,8 +87,7 @@ export function buildRequest(options: BuildRequestOptions) {
     let res: Response | undefined;
     try {
       if (formData) {
-        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
+        res = await runtime.fetch(finalUrl.href, {
           method,
           headers,
           body: formData,
@@ -100,8 +99,7 @@ export function buildRequest(options: BuildRequestOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
+        res = await runtime.fetch(finalUrl.href, {
           method,
           headers,
           ...body,
