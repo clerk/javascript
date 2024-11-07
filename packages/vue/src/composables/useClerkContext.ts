@@ -7,7 +7,7 @@ export function useClerkContext() {
 
   if (!ctx) {
     throw new Error(
-      'This component/composable can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/components/clerk-provider',
+      'This component/composable can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/quickstarts/vue',
     );
   }
 
