@@ -1,4 +1,5 @@
 import type * as CSS from 'csstype';
+import type { EnterpriseProvider } from 'enterpriseAccount';
 
 import type {
   AlertId,
@@ -12,7 +13,6 @@ import type {
   UserPreviewId,
 } from './elementIds';
 import type { OAuthProvider } from './oauth';
-import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
 import type { Web3Provider } from './web3';
 
@@ -172,7 +172,7 @@ export type ElementsConfig = {
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
-  enterpriseButtonsProviderIcon: WithOptions<SamlIdpSlug, LoadingState>;
+  enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
   alternativeMethods: WithOptions;
   alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
