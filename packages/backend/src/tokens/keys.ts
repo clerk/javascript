@@ -1,4 +1,10 @@
-import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS, SUPPORTED_BAPI_VERSION } from '../constants';
+import {
+  API_URL,
+  API_VERSION,
+  MAX_CACHE_LAST_UPDATED_AT_SECONDS,
+  SUPPORTED_BAPI_VERSION,
+  USER_AGENT,
+} from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -168,6 +174,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
       Authorization: `Bearer ${key}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
     },
   });
 

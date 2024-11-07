@@ -12,14 +12,32 @@ export function validateHeaders(resolver: HttpResponseResolver): HttpResponseRes
     const { request } = input;
 
     if (!request.headers.get('Authorization')) {
-      return HttpResponse.json(null, { status: 401 });
+      return HttpResponse.json(
+        {
+          error: 'Unauthorized',
+          message: 'Missing Authorization header',
+        },
+        { status: 401 },
+      );
     }
     if (!request.headers.get('Clerk-API-Version')) {
-      return HttpResponse.json(null, { status: 400 });
+      return HttpResponse.json(
+        {
+          error: 'Bad request',
+          message: 'Missing Clerk-API-Version header',
+        },
+        { status: 400 },
+      );
     }
-    // if (!request.headers.get('User-Agent') || request.headers.get('User-Agent') !== '@clerk/backend@0.0.0-test') {
-    //   return HttpResponse.json(null, { status: 400 });
-    // }
+    if (!request.headers.get('User-Agent') || request.headers.get('User-Agent') !== '@clerk/backend@0.0.0-test') {
+      return HttpResponse.json(
+        {
+          error: 'Bad request',
+          message: 'Missing or invalid User-Agent header',
+        },
+        { status: 400 },
+      );
+    }
 
     return resolver(input);
   };
