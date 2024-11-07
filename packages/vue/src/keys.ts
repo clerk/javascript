@@ -4,11 +4,11 @@ import type { AddCustomMenuItemParams, AddUserProfileCustomPagesParams, VueClerk
 
 export const ClerkInjectionKey = Symbol('clerk') as InjectionKey<VueClerkInjectionKeyType>;
 
-export const UserButtonRootKey = Symbol('UserButtonRoot') as InjectionKey<{
+export const UserButtonInjectionKey = Symbol('UserButtonRoot') as InjectionKey<{
   addCustomMenuItem(params: AddCustomMenuItemParams): void;
   addCustomPage(params: AddUserProfileCustomPagesParams): void;
 }>;
 
-export const UserButtonMenuItemsKey = Symbol('UserButtonMenuItems') as InjectionKey<{
+export const UserButtonMenuItemsInjectionKey = Symbol('UserButtonMenuItems') as InjectionKey<{
   addCustomMenuItem(params: AddCustomMenuItemParams): void;
 }>;

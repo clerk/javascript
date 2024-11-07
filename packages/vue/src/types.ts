@@ -90,6 +90,11 @@ type ButtonActionProps<T extends string> =
 
 export type UserButtonActionProps = ButtonActionProps<'manageAccount' | 'signOut'>;
 
+export type UserButtonLinkProps = {
+  href: string;
+  label: string;
+};
+
 declare global {
   interface Window {
     Clerk: BrowserClerk;
