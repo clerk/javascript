@@ -470,17 +470,6 @@ export const bgBG: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Въведете вашата парола',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Влезте',
       actionText: 'Вече имате акаунт?',
@@ -514,6 +503,17 @@ export const bgBG: LocalizationResource = {
         subtitle: 'Върнете се към новоотворения таб, за да продължите',
         subtitleNewTab: 'Върнете се към предходния таб, за да продължите',
         title: 'Успешно потвърден имейл',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

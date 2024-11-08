@@ -479,18 +479,6 @@ export const ruRU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: 'Я согласен с {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
-        label__onlyTermsOfService: 'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }}',
-        label__termsOfServiceAndPrivacyPolicy:
-          'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }} и {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
-      },
-      continue: {
-        subtitle: 'Пожалуйста, прочитайте и примите условия, чтобы продолжить.',
-        title: 'Юридическое согласие',
-      },
-    },
     continue: {
       actionLink: 'Войти',
       actionText: 'Уже есть учетная запись?',
@@ -525,6 +513,18 @@ export const ruRU: LocalizationResource = {
         subtitle: 'Вернитесь на новую открытую вкладку, чтобы продолжить',
         subtitleNewTab: 'Вернитесь на предыдущую вкладку, чтобы продолжить',
         title: 'Почта верифицирована',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'Я согласен с {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
+        label__onlyTermsOfService: 'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Я согласен с {{ termsOfServiceLink || link("Условия обслуживания") }} и {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
+      },
+      continue: {
+        subtitle: 'Пожалуйста, прочитайте и примите условия, чтобы продолжить.',
+        title: 'Юридическое согласие',
       },
     },
     phoneCode: {

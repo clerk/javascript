@@ -471,17 +471,6 @@ export const trTR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Giriş yap',
       actionText: 'Hesabınız var mı?',
@@ -515,6 +504,17 @@ export const trTR: LocalizationResource = {
         subtitle: 'Devam etmek için yeni açılmış sekmeye dönün',
         subtitleNewTab: 'Devam etmek için önceki sekmeye dönün',
         title: 'E-posta adresiniz başarıyla doğrulandı',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

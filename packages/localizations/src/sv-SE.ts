@@ -472,17 +472,6 @@ export const svSE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Logga in',
       actionText: 'Har du redan ett konto?',
@@ -517,6 +506,17 @@ export const svSE: LocalizationResource = {
         subtitle: 'Återgå till den nyligen öppnade fliken för att fortsätta',
         subtitleNewTab: 'Återgå till föregående flik för att fortsätta',
         title: 'E-posten har verifierats',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

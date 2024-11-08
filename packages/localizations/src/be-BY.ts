@@ -473,17 +473,6 @@ export const beBY: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Увядзіце ваш пароль',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Увайсці',
       actionText: 'Ужо ёсць уліковы запіс?',
@@ -517,6 +506,17 @@ export const beBY: LocalizationResource = {
         subtitle: 'Вярніцеся на новую адкрытую ўкладку, каб працягнуць',
         subtitleNewTab: 'Вярніцеся на папярэднюю ўкладку, каб працягнуць',
         title: 'Пошта верыфікавана',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

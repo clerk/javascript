@@ -459,17 +459,6 @@ export const zhCN: LocalizationResource = {
   },
   signInEnterPasswordTitle: '输入您的密码',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: '登录',
       actionText: '已经有账户了？',
@@ -503,6 +492,17 @@ export const zhCN: LocalizationResource = {
         subtitle: '返回新打开的标签页继续',
         subtitleNewTab: '返回上一个标签页继续',
         title: '成功验证电子邮件',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

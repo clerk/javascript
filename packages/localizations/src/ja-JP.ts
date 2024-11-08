@@ -470,17 +470,6 @@ export const jaJP: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'パスワードを入力してください',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'サインイン',
       actionText: 'アカウントをお持ちですか？',
@@ -514,6 +503,17 @@ export const jaJP: LocalizationResource = {
         subtitle: '続行するために新しく開いたタブに戻ってください',
         subtitleNewTab: '続行するために前のタブに戻ってください',
         title: 'メールアドレスが正常に確認されました',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {
