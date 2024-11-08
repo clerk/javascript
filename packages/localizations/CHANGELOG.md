@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.6.0
+
+### Minor Changes
+
+- The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
+
+  Removed the `__experimental_` preffix.
+
+### Patch Changes
+
+- Adds German (de-DE) translations for experimental legal content ([#4503](https://github.com/clerk/javascript/pull/4503)) by [@feliche93](https://github.com/feliche93)
+
+- Updated dependencies [[`f7472e22877f62fc7f3c8d3efe409ff2276fb4a3`](https://github.com/clerk/javascript/commit/f7472e22877f62fc7f3c8d3efe409ff2276fb4a3), [`e199037b8f484abdeeb9fc24455a1b4b8c31c8dd`](https://github.com/clerk/javascript/commit/e199037b8f484abdeeb9fc24455a1b4b8c31c8dd), [`0e443ad7c76643420b50e5b169193e03f6ef79f9`](https://github.com/clerk/javascript/commit/0e443ad7c76643420b50e5b169193e03f6ef79f9), [`cc24c8145f1eea7fb91550f2c3e0bac3993e4320`](https://github.com/clerk/javascript/commit/cc24c8145f1eea7fb91550f2c3e0bac3993e4320)]:
+  - @clerk/types@4.31.0
+
 ## 3.5.0
 
 ### Minor Changes
