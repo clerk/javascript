@@ -466,17 +466,6 @@ export const thTH: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'ใส่รหัสผ่านของคุณ',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'เข้าสู่ระบบ',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
@@ -510,6 +499,17 @@ export const thTH: LocalizationResource = {
         subtitle: 'กลับไปยังแท็บที่เปิดใหม่เพื่อดำเนินการต่อ',
         subtitleNewTab: 'กลับไปยังแท็บก่อนหน้าเพื่อดำเนินการต่อ',
         title: 'ยืนยันอีเมลสำเร็จ',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

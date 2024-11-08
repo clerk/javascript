@@ -469,17 +469,6 @@ export const plPL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Wprowadź swoje hasło',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Zaloguj się',
       actionText: 'Masz już konto?',
@@ -513,6 +502,17 @@ export const plPL: LocalizationResource = {
         subtitle: 'Powróć do nowo otwartej karty, aby kontynuować',
         subtitleNewTab: 'Powróć do poprzedniej karty, aby kontynuować',
         title: 'Adres e-mail został pomyślnie zweryfikowany',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

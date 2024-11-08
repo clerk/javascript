@@ -121,6 +121,7 @@
   },
   "dependencies": {
     "@clerk/types": "4.30.0",
+    "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
@@ -132,6 +133,7 @@
     "@types/js-cookie": "3.0.6",
     "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
+    "esbuild": "0.20.2",
     "tsup": "*",
     "typescript": "*"
   },

@@ -473,17 +473,6 @@ export const frFR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: "S'identifier",
       actionText: 'Vous avez déjà un compte ?',
@@ -517,6 +506,17 @@ export const frFR: LocalizationResource = {
         subtitle: "Revenez à l'onglet nouvellement ouvert pour continuer",
         subtitleNewTab: "Revenir à l'onglet précédent pour continuer",
         title: 'Courriel vérifié avec succès',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

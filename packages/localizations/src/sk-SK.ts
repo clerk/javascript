@@ -468,17 +468,6 @@ export const skSK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Prihlásiť sa',
       actionText: 'Máte účet?',
@@ -512,6 +501,17 @@ export const skSK: LocalizationResource = {
         subtitle: 'Vráťte sa do novootvoreného okna pre pokračovanie',
         subtitleNewTab: 'Vráťte sa do predchádzajúceho okna pre pokračovanie',
         title: 'Email úspešne overený',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

@@ -71,7 +71,7 @@ function _SignUpContinue() {
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       validatePassword: true,
     }),
-    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+    legalAccepted: useFormControl('legalAccepted', '', {
       type: 'checkbox',
       label: '',
       defaultChecked: false,
@@ -171,11 +171,11 @@ function _SignUpContinue() {
 
   const headerTitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.title')
-    : localizationKeys('signUp.__experimental_legalConsent.continue.title');
+    : localizationKeys('signUp.legalConsent.continue.title');
 
   const headerSubtitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.subtitle')
-    : localizationKeys('signUp.__experimental_legalConsent.continue.subtitle');
+    : localizationKeys('signUp.legalConsent.continue.subtitle');
 
   return (
     <Flow.Part part='complete'>

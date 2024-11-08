@@ -33,21 +33,23 @@ export class UI {
     this.clerk = clerk;
     this.options = options;
 
-    // register components
-    this.register('SignIn', {
-      type: 'component',
-      load: () =>
-        import(/* webpackChunkName: "rebuild--sign-in" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({
-          default: SignIn,
-        })),
-    });
-    this.register('SignUp', {
-      type: 'component',
-      load: () =>
-        import(/* webpackChunkName: "rebuild--sign-up" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({
-          default: SignUp,
-        })),
-    });
+    if (BUILD_ENABLE_NEW_COMPONENTS) {
+      // register components
+      this.register('SignIn', {
+        type: 'component',
+        load: () =>
+          import(/* webpackChunkName: "rebuild--sign-in" */ '@clerk/ui/sign-in').then(({ SignIn }) => ({
+            default: SignIn,
+          })),
+      });
+      this.register('SignUp', {
+        type: 'component',
+        load: () =>
+          import(/* webpackChunkName: "rebuild--sign-up" */ '@clerk/ui/sign-up').then(({ SignUp }) => ({
+            default: SignUp,
+          })),
+      });
+    }
   }
 
   // Mount a component from the registry

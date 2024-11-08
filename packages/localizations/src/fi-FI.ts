@@ -471,17 +471,6 @@ export const fiFI: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
@@ -515,6 +504,17 @@ export const fiFI: LocalizationResource = {
         subtitle: 'Palaa alkuperäiseen välilehteen jatkaaksesi',
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         title: 'Rekisteröitynyt toiseen välilehteen',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {
