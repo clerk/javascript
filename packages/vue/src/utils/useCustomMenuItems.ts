@@ -35,22 +35,27 @@ export const useUserButtonCustomMenuItems = () => {
       },
     };
 
-    // Action
-    if (onClick || open) {
+    if (onClick) {
+      // Action
       customMenuItems.value.push({
         ...baseItem,
         onClick,
         open,
       });
-      return;
-    }
-
-    // Link
-    if (href) {
+    } else if (open) {
+      // Action with custom page
+      customMenuItems.value.push({
+        ...baseItem,
+        open: open.startsWith('/') ? open : `/${open}`,
+      });
+    } else if (href) {
+      // Link
       customMenuItems.value.push({
         ...baseItem,
         href,
       });
+    } else {
+      throw new Error('Invalid custom menu item');
     }
   }
 
