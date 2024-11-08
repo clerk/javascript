@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -40,9 +40,9 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/backend": "1.15.7",
-    "@clerk/shared": "2.11.5",
-    "@clerk/types": "4.30.0",
+    "@clerk/backend": "1.16.0",
+    "@clerk/shared": "2.12.0",
+    "@clerk/types": "4.31.0",
     "cookies": "0.8.0",
     "fastify-plugin": "^5.0.1"
   },
