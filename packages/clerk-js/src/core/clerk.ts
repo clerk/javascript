@@ -340,12 +340,14 @@ export class Clerk implements ClerkInterface {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
 
-    if (clerkIsLoaded(this)) {
-      this.__experimental_ui = new UI({
-        router: this.#options.__experimental_router,
-        clerk: this,
-        options: this.#options,
-      });
+    if (BUILD_ENABLE_NEW_COMPONENTS) {
+      if (clerkIsLoaded(this)) {
+        this.__experimental_ui = new UI({
+          router: this.#options.__experimental_router,
+          clerk: this,
+          options: this.#options,
+        });
+      }
     }
   };
 
