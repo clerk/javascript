@@ -499,6 +499,7 @@ export default function SignInPage() {
             <CustomSubmit>Update Password</CustomSubmit>
           </div>
         </SignIn.Step>
+        <SignIn.Step name='sso-callback'></SignIn.Step>
       </div>
     </SignIn.Root>
   );
