@@ -6,6 +6,8 @@ import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { SignInChooseSession, type SignInChooseSessionProps } from './choose-session';
 import { SignInChooseStrategy, type SignInChooseStrategyProps, SignInForgotPassword } from './choose-strategy';
 import { SignInResetPassword, type SignInResetPasswordProps } from './reset-password';
+import type { SignInSSOCallbackProps } from './sso-callback';
+import { SignInSSOCallback } from './sso-callback';
 import { SignInStart, type SignInStartProps } from './start';
 import { SignInVerifications, type SignInVerificationsProps } from './verifications';
 
@@ -16,6 +18,7 @@ export const SIGN_IN_STEPS = {
   'choose-session': 'choose-session',
   'forgot-password': 'forgot-password',
   'reset-password': 'reset-password',
+  'sso-callback': 'sso-callback',
 } as const;
 
 export type TSignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
@@ -26,7 +29,8 @@ export type SignInStepProps =
   | StepWithProps<'verifications', SignInVerificationsProps>
   | StepWithProps<'choose-strategy' | 'forgot-password', SignInChooseStrategyProps>
   | StepWithProps<'reset-password', SignInResetPasswordProps>
-  | StepWithProps<'choose-session', SignInChooseSessionProps>;
+  | StepWithProps<'choose-session', SignInChooseSessionProps>
+  | StepWithProps<'sso-callback', SignInSSOCallbackProps>;
 
 /**
  * Render different steps of the sign-in flow. Initially the `'start'` step is rendered. Once a sign-in attempt has been created, `'verifications'` will be displayed. If during that verification step the user decides to choose a different method of signing in or verifying, the `'choose-strategy'` step will be displayed.
@@ -63,6 +67,8 @@ export function SignInStep(props: SignInStepProps) {
       return <SignInResetPassword {...props} />;
     case SIGN_IN_STEPS['choose-session']:
       return <SignInChooseSession {...props} />;
+    case SIGN_IN_STEPS['sso-callback']:
+      return <SignInSSOCallback {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use: ${Object.keys(SIGN_IN_STEPS).join(',')}.`);
   }
