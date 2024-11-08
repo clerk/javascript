@@ -77,7 +77,7 @@ You can now start using Clerk's components. Here's a basic example showing a hea
 
 ```vue
 <script setup>
-import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk';
+import { SignedIn, SignedOut, UserButton } from '@clerk/vue';
 </script>
 
 <template>
@@ -87,7 +87,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk';
       <UserButton />
     </SignedIn>
     <SignedOut>
-      <SignInButton />
+      <a href="/sign-in">Sign in</a>
     </SignedOut>
   </header>
 </template>
