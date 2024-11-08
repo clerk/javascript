@@ -41,6 +41,7 @@ export interface DisplayConfigJSON {
   terms_url: string;
   privacy_policy_url: string;
   waitlist_url: string;
+  after_join_waitlist_url: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -84,4 +85,5 @@ export interface DisplayConfigResource extends ClerkResource {
   termsUrl: string;
   privacyPolicyUrl: string;
   waitlistUrl: string;
+  afterJoinWaitlistUrl: string;
 }
