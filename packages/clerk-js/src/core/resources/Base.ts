@@ -37,7 +37,7 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
-      if (!isValidBrowserOnline()) {
+      if (!isValidBrowserOnline() && !this.isExpo()) {
         console.warn(e);
         return null;
       } else {
@@ -156,5 +156,9 @@ export abstract class BaseResource {
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
     const { rotatingTokenNonce } = params || {};
     return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
+  }
+
+  private static isExpo(): boolean {
+    return BaseResource.clerk?.sdkMetadata?.name === '@clerk/clerk-expo';
   }
 }
