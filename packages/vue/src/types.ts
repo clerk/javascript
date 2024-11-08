@@ -58,6 +58,7 @@ export type AddCustomPagesParams = {
 };
 
 export type AddUserProfileCustomPagesParams = Without<AddCustomPagesParams, 'reorderItemsLabels'>;
+export type AddOrganizationProfileCustomPagesParams = Without<AddCustomPagesParams, 'reorderItemsLabels'>;
 
 type PageProps<T extends string> =
   | {
@@ -70,6 +71,11 @@ type PageProps<T extends string> =
     };
 
 export type UserProfilePageProps = PageProps<'account' | 'security'>;
+
+export type UserProfileLinkProps = {
+  url: string;
+  label: string;
+};
 
 type ButtonActionProps<T extends string> =
   | {
