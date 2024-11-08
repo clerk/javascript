@@ -10,11 +10,11 @@ import type {
 export const ClerkInjectionKey = Symbol('clerk') as InjectionKey<VueClerkInjectionKeyType>;
 
 export const UserButtonInjectionKey = Symbol('UserButtonRoot') as InjectionKey<{
-  addCustomMenuItem?: (params: AddCustomMenuItemParams) => void;
+  addCustomMenuItem(params: AddCustomMenuItemParams): void;
 }>;
 
 export const UserButtonMenuItemsInjectionKey = Symbol('UserButtonMenuItems') as InjectionKey<{
-  addCustomMenuItem?: (params: AddCustomMenuItemParams) => void;
+  addCustomMenuItem(params: AddCustomMenuItemParams): void;
 }>;
 
 export const UserProfileInjectionKey = Symbol('UserProfile') as InjectionKey<{

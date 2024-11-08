@@ -116,7 +116,7 @@ const UserProfilePage = defineComponent((props: UserProfilePageProps, { slots })
   }
 
   ctx.addCustomPage({
-    customPage: props,
+    props,
     defaultSlot: slots.default,
     iconSlot: slots.labelIcon,
   });
@@ -131,7 +131,7 @@ const UserProfileLink = defineComponent((props: UserProfileLinkProps, { slots })
   }
 
   ctx.addCustomPage({
-    customPage: props,
+    props,
     defaultSlot: slots.default,
     iconSlot: slots.labelIcon,
   });
@@ -194,33 +194,41 @@ const MenuItems = defineComponent((_, { slots }) => {
   return () => slots.default?.();
 });
 
-const MenuAction = defineComponent((props: UserButtonActionProps, { slots }) => {
-  const ctx = inject(UserButtonMenuItemsInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const MenuAction = defineComponent(
+  (props: UserButtonActionProps, { slots }) => {
+    const ctx = inject(UserButtonMenuItemsInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomMenuItem?.({
-    customMenuItem: props,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomMenuItem({
+      props,
+      iconSlot: slots.labelIcon,
+      component: MenuAction,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'MenuAction' },
+);
 
-const MenuLink = defineComponent((props: UserButtonLinkProps, { slots }) => {
-  const ctx = inject(UserButtonMenuItemsInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const MenuLink = defineComponent(
+  (props: UserButtonLinkProps, { slots }) => {
+    const ctx = inject(UserButtonMenuItemsInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomMenuItem?.({
-    customMenuItem: props,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomMenuItem({
+      props,
+      iconSlot: slots.labelIcon,
+      component: MenuLink,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'MenuLink' },
+);
 
 export const UserButton = Object.assign(_UserButton, {
   MenuItems,
@@ -331,7 +339,7 @@ const OrganizationProfilePage = defineComponent((props: UserProfilePageProps, { 
   }
 
   ctx.addCustomPage({
-    customPage: props,
+    props,
     defaultSlot: slots.default,
     iconSlot: slots.labelIcon,
   });
@@ -346,7 +354,7 @@ const OrganizationProfileLink = defineComponent((props: UserProfileLinkProps, { 
   }
 
   ctx.addCustomPage({
-    customPage: props,
+    props,
     defaultSlot: slots.default,
     iconSlot: slots.labelIcon,
   });

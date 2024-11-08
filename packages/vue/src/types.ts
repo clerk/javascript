@@ -12,7 +12,7 @@ import type {
   UserResource,
   Without,
 } from '@clerk/types';
-import type { ComputedRef, ShallowRef, Slot } from 'vue';
+import type { Component, ComputedRef, ShallowRef, Slot } from 'vue';
 
 export interface VueClerkInjectionKeyType {
   clerk: ShallowRef<Clerk | null>;
@@ -51,12 +51,13 @@ export interface CustomPortalsRendererProps {
 export type CustomItemOrPageWithoutHandler<T> = Without<T, 'mount' | 'unmount' | 'mountIcon' | 'unmountIcon'>;
 
 export type AddCustomMenuItemParams = {
-  customMenuItem: CustomItemOrPageWithoutHandler<CustomMenuItem>;
+  props: CustomItemOrPageWithoutHandler<CustomMenuItem>;
   iconSlot?: Slot;
+  component: Component;
 };
 
 export type AddCustomPagesParams = {
-  customPage: CustomItemOrPageWithoutHandler<CustomPage>;
+  props: CustomItemOrPageWithoutHandler<CustomPage>;
   reorderItemsLabels: string[];
   defaultSlot?: Slot;
   iconSlot?: Slot;

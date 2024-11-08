@@ -44,8 +44,8 @@ export const useCustomPages = () => {
   const customPagesPortals = ref(new Map<HTMLDivElement, Slot>());
 
   const addCustomPage = (params: AddCustomPagesParams) => {
-    const { reorderItemsLabels, customPage, defaultSlot, iconSlot } = params;
-    const { label, url } = customPage;
+    const { reorderItemsLabels, props, defaultSlot, iconSlot } = params;
+    const { label, url } = props;
 
     if (reorderItemsLabels.includes(label)) {
       customPages.value.push({ label });
