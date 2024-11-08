@@ -11,7 +11,7 @@ import {
   mockRsaJwk,
   mockRsaJwkKid,
 } from '../../fixtures';
-import { server } from '../../mock-server';
+import { server, validateHeaders } from '../../mock-server';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
 
 describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
@@ -48,9 +48,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('loads JWKS from Backend API when secretKey is provided', async () => {
     server.use(
-      http.get('https://api.clerk.com/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
     );
     const jwk = await loadClerkJWKFromRemote({
       secretKey: 'sk_test_deadbeef',
@@ -63,9 +66,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('loads JWKS from Backend API using the provided apiUrl', async () => {
     server.use(
-      http.get('https://api.clerk.test/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
     );
 
     const jwk = await loadClerkJWKFromRemote({
@@ -80,9 +86,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('caches JWK by kid', async () => {
     server.use(
-      http.get('https://api.clerk.com/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
     );
 
     let jwk = await loadClerkJWKFromRemote({
@@ -100,9 +109,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('retries five times with exponential back-off policy to fetch JWKS before it fails', async () => {
     server.use(
-      http.get('https://api.clerk.com/v1/jwks', () => {
-        return HttpResponse.json({}, { status: 503 });
-      }),
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json({}, { status: 503 });
+        }),
+      ),
     );
 
     await expect(async () => {
@@ -127,9 +139,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('throws an error when no JWK matches the provided kid', async () => {
     server.use(
-      http.get('https://api.clerk.com/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
     );
 
     const kid = 'ins_whatever';
@@ -146,9 +161,12 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
 
   it('cache TTLs do not conflict', async () => {
     server.use(
-      http.get('https://api.clerk.com/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
     );
 
     let jwk = await loadClerkJWKFromRemote({
