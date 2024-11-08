@@ -43,6 +43,11 @@ export interface BrowserClerk extends HeadlessBrowserClerk {
   components: any;
 }
 
+export interface CustomPortalsRendererProps {
+  customPagesPortals?: Map<HTMLDivElement, Slot>;
+  customMenuItemsPortals?: Map<HTMLDivElement, Slot>;
+}
+
 export type CustomItemOrPageWithoutHandler<T> = Without<T, 'mount' | 'unmount' | 'mountIcon' | 'unmountIcon'>;
 
 export type AddCustomMenuItemParams = {
