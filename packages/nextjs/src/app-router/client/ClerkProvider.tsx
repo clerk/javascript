@@ -1,7 +1,5 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import type { ClerkHostRouter } from '@clerk/shared/router';
-import { ClerkHostRouterContext } from '@clerk/shared/router';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
@@ -25,40 +23,9 @@ declare global {
   }
 }
 
-// The version that Next added support for the window.history.pushState and replaceState APIs.
-// ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
-
-/**
- * Clerk router integration with Next.js's router.
- */
-const useNextRouter = (): ClerkHostRouter => {
-  const router = useRouter();
-
-  // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
-  // preserve internal state between steps.
-  const canUseWindowHistoryAPIs =
-    typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
-
-  return {
-    mode: 'path',
-    name: 'NextRouter',
-    push: (path: string) => router.push(path),
-    replace: (path: string) =>
-      canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
-    shallowPush(path: string) {
-      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
-    },
-    pathname: () => (typeof window !== 'undefined' ? window.location.pathname : ''),
-    searchParams: () =>
-      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams(),
-  };
-};
-
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
-  const clerkRouter = useNextRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
@@ -119,7 +86,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    __experimental_router: clerkRouter,
     routerPush: push,
     routerReplace: replace,
   });
@@ -128,7 +94,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <ClerkJSScript router='app' />
-        <ClerkHostRouterContext.Provider value={clerkRouter}>{children}</ClerkHostRouterContext.Provider>
+        {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );

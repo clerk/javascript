@@ -80,8 +80,8 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
       {
         signInForceRedirectUrl: ClerkJSNavigationEvent.complete,
         signInFallbackRedirectUrl: ClerkJSNavigationEvent.complete,
-        signUpForceRedirectUrl: ClerkJSNavigationEvent.signUp,
-        signUpFallbackRedirectUrl: ClerkJSNavigationEvent.signUp,
+        signUpForceRedirectUrl: ClerkJSNavigationEvent.complete,
+        signUpFallbackRedirectUrl: ClerkJSNavigationEvent.complete,
         continueSignUpUrl: ClerkJSNavigationEvent.continue,
         firstFactorUrl: ClerkJSNavigationEvent.signIn,
         resetPasswordUrl: ClerkJSNavigationEvent.resetPassword,
