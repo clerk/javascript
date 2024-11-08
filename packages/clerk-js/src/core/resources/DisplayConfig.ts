@@ -47,6 +47,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   termsUrl!: string;
   privacyPolicyUrl!: string;
   waitlistUrl!: string;
+  afterJoinWaitlistUrl!: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -93,6 +94,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.termsUrl = data.terms_url;
     this.privacyPolicyUrl = data.privacy_policy_url;
     this.waitlistUrl = data.waitlist_url;
+    this.afterJoinWaitlistUrl = data.after_join_waitlist_url;
     return this;
   }
 }
