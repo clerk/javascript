@@ -1,17 +1,23 @@
-import type { CustomPage, Without } from '@clerk/types';
-import { ref, type Slot } from 'vue';
+import { logErrorInDevMode } from '@clerk/shared/utils';
+import type { CustomPage } from '@clerk/types';
+import type { Component, Slot } from 'vue';
+import { ref } from 'vue';
 
-import type { AddCustomPagesParams, AddUserProfileCustomPagesParams } from '../types';
+import { UserProfileLink, UserProfilePage } from '../components/uiComponents';
+import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
+import type { AddCustomPagesParams } from '../types';
+import { isThatComponent } from './componentValidation';
 
 export const useUserProfileCustomPages = () => {
-  const { customPages, customPagesPortals, addCustomPage } = useCustomPages();
-  const reorderItemsLabels = ['account', 'security'];
+  const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
+    reorderItemsLabels: ['account', 'security'],
+    PageComponent: UserProfilePage,
+    LinkComponent: UserProfileLink,
+    componentName: 'UserProfile',
+  });
 
-  const addUserProfileCustomPage = (params: AddUserProfileCustomPagesParams) => {
-    return addCustomPage({
-      reorderItemsLabels,
-      ...params,
-    });
+  const addUserProfileCustomPage = (params: AddCustomPagesParams) => {
+    return addCustomPage(params);
   };
 
   return {
@@ -22,14 +28,15 @@ export const useUserProfileCustomPages = () => {
 };
 
 export const useOrganizationProfileCustomPages = () => {
-  const { customPages, customPagesPortals, addCustomPage } = useCustomPages();
-  const reorderItemsLabels = ['general', 'members'];
+  const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
+    reorderItemsLabels: ['general', 'members'],
+    PageComponent: UserProfilePage,
+    LinkComponent: UserProfileLink,
+    componentName: 'OrganizationProfile',
+  });
 
-  const addOrganizationProfileCustomPage = (params: Without<AddCustomPagesParams, 'reorderItemsLabels'>) => {
-    return addCustomPage({
-      reorderItemsLabels,
-      ...params,
-    });
+  const addOrganizationProfileCustomPage = (params: AddCustomPagesParams) => {
+    return addCustomPage(params);
   };
 
   return {
@@ -39,56 +46,74 @@ export const useOrganizationProfileCustomPages = () => {
   };
 };
 
-export const useCustomPages = () => {
+type UseCustomPagesParams = {
+  LinkComponent: Component;
+  PageComponent: Component;
+  // MenuItemsComponent?: Component;
+  reorderItemsLabels: string[];
+  componentName: string;
+};
+
+export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
   const customPages = ref<CustomPage[]>([]);
   const customPagesPortals = ref(new Map<HTMLDivElement, Slot>());
+  const { PageComponent, LinkComponent, reorderItemsLabels, componentName } = customPagesParams;
 
   const addCustomPage = (params: AddCustomPagesParams) => {
-    const { reorderItemsLabels, props, defaultSlot, iconSlot } = params;
+    const { props, slots, component } = params;
     const { label, url } = props;
 
-    if (reorderItemsLabels.includes(label)) {
-      customPages.value.push({ label });
-      return;
+    if (isThatComponent(component, PageComponent)) {
+      if (isReorderItem(props, slots, reorderItemsLabels)) {
+        // This is a reordering item
+        customPages.value.push({ label });
+      } else if (isCustomPage(props, slots)) {
+        // this is a custom page
+        customPages.value.push({
+          label,
+          url,
+          mountIcon(el) {
+            customPagesPortals.value.set(el, slots.labelIcon!);
+          },
+          unmountIcon(el) {
+            if (el) {
+              customPagesPortals.value.delete(el);
+            }
+          },
+          mount(el) {
+            customPagesPortals.value.set(el, slots.default!);
+          },
+          unmount(el) {
+            if (el) {
+              customPagesPortals.value.delete(el);
+            }
+          },
+        });
+      } else {
+        logErrorInDevMode(customPageWrongProps(componentName));
+        return;
+      }
     }
 
-    if (!defaultSlot) {
-      throw new Error('Default slot is required');
-    }
-
-    if (!iconSlot) {
-      throw new Error('Icon slot is required');
-    }
-
-    const baseItem: CustomPage = {
-      label,
-      mountIcon(el) {
-        customPagesPortals.value.set(el, iconSlot);
-      },
-      unmountIcon(el) {
-        if (el) {
-          customPagesPortals.value.delete(el);
-        }
-      },
-      mount(el) {
-        customPagesPortals.value.set(el, defaultSlot);
-      },
-      unmount(el) {
-        if (el) {
-          customPagesPortals.value.delete(el);
-        }
-      },
-    };
-
-    if (!url) {
-      throw new Error('URL is required');
-    }
-
-    if (url) {
-      customPages.value.push({
-        ...baseItem,
-        url,
-      });
+    if (isThatComponent(component, LinkComponent)) {
+      if (isExternalLink(props, slots)) {
+        // This is an external link
+        customPages.value.push({
+          label,
+          url,
+          mountIcon(el) {
+            customPagesPortals.value.set(el, slots.labelIcon!);
+          },
+          unmountIcon(el) {
+            if (el) {
+              customPagesPortals.value.delete(el);
+            }
+          },
+        });
+      } else {
+        logErrorInDevMode(customLinkWrongProps(componentName));
+        return;
+      }
     }
   };
 
@@ -97,4 +122,22 @@ export const useCustomPages = () => {
     customPagesPortals,
     addCustomPage,
   };
+};
+
+const isReorderItem = (props: any, slots: AddCustomPagesParams['slots'], validItems: string[]): boolean => {
+  const { label, url } = props;
+  const { default: defaultSlot, labelIcon } = slots;
+  return !defaultSlot && !url && !labelIcon && validItems.some(v => v === label);
+};
+
+const isCustomPage = (props: any, slots: AddCustomPagesParams['slots']): boolean => {
+  const { label, url } = props;
+  const { default: defaultSlot, labelIcon } = slots;
+  return !!defaultSlot && !!url && !!labelIcon && !!label;
+};
+
+const isExternalLink = (props: any, slots: AddCustomPagesParams['slots']): boolean => {
+  const { label, url } = props;
+  const { default: defaultSlot, labelIcon } = slots;
+  return !defaultSlot && !!url && !!labelIcon && !!label;
 };

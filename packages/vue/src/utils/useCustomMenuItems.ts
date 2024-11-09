@@ -14,18 +14,18 @@ export const useUserButtonCustomMenuItems = () => {
   const reorderItemsLabels = ['manageAccount', 'signOut'];
 
   function addCustomMenuItem(params: AddCustomMenuItemParams) {
-    const { props, component, iconSlot } = params;
+    const { props, component, slots } = params;
     const { label, onClick, open, href } = props;
 
     if (isThatComponent(component, MenuAction)) {
-      if (isReorderItem(props, iconSlot, reorderItemsLabels)) {
+      if (isReorderItem(props, slots, reorderItemsLabels)) {
         // This is a reordering item
         customMenuItems.value.push({ label });
-      } else if (isCustomMenuItem(props, iconSlot)) {
+      } else if (isCustomMenuItem(props, slots)) {
         const baseItem: CustomMenuItem = {
           label,
           mountIcon(el) {
-            customMenuItemsPortals.value.set(el, iconSlot!);
+            customMenuItemsPortals.value.set(el, slots.labelIcon!);
           },
           unmountIcon(el) {
             if (el) {
@@ -57,12 +57,12 @@ export const useUserButtonCustomMenuItems = () => {
     }
 
     if (isThatComponent(component, MenuLink)) {
-      if (isExternalLink(props, iconSlot)) {
+      if (isExternalLink(props, slots)) {
         customMenuItems.value.push({
           label,
           href,
           mountIcon(el) {
-            customMenuItemsPortals.value.set(el, iconSlot!);
+            customMenuItemsPortals.value.set(el, slots.labelIcon!);
           },
           unmountIcon(el) {
             if (el) {
@@ -84,17 +84,20 @@ export const useUserButtonCustomMenuItems = () => {
   };
 };
 
-const isReorderItem = (props: any, iconSlot: Slot | undefined, validItems: string[]): boolean => {
+const isReorderItem = (props: any, slots: AddCustomMenuItemParams['slots'], validItems: string[]): boolean => {
   const { label, onClick } = props;
-  return !onClick && !iconSlot && validItems.some(v => v === label);
+  const { labelIcon } = slots;
+  return !onClick && !labelIcon && validItems.some(v => v === label);
 };
 
-const isCustomMenuItem = (props: any, iconSlot: Slot | undefined): props is UserButtonActionProps => {
+const isCustomMenuItem = (props: any, slots: AddCustomMenuItemParams['slots']): props is UserButtonActionProps => {
   const { label, onClick, open } = props;
-  return !!iconSlot && !!label && (typeof onClick === 'function' || typeof open === 'string');
+  const { labelIcon } = slots;
+  return !!labelIcon && !!label && (typeof onClick === 'function' || typeof open === 'string');
 };
 
-const isExternalLink = (props: any, iconSlot: Slot | undefined): props is UserButtonLinkProps => {
+const isExternalLink = (props: any, slots: AddCustomMenuItemParams['slots']): props is UserButtonLinkProps => {
   const { label, href } = props;
-  return !!href && !!iconSlot && !!label;
+  const { labelIcon } = slots;
+  return !!href && !!labelIcon && !!label;
 };

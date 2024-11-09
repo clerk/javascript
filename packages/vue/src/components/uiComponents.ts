@@ -14,6 +14,8 @@ import type {
 import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, Teleport, watchEffect } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
+import { errorThrower } from '../errors/errorThrower';
+import { userButtonMenuActionRenderedError, userButtonMenuLinkRenderedError } from '../errors/messages';
 import {
   OrganizationProfileInjectionKey,
   UserButtonInjectionKey,
@@ -109,35 +111,41 @@ const _UserProfile = defineComponent((props: UserProfileProps, { slots }) => {
   ];
 });
 
-const UserProfilePage = defineComponent((props: UserProfilePageProps, { slots }) => {
-  const ctx = inject(UserProfileInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const UserProfilePage = defineComponent(
+  (props: UserProfilePageProps, { slots }) => {
+    const ctx = inject(UserProfileInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomPage({
-    props,
-    defaultSlot: slots.default,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomPage({
+      props,
+      slots,
+      component: UserProfilePage,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'UserProfilePage' },
+);
 
-const UserProfileLink = defineComponent((props: UserProfileLinkProps, { slots }) => {
-  const ctx = inject(UserProfileInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const UserProfileLink = defineComponent(
+  (props: UserProfileLinkProps, { slots }) => {
+    const ctx = inject(UserProfileInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomPage({
-    props,
-    defaultSlot: slots.default,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomPage({
+      props,
+      slots,
+      component: UserProfileLink,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'UserProfilePage' },
+);
 
 export const UserProfile = Object.assign(_UserProfile, {
   Page: UserProfilePage,
@@ -198,12 +206,12 @@ export const MenuAction = defineComponent(
   (props: UserButtonActionProps, { slots }) => {
     const ctx = inject(UserButtonMenuItemsInjectionKey);
     if (!ctx) {
-      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+      return errorThrower.throw(userButtonMenuActionRenderedError);
     }
 
     ctx.addCustomMenuItem({
       props,
-      iconSlot: slots.labelIcon,
+      slots,
       component: MenuAction,
     });
 
@@ -216,12 +224,12 @@ export const MenuLink = defineComponent(
   (props: UserButtonLinkProps, { slots }) => {
     const ctx = inject(UserButtonMenuItemsInjectionKey);
     if (!ctx) {
-      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+      return errorThrower.throw(userButtonMenuLinkRenderedError);
     }
 
     ctx.addCustomMenuItem({
       props,
-      iconSlot: slots.labelIcon,
+      slots,
       component: MenuLink,
     });
 
@@ -332,35 +340,41 @@ const _OrganizationProfile = defineComponent((props: OrganizationProfileProps, {
   ];
 });
 
-const OrganizationProfilePage = defineComponent((props: UserProfilePageProps, { slots }) => {
-  const ctx = inject(OrganizationProfileInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const OrganizationProfilePage = defineComponent(
+  (props: UserProfilePageProps, { slots }) => {
+    const ctx = inject(OrganizationProfileInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomPage({
-    props,
-    defaultSlot: slots.default,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomPage({
+      props,
+      slots,
+      component: OrganizationProfilePage,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'OrganizationProfilePage' },
+);
 
-const OrganizationProfileLink = defineComponent((props: UserProfileLinkProps, { slots }) => {
-  const ctx = inject(OrganizationProfileInjectionKey);
-  if (!ctx) {
-    throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
-  }
+export const OrganizationProfileLink = defineComponent(
+  (props: UserProfileLinkProps, { slots }) => {
+    const ctx = inject(OrganizationProfileInjectionKey);
+    if (!ctx) {
+      throw new Error('UserButton.Action must be used inside a UserButton.MenuItems component');
+    }
 
-  ctx.addCustomPage({
-    props,
-    defaultSlot: slots.default,
-    iconSlot: slots.labelIcon,
-  });
+    ctx.addCustomPage({
+      props,
+      slots,
+      component: OrganizationProfileLink,
+    });
 
-  return () => null;
-});
+    return () => null;
+  },
+  { name: 'OrganizationProfileLink' },
+);
 
 export const OrganizationProfile = Object.assign(_OrganizationProfile, {
   Page: OrganizationProfilePage,

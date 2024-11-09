@@ -52,19 +52,20 @@ export type CustomItemOrPageWithoutHandler<T> = Without<T, 'mount' | 'unmount' |
 
 export type AddCustomMenuItemParams = {
   props: CustomItemOrPageWithoutHandler<CustomMenuItem>;
-  iconSlot?: Slot;
+  slots: {
+    labelIcon?: Slot;
+  };
   component: Component;
 };
 
 export type AddCustomPagesParams = {
   props: CustomItemOrPageWithoutHandler<CustomPage>;
-  reorderItemsLabels: string[];
-  defaultSlot?: Slot;
-  iconSlot?: Slot;
+  slots: {
+    default?: Slot;
+    labelIcon?: Slot;
+  };
+  component: Component;
 };
-
-export type AddUserProfileCustomPagesParams = Without<AddCustomPagesParams, 'reorderItemsLabels'>;
-export type AddOrganizationProfileCustomPagesParams = Without<AddCustomPagesParams, 'reorderItemsLabels'>;
 
 type PageProps<T extends string> =
   | {
