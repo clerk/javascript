@@ -11,7 +11,7 @@ import type {
   WaitlistProps,
   Without,
 } from '@clerk/types';
-import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, Teleport, watchEffect } from 'vue';
+import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, watchEffect } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
 import { errorThrower } from '../errors/errorThrower';
@@ -76,14 +76,7 @@ const Portal = defineComponent((props: MountProps) => {
 });
 
 const CustomPortalsRenderer = defineComponent((props: CustomPortalsRendererProps) => {
-  return () => [
-    ...Array.from(props?.customPagesPortals ?? new Map(), ([el, slot]) => {
-      return h(Teleport, { to: el }, slot());
-    }),
-    ...Array.from(props?.customMenuItemsPortals ?? new Map(), ([el, slot]) => {
-      return h(Teleport, { to: el }, slot());
-    }),
-  ];
+  return () => [...(props?.customPagesPortals ?? []), ...(props?.customMenuItemsPortals ?? [])];
 });
 
 const _UserProfile = defineComponent((props: UserProfileProps, { slots }) => {

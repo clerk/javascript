@@ -1,12 +1,13 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { CustomPage } from '@clerk/types';
-import type { Component, Slot } from 'vue';
+import type { Component } from 'vue';
 import { ref } from 'vue';
 
 import { UserProfileLink, UserProfilePage } from '../components/uiComponents';
 import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
 import type { AddCustomPagesParams } from '../types';
 import { isThatComponent } from './componentValidation';
+import { useCustomElementPortal } from './useCustomElementPortal';
 
 export const useUserProfileCustomPages = () => {
   const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
@@ -56,7 +57,7 @@ type UseCustomPagesParams = {
 
 export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
   const customPages = ref<CustomPage[]>([]);
-  const customPagesPortals = ref(new Map<HTMLDivElement, Slot>());
+  const { portals: customPagesPortals, mount, unmount } = useCustomElementPortal();
   const { PageComponent, LinkComponent, reorderItemsLabels, componentName } = customPagesParams;
 
   const addCustomPage = (params: AddCustomPagesParams) => {
@@ -68,26 +69,18 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
         // This is a reordering item
         customPages.value.push({ label });
       } else if (isCustomPage(props, slots)) {
-        // this is a custom page
+        // This is a custom page
         customPages.value.push({
           label,
           url,
           mountIcon(el) {
-            customPagesPortals.value.set(el, slots.labelIcon!);
+            mount(el, slots.labelIcon!);
           },
-          unmountIcon(el) {
-            if (el) {
-              customPagesPortals.value.delete(el);
-            }
-          },
+          unmountIcon: unmount,
           mount(el) {
-            customPagesPortals.value.set(el, slots.default!);
+            mount(el, slots.default!);
           },
-          unmount(el) {
-            if (el) {
-              customPagesPortals.value.delete(el);
-            }
-          },
+          unmount,
         });
       } else {
         logErrorInDevMode(customPageWrongProps(componentName));
@@ -102,13 +95,9 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
           label,
           url,
           mountIcon(el) {
-            customPagesPortals.value.set(el, slots.labelIcon!);
+            mount(el, slots.labelIcon!);
           },
-          unmountIcon(el) {
-            if (el) {
-              customPagesPortals.value.delete(el);
-            }
-          },
+          unmountIcon: unmount,
         });
       } else {
         logErrorInDevMode(customLinkWrongProps(componentName));

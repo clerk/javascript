@@ -12,7 +12,7 @@ import type {
   UserResource,
   Without,
 } from '@clerk/types';
-import type { Component, ComputedRef, ShallowRef, Slot } from 'vue';
+import type { Component, ComputedRef, ShallowRef, Slot, VNode } from 'vue';
 
 export interface VueClerkInjectionKeyType {
   clerk: ShallowRef<Clerk | null>;
@@ -44,8 +44,8 @@ export interface BrowserClerk extends HeadlessBrowserClerk {
 }
 
 export interface CustomPortalsRendererProps {
-  customPagesPortals?: Map<HTMLDivElement, Slot>;
-  customMenuItemsPortals?: Map<HTMLDivElement, Slot>;
+  customPagesPortals?: VNode[];
+  customMenuItemsPortals?: VNode[];
 }
 
 export type CustomItemOrPageWithoutHandler<T> = Without<T, 'mount' | 'unmount' | 'mountIcon' | 'unmountIcon'>;

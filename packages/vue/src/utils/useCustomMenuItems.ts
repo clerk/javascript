@@ -1,16 +1,16 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { CustomMenuItem } from '@clerk/types';
-import type { Slot } from 'vue';
 import { ref } from 'vue';
 
 import { MenuAction, MenuLink } from '../components/uiComponents';
 import { userButtonMenuItemLinkWrongProps, userButtonMenuItemsActionWrongsProps } from '../errors/messages';
 import type { AddCustomMenuItemParams, UserButtonActionProps, UserButtonLinkProps } from '../types';
 import { isThatComponent } from './componentValidation';
+import { useCustomElementPortal } from './useCustomElementPortal';
 
 export const useUserButtonCustomMenuItems = () => {
   const customMenuItems = ref<CustomMenuItem[]>([]);
-  const customMenuItemsPortals = ref(new Map<HTMLDivElement, Slot>());
+  const { portals: customMenuItemsPortals, mount, unmount } = useCustomElementPortal();
   const reorderItemsLabels = ['manageAccount', 'signOut'];
 
   function addCustomMenuItem(params: AddCustomMenuItemParams) {
@@ -25,13 +25,9 @@ export const useUserButtonCustomMenuItems = () => {
         const baseItem: CustomMenuItem = {
           label,
           mountIcon(el) {
-            customMenuItemsPortals.value.set(el, slots.labelIcon!);
+            mount(el, slots.labelIcon!);
           },
-          unmountIcon(el) {
-            if (el) {
-              customMenuItemsPortals.value.delete(el);
-            }
-          },
+          unmountIcon: unmount,
         };
 
         if (onClick !== undefined) {
@@ -62,13 +58,9 @@ export const useUserButtonCustomMenuItems = () => {
           label,
           href,
           mountIcon(el) {
-            customMenuItemsPortals.value.set(el, slots.labelIcon!);
+            mount(el, slots.labelIcon!);
           },
-          unmountIcon(el) {
-            if (el) {
-              customMenuItemsPortals.value.delete(el);
-            }
-          },
+          unmountIcon: unmount,
         });
       } else {
         logErrorInDevMode(userButtonMenuItemLinkWrongProps);
