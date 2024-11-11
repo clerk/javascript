@@ -106,7 +106,6 @@ export const ClerkComponents = {
   GoogleOneTap,
   Waitlist,
   WaitlistModal,
-  AccountlessPrompt,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

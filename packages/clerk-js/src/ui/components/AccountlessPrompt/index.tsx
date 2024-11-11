@@ -24,7 +24,7 @@ type EyeCircleProps = PropsOfComponent<typeof Col> & {
 };
 
 type AccountlessPromptProps = {
-  url: string;
+  url?: string;
 };
 
 const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
@@ -100,7 +100,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
-  console.log('dwada', props.url);
 
   //essentials for calcs
   const eyeWidth = parsedInternalTheme.sizes.$16;
@@ -162,8 +161,12 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
   useEffect(repositionFabOnResize, []);
 
-  const title = 'dwadawda';
+  const title = localizationKeys('signIn');
   const titleLength = t(title).length;
+
+  if (!props.url) {
+    return null;
+  }
 
   return (
     <Portal>

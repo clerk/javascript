@@ -1952,11 +1952,11 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleAccountlessPrompt = () => {
-    if (this.#options.claimAccountlessKeysUrl) {
-      void this.#componentControls
-        ?.ensureMounted()
-        .then(controls => controls.mountAccountlessPrompt(this.#options.claimAccountlessKeysUrl));
-    }
+    void this.#componentControls?.ensureMounted().then(controls => {
+      if (this.#options.claimAccountlessKeysUrl) {
+        controls.mountAccountlessPrompt(this.#options.claimAccountlessKeysUrl);
+      }
+    });
   };
 
   #buildUrl = (
