@@ -62,7 +62,7 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
-      if (!isValidBrowserOnline() && !this.isExpo()) {
+      if (!isValidBrowserOnline() && !this.shouldRethrowOfflineNetworkErrors()) {
         console.warn(e);
         return null;
       } else {
@@ -188,7 +188,8 @@ export abstract class BaseResource {
     return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
   }
 
-  private static isExpo(): boolean {
-    return BaseResource.clerk?.sdkMetadata?.name === '@clerk/clerk-expo';
+  private static shouldRethrowOfflineNetworkErrors(): boolean {
+    const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
+    return experimental?.rethrowOfflineNetworkErrors || false;
   }
 }
