@@ -42,7 +42,7 @@ export const common = ({ page }: TestArgs) => {
       return page.locator('input[name=password]');
     },
     getLegalAccepted: () => {
-      return page.locator('input[name=__experimental_legalAccepted]');
+      return page.locator('input[name=legalAccepted]');
     },
     getFirstNameInput: () => {
       return page.locator('input[name=firstName]');

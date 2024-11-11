@@ -153,7 +153,7 @@ type _LocalizationResource = {
       blockButton__emailSupport: LocalizationValue;
       blockButton__joinWaitlist: LocalizationValue;
     };
-    __experimental_legalConsent: {
+    legalConsent: {
       continue: {
         title: LocalizationValue;
         subtitle: LocalizationValue;

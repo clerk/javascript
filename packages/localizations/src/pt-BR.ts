@@ -470,17 +470,6 @@ export const ptBR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Insira sua senha',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Entrar',
       actionText: 'Possui uma conta?',
@@ -515,6 +504,17 @@ export const ptBR: LocalizationResource = {
         subtitle: 'Retorne para a nova aba que foi aberta para continuar',
         subtitleNewTab: 'Retorne para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

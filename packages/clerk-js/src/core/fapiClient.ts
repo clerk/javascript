@@ -4,6 +4,7 @@ import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
+import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
@@ -92,6 +93,9 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
+
+    // Append supported FAPI version to the query string
+    searchParams.append('__clerk_api_version', SUPPORTED_FAPI_VERSION);
 
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);

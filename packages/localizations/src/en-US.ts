@@ -459,18 +459,6 @@ export const enUS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
-        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
-        label__termsOfServiceAndPrivacyPolicy:
-          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
-      },
-      continue: {
-        subtitle: 'Please read and accept the terms to continue',
-        title: 'Legal consent',
-      },
-    },
     continue: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -505,6 +493,18 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to the newly opened tab to continue',
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
+        label__onlyTermsOfService: 'I agree to the {{ termsOfServiceLink || link("Terms of Service") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'I agree to the {{ termsOfServiceLink || link("Terms of Service") }} and {{ privacyPolicyLink || link("Privacy Policy") }}',
+      },
+      continue: {
+        subtitle: 'Please read and accept the terms to continue',
+        title: 'Legal consent',
       },
     },
     phoneCode: {

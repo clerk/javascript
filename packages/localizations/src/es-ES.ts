@@ -470,17 +470,6 @@ export const esES: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Entrar',
       actionText: '¿Tiene una cuenta?',
@@ -514,6 +503,17 @@ export const esES: LocalizationResource = {
         subtitle: 'Regrese a la pestaña recién abierta para continuar',
         subtitleNewTab: 'Volver a la pestaña anterior para continuar',
         title: 'Correo electrónico verificado con éxito',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {
