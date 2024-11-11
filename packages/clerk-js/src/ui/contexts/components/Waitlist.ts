@@ -6,7 +6,7 @@ import type { WaitlistCtx } from '../../types';
 
 export type WaitlistContextType = WaitlistCtx & {
   signInUrl: string;
-  redirectUrl?: string;
+  afterJoinWaitlistUrl?: string;
 };
 
 export const WaitlistContext = createContext<WaitlistCtx | null>(null);
