@@ -2,5 +2,5 @@
 '@clerk/clerk-js': patch
 ---
 
-Stop silencing network errors when on Expo.
+Bubble up the network errors on Expo.
 
