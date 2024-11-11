@@ -16,6 +16,30 @@ export type BaseMutateParams = {
   path?: string;
 };
 
+function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
+  if (!payloadErrors) {
+    return;
+  }
+
+  if (!payloadErrors[0]) {
+    return;
+  }
+
+  const safeError = payloadErrors[0];
+  const safeErrorMessage = safeError.long_message;
+
+  if (safeError.code === 'origin_invalid' && isProductionFromPublishableKey(BaseResource.clerk.publishableKey)) {
+    const prodDomain = BaseResource.clerk.frontendApi.replace('clerk.', '');
+    throw new ClerkAPIResponseError(
+      `Clerk: Production Keys are only allowed for domain "${prodDomain}". \nAPI Error: ${safeErrorMessage}`,
+      {
+        data: payloadErrors,
+        status: statusCode,
+      },
+    );
+  }
+}
+
 export abstract class BaseResource {
   static clerk: Clerk;
   id?: string;
@@ -71,16 +95,7 @@ export abstract class BaseResource {
       const errors = payload?.errors as ClerkAPIErrorJSON[];
       const safeErrorMessage = errors?.[0]?.long_message;
 
-      if (errors?.[0]?.code === 'origin_invalid' && isProductionFromPublishableKey(BaseResource.clerk.publishableKey)) {
-        const prodDomain = BaseResource.clerk.frontendApi.replace('clerk.', '');
-        throw new ClerkAPIResponseError(
-          `Clerk: Production Keys are only allowed for domain "${prodDomain}". \nAPI Error: ${safeErrorMessage}`,
-          {
-            data: errors,
-            status: status,
-          },
-        );
-      }
+      assertProductionKeysOnDev(status, errors);
 
       throw new ClerkAPIResponseError(safeErrorMessage || statusText, {
         data: errors,
