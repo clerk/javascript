@@ -1,6 +1,8 @@
 'use server';
 
 import { getCookies } from 'ezheaders';
+import { RedirectType } from 'next/dist/client/components/redirect';
+import { redirect } from 'next/navigation';
 
 // This function needs to be async as we'd like to support next versions in the range of [14.1.2,14.2.0)
 // These versions required 'use server' files to export async methods only. This check was later relaxed
@@ -8,4 +10,19 @@ import { getCookies } from 'ezheaders';
 // ref: https://github.com/vercel/next.js/pull/62821
 export async function invalidateCacheAction(): Promise<void> {
   void (await getCookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
+}
+
+const accountlessCookiePrefix = `__clerk_acc_`;
+
+export async function syncAccountlessKeys(args: {
+  publishable_key: string;
+  secret_key: string;
+  claim_token: string;
+}): Promise<void> {
+  void (await getCookies()).set(accountlessCookiePrefix, JSON.stringify(args), {
+    secure: true,
+    httpOnly: true,
+  });
+
+  redirect('/clerk-sync-accountless', RedirectType.replace);
 }

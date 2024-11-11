@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { AuthObject } from '@clerk/backend';
@@ -14,42 +14,29 @@ import { createClerkClientWithOptions } from '../../server/clerkClient';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { AccountlessCookieSync } from '../client/accountless-cookie-sync';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
-function parseEnvToMap(content: string): Map<string, string> {
-  const config = new Map<string, string>();
+const CLERK_HIDDEN = '.clerk';
 
-  // Split content into lines
-  const lines = content.split('\n');
-
-  for (const line of lines) {
-    // Trim whitespace
-    const trimmedLine = line.trim();
-
-    // Ignore empty lines and comments (lines that start with #)
-    if (trimmedLine === '' || trimmedLine.startsWith('#')) {
-      continue;
-    }
-
-    // Split the line by the first '='
-    const separatorIndex = trimmedLine.indexOf('=');
-    if (separatorIndex === -1) {
-      continue; // Skip lines without '='
-    }
-
-    const key = trimmedLine.slice(0, separatorIndex).trim();
-    let value = trimmedLine.slice(separatorIndex + 1).trim();
-
-    // Remove surrounding quotes from the value if they exist
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-
-    config.set(key, value);
+function updateGitignore() {
+  const gitignorePath = path.join(process.cwd(), '.gitignore');
+  if (!existsSync(gitignorePath)) {
+    writeFileSync(gitignorePath, '');
+    console.log('.gitignore created.');
+  } else {
+    console.log('.gitignore found.');
   }
 
-  return config;
+  // Check if `.clerk/` entry exists in .gitignore
+  const gitignoreContent = readFileSync(gitignorePath, 'utf-8');
+  if (!gitignoreContent.includes(CLERK_HIDDEN + '/')) {
+    appendFileSync(gitignorePath, `\n${CLERK_HIDDEN}/\n`);
+    console.log('.clerk/ added to .gitignore.');
+  } else {
+    console.log('.clerk/ is already ignored.');
+  }
 }
 
 const isNext13 = nextPkg.version.startsWith('13.');
@@ -76,21 +63,21 @@ const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader()
 });
 
 const CLERK_LOCK = 'clerk.lock';
-const getEnvPath = () => path.join(process.cwd(), '.env.local');
+const getClerkPath = () => path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
 
 let isCreatingFile = false;
 
-export async function createAccountlessKeys(publishableKey: string | undefined): Promise<void> {
+export async function createAccountlessKeys(publishableKey: string | undefined): Promise<NonNullable<unknown>> {
   if (publishableKey) {
-    return;
+    return {};
   }
 
   if (isCreatingFile) {
-    return;
+    return {};
   }
 
   if (existsSync(CLERK_LOCK)) {
-    return;
+    return {};
   }
 
   isCreatingFile = true;
@@ -103,16 +90,22 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
 
   let res: any;
 
-  const ENV_PATH = getEnvPath();
-  mkdirSync(path.dirname(ENV_PATH), { recursive: true });
+  const CLERK_PATH = getClerkPath();
+  mkdirSync(path.dirname(CLERK_PATH), { recursive: true });
+  updateGitignore();
 
-  const fileAsString = readFileSync(ENV_PATH, { encoding: 'utf-8' });
-  const envVarsMap = parseEnvToMap(fileAsString);
+  let fileAsString;
+  try {
+    fileAsString = readFileSync(CLERK_PATH, { encoding: 'utf-8' });
+  } catch {
+    fileAsString = '{}';
+  }
+  const envVarsMap = JSON.parse(fileAsString);
 
-  if (envVarsMap.has('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY')) {
+  if (envVarsMap.publishable_key && envVarsMap.secret_key) {
     isCreatingFile = false;
     rmSync(CLERK_LOCK, { force: true, recursive: true });
-    return;
+    return envVarsMap;
   }
 
   /**
@@ -124,20 +117,18 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
   // eslint-disable-next-line prefer-const
   res = await client.accountlessApplications.createAccountlessApplication();
 
-  writeFileSync(
-    ENV_PATH,
-    `\nNEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${res.publishable_key}\nCLERK_SECRET_KEY=${res.secret_key}\nNEXT_PUBLIC_CLERK_ACC_CLAIM_TOKEN=${res.claim_token}`,
-    {
-      encoding: 'utf8',
-      mode: '0777',
-      flag: 'a',
-    },
-  );
+  console.log('--- new keys', res);
+
+  writeFileSync(CLERK_PATH, JSON.stringify(res), {
+    encoding: 'utf8',
+    mode: '0777',
+    flag: 'w',
+  });
 
   rmSync(CLERK_LOCK, { force: true, recursive: true });
 
   isCreatingFile = false;
-  return res.publishable_key;
+  return res;
 }
 
 export async function ClerkProvider(
@@ -164,9 +155,8 @@ export async function ClerkProvider(
   const dynamicConfig = await getDynamicConfig();
 
   let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
-  publishableKey = await createAccountlessKeys(publishableKey);
 
-  const output = (
+  let output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv({
         ...dynamicConfig,
@@ -179,6 +169,36 @@ export async function ClerkProvider(
       {children}
     </ClientClerkProvider>
   );
+
+  if (!publishableKey) {
+    const res = (await createAccountlessKeys(publishableKey)) as {
+      publishable_key: string;
+      secret_key: string;
+      claim_token: string;
+    };
+
+    publishableKey = res.publishable_key;
+
+    output = (
+      <html>
+        <body>
+          <AccountlessCookieSync {...res}>
+            <ClientClerkProvider
+              {...mergeNextClerkPropsWithEnv({
+                ...dynamicConfig,
+                ...rest,
+                publishableKey,
+              })}
+              nonce={await nonce}
+              initialState={await statePromise}
+            >
+              {children}
+            </ClientClerkProvider>
+          </AccountlessCookieSync>
+        </body>
+      </html>
+    );
+  }
 
   if (dynamic) {
     return (

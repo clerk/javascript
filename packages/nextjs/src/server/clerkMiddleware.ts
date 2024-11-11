@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
+import { getAccountlessCookie } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -96,11 +97,22 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
+      const accountlessCookieName = await getAccountlessCookie();
+      let accountless = {};
+      if (process.env.NODE_ENV === 'development' && accountlessCookieName) {
+        accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || '{}');
+      }
+
+      const publishableKey = assertKey(
+        // @ts-ignore
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishable_key,
+        () => errorThrower.throwMissingPublishableKeyError(),
       );
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
-        errorThrower.throwMissingSecretKeyError(),
+
+      const secretKey = assertKey(
+        //@ts-ignore
+        resolvedParams.secretKey || SECRET_KEY || accountless.secret_key,
+        () => errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
@@ -220,8 +232,27 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         return baseNextMiddleware(request, event);
       }
 
+      const isSyncAccountless = request.nextUrl.pathname === '/clerk-sync-accountless';
+      if (isSyncAccountless) {
+        const url = new URL(request.url);
+        url.pathname = '';
+
+        const response = new NextResponse(null, {
+          status: 307,
+          headers: { location: url.toString() },
+        });
+        return response;
+      }
+
       const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY);
+
+      const accountlessCookieName = await getAccountlessCookie();
+      let accountless = {};
+      if (process.env.NODE_ENV === 'development' && accountlessCookieName) {
+        accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || '{}');
+      }
+      // @ts-ignore
+      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishable_key);
 
       if (isPkMissing) {
         const res = NextResponse.next();
