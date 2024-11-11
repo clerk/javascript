@@ -471,17 +471,6 @@ export const mnMN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Нэвтрэх',
       actionText: 'Бүртгэлтэй юу?',
@@ -515,6 +504,17 @@ export const mnMN: LocalizationResource = {
         subtitle: 'Үргэлжлүүлэхийн тулд шинээр нээгдсэн таб руу буцна уу',
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд өмнөх таб руу буцна уу',
         title: 'Имэйлийг амжилттай баталгаажууллаа',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

@@ -1,5 +1,64 @@
 # Change Log
 
+## 4.32.0
+
+### Minor Changes
+
+- Replace `redirectUrl` with `afterJoinWaitlistUrl` in `<Waitlist />` component ([#4532](https://github.com/clerk/javascript/pull/4532)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.31.0
+
+### Minor Changes
+
+- Introduce experimental support for passkeys in Expo (iOS, Android, and Web). ([#4352](https://github.com/clerk/javascript/pull/4352)) by [@AlexNti](https://github.com/AlexNti)
+
+  To use passkeys in Expo projects, pass the `__experimental_passkeys` object, which can be imported from `@clerk/clerk-expo/passkeys`, to the `ClerkProvider` component:
+
+  ```tsx
+  import { ClerkProvider } from '@clerk/clerk-expo';
+  import { passkeys } from '@clerk/clerk-expo/passkeys';
+
+  <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
+  ```
+
+  The API for using passkeys in Expo projects is the same as the one used in web apps:
+
+  ```tsx
+  // passkey creation
+  const { user } = useUser();
+
+  const handleCreatePasskey = async () => {
+    if (!user) return;
+    try {
+      return await user.createPasskey();
+    } catch (e: any) {
+      // handle error
+    }
+  };
+
+  // passkey authentication
+  const { signIn, setActive } = useSignIn();
+
+  const handlePasskeySignIn = async () => {
+    try {
+      const signInResponse = await signIn.authenticateWithPasskey();
+      await setActive({ session: signInResponse.createdSessionId });
+    } catch (err: any) {
+      //handle error
+    }
+  };
+  ```
+
+- The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
+
+  Removed the `__experimental_` preffix.
+
+### Patch Changes
+
+- Fixes issues in `ClerkRouter` that were causing inaccurate pathnames within Elements flows. Also fixes a dependency issue where `@clerk/elements` was pulling in the wrong version of `@clerk/shared`. ([#4513](https://github.com/clerk/javascript/pull/4513)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add afterJoinWaitlistUrl to DisplayConfig resource ([#4524](https://github.com/clerk/javascript/pull/4524)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 4.30.0
 
 ### Minor Changes

@@ -92,7 +92,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithWeb3: (
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ) => Promise<SignUpResource>;
 
@@ -165,7 +165,7 @@ export type SignUpCreateParams = Partial<
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
     token: string;
-    __experimental_legalAccepted: boolean;
+    legalAccepted: boolean;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
