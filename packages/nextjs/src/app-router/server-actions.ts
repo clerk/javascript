@@ -4,6 +4,8 @@ import { getCookies } from 'ezheaders';
 import { RedirectType } from 'next/dist/client/components/redirect';
 import { redirect } from 'next/navigation';
 
+import { getAccountlessCookie } from '../server/accountless';
+
 // This function needs to be async as we'd like to support next versions in the range of [14.1.2,14.2.0)
 // These versions required 'use server' files to export async methods only. This check was later relaxed
 // and the async is no longer required in newer next versions.
@@ -12,14 +14,12 @@ export async function invalidateCacheAction(): Promise<void> {
   void (await getCookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
 }
 
-const accountlessCookiePrefix = `__clerk_acc_`;
-
 export async function syncAccountlessKeys(args: {
   publishable_key: string;
   secret_key: string;
   claim_token: string;
 }): Promise<void> {
-  void (await getCookies()).set(accountlessCookiePrefix, JSON.stringify(args), {
+  void (await getCookies()).set(getAccountlessCookie(), JSON.stringify(args), {
     secure: true,
     httpOnly: true,
   });
