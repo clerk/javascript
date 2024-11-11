@@ -7,9 +7,6 @@ import type { NextClerkProviderProps } from '../types';
 export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
   return {
     ...props,
-    claimAccountlessKeysUrl: process.env.NEXT_PUBLIC_CLERK_ACC_CLAIM_TOKEN
-      ? `https://dashboard.clerk.com/apps/claim?token=${process.env.NEXT_PUBLIC_CLERK_ACC_CLAIM_TOKEN}`
-      : '',
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     clerkJSUrl: props.clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS_URL,
     clerkJSVersion: props.clerkJSVersion || process.env.NEXT_PUBLIC_CLERK_JS_VERSION,

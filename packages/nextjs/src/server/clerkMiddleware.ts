@@ -213,6 +213,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           domain,
           afterSignInUrl,
           afterSignUpUrl,
+          // @ts-expect-error
+          claimAccountlessKeysUrl: accountless?.claim_token
+            ? // @ts-expect-error
+              `https://dashboard.clerk.com/apps/claim?token=${accountless.claim_token}`
+            : undefined,
         };
       }
 

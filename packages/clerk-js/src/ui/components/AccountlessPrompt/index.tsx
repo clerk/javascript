@@ -2,17 +2,7 @@ import type { PointerEventHandler } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import {
-  Col,
-  descriptors,
-  Flex,
-  Icon,
-  Link,
-  localizationKeys,
-  Text,
-  useAppearance,
-  useLocalizations,
-} from '../../customizables';
+import { Col, descriptors, Flex, Icon, Link, Text, useAppearance, useLocalizations } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -56,9 +46,9 @@ const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
   );
 };
 
-type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
+type FabContentProps = { title: LocalizationKey | string; signOutText: LocalizationKey | string; url: string };
 
-const FabContent = ({ title, signOutText }: FabContentProps) => {
+const FabContent = ({ title, signOutText, url }: FabContentProps) => {
   return (
     <Col
       sx={t => ({
@@ -87,7 +77,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         })}
         localizationKey={signOutText}
         onClick={
-          undefined
+          () => (window.location.href = url)
           // clerk-js has been loaded at this point so we can safely access session
           // handleSignOutSessionClicked(session!)
         }
@@ -161,7 +151,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
   useEffect(repositionFabOnResize, []);
 
-  const title = localizationKeys('signIn');
+  const title = 'todo';
   const titleLength = t(title).length;
 
   if (!props.url) {
@@ -220,8 +210,9 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           })}
         >
           <FabContent
+            url={props.url}
             title={title}
-            signOutText={localizationKeys('impersonationFab.action__signOut')}
+            signOutText={'Claim'}
           />
         </Flex>
       </Flex>
