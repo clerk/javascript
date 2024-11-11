@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`7dbad4c5abd226d7b10941a626ead5d85b1a3f24`](https://github.com/clerk/javascript/commit/7dbad4c5abd226d7b10941a626ead5d85b1a3f24)]:
+  - @clerk/clerk-js@5.33.0
+  - @clerk/types@4.32.0
+  - @clerk/clerk-react@5.15.3
+  - @clerk/shared@2.12.1
+
 ## 2.3.0
 
 ### Minor Changes
