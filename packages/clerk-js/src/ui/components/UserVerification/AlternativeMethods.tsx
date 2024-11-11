@@ -1,4 +1,4 @@
-import type { __experimental_SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
+import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -29,12 +29,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { data } = useUserVerificationSession();
-  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies<__experimental_SessionVerificationFirstFactor>(
-    {
-      filterOutFactor: props?.currentFactor,
-      supportedFirstFactors: data!.supportedFirstFactors,
-    },
-  );
+  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies<SessionVerificationFirstFactor>({
+    filterOutFactor: props?.currentFactor,
+    supportedFirstFactors: data?.supportedFirstFactors,
+  });
 
   return (
     <Flow.Part part={'alternativeMethods'}>
@@ -107,7 +105,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   );
 };
 
-export function getButtonLabel(factor: __experimental_SessionVerificationFirstFactor): LocalizationKey {
+export function getButtonLabel(factor: SessionVerificationFirstFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'email_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__emailCode', {
@@ -124,7 +122,7 @@ export function getButtonLabel(factor: __experimental_SessionVerificationFirstFa
   }
 }
 
-export function getButtonIcon(factor: __experimental_SessionVerificationFirstFactor) {
+export function getButtonIcon(factor: SessionVerificationFirstFactor) {
   const icons = {
     email_code: Email,
     phone_code: ChatAltIcon,

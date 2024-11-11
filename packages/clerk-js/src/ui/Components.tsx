@@ -1,7 +1,7 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationProps,
   Appearance,
   Clerk,
   ClerkOptions,
@@ -76,7 +76,7 @@ export type ComponentControls = {
       : T extends 'signUp'
         ? SignUpProps
         : T extends 'userVerification'
-          ? __experimental_UserVerificationProps
+          ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
             : UserProfileProps,
@@ -121,7 +121,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
-  userVerificationModal: null | __experimental_UserVerificationProps;
+  userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   organizationSwitcherPrefetch: boolean;

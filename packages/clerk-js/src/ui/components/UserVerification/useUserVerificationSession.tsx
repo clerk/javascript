@@ -18,7 +18,7 @@ const useUserVerificationSessionKey = () => {
 const useUserVerificationSession = () => {
   const { session } = useSession();
   const key = useUserVerificationSessionKey();
-  const data = useFetch(session ? session.__experimental_startVerification : undefined, key, {
+  const data = useFetch(session ? session.startVerification : undefined, key, {
     throttleTime: 300,
   });
 

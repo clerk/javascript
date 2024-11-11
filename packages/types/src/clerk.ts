@@ -35,7 +35,7 @@ import type {
 } from './redirects';
 import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
-import type { __experimental_SessionVerificationLevel } from './sessionVerification';
+import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { Web3Strategy } from './strategies';
@@ -165,16 +165,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserVerification component in a modal.
-   * @experimantal This API is still under active development and may change at any moment.
    * @param props Optional user verification configuration parameters.
    */
-  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
+  __internal_openUserVerification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
-   * @experimantal This API is still under active development and may change at any moment.
    */
-  __experimental_closeUserVerification: () => void;
+  __internal_closeUserVerification: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -916,10 +914,7 @@ interface TransferableOption {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-/**
- * @experimantal
- */
-export type __experimental_UserVerificationProps = RoutingOptions & {
+export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -935,7 +930,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
    * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
    * @default `'secondFactor'`
    */
-  level?: __experimental_SessionVerificationLevel;
+  level?: SessionVerificationLevel;
 
   /**
    * Customisation options to fully match the Clerk components to your own brand.
@@ -945,7 +940,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
   appearance?: UserVerificationTheme;
 };
 
-export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
+export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

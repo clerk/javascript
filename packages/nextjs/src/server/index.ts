@@ -67,7 +67,4 @@ export type {
 /**
  * Utilities for reverification
  */
-export {
-  __experimental_reverificationMismatchResponse,
-  __experimental_reverificationMismatch,
-} from '@clerk/backend/internal';
+export { reverificationMismatchResponse, reverificationMismatch } from '@clerk/backend/internal';

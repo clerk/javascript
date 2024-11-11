@@ -12,7 +12,7 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
 
   const prepare = () => {
     const { phoneNumberId, strategy } = props.factor;
-    return session!.__experimental_prepareSecondFactorVerification({ phoneNumberId, strategy });
+    return session!.prepareSecondFactorVerification({ phoneNumberId, strategy });
   };
 
   return (

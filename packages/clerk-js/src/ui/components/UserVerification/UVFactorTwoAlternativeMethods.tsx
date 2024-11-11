@@ -1,4 +1,4 @@
-import type { __experimental_SessionVerificationSecondFactor } from '@clerk/types';
+import type { SessionVerificationSecondFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -10,8 +10,8 @@ import { HavingTrouble } from './HavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
-  onFactorSelected: (factor: __experimental_SessionVerificationSecondFactor) => void;
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null;
+  onFactorSelected: (factor: SessionVerificationSecondFactor) => void;
+  supportedSecondFactors: SessionVerificationSecondFactor[] | null;
 };
 
 export const UVFactorTwoAlternativeMethods = (props: AlternativeMethodsProps) => {
@@ -94,7 +94,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   );
 };
 
-export function getButtonLabel(factor: __experimental_SessionVerificationSecondFactor): LocalizationKey {
+export function getButtonLabel(factor: SessionVerificationSecondFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__phoneCode', {

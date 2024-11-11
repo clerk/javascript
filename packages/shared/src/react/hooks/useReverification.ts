@@ -1,15 +1,13 @@
 import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
-import { __experimental_isReverificationHint, __experimental_reverificationMismatch } from '../../authorization-errors';
+import { isReverificationHint, reverificationMismatch } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
-async function resolveResult<T>(
-  result: Promise<T>,
-): Promise<T | ReturnType<typeof __experimental_reverificationMismatch>> {
+async function resolveResult<T>(result: Promise<T>): Promise<T | ReturnType<typeof reverificationMismatch>> {
   return result
     .then(r => {
       if (r instanceof Response) {
@@ -20,7 +18,7 @@ async function resolveResult<T>(
     .catch(e => {
       // Treat fapi assurance as an assurance hint
       if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return __experimental_reverificationMismatch();
+        return reverificationMismatch();
       }
 
       // rethrow
@@ -28,12 +26,12 @@ async function resolveResult<T>(
     });
 }
 
-function createReverificationHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
+function createReverificationHandler(params: { onOpenModal: Clerk['__internal_openUserVerification'] }) {
   function assertReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): Fetcher {
     return (async (...args) => {
       let result = await resolveResult(fetcher(...args));
 
-      if (__experimental_isReverificationHint(result)) {
+      if (isReverificationHint(result)) {
         /**
          * Create a promise
          */
@@ -75,15 +73,15 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
 }
 
 function __experimental_useReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): readonly [Fetcher] {
-  const { __experimental_openUserVerification } = useClerk();
+  const { __internal_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      onOpenModal: __experimental_openUserVerification,
+      onOpenModal: __internal_openUserVerification,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__experimental_openUserVerification, fetcherRef.current]);
+  }, [__internal_openUserVerification, fetcherRef.current]);
 
   // Keep fetcher ref in sync
   useSafeLayoutEffect(() => {

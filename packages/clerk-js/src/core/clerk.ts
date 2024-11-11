@@ -9,7 +9,7 @@ import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared
 import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
+  __internal_UserVerificationModalProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -420,7 +420,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  public __internal_openUserVerification = (props?: __internal_UserVerificationModalProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -435,7 +435,7 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
-  public __experimental_closeUserVerification = (): void => {
+  public __internal_closeUserVerification = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };

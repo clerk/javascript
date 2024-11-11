@@ -3,29 +3,29 @@ import type { ClerkResource } from './resource';
 import type { SessionResource } from './session';
 import type { VerificationResource } from './verification';
 
-export interface __experimental_SessionVerificationResource extends ClerkResource {
-  status: __experimental_SessionVerificationStatus;
-  level: __experimental_SessionVerificationLevel;
+export interface SessionVerificationResource extends ClerkResource {
+  status: SessionVerificationStatus;
+  level: SessionVerificationLevel;
   session: SessionResource;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
-  supportedFirstFactors: __experimental_SessionVerificationFirstFactor[] | null;
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null;
+  supportedFirstFactors: SessionVerificationFirstFactor[] | null;
+  supportedSecondFactors: SessionVerificationSecondFactor[] | null;
 }
 
-export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
+export type SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
-export type __experimental_SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
+export type SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
 
-export type __experimental_ReverificationConfig =
-  | __experimental_SessionVerificationTypes
+export type ReverificationConfig =
+  | SessionVerificationTypes
   | {
-      level: __experimental_SessionVerificationLevel;
-      afterMinutes: __experimental_SessionVerificationAfterMinutes;
+      level: SessionVerificationLevel;
+      afterMinutes: SessionVerificationAfterMinutes;
     };
 
-export type __experimental_SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
-export type __experimental_SessionVerificationAfterMinutes = number;
+export type SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
+export type SessionVerificationAfterMinutes = number;
 
-export type __experimental_SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;
-export type __experimental_SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
+export type SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;
+export type SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;

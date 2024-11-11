@@ -25,7 +25,7 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
     return session!
-      .__experimental_attemptSecondFactorVerification({ strategy: 'backup_code', code: codeControl.value })
+      .attemptSecondFactorVerification({ strategy: 'backup_code', code: codeControl.value })
       .then(handleVerificationResponse)
       .catch(err => handleError(err, [codeControl], card.setError));
   };
