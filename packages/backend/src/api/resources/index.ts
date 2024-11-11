@@ -29,6 +29,7 @@ export * from './SignInTokens';
 export * from './SMSMessage';
 export * from './Token';
 export * from './User';
+export * from './UserTotp';
 export * from './Verification';
 export * from './SamlConnection';
 export * from './TestingToken';

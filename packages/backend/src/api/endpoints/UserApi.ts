@@ -2,7 +2,7 @@ import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
-import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
+import type { OauthAccessToken, OrganizationMembership, User, UserTotp } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
@@ -237,6 +237,15 @@ export class UserAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, userId, 'verify_password'),
       bodyParams: { password },
+    });
+  }
+
+  public async createTOTP(userId: string) {
+    this.requireId(userId);
+
+    return this.request<UserTotp>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'totp'),
     });
   }
 
