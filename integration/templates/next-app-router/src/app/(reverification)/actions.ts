@@ -1,7 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
-import { __experimental_reverificationMismatch as reverificationMismatch } from '@clerk/shared/authorization-errors';
+import { auth, reverificationMismatch } from '@clerk/nextjs/server';
 
 const logUserIdActionReverification = async () => {
   const { userId, has } = await auth.protect();
@@ -12,7 +11,7 @@ const logUserIdActionReverification = async () => {
   } as const;
 
   const userNeedsReverification = !has({
-    __experimental_reverification: config,
+    reverification: config,
   });
 
   if (userNeedsReverification) {

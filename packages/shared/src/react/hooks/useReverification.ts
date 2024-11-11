@@ -72,7 +72,7 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__internal_op
   return assertReverification;
 }
 
-function __experimental_useReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): readonly [Fetcher] {
+function useReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): readonly [Fetcher] {
   const { __internal_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
 
@@ -91,4 +91,4 @@ function __experimental_useReverification<Fetcher extends () => Promise<any>>(fe
   return handleReverification;
 }
 
-export { __experimental_useReverification };
+export { useReverification };

@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import { useRef } from 'react';
 
 import { useEnvironment } from '../../contexts';

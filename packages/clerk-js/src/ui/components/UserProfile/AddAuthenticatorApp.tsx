@@ -1,5 +1,5 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
