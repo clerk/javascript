@@ -7,13 +7,14 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "start": "expo start",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "yalc": "yalc add @clerk/clerk-expo @clerk/clerk-js @clerk/clerk-react @clerk/types @clerk/shared @clerk/types"
   },
   "dependencies": {
     "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo",
     "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
     "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/expo-passkeys": "0.0.2-snapshot.v6db56a78ff8bd026e58d6be41383e109862d0e9d",
+    "@clerk/expo-passkeys": "file:.yalc/@clerk/expo-passkeys",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "@expo/metro-runtime": "~3.2.3",
