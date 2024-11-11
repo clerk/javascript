@@ -38,3 +38,4 @@ yarn-error.*
 .yalc
 ios
 android
+app.json

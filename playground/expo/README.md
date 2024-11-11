@@ -20,6 +20,9 @@ In the project root, run:
    cd example
 ```
 
+### 3. Create the app.json
+cp app.json.example app.json
+
 ### 3. Set Up Environment Variables
 
 Add the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `.env`.
