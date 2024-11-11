@@ -469,17 +469,6 @@ export const daDK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
@@ -513,6 +502,17 @@ export const daDK: LocalizationResource = {
         subtitle: 'Vend tilbage til den nyligt åbnede fane for at fortsætte',
         subtitleNewTab: 'Vend tilbage til forrige fane for at fortsætte',
         title: 'E-mail er bekræftet',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

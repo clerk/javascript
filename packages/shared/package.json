@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.11.5",
+  "version": "2.12.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -120,7 +120,8 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.30.0",
+    "@clerk/types": "4.31.0",
+    "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
@@ -132,12 +133,13 @@
     "@types/js-cookie": "3.0.6",
     "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
+    "esbuild": "0.20.2",
     "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "react": "^18 || ^19.0.0-0",
+    "react-dom": "^18 || ^19.0.0-0"
   },
   "peerDependenciesMeta": {
     "react": {

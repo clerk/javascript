@@ -2,7 +2,7 @@ import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
-import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
+import { API_URL, API_VERSION, constants, SUPPORTED_BAPI_VERSION, USER_AGENT } from '../constants';
 import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
@@ -90,6 +90,7 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers: Record<string, any> = {
       Authorization: `Bearer ${secretKey}`,
+      'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
     };
@@ -97,8 +98,7 @@ export function buildRequest(options: BuildRequestOptions) {
     let res: Response | undefined;
     try {
       if (formData) {
-        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
+        res = await runtime.fetch(finalUrl.href, {
           method,
           headers,
           body: formData,
@@ -110,8 +110,7 @@ export function buildRequest(options: BuildRequestOptions) {
         const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
         const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
-        // FIXME: We need to use the global fetch in tests because the runtime.fetch() is not intercepted by MSW
-        res = await (process.env.NODE_ENV === 'test' ? fetch : runtime.fetch)(finalUrl.href, {
+        res = await runtime.fetch(finalUrl.href, {
           method,
           headers,
           ...body,

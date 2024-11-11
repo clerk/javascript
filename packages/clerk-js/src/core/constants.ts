@@ -38,3 +38,6 @@ export const SIGN_UP_MODES: Record<string, SignUpModes> = {
   RESTRICTED: 'restricted',
   WAITLIST: 'waitlist',
 };
+
+// This is the currently supported version of the Frontend API
+export const SUPPORTED_FAPI_VERSION = '2021-02-05';

@@ -340,12 +340,14 @@ export class Clerk implements ClerkInterface {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
 
-    if (clerkIsLoaded(this)) {
-      this.__experimental_ui = new UI({
-        router: this.#options.__experimental_router,
-        clerk: this,
-        options: this.#options,
-      });
+    if (BUILD_ENABLE_NEW_COMPONENTS) {
+      if (clerkIsLoaded(this)) {
+        this.__experimental_ui = new UI({
+          router: this.#options.__experimental_router,
+          clerk: this,
+          options: this.#options,
+        });
+      }
     }
   };
 
@@ -1478,7 +1480,7 @@ export class Clerk implements ClerkInterface {
           return this.client?.signUp.create({
             strategy: 'google_one_tap',
             token: params.token,
-            __experimental_legalAccepted: params.__experimental_legalAccepted,
+            legalAccepted: params.legalAccepted,
           });
         }
         throw err;
@@ -1499,7 +1501,7 @@ export class Clerk implements ClerkInterface {
     customNavigate,
     unsafeMetadata,
     strategy,
-    __experimental_legalAccepted,
+    legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -1522,7 +1524,7 @@ export class Clerk implements ClerkInterface {
           generateSignature,
           unsafeMetadata,
           strategy,
-          __experimental_legalAccepted,
+          legalAccepted,
         });
 
         if (

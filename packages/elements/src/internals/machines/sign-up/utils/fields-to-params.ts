@@ -9,7 +9,7 @@ const SignUpAdditionalKeys = [
   'username',
   'password',
   'phoneNumber',
-  '__experimental_legalAccepted',
+  'legalAccepted',
 ] as const;
 
 type SignUpAdditionalKeys = (typeof SignUpAdditionalKeys)[number];

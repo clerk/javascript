@@ -470,17 +470,6 @@ export const elGR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Σύνδεση',
       actionText: 'Έχετε ήδη λογαριασμό;',
@@ -514,6 +503,17 @@ export const elGR: LocalizationResource = {
         subtitle: 'Επιστροφή στη νέα καρτέλα για να συνεχίσετε',
         subtitleNewTab: 'Επιστροφή στην προηγούμενη καρτέλα για να συνεχίσετε',
         title: 'Επιτυχής επαλήθευση email',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {
