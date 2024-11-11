@@ -25,7 +25,7 @@ describe('useAuth type tests', () => {
       expectTypeOf({ role: 'org:admin', permission: 'some-perm' }).not.toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('has with role and assurance is allowed', () => {
+    it('has with role and re-verification is allowed', () => {
       expectTypeOf({
         role: 'org:admin',
         __experimental_reverification: {
@@ -35,10 +35,10 @@ describe('useAuth type tests', () => {
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
-    it('has with permission and reverification is allowed', () => {
+    it('has with permission and re-verification is allowed', () => {
       expectTypeOf({
         permission: 'org:edit:posts',
-        __experimental_reverification: {
+        reverification: {
           level: 'firstFactor',
           afterMinutes: 10,
         },
@@ -47,7 +47,7 @@ describe('useAuth type tests', () => {
 
     it('has({reverification: {level, maxAge}}) is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: {
+        reverification: {
           level: 'firstFactor',
           afterMinutes: 10,
         },
@@ -56,7 +56,7 @@ describe('useAuth type tests', () => {
 
     it('reverification with other values as maxAge should throw', () => {
       expectTypeOf({
-        __experimental_reverification: {
+        reverification: {
           level: 'firstFactor',
           afterMinutes: '10',
         },
@@ -65,37 +65,37 @@ describe('useAuth type tests', () => {
 
     it('veryStrict reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'veryStrict',
+        reverification: 'veryStrict',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
     it('strict reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'strict',
+        reverification: 'strict',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
     it('moderate reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'moderate',
+        reverification: 'moderate',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
     it('lax reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'lax',
+        reverification: 'lax',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
     it('random reverification is not allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'random',
+        reverification: 'random',
       } as const).not.toMatchTypeOf<ParamsOfHas>();
     });
 
     it('reverification with other strings as level should throw', () => {
       expectTypeOf({
-        __experimental_reverification: {
+        reverification: {
           level: 'some-factor',
           afterMinutes: 10,
         },
@@ -104,7 +104,7 @@ describe('useAuth type tests', () => {
 
     it('reverification with number as level should throw', () => {
       expectTypeOf({
-        __experimental_reverification: {
+        reverification: {
           level: 2,
           afterMinutes: 10,
         },
