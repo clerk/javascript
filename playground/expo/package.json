@@ -8,7 +8,8 @@
     "ios": "expo run:ios",
     "start": "expo start",
     "web": "expo start --web",
-    "yalc": "yalc add @clerk/clerk-expo @clerk/clerk-js @clerk/clerk-react @clerk/types @clerk/shared @clerk/types"
+    "yalc": "yalc add @clerk/clerk-expo @clerk/clerk-js @clerk/clerk-react @clerk/types @clerk/shared @clerk/types @clerk/expo-passkeys",
+    "expo:update": "npx expo install --fix"
   },
   "dependencies": {
     "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo",
@@ -18,19 +19,22 @@
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "@expo/metro-runtime": "~3.2.3",
-    "@react-native-async-storage/async-storage": "^1.24.0",
-    "expo": "~51.0.24",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "expo": "~51.0.39",
     "expo-auth-session": "^5.5.2",
     "expo-build-properties": "^0.12.5",
     "expo-secure-store": "^13.0.2",
     "expo-web-browser": "^13.0.3",
-    "react": "18.2.0",
-    "react-native": "0.74.3",
-    "react-native-web": "~0.19.10"
+    "react": "18.3.1",
+    "react-native": "~0.75.0",
+    "react-native-web": "~0.19.10",
+    "react-native-reanimated": "~3.15.0",
+    "react-native-gesture-handler": "~2.18.1",
+    "react-native-screens": "~3.34.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
-    "typescript": "^5.6.3"
+    "typescript": "~5.3.3"
   }
 }
