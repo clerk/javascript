@@ -21,6 +21,11 @@ const routes = [
     path: '/admin',
     component: () => import('./views/Admin.vue'),
   },
+  {
+    name: 'Unstyled',
+    path: '/unstyled',
+    component: () => import('./views/Unstyled.vue'),
+  },
 ];
 
 const router = createRouter({

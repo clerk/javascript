@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { SignedIn, SignedOut, UserButton, OrganizationSwitcher, useClerk } from '@clerk/vue';
-
-const clerk = useClerk();
+import { SignedIn, SignedOut, UserButton, OrganizationSwitcher, ClerkLoaded, ClerkLoading } from '@clerk/vue';
 </script>
 
 <template>
@@ -20,7 +18,11 @@ const clerk = useClerk();
     </div>
   </header>
   <main>
-    <RouterView v-if="clerk?.loaded" />
-    <div v-else>Loading...</div>
+    <ClerkLoaded>
+      <RouterView />
+    </ClerkLoaded>
+    <ClerkLoading>
+      <div>Loading...</div>
+    </ClerkLoading>
   </main>
 </template>

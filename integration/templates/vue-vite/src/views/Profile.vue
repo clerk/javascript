@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UserProfile, useUser } from '@clerk/vue';
 
-const { user } = useUser()
+const { user } = useUser();
 </script>
 
 <template>

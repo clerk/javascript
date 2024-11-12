@@ -86,4 +86,43 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.goToRelative('/admin');
     await expect(u.page.getByText('I am an admin')).toBeVisible();
   });
+
+  test('<SignInButton /> renders and respects props', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/unstyled');
+    await u.po.expect.toBeSignedOut();
+    await u.page.waitForClerkJsLoaded();
+
+    await u.page.getByRole('button', { name: /Sign in/i }).click();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('<SignUpButton /> renders and respects props', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeAdmin = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+
+    await u.page.goToRelative('/unstyled');
+    await u.page.waitForClerkJsLoaded();
+
+    await u.page.getByRole('button', { name: /Sign up/i }).click();
+    await u.po.signUp.waitForMounted();
+    await u.po.signUp.signUpWithEmailAndPassword({
+      email: fakeAdmin.email,
+      password: fakeAdmin.password,
+    });
+
+    await u.po.signUp.enterTestOtpCode();
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await fakeAdmin.deleteIfExists();
+  });
 });
