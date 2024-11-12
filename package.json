@@ -46,6 +46,7 @@
     "test:integration:sessions": "npm run test:integration:base -- --grep @sessions",
     "test:integration:tanstack-router": "E2E_APP_ID=tanstack.router npm run test:integration:base -- --grep @tanstack-router",
     "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start npm run test:integration:base -- --grep @tanstack-start",
+    "test:integration:vue": "E2E_APP_ID=vue.vite npm run test:integration:base -- --grep @vue",
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
     "version": "changeset version && npm install --package-lock-only --engine-strict=false",
