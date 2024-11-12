@@ -1,11 +1,12 @@
 {
-  "name": "@clerk/vue",
-  "version": "0.0.4",
-  "description": "Clerk SDK for Vue",
+  "name": "@clerk/nuxt",
+  "version": "0.0.0",
+  "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
     "typescript",
     "vue",
+    "nuxt",
     "auth",
     "authentication",
     "passwordless",
@@ -19,48 +20,43 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/vue"
+    "directory": "packages/nuxt"
   },
   "license": "MIT",
   "author": "Clerk",
-  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/types.d.ts",
       "import": "./dist/index.js"
     },
-    "./internal": {
-      "types": "./dist/internal.d.ts",
-      "import": "./dist/internal.js"
+    "./server": {
+      "types": "./dist/runtime/server/index.d.ts",
+      "import": "./dist/runtime/server/index.js"
     }
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/types.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig",
-    "test": "vitest",
-    "test:ci": "vitest --maxWorkers=70%"
+    "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/shared": "2.14.0",
-    "@clerk/types": "4.34.0"
+    "@clerk/backend": "1.16.1",
+    "@clerk/shared": "2.12.1",
+    "@clerk/vue": "0.0.2",
+    "@nuxt/kit": "^3.14.159",
+    "h3": "^1.13.0"
   },
   "devDependencies": {
-    "@testing-library/vue": "^8.1.0",
-    "@vue.ts/tsx-auto-props": "^0.6.0",
-    "typescript": "*",
-    "vue": "3.5.12"
-  },
-  "peerDependencies": {
-    "vue": "^3.2.0"
+    "nuxt": "^3.14.159",
+    "typescript": "*"
   },
   "engines": {
     "node": ">=18.17.0"
