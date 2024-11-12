@@ -133,7 +133,6 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
      * Avoid flickering children or fallback while clerk is loading sessionId or userId
      */
     if (!isLoaded.value) {
-      console.log('should render null');
       return null;
     }
 
@@ -141,7 +140,6 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
      * Fallback to UI provided by user or `null` if authorization checks failed
      */
     if (!userId.value) {
-      console.log('should render fallback');
       return slots.fallback?.();
     }
 
