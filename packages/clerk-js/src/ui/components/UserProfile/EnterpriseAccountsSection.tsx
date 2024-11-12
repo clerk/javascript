@@ -1,24 +1,27 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import { useUser } from '@clerk/shared/react';
 import type {
+  CustomOauthProvider,
   EnterpriseAccountResource,
   EnterpriseProvider,
   GoogleOauthProvider,
   MicrosoftOauthProvider,
   SamlIdpSlug,
 } from '@clerk/types';
-import { getOAuthProviderData, OAUTH_PROVIDERS, SAML_IDPS } from '@clerk/types';
+import { getOAuthProviderData, SAML_IDPS } from '@clerk/types';
 
 import { ProviderInitialIcon } from '../../common';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 
-const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.startsWith('saml');
+const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.includes('saml');
 
 const isOAuthBuiltInProvider = (
   provider: EnterpriseProvider,
-): provider is GoogleOauthProvider | MicrosoftOauthProvider =>
-  OAUTH_PROVIDERS.some(oauth_provider => oauth_provider.provider == provider);
+): provider is GoogleOauthProvider | MicrosoftOauthProvider => ['google', 'microsoft'].includes(provider);
+
+const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is CustomOauthProvider =>
+  provider.includes('custom');
 
 const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: EnterpriseAccountResource) => {
   if (isSamlProvider(provider)) {
@@ -57,23 +60,25 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
   const { provider } = account;
   const providerName = getEnterpriseAccountProviderName(account);
 
-  if (isOAuthBuiltInProvider(provider) || isSamlProvider(provider)) {
+  if (isOAuthCustomProvider(provider)) {
     return (
-      <Image
-        elementDescriptor={[descriptors.providerIcon]}
-        elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
-        alt={providerName}
-        src={iconImageUrl(provider)}
-        sx={theme => ({ width: theme.sizes.$4 })}
+      <ProviderInitialIcon
+        id={provider}
+        value={providerName ?? provider}
+        aria-label={`${providerName}'s icon`}
       />
     );
   }
 
+  const src = iconImageUrl(isSamlProvider(provider) ? SAML_IDPS[provider].logo : provider);
+
   return (
-    <ProviderInitialIcon
-      id={provider}
-      value={providerName ?? provider}
-      aria-label={`${providerName}'s icon`}
+    <Image
+      elementDescriptor={[descriptors.providerIcon]}
+      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+      alt={providerName}
+      src={src}
+      sx={theme => ({ width: theme.sizes.$4 })}
     />
   );
 };
