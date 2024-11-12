@@ -214,7 +214,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           afterSignInUrl,
           afterSignUpUrl,
           // @ts-expect-error
-          claimAccountlessKeysUrl: accountless?.claimUrl || undefined,
+          claimAccountlessKeysUrl: accountless?.publishableKey === publishableKey ? accountless?.claimUrl : undefined,
         };
       }
 
