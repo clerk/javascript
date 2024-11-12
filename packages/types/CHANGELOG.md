@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.32.0
+
+### Minor Changes
+
+- Replace `redirectUrl` with `afterJoinWaitlistUrl` in `<Waitlist />` component ([#4532](https://github.com/clerk/javascript/pull/4532)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 4.31.0
 
 ### Minor Changes
