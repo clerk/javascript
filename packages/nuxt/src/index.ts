@@ -11,8 +11,6 @@ import {
 
 export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace'> & {
   /**
-   * @experimental
-   *
    * Skip the automatic server middleware registration. When enabled, you'll need to
    * register the middleware manually in your application.
    *
@@ -46,7 +44,7 @@ export default defineNuxtModule<ModuleOptions>({
     // by environment variables following the pattern NUXT_PUBLIC_CLERK_* (e.g. NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY).
     // More info https://nuxt.com/docs/guide/going-further/runtime-config
     void updateRuntimeConfig({
-      // Public keys exposed to client
+      // Public keys exposed to client and shared with the server
       public: {
         clerk: {
           ...options,
@@ -149,8 +147,5 @@ export default defineNuxtModule<ModuleOptions>({
         filePath: '@clerk/vue',
       });
     });
-
-    // addRouteMiddleware({ name: 'auth', path: resolver.resolve('./runtime/middleware/auth') })
-    // addRouteMiddleware({ name: 'guest', path: resolver.resolve('./runtime/middleware/guest') })
   },
 });
