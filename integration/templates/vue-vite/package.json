@@ -1,0 +1,21 @@
+{
+  "name": "vue-clerk-integration-template",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vue-tsc -b && vite build",
+    "dev": "vite --port $PORT",
+    "preview": "vite preview --port $PORT"
+  },
+  "dependencies": {
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vue-tsc": "^2.1.8"
+  }
+}

@@ -9,6 +9,7 @@ import { next } from './next';
 import { react } from './react';
 import { remix } from './remix';
 import { tanstack } from './tanstack';
+import { vue } from './vue';
 
 /**
  * A list of long-running applications that can be used in tests.
@@ -37,6 +38,7 @@ export const createLongRunningApps = () => {
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
     { id: 'tanstack.start', config: tanstack.start, env: envs.withEmailCodes },
     { id: 'tanstack.router', config: tanstack.router, env: envs.withEmailCodes },
+    { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
