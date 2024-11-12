@@ -15,6 +15,57 @@ const withoutEnterpriseConnection = createFixtures.config(f => {
   });
 });
 
+const withInactiveEnterpriseConnection = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withSocialProvider({ provider: 'github' });
+  f.withUser({
+    enterprise_accounts: [
+      {
+        object: 'enterprise_account',
+        active: false,
+        first_name: 'Laura',
+        last_name: 'Serafim',
+        protocol: 'saml',
+        provider_user_id: null,
+        public_metadata: {},
+        email_address: 'test@clerk.com',
+        provider: 'saml_okta',
+        enterprise_connection: {
+          object: 'enterprise_connection',
+          provider: 'saml_okta',
+          name: 'FooCorp',
+          id: 'ent_123',
+          active: false,
+          allow_idp_initiated: false,
+          allow_subdomains: false,
+          disable_additional_identifications: false,
+          sync_user_attributes: false,
+          domain: 'foocorp.com',
+          created_at: 123,
+          updated_at: 123,
+          logo_public_url: null,
+          protocol: 'saml',
+        },
+        verification: {
+          status: 'verified',
+          strategy: 'saml',
+          verified_at_client: 'foo',
+          attempts: 0,
+          error: {
+            code: 'identifier_already_signed_in',
+            long_message: "You're already signed in",
+            message: "You're already signed in",
+          },
+          expire_at: 123,
+          id: 'ver_123',
+          object: 'verification',
+        },
+        id: 'eac_123',
+      },
+    ],
+  });
+});
+
 const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
   f.withUser({
     enterprise_accounts: [
@@ -163,12 +214,24 @@ const withSamlEnterpriseConnection = createFixtures.config(f => {
 });
 
 describe('EnterpriseAccountsSection ', () => {
-  it('renders the component', async () => {
-    const { wrapper } = await createFixtures(withoutEnterpriseConnection);
+  describe('without enterprise accounts', () => {
+    it('does not render the component', async () => {
+      const { wrapper } = await createFixtures(withoutEnterpriseConnection);
 
-    const { getByText } = render(<EnterpriseAccountsSection />, { wrapper });
+      const { queryByText } = render(<EnterpriseAccountsSection />, { wrapper });
 
-    getByText(/^Enterprise accounts/i);
+      expect(queryByText(/^Enterprise accounts/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('with inactive enterprise accounts accounts', () => {
+    it('does not render the component', async () => {
+      const { wrapper } = await createFixtures(withInactiveEnterpriseConnection);
+
+      const { queryByText } = render(<EnterpriseAccountsSection />, { wrapper });
+
+      expect(queryByText(/^Enterprise accounts/i)).not.toBeInTheDocument();
+    });
   });
 
   describe('with oauth built-in', () => {

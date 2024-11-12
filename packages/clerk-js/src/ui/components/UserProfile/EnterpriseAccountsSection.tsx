@@ -13,28 +13,16 @@ import { ProviderInitialIcon } from '../../common';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 
-const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.includes('saml');
-
-const isOAuthBuiltInProvider = (provider: EnterpriseProvider): provider is EnterpriseProviderKey =>
-  ['oauth_google', 'oauth_microsoft'].includes(provider);
-
-const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is CustomOauthProvider =>
-  provider.includes('custom');
-
-const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: EnterpriseAccountResource) => {
-  if (isSamlProvider(provider)) {
-    return SAML_IDPS[provider]?.name;
-  }
-
-  if (isOAuthBuiltInProvider(provider)) {
-    return getOAuthProviderData({ strategy: provider })?.name;
-  }
-
-  return enterpriseConnection?.name;
-};
-
 export const EnterpriseAccountsSection = () => {
   const { user } = useUser();
+
+  const activeEnterpriseAccounts = user?.enterpriseAccounts.filter(
+    ({ enterpriseConnection }) => enterpriseConnection?.active,
+  );
+
+  if (!activeEnterpriseAccounts?.length) {
+    return null;
+  }
 
   return (
     <ProfileSection.Root
@@ -43,7 +31,7 @@ export const EnterpriseAccountsSection = () => {
       centered={false}
     >
       <ProfileSection.ItemList id='enterpriseAccounts'>
-        {user?.enterpriseAccounts.map(account => (
+        {activeEnterpriseAccounts.map(account => (
           <EnterpriseAccount
             key={account.id}
             account={account}
@@ -51,35 +39,6 @@ export const EnterpriseAccountsSection = () => {
         ))}
       </ProfileSection.ItemList>
     </ProfileSection.Root>
-  );
-};
-
-const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
-  const { provider } = account;
-  const providerName = getEnterpriseAccountProviderName(account);
-
-  if (isOAuthCustomProvider(provider)) {
-    return (
-      <ProviderInitialIcon
-        id={provider}
-        value={providerName ?? provider}
-        aria-label={`${providerName}'s icon`}
-      />
-    );
-  }
-
-  const src = iconImageUrl(
-    isOAuthBuiltInProvider(provider) ? provider.replace('oauth_', '').trim() : SAML_IDPS[provider].logo,
-  );
-
-  return (
-    <Image
-      elementDescriptor={[descriptors.providerIcon]}
-      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
-      alt={providerName}
-      src={src}
-      sx={theme => ({ width: theme.sizes.$4 })}
-    />
   );
 };
 
@@ -127,3 +86,55 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
     </ProfileSection.Item>
   );
 };
+
+const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
+  const { provider } = account;
+  const providerName = getEnterpriseAccountProviderName(account);
+
+  if (isOAuthCustomProvider(provider)) {
+    return (
+      <ProviderInitialIcon
+        id={provider}
+        value={providerName ?? provider}
+        aria-label={`${providerName}'s icon`}
+      />
+    );
+  }
+
+  const src = iconImageUrl(
+    isOAuthBuiltInProvider(provider)
+      ? // Remove 'oauth_' prefix since our CDN image paths don't include it
+        provider.replace('oauth_', '').trim()
+      : SAML_IDPS[provider].logo,
+  );
+
+  return (
+    <Image
+      elementDescriptor={[descriptors.providerIcon]}
+      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+      alt={providerName}
+      src={src}
+      sx={theme => ({ width: theme.sizes.$4 })}
+    />
+  );
+};
+
+const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: EnterpriseAccountResource) => {
+  if (isSamlProvider(provider)) {
+    return SAML_IDPS[provider]?.name;
+  }
+
+  if (isOAuthBuiltInProvider(provider)) {
+    return getOAuthProviderData({ strategy: provider })?.name;
+  }
+
+  return enterpriseConnection?.name;
+};
+
+const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.includes('saml');
+
+const isOAuthBuiltInProvider = (provider: EnterpriseProvider): provider is EnterpriseProviderKey =>
+  ['oauth_google', 'oauth_microsoft'].includes(provider);
+
+const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is CustomOauthProvider =>
+  provider.includes('custom');

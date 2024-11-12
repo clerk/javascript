@@ -402,7 +402,7 @@ describe('PasswordSection', () => {
             enterprise_accounts: [
               {
                 object: 'enterprise_account',
-                active: true,
+                active: false,
                 first_name: 'Laura',
                 last_name: 'Serafim',
                 protocol: 'saml',
@@ -415,7 +415,7 @@ describe('PasswordSection', () => {
                   provider: 'saml_okta',
                   name: 'FooCorp',
                   id: 'ent_123',
-                  active: true,
+                  active: false,
                   allow_idp_initiated: false,
                   allow_subdomains: false,
                   disable_additional_identifications: false,
