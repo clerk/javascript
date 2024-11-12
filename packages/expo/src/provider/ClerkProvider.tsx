@@ -29,12 +29,8 @@ const SDK_METADATA = {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, publishableKey, __experimental_passkeys, experimental, ...rest } = props;
+  const { children, tokenCache, publishableKey, __experimental_passkeys, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
-  const rethrowOfflineNetworkErrors =
-    experimental?.rethrowOfflineNetworkErrors ||
-    process.env.EXPO_PUBLIC_CLERK_EXPERIMENTAL_RETHROW_OFFLINE_NETWORK_ERRORS ||
-    false;
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
@@ -59,9 +55,6 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
           : null
       }
       standardBrowser={!isNative()}
-      experimental={{
-        rethrowOfflineNetworkErrors,
-      }}
     >
       {children}
     </ClerkReactProvider>
