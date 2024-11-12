@@ -71,6 +71,9 @@ export interface UserResource extends ClerkResource {
   externalAccounts: ExternalAccountResource[];
   enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
+  /**
+   * @deprecated use `enterpriseAccounts` instead
+   */
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];

@@ -70,7 +70,7 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
     );
   }
 
-  const src = iconImageUrl(isSamlProvider(provider) ? SAML_IDPS[provider].logo : provider);
+  const src = iconImageUrl(isOAuthBuiltInProvider(provider) ? provider : SAML_IDPS[provider].logo);
 
   return (
     <Image
