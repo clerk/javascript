@@ -198,8 +198,8 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   active: boolean;
   email_address: string;
   enterprise_connection: EnterpriseAccountConnectionJSON | null;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   provider_user_id: string | null;

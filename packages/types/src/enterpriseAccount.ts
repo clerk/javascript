@@ -12,8 +12,8 @@ export interface EnterpriseAccountResource extends ClerkResource {
   active: boolean;
   emailAddress: string;
   enterpriseConnection: EnterpriseAccountConnectionResource | null;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   providerUserId: string | null;

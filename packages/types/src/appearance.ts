@@ -1,5 +1,4 @@
 import type * as CSS from 'csstype';
-import type { EnterpriseProvider } from 'enterpriseAccount';
 
 import type {
   AlertId,
@@ -12,6 +11,7 @@ import type {
   SelectId,
   UserPreviewId,
 } from './elementIds';
+import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
 import type { BuiltInColors, TransparentColor } from './theme';
 import type { Web3Provider } from './web3';

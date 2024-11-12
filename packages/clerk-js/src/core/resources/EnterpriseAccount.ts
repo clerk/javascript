@@ -17,8 +17,8 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
   providerUserId: string | null = null;
   active!: boolean;
   emailAddress = '';
-  firstName = '';
-  lastName = '';
+  firstName: string | null = '';
+  lastName: string | null = '';
   publicMetadata = {};
   verification: VerificationResource | null = null;
   enterpriseConnection: EnterpriseAccountConnectionResource | null = null;
