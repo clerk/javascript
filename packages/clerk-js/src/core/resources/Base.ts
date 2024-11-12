@@ -5,7 +5,7 @@ import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, D
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
-import { ClerkAPIResponseError, Client } from './internal';
+import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
 
@@ -62,7 +62,11 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
-      if (!isValidBrowserOnline() && !this.shouldRethrowOfflineNetworkErrors()) {
+      if (this.shouldRethrowOfflineNetworkErrors()) {
+        throw new ClerkRuntimeError(e?.message || e, {
+          code: 'network_error',
+        });
+      } else if (!isValidBrowserOnline()) {
         console.warn(e);
         return null;
       } else {
