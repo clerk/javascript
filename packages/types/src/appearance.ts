@@ -13,6 +13,7 @@ import type {
 } from './elementIds';
 import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
+import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
 import type { Web3Provider } from './web3';
 
@@ -170,9 +171,10 @@ export type ElementsConfig = {
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
+
+  ssoConnectionProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
 
   alternativeMethods: WithOptions;
   alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;

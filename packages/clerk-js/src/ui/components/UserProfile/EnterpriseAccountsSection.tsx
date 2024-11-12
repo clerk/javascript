@@ -88,11 +88,19 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
 };
 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
-  const { provider } = account;
+  const { provider, enterpriseConnection } = account;
   const providerName = getEnterpriseAccountProviderName(account);
 
   if (isOAuthCustomProvider(provider)) {
-    return (
+    return enterpriseConnection?.logoPublicUrl ? (
+      <Image
+        elementDescriptor={[descriptors.providerIcon]}
+        elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+        alt={providerName}
+        src={enterpriseConnection.logoPublicUrl}
+        sx={theme => ({ width: theme.sizes.$4 })}
+      />
+    ) : (
       <ProviderInitialIcon
         id={provider}
         value={providerName ?? provider}
