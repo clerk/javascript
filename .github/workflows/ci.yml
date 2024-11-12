@@ -86,7 +86,6 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -138,7 +137,6 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
