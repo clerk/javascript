@@ -51,6 +51,7 @@
   "dependencies": {
     "@clerk/backend": "1.16.1",
     "@clerk/shared": "2.12.1",
+    "@clerk/types": "4.32.0",
     "@clerk/vue": "0.0.2",
     "@nuxt/kit": "^3.14.159",
     "h3": "^1.13.0"
