@@ -105,13 +105,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const publishableKey = assertKey(
         // @ts-ignore
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishable_key,
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishableKey,
         () => errorThrower.throwMissingPublishableKeyError(),
       );
 
       const secretKey = assertKey(
         //@ts-ignore
-        resolvedParams.secretKey || SECRET_KEY || accountless.secret_key,
+        resolvedParams.secretKey || SECRET_KEY || accountless.secretKey,
         () => errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -214,10 +214,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           afterSignInUrl,
           afterSignUpUrl,
           // @ts-expect-error
-          claimAccountlessKeysUrl: accountless?.claim_token
-            ? // @ts-expect-error
-              `https://dashboard.clerk.com/apps/claim?token=${accountless.claim_token}`
-            : undefined,
+          claimAccountlessKeysUrl: accountless?.claimUrl || undefined,
         };
       }
 
@@ -257,7 +254,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || '{}');
       }
       // @ts-ignore
-      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishable_key);
+      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishableKey);
 
       if (isPkMissing) {
         const res = NextResponse.next();

@@ -1,20 +1,14 @@
 'use client';
 
+import type { AccountlessApplication } from '@clerk/backend';
 import type { PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
 import { syncAccountlessKeys } from '../server-actions';
 
-export function AccountlessCookieSync(
-  props: PropsWithChildren<{
-    publishable_key: string;
-    secret_key: string;
-    claim_token: string;
-  }>,
-) {
-  const { claim_token, secret_key, publishable_key } = props;
+export function AccountlessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   useEffect(() => {
-    void syncAccountlessKeys({ claim_token, secret_key, publishable_key });
+    void syncAccountlessKeys(props);
   }, []);
 
   return null;

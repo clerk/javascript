@@ -1,5 +1,6 @@
 'use server';
 
+import type { AccountlessApplication } from '@clerk/backend';
 import { getCookies } from 'ezheaders';
 import { RedirectType } from 'next/dist/client/components/redirect';
 import { redirect } from 'next/navigation';
@@ -14,12 +15,9 @@ export async function invalidateCacheAction(): Promise<void> {
   void (await getCookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
 }
 
-export async function syncAccountlessKeys(args: {
-  publishable_key: string;
-  secret_key: string;
-  claim_token: string;
-}): Promise<void> {
-  void (await getCookies()).set(getAccountlessCookie(), JSON.stringify(args), {
+export async function syncAccountlessKeys(args: AccountlessApplication): Promise<void> {
+  const { claimUrl, publishableKey, secretKey } = args;
+  void (await getCookies()).set(getAccountlessCookie(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });

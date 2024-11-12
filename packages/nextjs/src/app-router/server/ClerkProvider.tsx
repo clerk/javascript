@@ -1,7 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { AuthObject } from '@clerk/backend';
+import type { AccountlessApplication, AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
@@ -88,8 +88,6 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
     flag: 'w',
   });
 
-  let res: any;
-
   const CLERK_PATH = getClerkPath();
   mkdirSync(path.dirname(CLERK_PATH), { recursive: true });
   updateGitignore();
@@ -114,12 +112,11 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
 
   const client = createClerkClientWithOptions({});
 
-  // eslint-disable-next-line prefer-const
-  res = await client.accountlessApplications.createAccountlessApplication();
+  const accountlessApplication = await client.accountlessApplications.createAccountlessApplication();
 
-  console.log('--- new keys', res);
+  console.log('--- new keys', accountlessApplication);
 
-  writeFileSync(CLERK_PATH, JSON.stringify(res), {
+  writeFileSync(CLERK_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
     mode: '0777',
     flag: 'w',
@@ -128,7 +125,7 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
   rmSync(CLERK_LOCK, { force: true, recursive: true });
 
   isCreatingFile = false;
-  return res;
+  return accountlessApplication;
 }
 
 export async function ClerkProvider(
@@ -171,13 +168,8 @@ export async function ClerkProvider(
   );
 
   if (!publishableKey) {
-    const res = (await createAccountlessKeys(publishableKey)) as {
-      publishable_key: string;
-      secret_key: string;
-      claim_token: string;
-    };
-
-    publishableKey = res.publishable_key;
+    const res = (await createAccountlessKeys(publishableKey)) as AccountlessApplication;
+    publishableKey = res.publishableKey;
 
     output = (
       <html>
