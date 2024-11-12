@@ -36,8 +36,8 @@ export function getAuthDataFromRequest(
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
   const options = {
-    secretKey: opts?.secretKey || accountlessCookie?.secret_key || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: accountlessCookie?.publishable_key || decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY || accountlessCookie?.secret_key,
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY || accountlessCookie?.publishable_key,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,
