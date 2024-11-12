@@ -6,7 +6,9 @@ import type { ClerkResource } from './resource';
 
 export type EnterpriseProtocol = 'saml' | 'oauth';
 
-export type EnterpriseProvider = SamlIdpSlug | GoogleOauthProvider | MicrosoftOauthProvider | CustomOauthProvider;
+export type EnterpriseProviderKey = `oauth_${GoogleOauthProvider | MicrosoftOauthProvider}`;
+
+export type EnterpriseProvider = SamlIdpSlug | EnterpriseProviderKey | CustomOauthProvider;
 
 export interface EnterpriseAccountResource extends ClerkResource {
   active: boolean;

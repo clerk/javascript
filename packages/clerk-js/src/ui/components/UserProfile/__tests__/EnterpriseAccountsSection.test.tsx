@@ -27,10 +27,10 @@ const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
         provider_user_id: null,
         public_metadata: {},
         email_address: 'test@clerk.com',
-        provider: 'google',
+        provider: 'oauth_google',
         enterprise_connection: {
           object: 'enterprise_connection',
-          provider: 'google',
+          provider: 'oauth_google',
           name: 'FooCorp',
           id: 'ent_123',
           active: true,

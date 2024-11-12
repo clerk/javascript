@@ -4,8 +4,7 @@ import type {
   CustomOauthProvider,
   EnterpriseAccountResource,
   EnterpriseProvider,
-  GoogleOauthProvider,
-  MicrosoftOauthProvider,
+  EnterpriseProviderKey,
   SamlIdpSlug,
 } from '@clerk/types';
 import { getOAuthProviderData, SAML_IDPS } from '@clerk/types';
@@ -16,9 +15,8 @@ import { ProfileSection } from '../../elements';
 
 const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.includes('saml');
 
-const isOAuthBuiltInProvider = (
-  provider: EnterpriseProvider,
-): provider is GoogleOauthProvider | MicrosoftOauthProvider => ['google', 'microsoft'].includes(provider);
+const isOAuthBuiltInProvider = (provider: EnterpriseProvider): provider is EnterpriseProviderKey =>
+  ['oauth_google', 'oauth_microsoft'].includes(provider);
 
 const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is CustomOauthProvider =>
   provider.includes('custom');
@@ -29,7 +27,7 @@ const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: En
   }
 
   if (isOAuthBuiltInProvider(provider)) {
-    return getOAuthProviderData({ provider })?.name;
+    return getOAuthProviderData({ strategy: provider })?.name;
   }
 
   return enterpriseConnection?.name;
@@ -70,7 +68,9 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
     );
   }
 
-  const src = iconImageUrl(isOAuthBuiltInProvider(provider) ? provider : SAML_IDPS[provider].logo);
+  const src = iconImageUrl(
+    isOAuthBuiltInProvider(provider) ? provider.replace('oauth_', '').trim() : SAML_IDPS[provider].logo,
+  );
 
   return (
     <Image
