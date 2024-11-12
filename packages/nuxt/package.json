@@ -27,7 +27,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./server": {
@@ -36,14 +36,15 @@
     }
   },
   "main": "./dist/index.js",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "server"
   ],
   "scripts": {
     "build": "tsup",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
     "publish:local": "npx yalc push --replace --sig"
   },
