@@ -112,7 +112,7 @@ runs:
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install NPM Dependencies
-      run: npm ci --audit=false --fund=false --engine-strict=false
+      run: npm ci --audit=false --fund=false --engine-strict=false --loglevel=verbose
       shell: bash
 
     - name: Get Playwright Version
