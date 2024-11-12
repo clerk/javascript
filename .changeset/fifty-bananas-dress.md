@@ -1,7 +1,6 @@
 ---
 '@clerk/clerk-js': patch
 '@clerk/types': patch
-'@clerk/clerk-expo': patch
 ---
 
 Introduce the `experimental.rethrowOfflineNetworkErrors` option to the `ClerkProvider` component. 
