@@ -64,6 +64,7 @@ export function clerkMiddleware(handler?: Handler) {
 
     const authObject = requestState.toAuth();
     event.context.auth = authObject;
+    // Internal serializable state that will be passed to the client
     event.context.__clerk_initial_state = createInitialState(authObject);
 
     handler?.(event);
