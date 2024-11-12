@@ -6,9 +6,11 @@ setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 export default defineNuxtPlugin(nuxtApp => {
+  // SSR-friendly shared state
   const initialState = useState('clerk-initial-state', () => undefined);
 
   if (import.meta.server) {
+    // Save the initial state from server and pass it to the plugin
     initialState.value = nuxtApp.ssrContext?.event.context.__clerk_initial_state;
   }
 
