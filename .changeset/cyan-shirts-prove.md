@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-Support multiple enterprise protocols in `UserProfile`
+Surface enterprise accounts in `UserProfile`, allowing to display more protocols besides SAML
