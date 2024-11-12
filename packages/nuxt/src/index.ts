@@ -92,8 +92,12 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    type VueClerkImports = Array<keyof typeof import('@clerk/vue')>;
+
     // Add auto-imports for Clerk components and composables
-    const components = [
+    // More info https://nuxt.com/docs/guide/concepts/auto-imports
+    const components: VueClerkImports = [
       // Authentication Components
       'SignIn',
       'SignUp',
@@ -122,7 +126,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
     ];
-    const composables = [
+    const composables: VueClerkImports = [
       'useAuth',
       'useClerk',
       'useSession',
@@ -131,8 +135,6 @@ export default defineNuxtModule<ModuleOptions>({
       'useSignUp',
       'useUser',
       'useOrganization',
-      // helpers
-      'updateClerkOptions',
     ];
     addImports(
       composables.map(composable => ({
