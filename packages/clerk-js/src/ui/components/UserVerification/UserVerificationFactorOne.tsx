@@ -77,9 +77,9 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
   if (!currentFactor) {
     return (
       <ErrorCard
-        cardTitle={localizationKeys('__experimental_userVerification.noAvailableMethods.title')}
-        cardSubtitle={localizationKeys('__experimental_userVerification.noAvailableMethods.subtitle')}
-        message={localizationKeys('__experimental_userVerification.noAvailableMethods.message')}
+        cardTitle={localizationKeys('userVerification.noAvailableMethods.title')}
+        cardSubtitle={localizationKeys('userVerification.noAvailableMethods.subtitle')}
+        message={localizationKeys('userVerification.noAvailableMethods.message')}
         shouldNavigateBack={false}
       />
     );

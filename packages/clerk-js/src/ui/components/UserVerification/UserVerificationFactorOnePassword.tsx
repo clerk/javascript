@@ -47,8 +47,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('__experimental_userVerification.password.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('__experimental_userVerification.password.subtitle')} />
+            <Header.Title localizationKey={localizationKeys('userVerification.password.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('userVerification.password.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Col
@@ -80,8 +80,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
               <Card.ActionLink
                 localizationKey={localizationKeys(
                   onShowAlternativeMethodsClick
-                    ? '__experimental_userVerification.password.actionLink'
-                    : '__experimental_userVerification.alternativeMethods.actionLink',
+                    ? 'userVerification.password.actionLink'
+                    : 'userVerification.alternativeMethods.actionLink',
                 )}
                 onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
               />

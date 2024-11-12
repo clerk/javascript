@@ -34,10 +34,8 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
     <Card.Root>
       <Card.Content>
         <Header.Root showLogo>
-          <Header.Title localizationKey={localizationKeys('__experimental_userVerification.backupCodeMfa.title')} />
-          <Header.Subtitle
-            localizationKey={localizationKeys('__experimental_userVerification.backupCodeMfa.subtitle')}
-          />
+          <Header.Title localizationKey={localizationKeys('userVerification.backupCodeMfa.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('userVerification.backupCodeMfa.subtitle')} />
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
         <Col
