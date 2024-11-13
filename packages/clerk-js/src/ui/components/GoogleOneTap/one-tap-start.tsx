@@ -33,16 +33,23 @@ function _OneTapStart(): JSX.Element | null {
   const shouldLoadGIS = !user?.id && !!environmentClientID;
 
   async function initializeGIS() {
-    const google = await loadGIS();
-    google.accounts.id.initialize({
-      client_id: environmentClientID!,
-      callback: oneTapCallback,
-      itp_support: ctx.itpSupport,
-      cancel_on_tap_outside: ctx.cancelOnTapOutside,
-      auto_select: false,
-      use_fedcm_for_prompt: ctx.fedCmSupport,
-    });
-    return google;
+    if (__BUILD_ENABLE_RHC__) {
+      const google = await loadGIS();
+
+      google.accounts.id.initialize({
+        client_id: environmentClientID!,
+        callback: oneTapCallback,
+        itp_support: ctx.itpSupport,
+        cancel_on_tap_outside: ctx.cancelOnTapOutside,
+        auto_select: false,
+        use_fedcm_for_prompt: ctx.fedCmSupport,
+      });
+
+      return google;
+    }
+
+    console.warn('Google Identity Services is not enabled in this environment');
+    return undefined;
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/clerk-js';
+import { Clerk } from '@clerk/clerk-js/no-rhc';
 import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
@@ -32,6 +32,10 @@ export async function createClerkClient({
   storageCache = BrowserStorageCache,
   syncHost,
 }: CreateClerkClientOptions): Promise<Clerk> {
+  if (scope === SCOPE.BACKGROUND) {
+    Clerk.mountComponentRenderer = undefined;
+  }
+
   // Don't cache background scripts as it can result in out-of-sync client information.
   if (clerk && scope !== SCOPE.BACKGROUND) {
     return clerk;

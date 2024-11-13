@@ -11,6 +11,7 @@ const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   clerk: 'clerk',
+  clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
@@ -18,6 +19,7 @@ const variants = {
 
 const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
+  [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
@@ -27,9 +29,10 @@ const variantToSourceFile = {
  *
  * @param {object} config
  * @param {'development'|'production'} config.mode
+ * @param {boolean} [config.rhc=true]
  * @returns { import('@rspack/cli').Configuration }
  */
-const common = ({ mode }) => {
+const common = ({ mode, rhc = true }) => {
   return {
     mode,
     resolve: {
@@ -39,6 +42,7 @@ const common = ({ mode }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
+        __BUILD_ENABLE_RHC__: JSON.stringify(rhc),
         __DEV__: isDevelopment(mode),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
@@ -400,12 +404,63 @@ const prodConfig = ({ mode, env, analysis }) => {
     },
   });
 
+  const clerkEsmNoRHC = merge(
+    entryForVariant(variants.clerkNoRHC),
+    common({ mode, rhc: false }),
+    commonForProd(),
+    commonForProdBundled(),
+    {
+      experiments: {
+        outputModule: true,
+      },
+      output: {
+        filename: '[name].mjs',
+        libraryTarget: 'module',
+      },
+      plugins: [
+        // Include the lazy chunks in the bundle as well
+        // so that the final bundle can be imported and bundled again
+        // by a different bundler, eg the webpack instance used by react-scripts
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
+    },
+  );
+
+  const clerkCjsNoRHC = merge(
+    entryForVariant(variants.clerkNoRHC),
+    common({ mode, rhc: false }),
+    commonForProd(),
+    commonForProdBundled(),
+    {
+      output: {
+        filename: '[name].js',
+        libraryTarget: 'commonjs',
+      },
+      plugins: [
+        // Include the lazy chunks in the bundle as well
+        // so that the final bundle can be imported and bundled again
+        // by a different bundler, eg the webpack instance used by react-scripts
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
+    },
+  );
+
   // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
   if (analysis) {
     return [clerkBrowser];
   }
 
-  return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
+  return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
 };
 
 /**
@@ -478,9 +533,21 @@ const devConfig = ({ mode, env }) => {
       common({ mode }),
       commonForDev(),
     ),
+    // prettier-ignore
+    [variants.clerkBrowserNoRHC]: merge(
+      entryForVariant(variants.clerkBrowserNoRHC),
+      common({ mode, rhc: false }),
+      commonForDev(),
+    ),
     [variants.clerkHeadless]: merge(
       entryForVariant(variants.clerkHeadless),
       common({ mode }),
+      commonForDev(),
+      // externalsForHeadless(),
+    ),
+    [variants.clerkHeadlessNoRHC]: merge(
+      entryForVariant(variants.clerkHeadlessNoRHC),
+      common({ mode, rhc: false }),
       commonForDev(),
       // externalsForHeadless(),
     ),

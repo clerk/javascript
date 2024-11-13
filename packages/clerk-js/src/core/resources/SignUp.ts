@@ -79,31 +79,41 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
-      retrieveCaptchaInfo(SignUp.clerk);
 
-    if (
-      !this.shouldBypassCaptchaForAttempt(params) &&
-      canUseCaptcha &&
-      captchaSiteKey &&
-      captchaURL &&
-      captchaPublicKeyInvisible
-    ) {
-      try {
-        const captchaParams = await getCaptchaToken({
-          siteKey: captchaSiteKey,
-          widgetType: captchaWidgetType,
-          invisibleSiteKey: captchaPublicKeyInvisible,
-          scriptUrl: captchaURL,
-          captchaProvider,
-        });
-        paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
-        paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
-      } catch (e) {
-        if (e.captchaError) {
-          paramsWithCaptcha.captchaError = e.captchaError;
-        } else {
-          throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+    if (__BUILD_ENABLE_RHC__) {
+      const {
+        captchaSiteKey,
+        canUseCaptcha,
+        captchaURL,
+        captchaWidgetType,
+        captchaProvider,
+        captchaPublicKeyInvisible,
+      } = retrieveCaptchaInfo(SignUp.clerk);
+
+      if (
+        !this.shouldBypassCaptchaForAttempt(params) &&
+        canUseCaptcha &&
+        captchaSiteKey &&
+        captchaURL &&
+        captchaPublicKeyInvisible
+      ) {
+        try {
+          const captchaParams = await getCaptchaToken({
+            siteKey: captchaSiteKey,
+            widgetType: captchaWidgetType,
+            invisibleSiteKey: captchaPublicKeyInvisible,
+            scriptUrl: captchaURL,
+            captchaProvider,
+          });
+
+          paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
+          paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
+        } catch (e) {
+          if (e.captchaError) {
+            paramsWithCaptcha.captchaError = e.captchaError;
+          } else {
+            throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+          }
         }
       }
     }
@@ -196,47 +206,52 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const {
-      generateSignature,
-      identifier,
-      unsafeMetadata,
-      strategy = 'web3_metamask_signature',
-      legalAccepted,
-    } = params || {};
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    if (__BUILD_ENABLE_RHC__) {
+      const {
+        generateSignature,
+        identifier,
+        unsafeMetadata,
+        strategy = 'web3_metamask_signature',
+        legalAccepted,
+      } = params || {};
+      const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
-    if (!(typeof generateSignature === 'function')) {
-      clerkMissingOptionError('generateSignature');
-    }
-
-    const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
-    await this.prepareWeb3WalletVerification({ strategy });
-
-    const { message } = this.verifications.web3Wallet;
-    if (!message) {
-      clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
-    }
-
-    let signature: string;
-    try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
-    } catch (err) {
-      // There is a chance that as a first time visitor when you try to setup and use the
-      // Coinbase Wallet from scratch in order to authenticate, the initial generate
-      // signature request to be rejected. For this reason we retry the request once more
-      // in order for the flow to be able to be completed successfully.
-      //
-      // error code 4001 means the user rejected the request
-      // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
-      if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce: message, provider });
-      } else {
-        throw err;
+      if (!(typeof generateSignature === 'function')) {
+        clerkMissingOptionError('generateSignature');
       }
-    }
 
-    return this.attemptWeb3WalletVerification({ signature, strategy });
+      const web3Wallet = identifier || this.web3wallet!;
+      await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
+      await this.prepareWeb3WalletVerification({ strategy });
+
+      const { message } = this.verifications.web3Wallet;
+      if (!message) {
+        clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
+      }
+
+      let signature: string;
+      try {
+        signature = await generateSignature({ identifier, nonce: message, provider });
+      } catch (err) {
+        // There is a chance that as a first time visitor when you try to setup and use the
+        // Coinbase Wallet from scratch in order to authenticate, the initial generate
+        // signature request to be rejected. For this reason we retry the request once more
+        // in order for the flow to be able to be completed successfully.
+        //
+        // error code 4001 means the user rejected the request
+        // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
+        if (provider === 'coinbase_wallet' && err.code === 4001) {
+          signature = await generateSignature({ identifier, nonce: message, provider });
+        } else {
+          throw err;
+        }
+      }
+
+      return this.attemptWeb3WalletVerification({ signature, strategy });
+    } else {
+      console.warn('Web3 is not enabled in this environment');
+      return this;
+    }
   };
 
   public authenticateWithMetamask = async (
@@ -244,14 +259,19 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getMetamaskIdentifier();
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithMetamask,
-      unsafeMetadata: params?.unsafeMetadata,
-      strategy: 'web3_metamask_signature',
-      legalAccepted: params?.legalAccepted,
-    });
+    if (__BUILD_ENABLE_RHC__) {
+      const identifier = await getMetamaskIdentifier();
+      return this.authenticateWithWeb3({
+        identifier,
+        generateSignature: generateSignatureWithMetamask,
+        unsafeMetadata: params?.unsafeMetadata,
+        strategy: 'web3_metamask_signature',
+        legalAccepted: params?.legalAccepted,
+      });
+    } else {
+      console.warn('Metamask is not enabled in this environment');
+      return this;
+    }
   };
 
   public authenticateWithCoinbaseWallet = async (
@@ -259,14 +279,19 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
-      unsafeMetadata: params?.unsafeMetadata,
-      strategy: 'web3_coinbase_wallet_signature',
-      legalAccepted: params?.legalAccepted,
-    });
+    if (__BUILD_ENABLE_RHC__) {
+      const identifier = await getCoinbaseWalletIdentifier();
+      return this.authenticateWithWeb3({
+        identifier,
+        generateSignature: generateSignatureWithCoinbaseWallet,
+        unsafeMetadata: params?.unsafeMetadata,
+        strategy: 'web3_coinbase_wallet_signature',
+        legalAccepted: params?.legalAccepted,
+      });
+    } else {
+      console.warn('Coinbase Wallet is not enabled in this environment');
+      return this;
+    }
   };
 
   public authenticateWithRedirect = async ({

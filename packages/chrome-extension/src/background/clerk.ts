@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/clerk-js';
+import { Clerk } from '@clerk/clerk-js/no-rhc';
 
 import {
   createClerkClient as _createClerkClient,
@@ -6,10 +6,11 @@ import {
 } from '../internal';
 import { SCOPE } from '../types';
 
+Clerk.mountComponentRenderer = undefined;
+
 export type CreateClerkClientOptions = Omit<_CreateClerkClientOptions, 'scope'>;
 
 export async function createClerkClient(opts: CreateClerkClientOptions): Promise<Clerk> {
-  Clerk.mountComponentRenderer = undefined;
   const clerk = await _createClerkClient({ ...opts, scope: SCOPE.BACKGROUND });
   await clerk.load({ standardBrowser: false });
   return clerk;

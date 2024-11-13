@@ -60,6 +60,11 @@ import type {
 } from './types';
 import { isConstructor } from './utils';
 
+if (typeof __BUILD_ENABLE_RHC__ === 'undefined') {
+  // @ts-expect-error -- TODO: Fix typing
+  globalThis.__BUILD_ENABLE_RHC__ = true;
+}
+
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
@@ -462,22 +467,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
         global.Clerk = c;
       } else {
-        // Hot-load latest ClerkJS from Clerk CDN
-        if (!global.Clerk) {
-          await loadClerkJsScript({
-            ...this.options,
-            publishableKey: this.#publishableKey,
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-            nonce: this.options.nonce,
-          });
-        }
+        if (__BUILD_ENABLE_RHC__) {
+          // Hot-load latest ClerkJS from Clerk CDN
+          if (!global.Clerk) {
+            await loadClerkJsScript({
+              ...this.options,
+              publishableKey: this.#publishableKey,
+              proxyUrl: this.proxyUrl,
+              domain: this.domain,
+              nonce: this.options.nonce,
+            });
+          }
 
-        if (!global.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
-        }
+          if (!global.Clerk) {
+            throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+          }
 
-        await global.Clerk.load(this.options);
+          await global.Clerk.load(this.options);
+        }
       }
 
       if (global.Clerk?.loaded) {
@@ -1118,37 +1125,53 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   authenticateWithMetamask = async (params: AuthenticateWithMetamaskParams): Promise<void> => {
-    const callback = () => this.clerkjs?.authenticateWithMetamask(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
+    if (__BUILD_ENABLE_RHC__) {
+      const callback = () => this.clerkjs?.authenticateWithMetamask(params);
+      if (this.clerkjs && this.#loaded) {
+        return callback() as Promise<void>;
+      } else {
+        this.premountMethodCalls.set('authenticateWithMetamask', callback);
+      }
     } else {
-      this.premountMethodCalls.set('authenticateWithMetamask', callback);
+      console.warn('Metamask authentication is not supported in this environment');
     }
   };
 
   authenticateWithCoinbaseWallet = async (params: AuthenticateWithCoinbaseWalletParams): Promise<void> => {
-    const callback = () => this.clerkjs?.authenticateWithCoinbaseWallet(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
+    if (__BUILD_ENABLE_RHC__) {
+      const callback = () => this.clerkjs?.authenticateWithCoinbaseWallet(params);
+      if (this.clerkjs && this.#loaded) {
+        return callback() as Promise<void>;
+      } else {
+        this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+      }
     } else {
-      this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+      console.warn('Coinbase Wallet authentication is not supported in this environment');
     }
   };
 
   authenticateWithWeb3 = async (params: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    const callback = () => this.clerkjs?.authenticateWithWeb3(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
+    if (__BUILD_ENABLE_RHC__) {
+      const callback = () => this.clerkjs?.authenticateWithWeb3(params);
+      if (this.clerkjs && this.#loaded) {
+        return callback() as Promise<void>;
+      } else {
+        this.premountMethodCalls.set('authenticateWithWeb3', callback);
+      }
     } else {
-      this.premountMethodCalls.set('authenticateWithWeb3', callback);
+      console.warn('Web3 authentication is not supported in this environment');
     }
   };
 
   authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
-    const clerkjs = await this.#waitForClerkJS();
-    return clerkjs.authenticateWithGoogleOneTap(params);
+    if (__BUILD_ENABLE_RHC__) {
+      const clerkjs = await this.#waitForClerkJS();
+      return clerkjs.authenticateWithGoogleOneTap(params);
+    } else {
+      console.warn('Google One Tap authentication is not supported in this environment');
+    }
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

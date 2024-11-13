@@ -1486,21 +1486,25 @@ export class Clerk implements ClerkInterface {
   public authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
-    return this.client?.signIn
-      .create({
-        strategy: 'google_one_tap',
-        token: params.token,
-      })
-      .catch(err => {
-        if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
-          return this.client?.signUp.create({
-            strategy: 'google_one_tap',
-            token: params.token,
-            legalAccepted: params.legalAccepted,
-          });
-        }
-        throw err;
-      }) as Promise<SignInResource | SignUpResource>;
+    if (__BUILD_ENABLE_RHC__) {
+      return this.client?.signIn
+        .create({
+          strategy: 'google_one_tap',
+          token: params.token,
+        })
+        .catch(err => {
+          if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
+            return this.client?.signUp.create({
+              strategy: 'google_one_tap',
+              token: params.token,
+              legalAccepted: params.legalAccepted,
+            });
+          }
+          throw err;
+        }) as Promise<SignInResource | SignUpResource>;
+    } else {
+      throw new Error('Google One Tap authentication is not supported in this environment');
+    }
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
@@ -1519,47 +1523,51 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    if (!this.client || !this.environment) {
-      return;
-    }
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-    const identifier = await getWeb3Identifier({ provider });
-    const generateSignature =
-      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
-
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
-
-    let signInOrSignUp: SignInResource | SignUpResource;
-    try {
-      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
-    } catch (err) {
-      if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
-          identifier,
-          generateSignature,
-          unsafeMetadata,
-          strategy,
-          legalAccepted,
-        });
-
-        if (
-          signUpContinueUrl &&
-          signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
-        ) {
-          await navigate(signUpContinueUrl);
-        }
-      } else {
-        throw err;
+    if (__BUILD_ENABLE_RHC__) {
+      if (!this.client || !this.environment) {
+        return;
       }
-    }
+      const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+      const identifier = await getWeb3Identifier({ provider });
+      const generateSignature =
+        provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
 
-    if (signInOrSignUp.createdSessionId) {
-      await this.setActive({
-        session: signInOrSignUp.createdSessionId,
-        redirectUrl,
-      });
+      const navigate = (to: string) =>
+        customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+      let signInOrSignUp: SignInResource | SignUpResource;
+      try {
+        signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
+      } catch (err) {
+        if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+          signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
+            identifier,
+            generateSignature,
+            unsafeMetadata,
+            strategy,
+            legalAccepted,
+          });
+
+          if (
+            signUpContinueUrl &&
+            signInOrSignUp.status === 'missing_requirements' &&
+            signInOrSignUp.verifications.web3Wallet.status === 'verified'
+          ) {
+            await navigate(signUpContinueUrl);
+          }
+        } else {
+          throw err;
+        }
+      }
+
+      if (signInOrSignUp.createdSessionId) {
+        await this.setActive({
+          session: signInOrSignUp.createdSessionId,
+          redirectUrl,
+        });
+      }
+    } else {
+      throw new Error('Web3 authentication is not supported in this environment');
     }
   };
 
