@@ -237,6 +237,8 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 }
 
+const ACCOUNTLESS_ENCRYPTION_KEY = 'clerk_accountless_dummy_key';
+
 /**
  * Encrypt request data propagated between server requests.
  * @internal
@@ -246,7 +248,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  if (requestData.secretKey && !ENCRYPTION_KEY) {
+  if (requestData.secretKey && !ENCRYPTION_KEY && process.env.NODE_ENV === 'production') {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
@@ -255,10 +257,12 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  return AES.encrypt(
-    JSON.stringify(requestData),
-    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
-  ).toString();
+  const maybeAccountlessKey =
+    process.env.NODE_ENV === 'production'
+      ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
+      : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+
+  return AES.encrypt(JSON.stringify(requestData), maybeAccountlessKey).toString();
 }
 
 /**
@@ -272,8 +276,13 @@ export function decryptClerkRequestData(
     return {};
   }
 
+  const maybeAccountlessKey =
+    process.env.NODE_ENV === 'production'
+      ? ENCRYPTION_KEY || SECRET_KEY
+      : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, maybeAccountlessKey);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {

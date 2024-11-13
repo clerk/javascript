@@ -366,12 +366,3 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
 
   throw e;
 };
-
-// export function isClerkKeyError(err: any) {
-//   const message = String(err);
-//   return (
-//     message.includes('Missing publishableKey') ||
-//     message.includes('Missing secretKey') ||
-//     message.includes("Clerk can't detect usage of clerkMiddleware()")
-//   );
-// }
