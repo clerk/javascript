@@ -2,7 +2,7 @@ import { createClerkClient } from '@clerk/backend';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { H3Event } from 'h3';
 
-// @ts-expect-error: Handled by Nuxt
+// @ts-expect-error: Nitro import. Handled by Nuxt.
 // eslint-disable-next-line import/no-unresolved
 import { useRuntimeConfig } from '#imports';
 
