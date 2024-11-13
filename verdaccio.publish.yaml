@@ -15,3 +15,4 @@ packages:
     proxy: npmjs
 log: { type: stdout, format: pretty, level: http }
 max_body_size: 20mb
+listen: 0.0.0.0:4873
