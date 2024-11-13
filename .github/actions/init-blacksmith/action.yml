@@ -111,6 +111,10 @@ runs:
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
+    - name: Install npm
+      run: npm install --global npm@10.8.3
+      shell: bash
+
     - name: Install NPM Dependencies
       run: npm ci --audit=false --fund=false --engine-strict=false --loglevel=verbose
       shell: bash
