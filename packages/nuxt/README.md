@@ -82,6 +82,23 @@ You can now start using Clerk's components. Here's a basic example showing a hea
 </template>
 ```
 
+To protect an API route, you can access the `event.context.auth` object and check the value of `userId` to determine if the user is authenticated:
+
+```ts
+export default eventHandler(async event => {
+  const { userId } = event.context.auth;
+
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      message: 'Unauthorized',
+    });
+  }
+
+  return { userId };
+});
+```
+
 ## Support
 
 You can get in touch with us in any of the following ways:
