@@ -1,5 +1,6 @@
+import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import { clerkPlugin } from '@clerk/vue';
-import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/vue/internal';
+import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
