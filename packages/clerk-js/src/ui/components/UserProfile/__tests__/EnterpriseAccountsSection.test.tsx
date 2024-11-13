@@ -33,7 +33,7 @@ const withInactiveEnterpriseConnection = createFixtures.config(f => {
         enterprise_connection: {
           object: 'enterprise_connection',
           provider: 'saml_okta',
-          name: 'FooCorp',
+          name: 'Okta Workforce',
           id: 'ent_123',
           active: false,
           allow_idp_initiated: false,
@@ -43,7 +43,7 @@ const withInactiveEnterpriseConnection = createFixtures.config(f => {
           domain: 'foocorp.com',
           created_at: 123,
           updated_at: 123,
-          logo_public_url: null,
+          logo_public_url: 'https://img.clerk.com/static/okta.svg',
           protocol: 'saml',
         },
         verification: {
@@ -82,7 +82,7 @@ const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
         enterprise_connection: {
           object: 'enterprise_connection',
           provider: 'oauth_google',
-          name: 'FooCorp',
+          name: 'Google',
           id: 'ent_123',
           active: true,
           allow_idp_initiated: false,
@@ -92,7 +92,7 @@ const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
           domain: 'foocorp.com',
           created_at: 123,
           updated_at: 123,
-          logo_public_url: null,
+          logo_public_url: 'https://img.clerk.com/static/google.svg',
           protocol: 'oauth',
         },
         verification: {
@@ -181,7 +181,7 @@ const withSamlEnterpriseConnection = createFixtures.config(f => {
         enterprise_connection: {
           object: 'enterprise_connection',
           provider: 'saml_okta',
-          name: 'FooCorp',
+          name: 'Okta Workforce',
           id: 'ent_123',
           active: true,
           allow_idp_initiated: false,
@@ -191,7 +191,7 @@ const withSamlEnterpriseConnection = createFixtures.config(f => {
           domain: 'foocorp.com',
           created_at: 123,
           updated_at: 123,
-          logo_public_url: null,
+          logo_public_url: 'https://img.clerk.com/static/okta.svg',
           protocol: 'saml',
         },
         verification: {

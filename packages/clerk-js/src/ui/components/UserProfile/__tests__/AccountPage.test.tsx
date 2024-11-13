@@ -108,7 +108,7 @@ describe('AccountPage', () => {
                 enterprise_connection: {
                   object: 'enterprise_connection',
                   provider: 'saml_okta',
-                  name: 'FooCorp',
+                  name: 'Okta Workforce',
                   id: 'ent_123',
                   active: true,
                   allow_idp_initiated: false,
@@ -173,7 +173,7 @@ describe('AccountPage', () => {
                 enterprise_connection: {
                   object: 'enterprise_connection',
                   provider: 'saml_okta',
-                  name: 'FooCorp',
+                  name: 'Okta Workforce',
                   id: 'ent_123',
                   active: false,
                   allow_idp_initiated: false,
@@ -233,7 +233,7 @@ describe('AccountPage', () => {
         enterprise_connection: {
           object: 'enterprise_connection',
           provider: 'saml_okta',
-          name: 'FooCorp',
+          name: 'Okta Workforce',
           id: 'ent_123',
           active: true,
           allow_idp_initiated: false,
