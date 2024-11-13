@@ -42,6 +42,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
