@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.33.1
+
+### Patch Changes
+
+- Use fapi error long message instead of statusText when throwing API errors. ([#4511](https://github.com/clerk/javascript/pull/4511)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes satellite syncing when both the satellite and the primary apps use server-side enabled frameworks like NextJS ([#4516](https://github.com/clerk/javascript/pull/4516)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`cc741adf26d983ae199ad8e7faa6551a80999f16`](https://github.com/clerk/javascript/commit/cc741adf26d983ae199ad8e7faa6551a80999f16)]:
+  - @clerk/localizations@3.6.2
+
 ## 5.33.0
 
 ### Minor Changes

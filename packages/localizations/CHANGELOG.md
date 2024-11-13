@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.6.2
+
+### Patch Changes
+
+- Add legal consent translations to the `el-GR` localization. ([#4543](https://github.com/clerk/javascript/pull/4543)) by [@dikaioai](https://github.com/dikaioai)
+
 ## 3.6.1
 
 ### Patch Changes
