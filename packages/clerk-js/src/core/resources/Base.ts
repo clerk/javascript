@@ -5,7 +5,7 @@ import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, D
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
-import { ClerkAPIResponseError, Client } from './internal';
+import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
 
@@ -62,7 +62,12 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
-      if (!isValidBrowserOnline()) {
+      // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
+      if (this.shouldRethrowOfflineNetworkErrors()) {
+        throw new ClerkRuntimeError(e?.message || e, {
+          code: 'network_error',
+        });
+      } else if (!isValidBrowserOnline()) {
         console.warn(e);
         return null;
       } else {
@@ -186,5 +191,10 @@ export abstract class BaseResource {
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
     const { rotatingTokenNonce } = params || {};
     return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
+  }
+
+  private static shouldRethrowOfflineNetworkErrors(): boolean {
+    const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
+    return experimental?.rethrowOfflineNetworkErrors || false;
   }
 }
