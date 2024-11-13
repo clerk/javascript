@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.16.2
+
+### Patch Changes
+
+- Fixes satellite syncing when both the satellite and the primary apps use server-side enabled frameworks like NextJS ([#4516](https://github.com/clerk/javascript/pull/4516)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.16.1
 
 ### Patch Changes

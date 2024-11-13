@@ -99,7 +99,7 @@ import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
-import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
+import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -1635,9 +1635,6 @@ export class Clerk implements ClerkInterface {
     return this.navigate(to);
   }
 
-  #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
-  #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
-
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
       [CLERK_SATELLITE_URL]: window.location.href,
@@ -1661,8 +1658,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
-    if (this.#hasJustSynced()) {
-      this.#clearJustSynced();
+    if (getClerkQueryParam(CLERK_SYNCED) === 'true') {
       return false;
     }
 
@@ -1818,7 +1814,7 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    this.#clearHandshakeFromUrl();
+    this.#clearClerkQueryParams();
 
     this.#handleImpersonationFab();
     return true;
@@ -2010,8 +2006,12 @@ export class Clerk implements ClerkInterface {
    * The handshake payload is transported in the URL in development. In cases where FAPI is returning the handshake payload, but Clerk is being used in a client-only application,
    * we remove the handshake associated parameters as they are not necessary.
    */
-  #clearHandshakeFromUrl = () => {
+  #clearClerkQueryParams = () => {
     try {
+      removeClerkQueryParam(CLERK_SYNCED);
+      // @nikos: we're looking into dropping this param completely
+      // in the meantime, we're removing it here to keep the URL clean
+      removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
       removeClerkQueryParam('__clerk_help');
     } catch (_) {
