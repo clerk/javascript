@@ -1125,53 +1125,37 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   authenticateWithMetamask = async (params: AuthenticateWithMetamaskParams): Promise<void> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const callback = () => this.clerkjs?.authenticateWithMetamask(params);
-      if (this.clerkjs && this.#loaded) {
-        return callback() as Promise<void>;
-      } else {
-        this.premountMethodCalls.set('authenticateWithMetamask', callback);
-      }
+    const callback = () => this.clerkjs?.authenticateWithMetamask(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
     } else {
-      console.warn('Metamask authentication is not supported in this environment');
+      this.premountMethodCalls.set('authenticateWithMetamask', callback);
     }
   };
 
   authenticateWithCoinbaseWallet = async (params: AuthenticateWithCoinbaseWalletParams): Promise<void> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const callback = () => this.clerkjs?.authenticateWithCoinbaseWallet(params);
-      if (this.clerkjs && this.#loaded) {
-        return callback() as Promise<void>;
-      } else {
-        this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
-      }
+    const callback = () => this.clerkjs?.authenticateWithCoinbaseWallet(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
     } else {
-      console.warn('Coinbase Wallet authentication is not supported in this environment');
+      this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
     }
   };
 
   authenticateWithWeb3 = async (params: ClerkAuthenticateWithWeb3Params): Promise<void> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const callback = () => this.clerkjs?.authenticateWithWeb3(params);
-      if (this.clerkjs && this.#loaded) {
-        return callback() as Promise<void>;
-      } else {
-        this.premountMethodCalls.set('authenticateWithWeb3', callback);
-      }
+    const callback = () => this.clerkjs?.authenticateWithWeb3(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
     } else {
-      console.warn('Web3 authentication is not supported in this environment');
+      this.premountMethodCalls.set('authenticateWithWeb3', callback);
     }
   };
 
   authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const clerkjs = await this.#waitForClerkJS();
-      return clerkjs.authenticateWithGoogleOneTap(params);
-    } else {
-      console.warn('Google One Tap authentication is not supported in this environment');
-    }
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.authenticateWithGoogleOneTap(params);
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

@@ -55,6 +55,7 @@ import {
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkMissingWebAuthnPublicKeyOptions,
+  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -281,10 +282,10 @@ export class SignIn extends BaseResource implements SignInResource {
         signature,
         strategy,
       });
-    } else {
-      console.warn('Web3 is not supported in this environment');
-      return this;
     }
+
+    clerkUnsupportedEnvironmentWarning('Web3');
+    return this;
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
@@ -295,10 +296,10 @@ export class SignIn extends BaseResource implements SignInResource {
         generateSignature: generateSignatureWithMetamask,
         strategy: 'web3_metamask_signature',
       });
-    } else {
-      console.warn('Metamask is not supported in this environment');
-      return this;
     }
+
+    clerkUnsupportedEnvironmentWarning('Metamask');
+    return this;
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
@@ -309,10 +310,10 @@ export class SignIn extends BaseResource implements SignInResource {
         generateSignature: generateSignatureWithCoinbaseWallet,
         strategy: 'web3_coinbase_wallet_signature',
       });
-    } else {
-      console.warn('Coinbase Wallet is not supported in this environment');
-      return this;
     }
+
+    clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+    return this;
   };
 
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {

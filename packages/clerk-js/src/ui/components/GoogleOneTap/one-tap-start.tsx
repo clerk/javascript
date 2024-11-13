@@ -1,6 +1,7 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 import { useEffect, useRef } from 'react';
 
+import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
 import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
@@ -48,7 +49,7 @@ function _OneTapStart(): JSX.Element | null {
       return google;
     }
 
-    console.warn('Google Identity Services is not enabled in this environment');
+    clerkUnsupportedEnvironmentWarning('Google Identity Services');
     return undefined;
   }
 
