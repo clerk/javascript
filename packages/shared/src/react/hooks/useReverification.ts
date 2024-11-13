@@ -28,7 +28,13 @@ async function resolveResult<T>(
     });
 }
 
-function createReverificationHandler(params: { onOpenModal: Clerk['__experimental_openUserVerification'] }) {
+type UseReverificationOptions = {
+  onCancel?: (() => void) | 'throw';
+};
+
+function createReverificationHandler(
+  params: { onOpenModal: Clerk['__experimental_openUserVerification'] } & UseReverificationOptions,
+) {
   function assertReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): Fetcher {
     return (async (...args) => {
       let result = await resolveResult(fetcher(...args));
@@ -56,10 +62,20 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
           },
         });
 
-        /**
-         * Wait until the promise from above have been resolved or rejected
-         */
-        await resolvers.promise;
+        try {
+          /**
+           * Wait until the promise from above have been resolved or rejected
+           */
+          await resolvers.promise;
+        } catch (e) {
+          if (params.onCancel === 'throw') {
+            throw e;
+          }
+          params?.onCancel?.();
+
+          // Is this even right ?
+          return null;
+        }
 
         /**
          * After the promise resolved successfully try the original request one more time
@@ -74,16 +90,21 @@ function createReverificationHandler(params: { onOpenModal: Clerk['__experimenta
   return assertReverification;
 }
 
-function __experimental_useReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): readonly [Fetcher] {
+function __experimental_useReverification<Fetcher extends () => Promise<any>>(
+  fetcher: Fetcher,
+  options?: UseReverificationOptions,
+): readonly [Fetcher] {
   const { __experimental_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
+  const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
       onOpenModal: __experimental_openUserVerification,
+      onCancel: optionsRef.current?.onCancel,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__experimental_openUserVerification, fetcherRef.current]);
+  }, [__experimental_openUserVerification, fetcherRef.current, optionsRef.current]);
 
   // Keep fetcher ref in sync
   useSafeLayoutEffect(() => {
