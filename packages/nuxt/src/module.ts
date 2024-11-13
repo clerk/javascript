@@ -35,7 +35,7 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@clerk/nuxt',
     configKey: 'clerk',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '^3.0.0 || ^4.0.0',
     },
   },
   setup(options, nuxt) {
