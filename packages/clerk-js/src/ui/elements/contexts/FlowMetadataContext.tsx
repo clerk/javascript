@@ -13,6 +13,7 @@ type FlowMetadata = {
     | 'organizationSwitcher'
     | 'organizationList'
     | 'oneTap'
+    | 'blankCaptcha'
     | 'waitlist';
   part?:
     | 'start'
