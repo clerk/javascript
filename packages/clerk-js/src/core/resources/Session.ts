@@ -106,7 +106,6 @@ export class Session extends BaseResource implements SessionResource {
         tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
-      eventBus.dispatch(events.TokenUpdate, { token });
     }
   };
 

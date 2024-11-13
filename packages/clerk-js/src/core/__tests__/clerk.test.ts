@@ -461,6 +461,7 @@ describe('Clerk singleton', () => {
       status: 'active',
       user: {},
       getToken: jest.fn(),
+      lastActiveToken: { getRawString: () => mockJwt },
     };
 
     afterEach(() => {
@@ -489,6 +490,15 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('updates auth cookie on load from fetched session', async () => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+
+      expect(document.cookie).toContain(mockJwt);
+    });
+
     it('updates auth cookie on token:update event', async () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
@@ -497,11 +507,11 @@ describe('Clerk singleton', () => {
 
       const token = {
         jwt: {},
-        getRawString: () => mockJwt,
+        getRawString: () => 'updated-jwt',
       } as TokenResource;
       eventBus.dispatch(events.TokenUpdate, { token });
 
-      expect(document.cookie).toContain(mockJwt);
+      expect(document.cookie).toContain('updated-jwt');
     });
   });
 

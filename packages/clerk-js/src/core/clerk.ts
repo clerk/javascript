@@ -1793,6 +1793,11 @@ export class Clerk implements ClerkInterface {
 
         this.#authService.setActiveOrganizationInStorage();
 
+        // Ensure session cookie is updated with the session's last active token
+        if (this.session) {
+          eventBus.dispatch(events.TokenUpdate, { token: this.session.lastActiveToken });
+        }
+
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
