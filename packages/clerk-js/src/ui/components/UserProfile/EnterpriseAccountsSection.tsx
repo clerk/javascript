@@ -4,7 +4,6 @@ import type {
   CustomOauthProvider,
   EnterpriseAccountResource,
   EnterpriseProvider,
-  EnterpriseProviderKey,
   OAuthProvider,
   SamlIdpSlug,
 } from '@clerk/types';
@@ -92,32 +91,34 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
   const { provider, enterpriseConnection } = account;
   const providerName = getEnterpriseAccountProviderName(account) ?? provider;
 
+  const providerWithoutPrefix = provider.replace('oauth_', '').trim() as OAuthProvider;
+
   if (isOAuthCustomProvider(provider)) {
     return enterpriseConnection?.logoPublicUrl ? (
       <Image
         elementDescriptor={[descriptors.providerIcon]}
-        elementId={descriptors.providerIcon.setId(provider)}
+        elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
         alt={providerName}
         src={enterpriseConnection.logoPublicUrl}
         sx={theme => ({ width: theme.sizes.$4 })}
       />
     ) : (
       <ProviderInitialIcon
-        id={provider}
+        id={providerWithoutPrefix}
         value={providerName}
         aria-label={`${providerName}'s icon`}
+        elementDescriptor={[descriptors.providerIcon, descriptors.providerInitialIcon]}
+        elementId={descriptors.providerInitialIcon.setId(providerWithoutPrefix)}
       />
     );
   }
 
-  const providerWithoutPrefix = provider.replace('oauth_', '').trim() as OAuthProvider;
-
-  const src = iconImageUrl(isOAuthBuiltInProvider(provider) ? providerWithoutPrefix : SAML_IDPS[provider].logo);
+  const src = iconImageUrl(isSamlProvider(provider) ? SAML_IDPS[provider].logo : providerWithoutPrefix);
 
   return (
     <Image
       elementDescriptor={[descriptors.providerIcon]}
-      elementId={descriptors.providerIcon.setId(providerWithoutPrefix)}
+      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
       alt={providerName}
       src={src}
       sx={theme => ({ width: theme.sizes.$4 })}
@@ -130,17 +131,14 @@ const getEnterpriseAccountProviderName = ({ provider, enterpriseConnection }: En
     return SAML_IDPS[provider]?.name;
   }
 
-  if (isOAuthBuiltInProvider(provider)) {
-    return getOAuthProviderData({ strategy: provider })?.name;
+  if (isOAuthCustomProvider(provider)) {
+    return enterpriseConnection?.name;
   }
 
-  return enterpriseConnection?.name;
+  return getOAuthProviderData({ strategy: provider })?.name;
 };
 
 const isSamlProvider = (provider: EnterpriseProvider): provider is SamlIdpSlug => provider.includes('saml');
 
-const isOAuthBuiltInProvider = (provider: EnterpriseProvider): provider is EnterpriseProviderKey =>
-  ['oauth_google', 'oauth_microsoft'].includes(provider);
-
-const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is CustomOauthProvider =>
+const isOAuthCustomProvider = (provider: EnterpriseProvider): provider is `oauth_${CustomOauthProvider}` =>
   provider.includes('custom');

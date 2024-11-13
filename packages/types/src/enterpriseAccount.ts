@@ -1,4 +1,4 @@
-import type { CustomOauthProvider, GoogleOauthProvider, MicrosoftOauthProvider } from 'oauth';
+import type { OAuthProvider } from 'oauth';
 import type { SamlIdpSlug } from 'saml';
 import type { VerificationResource } from 'verification';
 
@@ -6,9 +6,7 @@ import type { ClerkResource } from './resource';
 
 export type EnterpriseProtocol = 'saml' | 'oauth';
 
-export type EnterpriseProviderKey = `oauth_${GoogleOauthProvider | MicrosoftOauthProvider}`;
-
-export type EnterpriseProvider = SamlIdpSlug | EnterpriseProviderKey | CustomOauthProvider;
+export type EnterpriseProvider = SamlIdpSlug | `oauth_${OAuthProvider}`;
 
 export interface EnterpriseAccountResource extends ClerkResource {
   active: boolean;

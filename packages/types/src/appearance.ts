@@ -11,6 +11,7 @@ import type {
   SelectId,
   UserPreviewId,
 } from './elementIds';
+import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
@@ -171,6 +172,8 @@ export type ElementsConfig = {
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+
+  enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
   providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
   providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
