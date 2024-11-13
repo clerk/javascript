@@ -503,7 +503,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'veryStrict',
+        __experimental_reverification: 'strictMfa',
       });
 
       expect(isAuthorized).toBe(true);
