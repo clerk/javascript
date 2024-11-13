@@ -15,8 +15,12 @@ export const ProviderInitialIcon = (props: ProviderInitialIconProps) => {
   return (
     <Box
       as='span'
-      elementDescriptor={[descriptors.providerIcon, descriptors.ssoConnectionProviderInitialIcon]}
-      elementId={descriptors.ssoConnectionProviderInitialIcon.setId(id)}
+      elementDescriptor={[
+        descriptors.providerIcon,
+        descriptors.socialButtonsProviderInitialIcon,
+        descriptors.providerInitialIcon,
+      ]}
+      elementId={descriptors.providerInitialIcon.setId(id)}
       sx={t => ({
         ...common.centeredFlex('inline-flex'),
         width: t.space.$4,

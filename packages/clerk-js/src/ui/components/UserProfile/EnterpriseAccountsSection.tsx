@@ -5,6 +5,7 @@ import type {
   EnterpriseAccountResource,
   EnterpriseProvider,
   EnterpriseProviderKey,
+  OAuthProvider,
   SamlIdpSlug,
 } from '@clerk/types';
 import { getOAuthProviderData, SAML_IDPS } from '@clerk/types';
@@ -89,13 +90,13 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
   const { provider, enterpriseConnection } = account;
-  const providerName = getEnterpriseAccountProviderName(account);
+  const providerName = getEnterpriseAccountProviderName(account) ?? provider;
 
   if (isOAuthCustomProvider(provider)) {
     return enterpriseConnection?.logoPublicUrl ? (
       <Image
         elementDescriptor={[descriptors.providerIcon]}
-        elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+        elementId={descriptors.providerIcon.setId(provider)}
         alt={providerName}
         src={enterpriseConnection.logoPublicUrl}
         sx={theme => ({ width: theme.sizes.$4 })}
@@ -103,23 +104,20 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
     ) : (
       <ProviderInitialIcon
         id={provider}
-        value={providerName ?? provider}
+        value={providerName}
         aria-label={`${providerName}'s icon`}
       />
     );
   }
 
-  const src = iconImageUrl(
-    isOAuthBuiltInProvider(provider)
-      ? // Remove 'oauth_' prefix since our CDN image paths don't include it
-        provider.replace('oauth_', '').trim()
-      : SAML_IDPS[provider].logo,
-  );
+  const providerWithoutPrefix = provider.replace('oauth_', '').trim() as OAuthProvider;
+
+  const src = iconImageUrl(isOAuthBuiltInProvider(provider) ? providerWithoutPrefix : SAML_IDPS[provider].logo);
 
   return (
     <Image
       elementDescriptor={[descriptors.providerIcon]}
-      elementId={descriptors.enterpriseButtonsProviderIcon.setId(account.provider)}
+      elementId={descriptors.providerIcon.setId(providerWithoutPrefix)}
       alt={providerName}
       src={src}
       sx={theme => ({ width: theme.sizes.$4 })}

@@ -11,7 +11,6 @@ import type {
   SelectId,
   UserPreviewId,
 } from './elementIds';
-import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
@@ -171,10 +170,10 @@ export type ElementsConfig = {
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
-  enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
-
-  ssoConnectionProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
 
   alternativeMethods: WithOptions;
   alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
@@ -399,7 +398,6 @@ export type ElementsConfig = {
   badge: WithOptions<'primary' | 'actionRequired'>;
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
-  providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
 };
 
