@@ -55,6 +55,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderInitialIcon',
 
   'enterpriseButtonsProviderIcon',
+
+  'providerIcon',
+  'providerInitialIcon',
+
   'alternativeMethods',
   'alternativeMethodsBlockButton',
   'alternativeMethodsBlockButtonText',
@@ -271,7 +275,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'badge',
   'notificationBadge',
   'buttonArrowIcon',
-  'providerIcon',
   'spinner',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 

@@ -47,7 +47,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const requiredFieldsFilled =
     hasRequiredFields && !!lastNameField.value && !!firstNameField.value && optionalFieldsChanged;
 
-  const nameEditDisabled = user.samlAccounts.some(sa => sa.active);
+  const nameEditDisabled = user.enterpriseAccounts.some(ea => ea.active);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
