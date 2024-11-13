@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { getAccountlessCookie } from './accountless';
+import { getAccountlessCookieValue } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -97,22 +97,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const accountlessCookieName = await getAccountlessCookie();
-      let accountless = {};
-      if (process.env.NODE_ENV === 'development' && accountlessCookieName) {
-        accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || '{}');
-      }
+      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
-        // @ts-ignore
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishableKey,
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey,
         () => errorThrower.throwMissingPublishableKeyError(),
       );
 
-      const secretKey = assertKey(
-        //@ts-ignore
-        resolvedParams.secretKey || SECRET_KEY || accountless.secretKey,
-        () => errorThrower.throwMissingSecretKeyError(),
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secretKey, () =>
+        errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
@@ -213,8 +206,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           domain,
           afterSignInUrl,
           afterSignUpUrl,
-          // @ts-expect-error
           claimAccountlessKeysUrl: accountless?.publishableKey === publishableKey ? accountless?.claimUrl : undefined,
+          accountlessMode: accountless?.publishableKey === publishableKey,
         };
       }
 
@@ -248,13 +241,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const accountlessCookieName = await getAccountlessCookie();
-      let accountless = {};
-      if (process.env.NODE_ENV === 'development' && accountlessCookieName) {
-        accountless = JSON.parse(request.cookies.get(accountlessCookieName)?.value || '{}');
-      }
-      // @ts-ignore
-      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless.publishableKey);
+      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
+
+      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey);
 
       if (isPkMissing) {
         const res = NextResponse.next();

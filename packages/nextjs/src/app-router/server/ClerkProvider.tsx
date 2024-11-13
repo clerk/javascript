@@ -67,17 +67,28 @@ const getClerkPath = () => path.join(process.cwd(), '.clerk', '.tmp', 'accountle
 
 let isCreatingFile = false;
 
-export async function createAccountlessKeys(publishableKey: string | undefined): Promise<NonNullable<unknown>> {
-  if (publishableKey) {
-    return {};
+function safeParseClerkFile(): AccountlessApplication | undefined {
+  try {
+    const CLERK_PATH = getClerkPath();
+    let fileAsString;
+    try {
+      fileAsString = readFileSync(CLERK_PATH, { encoding: 'utf-8' }) || '{}';
+    } catch {
+      fileAsString = '{}';
+    }
+    return JSON.parse(fileAsString) as AccountlessApplication;
+  } catch {
+    return undefined;
   }
+}
 
+export async function createAccountlessKeys(): Promise<AccountlessApplication | undefined> {
   if (isCreatingFile) {
-    return {};
+    return undefined;
   }
 
   if (existsSync(CLERK_LOCK)) {
-    return {};
+    return undefined;
   }
 
   isCreatingFile = true;
@@ -92,15 +103,9 @@ export async function createAccountlessKeys(publishableKey: string | undefined):
   mkdirSync(path.dirname(CLERK_PATH), { recursive: true });
   updateGitignore();
 
-  let fileAsString;
-  try {
-    fileAsString = readFileSync(CLERK_PATH, { encoding: 'utf-8' });
-  } catch {
-    fileAsString = '{}';
-  }
-  const envVarsMap = JSON.parse(fileAsString);
+  const envVarsMap = safeParseClerkFile();
 
-  if (envVarsMap.publishable_key && envVarsMap.secret_key) {
+  if (envVarsMap?.publishableKey && envVarsMap?.secretKey) {
     isCreatingFile = false;
     rmSync(CLERK_LOCK, { force: true, recursive: true });
     return envVarsMap;
@@ -151,6 +156,8 @@ export async function ClerkProvider(
 
   const dynamicConfig = await getDynamicConfig();
 
+  console.log('--- dynamicConfig', dynamicConfig);
+
   let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
 
   let output = (
@@ -167,30 +174,32 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  if (!publishableKey) {
-    const res = (await createAccountlessKeys(publishableKey)) as AccountlessApplication;
+  // if (!publishableKey) {
+  const res = !publishableKey || dynamicConfig.accountlessMode ? await createAccountlessKeys() : undefined;
+  if (res) {
     publishableKey = res.publishableKey;
 
     output = (
-      <html>
-        <body>
-          <AccountlessCookieSync {...res}>
-            <ClientClerkProvider
-              {...mergeNextClerkPropsWithEnv({
-                ...dynamicConfig,
-                ...rest,
-                publishableKey,
-              })}
-              nonce={await nonce}
-              initialState={await statePromise}
-            >
-              {children}
-            </ClientClerkProvider>
-          </AccountlessCookieSync>
-        </body>
-      </html>
+      // <html>
+      //   <body>
+      <AccountlessCookieSync {...res}>
+        <ClientClerkProvider
+          {...mergeNextClerkPropsWithEnv({
+            ...dynamicConfig,
+            ...rest,
+            publishableKey,
+          })}
+          nonce={await nonce}
+          initialState={await statePromise}
+        >
+          {children}
+        </ClientClerkProvider>
+      </AccountlessCookieSync>
+      //   </body>
+      // </html>
     );
   }
+  // }
 
   if (dynamic) {
     return (

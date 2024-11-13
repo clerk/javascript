@@ -1,9 +1,10 @@
+import type { AccountlessApplication } from '@clerk/backend';
 import hex from 'crypto-js/enc-hex';
 import sha256 from 'crypto-js/sha256';
 
 const accountlessCookiePrefix = `__clerk_acc_`;
 
-const getAccountlessCookie = (): string => {
+const getAccountlessCookieName = (): string => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const PATH = process.env.PWD;
 
@@ -23,4 +24,25 @@ function hashString(str: string) {
   return sha256(str).toString(hex).slice(0, 16); // Take only the first 32 characters
 }
 
-export { getAccountlessCookie };
+function getAccountlessCookieValue(
+  getter: (cookieName: string) => string | undefined,
+): AccountlessApplication | undefined {
+  if (process.env.NODE_ENV !== 'development') {
+    return undefined;
+  }
+
+  const accountlessCookieName = getAccountlessCookieName();
+  let accountless;
+
+  try {
+    if (accountlessCookieName) {
+      accountless = JSON.parse(getter(accountlessCookieName) || '{}');
+    }
+  } catch {
+    accountless = undefined;
+  }
+
+  return accountless;
+}
+
+export { getAccountlessCookieValue, getAccountlessCookieName };

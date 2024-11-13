@@ -11,5 +11,5 @@ export function AccountlessCookieSync(props: PropsWithChildren<AccountlessApplic
     void syncAccountlessKeys(props);
   }, []);
 
-  return null;
+  return props.children;
 }

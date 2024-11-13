@@ -3,7 +3,7 @@ import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
-import { getAccountlessCookie } from '../accountless';
+import { getAccountlessCookieValue } from '../accountless';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import type { RequestLike } from '../types';
 import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getCookie, getHeader } from '../utils';
@@ -26,18 +26,13 @@ export function getAuthDataFromRequest(
 
   const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
 
-  const accountlessCookieName = getAccountlessCookie();
-
-  let accountlessCookie: Record<string, any> | null = null;
-  if (accountlessCookieName) {
-    accountlessCookie = JSON.parse(getCookie(req, accountlessCookieName) || 'null');
-  }
+  const accountlessCookie = getAccountlessCookieValue(name => getCookie(req, name));
 
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
   const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY || accountlessCookie?.secret_key,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY || accountlessCookie?.publishable_key,
+    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY || accountlessCookie?.secretKey || '',
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY || accountlessCookie?.publishableKey,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,

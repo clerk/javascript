@@ -5,7 +5,7 @@ import { getCookies } from 'ezheaders';
 import { RedirectType } from 'next/dist/client/components/redirect';
 import { redirect } from 'next/navigation';
 
-import { getAccountlessCookie } from '../server/accountless';
+import { getAccountlessCookieName } from '../server/accountless';
 
 // This function needs to be async as we'd like to support next versions in the range of [14.1.2,14.2.0)
 // These versions required 'use server' files to export async methods only. This check was later relaxed
@@ -17,10 +17,11 @@ export async function invalidateCacheAction(): Promise<void> {
 
 export async function syncAccountlessKeys(args: AccountlessApplication): Promise<void> {
   const { claimUrl, publishableKey, secretKey } = args;
-  void (await getCookies()).set(getAccountlessCookie(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
 
+  // TODO-ACCOUNTLESS: Do we even need this ? I think setting the cookie will reset the router cache.
   redirect('/clerk-sync-accountless', RedirectType.replace);
 }
