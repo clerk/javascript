@@ -62,6 +62,7 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
+      // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
