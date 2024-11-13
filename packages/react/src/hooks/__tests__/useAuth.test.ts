@@ -65,7 +65,7 @@ describe('useAuth type tests', () => {
 
     it('veryStrict reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'veryStrict',
+        __experimental_reverification: 'strictMfa',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 
