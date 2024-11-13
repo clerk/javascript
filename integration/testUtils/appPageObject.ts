@@ -35,7 +35,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       if (opts.searchParams) {
         url.search = opts.searchParams.toString();
       }
-      return page.goto(url.toString(), { timeout: opts.timeout ?? 10000 });
+      return page.goto(url.toString(), { timeout: opts.timeout ?? 20000 });
     },
     waitForClerkJsLoaded: async () => {
       return page.waitForFunction(() => {

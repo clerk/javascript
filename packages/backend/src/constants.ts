@@ -26,6 +26,7 @@ const Cookies = {
 
 const QueryParameters = {
   ClerkSynced: '__clerk_synced',
+  SuffixedCookies: 'suffixed_cookies',
   ClerkRedirectUrl: '__clerk_redirect_url',
   // use the reference to Cookies to indicate that it's the same value
   DevBrowser: Cookies.DevBrowser,
