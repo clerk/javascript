@@ -15,7 +15,7 @@ export interface __experimental_SessionVerificationResource extends ClerkResourc
 
 export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
-export type __experimental_SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
+export type __experimental_SessionVerificationTypes = 'strictMfa' | 'strict' | 'moderate' | 'lax';
 
 export type __experimental_ReverificationConfig =
   | __experimental_SessionVerificationTypes

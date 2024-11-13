@@ -32,7 +32,7 @@ type CheckStepUpAuthorization = (
 ) => boolean | null;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
-  veryStrict: {
+  strictMfa: {
     afterMinutes: 10,
     level: 'multiFactor',
   },
@@ -52,7 +52,7 @@ const TYPES_TO_OBJECTS: TypesToConfig = {
 
 const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>(['firstFactor', 'secondFactor', 'multiFactor']);
 
-const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['veryStrict', 'strict', 'moderate', 'lax']);
+const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['strictMfa', 'strict', 'moderate', 'lax']);
 
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
