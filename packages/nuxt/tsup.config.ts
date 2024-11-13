@@ -5,7 +5,7 @@ import { name, version } from './package.json';
 export default defineConfig(() => {
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/runtime/plugin.ts', './src/runtime/server/*.ts'],
+    entry: ['./src/module.ts', './src/runtime/plugin.ts', './src/runtime/server/*.ts'],
     format: ['esm'],
     bundle: false,
     sourcemap: true,

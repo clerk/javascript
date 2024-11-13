@@ -27,16 +27,16 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js"
     },
     "./server": {
       "types": "./dist/runtime/server/index.d.ts",
       "import": "./dist/runtime/server/index.js"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/module.js",
+  "types": "./dist/module.d.ts",
   "files": [
     "dist",
     "server"
