@@ -85,11 +85,7 @@ You can now start using Clerk's components. Here's a basic example showing a hea
 To protect an API route, you can access the `event.context.auth` object and check the value of `userId` to determine if the user is authenticated:
 
 ```ts
-<<<<<<< HEAD
-export default eventHandler(event => {
-=======
 export default eventHandler(async event => {
->>>>>>> 2cf6bca44 (chore(nuxt): Update README)
   const { userId } = event.context.auth;
 
   if (!userId) {
