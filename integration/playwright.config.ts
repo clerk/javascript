@@ -16,7 +16,6 @@ export const common: PlaywrightTestConfig = {
   timeout: 90_000,
   maxFailures: process.env.CI ? 5 : undefined,
   workers: process.env.CI ? '50%' : '70%',
-  reporter: process.env.CI ? 'line' : 'list',
   use: {
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
