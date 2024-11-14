@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.34.0
+
+### Minor Changes
+
+- Update reverification config values to snake_case. ([#4556](https://github.com/clerk/javascript/pull/4556)) by [@panteliselef](https://github.com/panteliselef)
+
+  For `__experimental_ReverificationConfig`
+
+  - `strictMfa` changes to `strict_mfa`
+
+  For `__experimental_SessionVerificationLevel`
+
+  - `firstFactor` changes to `first_factor`
+  - - `secondFactor` changes to `second_factor`
+  - - `multiFactor` changes to `multi_factor`
+
 ## 4.33.0
 
 ### Minor Changes
