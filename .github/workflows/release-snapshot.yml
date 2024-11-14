@@ -87,15 +87,15 @@ jobs:
 
       - name: Version packages for snapshot
         id: version-packages
-        run: npm run version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
-        run: npx turbo build $TURBO_ARGS
+        run: pnpm turbo build $TURBO_ARGS
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
-        run: npm run release:snapshot
+        run: pnpm release:snapshot
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

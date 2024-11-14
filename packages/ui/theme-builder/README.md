@@ -7,5 +7,5 @@
 To deploy the theme builder to Vercel, run the following command:
 
 ```
-npm run deploy [-- --prod]
+pnpm deploy [-- --prod]
 ```

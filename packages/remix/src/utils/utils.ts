@@ -51,7 +51,7 @@ const hasCloudflareContext = (context: any): context is CloudflareEnv => {
 export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
   // Node envs
   if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
-    return process.env[name] as string;
+    return process.env[name];
   }
 
   // Remix + Cloudflare pages
@@ -67,7 +67,7 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
 
   // Check whether the value exists in the context object directly
   if (context && typeof context[name] === 'string') {
-    return context[name] as string;
+    return context[name];
   }
 
   // Cloudflare workers

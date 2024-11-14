@@ -41,7 +41,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace --sig",
+    "publish:local": "pnpm dlx yalc push --replace --sig",
     "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%"
   },
@@ -52,7 +52,8 @@
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "typescript": "*"
+    "typescript": "*",
+    "vue": "3.5.12"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

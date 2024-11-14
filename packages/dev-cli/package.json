@@ -29,7 +29,7 @@
     "jscodeshift": "^0.16.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^20.14.8",
     "typescript": "*"
   },

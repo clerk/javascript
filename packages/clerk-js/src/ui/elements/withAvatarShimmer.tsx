@@ -14,7 +14,7 @@ export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component:
 
     return (
       <Component
-        {...props}
+        {...(props as T)}
         ref={ref}
         sx={[
           parsedLayout.shimmer

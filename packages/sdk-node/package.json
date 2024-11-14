@@ -40,10 +40,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && tsup",
+    "build": "pnpm clean && tsup",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
-    "publish:local": "npx yalc push --replace  --sig",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "publish:local": "pnpm dlx yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
@@ -59,7 +59,7 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/express": "^4.17.21",
     "@types/node": "^18.19.33",
     "nock": "^13.0.7",

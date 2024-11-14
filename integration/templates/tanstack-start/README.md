@@ -56,7 +56,7 @@ To run the example locally, you need to:
 
 4. `npm install` the required dependencies.
 
-5. `npm run dev` to launch the development server.
+5. `pnpm dev` to launch the development server.
 
 ## Learn more
 
