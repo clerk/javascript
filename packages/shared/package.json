@@ -60,6 +60,16 @@
         "default": "./dist/workerTimers/index.js"
       }
     },
+    "./dom": {
+      "import": {
+        "types": "./dist/dom/index.d.mts",
+        "default": "./dist/dom/index.mjs"
+      },
+      "require": {
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -75,6 +85,7 @@
     "date",
     "deprecated",
     "deriveState",
+    "dom",
     "error",
     "file",
     "globs",

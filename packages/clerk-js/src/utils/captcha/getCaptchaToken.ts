@@ -1,24 +1,14 @@
-import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/types';
-
 import { getHCaptchaToken } from './hcaptcha';
-import { getTunstileToken } from './turnstile';
-
-type CaptchaOptions = {
-  siteKey: string;
-  scriptUrl: string;
-  widgetType: CaptchaWidgetType;
-  invisibleSiteKey: string;
-  captchaProvider: CaptchaProvider;
-};
+import { getTurnstileToken } from './turnstile';
+import type { CaptchaOptions } from './types';
 
 /*
  * This is a temporary solution to test different captcha providers, until we decide on a single one.
  */
-export const getCaptchaToken = (captchaOptions: CaptchaOptions) => {
-  const { captchaProvider, ...captchaProviderOptions } = captchaOptions;
-  if (captchaProvider === 'hcaptcha') {
-    return getHCaptchaToken(captchaProviderOptions);
+export const getCaptchaToken = (opts: CaptchaOptions) => {
+  if (opts.captchaProvider === 'hcaptcha') {
+    return getHCaptchaToken(opts);
   } else {
-    return getTunstileToken(captchaProviderOptions);
+    return getTurnstileToken(opts);
   }
 };
