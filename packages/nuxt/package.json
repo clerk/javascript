@@ -54,9 +54,11 @@
     "@clerk/types": "4.34.0",
     "@clerk/vue": "0.0.4",
     "@nuxt/kit": "^3.14.159",
+    "@nuxt/schema": "^3.14.159",
     "h3": "^1.13.0"
   },
   "devDependencies": {
+    "@types/node": "latest",
     "nuxt": "^3.14.159",
     "typescript": "*"
   },
