@@ -38,8 +38,7 @@
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
   "files": [
-    "dist",
-    "server"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
