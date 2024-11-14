@@ -32,7 +32,8 @@ export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'route
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: '@clerk/nuxt',
+    name: PACKAGE_NAME,
+    version: PACKAGE_VERSION,
     configKey: 'clerk',
     compatibility: {
       nuxt: '>=3.0.0',
