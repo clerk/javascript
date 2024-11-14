@@ -234,7 +234,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     closeModal?.();
     const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
     if (invisibleWidget) {
-      document.removeChild(invisibleWidget);
+      document.body.removeChild(invisibleWidget);
     }
     const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleWidget) {

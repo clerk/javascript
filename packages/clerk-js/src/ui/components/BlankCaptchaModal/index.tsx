@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Flow } from '../../customizables';
 import { Card, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
