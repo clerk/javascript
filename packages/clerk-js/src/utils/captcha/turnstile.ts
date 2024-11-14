@@ -1,5 +1,6 @@
 import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
+import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
@@ -124,41 +125,45 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
 
   let captchaToken = '';
   let id = '';
-  let isInvisibleWidget = !widgetType || widgetType === 'invisible';
   let turnstileSiteKey = siteKey;
   let retries = 0;
-  let widgetContainer: HTMLElement | null = null;
-  let widgetContainerQuerySelector: string;
+  let widgetContainerQuerySelector: string | undefined;
+  // The backend uses this to determine which turnstile to used in order to verify the token
+  let captchaWidgetTypeUsed: CaptchaWidgetType = null;
 
-  const createInvisibleDOMElement = () => {
-    const div = document.createElement('div');
-    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
-    document.body.appendChild(div);
-    return div;
-  };
-
+  // modal
   if (modalContainerQuerySelector && modalWrapperQuerySelector) {
+    // if invisible is selected but modal is provided,
+    // we're going to render the invisible widget in the modal
+    // but we won't show the modal as it will never escalate to interactive mode
+    captchaWidgetTypeUsed = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
     await openModal?.();
     await waitForElement(modalContainerQuerySelector);
-  } else if (isInvisibleWidget) {
-    widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
-    widgetContainer = createInvisibleDOMElement();
-  } else {
-    widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
+  }
+
+  // smart widget with container provided by user
+  if (!widgetContainerQuerySelector && widgetType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
+      captchaWidgetTypeUsed = 'smart';
+      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
       visibleDiv.style.display = 'block';
-      widgetContainer = visibleDiv;
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
       );
-      widgetContainer = createInvisibleDOMElement();
-      isInvisibleWidget = true;
-
-      turnstileSiteKey = invisibleSiteKey;
     }
+  }
+
+  // invisible widget for which we create the container automatically
+  if (!widgetContainerQuerySelector) {
+    turnstileSiteKey = invisibleSiteKey;
+    captchaWidgetTypeUsed = 'invisible';
+    widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
+    const div = document.createElement('div');
+    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    document.body.appendChild(div);
   }
 
   const handleCaptchaTokenGeneration = async (): Promise<[string, string]> => {
@@ -166,7 +171,6 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       try {
         const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
-
           appearance: 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
@@ -179,6 +183,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
               const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
               el?.style.setProperty('visibility', 'visible');
               el?.style.setProperty('pointer-events', 'all');
+              return;
             }
           },
           'error-callback': function (errorCode) {
@@ -225,15 +230,17 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captchaError: e,
     };
   } finally {
+    // cleanup
     closeModal?.();
-    if (widgetContainer) {
-      if (isInvisibleWidget) {
-        document.body.removeChild(widgetContainer);
-      } else {
-        widgetContainer.style.display = 'none';
-      }
+    const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
+    if (invisibleWidget) {
+      document.removeChild(invisibleWidget);
+    }
+    const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleWidget) {
+      visibleWidget.style.display = 'none';
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
+  return { captchaToken, captchaWidgetTypeUsed: captchaWidgetTypeUsed };
 };
