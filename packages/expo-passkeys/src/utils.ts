@@ -1,5 +1,6 @@
+import { Buffer } from 'node:buffer';
+
 import { ClerkWebAuthnError } from '@clerk/shared/error';
-import { Buffer } from 'buffer';
 export { ClerkWebAuthnError };
 
 export function encodeBase64(data: ArrayLike<number> | ArrayBufferLike) {
@@ -60,7 +61,7 @@ export function base64urlToArrayBuffer(base64url: string) {
   return buffer;
 }
 
-export function arrayBufferToBase64Url(buffer) {
+export function arrayBufferToBase64Url(buffer: ArrayBufferLike) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
 

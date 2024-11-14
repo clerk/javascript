@@ -5,14 +5,14 @@
         "name": "playground/nextjs: debug server",
         "type": "node-terminal",
         "request": "launch",
-        "command": "npm run dev",
+        "command": "pnpm dev",
         "cwd": "${workspaceFolder}/playground/nextjs"
       },
       {
         "name": "playground/nextjs12: debug server",
         "type": "node-terminal",
         "request": "launch",
-        "command": "npm run dev",
+        "command": "pnpm dev",
         "cwd": "${workspaceFolder}/playground/nextjs12"
       },
       {
