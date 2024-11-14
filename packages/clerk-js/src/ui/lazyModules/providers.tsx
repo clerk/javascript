@@ -78,6 +78,9 @@ type LazyModalRendererProps = React.PropsWithChildren<
     onExternalNavigate?: () => any;
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
+    canCloseModal?: boolean;
+    modalId?: string;
+    modalStyle?: React.CSSProperties;
   } & AppearanceProviderProps
 >;
 
@@ -92,9 +95,12 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
         <FlowMetadataProvider flow={props.flowName || ('' as any)}>
           <InternalThemeProvider>
             <Modal
+              id={props.modalId}
+              style={props.modalStyle}
               handleClose={props.onClose}
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
+              canCloseModal={props.canCloseModal}
             >
               {props.startPath ? (
                 <Suspense>

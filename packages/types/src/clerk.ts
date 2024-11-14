@@ -740,6 +740,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        rethrowOfflineNetworkErrors: boolean;
       },
       Record<string, any>
     >;

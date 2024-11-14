@@ -11,6 +11,7 @@ type UsePopoverProps = {
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
   adjustToReferenceWidth?: boolean;
   referenceElement?: React.RefObject<HTMLElement> | null;
+  canCloseModal?: boolean;
   bubbles?:
     | boolean
     | {
@@ -22,7 +23,14 @@ type UsePopoverProps = {
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
-  const { bubbles = false, shoudFlip = true, outsidePress, adjustToReferenceWidth = false, referenceElement } = props;
+  const {
+    bubbles = false,
+    shoudFlip = true,
+    outsidePress,
+    adjustToReferenceWidth = false,
+    referenceElement,
+    canCloseModal,
+  } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
   const { update, refs, strategy, x, y, context } = useFloating({
@@ -54,6 +62,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   const { setReference: reference, setFloating: floating } = refs;
 
   useDismiss(context, {
+    enabled: canCloseModal !== false,
     bubbles,
     outsidePress,
   });
