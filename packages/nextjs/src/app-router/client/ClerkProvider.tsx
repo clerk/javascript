@@ -8,7 +8,7 @@ import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boun
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { invalidateCacheAction } from '../server-actions';
+import { createAccountlessKeysAction, invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
+const __ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
@@ -97,5 +97,38 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
+  );
+};
+
+const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
+  const { children } = props;
+  const [state, fetchKeys] = React.useActionState(createAccountlessKeysAction, null);
+  useEffect(() => {
+    React.startTransition(() => {
+      fetchKeys();
+    });
+  }, []);
+
+  if (!React.isValidElement(children)) {
+    return children;
+  }
+
+  return React.cloneElement(children, {
+    key: state?.publishableKey,
+    publishableKey: state?.publishableKey,
+    claimAccountlessKeysUrl: state?.claimUrl,
+    __internal_bypassMissingPk: true,
+  } as any);
+};
+
+export const ClientClerkProvider = (props: NextClerkProviderProps) => {
+  if (props.publishableKey) {
+    return <__ClientClerkProvider {...props} />;
+  }
+
+  return (
+    <AccountlessCreateKeys>
+      <__ClientClerkProvider {...props} />
+    </AccountlessCreateKeys>
   );
 };

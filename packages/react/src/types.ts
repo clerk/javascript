@@ -55,6 +55,7 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    * Provide an initial state of the Clerk client during server-side rendering (SSR)
    */
   initialState?: InitialState;
+  __internal_bypassMissingPk?: boolean;
 };
 
 export interface BrowserClerkConstructor {
