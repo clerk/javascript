@@ -12,7 +12,6 @@
       "inputs": [
         "**/__test__/**",
         "*.d.ts",
-        "bundlewatch.config.json",
         "jest.*",
         "src/**",
         "tsconfig.json",

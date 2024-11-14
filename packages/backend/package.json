@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.16.2",
+  "version": "1.16.4",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -76,12 +76,11 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace --sig",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "publish:local": "pnpm dlx yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
-    "build:tests": "tsup --config tsup.config.test.ts",
     "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
@@ -93,14 +92,15 @@
     "test:cloudflare-miniflare": "vitest --environment miniflare"
   },
   "dependencies": {
-    "@clerk/shared": "2.12.1",
-    "@clerk/types": "4.32.0",
+    "@clerk/shared": "2.14.0",
+    "@clerk/types": "4.34.0",
     "cookie": "0.7.0",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@edge-runtime/vm": "4.0.4",
     "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
     "msw": "2.4.8",

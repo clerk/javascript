@@ -3,8 +3,8 @@
 Execute in root folder:
 
 ```bash
-npm i
-npm run build && npm run yalc:all
+pnpm i
+pnpm build && pnpm yalc:all
 ```
 
 Execute in current folder:
@@ -28,4 +28,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Reload changes from packages/\* package
 
-Apply change in packages/\* project folder and run `npm run build`. Then restart Express server by killing the current and executing `npm start` and the change should be visible.
+Apply change in packages/\* project folder and run `pnpm build`. Then restart Express server by killing the current and executing `npm start` and the change should be visible.

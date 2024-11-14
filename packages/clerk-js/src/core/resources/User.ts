@@ -8,6 +8,7 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
+  EnterpriseAccountResource,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetOrganizationMemberships,
@@ -38,6 +39,7 @@ import {
   BaseResource,
   DeletedObject,
   EmailAddress,
+  EnterpriseAccount,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -61,6 +63,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  enterpriseAccounts: EnterpriseAccountResource[] = [];
   passkeys: PasskeyResource[] = [];
 
   samlAccounts: SamlAccountResource[] = [];
@@ -345,6 +348,10 @@ export class User extends BaseResource implements UserResource {
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 
     this.samlAccounts = (data.saml_accounts || []).map(sa => new SamlAccount(sa, this.path() + '/saml_accounts'));
+
+    this.enterpriseAccounts = (data.enterprise_accounts || []).map(
+      ea => new EnterpriseAccount(ea, this.path() + '/enterprise_accounts'),
+    );
 
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.6.2",
+  "version": "3.6.4",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -100,10 +100,10 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "4.32.0"
+    "@clerk/types": "4.34.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "tsup": "*",
     "typescript": "*"
   },
