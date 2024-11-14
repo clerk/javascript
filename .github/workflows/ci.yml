@@ -20,7 +20,7 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: 'blacksmith-16vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -86,7 +86,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: 'blacksmith-16vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -137,7 +137,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: 'blacksmith-16vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     strategy:
