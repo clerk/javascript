@@ -21,7 +21,7 @@ jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
@@ -87,7 +87,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
@@ -138,7 +138,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     strategy:
       fail-fast: false
