@@ -187,13 +187,13 @@ importers:
   packages/astro:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       astro:
         specifier: ^3.2.0 || ^4.0.0
@@ -218,10 +218,10 @@ importers:
   packages/backend:
     dependencies:
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       cookie:
         specifier: 0.7.0
@@ -264,13 +264,13 @@ importers:
   packages/chrome-extension:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.0
+        specifier: 5.34.1
         version: link:../clerk-js
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       react:
         specifier: '>=18'
@@ -313,13 +313,13 @@ importers:
   packages/clerk-js:
     dependencies:
       '@clerk/localizations':
-        specifier: 3.6.3
+        specifier: 3.6.4
         version: link:../localizations
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       '@coinbase/wallet-sdk':
         specifier: 4.0.4
@@ -459,13 +459,13 @@ importers:
   packages/elements:
     dependencies:
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: ^4.33.0
+        specifier: ^4.34.0
         version: link:../types
       '@radix-ui/primitive':
         specifier: ^1.1.0
@@ -562,19 +562,19 @@ importers:
   packages/expo:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.0
+        specifier: 5.34.1
         version: link:../clerk-js
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/expo-passkeys':
-        specifier: 0.0.4
+        specifier: 0.0.5
         version: link:../expo-passkeys
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       base-64:
         specifier: ^1.0.0
@@ -629,10 +629,10 @@ importers:
   packages/expo-passkeys:
     dependencies:
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       expo:
         specifier: '*'
@@ -650,13 +650,13 @@ importers:
   packages/express:
     dependencies:
       '@clerk/backend':
-        specifier: ^1.16.3
+        specifier: ^1.16.4
         version: link:../backend
       '@clerk/shared':
-        specifier: ^2.13.0
+        specifier: ^2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       tslib:
         specifier: 2.4.1
@@ -687,13 +687,13 @@ importers:
   packages/fastify:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       cookies:
         specifier: 0.8.0
@@ -721,7 +721,7 @@ importers:
   packages/localizations:
     dependencies:
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -737,16 +737,16 @@ importers:
   packages/nextjs:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       crypto-js:
         specifier: 4.2.0
@@ -792,10 +792,10 @@ importers:
   packages/react:
     dependencies:
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       react:
         specifier: ^18 || ^19.0.0-0
@@ -835,16 +835,16 @@ importers:
   packages/remix:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       cookie:
         specifier: 0.7.0
@@ -890,13 +890,13 @@ importers:
   packages/sdk-node:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       tslib:
         specifier: 2.4.1
@@ -927,7 +927,7 @@ importers:
   packages/shared:
     dependencies:
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       dequal:
         specifier: 2.0.3
@@ -1003,16 +1003,16 @@ importers:
   packages/tanstack-start:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.4
+        specifier: 5.15.5
         version: link:../react
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       react:
         specifier: '>=18 || >=19.0.0-beta'
@@ -1055,13 +1055,13 @@ importers:
   packages/testing:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.3
+        specifier: 1.16.4
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       dotenv:
         specifier: 16.4.5
@@ -1089,7 +1089,7 @@ importers:
   packages/themes:
     dependencies:
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       tslib:
         specifier: 2.4.1
@@ -1124,16 +1124,16 @@ importers:
   packages/ui:
     dependencies:
       '@clerk/elements':
-        specifier: 0.19.2
+        specifier: 0.19.3
         version: link:../elements
       '@clerk/localizations':
-        specifier: 3.6.3
+        specifier: 3.6.4
         version: link:../localizations
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
       '@formkit/auto-animate':
         specifier: ^0.8.2
@@ -1252,10 +1252,10 @@ importers:
   packages/vue:
     dependencies:
       '@clerk/shared':
-        specifier: 2.13.0
+        specifier: 2.14.0
         version: link:../shared
       '@clerk/types':
-        specifier: 4.33.0
+        specifier: 4.34.0
         version: link:../types
     devDependencies:
       '@testing-library/vue':

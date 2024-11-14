@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -71,9 +71,9 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "5.15.4",
-    "@clerk/shared": "2.13.0",
-    "@clerk/types": "^4.33.0",
+    "@clerk/clerk-react": "5.15.5",
+    "@clerk/shared": "2.14.0",
+    "@clerk/types": "^4.34.0",
     "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
