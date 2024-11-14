@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.33.0
+
+### Minor Changes
+
+- Surface enterprise accounts in `UserProfile`, allowing to display more protocols besides SAML ([#4518](https://github.com/clerk/javascript/pull/4518)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce the `experimental.rethrowOfflineNetworkErrors` option to the `ClerkProvider` component. ([#4525](https://github.com/clerk/javascript/pull/4525)) by [@anagstef](https://github.com/anagstef)
+
+  When set to `true`, Clerk will rethrow network errors that occur while the user is offline.
+
+- Replace `veryStrict` with `strictMfa` configuration for reverification. ([#4545](https://github.com/clerk/javascript/pull/4545)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.32.0
 
 ### Minor Changes

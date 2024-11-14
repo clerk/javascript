@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -60,11 +60,11 @@
     "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.33.1",
-    "@clerk/clerk-react": "5.15.3",
-    "@clerk/expo-passkeys": "0.0.3",
-    "@clerk/shared": "2.12.1",
-    "@clerk/types": "4.32.0",
+    "@clerk/clerk-js": "5.34.0",
+    "@clerk/clerk-react": "5.15.4",
+    "@clerk/expo-passkeys": "0.0.4",
+    "@clerk/shared": "2.13.0",
+    "@clerk/types": "4.33.0",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
