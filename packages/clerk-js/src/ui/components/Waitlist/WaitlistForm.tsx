@@ -58,7 +58,7 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <Col gap={6}>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('waitlist.start.title')} />
           <Header.Subtitle localizationKey={localizationKeys('waitlist.start.subtitle')} />
         </Header.Root>
@@ -87,7 +87,7 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
         </Flex>
       </Col>
       <Col gap={6}>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('waitlist.success.title')} />
           <Header.Subtitle localizationKey={localizationKeys('waitlist.success.subtitle')} />
         </Header.Root>
