@@ -66,11 +66,11 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig"
+    "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
     "@clerk/backend": "1.16.2",
@@ -81,20 +81,21 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
     "typescript": "*"
   },
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-router": "^6.0.0"
   },
   "engines": {
     "node": ">=18.17.0"

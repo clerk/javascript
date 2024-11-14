@@ -35,7 +35,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "pnpm dlx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"
   },
@@ -47,7 +47,7 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^20.14.8",
     "fastify": "^5.0.0",
     "tsup": "*",

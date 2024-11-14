@@ -86,7 +86,7 @@ export async function create(
       publicKeyCredential: makeSerializedCreateResponse(typeof response === 'string' ? JSON.parse(response) : response),
       error: null,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       publicKeyCredential: null,
       error: mapNativeErrorToClerkWebAuthnErrorCode(error.code, error.message, 'create'),
@@ -125,6 +125,7 @@ export async function get({
 
   const serializedPublicCredential: SerializedPublicKeyCredentialRequestOptions = {
     ...publicKeyOptions,
+    // @ts-expect-error FIXME
     challenge: arrayBufferToBase64Url(publicKeyOptions.challenge),
   };
 
@@ -147,7 +148,7 @@ export async function get({
       publicKeyCredential: makeSerializedGetResponse(typeof response === 'string' ? JSON.parse(response) : response),
       error: null,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       publicKeyCredential: null,
       error: mapNativeErrorToClerkWebAuthnErrorCode(error.code, error.message, 'get'),

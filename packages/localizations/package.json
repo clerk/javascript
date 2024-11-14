@@ -103,7 +103,7 @@
     "@clerk/types": "4.32.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "tsup": "*",
     "typescript": "*"
   },

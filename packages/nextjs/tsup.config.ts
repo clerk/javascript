@@ -57,11 +57,11 @@ export default defineConfig(overrideOptions => {
     `mv ./dist/${format}/server-actions.js ./dist/${format}/app-router`;
 
   return runAfterLast([
-    'npm run build:declarations',
+    'pnpm build:declarations',
     copyPackageJson('esm'),
     copyPackageJson('cjs'),
     moveServerActions('esm'),
     moveServerActions('cjs'),
-    shouldPublish && 'npm run publish:local',
+    shouldPublish && 'pnpm publish:local',
   ])(esm, cjs, serverActionsEsm, serverActionsCjs);
 });

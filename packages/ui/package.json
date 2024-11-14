@@ -46,27 +46,30 @@
   ],
   "scripts": {
     "build": "tsup",
-    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
+    "bundlewatch": "pnpm dlx bundlewatch --config bundlewatch.config.json",
     "dev": "tsup --watch",
-    "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\"",
+    "dev:theme-builder": "concurrently \"pnpm dev\" \"cd theme-builder && pnpm dev\"",
     "test": "vitest"
   },
   "dependencies": {
     "@clerk/elements": "0.19.1",
+    "@clerk/localizations": "3.6.2",
     "@clerk/shared": "2.12.1",
     "@clerk/types": "4.32.0",
     "@formkit/auto-animate": "^0.8.2",
     "@radix-ui/react-slot": "^1.1.0",
+    "clsx": "^2.0.0",
     "cmdk": "^1.0.0",
     "cva": "^1.0.0-beta.1",
+    "dequal": "^2.0.3",
+    "react-aria": "^3.35.1",
     "react-aria-components": "^1.2.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/tailwindcss-transformer": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@clerk/tailwindcss-transformer": "workspace:*",
     "@testing-library/react": "^16.0.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "bundlewatch": "^0.4.0",
     "concurrently": "^8.2.2",
     "jsdom": "^24.1.1"
   }

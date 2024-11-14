@@ -103,16 +103,18 @@ runs:
       shell: bash
       run: echo $TURBO_ARGS
 
+    - name: Install PNPM
+      uses: pnpm/action-setup@v4
+
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v4
       with:
-        cache: npm
-        cache-dependency-path: '**/package-lock.json'
+        cache: pnpm
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
-    - name: Install NPM Dependencies
-      run: npm ci --audit=false --fund=false --engine-strict=false
+    - name: Install PNPM Dependencies
+      run: pnpm install 
       shell: bash
 
     - name: Get Playwright Version
@@ -133,4 +135,4 @@ runs:
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        npx playwright install chromium
+        pnpm playwright install chromium

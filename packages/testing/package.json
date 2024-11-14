@@ -68,7 +68,7 @@
     "dotenv": "16.4.5"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@playwright/test": "^1.44.0",
     "@types/node": "^18.19.33",
     "cypress": "^13.9.0",
