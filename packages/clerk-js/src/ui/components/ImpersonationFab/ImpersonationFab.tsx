@@ -112,7 +112,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
 const _ImpersonationFab = () => {
   const { session } = useSession();
   const { t } = useLocalizations();
-  const { parsedInternalTheme } = useAppearance();
+  const { parsedInternalTheme, parsedLayout } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
   const actor = session?.actor;
   const isImpersonating = !!actor;
@@ -182,7 +182,9 @@ const _ImpersonationFab = () => {
   }
 
   const title = localizationKeys('impersonationFab.title', {
-    identifier: getFullName(session.user) || getIdentifier(session.user),
+    identifier:
+      getFullName({ ...session.user, reverse: parsedLayout.nameFieldsOrder === 'reversed' }) ||
+      getIdentifier(session.user),
   });
   const titleLength = t(title).length;
 

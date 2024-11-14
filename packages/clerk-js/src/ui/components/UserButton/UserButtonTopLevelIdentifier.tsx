@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { descriptors, Text } from '../../customizables';
+import { descriptors, Text, useAppearance } from '../../customizables';
 
 type UserButtonTopLevelIdentifierProps = {
   showName: boolean | undefined;
@@ -9,6 +9,7 @@ type UserButtonTopLevelIdentifierProps = {
 
 export const UserButtonTopLevelIdentifier = ({ showName }: UserButtonTopLevelIdentifierProps) => {
   const { user } = useUser();
+  const { nameFieldsOrder } = useAppearance().parsedLayout;
 
   if (!user || !showName) {
     return null;
@@ -24,7 +25,7 @@ export const UserButtonTopLevelIdentifier = ({ showName }: UserButtonTopLevelIde
         }),
       ]}
     >
-      {getFullName(user) || getIdentifier(user)}
+      {getFullName({ ...user, reverse: nameFieldsOrder === 'reversed' }) || getIdentifier(user)}
     </Text>
   );
 };
