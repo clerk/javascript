@@ -39,8 +39,8 @@ export default defineConfig({
       testMatch: /global\.teardown/,
     },
     {
-      name: 'chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
       dependencies: ['setup'],
     },
     // {
