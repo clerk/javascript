@@ -9,8 +9,17 @@ type NameHelperParams = {
   reverse?: boolean;
 };
 
-export const getFullName = ({ firstName, lastName, name, reverse }: NameHelperParams) =>
-  name || (reverse ? [lastName, firstName].join(' ').trim() : [firstName, lastName].join(' ').trim()) || '';
+export const getFullName = ({ firstName, lastName, name, reverse }: NameHelperParams) => {
+  if (name) {
+    return name;
+  }
+
+  if (reverse) {
+    return [lastName, firstName].join(' ').trim() || '';
+  }
+
+  return [firstName, lastName].join(' ').trim() || '';
+};
 
 export const getInitials = ({ firstName, lastName, name }: NameHelperParams) =>
   [(firstName || '')[0], (lastName || '')[0]].join('').trim() || (name || '')[0];
