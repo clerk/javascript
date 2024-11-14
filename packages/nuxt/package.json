@@ -50,9 +50,9 @@
     "publish:local": "npx yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.16.3",
-    "@clerk/shared": "2.13.0",
-    "@clerk/types": "4.33.0",
+    "@clerk/backend": "1.16.4",
+    "@clerk/shared": "2.14.0",
+    "@clerk/types": "4.34.0",
     "@clerk/vue": "0.0.3",
     "@nuxt/kit": "^3.14.159",
     "h3": "^1.13.0"
