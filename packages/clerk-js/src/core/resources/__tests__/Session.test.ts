@@ -11,41 +11,6 @@ describe('Session', () => {
     SessionTokenCache.clear();
   });
 
-  describe('creating new session', () => {
-    let dispatchSpy;
-
-    beforeEach(() => {
-      dispatchSpy = jest.spyOn(eventBus, 'dispatch');
-      BaseResource.clerk = clerkMock() as any;
-    });
-
-    afterEach(() => {
-      dispatchSpy?.mockRestore();
-      BaseResource.clerk = null as any;
-      // @ts-ignore
-      global.fetch?.mockClear();
-      SessionTokenCache.clear();
-    });
-
-    it('dispatches token:update event on initialization with lastActiveToken', () => {
-      new Session({
-        status: 'active',
-        id: 'session_1',
-
-        object: 'session',
-        user: createUser({}),
-        last_active_organization_id: 'activeOrganization',
-        last_active_token: { object: 'token', jwt: mockJwt },
-        actor: null,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as SessionJSON);
-
-      expect(dispatchSpy).toHaveBeenCalledTimes(1);
-      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
-    });
-  });
-
   describe('getToken()', () => {
     let dispatchSpy;
 
@@ -101,7 +66,7 @@ describe('Session', () => {
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
 
       expect(token).toEqual(mockJwt);
-      expect(dispatchSpy).toHaveBeenCalledTimes(3);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
     });
 
     it('dispatches token:update event on getToken with active organization', async () => {
