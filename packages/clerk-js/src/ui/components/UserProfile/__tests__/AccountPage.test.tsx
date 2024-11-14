@@ -1,4 +1,4 @@
-import type { SamlAccountJSON } from '@clerk/types';
+import type { EnterpriseAccountJSON } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
 import { render, screen, waitFor } from '../../../../testUtils';
@@ -83,33 +83,135 @@ describe('AccountPage', () => {
       screen.getByText(/google/i);
     });
 
-    it('shows the enterprise accounts of the user', async () => {
-      const emailAddress = 'george@jungle.com';
-      const firstName = 'George';
-      const lastName = 'Clerk';
+    describe('with active enterprise connection', () => {
+      it('shows the enterprise accounts of the user', async () => {
+        const emailAddress = 'george@jungle.com';
+        const firstName = 'George';
+        const lastName = 'Clerk';
 
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withSaml();
-        f.withUser({
-          email_addresses: [emailAddress],
-          saml_accounts: [
-            {
-              id: 'samlacc_foo',
-              provider: 'saml_okta',
-              email_address: emailAddress,
-              first_name: firstName,
-              last_name: lastName,
-            },
-          ],
-          first_name: firstName,
-          last_name: lastName,
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withSaml();
+          f.withUser({
+            email_addresses: [emailAddress],
+            enterprise_accounts: [
+              {
+                object: 'enterprise_account',
+                active: true,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: true,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
+              },
+            ],
+            first_name: firstName,
+            last_name: lastName,
+          });
         });
-      });
 
-      render(<AccountPage />, { wrapper });
-      screen.getByText(/Enterprise Accounts/i);
-      screen.getByText(/Okta Workforce/i);
+        render(<AccountPage />, { wrapper });
+        screen.getByText(/Enterprise Accounts/i);
+        screen.getByText(/Okta Workforce/i);
+      });
+    });
+
+    describe('with inactive enterprise connection', () => {
+      it('does not show the enterprise accounts of the user', async () => {
+        const emailAddress = 'george@jungle.com';
+        const firstName = 'George';
+        const lastName = 'Clerk';
+
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withUser({
+            email_addresses: [emailAddress],
+            enterprise_accounts: [
+              {
+                object: 'enterprise_account',
+                active: false,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: false,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
+              },
+            ],
+            first_name: firstName,
+            last_name: lastName,
+          });
+        });
+
+        render(<AccountPage />, { wrapper });
+        expect(screen.queryByText(/Enterprise Accounts/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Okta Workforce/i)).not.toBeInTheDocument();
+      });
     });
 
     describe('with `disable_additional_identifications`', () => {
@@ -118,29 +220,47 @@ describe('AccountPage', () => {
       const firstName = 'George';
       const lastName = 'Clerk';
 
-      const samlAccount: SamlAccountJSON = {
-        id: 'samlacc_foo',
-        provider: 'saml_okta',
-        email_address: emailAddress,
-        first_name: firstName,
-        last_name: lastName,
-        saml_connection: {
-          id: 'samlc_foo',
-          active: true,
-          disable_additional_identifications: true,
-          allow_idp_initiated: true,
-          allow_subdomains: true,
-          domain: 'foo.com',
-          name: 'Foo',
-          created_at: new Date().getTime(),
-          updated_at: new Date().getTime(),
-          object: 'saml_connection',
-          provider: 'saml_okta',
-          sync_user_attributes: true,
-        },
+      const enterpriseAccount: EnterpriseAccountJSON = {
+        object: 'enterprise_account',
         active: true,
-        object: 'saml_account',
-        provider_user_id: '',
+        first_name: 'Laura',
+        last_name: 'Serafim',
+        protocol: 'saml',
+        provider_user_id: null,
+        public_metadata: {},
+        email_address: 'test@clerk.com',
+        provider: 'saml_okta',
+        enterprise_connection: {
+          object: 'enterprise_connection',
+          provider: 'saml_okta',
+          name: 'Okta Workforce',
+          id: 'ent_123',
+          active: true,
+          allow_idp_initiated: false,
+          allow_subdomains: false,
+          disable_additional_identifications: true,
+          sync_user_attributes: false,
+          domain: 'foocorp.com',
+          created_at: 123,
+          updated_at: 123,
+          logo_public_url: null,
+          protocol: 'saml',
+        },
+        verification: {
+          status: 'verified',
+          strategy: 'saml',
+          verified_at_client: 'foo',
+          attempts: 0,
+          error: {
+            code: 'identifier_already_signed_in',
+            long_message: "You're already signed in",
+            message: "You're already signed in",
+          },
+          expire_at: 123,
+          id: 'ver_123',
+          object: 'verification',
+        },
+        id: 'eac_123',
       };
 
       it('shows only the enterprise accounts of the user', async () => {
@@ -151,7 +271,7 @@ describe('AccountPage', () => {
           f.withSaml();
           f.withUser({
             email_addresses: [emailAddress],
-            saml_accounts: [samlAccount],
+            enterprise_accounts: [enterpriseAccount],
             first_name: firstName,
             last_name: lastName,
           });
@@ -176,7 +296,7 @@ describe('AccountPage', () => {
             email_addresses: [emailAddress],
             phone_numbers: [phoneNumber],
             external_accounts: [{ provider: 'google', email_address: 'test@clerk.com' }],
-            saml_accounts: [samlAccount],
+            enterprise_accounts: [enterpriseAccount],
             first_name: firstName,
             last_name: lastName,
           });

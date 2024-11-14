@@ -277,7 +277,7 @@ describe('Session', () => {
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -304,7 +304,7 @@ describe('Session', () => {
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -328,7 +328,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -352,7 +352,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -376,7 +376,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -400,7 +400,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -424,7 +424,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -468,7 +468,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'veryStrict',
+        __experimental_reverification: 'strict_mfa',
       });
 
       expect(isAuthorized).toBe(true);
@@ -490,7 +490,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -514,7 +514,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -610,7 +610,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: 10,
         },
       });
@@ -751,7 +751,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           //@ts-expect-error
           afterMinutes: '10',
         },
@@ -779,7 +779,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'multiFactor',
+          level: 'multi_factor',
           afterMinutes: 10,
         },
       });
@@ -787,7 +787,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('first factor not enrolled should NOT be authorized for firstFactor assurance', async () => {
+    it('first factor not enrolled should NOT be authorized for first_factor assurance', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -803,7 +803,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: 10,
         },
       });

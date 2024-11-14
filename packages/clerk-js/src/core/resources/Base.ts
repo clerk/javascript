@@ -5,7 +5,7 @@ import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, D
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
-import { ClerkAPIResponseError, Client } from './internal';
+import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
 
@@ -62,7 +62,12 @@ export abstract class BaseResource {
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
     } catch (e) {
-      if (!isValidBrowserOnline()) {
+      // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
+      if (this.shouldRethrowOfflineNetworkErrors()) {
+        throw new ClerkRuntimeError(e?.message || e, {
+          code: 'network_error',
+        });
+      } else if (!isValidBrowserOnline()) {
         console.warn(e);
         return null;
       } else {
@@ -87,17 +92,21 @@ export abstract class BaseResource {
       return payload;
     }
 
-    if (status === 401) {
-      await BaseResource.clerk.handleUnauthenticated();
-    }
-
     if (status >= 400) {
       const errors = payload?.errors as ClerkAPIErrorJSON[];
-      const safeErrorMessage = errors?.[0]?.long_message;
+      const message = errors?.[0]?.long_message;
+      const code = errors?.[0]?.code;
+
+      // if the status is 401, we need to handle unauthenticated as we did before
+      // otherwise, we are going to ignore the requires_captcha error
+      // as we're going to handle it by triggering the captcha challenge
+      if (status === 401 && code !== 'requires_captcha') {
+        await BaseResource.clerk.handleUnauthenticated();
+      }
 
       assertProductionKeysOnDev(status, errors);
 
-      throw new ClerkAPIResponseError(safeErrorMessage || statusText, {
+      throw new ClerkAPIResponseError(message || statusText, {
         data: errors,
         status: status,
       });
@@ -186,5 +195,10 @@ export abstract class BaseResource {
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {
     const { rotatingTokenNonce } = params || {};
     return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
+  }
+
+  private static shouldRethrowOfflineNetworkErrors(): boolean {
+    const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
+    return experimental?.rethrowOfflineNetworkErrors || false;
   }
 }
