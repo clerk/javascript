@@ -2,6 +2,10 @@ type NameHelperParams = {
   firstName?: string | null;
   lastName?: string | null;
   name?: string | null;
+  /**
+   * If true, the name will be formatted as "lastName firstName"
+   * @default false
+   */
   reverse?: boolean;
 };
 
