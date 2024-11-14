@@ -135,4 +135,4 @@ runs:
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        pnpm playwright install chromium
+        pnpm playwright install chrome
