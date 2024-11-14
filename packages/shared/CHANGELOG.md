@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.13.0
+
+### Minor Changes
+
+- Replace `veryStrict` with `strictMfa` configuration for reverification. ([#4545](https://github.com/clerk/javascript/pull/4545)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`1c0b5001f7f975a2f3f54ad692526ecf7257847e`](https://github.com/clerk/javascript/commit/1c0b5001f7f975a2f3f54ad692526ecf7257847e), [`6217a3f7c94311d49f873214bd406961e0b8d6f7`](https://github.com/clerk/javascript/commit/6217a3f7c94311d49f873214bd406961e0b8d6f7), [`1783025cdb94c447028704c2121fa0b8af785904`](https://github.com/clerk/javascript/commit/1783025cdb94c447028704c2121fa0b8af785904)]:
+  - @clerk/types@4.33.0
+
 ## 2.12.1
 
 ### Patch Changes
