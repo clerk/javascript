@@ -740,6 +740,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        rethrowOfflineNetworkErrors: boolean;
       },
       Record<string, any>
     >;
@@ -1308,9 +1309,9 @@ export type OrganizationListProps = {
 
 export type WaitlistProps = {
   /**
-   * Full URL or path to navigate after successful waitlist submission.
+   * Full URL or path to navigate after join waitlist.
    */
-  redirectUrl?: string;
+  afterJoinWaitlistUrl?: string;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -1364,7 +1365,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export type JoinWaitlistParams = {
@@ -1376,7 +1377,7 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
@@ -1384,12 +1385,12 @@ export interface AuthenticateWithCoinbaseWalletParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {

@@ -11,4 +11,5 @@ export type ClerkHostRouter = {
   replace: (path: string) => void;
   searchParams: () => URLSearchParams;
   shallowPush: (path: string) => void;
+  inferredBasePath?: () => string;
 };

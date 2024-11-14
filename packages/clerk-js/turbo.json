@@ -2,9 +2,9 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "env": ["BUILD_ENABLE_NEW_COMPONENTS"],
       "inputs": [
         "*.d.ts",
-        "bundlewatch.config.json",
         "headless/**",
         "src/**",
         "tsconfig.json",
@@ -25,7 +25,6 @@
     "test": {
       "inputs": [
         "*.d.ts",
-        "bundlewatch.config.json",
         "jest.*",
         "src/**",
         "svgTransform.js",

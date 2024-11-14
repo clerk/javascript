@@ -1,5 +1,5 @@
 import type { Plugin } from 'esbuild';
-import { transform } from 'esbuild';
+import * as esbuild from 'esbuild';
 import { readFile } from 'fs/promises';
 import { defineConfig } from 'tsup';
 
@@ -15,6 +15,7 @@ export default defineConfig(overrideOptions => {
       './src/react/index.ts',
       './src/utils/index.ts',
       './src/workerTimers/index.ts',
+      './src/dom/*.ts',
       '!./src/**/*.test.{ts,tsx}',
     ],
     format: ['cjs', 'esm'],
@@ -42,7 +43,7 @@ export const WebWorkerMinifyPlugin: Plugin = {
   setup(build) {
     build.onLoad({ filter: /\.worker\.ts/ }, async args => {
       const f = await readFile(args.path);
-      const js = await transform(f, { loader: 'ts', minify: true });
+      const js = await esbuild.transform(f, { loader: 'ts', minify: true });
       return { loader: 'text', contents: js.code };
     });
   },

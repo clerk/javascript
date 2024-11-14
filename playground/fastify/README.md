@@ -15,7 +15,7 @@ npm install
 1. Start the server:
 
 ```shell
-npm run start
+pnpm start
 ```
 
 You can visit these routes:

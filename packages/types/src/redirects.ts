@@ -83,7 +83,7 @@ export type AuthenticateWithRedirectParams = {
   /**
    * Whether the user has accepted the legal requirements.
    */
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 };
 
 export type RedirectUrlProp = {

@@ -60,7 +60,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     : localizationKeys('userProfile.passwordPage.title__set');
   const card = useCardState();
 
-  const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
+  const passwordEditDisabled = user.enterpriseAccounts.some(ea => ea.active);
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({

@@ -470,17 +470,6 @@ export const huHU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Bejelentkezés',
       actionText: 'Van már fiókod?',
@@ -514,6 +503,17 @@ export const huHU: LocalizationResource = {
         subtitle: 'Menj az újonan nyitott lapra, a folytatáshoz',
         subtitleNewTab: 'Menj vissza az előző lapra a folytatáshoz',
         title: 'Sikeresen megerősítetted az email címed',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

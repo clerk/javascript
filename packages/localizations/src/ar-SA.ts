@@ -469,17 +469,6 @@ export const arSA: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'تسجيل الدخول',
       actionText: 'ليس لديك حساب؟',
@@ -513,6 +502,17 @@ export const arSA: LocalizationResource = {
         subtitle: 'ارجع إلى علامة التبويب المفتوحة حديثًا للمتابعة',
         subtitleNewTab: 'ارجع إلى علامة التبويب السابقة للمتابعة',
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

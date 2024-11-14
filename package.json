@@ -3,22 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
     "bundlewatch": "turbo bundlewatch",
     "changeset": "changeset",
-    "changeset:empty": "npm run changeset -- --empty",
+    "changeset:empty": "pnpm changeset --empty",
     "clean": "turbo clean",
-    "dependencies": "node scripts/patch-incorrect-lockfile.mjs",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/tailwindcss-transformer --filter=!@clerk/remix --filter=!@clerk/ui --filter=!@clerk/chrome-extension",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "format": "prettier --write .",
     "format:check": "prettier --cache --check .",
+    "preinstall": "npx only-allow pnpm",
     "lint": "FORCE_COLOR=1 turbo lint",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
@@ -28,30 +23,30 @@
     "release": "changeset publish && git push --follow-tags",
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
-    "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 npm run build && changeset publish --no-git-tag; fi",
+    "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 pnpm build && changeset publish --no-git-tag; fi",
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
-    "test:integration:ap-flows": "npm run test:integration:base -- --grep @ap-flows",
-    "test:integration:astro": "E2E_APP_ID=astro.* npm run test:integration:base -- --grep @astro",
-    "test:integration:base": "npx playwright test --config integration/playwright.config.ts",
-    "test:integration:cleanup": "npx playwright test --config integration/playwright.cleanup.config.ts",
-    "test:integration:deployment:nextjs": "npx playwright test --config integration/playwright.deployments.config.ts",
-    "test:integration:elements": "E2E_APP_ID=elements.* npm run test:integration:base -- --grep @elements",
-    "test:integration:expo-web": "E2E_APP_ID=expo.expo-web npm run test:integration:base -- --grep @expo-web",
-    "test:integration:express": "E2E_APP_ID=express.* npm run test:integration:base -- --grep @express",
-    "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* npm run test:integration:base -- --grep @generic",
-    "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
-    "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
+    "test:integration:ap-flows": "pnpm test:integration:base --grep @ap-flows",
+    "test:integration:astro": "E2E_APP_ID=astro.* pnpm test:integration:base --grep @astro",
+    "test:integration:base": "pnpm playwright test --config integration/playwright.config.ts",
+    "test:integration:cleanup": "pnpm playwright test --config integration/playwright.cleanup.config.ts",
+    "test:integration:deployment:nextjs": "pnpm playwright test --config integration/playwright.deployments.config.ts",
+    "test:integration:elements": "E2E_APP_ID=elements.* pnpm test:integration:base --grep @elements",
+    "test:integration:expo-web": "E2E_APP_ID=expo.expo-web pnpm test:integration:base --grep @expo-web",
+    "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
+    "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
+    "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
+    "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
     "test:integration:remix": "echo 'placeholder'",
-    "test:integration:sessions": "npm run test:integration:base -- --grep @sessions",
-    "test:integration:tanstack-router": "E2E_APP_ID=tanstack.router npm run test:integration:base -- --grep @tanstack-router",
-    "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start npm run test:integration:base -- --grep @tanstack-start",
+    "test:integration:sessions": "pnpm test:integration:base --grep @sessions",
+    "test:integration:tanstack-router": "E2E_APP_ID=tanstack.router pnpm test:integration:base --grep @tanstack-router",
+    "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start pnpm test:integration:base --grep @tanstack-start",
+    "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "turbo:clean": "turbo daemon clean",
-    "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
-    "version": "changeset version && npm install --package-lock-only --engine-strict=false",
+    "version": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version:canary": "./scripts/canary.mjs",
     "version:snapshot": "./scripts/snapshot.mjs",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; npx yalc push --replace --sig; cd '../../'; done"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm dlx yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
@@ -63,6 +58,7 @@
     "@emotion/jest": "^11.11.0",
     "@faker-js/faker": "^8.1.0",
     "@hcaptcha/types": "^1.0.3",
+    "@jest/globals": "29.7.0",
     "@octokit/rest": "^20.0.2",
     "@playwright/test": "^1.44.0",
     "@testing-library/dom": "^10.1.0",
@@ -71,8 +67,10 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.3",
     "@types/jest": "^29.3.1",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/node": "^20.11.24",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitest/coverage-v8": "2.1.4",
     "citty": "^0.1.4",
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "cpy-cli": "^5.0.0",
@@ -97,7 +95,7 @@
     "publint": "^0.2.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "rimraf": "^5.0.5",
+    "rimraf": "6.0.1",
     "statuses": "^1.4.0",
     "tree-kill": "^1.2.2",
     "ts-jest": "^29.0.3",
@@ -109,16 +107,15 @@
     "vitest": "2.1.4",
     "zx": "^7.2.3"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.14.0"
-  },
-  "packageManager": "npm@10.7.0",
+  "packageManager": "pnpm@9.13.0+sha512.beb9e2a803db336c10c9af682b58ad7181ca0fbd0d4119f2b33d5f2582e96d6c0d93c85b23869295b765170fbdaa92890c0da6ada457415039769edf3c959efe",
   "engines": {
     "node": ">=18.17.0",
-    "npm": ">=8.5.0"
+    "pnpm": ">=9"
   },
-  "overrides": {
-    "jest": "^29.7.0",
-    "jest-snapshot-prettier": "npm:prettier@^3"
+  "pnpm": {
+    "overrides": {
+      "jest": "29.7.0",
+      "jest-snapshot-prettier": "npm:prettier@^3"
+    }
   }
 }

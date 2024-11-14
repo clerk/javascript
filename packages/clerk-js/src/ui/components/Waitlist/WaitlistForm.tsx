@@ -40,8 +40,8 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
         wizard.nextStep();
 
         setTimeout(() => {
-          if (ctx.redirectUrl) {
-            void navigate(ctx.redirectUrl);
+          if (ctx.afterJoinWaitlistUrl) {
+            void navigate(ctx.afterJoinWaitlistUrl);
           }
         }, 2000);
         return;
@@ -58,7 +58,7 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <Col gap={6}>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('waitlist.start.title')} />
           <Header.Subtitle localizationKey={localizationKeys('waitlist.start.subtitle')} />
         </Header.Root>
@@ -87,11 +87,11 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
         </Flex>
       </Col>
       <Col gap={6}>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('waitlist.success.title')} />
           <Header.Subtitle localizationKey={localizationKeys('waitlist.success.subtitle')} />
         </Header.Root>
-        {ctx.redirectUrl && (
+        {ctx.afterJoinWaitlistUrl && (
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}

@@ -465,17 +465,6 @@ export const koKR: LocalizationResource = {
   },
   signInEnterPasswordTitle: '비밀번호를 입력하세요',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: '로그인',
       actionText: '계정이 있으신가요?',
@@ -509,6 +498,17 @@ export const koKR: LocalizationResource = {
         subtitle: '계속하려면 새로 연 탭으로 돌아가기',
         subtitleNewTab: '계속하려면 이전 탭으로 돌아가기',
         title: '이메일 인증 성공',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

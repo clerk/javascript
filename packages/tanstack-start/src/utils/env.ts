@@ -13,7 +13,7 @@ import { isTruthy } from '@clerk/shared/underscore';
 export const getEnvVariable = (name: string, defaultVaue: string = ''): string => {
   // Node envs
   if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
-    return (process.env[name] as string) || defaultVaue;
+    return process.env[name] || defaultVaue;
   }
 
   // @ts-expect-error - Vite specific

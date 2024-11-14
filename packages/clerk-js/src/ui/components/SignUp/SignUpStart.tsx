@@ -81,7 +81,7 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
-    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+    legalAccepted: useFormControl('legalAccepted', '', {
       type: 'checkbox',
       label: '',
       defaultChecked: false,
@@ -169,6 +169,10 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
+          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
             card.setError(error);
             break;
           default:
@@ -281,7 +285,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
-                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked) || undefined}
+                  legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
                 />
               )}
               {shouldShowForm && (
@@ -295,10 +299,10 @@ function _SignUpStart(): JSX.Element {
               )}
             </SocialButtonsReversibleContainerWithDivider>
             {!shouldShowForm && isLegalConsentEnabled && (
-              <Form.ControlRow elementId='__experimental_legalAccepted'>
+              <Form.ControlRow elementId='legalAccepted'>
                 <LegalCheckbox
-                  {...formState.__experimental_legalAccepted.props}
-                  isRequired={fields.__experimental_legalAccepted?.required}
+                  {...formState.legalAccepted.props}
+                  isRequired={fields.legalAccepted?.required}
                 />
               </Form.ControlRow>
             )}

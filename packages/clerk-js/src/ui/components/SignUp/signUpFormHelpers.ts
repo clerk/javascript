@@ -16,7 +16,7 @@ const FieldKeys = [
   'lastName',
   'password',
   'ticket',
-  '__experimental_legalAccepted',
+  'legalAccepted',
 ] as const;
 export type FieldKey = (typeof FieldKeys)[number];
 
@@ -91,7 +91,7 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     }
 
     if (hasLegalAccepted) {
-      delete fields.__experimental_legalAccepted;
+      delete fields.legalAccepted;
     }
 
     // Hide any non-required fields
@@ -148,7 +148,7 @@ function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Fiel
       return getPasswordField(fieldProps.attributes);
     case 'ticket':
       return getTicketField(fieldProps.hasTicket);
-    case '__experimental_legalAccepted':
+    case 'legalAccepted':
       return getLegalAcceptedField(fieldProps.legalConsentRequired);
     case 'username':
     case 'firstName':

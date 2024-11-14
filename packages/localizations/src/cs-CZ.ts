@@ -468,17 +468,6 @@ export const csCZ: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Přihlásit se',
       actionText: 'Máte účet?',
@@ -512,6 +501,17 @@ export const csCZ: LocalizationResource = {
         subtitle: 'Vraťte se do nově otevřeného okna pro pokračování',
         subtitleNewTab: 'Vraťte se do předchozího okna pro pokračování',
         title: 'Email úspěšně ověřen',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

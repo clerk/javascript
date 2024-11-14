@@ -4,6 +4,7 @@ export const API_VERSION = 'v1';
 export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 export const JWKS_CACHE_TTL_MS = 1000 * 60 * 60;
+export const SUPPORTED_BAPI_VERSION = '2021-02-05';
 
 const Attributes = {
   AuthToken: '__clerkAuthToken',
@@ -25,6 +26,7 @@ const Cookies = {
 
 const QueryParameters = {
   ClerkSynced: '__clerk_synced',
+  SuffixedCookies: 'suffixed_cookies',
   ClerkRedirectUrl: '__clerk_redirect_url',
   // use the reference to Cookies to indicate that it's the same value
   DevBrowser: Cookies.DevBrowser,
