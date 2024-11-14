@@ -2,7 +2,7 @@ import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
 import { __experimental_isReverificationHint, __experimental_reverificationMismatch } from '../../authorization-errors';
-import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
+import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
@@ -28,14 +28,21 @@ async function resolveResult<T>(
     });
 }
 
+type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnCancel: true } ? never : null) : T;
+
 type UseReverificationOptions = {
-  onCancel?: (() => void) | 'throw';
+  onCancel?: () => void;
+  throwOnCancel?: boolean;
 };
 
 function createReverificationHandler(
   params: { onOpenModal: Clerk['__experimental_openUserVerification'] } & UseReverificationOptions,
 ) {
-  function assertReverification<Fetcher extends () => Promise<any>>(fetcher: Fetcher): Fetcher {
+  function assertReverification<Fetcher extends (...args: any[]) => Promise<any>>(
+    fetcher: Fetcher,
+  ): (
+    ...args: Parameters<Fetcher>
+  ) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>> {
     return (async (...args) => {
       let result = await resolveResult(fetcher(...args));
 
@@ -68,12 +75,14 @@ function createReverificationHandler(
            */
           await resolvers.promise;
         } catch (e) {
-          if (params.onCancel === 'throw') {
+          if (params.onCancel) {
+            params.onCancel();
+          }
+
+          if (isClerkRuntimeError(e) && e.code === 'reverification_cancelled' && params.throwOnCancel) {
             throw e;
           }
-          params?.onCancel?.();
 
-          // Is this even right ?
           return null;
         }
 
@@ -90,10 +99,13 @@ function createReverificationHandler(
   return assertReverification;
 }
 
-function __experimental_useReverification<Fetcher extends () => Promise<any>>(
+function __experimental_useReverification<
+  Fetcher extends (...args: any[]) => Promise<any>,
+  O extends UseReverificationOptions,
+>(
   fetcher: Fetcher,
-  options?: UseReverificationOptions,
-): readonly [Fetcher] {
+  options?: O,
+): readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, O>>] {
   const { __experimental_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
