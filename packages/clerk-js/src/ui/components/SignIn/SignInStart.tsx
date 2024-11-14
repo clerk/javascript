@@ -451,7 +451,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
         const autofilled =
           window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart' ||
           // https://github.com/facebook/react/issues/1159#issuecomment-1025423604
-          !!document.getElementById('password-field')?.matches('*:-webkit-autofill');
+          !!ref.current?.matches('*:-webkit-autofill');
         if (autofilled) {
           setAutofilled(autofilled);
           clearInterval(intervalId);
