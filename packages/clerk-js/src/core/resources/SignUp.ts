@@ -81,7 +81,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
 
-    if (__BUILD_ENABLE_RHC__) {
+    if (!__BUILD_DISABLE_RHC__) {
       const {
         captchaSiteKey,
         canUseCaptcha,
@@ -207,7 +207,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
       return this;
     }
@@ -260,7 +260,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Metamask');
       return this;
     }
@@ -280,7 +280,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
       return this;
     }

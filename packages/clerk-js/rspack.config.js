@@ -29,10 +29,10 @@ const variantToSourceFile = {
  *
  * @param {object} config
  * @param {'development'|'production'} config.mode
- * @param {boolean} [config.rhc=true]
+ * @param {boolean} [config.disableRHC=false]
  * @returns { import('@rspack/cli').Configuration }
  */
-const common = ({ mode, rhc = true }) => {
+const common = ({ mode, disableRHC = false }) => {
   return {
     mode,
     resolve: {
@@ -42,7 +42,7 @@ const common = ({ mode, rhc = true }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __BUILD_ENABLE_RHC__: JSON.stringify(rhc),
+        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         __DEV__: isDevelopment(mode),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
@@ -406,7 +406,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkEsmNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
-    common({ mode, rhc: false }),
+    common({ mode, disableRHC: true }),
     commonForProd(),
     commonForProdBundled(),
     {
@@ -433,7 +433,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkCjsNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
-    common({ mode, rhc: false }),
+    common({ mode, disableRHC: true }),
     commonForProd(),
     commonForProdBundled(),
     {
@@ -536,7 +536,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowserNoRHC]: merge(
       entryForVariant(variants.clerkBrowserNoRHC),
-      common({ mode, rhc: false }),
+      common({ mode, disableRHC: true }),
       commonForDev(),
     ),
     [variants.clerkHeadless]: merge(

@@ -34,7 +34,7 @@ function _OneTapStart(): JSX.Element | null {
   const shouldLoadGIS = !user?.id && !!environmentClientID;
 
   async function initializeGIS() {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Google Identity Services');
       return undefined;
     }

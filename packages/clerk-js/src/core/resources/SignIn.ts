@@ -238,7 +238,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
       return this;
     }
@@ -289,7 +289,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Metamask');
       return this;
     }
@@ -303,7 +303,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    if (!__BUILD_ENABLE_RHC__) {
+    if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
       return this;
     }

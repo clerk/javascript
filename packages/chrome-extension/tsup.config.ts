@@ -22,7 +22,7 @@ export default defineConfig(overrideOptions => {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${isWatch}`,
-      __BUILD_ENABLE_RHC__: 'false',
+      __BUILD_DISABLE_RHC__: 'true',
     },
   };
 
