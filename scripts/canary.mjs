@@ -26,7 +26,7 @@ const snapshot = `---
 Canary release
 `;
 
-await $`pnpm json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
+await $`pnpm dlx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
 
 try {
   // exit pre-release mode if we're in it
