@@ -32,27 +32,31 @@ type CheckStepUpAuthorization = (
 ) => boolean | null;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
-  strictMfa: {
+  strict_mfa: {
     afterMinutes: 10,
-    level: 'multiFactor',
+    level: 'multi_factor',
   },
   strict: {
     afterMinutes: 10,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   moderate: {
     afterMinutes: 60,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   lax: {
     afterMinutes: 1_440,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
 };
 
-const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>(['firstFactor', 'secondFactor', 'multiFactor']);
+const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>([
+  'first_factor',
+  'second_factor',
+  'multi_factor',
+]);
 
-const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['strictMfa', 'strict', 'moderate', 'lax']);
+const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
@@ -126,11 +130,11 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experime
   const isValidFactor2 = factor2Age !== -1 ? afterMinutes > factor2Age : null;
 
   switch (level) {
-    case 'firstFactor':
+    case 'first_factor':
       return isValidFactor1;
-    case 'secondFactor':
+    case 'second_factor':
       return factor2Age !== -1 ? isValidFactor2 : isValidFactor1;
-    case 'multiFactor':
+    case 'multi_factor':
       return factor2Age === -1 ? isValidFactor1 : isValidFactor1 && isValidFactor2;
   }
 };
