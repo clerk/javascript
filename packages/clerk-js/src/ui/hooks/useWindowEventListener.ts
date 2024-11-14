@@ -3,7 +3,7 @@ type EventType = keyof WindowEventMap;
 
 export const useWindowEventListener = (eventOrEvents: EventType | EventType[] | undefined, cb: () => void): void => {
   React.useEffect(() => {
-    const events = [eventOrEvents].flat().filter(x => !!x) as EventType[];
+    const events = [eventOrEvents].flat().filter(x => !!x);
     if (!events.length) {
       return;
     }

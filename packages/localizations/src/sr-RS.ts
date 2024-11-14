@@ -469,17 +469,6 @@ export const srRS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Unesi svoju lozinku',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'Prijavi se',
       actionText: 'Već imaš nalog?',
@@ -513,6 +502,17 @@ export const srRS: LocalizationResource = {
         subtitle: 'Vrati se na novootvoreni tab da nastaviš',
         subtitleNewTab: 'Vrati se na prethodni tab da nastaviš',
         title: 'Uspešno verifikovan e-mail',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

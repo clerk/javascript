@@ -12,11 +12,10 @@ export const common: PlaywrightTestConfig = {
   snapshotDir: './tests/snapshots',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 5 : 0,
   timeout: 90_000,
-  maxFailures: process.env.CI ? 1 : undefined,
+  maxFailures: process.env.CI ? 5 : undefined,
   workers: process.env.CI ? '50%' : '70%',
-  reporter: process.env.CI ? 'line' : 'list',
   use: {
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',

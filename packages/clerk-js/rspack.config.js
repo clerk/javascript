@@ -42,6 +42,7 @@ const common = ({ mode }) => {
         __DEV__: isDevelopment(mode),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
+        BUILD_ENABLE_NEW_COMPONENTS: JSON.stringify(process.env.BUILD_ENABLE_NEW_COMPONENTS),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,

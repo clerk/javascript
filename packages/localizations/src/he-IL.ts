@@ -463,17 +463,6 @@ export const heIL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
   signUp: {
-    __experimental_legalConsent: {
-      checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
-      },
-      continue: {
-        subtitle: undefined,
-        title: undefined,
-      },
-    },
     continue: {
       actionLink: 'התחבר',
       actionText: 'יש לך חשבון?',
@@ -507,6 +496,17 @@ export const heIL: LocalizationResource = {
         subtitle: 'חזור לכרטיסייה שנפתחה לאחרונה להמשיך',
         subtitleNewTab: 'חזור לכרטיסייה הקודמת להמשיך',
         title: 'אימות דוא"ל הצליח',
+      },
+    },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     phoneCode: {

@@ -109,6 +109,10 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
         case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
         case ERROR_CODES.USER_LOCKED:
+        case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+        case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+        case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
         default:
