@@ -128,7 +128,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let turnstileSiteKey = siteKey;
   let retries = 0;
   let widgetContainerQuerySelector: string | undefined;
-  // The backend uses this to determine which turnstile to used in order to verify the token
+  // The backend uses this to determine which Turnstile site-key was used in order to verify the token
   let captchaWidgetTypeUsed: CaptchaWidgetType = null;
 
   // modal
