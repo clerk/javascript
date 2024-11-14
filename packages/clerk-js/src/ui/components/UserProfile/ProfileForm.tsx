@@ -3,7 +3,7 @@ import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, useAppearance } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, InformationBox, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -21,6 +21,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   }
 
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
+  const { nameFieldsOrder } = useAppearance().parsedLayout;
   const showFirstName = first_name.enabled;
   const showLastName = last_name.enabled;
   const userFirstName = user.firstName || '';
@@ -96,23 +97,43 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         />
         {(showFirstName || showLastName) && (
           <Form.ControlRow elementId='name'>
-            {showFirstName && (
-              <Form.PlainInput
-                {...firstNameField.props}
-                isDisabled={nameEditDisabled}
-                autoFocus
-              />
-            )}
-            {showLastName && (
-              <Form.PlainInput
-                {...lastNameField.props}
-                isDisabled={nameEditDisabled}
-                autoFocus={!showFirstName}
-              />
+            {nameFieldsOrder === 'default' ? (
+              <>
+                {showFirstName && (
+                  <Form.PlainInput
+                    {...firstNameField.props}
+                    autoFocus
+                    isDisabled={nameEditDisabled}
+                  />
+                )}
+                {showLastName && (
+                  <Form.PlainInput
+                    {...lastNameField.props}
+                    isDisabled={nameEditDisabled}
+                    autoFocus={!showFirstName}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {showLastName && (
+                  <Form.PlainInput
+                    {...lastNameField.props}
+                    isDisabled={nameEditDisabled}
+                    autoFocus
+                  />
+                )}
+                {showFirstName && (
+                  <Form.PlainInput
+                    {...firstNameField.props}
+                    isDisabled={nameEditDisabled}
+                    autoFocus={!showLastName}
+                  />
+                )}
+              </>
             )}
           </Form.ControlRow>
         )}
-
         <FormButtons
           isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
           onReset={onReset}

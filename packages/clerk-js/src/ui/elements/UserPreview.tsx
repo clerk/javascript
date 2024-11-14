@@ -3,7 +3,7 @@ import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Text, useLocalizations } from '../customizables';
+import { descriptors, Flex, Text, useAppearance, useLocalizations } from '../customizables';
 import type { InternalTheme, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { UserAvatar } from './UserAvatar';
 
@@ -66,7 +66,12 @@ export const UserPreview = (props: UserPreviewProps) => {
     ...rest
   } = props;
   const { t } = useLocalizations();
-  const name = getFullName({ ...user }) || getFullName({ ...externalAccount }) || getFullName({ ...samlAccount });
+  const { nameFieldsOrder } = useAppearance().parsedLayout;
+  const reverse = nameFieldsOrder === 'reversed';
+  const name =
+    getFullName({ ...user, reverse: reverse }) ||
+    getFullName({ ...externalAccount, reverse: reverse }) ||
+    getFullName({ ...samlAccount, reverse: reverse });
   const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.() || samlAccount?.emailAddress;
   const localizedTitle = t(title);
 
