@@ -34,23 +34,23 @@ function _OneTapStart(): JSX.Element | null {
   const shouldLoadGIS = !user?.id && !!environmentClientID;
 
   async function initializeGIS() {
-    if (__BUILD_ENABLE_RHC__) {
-      const google = await loadGIS();
-
-      google.accounts.id.initialize({
-        client_id: environmentClientID!,
-        callback: oneTapCallback,
-        itp_support: ctx.itpSupport,
-        cancel_on_tap_outside: ctx.cancelOnTapOutside,
-        auto_select: false,
-        use_fedcm_for_prompt: ctx.fedCmSupport,
-      });
-
-      return google;
+    if (!__BUILD_ENABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Google Identity Services');
+      return undefined;
     }
 
-    clerkUnsupportedEnvironmentWarning('Google Identity Services');
-    return undefined;
+    const google = await loadGIS();
+
+    google.accounts.id.initialize({
+      client_id: environmentClientID!,
+      callback: oneTapCallback,
+      itp_support: ctx.itpSupport,
+      cancel_on_tap_outside: ctx.cancelOnTapOutside,
+      auto_select: false,
+      use_fedcm_for_prompt: ctx.fedCmSupport,
+    });
+
+    return google;
   }
 
   /**

@@ -466,25 +466,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
-        if (__BUILD_ENABLE_RHC__) {
-          // Hot-load latest ClerkJS from Clerk CDN
-          if (!global.Clerk) {
-            await loadClerkJsScript({
-              ...this.options,
-              publishableKey: this.#publishableKey,
-              proxyUrl: this.proxyUrl,
-              domain: this.domain,
-              nonce: this.options.nonce,
-            });
-          }
-
-          if (!global.Clerk) {
-            throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
-          }
-
-          await global.Clerk.load(this.options);
+      } else if (__BUILD_ENABLE_RHC__) {
+        // Hot-load latest ClerkJS from Clerk CDN
+        if (!global.Clerk) {
+          await loadClerkJsScript({
+            ...this.options,
+            publishableKey: this.#publishableKey,
+            proxyUrl: this.proxyUrl,
+            domain: this.domain,
+            nonce: this.options.nonce,
+          });
         }
+
+        if (!global.Clerk) {
+          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+        }
+
+        await global.Clerk.load(this.options);
       }
 
       if (global.Clerk?.loaded) {

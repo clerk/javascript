@@ -238,82 +238,82 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
-      const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-
-      if (!(typeof generateSignature === 'function')) {
-        clerkMissingOptionError('generateSignature');
-      }
-
-      await this.create({ identifier });
-
-      const web3FirstFactor = this.supportedFirstFactors?.find(f => f.strategy === strategy) as Web3SignatureFactor;
-
-      if (!web3FirstFactor) {
-        clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
-      }
-
-      await this.prepareFirstFactor(web3FirstFactor);
-
-      const { message } = this.firstFactorVerification;
-      if (!message) {
-        clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
-      }
-
-      let signature: string;
-      try {
-        signature = await generateSignature({ identifier, nonce: message, provider });
-      } catch (err) {
-        // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
-        // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
-        // reason we retry the request once more in order for the flow to be able to be completed successfully.
-        //
-        // error code 4001 means the user rejected the request
-        // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
-        if (provider === 'coinbase_wallet' && err.code === 4001) {
-          signature = await generateSignature({ identifier, nonce: message, provider });
-        } else {
-          throw err;
-        }
-      }
-
-      return this.attemptFirstFactor({
-        signature,
-        strategy,
-      });
+    if (!__BUILD_ENABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return this;
     }
 
-    clerkUnsupportedEnvironmentWarning('Web3');
-    return this;
+    const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    if (!(typeof generateSignature === 'function')) {
+      clerkMissingOptionError('generateSignature');
+    }
+
+    await this.create({ identifier });
+
+    const web3FirstFactor = this.supportedFirstFactors?.find(f => f.strategy === strategy) as Web3SignatureFactor;
+
+    if (!web3FirstFactor) {
+      clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
+    }
+
+    await this.prepareFirstFactor(web3FirstFactor);
+
+    const { message } = this.firstFactorVerification;
+    if (!message) {
+      clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
+    }
+
+    let signature: string;
+    try {
+      signature = await generateSignature({ identifier, nonce: message, provider });
+    } catch (err) {
+      // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
+      // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
+      // reason we retry the request once more in order for the flow to be able to be completed successfully.
+      //
+      // error code 4001 means the user rejected the request
+      // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
+      if (provider === 'coinbase_wallet' && err.code === 4001) {
+        signature = await generateSignature({ identifier, nonce: message, provider });
+      } else {
+        throw err;
+      }
+    }
+
+    return this.attemptFirstFactor({
+      signature,
+      strategy,
+    });
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const identifier = await getMetamaskIdentifier();
-      return this.authenticateWithWeb3({
-        identifier,
-        generateSignature: generateSignatureWithMetamask,
-        strategy: 'web3_metamask_signature',
-      });
+    if (!__BUILD_ENABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return this;
     }
 
-    clerkUnsupportedEnvironmentWarning('Metamask');
-    return this;
+    const identifier = await getMetamaskIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithMetamask,
+      strategy: 'web3_metamask_signature',
+    });
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    if (__BUILD_ENABLE_RHC__) {
-      const identifier = await getCoinbaseWalletIdentifier();
-      return this.authenticateWithWeb3({
-        identifier,
-        generateSignature: generateSignatureWithCoinbaseWallet,
-        strategy: 'web3_coinbase_wallet_signature',
-      });
+    if (!__BUILD_ENABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return this;
     }
 
-    clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
-    return this;
+    const identifier = await getCoinbaseWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithCoinbaseWallet,
+      strategy: 'web3_coinbase_wallet_signature',
+    });
   };
 
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
