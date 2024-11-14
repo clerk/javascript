@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <title>clerk-js Sandbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-gray-800">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center">
+            <div class="md:block">
+              <div class="flex items-baseline space-x-4">
+                <a
+                  href="/sign-in"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Sign In</a
+                >
+                <a
+                  href="/sign-up"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Sign Up</a
+                >
+                <a
+                  href="/user-button"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >User Button</a
+                >
+                <a
+                  href="/user-profile"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >User Profile</a
+                >
+                <a
+                  href="/create-organization"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Create Organization</a
+                >
+                <a
+                  href="/organization-list"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Organization List</a
+                >
+                <a
+                  href="/organization-profile"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Organization Profile</a
+                >
+                <a
+                  href="/organization-switcher"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Organization Switcher</a
+                >
+                <a
+                  href="/waitlist"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >Waitlist</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="flex justify-center pt-8">
+      <div id="app"></div>
+    </div>
+
+    <script
+      type="text/javascript"
+      src="/npm/clerk.browser.js"
+      data-clerk-publishable-key="pk_test_Zmx1ZW50LWxhYnJhZG9yLTM0LmNsZXJrLmFjY291bnRzLmRldiQ"
+    ></script>
+    <script
+      type="text/javascript"
+      src="/app.js"
+    ></script>
+  </body>
+</html>
