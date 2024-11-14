@@ -43,6 +43,7 @@ const defaultLayout: ParsedLayout = {
   termsPageUrl: '',
   shimmer: true,
   animations: true,
+  nameFieldsOrder: 'default',
   unsafe_disableDevelopmentModeWarnings: false,
 };
 

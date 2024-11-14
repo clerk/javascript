@@ -572,6 +572,12 @@ export type Layout = {
    */
   logoLinkUrl?: string;
   /**
+   * Controls the order of the first name last name fields. In some languages its preferred to lead
+   * with the last name. Use `reversed` to render last name before first name.
+   * @default default
+   */
+  nameFieldsOrder?: 'default' | 'reversed';
+  /**
    * Controls the variant that will be used for the social buttons.
    * By default, the components will use block buttons if you have less than
    * 3 social providers enabled, otherwise icon buttons will be used.

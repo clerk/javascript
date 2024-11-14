@@ -25,7 +25,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
     onlyLegalAcceptedMissing = false,
     handleEmailPhoneToggle,
   } = props;
-  const { showOptionalFields } = useAppearance().parsedLayout;
+  const { showOptionalFields, nameFieldsOrder } = useAppearance().parsedLayout;
 
   const shouldShow = (name: keyof typeof fields) => {
     // In case both email & phone are optional, then don't take into account the
@@ -53,19 +53,40 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 },
               }}
             >
-              {shouldShow('firstName') && (
-                <Form.PlainInput
-                  {...formState.firstName.props}
-                  isRequired={fields.firstName?.required}
-                  isOptional={!fields.firstName?.required}
-                />
-              )}
-              {shouldShow('lastName') && (
-                <Form.PlainInput
-                  {...formState.lastName.props}
-                  isRequired={fields.lastName?.required}
-                  isOptional={!fields.lastName?.required}
-                />
+              {nameFieldsOrder === 'default' ? (
+                <>
+                  {shouldShow('firstName') && (
+                    <Form.PlainInput
+                      {...formState.firstName.props}
+                      isRequired={fields.firstName?.required}
+                      isOptional={!fields.firstName?.required}
+                    />
+                  )}
+                  {shouldShow('lastName') && (
+                    <Form.PlainInput
+                      {...formState.lastName.props}
+                      isRequired={fields.lastName?.required}
+                      isOptional={!fields.lastName?.required}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {shouldShow('lastName') && (
+                    <Form.PlainInput
+                      {...formState.lastName.props}
+                      isRequired={fields.lastName?.required}
+                      isOptional={!fields.lastName?.required}
+                    />
+                  )}
+                  {shouldShow('firstName') && (
+                    <Form.PlainInput
+                      {...formState.firstName.props}
+                      isRequired={fields.firstName?.required}
+                      isOptional={!fields.firstName?.required}
+                    />
+                  )}
+                </>
               )}
             </Form.ControlRow>
           )}
