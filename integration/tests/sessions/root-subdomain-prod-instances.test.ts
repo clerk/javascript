@@ -71,16 +71,6 @@ test.describe('root and subdomain production apps @sessions', () => {
       const u = createTestUtils({ app: apps[0].app });
       fakeUser = u.services.users.createFakeUser();
       await u.services.users.createBapiUser(fakeUser);
-
-      try {
-        console.log('tying to access app[0] via https...');
-        console.log(await (await fetch(`https://${hosts[0]}`)).text());
-
-        console.log('tying to access app[1] via https...');
-        console.log(await (await fetch(`https://${hosts[1]}`)).text());
-      } catch (err) {
-        console.error(err);
-      }
     });
 
     test.afterAll(async () => {
