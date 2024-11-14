@@ -7,8 +7,6 @@ import * as path from 'path';
 
 config({ path: path.resolve(__dirname, '.env.local') });
 
-// modifying to trigger a test run arm
-
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
   snapshotDir: './tests/snapshots',
@@ -39,8 +37,8 @@ export default defineConfig({
       testMatch: /global\.teardown/,
     },
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'chrome',
+      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
       dependencies: ['setup'],
     },
     // {
