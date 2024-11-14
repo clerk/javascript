@@ -264,7 +264,9 @@ export class Clerk implements ClerkInterface {
     const publishableKey = parsePublishableKey(this.publishableKey);
 
     if (!publishableKey) {
-      return errorThrower.throwInvalidPublishableKeyError({ key: this.publishableKey });
+      return errorThrower.throwInvalidPublishableKeyError({
+        key: this.publishableKey,
+      });
     }
 
     return publishableKey.frontendApi;
@@ -283,24 +285,22 @@ export class Clerk implements ClerkInterface {
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
-    const trimmedKey = (key || '').trim();
+    key = (key || '').trim();
 
     this.#domain = options?.domain;
     this.#proxyUrl = options?.proxyUrl;
 
-    if (!trimmedKey) {
-      errorThrower.throwMissingPublishableKeyError();
-      return;
+    if (!key) {
+      return errorThrower.throwMissingPublishableKeyError();
     }
 
     const publishableKey = parsePublishableKey(key);
 
     if (!publishableKey) {
-      errorThrower.throwInvalidPublishableKeyError({ key: trimmedKey });
-      return;
+      return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.#publishableKey = trimmedKey;
+    this.#publishableKey = key;
     this.#instanceType = publishableKey.instanceType;
 
     this.#fapiClient = createFapiClient(this);
@@ -933,7 +933,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
-    const memoizedListener = memoizeListenerCallback(listener);
+    listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
     // emit right away
     if (this.client) {
@@ -946,7 +946,7 @@ export class Clerk implements ClerkInterface {
     }
 
     const unsubscribe = () => {
-      this.#listeners = this.#listeners.filter(l => l !== memoizedListener);
+      this.#listeners = this.#listeners.filter(l => l !== listener);
     };
     return unsubscribe;
   };
@@ -1054,7 +1054,7 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const waitlistUrl = this.#options.waitlistUrl || this.environment.displayConfig.waitlistUrl;
+    const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
 
     return buildURL({ base: waitlistUrl }, { stringify: true });
   }
@@ -1189,13 +1189,12 @@ export class Clerk implements ClerkInterface {
     }
 
     const verificationStatus = getClerkQueryParam('__clerk_status');
-    switch (verificationStatus) {
-      case 'verified':
-        throw new EmailLinkError(EmailLinkErrorCode.Failed);
-      case 'client_mismatch':
-        throw new EmailLinkError(EmailLinkErrorCode.ClientMismatch);
-      case 'expired':
-        throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    if (verificationStatus === 'expired') {
+      throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    } else if (verificationStatus === 'client_mismatch') {
+      throw new EmailLinkError(EmailLinkErrorCode.ClientMismatch);
+    } else if (verificationStatus !== 'verified') {
+      throw new EmailLinkError(EmailLinkErrorCode.Failed);
     }
 
     const newSessionId = getClerkQueryParam('__clerk_created_session');
@@ -1215,9 +1214,7 @@ export class Clerk implements ClerkInterface {
         session: newSessionId,
         redirectUrl: params.redirectUrlComplete,
       });
-    }
-
-    if (shouldContinueOnThisDevice) {
+    } else if (shouldContinueOnThisDevice) {
       return redirectContinue();
     }
 
@@ -1331,7 +1328,13 @@ export class Clerk implements ClerkInterface {
         signUp,
         verifyEmailPath:
           params.verifyEmailAddressUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+          buildURL(
+            {
+              base: displayConfig.signUpUrl,
+              hashPath: '/verify-email-address',
+            },
+            { stringify: true },
+          ),
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
@@ -1517,7 +1520,7 @@ export class Clerk implements ClerkInterface {
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
     if (!__BUILD_ENABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Metamask');
-      return Promise.reject();
+      return;
     }
 
     await this.authenticateWithWeb3({
@@ -1564,7 +1567,11 @@ export class Clerk implements ClerkInterface {
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
+      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
+        identifier,
+        generateSignature,
+        strategy,
+      });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
@@ -1674,7 +1681,10 @@ export class Clerk implements ClerkInterface {
     // 2. clerk-js initializes propA with a default value
     // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
     // 4. If we don't merge the new props with the current options, propA will be reset to undefined
-    const props = { ..._props, options: this.#initOptions({ ...this.#options, ..._props.options }) };
+    const props = {
+      ..._props,
+      options: this.#initOptions({ ...this.#options, ..._props.options }),
+    };
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 

@@ -14,7 +14,7 @@ async function getToken() {
   });
 
   if (!clerk.session) {
-    console.warn('No session found');
+    return null;
   }
 
   return await clerk.session?.getToken();
@@ -25,8 +25,10 @@ async function getToken() {
 //       It must return true, in order to keep the connection open and send a response later.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.greeting === 'get-token') {
-    console.log('Handling request for the user\'s current token');
-    getToken().then((token) => sendResponse({ token })).catch((error) => console.error(JSON.stringify(error)));
+    console.log("Handling request for the user's current token");
+    getToken()
+      .then(token => sendResponse({ token }))
+      .catch(error => console.error(JSON.stringify(error)));
   }
   return true;
 });
