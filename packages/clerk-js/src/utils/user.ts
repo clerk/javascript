@@ -9,7 +9,7 @@ type NameHelperParams = {
   reverse?: boolean;
 };
 
-export const getFullName = ({ firstName, lastName, name, reverse }: NameHelperParams) => {
+export const getFullName = ({ firstName, lastName, name, reverse = false }: NameHelperParams) => {
   if (name) {
     return name;
   }
