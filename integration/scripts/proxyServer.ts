@@ -14,7 +14,7 @@ type ProxyServerOptions = {
  * The server will listen on port 80 (http) or 443 (https) depending on whether SSL options are provided.
  */
 export const createProxyServer = (opts: ProxyServerOptions) => {
-  const proxy = httpProxy.createProxyServer();
+  const proxy = httpProxy.createProxyServer({ xfwd: true });
   const usingSSL = !!opts.ssl;
   const createServer: typeof _createServer = usingSSL ? https.createServer.bind(https) : http.createServer.bind(http);
 
