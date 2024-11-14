@@ -15,8 +15,8 @@
 
 ## Checklist
 
-- [ ] `npm test` runs as expected.
-- [ ] `npm run build` runs as expected.
+- [ ] `pnpm test` runs as expected.
+- [ ] `pnpm build` runs as expected.
 - [ ] (If applicable) [JSDoc comments](https://jsdoc.app/about-getting-started.html) have been added or updated for any package exports
 - [ ] (If applicable) [Documentation](https://github.com/clerk/clerk-docs) has been updated
 

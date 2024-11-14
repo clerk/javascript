@@ -55,13 +55,14 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
-    "publish:local": "npx yalc push --replace  --sig"
+    "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
     "@clerk/clerk-js": "5.34.1",
     "@clerk/clerk-react": "5.15.5",
+    "@clerk/expo-passkeys": "0.0.5",
     "@clerk/shared": "2.14.0",
     "@clerk/types": "4.34.0",
     "base-64": "^1.0.0",
@@ -69,12 +70,11 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/expo-passkeys": "0.0.5",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",

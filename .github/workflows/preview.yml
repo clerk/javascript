@@ -80,7 +80,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Build packages
-        run: npx turbo build $TURBO_ARGS
+        run: pnpm turbo build $TURBO_ARGS
 
       - name: Get date
         run: |
@@ -90,7 +90,7 @@ jobs:
         run: node scripts/install-site-in-isolation.mjs playground/nextjs
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: pnpm add -g vercel@latest
 
       - name: Pull Vercel environment information
         run: |

@@ -17,6 +17,7 @@ dist
 /packages/sdk-node/examples
 node_modules
 package-lock.json
+pnpm-lock.yaml
 playground
 packages/backend/tests/**/*.js
 /**/CHANGELOG.md

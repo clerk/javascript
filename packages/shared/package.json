@@ -119,12 +119,12 @@
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "pnpm dlx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
@@ -139,7 +139,7 @@
     "swr": "^2.2.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "@types/node": "^18.19.33",
