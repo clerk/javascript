@@ -9,6 +9,7 @@ export * from './EmailAddress';
 export * from './Environment';
 export * from './Error';
 export * from './ExternalAccount';
+export * from './EnterpriseAccount';
 export * from './IdentificationLink';
 export * from './Image';
 export * from './PhoneNumber';

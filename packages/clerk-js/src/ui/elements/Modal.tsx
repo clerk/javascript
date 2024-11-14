@@ -8,23 +8,27 @@ import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 
-export const [ModalContext, _, useUnsafeModalContext] = createContextAndHook<{ toggle: () => void }>('ModalContext');
+export const [ModalContext, _, useUnsafeModalContext] = createContextAndHook<{ toggle?: () => void }>('ModalContext');
 
 type ModalProps = React.PropsWithChildren<{
+  id?: string;
   handleOpen?: () => void;
   handleClose?: () => void;
   contentSx?: ThemableCssProp;
   containerSx?: ThemableCssProp;
+  canCloseModal?: boolean;
+  style?: React.CSSProperties;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
-  const { handleClose, handleOpen, contentSx, containerSx } = props;
+  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style } = props;
   const { disableScroll, enableScroll } = useScrollLock(document.body);
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
     outsidePress: e => e.target === overlayRef.current,
+    canCloseModal,
   });
 
   React.useEffect(() => {
@@ -40,7 +44,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     return () => enableScroll();
   });
 
-  const modalCtx = React.useMemo(() => ({ value: { toggle } }), [toggle]);
+  const modalCtx = React.useMemo(() => ({ value: canCloseModal === false ? {} : { toggle } }), [toggle, canCloseModal]);
 
   return (
     <Popover
@@ -50,8 +54,10 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
+          id={id}
           ref={overlayRef}
           elementDescriptor={descriptors.modalBackdrop}
+          style={style}
           sx={[
             t => ({
               animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,

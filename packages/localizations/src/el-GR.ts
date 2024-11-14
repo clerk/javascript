@@ -507,13 +507,14 @@ export const elGR: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Συμφωνώ με την {{ privacyPolicyLink || link("Πολιτική Απορρήτου") }}',
+        label__onlyTermsOfService: 'Συμφωνώ με τους {{ termsOfServiceLink || link("Όρους Χρήσης") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Συμφωνώ με τους {{ termsOfServiceLink || link("Όρους Χρήσης") }} και την {{ privacyPolicyLink || link("Πολιτική Απορρήτου") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Παρακαλώ διαβάστε και αποδεχτείτε τους όρους για να συνεχίσετε',
+        title: 'Νομική συναίνεση',
       },
     },
     phoneCode: {

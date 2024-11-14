@@ -5,6 +5,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
   const _environment = clerk.__unstable__environment;
   const fapiClient = createFapiClient(clerk);
   const captchaProvider = _environment ? _environment.displayConfig.captchaProvider : 'turnstile';
+
   return {
     captchaSiteKey: _environment ? _environment.displayConfig.captchaPublicKey : null,
     captchaWidgetType: _environment ? _environment.displayConfig.captchaWidgetType : null,

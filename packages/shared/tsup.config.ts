@@ -15,6 +15,7 @@ export default defineConfig(overrideOptions => {
       './src/react/index.ts',
       './src/utils/index.ts',
       './src/workerTimers/index.ts',
+      './src/dom/*.ts',
       '!./src/**/*.test.{ts,tsx}',
     ],
     format: ['cjs', 'esm'],

@@ -740,6 +740,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        rethrowOfflineNetworkErrors: boolean;
       },
       Record<string, any>
     >;
@@ -1309,9 +1310,9 @@ export type OrganizationListProps = {
 
 export type WaitlistProps = {
   /**
-   * Full URL or path to navigate after successful waitlist submission.
+   * Full URL or path to navigate after join waitlist.
    */
-  redirectUrl?: string;
+  afterJoinWaitlistUrl?: string;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

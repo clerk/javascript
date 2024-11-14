@@ -5,6 +5,7 @@ export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
 export { SignInAction as Action } from './action';
 export { SignInPasskey as Passkey } from './passkey';
+export { SignInCaptcha as Captcha } from './captcha';
 export { SignInSupportedStrategy as SupportedStrategy } from './choose-strategy';
 export { SignInSessionList as SessionList, SignInSessionListItem as SessionListItem } from './choose-session';
 

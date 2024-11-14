@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.12.0",
+  "version": "2.14.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -60,6 +60,16 @@
         "default": "./dist/workerTimers/index.js"
       }
     },
+    "./dom": {
+      "import": {
+        "types": "./dist/dom/index.d.mts",
+        "default": "./dist/dom/index.mjs"
+      },
+      "require": {
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -75,6 +85,7 @@
     "date",
     "deprecated",
     "deriveState",
+    "dom",
     "error",
     "file",
     "globs",
@@ -120,7 +131,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.31.0",
+    "@clerk/types": "4.34.0",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
