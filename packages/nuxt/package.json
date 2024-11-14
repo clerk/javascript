@@ -38,8 +38,7 @@
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
   "files": [
-    "dist",
-    "server"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
@@ -53,7 +52,7 @@
     "@clerk/backend": "1.16.4",
     "@clerk/shared": "2.14.0",
     "@clerk/types": "4.34.0",
-    "@clerk/vue": "0.0.3",
+    "@clerk/vue": "0.0.4",
     "@nuxt/kit": "^3.14.159",
     "h3": "^1.13.0"
   },
