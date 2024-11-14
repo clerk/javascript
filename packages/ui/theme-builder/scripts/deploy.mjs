@@ -15,7 +15,7 @@ await within(async () => {
   cd('../../../');
 
   // turbo build
-  await spinner('Building dependencies...', () => $`npx turbo build --filter=@clerk/ui...`);
+  await spinner('Building dependencies...', () => $`pnpm turbo build --filter=@clerk/ui...`);
 });
 
 await $`vercel pull`;

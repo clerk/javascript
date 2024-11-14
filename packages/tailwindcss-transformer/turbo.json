@@ -5,7 +5,6 @@
       "dependsOn": ["^build"],
       "inputs": [
         "*.d.ts",
-        "bundlewatch.config.json",
         "jest.*",
         "src/**",
         "tests/**",

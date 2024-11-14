@@ -2,11 +2,10 @@
   "extends": ["//"],
   "tasks": {
     "test": {
-      "dependsOn": ["^@clerk/localizations#build", "^build"],
+      "dependsOn": ["^build"],
       "inputs": [
         "**/__test__/**",
         "*.d.ts",
-        "bundlewatch.config.json",
         "jest.*",
         "src/**",
         "tsconfig.json",

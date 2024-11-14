@@ -66,11 +66,11 @@
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "pnpm dlx yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
@@ -81,11 +81,12 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/themes": "2.1.45",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@clerk/localizations": "workspace:*",
+    "@clerk/themes": "workspace:*",
     "@types/node": "^18.19.33",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
     "@types/semver": "^7.5.8",
     "typescript": "*"
   },
