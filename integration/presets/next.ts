@@ -4,6 +4,7 @@ import { templates } from '../templates/index.js';
 
 const clerkNextjsLocal = `file:${process.cwd()}/packages/nextjs`;
 const clerkSharedLocal = `file:${process.cwd()}/packages/shared`;
+const clerkTypesLocal = `file:${process.cwd()}/packages/types`;
 const appRouter = applicationConfig()
   .setName('next-app-router')
   .useTemplate(templates['next-app-router'])
@@ -16,7 +17,8 @@ const appRouter = applicationConfig()
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal)
-  .addDependency('@clerk/shared', clerkSharedLocal);
+  .addDependency('@clerk/shared', clerkSharedLocal)
+  .addDependency('@clerk/types', clerkTypesLocal);
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 
