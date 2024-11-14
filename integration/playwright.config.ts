@@ -7,6 +7,8 @@ import * as path from 'path';
 
 config({ path: path.resolve(__dirname, '.env.local') });
 
+// modifying to trigger a test run
+
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
   snapshotDir: './tests/snapshots',
