@@ -9,10 +9,9 @@ import { deprecated, deprecatedObjectProperty, deprecatedProperty } from '../dep
 import { isProductionEnvironment, isTestEnvironment } from '../utils/runtimeEnvironment';
 
 describe('deprecated(fnName, warning)', () => {
-  let consoleWarnSpy = jest.fn();
+  let consoleWarnSpy;
 
   beforeEach(() => {
-    // @ts-ignore
     consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
   });
   afterEach(() => {

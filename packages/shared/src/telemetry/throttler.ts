@@ -59,7 +59,6 @@ export class TelemetryEventThrottler {
         ...rest,
       })
         .sort()
-        // @ts-ignore
         .map(key => sanitizedEvent[key]),
     );
   }
