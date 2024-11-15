@@ -29,6 +29,5 @@ jobs:
 
       - name: Lint Pull Request Title
         run: |
-          pnpm init
           pnpm add -D @commitlint/config-conventional @commitlint/cli globby
           echo '${{ github.event.pull_request.title }}' | pnpm dlx @commitlint/cli -- --config commitlint.config.ts
