@@ -168,7 +168,7 @@ describe('TelemetryCollector', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
 
-      randomSpy.mockRestore;
+      randomSpy.mockRestore();
     });
   });
 
