@@ -21,6 +21,6 @@ export { createClerkRequest } from './tokens/clerkRequest';
 export type { ClerkRequest } from './tokens/clerkRequest';
 
 export {
-  __experimental_reverificationMismatch,
-  __experimental_reverificationMismatchResponse,
+  __experimental_reverificationError,
+  __experimental_reverificationErrorResponse,
 } from '@clerk/shared/authorization-errors';
