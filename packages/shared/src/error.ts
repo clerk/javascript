@@ -166,6 +166,7 @@ export class ClerkRuntimeError extends Error {
     this.code = code;
     this.message = _message;
     this.clerkRuntimeError = true;
+    this.name = 'ClerkRuntimeError';
   }
 
   /**
