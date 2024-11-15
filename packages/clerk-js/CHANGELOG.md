@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.34.2
+
+### Patch Changes
+
+- Display logo in `<Waitlist />` component ([#4561](https://github.com/clerk/javascript/pull/4561)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Correctly handle async requires_captcha error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.34.1
 
 ### Patch Changes
