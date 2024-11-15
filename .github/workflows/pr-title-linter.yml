@@ -29,5 +29,5 @@ jobs:
 
       - name: Lint Pull Request Title
         run: |
-          pnpm install
+          pnpm install --dev --no-optional --ignore-scripts
           echo '${{ github.event.pull_request.title }}' | pnpm commitlint --config commitlint.config.ts
