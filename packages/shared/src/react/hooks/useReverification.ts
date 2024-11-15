@@ -1,6 +1,7 @@
 import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
+import { validateReverificationConfig } from '../../authorization';
 import { __experimental_isReverificationHint, __experimental_reverificationMismatch } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
@@ -52,11 +53,14 @@ function createReverificationHandler(
          */
         const resolvers = createDeferredPromise();
 
+        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata.reverification);
+
         /**
          * On success resolve the pending promise
          * On cancel reject the pending promise
          */
         params.onOpenModal?.({
+          level: isValidMetadata ? isValidMetadata().level : undefined,
           afterVerification() {
             resolvers.resolve(true);
           },
@@ -113,7 +117,7 @@ function __experimental_useReverification<
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
       onOpenModal: __experimental_openUserVerification,
-      onCancel: optionsRef.current?.onCancel,
+      ...options,
     })(fetcherRef.current);
     return [handler] as const;
   }, [__experimental_openUserVerification, fetcherRef.current, optionsRef.current]);
