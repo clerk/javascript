@@ -10,7 +10,12 @@
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center">
             <div class="md:block">
-              <div class="flex items-baseline space-x-4">
+              <div class="flex items-baseline space-x-2">
+                <a
+                  href="/"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >/</a
+                >
                 <a
                   href="/sign-in"
                   class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -63,14 +68,17 @@
       </div>
     </nav>
 
-    <div class="flex justify-center pt-8">
-      <div id="app"></div>
+    <div class="flex justify-center p-8">
+      <div
+        id="app"
+        class="overflow-x-auto"
+      ></div>
     </div>
 
     <script
       type="text/javascript"
       src="/npm/clerk.browser.js"
-      data-clerk-publishable-key="pk_test_Zmx1ZW50LWxhYnJhZG9yLTM0LmNsZXJrLmFjY291bnRzLmRldiQ"
+      data-clerk-publishable-key="pk_test_cG9zc2libGUtbWFuYXRlZS05Mi5jbGVyay5hY2NvdW50cy5kZXYk"
     ></script>
     <script
       type="text/javascript"

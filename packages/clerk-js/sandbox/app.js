@@ -1,31 +1,87 @@
-const app = document.getElementById('app');
+//@ts-check
+
+/** @typedef {import('@clerk/clerk-js').Clerk} Clerk */
+
+/**
+ * @typedef {object} CustomWindowObject
+ * @property {Clerk} [Clerk]
+ */
+
+/**
+ * @typedef {Window & CustomWindowObject} CustomWindow
+ */
+
+/** @type {CustomWindow} */
+const windowWithClerk = window;
+
+const Clerk = /** @type {Clerk} **/ (windowWithClerk.Clerk);
+if (!Clerk) {
+  throw new Error(`clerk-js is not loaded!`);
+}
+
+const app = /** @type {HTMLDivElement} **/ (document.getElementById('app'));
+
+/**
+ * @param {HTMLDivElement} element
+ */
+function mountIndex(element) {
+  const user = Clerk.user;
+  element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+}
+
+/** @typedef {keyof typeof routes} Route */
 
 const routes = {
-  '/': () => {},
+  '/': () => {
+    mountIndex(app);
+  },
   '/sign-in': () => {
-    window.Clerk.mountSignIn(app, {});
+    Clerk.mountSignIn(app, {});
   },
   '/sign-up': () => {
-    window.Clerk.mountSignUp(app, {});
-  },
-  '/create-organization': () => {
-    window.Clerk.mountCreateOrganization(app, {});
+    Clerk.mountSignUp(app, {});
   },
   '/user-button': () => {
-    window.Clerk.mountUserButton(app, {});
+    Clerk.mountUserButton(app, {});
+  },
+  '/user-profile': () => {
+    Clerk.mountUserProfile(app, {});
+  },
+  '/create-organization': () => {
+    Clerk.mountCreateOrganization(app, {});
+  },
+  '/organization-list': () => {
+    Clerk.mountOrganizationList(app, {});
+  },
+  '/organization-profile': () => {
+    Clerk.mountOrganizationProfile(app, {});
+  },
+  '/organization-switcher': () => {
+    Clerk.mountOrganizationSwitcher(app, {});
+  },
+  '/waitlist': () => {
+    Clerk.mountWaitlist(app, {});
   },
 };
 
+/**
+ * @param {string} currentRoute
+ */
 function addCurrentRouteIndicator(currentRoute) {
   const link = document.querySelector(`a[href="${currentRoute}"]`);
+  if (!link) {
+    return;
+  }
   link.classList.remove('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
   link.classList.add('bg-gray-900', 'text-white');
 }
 
 (async () => {
   const route = window.location.pathname;
-  const renderCurrentRoute = routes[route];
-  addCurrentRouteIndicator(route);
-  await window.Clerk.load();
-  renderCurrentRoute();
+  if (route in routes) {
+    const renderCurrentRoute = routes[route];
+    addCurrentRouteIndicator(route);
+    await Clerk.load();
+    renderCurrentRoute();
+  }
 })();
