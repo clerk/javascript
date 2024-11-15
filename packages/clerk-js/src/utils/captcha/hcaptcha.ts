@@ -1,6 +1,7 @@
 ///<reference types="@hcaptcha/types"/>
 
 import { loadScript } from '@clerk/shared/loadScript';
+import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
@@ -115,5 +116,5 @@ export const getHCaptchaToken = async (captchaOptions: CaptchaOptions) => {
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
+  return { captchaToken, captchaWidgetType: (isInvisibleWidget ? 'invisible' : 'smart') as CaptchaWidgetType };
 };

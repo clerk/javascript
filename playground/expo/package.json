@@ -9,7 +9,7 @@
     "start": "expo start",
     "web": "expo start --web",
     "yalc": "yalc add @clerk/clerk-expo @clerk/clerk-js @clerk/clerk-react @clerk/types @clerk/shared @clerk/types @clerk/expo-passkeys",
-    "expo:update": "npx expo install --fix"
+    "expo:update": "pnpm expo install --fix"
   },
   "dependencies": {
     "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo",
