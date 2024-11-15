@@ -59,7 +59,7 @@ jobs:
           title: 'ci(repo): Version packages'
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
-          version: pnpm version
+          version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
