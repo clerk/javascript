@@ -36,9 +36,11 @@ type UseReverificationOptions = {
   throwOnCancel?: boolean;
 };
 
-function createReverificationHandler(
-  params: { onOpenModal: Clerk['__experimental_openUserVerification'] } & UseReverificationOptions,
-) {
+type CreateReverificationHandlerParams = UseReverificationOptions & {
+  openUIComponent: Clerk['__experimental_openUserVerification'];
+};
+
+function createReverificationHandler(params: CreateReverificationHandlerParams) {
   function assertReverification<Fetcher extends (...args: any[]) => Promise<any>>(
     fetcher: Fetcher,
   ): (
@@ -59,7 +61,7 @@ function createReverificationHandler(
          * On success resolve the pending promise
          * On cancel reject the pending promise
          */
-        params.onOpenModal?.({
+        params.openUIComponent?.({
           level: isValidMetadata ? isValidMetadata().level : undefined,
           afterVerification() {
             resolvers.resolve(true);
@@ -103,28 +105,49 @@ function createReverificationHandler(
   return assertReverification;
 }
 
+type UseReverificationResult<
+  Fetcher extends (...args: any[]) => Promise<any>,
+  Options extends UseReverificationOptions,
+> = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
+
+/**
+ * Receives a fetcher async function and returned an enhanced fetcher that automatically handles the reverification flow
+ * by displaying a prebuilt UI component when the request from the fetcher fails with a reverification error response.
+ *
+ * While the UI component is displayed the promise is still pending.
+ * On success: the original request is retried one more time.
+ * On error:
+ * (1) by default the fetcher will return `null` and the `onCancel` callback will be executed.
+ * (2) when `throwOnCancel: true` instead of returning null, the returned fetcher will throw a `ClerkRuntimeError`.
+ *
+ * @example
+ * A simple example:
+ *
+ * function Hello() {
+ *   const [fetchBalance] = useReverification(()=> fetch('/transfer-balance',{method:"POST"}));
+ *   return <button onClick={fetchBalance}>...</button>
+ * }
+ */
 function __experimental_useReverification<
   Fetcher extends (...args: any[]) => Promise<any>,
-  O extends UseReverificationOptions,
->(
-  fetcher: Fetcher,
-  options?: O,
-): readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, O>>] {
+  Options extends UseReverificationOptions,
+>(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
   const { __experimental_openUserVerification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      onOpenModal: __experimental_openUserVerification,
-      ...options,
+      openUIComponent: __experimental_openUserVerification,
+      ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__experimental_openUserVerification, fetcherRef.current, optionsRef.current]);
+  }, [__experimental_openUserVerification]);
 
-  // Keep fetcher ref in sync
+  // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
+    optionsRef.current = options;
   });
 
   return handleReverification;
