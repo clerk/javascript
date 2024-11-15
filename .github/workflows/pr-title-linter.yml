@@ -20,16 +20,13 @@ jobs:
           show-progress: false
           sparse-checkout: |
             commitlint.config.ts
+            package.json
             packages/*/package.json
           sparse-checkout-cone-mode: false
 
       - name: Install PNPM
         uses: pnpm/action-setup@v4
-          with:
-            version: 9.13.0
 
       - name: Lint Pull Request Title
         run: |
-          pnpm init
-          pnpm add -D @commitlint/config-conventional @commitlint/cli globby
-          echo '${{ github.event.pull_request.title }}' | pnpm dlx @commitlint/cli -- --config commitlint.config.ts
+          echo '${{ github.event.pull_request.title }}' | pnpm commitlint --config commitlint.config.ts
