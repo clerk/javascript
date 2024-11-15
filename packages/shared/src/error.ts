@@ -158,7 +158,7 @@ export class ClerkRuntimeError extends Error {
     const prefix = '🔒 Clerk:';
     const regex = new RegExp(prefix.replace(' ', '\\s*'), 'i');
     const sanitized = message.replace(regex, '');
-    const _message = `${prefix}\n${sanitized.trim()}\n\n(Code: "${code}")\n`;
+    const _message = `${prefix} ${sanitized.trim()}\n\n(code="${code}")\n`;
     super(_message);
 
     Object.setPrototypeOf(this, ClerkRuntimeError.prototype);
