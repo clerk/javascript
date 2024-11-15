@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { __experimental_reverificationMismatch as reverificationMismatch } from '@clerk/shared/authorization-errors';
+import { __experimental_reverificationError as reverificationError } from '@clerk/shared/authorization-errors';
 import { __experimental_ReverificationConfig } from '@clerk/types';
 
 const logUserIdActionReverification = async () => {
@@ -17,7 +17,7 @@ const logUserIdActionReverification = async () => {
   });
 
   if (userNeedsReverification) {
-    return reverificationMismatch(config);
+    return reverificationError(config);
   }
 
   return {
