@@ -62,8 +62,8 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
-    "@tanstack/react-router": "^1.49.1",
-    "@tanstack/start": "^1.49.1",
+    "@tanstack/react-router": "^1.81.9",
+    "@tanstack/start": "^1.81.9",
     "@types/node": "^18.19.43",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
@@ -72,8 +72,8 @@
     "vinxi": "^0.4.1"
   },
   "peerDependencies": {
-    "@tanstack/react-router": ">=1.49.1",
-    "@tanstack/start": ">=1.49.1",
+    "@tanstack/react-router": ">=1.81.9",
+    "@tanstack/start": ">=1.81.9",
     "react": ">=18 || >=19.0.0-beta",
     "react-dom": ">=18 || >=19.0.0-beta"
   },
