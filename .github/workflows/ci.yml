@@ -20,7 +20,7 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -86,7 +86,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -105,7 +105,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
           node-version: ${{ matrix.node-version }}
@@ -137,7 +137,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
@@ -184,7 +184,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}

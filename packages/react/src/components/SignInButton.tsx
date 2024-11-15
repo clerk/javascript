@@ -6,8 +6,15 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkProp<SignInButtonProps>) => {
-  const { signUpFallbackRedirectUrl, forceRedirectUrl, fallbackRedirectUrl, signUpForceRedirectUrl, mode, ...rest } =
-    props;
+  const {
+    signUpFallbackRedirectUrl,
+    forceRedirectUrl,
+    fallbackRedirectUrl,
+    signUpForceRedirectUrl,
+    mode,
+    initialValues,
+    ...rest
+  } = props;
   children = normalizeWithDefaultValue(children, 'Sign in');
   const child = assertSingleChild(children)('SignInButton');
 
@@ -17,6 +24,7 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
       fallbackRedirectUrl,
       signUpFallbackRedirectUrl,
       signUpForceRedirectUrl,
+      initialValues,
     };
 
     if (mode === 'modal') {
