@@ -35,7 +35,7 @@ export const ProviderInitialIcon = (props: ProviderInitialIconProps) => {
           width: '100%',
         }}
       >
-        {value[0]}
+        {value[0].toUpperCase()}
       </Text>
     </Box>
   );
