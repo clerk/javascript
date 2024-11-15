@@ -1,0 +1,34 @@
+{
+  "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+  "out": "./typedoc-docs",
+  "json": "./typedoc-docs.json",
+  "entryPoints": [
+    "./packages/astro",
+    "./packages/backend",
+    "./packages/chrome-extension",
+    "./packages/clerk-js",
+    "./packages/elements",
+    "./packages/expo",
+    "./packages/express",
+    "./packages/fastify",
+    "./packages/nextjs",
+    "./packages/react",
+    "./packages/remix",
+    "./packages/shared",
+    "./packages/tanstack-start",
+    "./packages/types",
+    "./packages/vue"
+  ],
+  "entryPointStrategy": "packages",
+  "excludePrivate": true,
+  "blockTags": ["@param", "@returns"],
+  "modifierTags": ["@alpha", "@beta", "@experimental", "@deprecated"],
+  "packageOptions": {
+    "includeVersion": false,
+    "excludePrivate": true,
+    "sortEntryPoints": true,
+    "sort": "alphabetical",
+    "excludeExternals": true,
+    "gitRevision": "main"
+  }
+}
