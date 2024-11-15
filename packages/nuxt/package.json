@@ -58,7 +58,6 @@
     "h3": "^1.13.0"
   },
   "devDependencies": {
-    "@types/node": "latest",
     "nuxt": "^3.14.159",
     "typescript": "*"
   },

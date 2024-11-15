@@ -813,9 +813,6 @@ importers:
         specifier: ^1.13.0
         version: 1.13.0
     devDependencies:
-      '@types/node':
-        specifier: latest
-        version: 22.9.0
       nuxt:
         specifier: ^3.14.159
         version: 3.14.159(@parcel/watcher@2.4.1)(@types/node@22.9.0)(eslint@8.49.0)(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.26.0)(terser@5.31.1)(typescript@5.6.3)(vite@5.4.10(@types/node@22.9.0)(terser@5.31.1))(webpack-sources@3.2.3)
