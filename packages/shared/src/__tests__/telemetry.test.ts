@@ -1,9 +1,10 @@
 import 'cross-fetch/polyfill';
 
+import type { TelemetryEvent } from '@clerk/types';
+// @ts-ignore
 import assert from 'assert';
 
 import { TelemetryCollector } from '../telemetry';
-import type { TelemetryEvent } from '../telemetry/types';
 
 jest.useFakeTimers();
 
@@ -165,7 +166,7 @@ describe('TelemetryCollector', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
 
-      randomSpy.mockRestore;
+      randomSpy.mockRestore();
     });
   });
 

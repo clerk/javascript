@@ -112,7 +112,11 @@ type ButtonProps = {
 export type SignInButtonProps = ButtonProps &
   Pick<
     SignInProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
   >;
 
 export type SignUpButtonProps = {
