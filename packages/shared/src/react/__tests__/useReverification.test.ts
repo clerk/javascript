@@ -1,6 +1,7 @@
-import { __experimental_reverificationMismatch } from '@clerk/shared/authorization-errors';
-import type { __experimental_useReverification as useReverification } from '@clerk/shared/react';
 import { expectTypeOf } from 'expect-type';
+
+import { __experimental_reverificationError } from '../../authorization-errors';
+import type { __experimental_useReverification as useReverification } from '../hooks/useReverification';
 
 type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 
@@ -13,7 +14,7 @@ const fetcher = async (key: string, options: { id: string }) => {
 
 const fetcherWithHelper = async (key: string, options: { id: string }) => {
   if (key == 'a') {
-    return __experimental_reverificationMismatch();
+    return __experimental_reverificationError();
   }
 
   return {
