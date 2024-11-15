@@ -1,6 +1,7 @@
 import type { UserResource } from '@clerk/types';
 
 import { getFullName, getInitials } from '../../utils/user';
+import { useAppearance } from '../customizables';
 import { Avatar } from '../elements';
 import type { PropsOfComponent } from '../styledSystem';
 
@@ -12,7 +13,8 @@ type UserAvatarProps = Omit<PropsOfComponent<typeof Avatar>, 'imageUrl'> &
 
 export const UserAvatar = (props: UserAvatarProps) => {
   const { name, firstName, lastName, avatarUrl, imageUrl, ...rest } = props;
-  const generatedName = getFullName({ name, firstName, lastName });
+  const { nameFieldsOrder } = useAppearance().parsedLayout;
+  const generatedName = getFullName({ name, firstName, lastName, reverse: nameFieldsOrder === 'reversed' });
   const initials = getInitials({ name, firstName, lastName });
 
   return (

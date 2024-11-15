@@ -69,9 +69,9 @@ export const UserPreview = (props: UserPreviewProps) => {
   const { nameFieldsOrder } = useAppearance().parsedLayout;
   const reverse = nameFieldsOrder === 'reversed';
   const name =
-    getFullName({ ...user, reverse: reverse }) ||
-    getFullName({ ...externalAccount, reverse: reverse }) ||
-    getFullName({ ...samlAccount, reverse: reverse });
+    getFullName({ ...user, reverse }) ||
+    getFullName({ ...externalAccount, reverse }) ||
+    getFullName({ ...samlAccount, reverse });
   const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.() || samlAccount?.emailAddress;
   const localizedTitle = t(title);
 
