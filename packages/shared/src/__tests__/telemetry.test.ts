@@ -1,20 +1,23 @@
 import 'cross-fetch/polyfill';
 
+import type { TelemetryEvent } from '@clerk/types';
+// @ts-ignore
 import assert from 'assert';
 
 import { TelemetryCollector } from '../telemetry';
-import type { TelemetryEvent } from '../telemetry/types';
 
 jest.useFakeTimers();
 
 const TEST_PK = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
 describe('TelemetryCollector', () => {
-  let windowSpy;
-  let fetchSpy;
+  let windowSpy = jest.fn();
+  let fetchSpy = jest.fn();
 
   beforeEach(() => {
+    // @ts-ignore
     fetchSpy = jest.spyOn(global, 'fetch');
+    // @ts-ignore
     windowSpy = jest.spyOn(window, 'window', 'get');
   });
 
