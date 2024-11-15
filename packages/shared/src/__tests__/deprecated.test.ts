@@ -9,9 +9,10 @@ import { deprecated, deprecatedObjectProperty, deprecatedProperty } from '../dep
 import { isProductionEnvironment, isTestEnvironment } from '../utils/runtimeEnvironment';
 
 describe('deprecated(fnName, warning)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy = jest.fn();
 
   beforeEach(() => {
+    // @ts-ignore
     consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
   });
   afterEach(() => {
@@ -179,9 +180,10 @@ describe('deprecated(fnName, warning)', () => {
 });
 
 describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy = jest.fn();
 
   beforeEach(() => {
+    // @ts-ignore
     consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
   });
   afterEach(() => {
@@ -312,9 +314,10 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 });
 
 describe('deprecatedObjectProperty(obj, propName, warning)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy = jest.fn();
 
   beforeEach(() => {
+    // @ts-ignore
     consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
   });
   afterEach(() => {
