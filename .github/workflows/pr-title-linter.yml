@@ -20,11 +20,14 @@ jobs:
           show-progress: false
           sparse-checkout: |
             commitlint.config.ts
+            package.json
             packages/*/package.json
           sparse-checkout-cone-mode: false
 
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
+
       - name: Lint Pull Request Title
         run: |
-          npm init --scope=clerk --yes
-          npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
-          echo '${{ github.event.pull_request.title }}' | npm exec @commitlint/cli -- --config commitlint.config.ts
+          pnpm install
+          echo '${{ github.event.pull_request.title }}' | pnpm commitlint --config commitlint.config.ts

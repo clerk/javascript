@@ -1,5 +1,5 @@
 import type { ErrorThrowerOptions } from '../error';
-import { buildErrorThrower } from '../error';
+import { buildErrorThrower, ClerkRuntimeError, isClerkRuntimeError } from '../error';
 
 describe('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });
@@ -30,5 +30,35 @@ describe('ErrorThrower', () => {
         } as ErrorThrowerOptions)
         .throwInvalidPublishableKeyError({ key: 'whatever' }),
     ).toThrow('@clerk/another-test-package: This is a custom error message for key=whatever and an unknown ');
+  });
+});
+
+describe('ClerkRuntimeError', () => {
+  const clerkRuntimeError = new ClerkRuntimeError('test', { code: 'test_code' });
+
+  it('throws the correct error message', () => {
+    expect(() => {
+      throw clerkRuntimeError;
+    }).toThrow(/^🔒 Clerk: test\n\n\(code="test_code"\)/);
+  });
+
+  it('throws the correct error message without duplicate prefixes', () => {
+    expect(() => {
+      throw new ClerkRuntimeError('🔒 Clerk: test', { code: 'test_code' });
+    }).toThrow(/^🔒 Clerk: test\n\n\(code="test_code"\)/);
+  });
+
+  it('properties are populated correctly', () => {
+    expect(clerkRuntimeError.name).toEqual('ClerkRuntimeError');
+    expect(clerkRuntimeError.code).toEqual('test_code');
+    expect(clerkRuntimeError.message).toMatch(/🔒 Clerk: test\n\n\(code="test_code"\)/);
+    expect(clerkRuntimeError.clerkRuntimeError).toBe(true);
+    expect(clerkRuntimeError.toString()).toMatch(
+      /^\[ClerkRuntimeError\]\nMessage:🔒 Clerk: test\n\n\(code="test_code"\)/,
+    );
+  });
+
+  it('helper recognises error', () => {
+    expect(isClerkRuntimeError(clerkRuntimeError)).toEqual(true);
   });
 });

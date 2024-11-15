@@ -13,6 +13,7 @@ const componentImportPaths = {
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
   GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
+  BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
 } as const;
@@ -75,6 +76,10 @@ export const WaitlistModal = lazy(() =>
   componentImportPaths.Waitlist().then(module => ({ default: module.WaitlistModal })),
 );
 
+export const BlankCaptchaModal = lazy(() =>
+  componentImportPaths.BlankCaptchaModal().then(module => ({ default: module.BlankCaptchaModal })),
+);
+
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
@@ -102,6 +107,7 @@ export const ClerkComponents = {
   GoogleOneTap,
   Waitlist,
   WaitlistModal,
+  BlankCaptchaModal,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

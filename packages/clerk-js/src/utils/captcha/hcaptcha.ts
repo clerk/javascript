@@ -4,6 +4,7 @@ import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
+import type { CaptchaOptions } from './types';
 
 async function loadCaptcha(url: string) {
   if (!window.hcaptcha) {
@@ -20,12 +21,7 @@ async function loadCaptcha(url: string) {
   return window.hcaptcha;
 }
 
-export const getHCaptchaToken = async (captchaOptions: {
-  siteKey: string;
-  scriptUrl: string;
-  widgetType: CaptchaWidgetType;
-  invisibleSiteKey: string;
-}) => {
+export const getHCaptchaToken = async (captchaOptions: CaptchaOptions) => {
   const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = captchaOptions;
   let captchaToken = '',
     id = '';
@@ -120,5 +116,5 @@ export const getHCaptchaToken = async (captchaOptions: {
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
+  return { captchaToken, captchaWidgetType: (isInvisibleWidget ? 'invisible' : 'smart') as CaptchaWidgetType };
 };

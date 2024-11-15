@@ -15,7 +15,7 @@ export interface __experimental_SessionVerificationResource extends ClerkResourc
 
 export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
-export type __experimental_SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
+export type __experimental_SessionVerificationTypes = 'strict_mfa' | 'strict' | 'moderate' | 'lax';
 
 export type __experimental_ReverificationConfig =
   | __experimental_SessionVerificationTypes
@@ -24,7 +24,7 @@ export type __experimental_ReverificationConfig =
       afterMinutes: __experimental_SessionVerificationAfterMinutes;
     };
 
-export type __experimental_SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
+export type __experimental_SessionVerificationLevel = 'first_factor' | 'second_factor' | 'multi_factor';
 export type __experimental_SessionVerificationAfterMinutes = number;
 
 export type __experimental_SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;

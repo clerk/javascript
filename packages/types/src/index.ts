@@ -11,6 +11,7 @@ export * from './displayConfig';
 export * from './emailAddress';
 export * from './environment';
 export * from './externalAccount';
+export * from './enterpriseAccount';
 export * from './factors';
 export * from './identificationLink';
 export * from './identifiers';

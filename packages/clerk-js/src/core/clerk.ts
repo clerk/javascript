@@ -435,6 +435,20 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
+  public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
+    this.assertComponentsReady(this.#componentControls);
+    return this.#componentControls
+      .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
+      .then(controls => controls.openModal('blankCaptcha', {}));
+  };
+
+  public __internal_closeBlankCaptchaModal = (): Promise<unknown> => {
+    this.assertComponentsReady(this.#componentControls);
+    return this.#componentControls
+      .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
+      .then(controls => controls.closeModal('blankCaptcha'));
+  };
+
   public __experimental_closeUserVerification = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));

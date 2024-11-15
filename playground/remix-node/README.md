@@ -7,40 +7,40 @@
 At repository level:
 
 ```bash
-npm run build
-npm run yalc:all
+pnpm build
+pnpm yalc:all
 ```
 
 At current directory level:
 
 ```bash
-npm run yalc:add
+pnpm yalc:add
 npm i
 ```
 
 ## Run development server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
 
-To get the latest unpublished changes from the `packages` (if they are not auto updated) use `npm run yalc:all` in repository level or `yalc push --replace` from the updated package
-after an `npm run build` is being executed.
+To get the latest unpublished changes from the `packages` (if they are not auto updated) use `pnpm yalc:all` in repository level or `yalc push --replace` from the updated package
+after an `pnpm build` is being executed.
 
 ## Deployment
 
 First, build your app for production:
 
 ```sh
-npm run build
+pnpm build
 ```
 
 Then run the app in production mode:
 
 ```sh
-npm start
+pnpm start
 ```
 
 Now you'll need to pick a host to deploy it to.
@@ -56,12 +56,12 @@ Make sure to deploy the output of `remix build`
 
 ### Using a Template
 
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
+When you ran `pnpm dlx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
 
 ```sh
 cd ..
 # create a new project, and pick a pre-configured host
-npx create-remix@latest
+pnpm dlx create-remix@latest
 cd my-new-remix-app
 # remove the new project's app (not the old one!)
 rm -rf app

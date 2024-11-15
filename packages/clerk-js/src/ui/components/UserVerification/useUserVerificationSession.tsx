@@ -1,4 +1,5 @@
 import { useSession } from '@clerk/shared/react';
+import type { __experimental_SessionVerificationLevel } from '@clerk/types';
 import { useMemo } from 'react';
 
 import { useUserVerification } from '../../contexts';
@@ -8,9 +9,10 @@ import { useFetch } from '../../hooks';
 const useUserVerificationSessionKey = () => {
   const { level } = useUserVerification();
   return useMemo(
-    () => ({
-      level: level || 'secondFactor',
-    }),
+    () =>
+      ({
+        level: level || 'second_factor',
+      }) satisfies { level: __experimental_SessionVerificationLevel },
     [level],
   );
 };

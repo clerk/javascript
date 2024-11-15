@@ -15,7 +15,7 @@ export const applicationConfig = () => {
   let serverUrl = '';
   const templates: string[] = [];
   const files = new Map<string, string>();
-  const scripts: Scripts = { dev: 'npm run dev', serve: 'npm run serve', build: 'npm run build', setup: 'npm i' };
+  const scripts: Scripts = { dev: 'pnpm dev', serve: 'pnpm serve', build: 'pnpm build', setup: 'pnpm install' };
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
   const logger = createLogger({ prefix: 'appConfig', color: 'yellow' });
   const dependencies = new Map<string, string>();

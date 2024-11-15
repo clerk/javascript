@@ -6,7 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "module": "esnext",
-    "lib": ["es2021.intl"],
+    "lib": ["dom", "dom.iterable", "es2021.intl"],
     "moduleResolution": "Bundler",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
