@@ -135,6 +135,7 @@
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
+    "std-env": "^3.7.0",
     "swr": "^2.2.0"
   },
   "devDependencies": {
@@ -144,7 +145,6 @@
     "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
     "esbuild": "0.20.2",
-    "std-env": "^3.7.0",
     "tsup": "*",
     "typescript": "*"
   },
