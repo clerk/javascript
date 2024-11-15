@@ -68,6 +68,6 @@ export type {
  * Utilities for reverification
  */
 export {
-  __experimental_reverificationMismatchResponse,
-  __experimental_reverificationMismatch,
+  __experimental_reverificationErrorResponse,
+  __experimental_reverificationError,
 } from '@clerk/backend/internal';
