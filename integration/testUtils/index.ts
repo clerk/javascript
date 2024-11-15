@@ -31,7 +31,7 @@ const createExpectPageObject = ({ page }: TestArgs) => {
     toBeHandshake: async (res: Response) => {
       // Travel the redirect chain until we find the handshake header
       // TODO: Loop through the redirects until we find a handshake header, or timeout trying
-      const redirect = await res.request().redirectedFrom().redirectedFrom().redirectedFrom().response();
+      const redirect = await res.request().redirectedFrom().redirectedFrom().response();
       expect(redirect.status()).toBe(307);
       expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
     },

@@ -2,7 +2,7 @@ import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
-import { __experimental_isReverificationHint, __experimental_reverificationMismatch } from '../../authorization-errors';
+import { __experimental_isReverificationHint, __experimental_reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
@@ -10,7 +10,7 @@ import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
 async function resolveResult<T>(
   result: Promise<T>,
-): Promise<T | ReturnType<typeof __experimental_reverificationMismatch>> {
+): Promise<T | ReturnType<typeof __experimental_reverificationError>> {
   return result
     .then(r => {
       if (r instanceof Response) {
@@ -21,7 +21,7 @@ async function resolveResult<T>(
     .catch(e => {
       // Treat fapi assurance as an assurance hint
       if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return __experimental_reverificationMismatch();
+        return __experimental_reverificationError();
       }
 
       // rethrow
