@@ -264,7 +264,7 @@ importers:
   packages/chrome-extension:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.1
+        specifier: 5.34.2
         version: link:../clerk-js
       '@clerk/clerk-react':
         specifier: 5.15.5
@@ -562,7 +562,7 @@ importers:
   packages/expo:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.1
+        specifier: 5.34.2
         version: link:../clerk-js
       '@clerk/clerk-react':
         specifier: 5.15.5
@@ -2780,7 +2780,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -6230,6 +6230,7 @@ packages:
 
   acorn-import-assertions@1.9.0:
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
+    deprecated: package has been renamed to acorn-import-attributes
     peerDependencies:
       acorn: ^8
 

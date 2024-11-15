@@ -274,7 +274,7 @@ export class Session extends BaseResource implements SessionResource {
 
     const createTokenWithCaptchaProtection = async () => {
       try {
-        return Token.create(path, params);
+        return await Token.create(path, params);
       } catch (e) {
         if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
           const captchaParams = await this.#triggerCaptchaChallenge();

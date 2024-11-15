@@ -90,15 +90,15 @@ export class SignUp extends BaseResource implements SignUpResource {
       captchaPublicKeyInvisible
     ) {
       try {
-        const { captchaToken, captchaWidgetTypeUsed } = await getCaptchaToken({
+        const captchaParams = await getCaptchaToken({
           siteKey: captchaSiteKey,
           widgetType: captchaWidgetType,
           invisibleSiteKey: captchaPublicKeyInvisible,
           scriptUrl: captchaURL,
           captchaProvider,
         });
-        paramsWithCaptcha.captchaToken = captchaToken;
-        paramsWithCaptcha.captchaWidgetType = captchaWidgetTypeUsed;
+        paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
+        paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
       } catch (e) {
         if (e.captchaError) {
           paramsWithCaptcha.captchaError = e.captchaError;

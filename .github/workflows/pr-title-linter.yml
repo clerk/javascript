@@ -25,6 +25,8 @@ jobs:
 
       - name: Install PNPM
         uses: pnpm/action-setup@v4
+          with:
+            version: 9.13.0
 
       - name: Lint Pull Request Title
         run: |
