@@ -137,7 +137,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       logger.debug('requestState', () => ({
         status: requestState.status,
-        // @ts-expect-error : FIXME
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
         reason: requestState.reason,
       }));
