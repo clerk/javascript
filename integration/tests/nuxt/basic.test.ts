@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.context().clearCookies();
   });
 
-  test.skip('sign in with hash routing', async ({ page, context }) => {
+  test('sign in with hash routing', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');
@@ -45,7 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
   });
 
-  test.skip('render user profile with SSR data', async ({ page, context }) => {
+  test('render user profile with SSR data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');
@@ -63,7 +63,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByText(`Email: ${fakeUser.email}`)).toBeVisible();
   });
 
-  test.skip('redirects to sign-in when unauthenticated', async ({ page, context }) => {
+  test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/user');
@@ -71,7 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.waitForMounted();
   });
 
-  test.skip('renders control components contents in SSR', async ({ page, context }) => {
+  test('renders control components contents in SSR', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.page.goToAppHome();
