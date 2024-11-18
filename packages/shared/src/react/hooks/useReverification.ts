@@ -142,7 +142,7 @@ function __experimental_useReverification<
       ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__experimental_openUserVerification]);
+  }, [__experimental_openUserVerification, fetcherRef.current, optionsRef.current]);
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
