@@ -13,6 +13,7 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
     signInForceRedirectUrl,
     mode,
     unsafeMetadata,
+    initialValues,
     ...rest
   } = props;
 
@@ -26,6 +27,7 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
       unsafeMetadata,
+      initialValues,
     };
 
     if (mode === 'modal') {

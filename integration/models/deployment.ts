@@ -40,14 +40,14 @@ export const vercelDeployment = async (config: ApplicationConfig) => {
   // resolve issues with vercel cli not finding a git repo
   await run(`git init`, { cwd: app.appDir, log: logger.info });
   // pull project config from vercel using the env variables
-  await run(`npx vercel pull --yes --token ${process.env.VERCEL_TOKEN}`, procConfig);
+  await run(`pnpm  vercel pull --yes --token ${process.env.VERCEL_TOKEN}`, procConfig);
   // build for prod locally
-  await run(`npx vercel build --prod`, procConfig);
+  await run(`pnpm vercel build --prod`, procConfig);
   const pk = app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
   const sk = app.env.privateVariables.get('CLERK_SECRET_KEY');
   // deploy to vercel and set the Clerk env variables
   await run(
-    `npx vercel --prod --prebuilt --token ${process.env.VERCEL_TOKEN} --env NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${pk} --env CLERK_SECRET_KEY=${sk}`,
+    `pnpm vercel --prod --prebuilt --token ${process.env.VERCEL_TOKEN} --env NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${pk} --env CLERK_SECRET_KEY=${sk}`,
     procConfig,
   );
 

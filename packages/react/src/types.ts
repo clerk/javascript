@@ -113,7 +113,11 @@ type ButtonProps = {
 export type SignInButtonProps = ButtonProps &
   Pick<
     SignInProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
   >;
 
 export type SignUpButtonProps = {
@@ -121,7 +125,11 @@ export type SignUpButtonProps = {
 } & ButtonProps &
   Pick<
     SignUpProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
   >;
 
 export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;

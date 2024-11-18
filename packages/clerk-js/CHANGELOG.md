@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.34.3
+
+### Patch Changes
+
+- Block /tokens requests until fraud detection completes by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enforce uppercase rendering for `<ProviderInitialIcon />`. ([#4578](https://github.com/clerk/javascript/pull/4578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the password field would not render during autofill event until the user interacted with the screen. ([#4560](https://github.com/clerk/javascript/pull/4560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da)]:
+  - @clerk/shared@2.15.0
+
+## 5.34.2
+
+### Patch Changes
+
+- Display logo in `<Waitlist />` component ([#4561](https://github.com/clerk/javascript/pull/4561)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Correctly handle async requires_captcha error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.34.1
 
 ### Patch Changes

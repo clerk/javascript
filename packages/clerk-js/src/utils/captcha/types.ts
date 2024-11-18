@@ -11,3 +11,8 @@ export type CaptchaOptions = {
   openModal?: () => Promise<unknown>;
   closeModal?: () => Promise<unknown>;
 };
+
+export type GetCaptchaTokenReturn = {
+  captchaToken: string;
+  captchaWidgetType: CaptchaWidgetType;
+};

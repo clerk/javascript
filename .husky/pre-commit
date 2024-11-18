@@ -30,7 +30,7 @@
 ###############################
 #
 #if [ -n "$unique_folders" ]; then
-#  npx turbo run build --output-logs=errors-only $unique_folders
+#  pnpm turbo run build --output-logs=errors-only $unique_folders
 #else
 #  echo "SKIPPING: No packages to build"
 #fi
@@ -39,4 +39,4 @@
 # Run Lint Staged
 ##############################
 
-npx lint-staged
+pnpm lint-staged

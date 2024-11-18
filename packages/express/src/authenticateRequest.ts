@@ -97,7 +97,7 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
 
-export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}) => {
+export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
   const enableHandshake = options.enableHandshake ?? true;
 
