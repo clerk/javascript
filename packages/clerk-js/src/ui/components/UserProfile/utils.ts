@@ -76,3 +76,25 @@ export function sortIdentificationBasedOnVerification<T extends Array<EmailAddre
 
   return [...primaryItem, ...verifiedItems, ...unverifiedItems, ...unverifiedItemsWithoutVerification] as T;
 }
+
+/**
+ * Error codes that indicate a need for reconnection during OAuth verification.
+ */
+export const errorCodesForReconnect = [
+  /**
+   * Some Oauth providers will generate a refresh token only the first time the user gives consent to the app.
+   */
+  'external_account_missing_refresh_token',
+  /**
+   * Provider is experiencing an issue currently.
+   */
+  'oauth_fetch_user_error',
+  /**
+   * Provider is experiencing an issue currently (same as above).
+   */
+  'oauth_token_exchange_error',
+  /**
+   * User's associated email address is required to be verified, because it was initially created as unverified.
+   */
+  'external_account_email_address_verification_required',
+];
