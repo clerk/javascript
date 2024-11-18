@@ -26,6 +26,7 @@ import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
 import { unixEpochToDate } from '../../utils/date';
 import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
+import { fraudProtection } from '../fraudProtection';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -272,16 +273,18 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
+    await fraudProtection.blockUntilReady();
+
     const createTokenWithCaptchaProtection = async () => {
-      try {
-        return await Token.create(path, params);
-      } catch (e) {
+      return Token.create(path, params).catch(e => {
         if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-          const captchaParams = await this.#triggerCaptchaChallenge();
-          return Token.create(path, { ...params, ...captchaParams });
+          return fraudProtection.execute(async () => {
+            const captchaParams = await this.#triggerCaptchaChallenge();
+            return Token.create(path, { ...params, ...captchaParams });
+          });
         }
         throw e;
-      }
+      });
     };
 
     const tokenResolver = createTokenWithCaptchaProtection();
