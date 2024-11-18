@@ -100,7 +100,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
 
   const [createExternalAccount] = useReverification(() =>
     user?.createExternalAccount({
-      strategy: 'wowow' as OAuthStrategy,
+      strategy: account.verification!.strategy as OAuthStrategy,
       redirectUrl,
       additionalScopes,
     }),
