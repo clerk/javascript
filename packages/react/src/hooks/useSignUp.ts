@@ -1,21 +1,9 @@
 import { useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { SetActive, SignUpResource } from '@clerk/types';
+import type { UseSignUpReturn } from '@clerk/types';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
-
-type UseSignUpReturn =
-  | {
-      isLoaded: false;
-      signUp: undefined;
-      setActive: undefined;
-    }
-  | {
-      isLoaded: true;
-      signUp: SignUpResource;
-      setActive: SetActive;
-    };
 
 type UseSignUp = () => UseSignUpReturn;
 
