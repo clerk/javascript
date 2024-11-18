@@ -72,8 +72,8 @@ function addCurrentRouteIndicator(currentRoute) {
   if (!link) {
     return;
   }
-  link.classList.remove('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
-  link.classList.add('bg-gray-900', 'text-white');
+  link.classList.remove('text-gray-400', 'hover:bg-[#1D1D21]', 'hover:text-white');
+  link.classList.add('bg-[#1D1D21]', 'text-white');
 }
 
 (async () => {
