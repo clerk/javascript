@@ -168,6 +168,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;

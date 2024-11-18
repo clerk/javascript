@@ -65,7 +65,8 @@ export function _SignInStart(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, __experimental } = ctx;
+  const isCombinedFlow = __experimental?.combinedFlow || false;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -301,7 +302,7 @@ export function _SignInStart(): JSX.Element {
         }
       }
     } catch (e) {
-      return attemptToRecoverFromSignInError(e);
+      return attemptToRecoverFromSignInError(e, fields);
     }
   };
 
@@ -316,7 +317,7 @@ export function _SignInStart(): JSX.Element {
     });
   };
 
-  const attemptToRecoverFromSignInError = async (e: any) => {
+  const attemptToRecoverFromSignInError = async (e: any, fields: any) => {
     if (!e.errors) {
       return;
     }
@@ -334,6 +335,12 @@ export function _SignInStart(): JSX.Element {
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
+      if (isCombinedFlow) {
+        clerk.client.signUp.emailAddress = fields.find(f => f.name === 'identifier')?.value;
+        clerk.client.signUp.phoneNumber = fields.find(f => f.name === 'identifier')?.value;
+        clerk.client.signUp.username = fields.find(f => f.name === 'identifier')?.value;
+        return navigate('create');
+      }
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
   };
@@ -365,8 +372,14 @@ export function _SignInStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+            {isCombinedFlow ? (
+              <Header.Title localizationKey={localizationKeys('signIn.start.titleCombined')} />
+            ) : (
+              <>
+                <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+                <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+              </>
+            )}
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -415,7 +428,7 @@ export function _SignInStart(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
-          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && (
+          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
             <Card.Action elementId='signIn'>
               <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
               <Card.ActionLink

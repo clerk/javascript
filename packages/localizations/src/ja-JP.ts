@@ -461,6 +461,7 @@ export const jaJP: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'サインイン',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '検証コード',

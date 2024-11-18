@@ -39,7 +39,8 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const { afterSignUpUrl, signInUrl, unsafeMetadata, __experimental } = ctx;
+  const isCombinedFlow = __experimental?.combinedFlow;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -315,7 +316,7 @@ function _SignUpStart(): JSX.Element {
             <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Card.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
+              to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>
         </Card.Footer>

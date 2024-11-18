@@ -459,6 +459,7 @@ export const ukUA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Увійти',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верифікаційний код',

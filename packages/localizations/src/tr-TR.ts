@@ -462,6 +462,7 @@ export const trTR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Giriş yap',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Doğrulama kodu',

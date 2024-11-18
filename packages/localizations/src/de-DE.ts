@@ -466,6 +466,7 @@ export const deDE: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Einloggen',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',

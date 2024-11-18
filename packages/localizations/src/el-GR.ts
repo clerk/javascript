@@ -461,6 +461,7 @@ export const elGR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Σύνδεση',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Κωδικός επαλήθευσης',

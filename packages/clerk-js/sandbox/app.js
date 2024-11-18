@@ -36,7 +36,11 @@ const routes = {
     mountIndex(app);
   },
   '/sign-in': () => {
-    Clerk.mountSignIn(app, {});
+    Clerk.mountSignIn(app, {
+      __experimental: {
+        combinedFlow: true,
+      },
+    });
   },
   '/sign-up': () => {
     Clerk.mountSignUp(app, {});
@@ -81,7 +85,10 @@ function addCurrentRouteIndicator(currentRoute) {
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
-    await Clerk.load();
+    await Clerk.load({
+      signInUrl: '/sign-in',
+      signUpUrl: '/sign-up',
+    });
     renderCurrentRoute();
   }
 })();

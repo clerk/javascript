@@ -461,6 +461,7 @@ export const esES: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Entrar',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',

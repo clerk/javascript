@@ -461,6 +461,7 @@ export const nlNL: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',

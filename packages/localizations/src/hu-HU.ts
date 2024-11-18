@@ -461,6 +461,7 @@ export const huHU: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Visszaigazoló kód',

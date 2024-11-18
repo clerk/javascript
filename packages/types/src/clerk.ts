@@ -894,12 +894,14 @@ export type SignInProps = RoutingOptions & {
   /**
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
-  __experimental?: Record<string, any> & { newComponents?: boolean };
+  __experimental?: Record<string, any> & { newComponents?: boolean; combinedFlow?: boolean };
   /**
    * Full URL or path to for the waitlist process.
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+
+  signUpProps?: SignUpProps;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &

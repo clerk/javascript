@@ -470,6 +470,7 @@ export const ruRU: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Войти',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верификационный код',

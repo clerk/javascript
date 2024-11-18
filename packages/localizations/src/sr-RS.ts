@@ -460,6 +460,7 @@ export const srRS: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
       title: 'Prijavi se na {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',

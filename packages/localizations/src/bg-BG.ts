@@ -460,6 +460,7 @@ export const bgBG: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
       title: 'Влезте в {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код за потвърждение',

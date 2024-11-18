@@ -464,6 +464,7 @@ export const frFR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pour continuer vers {{applicationName}}',
       title: "S'identifier",
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Le code de vérification',

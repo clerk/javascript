@@ -450,6 +450,7 @@ export const enUS: LocalizationResource = {
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
+      titleCombined: 'Continue to {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Verification code',
