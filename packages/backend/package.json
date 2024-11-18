@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.16.4",
+  "version": "1.17.0",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -92,7 +92,7 @@
     "test:cloudflare-miniflare": "vitest --environment miniflare"
   },
   "dependencies": {
-    "@clerk/shared": "2.14.0",
+    "@clerk/shared": "2.15.0",
     "@clerk/types": "4.34.0",
     "cookie": "0.7.0",
     "snakecase-keys": "5.4.4",

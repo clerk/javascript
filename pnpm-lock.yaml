@@ -187,10 +187,10 @@ importers:
   packages/astro:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -218,7 +218,7 @@ importers:
   packages/backend:
     dependencies:
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -264,13 +264,13 @@ importers:
   packages/chrome-extension:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.2
+        specifier: 5.34.3
         version: link:../clerk-js
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       react:
         specifier: '>=18'
@@ -316,7 +316,7 @@ importers:
         specifier: 3.6.4
         version: link:../localizations
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -459,10 +459,10 @@ importers:
   packages/elements:
     dependencies:
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: ^4.34.0
@@ -562,16 +562,16 @@ importers:
   packages/expo:
     dependencies:
       '@clerk/clerk-js':
-        specifier: 5.34.2
+        specifier: 5.34.3
         version: link:../clerk-js
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/expo-passkeys':
-        specifier: 0.0.5
+        specifier: 0.0.6
         version: link:../expo-passkeys
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -629,7 +629,7 @@ importers:
   packages/expo-passkeys:
     dependencies:
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -650,10 +650,10 @@ importers:
   packages/express:
     dependencies:
       '@clerk/backend':
-        specifier: ^1.16.4
+        specifier: ^1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -687,10 +687,10 @@ importers:
   packages/fastify:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -737,13 +737,13 @@ importers:
   packages/nextjs:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -792,16 +792,16 @@ importers:
   packages/nuxt:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
         version: link:../types
       '@clerk/vue':
-        specifier: 0.0.4
+        specifier: 0.0.5
         version: link:../vue
       '@nuxt/kit':
         specifier: ^3.14.159
@@ -823,7 +823,7 @@ importers:
   packages/react:
     dependencies:
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -866,13 +866,13 @@ importers:
   packages/remix:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -921,10 +921,10 @@ importers:
   packages/sdk-node:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -1034,13 +1034,13 @@ importers:
   packages/tanstack-start:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/clerk-react':
-        specifier: 5.15.5
+        specifier: 5.16.0
         version: link:../react
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -1086,10 +1086,10 @@ importers:
   packages/testing:
     dependencies:
       '@clerk/backend':
-        specifier: 1.16.4
+        specifier: 1.17.0
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -1155,13 +1155,13 @@ importers:
   packages/ui:
     dependencies:
       '@clerk/elements':
-        specifier: 0.19.3
+        specifier: 0.19.4
         version: link:../elements
       '@clerk/localizations':
         specifier: 3.6.4
         version: link:../localizations
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
@@ -1283,7 +1283,7 @@ importers:
   packages/vue:
     dependencies:
       '@clerk/shared':
-        specifier: 2.14.0
+        specifier: 2.15.0
         version: link:../shared
       '@clerk/types':
         specifier: 4.34.0
