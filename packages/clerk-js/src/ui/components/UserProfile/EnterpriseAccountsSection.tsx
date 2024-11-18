@@ -3,8 +3,12 @@ import { useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/types';
 
 import { ProviderInitialIcon } from '../../common';
-import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
-import { ProfileSection } from '../../elements';
+import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { ProfileSection, useCardState } from '../../elements';
+import { Action } from '../../elements/Action';
+import { useRouter } from '../../router';
+import { handleError } from '../../utils';
+import { errorCodesForReconnect } from './utils';
 
 export const EnterpriseAccountsSection = () => {
   const { user } = useUser();
@@ -36,47 +40,96 @@ export const EnterpriseAccountsSection = () => {
 };
 
 const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) => {
-  const label = account.emailAddress;
+  const card = useCardState();
+  const { navigate } = useRouter();
+
+  const reconnect = async () => {
+    try {
+      await navigate(account.verification!.externalVerificationRedirectURL?.href || '');
+    } catch (err) {
+      handleError(err, [], card.setError);
+    }
+  };
+
+  const shouldDisplayReconnect = errorCodesForReconnect.includes(account.verification?.error?.code || '');
+  const fallbackErrorMessage = account.verification?.error?.longMessage;
+  const reconnectAccountErrorMessage = shouldDisplayReconnect
+    ? localizationKeys(`userProfile.start.enterpriseAccountsSection.subtitle__disconnected`)
+    : fallbackErrorMessage;
   const connectionName = account?.enterpriseConnection?.name;
-  const error = account.verification?.error?.longMessage;
+  const label = account.emailAddress;
 
   return (
-    <ProfileSection.Item
-      id='enterpriseAccounts'
-      sx={t => ({
-        gap: t.space.$2,
-        justifyContent: 'start',
-      })}
-      key={account.id}
-    >
-      <EnterpriseAccountProviderIcon account={account} />
-      <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-        <Flex
-          gap={2}
-          center
+    <Action.Root key={account.id}>
+      <ProfileSection.Item
+        id='enterpriseAccounts'
+        sx={t => ({
+          gap: t.space.$2,
+          justifyContent: 'start',
+        })}
+      >
+        <EnterpriseAccountProviderIcon account={account} />
+        <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+          <Flex
+            gap={2}
+            center
+          >
+            <Text
+              truncate
+              colorScheme='body'
+            >
+              {connectionName}
+            </Text>
+            <Text
+              truncate
+              as='span'
+              colorScheme='secondary'
+            >
+              {label ? `• ${label}` : ''}
+            </Text>
+          </Flex>
+        </Box>
+      </ProfileSection.Item>
+
+      {shouldDisplayReconnect && (
+        <Box
+          sx={t => ({
+            padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
+          })}
         >
           <Text
-            truncate
-            colorScheme='body'
-          >
-            {connectionName}
-          </Text>
-          <Text
-            truncate
-            as='span'
             colorScheme='secondary'
-          >
-            {label ? `• ${label}` : ''}
-          </Text>
-          {error && (
-            <Badge
-              colorScheme='danger'
-              localizationKey={localizationKeys('badge__requiresAction')}
-            />
-          )}
-        </Flex>
-      </Box>
-    </ProfileSection.Item>
+            sx={t => ({
+              paddingRight: t.sizes.$1x5,
+              display: 'inline-block',
+            })}
+            localizationKey={reconnectAccountErrorMessage}
+          />
+
+          <Button
+            sx={{
+              display: 'inline-block',
+            }}
+            onClick={reconnect}
+            variant='link'
+            localizationKey={localizationKeys(
+              'userProfile.start.enterpriseAccountsSection.actionLabel__connectionFailed',
+            )}
+          />
+        </Box>
+      )}
+
+      {account.verification?.error?.code && !shouldDisplayReconnect && (
+        <Text
+          colorScheme='danger'
+          sx={t => ({
+            padding: `${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
+          })}
+        >
+          {fallbackErrorMessage}
+        </Text>
+      )}
+    </Action.Root>
   );
 };
 
