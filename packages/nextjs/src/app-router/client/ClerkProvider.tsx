@@ -122,7 +122,11 @@ const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
 };
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  if (props.publishableKey) {
+  if (
+    mergeNextClerkPropsWithEnv({
+      ...props,
+    }).publishableKey
+  ) {
     return <__ClientClerkProvider {...props} />;
   }
 

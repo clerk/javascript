@@ -3,6 +3,7 @@ import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
 const clerkNextjsLocal = `file:${process.cwd()}/packages/nextjs`;
+const clerkBackendLocal = `file:${process.cwd()}/packages/backend`;
 const clerkSharedLocal = `file:${process.cwd()}/packages/shared`;
 const clerkTypesLocal = `file:${process.cwd()}/packages/types`;
 const appRouter = applicationConfig()
@@ -17,6 +18,7 @@ const appRouter = applicationConfig()
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal)
+  .addDependency('@clerk/backend', clerkBackendLocal)
   .addDependency('@clerk/shared', clerkSharedLocal)
   .addDependency('@clerk/types', clerkTypesLocal);
 
