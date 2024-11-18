@@ -83,6 +83,10 @@ export type SamlSettings = {
   enabled: boolean;
 };
 
+export type EnterpriseSSOSettings = {
+  enabled: boolean;
+};
+
 export type AttributesJSON = {
   [attribute in Attribute]: AttributeDataJSON;
 };
@@ -104,6 +108,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   social: OAuthProviders;
 
   saml: SamlSettings;
+  enterprise_sso: EnterpriseSSOSettings;
 
   sign_in: SignInData;
   sign_up: SignUpData;
@@ -116,6 +121,7 @@ export interface UserSettingsResource extends ClerkResource {
   social: OAuthProviders;
 
   saml: SamlSettings;
+  enterpriseSSO: EnterpriseSSOSettings;
 
   attributes: Attributes;
   actions: Actions;
