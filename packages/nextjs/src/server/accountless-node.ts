@@ -11,18 +11,12 @@ function updateGitignore() {
   const gitignorePath = path.join(process.cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
-    console.log('.gitignore created.');
-  } else {
-    console.log('.gitignore found.');
   }
 
   // Check if `.clerk/` entry exists in .gitignore
   const gitignoreContent = readFileSync(gitignorePath, 'utf-8');
   if (!gitignoreContent.includes(CLERK_HIDDEN + '/')) {
     appendFileSync(gitignorePath, `\n${CLERK_HIDDEN}/\n`);
-    console.log('.clerk/ added to .gitignore.');
-  } else {
-    console.log('.clerk/ is already ignored.');
   }
 }
 
@@ -81,7 +75,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
 
   const client = createClerkClientWithOptions({});
 
-  const accountlessApplication = await client.accountlessApplications.createAccountlessApplication();
+  const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
 
   console.log('--- new keys', accountlessApplication);
 

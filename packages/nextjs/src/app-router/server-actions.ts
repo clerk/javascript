@@ -36,8 +36,6 @@ export async function createAccountlessKeysAction(): Promise<null | AccountlessA
 
   const { claimUrl, publishableKey, secretKey } = result;
 
-  console.log('result', result);
-
   void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: false,
     httpOnly: false,

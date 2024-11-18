@@ -47,8 +47,6 @@ export async function verifyHandshakeToken(
 ): Promise<{ handshake: string[] }> {
   const { secretKey, apiUrl, apiVersion, jwksCacheTtlInMs, jwtKey, skipJwksCache } = options;
 
-  console.log('---verifyHandshakeToken', secretKey, apiUrl);
-
   const { data, errors } = decodeJwt(token);
   if (errors) {
     throw errors[0];

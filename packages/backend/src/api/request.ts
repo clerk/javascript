@@ -52,7 +52,7 @@ type BuildRequestOptions = {
   /* Library/SDK name */
   userAgent?: string;
 
-  allowAccountless?: boolean;
+  skipSecretKey?: boolean;
 };
 
 export function buildRequest(options: BuildRequestOptions) {
@@ -62,11 +62,11 @@ export function buildRequest(options: BuildRequestOptions) {
       apiUrl = API_URL,
       apiVersion = API_VERSION,
       userAgent = USER_AGENT,
-      allowAccountless = true,
+      skipSecretKey = false,
     } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
-    if (!allowAccountless) {
+    if (!skipSecretKey) {
       assertValidSecretKey(secretKey);
     }
 

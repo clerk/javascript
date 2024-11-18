@@ -156,8 +156,6 @@ export async function loadClerkJWKFromRemote({
 }
 
 async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
-  console.log('---fetchJWKSFromBAPI', key, apiUrl);
-
   if (!key) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkSecretKey,
@@ -181,7 +179,6 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
 
   if (!response.ok) {
     const json = await response.json();
-    console.log('---fetchJWKSFromBAPI res', json);
     const invalidSecretKeyError = getErrorObjectByCode(json?.errors, TokenVerificationErrorCode.InvalidSecretKey);
 
     if (invalidSecretKeyError) {

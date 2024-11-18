@@ -61,8 +61,6 @@ export async function ClerkProvider(
 
   const dynamicConfig = await getDynamicConfig();
 
-  console.log('--- dynamicConfig', dynamicConfig);
-
   let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
 
   let output = (
@@ -85,8 +83,6 @@ export async function ClerkProvider(
     publishableKey = res.publishableKey;
 
     output = (
-      // <html>
-      //   <body>
       <AccountlessCookieSync {...res}>
         <ClientClerkProvider
           {...mergeNextClerkPropsWithEnv({
@@ -100,11 +96,8 @@ export async function ClerkProvider(
           {children}
         </ClientClerkProvider>
       </AccountlessCookieSync>
-      //   </body>
-      // </html>
     );
   }
-  // }
 
   if (dynamic) {
     return (
