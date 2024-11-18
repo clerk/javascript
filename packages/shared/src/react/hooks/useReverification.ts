@@ -9,24 +9,23 @@ import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
 async function resolveResult<T>(
-  result: Promise<T>,
+  result: Promise<T> | T,
 ): Promise<T | ReturnType<typeof __experimental_reverificationError>> {
-  return result
-    .then(r => {
-      if (r instanceof Response) {
-        return r.json();
-      }
-      return r;
-    })
-    .catch(e => {
-      // Treat fapi assurance as an assurance hint
-      if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-        return __experimental_reverificationError();
-      }
+  try {
+    const r = await result;
+    if (r instanceof Response) {
+      return r.json();
+    }
+    return r;
+  } catch (e) {
+    // Treat fapi assurance as an assurance hint
+    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
+      return __experimental_reverificationError();
+    }
 
-      // rethrow
-      throw e;
-    });
+    // rethrow
+    throw e;
+  }
 }
 
 type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnCancel: true } ? never : null) : T;
@@ -41,12 +40,12 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
-  function assertReverification<Fetcher extends (...args: any[]) => Promise<any>>(
+  function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (
     ...args: Parameters<Fetcher>
   ) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>> {
-    return (async (...args) => {
+    return (async (...args: Parameters<Fetcher>) => {
       let result = await resolveResult(fetcher(...args));
 
       if (__experimental_isReverificationHint(result)) {
@@ -99,14 +98,14 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
       }
 
       return result;
-    }) as Fetcher;
+    }) as ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>;
   }
 
   return assertReverification;
 }
 
 type UseReverificationResult<
-  Fetcher extends (...args: any[]) => Promise<any>,
+  Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 > = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
 
@@ -129,7 +128,7 @@ type UseReverificationResult<
  * }
  */
 function __experimental_useReverification<
-  Fetcher extends (...args: any[]) => Promise<any>,
+  Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
   const { __experimental_openUserVerification } = useClerk();
