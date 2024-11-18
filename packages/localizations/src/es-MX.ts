@@ -839,6 +839,7 @@ export const esMX: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Cuentas de empresa',
       },
       headerTitle__account: 'Cuenta',

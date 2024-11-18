@@ -832,6 +832,7 @@ export const srRS: LocalizationResource = {
         title: 'E-mail adrese',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Korporativni nalozi',
       },
       headerTitle__account: 'Detalji profila',

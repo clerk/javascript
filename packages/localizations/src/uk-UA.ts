@@ -830,6 +830,7 @@ export const ukUA: LocalizationResource = {
         title: 'Адреси електронної пошти',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Обліковий запис',

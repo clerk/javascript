@@ -840,6 +840,7 @@ export const elGR: LocalizationResource = {
         title: 'Διευθύνσεις email',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Επιχειρησιακοί λογαριασμοί',
       },
       headerTitle__account: 'Λογαριασμός',

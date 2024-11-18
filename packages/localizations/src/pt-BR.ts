@@ -819,9 +819,9 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: undefined,
+        subtitle__disconnected: 'Essa conta foi desconectada',
         subtitle__reauthorize:
-          'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
+          'Os escopos necessários foram atualizados, e você pode estar experimentando funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
       },
       dangerSection: {
@@ -837,6 +837,8 @@ export const ptBR: LocalizationResource = {
         title: 'Endereços de e-mail',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: 'Tentar novamente',
+        subtitle__disconnected: 'Essa conta foi desconectada',
         title: 'Contas corporativas',
       },
       headerTitle__account: 'Conta',

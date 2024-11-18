@@ -831,6 +831,7 @@ export const daDK: LocalizationResource = {
         title: 'E-mailadresser',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Virksomhedskonti',
       },
       headerTitle__account: 'Konto',

@@ -830,6 +830,7 @@ export const ptPT: LocalizationResource = {
         title: 'Endereços de e-mail',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Contas corporativas',
       },
       headerTitle__account: 'Conta',

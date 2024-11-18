@@ -834,6 +834,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Kurumsal hesaplar',
       },
       headerTitle__account: 'Hesap',

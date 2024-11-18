@@ -419,6 +419,8 @@ type _LocalizationResource = {
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
+        actionLabel__connectionFailed: LocalizationValue;
+        subtitle__disconnected: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;

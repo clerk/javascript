@@ -827,6 +827,8 @@ export const enUS: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: 'Reconnect',
+        subtitle__disconnected: 'This account has been disconnected.',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',

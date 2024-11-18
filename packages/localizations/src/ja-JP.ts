@@ -828,6 +828,7 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレス',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'エンタープライズアカウント',
       },
       headerTitle__account: 'アカウント',

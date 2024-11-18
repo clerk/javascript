@@ -834,6 +834,7 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйл хаягууд',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Байгууллагын бүртгэлүүд',
       },
       headerTitle__account: 'Профайлын дэлгэрэнгүй',

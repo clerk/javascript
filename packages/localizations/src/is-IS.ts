@@ -839,6 +839,7 @@ export const isIS: LocalizationResource = {
         title: 'Netföng',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Fyrirtækjareikningar',
       },
       headerTitle__account: 'Prófílupplýsingar',

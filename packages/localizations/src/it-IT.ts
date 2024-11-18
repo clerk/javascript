@@ -835,6 +835,7 @@ export const itIT: LocalizationResource = {
         title: 'Indirizzi email',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Account aziendali',
       },
       headerTitle__account: 'Account',

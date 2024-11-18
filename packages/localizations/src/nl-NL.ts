@@ -831,6 +831,7 @@ export const nlNL: LocalizationResource = {
         title: 'E-mailadressen',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Bedrijfsaccounts',
       },
       headerTitle__account: 'Account',

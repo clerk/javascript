@@ -833,6 +833,7 @@ export const nbNO: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Bedriftskontoer',
       },
       headerTitle__account: 'Konto',

@@ -850,6 +850,7 @@ export const ruRU: LocalizationResource = {
         title: 'Адреса электронной почты',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Корпоративные учетные записи',
       },
       headerTitle__account: 'Учетная запись',

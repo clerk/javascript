@@ -829,6 +829,7 @@ export const skSK: LocalizationResource = {
         title: 'Emailové adresy',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Účet',

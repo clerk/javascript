@@ -834,6 +834,7 @@ export const svSE: LocalizationResource = {
         title: 'E-postadresser',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Konto',

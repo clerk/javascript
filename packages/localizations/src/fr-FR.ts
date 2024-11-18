@@ -839,6 +839,7 @@ export const frFR: LocalizationResource = {
         title: 'Adresses e-mail',
       },
       enterpriseAccountsSection: {
+        subtitle__disconnected: undefined,
         title: 'Comptes entreprises',
       },
       headerTitle__account: 'Compte',
