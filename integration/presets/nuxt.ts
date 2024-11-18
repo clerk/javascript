@@ -7,10 +7,10 @@ const nuxtNode = applicationConfig()
   .setName('nuxt-node')
   .useTemplate(templates['nuxt-node'])
   .setEnvFormatter('public', key => `NUXT_PUBLIC_${key}`)
-  .addScript('setup', 'npm i')
-  .addScript('dev', 'npm run dev')
-  .addScript('build', 'npm run build')
-  .addScript('serve', 'npm run preview')
+  .addScript('setup', 'pnpm install')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm preview')
   .addDependency('@clerk/nuxt', clerkNuxtLocal);
 
 export const nuxt = {
