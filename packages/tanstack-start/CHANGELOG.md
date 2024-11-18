@@ -1,5 +1,20 @@
 # @clerk/tanstack-start
 
+## 0.5.0
+
+### Minor Changes
+
+- **Breaking change:** Update `@tanstack/react-router` peer dependency from `>=1.49.1` to `>=1.81.9`. Also update `@tanstack/start` peer dependency from `>=1.49.1` to `>=1.81.9`. This update coincides with the [changed server function syntax & server middleware](https://github.com/TanStack/router/pull/2513) that will allow the SDK more functionality in the future. ([#4575](https://github.com/clerk/javascript/pull/4575)) by [@LekoArts](https://github.com/LekoArts)
+
+  When updating your `@clerk/tanstack-start` version you'll need to change various pieces in your code, Clerk's documentation ([quickstart](https://clerk.com/docs/quickstarts/tanstack-start), [reference](https://clerk.com/docs/references/tanstack-start/overview)) has been updated to account for that.
+
+### Patch Changes
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b2671affd230eed176ac03af516307898d371757`](https://github.com/clerk/javascript/commit/b2671affd230eed176ac03af516307898d371757), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da), [`6c424e179850f520ae738e816bf0423a55ddf3ef`](https://github.com/clerk/javascript/commit/6c424e179850f520ae738e816bf0423a55ddf3ef)]:
+  - @clerk/backend@1.17.0
+  - @clerk/shared@2.15.0
+  - @clerk/clerk-react@5.16.0
+
 ## 0.4.28
 
 ### Patch Changes
