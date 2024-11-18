@@ -1,21 +1,9 @@
 import { useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { SetActive, SignInResource } from '@clerk/types';
+import type { UseSignInReturn } from '@clerk/types';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
-
-type UseSignInReturn =
-  | {
-      isLoaded: false;
-      signIn: undefined;
-      setActive: undefined;
-    }
-  | {
-      isLoaded: true;
-      signIn: SignInResource;
-      setActive: SetActive;
-    };
 
 type UseSignIn = () => UseSignInReturn;
 

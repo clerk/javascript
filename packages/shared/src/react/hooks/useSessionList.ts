@@ -1,18 +1,6 @@
-import type { SessionResource, SetActive } from '@clerk/types';
+import type { UseSessionListReturn } from '@clerk/types';
 
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
-
-type UseSessionListReturn =
-  | {
-      isLoaded: false;
-      sessions: undefined;
-      setActive: undefined;
-    }
-  | {
-      isLoaded: true;
-      sessions: SessionResource[];
-      setActive: SetActive;
-    };
 
 type UseSessionList = () => UseSessionListReturn;
 
