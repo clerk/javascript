@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.15.0
+
+### Minor Changes
+
+- Rename `reverificationMismatch` to `reverificationError`. ([#4582](https://github.com/clerk/javascript/pull/4582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Improve formatting of ClerkRuntimeError message to include error code. ([#4574](https://github.com/clerk/javascript/pull/4574)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.14.0
 
 ### Minor Changes

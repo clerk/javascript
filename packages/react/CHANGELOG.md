@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.16.0
+
+### Minor Changes
+
+- Add `initialValues` option to `<SignInButton />` component. ([#4581](https://github.com/clerk/javascript/pull/4581)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `initialValues` option to `<SignUpButton />` component. ([#4567](https://github.com/clerk/javascript/pull/4567)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da)]:
+  - @clerk/shared@2.15.0
+
 ## 5.15.5
 
 ### Patch Changes
