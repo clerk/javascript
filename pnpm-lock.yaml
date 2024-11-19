@@ -595,6 +595,9 @@ importers:
       '@clerk/eslint-config-custom':
         specifier: workspace:*
         version: link:../eslint-config-custom
+      '@clerk/expo-passkeys':
+        specifier: 0.0.6
+        version: link:../expo-passkeys
       '@types/base-64':
         specifier: ^1.0.2
         version: 1.0.2
