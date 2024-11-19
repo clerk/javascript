@@ -93,6 +93,9 @@
     "react-native": ">=0.73"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-passkeys": {
+      "optional": true
+    },
     "expo-local-authentication": {
       "optional": true
     },
