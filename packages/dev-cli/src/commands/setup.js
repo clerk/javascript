@@ -40,7 +40,7 @@ function hasPackage(packages, dependency) {
 async function detectFramework() {
   const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
 
-  const IS_NEXT = hasFile('next.config.js') || hasFile('next.config.mjs');
+  const IS_NEXT = hasFile('next.config.js') || hasFile('next.config.mjs') || hasPackage(dependencies, 'next');
   if (IS_NEXT) {
     return 'nextjs';
   }
