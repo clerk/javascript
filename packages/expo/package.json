@@ -60,11 +60,11 @@
     "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.34.3",
-    "@clerk/clerk-react": "5.16.0",
-    "@clerk/expo-passkeys": "0.0.6",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
+    "@clerk/clerk-js": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/expo-passkeys": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"

@@ -2,7 +2,6 @@ import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
-const clerkRemixLocal = `file:${process.cwd()}/packages/remix`;
 const remixNode = applicationConfig()
   .setName('remix-node')
   .useTemplate(templates['remix-node'])
@@ -11,7 +10,7 @@ const remixNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/remix', constants.E2E_CLERK_VERSION || clerkRemixLocal);
+  .addDependency('@clerk/remix', constants.E2E_CLERK_VERSION || '*');
 
 export const remix = {
   remixNode,
