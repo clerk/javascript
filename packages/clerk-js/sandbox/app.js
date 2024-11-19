@@ -86,5 +86,7 @@ function addCurrentRouteIndicator(currentRoute) {
       signUpUrl: '/sign-up',
     });
     renderCurrentRoute();
+  } else {
+    console.error(`Unknown route: "${route}".`);
   }
 })();

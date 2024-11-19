@@ -313,9 +313,20 @@ const entryForVariant = variant => {
 const prodConfig = ({ mode, analysis }) => {
   const clerkBrowser = merge(
     entryForVariant(variants.clerkBrowser),
+    { entry: { sandbox: './sandbox/app.js' } },
     common({ mode }),
     commonForProd(),
     commonForProdChunked(),
+    {
+      plugins: [
+        new rspack.HtmlRspackPlugin({
+          minify: false,
+          template: './sandbox/template.html',
+          inject: false,
+          hash: true,
+        }),
+      ],
+    },
   );
 
   const clerkHeadless = merge(
@@ -404,6 +415,7 @@ const devConfig = ({ mode, env }) => {
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
+  const isSandbox = !!env.sandbox;
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
@@ -411,12 +423,20 @@ const devConfig = ({ mode, env }) => {
       module: {
         rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
       },
-      plugins: [new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } }))],
+      plugins: [
+        new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
+        isSandbox &&
+          new rspack.HtmlRspackPlugin({
+            minify: false,
+            template: './sandbox/template.html',
+            inject: false,
+          }),
+      ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
       output: {
-        publicPath: `${devUrl.origin}/npm`,
+        publicPath: isSandbox ? `` : `${devUrl.origin}/npm`,
         crossOriginLoading: 'anonymous',
-        filename: `${variant}.js`,
+        filename: `[name].js`,
         libraryTarget: 'umd',
       },
       optimization: {
@@ -430,10 +450,11 @@ const devConfig = ({ mode, env }) => {
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },
-        static: './sandbox',
-        historyApiFallback: {
-          index: '/index.html',
-        },
+        ...(isSandbox
+          ? {
+              historyApiFallback: true,
+            }
+          : {}),
       },
     };
   };
@@ -448,6 +469,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
+      isSandbox ? { entry: { sandbox: './sandbox/app.js' } } : {},
       common({ mode }),
       commonForDev(),
     ),
