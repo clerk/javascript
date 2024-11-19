@@ -36,12 +36,11 @@ export type SignedInAuthObject = {
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   * @experimental This API is experimental and may change at any moment.
+   * The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
    */
-  __experimental_factorVerificationAge: [number, number] | null;
+  __experimental_factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -60,10 +59,9 @@ export type SignedOutAuthObject = {
   orgSlug: null;
   orgPermissions: null;
   /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   * @experimental This API is experimental and may change at any moment.
+   * The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
    */
   __experimental_factorVerificationAge: null;
   getToken: ServerGetToken;

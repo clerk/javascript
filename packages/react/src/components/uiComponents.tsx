@@ -60,8 +60,9 @@ type UserButtonExportType = typeof _UserButton & {
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
    * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
-   * that could be mounted
-   * @experimental This API is experimental and may change at any moment.
+   * that could be mounted.
+   * This API is experimental and may change at any moment.
+   * @experimental
    */
   __experimental_Outlet: typeof UserButtonOutlet;
 };
@@ -73,7 +74,8 @@ type UserButtonPropsWithoutCustomPages = Without<
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * @experimental This API is experimental and may change at any moment.
+   * This API is experimental and may change at any moment.
+   * @experimental
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -90,8 +92,9 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
    * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
-   * that could be mounted
-   * @experimental This API is experimental and may change at any moment.
+   * that could be mounted.
+   * This API is experimental and may change at any moment.
+   * @experimental
    */
   __experimental_Outlet: typeof OrganizationSwitcherOutlet;
 };
@@ -103,7 +106,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * @experimental This API is experimental and may change at any moment.
+   * This API is experimental and may change at any moment.
+   * @experimental
    * @default undefined
    */
   __experimental_asProvider?: boolean;

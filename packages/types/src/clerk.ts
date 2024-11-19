@@ -165,14 +165,16 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserVerification component in a modal.
-   * @experimantal This API is still under active development and may change at any moment.
+   * This API is still under active development and may change at any moment.
+   * @experimental
    * @param props Optional user verification configuration parameters.
    */
   __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
-   * @experimantal This API is still under active development and may change at any moment.
+   * This API is still under active development and may change at any moment.
+   * @experimental
    */
   __experimental_closeUserVerification: () => void;
 
@@ -348,7 +350,8 @@ export interface Clerk {
   /**
    * Prefetches the data displayed by an organization switcher.
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
-   * @experimantal This API is still under active development and may change at any moment.
+   * This API is still under active development and may change at any moment.
+   * @experimental
    * @param props Optional user verification configuration parameters.
    */
   __experimental_prefetchOrganizationSwitcher: () => void;
@@ -918,7 +921,7 @@ interface TransferableOption {
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
 /**
- * @experimantal
+ * @experimental
  */
 export type __experimental_UserVerificationProps = RoutingOptions & {
   /**
@@ -1039,8 +1042,8 @@ export type UserProfileProps = RoutingOptions & {
    */
   customPages?: CustomPage[];
   /**
-   * @experimental
    * Specify on which page the user profile modal will open.
+   * @experimental
    **/
   __experimental_startPath?: string;
 };
@@ -1120,7 +1123,8 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * If true the `<UserButton />` will only render the popover.
    * Enables developers to implement a custom dialog.
-   * @experimental This API is experimental and may change at any moment.
+   * This API is experimental and may change at any moment.
+   * @experimental
    * @default undefined
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
@@ -1189,7 +1193,8 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * If true, `<OrganizationSwitcher />` will only render the popover.
      * Enables developers to implement a custom dialog.
-     * @experimental This API is experimental and may change at any moment.
+     * This API is experimental and may change at any moment.
+     * @experimental
      * @default undefined
      */
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
