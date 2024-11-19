@@ -27,19 +27,7 @@ import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
-
-const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
-const getSignUpAttributeFromIdentifier = (identifier: FormControlState<'identifier'>) => {
-  if (identifier.type === 'tel') {
-    return 'phoneNumber';
-  }
-
-  if (isEmail(identifier.value)) {
-    return 'emailAddress';
-  }
-
-  return 'username';
-};
+import { getSignUpAttributeFromIdentifier } from './utils';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -350,13 +338,6 @@ export function _SignInStart(): JSX.Element {
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
       if (isCombinedFlow) {
-        if (identifierField.type === 'tel') {
-          clerk.client.signUp.phoneNumber = identifierField.value;
-        } else if (isEmail(identifierField.value)) {
-          clerk.client.signUp.emailAddress = identifierField.value;
-        } else {
-          clerk.client.signUp.username = identifierField.value;
-        }
         const attribute = getSignUpAttributeFromIdentifier(identifierField);
         clerk.client.signUp[attribute] = identifierField.value;
         return navigate('create');
