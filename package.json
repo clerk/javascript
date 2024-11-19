@@ -36,6 +36,7 @@
     "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
+    "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
     "test:integration:remix": "echo 'placeholder'",
     "test:integration:sessions": "pnpm test:integration:base --grep @sessions",
