@@ -29,6 +29,15 @@ import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+const getSignUpAttributeFromIdentifier = (identifier: FormControlState<'identifier'>) => {
+  if (identifier.type === 'tel') {
+    return 'phoneNumber';
+  } else if (isEmail(identifier.value)) {
+    return 'emailAddress';
+  } else {
+    return 'username';
+  }
+};
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -346,6 +355,8 @@ export function _SignInStart(): JSX.Element {
         } else {
           clerk.client.signUp.username = identifierField.value;
         }
+        const attribute = getSignUpAttributeFromIdentifier(identifierField);
+        clerk.client.signUp[attribute] = identifierField.value;
         return navigate('create');
       }
       handleError(e, [identifierField, instantPasswordField], card.setError);
