@@ -430,6 +430,10 @@ const devConfig = ({ mode, env }) => {
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },
+        static: './sandbox',
+        historyApiFallback: {
+          index: '/index.html',
+        },
       },
     };
   };
