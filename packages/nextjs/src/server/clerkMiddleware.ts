@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
+import { getAccountlessCookieValue } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -96,13 +97,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      // const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
+      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
+      const publishableKey = assertKey(
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey,
+        () => errorThrower.throwMissingPublishableKeyError(),
       );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secretKey, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -192,7 +194,31 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, { ...resolvedParams, ...options });
+      function sanitizePublicData() {
+        const { publishableKey, proxyUrl, signUpUrl, signInUrl, isSatellite, domain, afterSignInUrl, afterSignUpUrl } =
+          options;
+
+        return {
+          publishableKey,
+          proxyUrl,
+          signUpUrl,
+          signInUrl,
+          isSatellite,
+          domain,
+          afterSignInUrl,
+          afterSignUpUrl,
+          claimAccountlessKeysUrl: accountless?.publishableKey === publishableKey ? accountless?.claimUrl : undefined,
+          accountlessMode: accountless?.publishableKey === publishableKey,
+        };
+      }
+
+      decorateRequest(
+        clerkRequest,
+        handlerResult,
+        requestState,
+        { ...resolvedParams, ...options },
+        sanitizePublicData(),
+      );
 
       return handlerResult;
     });

@@ -98,7 +98,7 @@ export function decorateRequest(
   res: Response,
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
-  publicRequestDate?: Pick<
+  publicRequestDate: Pick<
     AuthenticateRequestOptions,
     | 'publishableKey'
     | 'domain'
