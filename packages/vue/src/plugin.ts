@@ -32,7 +32,7 @@ export type PluginOptions = LoadClerkJsScriptOptions;
 export const clerkPlugin: Plugin = {
   install(app, options: PluginOptions) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
-    const { __internal_clerk_initial_state } = options;
+    const { initialState } = options;
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);
@@ -67,7 +67,7 @@ export const clerkPlugin: Plugin = {
       });
     }
 
-    const derivedState = computed(() => deriveState(loaded.value, resources.value, __internal_clerk_initial_state));
+    const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));
 
     const authCtx = computed(() => {
       const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions } = derivedState.value;

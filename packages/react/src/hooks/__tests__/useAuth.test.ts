@@ -29,7 +29,7 @@ describe('useAuth type tests', () => {
       expectTypeOf({
         role: 'org:admin',
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
@@ -39,7 +39,7 @@ describe('useAuth type tests', () => {
       expectTypeOf({
         permission: 'org:edit:posts',
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
@@ -48,7 +48,7 @@ describe('useAuth type tests', () => {
     it('has({reverification: {level, maxAge}}) is allowed', () => {
       expectTypeOf({
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: 10,
         },
       } as const).toMatchTypeOf<ParamsOfHas>();
@@ -57,7 +57,7 @@ describe('useAuth type tests', () => {
     it('reverification with other values as maxAge should throw', () => {
       expectTypeOf({
         __experimental_reverification: {
-          level: 'firstFactor',
+          level: 'first_factor',
           afterMinutes: '10',
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
@@ -65,7 +65,7 @@ describe('useAuth type tests', () => {
 
     it('veryStrict reverification is allowed', () => {
       expectTypeOf({
-        __experimental_reverification: 'veryStrict',
+        __experimental_reverification: 'strict_mfa',
       } as const).toMatchTypeOf<ParamsOfHas>();
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.3.2",
+  "version": "2.3.6",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -55,26 +55,26 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
-    "publish:local": "npx yalc push --replace  --sig"
+    "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.33.1",
-    "@clerk/clerk-react": "5.15.3",
-    "@clerk/shared": "2.12.1",
-    "@clerk/types": "4.32.0",
+    "@clerk/clerk-js": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/expo-passkeys": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/expo-passkeys": "0.0.3",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",

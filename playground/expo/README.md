@@ -10,8 +10,8 @@
 In the project root, run:
 
 ```bash
-   npm run yalc:add 
-   npm install
+   pnpm run yalc:add 
+   pnpm install
 ```
 ```bash
    cp app.json.example app.json
@@ -35,19 +35,19 @@ Add the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `.env`.
 ### Prebuild the Project
 
 ```bash
-   npx expo prebuild --clean
+   pnpm expo prebuild --clean
 ```
 
 ### Run the Project
 
 ```bash
-  npm run ios
+  pnpm run ios
 ```
 
 Or 
 
 ```bash
-  npm run android
+  pnpm run android
 ```
 
 ### Troubleshooting

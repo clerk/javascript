@@ -92,17 +92,21 @@ export abstract class BaseResource {
       return payload;
     }
 
-    if (status === 401) {
-      await BaseResource.clerk.handleUnauthenticated();
-    }
-
     if (status >= 400) {
       const errors = payload?.errors as ClerkAPIErrorJSON[];
-      const safeErrorMessage = errors?.[0]?.long_message;
+      const message = errors?.[0]?.long_message;
+      const code = errors?.[0]?.code;
+
+      // if the status is 401, we need to handle unauthenticated as we did before
+      // otherwise, we are going to ignore the requires_captcha error
+      // as we're going to handle it by triggering the captcha challenge
+      if (status === 401 && code !== 'requires_captcha') {
+        await BaseResource.clerk.handleUnauthenticated();
+      }
 
       assertProductionKeysOnDev(status, errors);
 
-      throw new ClerkAPIResponseError(safeErrorMessage || statusText, {
+      throw new ClerkAPIResponseError(message || statusText, {
         data: errors,
         status: status,
       });

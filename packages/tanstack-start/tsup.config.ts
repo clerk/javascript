@@ -30,7 +30,7 @@ export default defineConfig(overrideOptions => {
   };
 
   return runAfterLast([
-    // 'npm run build:declarations',
-    shouldPublish && 'npm run publish:local',
+    // 'pnpm build:declarations',
+    shouldPublish && 'pnpm publish:local',
   ])(common);
 });

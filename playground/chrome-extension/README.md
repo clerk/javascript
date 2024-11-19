@@ -59,7 +59,7 @@ This repo will be enhanced with examples of authentication redirection flows suc
    - `cp .env.example .env`
    - `cp manifest.json.example manifest.json`
    - `cp manifest.dev.json.example manifest.dev.json` (The attributes in this file overwrite the attributes in `manifest.json` when running in development mode.)
-7. Launch the development server: `npm run dev`
+7. Launch the development server: `pnpm dev`
 
 The files generated in the `dist` directory can be loaded as an unpacked extension in Chrome.
 

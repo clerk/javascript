@@ -34,5 +34,5 @@ export default defineConfig(overrideOptions => {
     outDir: './dist/cjs',
   };
 
-  return runAfterLast(['npm run build:declarations', shouldPublish && 'npm run publish:local'])(esm, cjs);
+  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(esm, cjs);
 });
