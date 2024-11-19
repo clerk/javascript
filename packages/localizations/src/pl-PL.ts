@@ -832,6 +832,7 @@ export const plPL: LocalizationResource = {
         title: 'Adresy email',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },

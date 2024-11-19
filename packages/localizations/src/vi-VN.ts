@@ -830,6 +830,7 @@ export const viVN: LocalizationResource = {
         title: 'Địa chỉ email',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Tài khoản doanh nghiệp',
       },

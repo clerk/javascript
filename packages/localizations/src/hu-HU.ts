@@ -836,6 +836,7 @@ export const huHU: LocalizationResource = {
         title: 'Email címek',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Vállalati fiókok',
       },

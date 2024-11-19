@@ -834,6 +834,7 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresleri',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Kurumsal hesaplar',
       },

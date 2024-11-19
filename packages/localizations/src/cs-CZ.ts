@@ -829,6 +829,7 @@ export const csCZ: LocalizationResource = {
         title: 'Emailové adresy',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },

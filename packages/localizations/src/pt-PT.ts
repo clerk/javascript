@@ -830,7 +830,8 @@ export const ptPT: LocalizationResource = {
         title: 'Endereços de e-mail',
       },
       enterpriseAccountsSection: {
-        subtitle__disconnected: undefined,
+        actionLabel__connectionFailed: 'Tentar novamente',
+        subtitle__disconnected: 'Essa conta foi desconectada',
         title: 'Contas corporativas',
       },
       headerTitle__account: 'Conta',

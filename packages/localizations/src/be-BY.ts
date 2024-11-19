@@ -839,6 +839,7 @@ export const beBY: LocalizationResource = {
         title: 'Адрасы электроннай пошты',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Enterprise accounts',
       },

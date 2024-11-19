@@ -835,6 +835,7 @@ export const fiFI: LocalizationResource = {
         title: 'Sähköpostiosoitteet',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Yritystilit',
       },

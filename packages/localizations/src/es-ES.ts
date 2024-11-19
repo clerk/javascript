@@ -837,6 +837,7 @@ export const esES: LocalizationResource = {
         title: 'Correos electrónicos',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: 'Inténtelo nuevamente',
         subtitle__disconnected: undefined,
         title: 'Cuentas empresariales',
       },

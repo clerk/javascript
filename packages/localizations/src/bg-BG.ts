@@ -833,6 +833,7 @@ export const bgBG: LocalizationResource = {
         title: 'Имейл адреси',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Корпоративни акаунти',
       },

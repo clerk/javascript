@@ -825,6 +825,7 @@ export const thTH: LocalizationResource = {
         title: 'ที่อยู่อีเมล',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'บัญชีองค์กร',
       },

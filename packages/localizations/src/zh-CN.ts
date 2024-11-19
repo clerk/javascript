@@ -805,6 +805,7 @@ export const zhCN: LocalizationResource = {
         title: '电子邮件地址',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: '企业账户',
       },

@@ -820,6 +820,7 @@ export const koKR: LocalizationResource = {
         title: '이메일 주소',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: '기업 계정',
       },

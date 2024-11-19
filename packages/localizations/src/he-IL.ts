@@ -814,6 +814,7 @@ export const heIL: LocalizationResource = {
         title: 'כתובת אימייל',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'חשבונות ארגוניים',
       },

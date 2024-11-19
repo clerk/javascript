@@ -846,6 +846,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adressen',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Unternehmens-Konten',
       },

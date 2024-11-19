@@ -841,6 +841,7 @@ export const roRO: LocalizationResource = {
         title: 'Adrese de e-mail',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'Conturi de companie',
       },

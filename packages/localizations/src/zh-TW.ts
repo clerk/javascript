@@ -815,6 +815,7 @@ export const zhTW: LocalizationResource = {
         title: '電子郵件地址',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: '企業帳戶',
       },

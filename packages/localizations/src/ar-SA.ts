@@ -826,6 +826,7 @@ export const arSA: LocalizationResource = {
         title: 'العنوان الإلكتروني',
       },
       enterpriseAccountsSection: {
+        actionLabel__connectionFailed: undefined,
         subtitle__disconnected: undefined,
         title: 'حساب المؤسسات',
       },
