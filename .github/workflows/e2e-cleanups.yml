@@ -35,7 +35,7 @@ jobs:
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend --no-save-workspace
+        run: pnpm init && pnpm add @clerk/backend
 
       - name: Run cleanup
         run: pnpm test:integration:cleanup

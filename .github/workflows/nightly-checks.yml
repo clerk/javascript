@@ -38,11 +38,11 @@ jobs:
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend --no-save-workspace
+        run: pnpm init && pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js --no-save-workspace
+        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Run Integration Tests
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force --no-cache
