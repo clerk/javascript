@@ -100,7 +100,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "4.34.0"
+    "@clerk/types": "workspace:*"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
