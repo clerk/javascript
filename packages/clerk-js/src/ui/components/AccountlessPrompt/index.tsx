@@ -2,51 +2,15 @@ import type { PointerEventHandler } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Icon, Link, Text, useAppearance, useLocalizations } from '../../customizables';
+import { Col, descriptors, Flex, Link, Text } from '../../customizables';
 import { Portal } from '../../elements/Portal';
-import { Eye } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
 import { InternalThemeProvider, mqu } from '../../styledSystem';
-
-type EyeCircleProps = PropsOfComponent<typeof Col> & {
-  width: string;
-  height: string;
-};
 
 type AccountlessPromptProps = {
   url?: string;
 };
 
-const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
-  const { sx, ...rest } = props;
-  return (
-    <Col
-      elementDescriptor={descriptors.impersonationFabIconContainer}
-      center
-      sx={[
-        t => ({
-          width,
-          height,
-          backgroundColor: t.colors.$danger500,
-          borderRadius: t.radii.$circle,
-        }),
-        sx,
-      ]}
-      {...rest}
-    >
-      <Icon
-        elementDescriptor={descriptors.impersonationFabIcon}
-        icon={Eye}
-        sx={t => ({
-          color: t.colors.$white,
-        })}
-        size={'lg'}
-      />
-    </Col>
-  );
-};
-
-type FabContentProps = { title: LocalizationKey | string; signOutText: LocalizationKey | string; url: string };
+type FabContentProps = { title?: LocalizationKey | string; signOutText: LocalizationKey | string; url: string };
 
 const FabContent = ({ title, signOutText, url }: FabContentProps) => {
   return (
@@ -87,13 +51,12 @@ const FabContent = ({ title, signOutText, url }: FabContentProps) => {
 };
 
 export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
-  const { t } = useLocalizations();
-  const { parsedInternalTheme } = useAppearance();
+  // const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
 
   //essentials for calcs
-  const eyeWidth = parsedInternalTheme.sizes.$16;
-  const eyeHeight = eyeWidth;
+  // const eyeWidth = parsedInternalTheme.sizes.$16;
+  // const eyeHeight = eyeWidth;
   const topProperty = '--cl-impersonation-fab-top';
   const rightProperty = '--cl-impersonation-fab-right';
   const defaultTop = 109;
@@ -151,9 +114,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
   useEffect(repositionFabOnResize, []);
 
-  const title = 'todo';
-  const titleLength = t(title).length;
-
   if (!props.url) {
     return null;
   }
@@ -171,6 +131,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
+          padding: `10px`,
           zIndex: t.zIndices.$fab,
           boxShadow: t.shadows.$fabShadow,
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
@@ -180,39 +141,27 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             cursor: 'grab',
           },
           ':hover #cl-impersonationText': {
-            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$slower} ease ${t.transitionDuration.$slowest}`,
-            maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
+            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity 0ms ease ${t.transitionDuration.$slowest}`,
+            maxWidth: `min(calc(50vw - 2 * ${defaultRight}px), ${15}ch)`,
             [mqu.md]: {
-              maxWidth: `min(calc(100vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
+              maxWidth: `min(calc(100vw - 2 * ${defaultRight}px), ${15}ch)`,
             },
             opacity: 1,
           },
-          ':hover #cl-impersonationEye': {
-            transform: 'rotate(-180deg)',
-          },
         })}
       >
-        Token
-        <EyeCircle
-          id='cl-impersonationEye'
-          width={eyeWidth}
-          height={eyeHeight}
-          sx={t => ({
-            transition: `transform ${t.transitionDuration.$slowest} ease`,
-          })}
-        />
+        🔓Accountless Mode
         <Flex
           id='cl-impersonationText'
           sx={t => ({
             transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$fast} ease`,
             maxWidth: '0px',
-            opacity: 0,
+            opacity: 1,
           })}
         >
           <FabContent
             url={props.url}
-            title={title}
-            signOutText={'Claim'}
+            signOutText={'Claim your keys'}
           />
         </Flex>
       </Flex>
