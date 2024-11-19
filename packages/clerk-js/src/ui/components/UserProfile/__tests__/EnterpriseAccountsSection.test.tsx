@@ -247,6 +247,12 @@ describe('EnterpriseAccountsSection ', () => {
       expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/google.svg?width=160');
       getByText(/test@clerk.com/i);
     });
+
+    describe('with verification error', () => {
+      it('allows to reconnect', async () => {
+        // TODO - Implement test
+      });
+    });
   });
 
   describe('with oauth custom', () => {
