@@ -20,11 +20,12 @@ type GetInvitationListParams = ClerkPaginationRequest<{
    * Filters invitations based on their status(accepted, pending, revoked).
    *
    * @example
-   * get all revoked invitations
-   *
+   * Get all revoked invitations
+   * ```ts
    * import { createClerkClient } from '@clerk/backend';
    * const clerkClient = createClerkClient(...)
    * await clerkClient.invitations.getInvitationList({ status: 'revoked })
+   * ```
    *
    */
   status?: 'accepted' | 'pending' | 'revoked';

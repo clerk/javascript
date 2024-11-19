@@ -56,7 +56,6 @@ type UseAuth = () => ToComputedRefs<UseAuthReturn>;
  * safely access the `userId` and `sessionId` variables.
  *
  * @example
- *
  * <script setup>
  * import { useAuth } from '@clerk/vue'
  *
