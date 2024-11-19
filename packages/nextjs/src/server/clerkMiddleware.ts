@@ -93,7 +93,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, params] = parseHandlerAndOptions(args);
 
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
-    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
@@ -223,41 +223,41 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       return handlerResult;
     });
 
-    // const nextMiddleware: NextMiddleware = async (request, event) => {
-    //   if (process.env.NODE_ENV === 'production') {
-    //     return baseNextMiddleware(request, event);
-    //   }
-    //
-    //   const isSyncAccountless = request.nextUrl.pathname === '/clerk-sync-accountless';
-    //   if (isSyncAccountless) {
-    //     const url = new URL(request.url);
-    //     url.pathname = '';
-    //
-    //     const response = new NextResponse(null, {
-    //       status: 307,
-    //       headers: { location: url.toString() },
-    //     });
-    //     return response;
-    //   }
-    //
-    //   const resolvedParams = typeof params === 'function' ? params(request) : params;
-    //
-    //   const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
-    //
-    //   const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey);
-    //
-    //   if (isPkMissing) {
-    //     const res = NextResponse.next();
-    //
-    //     setRequestHeadersOnNextResponse(res, request, {
-    //       [constants.Headers.AuthStatus]: 'signed-out',
-    //     });
-    //
-    //     return res;
-    //   }
-    //
-    //   return baseNextMiddleware(request, event);
-    // };
+    const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (process.env.NODE_ENV === 'production') {
+        return baseNextMiddleware(request, event);
+      }
+
+      const isSyncAccountless = request.nextUrl.pathname === '/clerk-sync-accountless';
+      if (isSyncAccountless) {
+        const url = new URL(request.url);
+        url.pathname = '';
+
+        const response = new NextResponse(null, {
+          status: 307,
+          headers: { location: url.toString() },
+        });
+        return response;
+      }
+
+      const resolvedParams = typeof params === 'function' ? params(request) : params;
+
+      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
+
+      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey);
+
+      if (isPkMissing) {
+        const res = NextResponse.next();
+
+        setRequestHeadersOnNextResponse(res, request, {
+          [constants.Headers.AuthStatus]: 'signed-out',
+        });
+
+        return res;
+      }
+
+      return baseNextMiddleware(request, event);
+    };
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
