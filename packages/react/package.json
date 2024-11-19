@@ -85,8 +85,6 @@
     "@clerk/localizations": "workspace:*",
     "@clerk/themes": "workspace:*",
     "@types/node": "^18.19.33",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
     "@types/semver": "^7.5.8",
     "typescript": "*"
   },

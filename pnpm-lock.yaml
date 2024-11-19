@@ -4,6 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  react:
+    '@types/react':
+      specifier: 18.3.12
+      version: 18.3.12
+    '@types/react-dom':
+      specifier: 18.3.1
+      version: 18.3.1
+    react:
+      specifier: 18.3.1
+      version: 18.3.1
+    react-dom:
+      specifier: 18.3.1
+      version: 18.3.1
+
 overrides:
   jest: 29.7.0
   jest-snapshot-prettier: npm:prettier@^3
@@ -70,10 +85,10 @@ importers:
         specifier: ^20.11.24
         version: 20.17.5
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       '@vitest/coverage-v8':
         specifier: 2.1.4
@@ -145,10 +160,10 @@ importers:
         specifier: ^0.2.4
         version: 0.2.4
       react:
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       react-dom:
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1(react@18.3.1)
       rimraf:
         specifier: 6.0.1
@@ -209,7 +224,7 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config-custom
       react:
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       typescript:
         specifier: '*'
@@ -776,12 +791,6 @@ importers:
       '@types/node':
         specifier: ^18.19.33
         version: 18.19.63
-      '@types/react':
-        specifier: 18.3.12
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: 18.3.1
-        version: 18.3.1
       next:
         specifier: ^14.2.10
         version: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -850,12 +859,6 @@ importers:
       '@types/node':
         specifier: ^18.19.33
         version: 18.19.63
-      '@types/react':
-        specifier: 18.3.12
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: 18.3.1
-        version: 18.3.1
       '@types/semver':
         specifier: ^7.5.8
         version: 7.5.8
@@ -1255,7 +1258,7 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
       react:
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       read-pkg:
         specifier: ^9.0.1
