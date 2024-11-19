@@ -81,7 +81,10 @@ function addCurrentRouteIndicator(currentRoute) {
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
-    await Clerk.load();
+    await Clerk.load({
+      signInUrl: '/sign-in',
+      signUpUrl: '/sign-up',
+    });
     renderCurrentRoute();
   }
 })();
