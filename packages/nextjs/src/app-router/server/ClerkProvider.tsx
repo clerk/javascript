@@ -5,9 +5,12 @@ import nextPkg from 'next/package.json';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
+import { createAccountlessKeys } from '../../server/accountless-node';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { AccountlessCookieSync } from '../client/accountless-cookie-sync';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
@@ -18,6 +21,16 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const data = getDynamicAuthData(request);
 
   return data;
+});
+
+const getDynamicConfig = React.cache(async function getDynamicClerkState() {
+  const request = await buildRequestLike();
+  const encoded = getHeader(request, 'x-clerk-public-request-config');
+
+  if (encoded) {
+    return JSON.parse(encoded);
+  }
+  return {};
 });
 
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
@@ -45,15 +58,45 @@ export async function ClerkProvider(
     }
   }
 
-  const output = (
+  const dynamicConfig = await getDynamicConfig();
+
+  let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
+
+  let output = (
     <ClientClerkProvider
-      {...mergeNextClerkPropsWithEnv(rest)}
+      {...mergeNextClerkPropsWithEnv({
+        ...dynamicConfig,
+        ...rest,
+        publishableKey,
+      })}
       nonce={await nonce}
       initialState={await statePromise}
     >
       {children}
     </ClientClerkProvider>
   );
+
+  // if (!publishableKey) {
+  const res = !publishableKey || dynamicConfig.accountlessMode ? await createAccountlessKeys() : undefined;
+  if (res) {
+    publishableKey = res.publishableKey;
+
+    output = (
+      <AccountlessCookieSync {...res}>
+        <ClientClerkProvider
+          {...mergeNextClerkPropsWithEnv({
+            ...dynamicConfig,
+            ...rest,
+            publishableKey,
+          })}
+          nonce={await nonce}
+          initialState={await statePromise}
+        >
+          {children}
+        </ClientClerkProvider>
+      </AccountlessCookieSync>
+    );
+  }
 
   if (dynamic) {
     return (
