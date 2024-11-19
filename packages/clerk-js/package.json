@@ -53,9 +53,9 @@
   },
   "browserslist": "last 2 years, Safari > 12, iOS > 12",
   "dependencies": {
-    "@clerk/localizations": "3.6.4",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
+    "@clerk/localizations": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "@coinbase/wallet-sdk": "4.0.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
