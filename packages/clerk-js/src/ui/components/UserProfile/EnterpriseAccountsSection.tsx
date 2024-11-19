@@ -4,13 +4,13 @@ import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/types';
 
 import { ProviderInitialIcon } from '../../common';
 import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
-import { ProfileSection, useCardState } from '../../elements';
+import { ProfileSection, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { errorCodesForReconnect } from './utils';
 
-export const EnterpriseAccountsSection = () => {
+export const EnterpriseAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
 
   const activeEnterpriseAccounts = user?.enterpriseAccounts.filter(
@@ -37,7 +37,7 @@ export const EnterpriseAccountsSection = () => {
       </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
-};
+});
 
 const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) => {
   const card = useCardState();

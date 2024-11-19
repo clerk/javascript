@@ -1,3 +1,4 @@
+import type { ClerkAPIErrorJSON } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
@@ -51,11 +52,7 @@ const withInactiveEnterpriseConnection = createFixtures.config(f => {
           strategy: 'saml',
           verified_at_client: 'foo',
           attempts: 0,
-          error: {
-            code: 'identifier_already_signed_in',
-            long_message: "You're already signed in",
-            message: "You're already signed in",
-          },
+          error: {} as ClerkAPIErrorJSON,
           expire_at: 123,
           id: 'ver_123',
           object: 'verification',
@@ -100,11 +97,7 @@ const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
           strategy: 'oauth_google',
           verified_at_client: 'foo',
           attempts: 0,
-          error: {
-            code: 'identifier_already_signed_in',
-            long_message: "You're already signed in",
-            message: "You're already signed in",
-          },
+          error: {} as ClerkAPIErrorJSON,
           expire_at: 123,
           id: 'ver_123',
           object: 'verification',
@@ -214,6 +207,54 @@ const withSamlEnterpriseConnection = createFixtures.config(f => {
   });
 });
 
+const withReconnectableConnection = createFixtures.config(f => {
+  f.withUser({
+    enterprise_accounts: [
+      {
+        object: 'enterprise_account',
+        active: true,
+        first_name: 'Laura',
+        last_name: 'Serafim',
+        protocol: 'oauth',
+        provider_user_id: null,
+        public_metadata: {},
+        email_address: 'test@clerk.com',
+        provider: 'oauth_google',
+        enterprise_connection: {
+          object: 'enterprise_connection',
+          provider: 'oauth_google',
+          name: 'Google',
+          id: 'ent_123',
+          active: true,
+          allow_idp_initiated: false,
+          allow_subdomains: false,
+          disable_additional_identifications: false,
+          sync_user_attributes: false,
+          domain: 'foocorp.com',
+          created_at: 123,
+          updated_at: 123,
+          logo_public_url: 'https://img.clerk.com/static/google.svg',
+          protocol: 'oauth',
+        },
+        verification: {
+          status: 'failed',
+          strategy: 'oauth_google',
+          verified_at_client: 'foo',
+          attempts: 0,
+          error: {
+            code: 'external_account_missing_refresh_token',
+          } as ClerkAPIErrorJSON,
+          expire_at: 123,
+          id: 'ver_123',
+          object: 'verification',
+          external_verification_redirect_url: 'https://foo.com/oauth',
+        },
+        id: 'eac_123',
+      },
+    ],
+  });
+});
+
 describe('EnterpriseAccountsSection ', () => {
   describe('without enterprise accounts', () => {
     it('does not render the component', async () => {
@@ -246,12 +287,6 @@ describe('EnterpriseAccountsSection ', () => {
       const img = getByRole('img', { name: /google/i });
       expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/google.svg?width=160');
       getByText(/test@clerk.com/i);
-    });
-
-    describe('with verification error', () => {
-      it('allows to reconnect', async () => {
-        // TODO - Implement test
-      });
     });
   });
 
@@ -297,6 +332,38 @@ describe('EnterpriseAccountsSection ', () => {
       const img = getByRole('img', { name: /okta/i });
       expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/okta.svg?width=160');
       getByText(/test@clerk.com/i);
+    });
+  });
+
+  describe('with verification error', () => {
+    it('allows to reconnect', async () => {
+      const { wrapper } = await createFixtures(withReconnectableConnection);
+
+      const { userEvent, getByText, getByRole } = render(<EnterpriseAccountsSection />, { wrapper });
+
+      getByText(/^Enterprise accounts/i);
+      getByText(/google/i);
+      const img = getByRole('img', { name: /google/i });
+      expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/google.svg?width=160');
+      getByText(/test@clerk.com/i);
+      getByText('This account has been disconnected.');
+      getByRole('button', { name: /reconnect/i });
+      await userEvent.click(getByRole('button', { name: /reconnect/i }));
+    });
+  });
+
+  describe('without verification error', () => {
+    it('does not display the ability to reconnect', async () => {
+      const { wrapper } = await createFixtures(withOAuthBuiltInEnterpriseConnection);
+
+      const { getByText, getByRole, queryByText } = render(<EnterpriseAccountsSection />, { wrapper });
+
+      getByText(/^Enterprise accounts/i);
+      getByText(/google/i);
+      const img = getByRole('img', { name: /google/i });
+      expect(img.getAttribute('src')).toBe('https://img.clerk.com/static/google.svg?width=160');
+      getByText(/test@clerk.com/i);
+      expect(queryByText(/^This account has been disconnected/i)).not.toBeInTheDocument();
     });
   });
 });
