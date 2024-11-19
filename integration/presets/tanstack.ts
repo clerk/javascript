@@ -1,8 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
-const clerkTanStackLocal = `file:${process.cwd()}/packages/tanstack-start`;
-
 const router = applicationConfig()
   .setName('tanstack-router')
   .useTemplate(templates['tanstack-router'])
@@ -11,7 +9,7 @@ const router = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', clerkTanStackLocal);
+  .addDependency('@clerk/tanstack-start', '*');
 
 const start = applicationConfig()
   .setName('tanstack-start')
@@ -21,7 +19,7 @@ const start = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', clerkTanStackLocal);
+  .addDependency('@clerk/tanstack-start', '*');
 
 export const tanstack = {
   start,

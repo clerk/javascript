@@ -10,6 +10,11 @@ const path = require('node:path');
 const getClerkExpoPath = () => {
   const clerkExpoPath = packageJson.dependencies['@clerk/clerk-expo'];
 
+  if (clerkExpoPath?.startsWith('*')) {
+    const pathToModule = require.resolve('@clerk/clerk-expo');
+    return pathToModule.replace('dist/index.js', '');
+  }
+
   if (clerkExpoPath?.startsWith('file:')) {
     return clerkExpoPath.replace('file:', '');
   }

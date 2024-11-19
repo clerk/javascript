@@ -37,7 +37,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "4.34.0",
+    "@clerk/types": "workspace:*",
     "tslib": "2.4.1"
   },
   "devDependencies": {

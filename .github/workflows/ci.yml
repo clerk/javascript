@@ -212,6 +212,9 @@ jobs:
           publish-cmd: |
             if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
 
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration

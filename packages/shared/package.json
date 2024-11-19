@@ -131,7 +131,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.34.0",
+    "@clerk/types": "workspace:*",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",

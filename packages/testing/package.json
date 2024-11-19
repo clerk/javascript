@@ -62,9 +62,9 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/backend": "1.17.0",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "dotenv": "16.4.5"
   },
   "devDependencies": {

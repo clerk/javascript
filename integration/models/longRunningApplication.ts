@@ -56,11 +56,31 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.setup.ts and by the test runner
       // the first time this is called, the app starts and the state is persisted in the state file
       init: async () => {
-        app = await config.commit();
-        await app.withEnv(params.env);
-        await app.setup();
-        const { port, serverUrl, pid } = await app.dev({ detached: true });
-        stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
+        try {
+          app = await config.commit();
+        } catch (error) {
+          console.error('Error committing config:', error);
+          throw error;
+        }
+        try {
+          await app.withEnv(params.env);
+        } catch (error) {
+          console.error('Error setting up environment:', error);
+          throw error;
+        }
+        try {
+          await app.setup();
+        } catch (error) {
+          console.error('Error during app setup:', error);
+          throw error;
+        }
+        try {
+          const { port, serverUrl, pid } = await app.dev({ detached: true });
+          stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
+        } catch (error) {
+          console.error('Error during app dev:', error);
+          throw error;
+        }
       },
       // will be called by global.teardown.ts
       destroy: async () => {
