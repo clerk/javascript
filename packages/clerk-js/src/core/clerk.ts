@@ -119,6 +119,7 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
+  isClerkRuntimeError,
   Organization,
   Waitlist,
 } from './resources/internal';
@@ -191,6 +192,11 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+
+  public __internal_getEnvironment: (() => Promise<EnvironmentResource>) | undefined;
+  public __internal_getClient: (() => Promise<ClientResource>) | undefined;
+  public __internal_setEnvironment: ((environment: EnvironmentResource) => Promise<void>) | undefined;
+  public __internal_setClient: ((client: ClientResource) => Promise<void>) | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -1839,10 +1845,29 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false }),
-      Client.getInstance().fetch(),
-    ]);
+    let environment, client;
+    try {
+      const [fetchedEnv, fetchedClient] = await Promise.all([
+        Environment.getInstance().fetch({ touch: false }),
+        Client.getInstance().fetch(),
+      ]);
+      environment = fetchedEnv;
+      client = fetchedClient;
+      await this.__internal_setEnvironment?.(fetchedEnv);
+      await this.__internal_setClient?.(fetchedClient);
+    } catch (err) {
+      if (isClerkRuntimeError(err) && err.code === 'network_error') {
+        console.log('Clerk: using cached environment and client');
+        environment = await this.__internal_getEnvironment?.();
+        client = await this.__internal_getClient?.();
+      } else {
+        throw err;
+      }
+    }
+
+    if (!environment || !client) {
+      return false;
+    }
 
     this.updateClient(client);
     this.updateEnvironment(environment);

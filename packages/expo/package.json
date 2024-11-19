@@ -64,6 +64,7 @@
     "@clerk/clerk-react": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "catalog:repo"

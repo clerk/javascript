@@ -5,6 +5,7 @@ import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
 } from '@clerk/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
@@ -80,6 +81,28 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // @ts-expect-error - This is an internal API
         __internal_clerk.__internal_isWebAuthnPlatformAuthenticatorSupported = () => {
           return Promise.resolve(true);
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__internal_setClient = async (client: any) => {
+          await AsyncStorage.setItem('clerk_client', JSON.stringify(client));
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__internal_getClient = async () => {
+          const client = await AsyncStorage.getItem('clerk_client');
+          return client ? JSON.parse(client) : null;
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__internal_setEnvironment = async (environment: any) => {
+          await AsyncStorage.setItem('clerk_environment', JSON.stringify(environment));
+        };
+
+        // @ts-expect-error - This is an internal API
+        __internal_clerk.__internal_getEnvironment = async () => {
+          const environment = await AsyncStorage.getItem('clerk_environment');
+          return environment ? JSON.parse(environment) : null;
         };
       }
 
