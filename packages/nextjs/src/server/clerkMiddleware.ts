@@ -1,5 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
@@ -13,6 +11,7 @@ import { getAccountlessCookieValue } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
+import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
@@ -84,9 +83,6 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
-export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
-
 // @ts-expect-error TS is not happy here. Will dig into it
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
@@ -144,7 +140,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       logger.debug('requestState', () => ({
         status: requestState.status,
-        // @ts-expect-error : FIXME
+
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
         reason: requestState.reason,
       }));

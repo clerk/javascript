@@ -1,6 +1,7 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
+import nextPkg from 'next/package.json';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
@@ -8,9 +9,16 @@ import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boun
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { createAccountlessKeysAction, invalidateCacheAction } from '../server-actions';
+import { invalidateCacheAction } from '../server-actions';
+import { AccountlessCreateKeys } from './lazy-accountless-creator';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
+
+const isNext13 = nextPkg.version.startsWith('13.');
+
+// const LazyAccountlessCreator = lazy(() =>
+//   import('./lazy-accountless-creator.js').then(m => ({ default: m.AccountlessCreateKeys })),
+// );
 
 declare global {
   export interface Window {
@@ -100,32 +108,12 @@ const __ClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
-  const { children } = props;
-  const [state, fetchKeys] = React.useActionState(createAccountlessKeysAction, null);
-  useEffect(() => {
-    React.startTransition(() => {
-      fetchKeys();
-    });
-  }, []);
-
-  if (!React.isValidElement(children)) {
-    return children;
-  }
-
-  return React.cloneElement(children, {
-    key: state?.publishableKey,
-    publishableKey: state?.publishableKey,
-    claimAccountlessKeysUrl: state?.claimUrl,
-    __internal_bypassMissingPk: true,
-  } as any);
-};
-
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   if (
     mergeNextClerkPropsWithEnv({
       ...props,
-    }).publishableKey
+    }).publishableKey ||
+    isNext13
   ) {
     return <__ClientClerkProvider {...props} />;
   }

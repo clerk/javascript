@@ -5,7 +5,6 @@ import nextPkg from 'next/package.json';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
-import { createAccountlessKeys } from '../../server/accountless-node';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
@@ -76,12 +75,16 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  // if (!publishableKey) {
-  const res = !publishableKey || dynamicConfig.accountlessMode ? await createAccountlessKeys() : undefined;
+  const res =
+    (!publishableKey || dynamicConfig.accountlessMode) && !isNext13
+      ? await import('../../server/accountless-node.js').then(mod => mod.createAccountlessKeys())
+      : undefined;
   if (res) {
+    // @ts-ignore
     publishableKey = res.publishableKey;
 
     output = (
+      // @ts-ignore
       <AccountlessCookieSync {...res}>
         <ClientClerkProvider
           {...mergeNextClerkPropsWithEnv({

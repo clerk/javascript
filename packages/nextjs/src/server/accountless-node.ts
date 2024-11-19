@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { AccountlessApplication } from '@clerk/backend';
 
-import { createClerkClientWithOptions } from './clerkClient';
+import { createClerkClientWithOptions } from './createClerkClient';
 
 const CLERK_HIDDEN = '.clerk';
 
