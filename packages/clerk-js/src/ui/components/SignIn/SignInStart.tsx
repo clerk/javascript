@@ -32,11 +32,13 @@ const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 const getSignUpAttributeFromIdentifier = (identifier: FormControlState<'identifier'>) => {
   if (identifier.type === 'tel') {
     return 'phoneNumber';
-  } else if (isEmail(identifier.value)) {
-    return 'emailAddress';
-  } else {
-    return 'username';
   }
+
+  if (isEmail(identifier.value)) {
+    return 'emailAddress';
+  }
+
+  return 'username';
 };
 
 const useAutoFillPasskey = () => {
