@@ -51,13 +51,23 @@ type BuildRequestOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
+
+  skipSecretKey?: boolean;
 };
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
+    const {
+      secretKey,
+      skipSecretKey = false,
+      apiUrl = API_URL,
+      apiVersion = API_VERSION,
+      userAgent = USER_AGENT,
+    } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
-    assertValidSecretKey(secretKey);
+    if (!skipSecretKey) {
+      assertValidSecretKey(secretKey);
+    }
 
     const url = joinPaths(apiUrl, apiVersion, path);
 

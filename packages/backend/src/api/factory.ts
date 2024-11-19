@@ -1,4 +1,5 @@
 import {
+  AccountlessApplicationAPI,
   AllowlistIdentifierAPI,
   ClientAPI,
   DomainAPI,
@@ -23,6 +24,9 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
   const request = buildRequest(options);
 
   return {
+    __experimental_accountlessApplications: new AccountlessApplicationAPI(
+      buildRequest({ ...options, skipSecretKey: true }),
+    ),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),
