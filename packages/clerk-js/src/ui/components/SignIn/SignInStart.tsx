@@ -28,6 +28,8 @@ import { buildRequest, handleError, isMobileDevice, useFormControl } from '../..
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
@@ -337,6 +339,13 @@ export function _SignInStart(): JSX.Element {
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
       if (isCombinedFlow) {
+        if (identifierField.type === 'tel') {
+          clerk.client.signUp.phoneNumber = identifierField.value;
+        } else if (isEmail(identifierField.value)) {
+          clerk.client.signUp.emailAddress = identifierField.value;
+        } else {
+          clerk.client.signUp.username = identifierField.value;
+        }
         return navigate('create');
       }
       handleError(e, [identifierField, instantPasswordField], card.setError);
