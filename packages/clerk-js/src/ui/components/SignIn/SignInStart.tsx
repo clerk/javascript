@@ -303,7 +303,7 @@ export function _SignInStart(): JSX.Element {
         }
       }
     } catch (e) {
-      return attemptToRecoverFromSignInError(e, fields);
+      return attemptToRecoverFromSignInError(e);
     }
   };
 
@@ -318,7 +318,7 @@ export function _SignInStart(): JSX.Element {
     });
   };
 
-  const attemptToRecoverFromSignInError = async (e: any, fields: any) => {
+  const attemptToRecoverFromSignInError = async (e: any) => {
     if (!e.errors) {
       return;
     }
@@ -337,9 +337,6 @@ export function _SignInStart(): JSX.Element {
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
       if (isCombinedFlow) {
-        clerk.client.signUp.emailAddress = fields.find(f => f.name === 'identifier')?.value;
-        clerk.client.signUp.phoneNumber = fields.find(f => f.name === 'identifier')?.value;
-        clerk.client.signUp.username = fields.find(f => f.name === 'identifier')?.value;
         return navigate('create');
       }
       handleError(e, [identifierField, instantPasswordField], card.setError);
