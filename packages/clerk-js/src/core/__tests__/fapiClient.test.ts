@@ -84,12 +84,15 @@ describe('buildUrl(options)', () => {
     );
   });
 
-  it('adds _clerk_session_id as a query parameter if provided and path does not start with client', () => {
+  it('adds _clerk_session_id as a query parameter if provided and path does not start with client or waitlist', () => {
     expect(fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href).toBe(
       `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=sess_42`,
     );
     expect(fapiClient.buildUrl({ path: '/client/foo', sessionId: 'sess_42' }).href).toBe(
       `https://clerk.example.com/v1/client/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+    );
+    expect(fapiClient.buildUrl({ path: '/waitlist', sessionId: 'sess_42' }).href).toBe(
+      `https://clerk.example.com/v1/waitlist?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 

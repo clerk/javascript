@@ -36,11 +36,7 @@ const routes = {
     mountIndex(app);
   },
   '/sign-in': () => {
-    Clerk.mountSignIn(app, {
-      __experimental: {
-        combinedFlow: true,
-      },
-    });
+    Clerk.mountSignIn(app, {});
   },
   '/sign-up': () => {
     Clerk.mountSignUp(app, {});

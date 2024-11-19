@@ -4,7 +4,6 @@ import { useAuth } from '@clerk/clerk-react';
 import { useDerivedAuth } from '@clerk/clerk-react/internal';
 import type { InitialState } from '@clerk/types';
 import { useRouter } from 'next/compat/router';
-import { PHASE_PRODUCTION_BUILD } from 'next/constants';
 import React from 'react';
 
 const PromisifiedAuthContext = React.createContext<Promise<InitialState> | InitialState | null>(null);
@@ -72,11 +71,6 @@ export function usePromisifiedAuth() {
       return useAuth();
     }
 
-    if (!resolvedData && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
-      throw new Error(
-        'Clerk: useAuth() called in static mode, wrap this component in <ClerkProvider dynamic> to make auth data available during server-side rendering.',
-      );
-    }
     // We don't need to deal with Clerk being loaded here
     return useDerivedAuth(resolvedData);
   } else {

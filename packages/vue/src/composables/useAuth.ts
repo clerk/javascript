@@ -1,11 +1,4 @@
-import type {
-  ActJWTClaim,
-  CheckAuthorizationWithCustomPermissions,
-  Clerk,
-  GetToken,
-  OrganizationCustomRoleKey,
-  SignOut,
-} from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions, Clerk, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
 import { computed, type ShallowRef, watch } from 'vue';
 
 import { errorThrower } from '../errors/errorThrower';
@@ -13,9 +6,6 @@ import { invalidStateError, useAuthHasRequiresRoleOrPermission } from '../errors
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
 import { useClerkContext } from './useClerkContext';
-
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
  * @internal
@@ -54,60 +44,6 @@ function createSignOut(clerk: ShallowRef<Clerk | null>) {
     return loadedClerk.signOut(...args);
   };
 }
-
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: undefined;
-      orgId: undefined;
-      orgRole: undefined;
-      orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: string;
-      orgRole: OrganizationCustomRoleKey;
-      orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
 
 type UseAuth = () => ToComputedRefs<UseAuthReturn>;
 
