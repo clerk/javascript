@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+  <head>
+    <title>clerk-js Sandbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          colors: {
+            inherit: 'inherit',
+            current: 'currentColor',
+            transparent: 'transparent',
+            black: '#000',
+            white: '#fff',
+            gray: {
+              25: '#FAFAFB',
+              50: '#F7F7F8',
+              100: '#EEEEF0',
+              150: '#E3E3E7',
+              200: '#D9D9DE',
+              300: '#B7B8C2',
+              400: '#9394A1',
+              500: '#747686',
+              600: '#5E5F6E',
+              700: '#42434D',
+              750: '#373840',
+              800: '#2F3037',
+              850: '#27272D',
+              900: '#212126',
+              950: '#131316',
+            },
+            purple: {
+              50: '#F4F2FF',
+              100: '#EAE8FF',
+              200: '#D7D4FF',
+              300: '#BAB1FF',
+              400: '#9785FF',
+              500: '#6C47FF',
+              600: '#6430F7',
+              700: '#561EE3',
+              800: '#4818BF',
+              900: '#3C169C',
+              950: '#230B6A',
+              DEFAULT: '#6C47FF',
+            },
+            sky: {
+              50: '#EBFDFF',
+              100: '#CCF9FF',
+              200: '#9FF1FF',
+              300: '#5DE3FF',
+              400: '#3AD4FD',
+              500: '#00AEE3',
+              600: '#0089BE',
+              700: '#056D99',
+              800: '#0E597C',
+              900: '#104A69',
+              950: '#043048',
+            },
+            blue: {
+              50: '#EFF6FF',
+              100: '#DBEAFE',
+              200: '#BFDBFE',
+              300: '#93C5FD',
+              400: '#60A5FA',
+              500: '#3B82F6',
+              600: '#2563EB',
+              700: '#1D4ED8',
+              800: '#1E40AF',
+              900: '#1E3A8A',
+              950: '#0E1A3A',
+            },
+            green: {
+              50: '#F0FDF2',
+              100: '#DCFCE2',
+              200: '#BBF7C6',
+              300: '#86EF9B',
+              400: '#4ADE68',
+              500: '#22C543',
+              600: '#16A332',
+              700: '#15802A',
+              800: '#166527',
+              900: '#145323',
+              950: '#052E0F',
+            },
+            red: {
+              50: '#FEF2F2',
+              100: '#FEF2F2',
+              200: '#FECACA',
+              300: '#FCA5A5',
+              400: '#F87171',
+              500: '#EF4444',
+              600: '#DC2626',
+              700: '#B91C1C',
+              800: '#991B1B',
+              900: '#7F1D1D',
+              950: '#450A0A',
+            },
+            orange: {
+              50: '#FFF6ED',
+              100: '#FFEBD5',
+              200: '#FED1AA',
+              300: '#FDB674',
+              400: '#F98C49',
+              500: '#F36B16',
+              600: '#EA520C',
+              700: '#C23A0C',
+              800: '#9A2F12',
+              900: '#7C2912',
+              950: '#431207',
+            },
+            yellow: {
+              50: '#FEFCE8',
+              100: '#FEF9C3',
+              200: '#FEF18A',
+              300: '#FDE047',
+              400: '#EFD420',
+              500: '#EAB308',
+              600: '#CA8A04',
+              700: '#A16207',
+              800: '#854D0E',
+              900: '#713F12',
+              950: '#422006',
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-gray-950">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center">
+            <div class="md:block">
+              <div class="flex items-baseline space-x-2">
+                <a
+                  href="/"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >/</a
+                >
+                <a
+                  href="/sign-in"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Sign In</a
+                >
+                <a
+                  href="/sign-up"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Sign Up</a
+                >
+                <a
+                  href="/user-button"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >User Button</a
+                >
+                <a
+                  href="/user-profile"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >User Profile</a
+                >
+                <a
+                  href="/create-organization"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Create Organization</a
+                >
+                <a
+                  href="/organization-list"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Organization List</a
+                >
+                <a
+                  href="/organization-profile"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Organization Profile</a
+                >
+                <a
+                  href="/organization-switcher"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Organization Switcher</a
+                >
+                <a
+                  href="/waitlist"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-[#1D1D21] hover:text-white"
+                  >Waitlist</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="flex justify-center p-8">
+      <div
+        id="app"
+        class="overflow-x-auto"
+      ></div>
+    </div>
+
+    <!-- This app is in the Team SDK organization. -->
+    <script
+      type="text/javascript"
+      src="/npm/clerk.browser.js"
+      data-clerk-publishable-key="pk_test_dG91Y2hlZC1sYWR5YmlyZC0yMy5jbGVyay5hY2NvdW50cy5kZXYk"
+    ></script>
+    <script
+      type="text/javascript"
+      src="/app.js"
+    ></script>
+  </body>
+</html>

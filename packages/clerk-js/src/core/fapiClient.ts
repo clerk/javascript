@@ -57,6 +57,9 @@ export interface FapiClient {
   request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
 }
 
+// List of paths that should not receive the session ID parameter in the URL
+const unauthorizedPathPrefixes = ['/client', '/waitlist'];
+
 export function createFapiClient(clerkInstance: Clerk): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
@@ -116,7 +119,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       searchParams.append('_method', method);
     }
 
-    if (path && !path.startsWith('/client') && sessionId) {
+    if (path && !unauthorizedPathPrefixes.some(p => path.startsWith(p)) && sessionId) {
       searchParams.append('_clerk_session_id', sessionId);
     }
 

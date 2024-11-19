@@ -123,11 +123,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await expect(u.page.getByText(/this page could not be found/i)).toBeVisible();
 
     // Route Handler
-    await u.page.goToRelative('/api/settings/').catch(() => {});
-
-    // Result of 404 response with empty body
-    expect(await u.page.content()).toMatch(/^(<!DOCTYPE html>)/);
-    expect(await u.page.content()).toMatch(/(No webpage was found)/);
-    expect(await u.page.content()).toMatch(/(HTTP ERROR 404)/);
+    const response = await u.page.request.get(new URL('/api/settings', app.serverUrl).toString());
+    expect(response.status()).toBe(404);
   });
 });
