@@ -12,10 +12,18 @@ type ClerkJSScriptProps = {
 function ClerkJSScript(props: ClerkJSScriptProps) {
   const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
+
+  /**
+   * If publishable key avoid appending an invalid script in the dom.
+   */
+  if (!publishableKey) {
+    return null;
+  }
+
   const options = {
     domain,
     proxyUrl,
-    publishableKey: publishableKey!,
+    publishableKey,
     clerkJSUrl,
     clerkJSVersion,
     clerkJSVariant,
