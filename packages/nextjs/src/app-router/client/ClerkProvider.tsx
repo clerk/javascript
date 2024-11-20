@@ -10,7 +10,6 @@ import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { invalidateCacheAction } from '../server-actions';
-import { AccountlessCreateKeys } from './lazy-accountless-creator';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -119,8 +118,8 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   }
 
   return (
-    <AccountlessCreateKeys>
-      <__ClientClerkProvider {...props} />
-    </AccountlessCreateKeys>
+    // <AccountlessCreateKeys>
+    <__ClientClerkProvider {...props} />
+    // </AccountlessCreateKeys>
   );
 };

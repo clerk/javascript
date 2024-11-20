@@ -34,19 +34,20 @@ export async function createAccountlessKeysAction(): Promise<null | AccountlessA
   if (!one) {
     return null;
   }
+  return null;
 
-  const result = await import('../server/accountless-node.js').then(m => m.createAccountlessKeys());
-
-  if (!result) {
-    return null;
-  }
-
-  const { claimUrl, publishableKey, secretKey } = result;
-
-  void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-    secure: false,
-    httpOnly: false,
-  });
-
-  return result;
+  // const result = await import('../server/accountless-node.js').then(m => m.createAccountlessKeys());
+  //
+  // if (!result) {
+  //   return null;
+  // }
+  //
+  // const { claimUrl, publishableKey, secretKey } = result;
+  //
+  // void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  //   secure: false,
+  //   httpOnly: false,
+  // });
+  //
+  // return result;
 }
