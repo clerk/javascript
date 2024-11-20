@@ -26,6 +26,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKeyInvisible: string | null = null;
   captchaOauthBypass: OAuthStrategy[] = [];
+  captchaHeartbeat: boolean = false;
   homeUrl!: string;
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
@@ -83,6 +84,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     // These are the OAuth strategies we used to bypass the captcha for by default
     // before the introduction of the captcha_oauth_bypass field
     this.captchaOauthBypass = data.captcha_oauth_bypass || ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
+    this.captchaHeartbeat = data.captcha_heartbeat || false;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.organizationProfileUrl = data.organization_profile_url;
