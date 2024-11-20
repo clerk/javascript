@@ -175,6 +175,7 @@ function addCurrentRouteIndicator(currentRoute) {
     await Clerk.load({
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      waitlistUrl: '/waitlist',
     });
     renderCurrentRoute();
   } else {

@@ -39,8 +39,8 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, __experimental } = ctx;
-  const isCombinedFlow = __experimental?.combinedFlow;
+  const { afterSignUpUrl, signInUrl, signUpUrl, unsafeMetadata, __experimental } = ctx;
+  const isCombinedFlow = (__experimental?.combinedFlow && signInUrl === signUpUrl) || false;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
