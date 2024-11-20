@@ -8,7 +8,8 @@
     ".github/.cache-version",
     "jest.*.ts",
     "package.json",
-    "package-lock.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     "tsconfig.json",
     "tsconfig.*.json",
     "scripts/subpath-workaround.mjs"
