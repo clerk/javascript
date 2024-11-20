@@ -50,7 +50,7 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^20.14.8",
     "fastify": "^5.0.0",
-    "tsup": "*",
+    "tsup": "catalog:repo",
     "typescript": "catalog:repo"
   },
   "peerDependencies": {

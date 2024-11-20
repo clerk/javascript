@@ -56,7 +56,7 @@
     "@clerk/backend": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
@@ -64,7 +64,7 @@
     "@types/node": "^18.19.33",
     "nock": "^13.0.7",
     "npm-run-all": "^4.1.5",
-    "tsup": "*",
+    "tsup": "catalog:repo",
     "typescript": "catalog:repo"
   },
   "engines": {

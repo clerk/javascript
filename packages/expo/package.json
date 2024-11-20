@@ -66,15 +66,15 @@
     "@clerk/types": "workspace:*",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",

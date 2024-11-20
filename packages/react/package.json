@@ -78,7 +78,7 @@
   "dependencies": {
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",

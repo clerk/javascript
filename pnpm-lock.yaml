@@ -19,6 +19,12 @@ catalogs:
       specifier: 18.3.1
       version: 18.3.1
   repo:
+    tslib:
+      specifier: 2.4.1
+      version: 2.4.1
+    tsup:
+      specifier: 8.3.5
+      version: 8.3.5
     typescript:
       specifier: 5.6.3
       version: 5.6.3
@@ -182,8 +188,8 @@ importers:
         specifier: ^29.0.3
         version: 29.0.5(@babel/core@7.26.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))(jest@29.7.0(@types/node@20.17.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3)))(typescript@5.6.3)
       tsup:
-        specifier: ^8.0.1
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       turbo:
         specifier: ^2.0.14
         version: 2.2.3
@@ -249,7 +255,7 @@ importers:
         specifier: 5.4.4
         version: 5.4.4
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -271,8 +277,8 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -311,17 +317,17 @@ importers:
         specifier: ^18.19.33
         version: 18.19.63
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       '@types/webextension-polyfill':
         specifier: ^0.10.7
         version: 0.10.7
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       type-fest:
         specifier: ^4.8.3
         version: 4.26.1
@@ -417,10 +423,10 @@ importers:
         specifier: ^6.2.1
         version: 6.5.1
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       '@types/webpack-dev-server':
         specifier: ^4.7.2
@@ -521,10 +527,10 @@ importers:
         specifier: ^18.19.33
         version: 18.19.63
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       concurrently:
         specifier: ^8.2.2
@@ -533,11 +539,11 @@ importers:
         specifier: ^14.2.10
         version: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       type-fest:
         specifier: ^4.9.0
         version: 4.26.1
@@ -605,7 +611,7 @@ importers:
         specifier: 2.0.0
         version: 2.0.0(react-native@0.73.9(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(react@18.3.1))
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -621,10 +627,10 @@ importers:
         specifier: ^20.11.24
         version: 20.17.5
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       expo-auth-session:
         specifier: ^5.4.0
@@ -678,7 +684,7 @@ importers:
         specifier: workspace:^
         version: link:../types
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@types/express':
@@ -697,8 +703,8 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -731,8 +737,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -747,8 +753,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config-custom
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -783,7 +789,7 @@ importers:
         specifier: 0.0.1
         version: 0.0.1
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -848,7 +854,7 @@ importers:
         specifier: ^18 || ^19.0.0-0
         version: 18.3.1(react@18.3.1)
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -897,7 +903,7 @@ importers:
         specifier: ^6.0.0
         version: 6.16.0(react@18.3.1)
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -916,10 +922,10 @@ importers:
         specifier: ^18.19.33
         version: 18.19.63
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       typescript:
         specifier: catalog:repo
@@ -937,7 +943,7 @@ importers:
         specifier: workspace:*
         version: link:../types
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -956,8 +962,8 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -1008,8 +1014,8 @@ importers:
         specifier: 0.20.2
         version: 0.20.2
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -1035,7 +1041,7 @@ importers:
         specifier: ^3.4.3
         version: 3.4.4(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
 
   packages/tanstack-start:
@@ -1059,7 +1065,7 @@ importers:
         specifier: '>=18 || >=19.0.0-beta'
         version: 18.3.1(react@18.3.1)
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -1075,10 +1081,10 @@ importers:
         specifier: ^18.19.43
         version: 18.19.63
       '@types/react':
-        specifier: 18.3.12
+        specifier: catalog:react
         version: 18.3.12
       '@types/react-dom':
-        specifier: 18.3.1
+        specifier: catalog:react
         version: 18.3.1
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.2
@@ -1118,8 +1124,8 @@ importers:
         specifier: ^13.9.0
         version: 13.9.0
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -1130,7 +1136,7 @@ importers:
         specifier: workspace:*
         version: link:../types
       tslib:
-        specifier: 2.4.1
+        specifier: catalog:repo
         version: 2.4.1
     devDependencies:
       '@clerk/eslint-config-custom':
@@ -1153,8 +1159,8 @@ importers:
         specifier: ^18.19.33
         version: 18.19.63
       tsup:
-        specifier: '*'
-        version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
+        specifier: catalog:repo
+        version: 8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -6822,11 +6828,11 @@ packages:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
     engines: {node: '>=18'}
 
-  bundle-require@4.2.1:
-    resolution: {integrity: sha512-7Q/6vkyYAwOmQNRw75x+4yRtZCZJXUDmHHlFdkiV0wgv/reNjtJwpu1jPJ0w2kbEpIM0uoKI3S4/f39dU7AjSA==}
+  bundle-require@5.0.0:
+    resolution: {integrity: sha512-GuziW3fSSmopcx4KRymQEJVbZUfqlCqcq7dvs6TYwKRZiegK/2buMxQTPs6MGlNv50wms1699qYO54R8XfRX4w==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
-      esbuild: '>=0.17'
+      esbuild: '>=0.18'
 
   busboy@1.6.0:
     resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
@@ -12080,6 +12086,24 @@ packages:
       ts-node:
         optional: true
 
+  postcss-load-config@6.0.1:
+    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      jiti: '>=1.21.0'
+      postcss: '>=8.0.9'
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      jiti:
+        optional: true
+      postcss:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+
   postcss-merge-longhand@7.0.4:
     resolution: {integrity: sha512-zer1KoZA54Q8RVHKOY5vMke0cCdNxMP3KBfDerjH/BYHh4nCIh+1Yy0t1pAEQF18ac/4z3OFclO+ZVH8azjR4A==}
     engines: {node: ^18.12.0 || ^20.9.0 || >=22.0}
@@ -13577,6 +13601,11 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
+  sucrase@3.35.0:
+    resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==}
+    engines: {node: '>=16 || 14 >=14.17'}
+    hasBin: true
+
   sudo-prompt@8.2.5:
     resolution: {integrity: sha512-rlBo3HU/1zAJUrkY6jNxDOC9eVYliG6nS4JA8u8KAshITd07tafMc/Br7xQwCSseXwJ2iCcHCE8SNWX3q8Z+kw==}
 
@@ -13995,8 +14024,8 @@ packages:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
 
-  tsup@8.1.0:
-    resolution: {integrity: sha512-UFdfCAXukax+U6KzeTNO2kAARHcWxmKsnvSPXUcfA1D+kU05XDccCrkffCQpFaWDsZfV0jMyTsxU39VfCp6EOg==}
+  tsup@8.3.5:
+    resolution: {integrity: sha512-Tunf6r6m6tnZsG9GYWndg0z8dEV7fD733VBFzFJ5Vcm1FtlXB8xBD/rtrBi2a3YKEV7hHtxiZtW5EAVADoe1pA==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -16650,7 +16679,7 @@ snapshots:
 
   '@emnapi/runtime@1.3.1':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
     optional: true
 
   '@emotion/babel-plugin@11.11.0':
@@ -17223,7 +17252,7 @@ snapshots:
       password-prompt: 1.1.3
       sudo-prompt: 8.2.5
       tmp: 0.0.33
-      tslib: 2.4.1
+      tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
@@ -17432,26 +17461,26 @@ snapshots:
   '@formatjs/ecma402-abstract@2.0.0':
     dependencies:
       '@formatjs/intl-localematcher': 0.5.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@formatjs/fast-memoize@2.2.0':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@formatjs/icu-messageformat-parser@2.7.8':
     dependencies:
       '@formatjs/ecma402-abstract': 2.0.0
       '@formatjs/icu-skeleton-parser': 1.8.2
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@formatjs/icu-skeleton-parser@1.8.2':
     dependencies:
       '@formatjs/ecma402-abstract': 2.0.0
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@formatjs/intl-localematcher@0.5.4':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@formkit/auto-animate@0.8.2': {}
 
@@ -17911,21 +17940,21 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.0
     optional: true
 
-  '@jsonjoy.com/base64@1.1.2(tslib@2.4.1)':
+  '@jsonjoy.com/base64@1.1.2(tslib@2.8.1)':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
-  '@jsonjoy.com/json-pack@1.1.0(tslib@2.4.1)':
+  '@jsonjoy.com/json-pack@1.1.0(tslib@2.8.1)':
     dependencies:
-      '@jsonjoy.com/base64': 1.1.2(tslib@2.4.1)
-      '@jsonjoy.com/util': 1.5.0(tslib@2.4.1)
+      '@jsonjoy.com/base64': 1.1.2(tslib@2.8.1)
+      '@jsonjoy.com/util': 1.5.0(tslib@2.8.1)
       hyperdyperid: 1.2.0
-      thingies: 1.21.0(tslib@2.4.1)
-      tslib: 2.4.1
+      thingies: 1.21.0(tslib@2.8.1)
+      tslib: 2.8.1
 
-  '@jsonjoy.com/util@1.5.0(tslib@2.4.1)':
+  '@jsonjoy.com/util@1.5.0(tslib@2.8.1)':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@kwsites/file-exists@1.1.1':
     dependencies:
@@ -20622,12 +20651,12 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@swc/helpers@0.5.5':
     dependencies:
       '@swc/counter': 0.1.3
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   '@tanstack/history@1.81.9': {}
 
@@ -22274,7 +22303,7 @@ snapshots:
 
   aria-hidden@1.2.4:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   aria-query@5.1.3:
     dependencies:
@@ -22381,15 +22410,15 @@ snapshots:
 
   ast-types@0.14.2:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   ast-types@0.16.1:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   ast-walker-scope@0.6.2:
     dependencies:
@@ -22881,9 +22910,9 @@ snapshots:
     dependencies:
       run-applescript: 7.0.0
 
-  bundle-require@4.2.1(esbuild@0.21.5):
+  bundle-require@5.0.0(esbuild@0.24.0):
     dependencies:
-      esbuild: 0.21.5
+      esbuild: 0.24.0
       load-tsconfig: 0.2.5
 
   busboy@1.6.0:
@@ -24100,7 +24129,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   dot-prop@5.3.0:
     dependencies:
@@ -25780,7 +25809,7 @@ snapshots:
   graphql-tag@2.12.6(graphql@15.8.0):
     dependencies:
       graphql: 15.8.0
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   graphql@15.8.0: {}
 
@@ -26325,7 +26354,7 @@ snapshots:
       '@formatjs/ecma402-abstract': 2.0.0
       '@formatjs/fast-memoize': 2.2.0
       '@formatjs/icu-messageformat-parser': 2.7.8
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   invariant@2.2.4:
     dependencies:
@@ -27746,7 +27775,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   lru-cache@10.4.3: {}
 
@@ -27990,10 +28019,10 @@ snapshots:
 
   memfs@4.14.0:
     dependencies:
-      '@jsonjoy.com/json-pack': 1.1.0(tslib@2.4.1)
-      '@jsonjoy.com/util': 1.5.0(tslib@2.4.1)
-      tree-dump: 1.0.2(tslib@2.4.1)
-      tslib: 2.4.1
+      '@jsonjoy.com/json-pack': 1.1.0(tslib@2.8.1)
+      '@jsonjoy.com/util': 1.5.0(tslib@2.8.1)
+      tree-dump: 1.0.2(tslib@2.8.1)
+      tslib: 2.8.1
 
   memoize-one@5.2.1: {}
 
@@ -28734,7 +28763,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   nocache@3.0.4: {}
 
@@ -29647,29 +29676,14 @@ snapshots:
       postcss: 8.4.47
       ts-node: 10.9.2(@types/node@22.9.0)(typescript@5.6.3)
 
-  postcss-load-config@4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3)):
+  postcss-load-config@6.0.1(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.0):
     dependencies:
-      lilconfig: 2.1.0
-      yaml: 2.6.0
+      lilconfig: 3.1.2
     optionalDependencies:
+      jiti: 2.4.0
       postcss: 8.4.49
-      ts-node: 10.9.2(@types/node@18.19.63)(typescript@5.6.3)
-
-  postcss-load-config@4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3)):
-    dependencies:
-      lilconfig: 2.1.0
+      tsx: 4.19.2
       yaml: 2.6.0
-    optionalDependencies:
-      postcss: 8.4.49
-      ts-node: 10.9.2(@types/node@20.17.5)(typescript@5.6.3)
-
-  postcss-load-config@4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3)):
-    dependencies:
-      lilconfig: 2.1.0
-      yaml: 2.6.0
-    optionalDependencies:
-      postcss: 8.4.49
-      ts-node: 10.9.2(@types/node@22.9.0)(typescript@5.6.3)
 
   postcss-merge-longhand@7.0.4(postcss@8.4.47):
     dependencies:
@@ -30195,7 +30209,7 @@ snapshots:
     dependencies:
       react: 18.3.1
       react-style-singleton: 2.2.1(@types/react@18.3.12)(react@18.3.1)
-      tslib: 2.4.1
+      tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.12
 
@@ -30204,7 +30218,7 @@ snapshots:
       react: 18.3.1
       react-remove-scroll-bar: 2.3.6(@types/react@18.3.12)(react@18.3.1)
       react-style-singleton: 2.2.1(@types/react@18.3.12)(react@18.3.1)
-      tslib: 2.4.1
+      tslib: 2.8.1
       use-callback-ref: 1.3.2(@types/react@18.3.12)(react@18.3.1)
       use-sidecar: 1.1.2(@types/react@18.3.12)(react@18.3.1)
     optionalDependencies:
@@ -30260,7 +30274,7 @@ snapshots:
       get-nonce: 1.0.1
       invariant: 2.2.4
       react: 18.3.1
-      tslib: 2.4.1
+      tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.12
 
@@ -30364,14 +30378,14 @@ snapshots:
       ast-types: 0.14.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   recast@0.21.5:
     dependencies:
       ast-types: 0.15.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   recast@0.23.9:
     dependencies:
@@ -30379,7 +30393,7 @@ snapshots:
       esprima: 4.0.1
       source-map: 0.6.1
       tiny-invariant: 1.3.3
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   rechoir@0.8.0:
     dependencies:
@@ -30704,7 +30718,7 @@ snapshots:
 
   rxjs@7.8.1:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   sade@1.8.1:
     dependencies:
@@ -31054,7 +31068,7 @@ snapshots:
   snake-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   snakecase-keys@5.4.4:
     dependencies:
@@ -31435,6 +31449,16 @@ snapshots:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
+  sucrase@3.35.0:
+    dependencies:
+      '@jridgewell/gen-mapping': 0.3.5
+      commander: 4.1.1
+      glob: 10.4.5
+      lines-and-columns: 1.2.4
+      mz: 2.7.0
+      pirates: 4.0.6
+      ts-interface-checker: 0.1.13
+
   sudo-prompt@8.2.5: {}
 
   sudo-prompt@9.1.1: {}
@@ -31667,9 +31691,9 @@ snapshots:
     dependencies:
       any-promise: 1.3.0
 
-  thingies@1.21.0(tslib@2.4.1):
+  thingies@1.21.0(tslib@2.8.1):
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   thread-stream@0.15.2:
     dependencies:
@@ -31773,9 +31797,9 @@ snapshots:
       typedarray.prototype.slice: 1.0.3
       which-typed-array: 1.1.15
 
-  tree-dump@1.0.2(tslib@2.4.1):
+  tree-dump@1.0.2(tslib@2.8.1):
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   tree-kill@1.2.2: {}
 
@@ -31821,25 +31845,6 @@ snapshots:
       source-map: 0.7.4
       typescript: 5.6.3
       webpack: 5.94.0
-
-  ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.63
-      acorn: 8.14.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.6.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optional: true
 
   ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3):
     dependencies:
@@ -31898,74 +31903,32 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3):
+  tsup@8.3.5(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.6.0):
     dependencies:
-      bundle-require: 4.2.1(esbuild@0.21.5)
+      bundle-require: 5.0.0(esbuild@0.24.0)
       cac: 6.7.14
-      chokidar: 3.6.0
+      chokidar: 4.0.1
+      consola: 3.2.3
       debug: 4.3.7(supports-color@8.1.1)
-      esbuild: 0.21.5
-      execa: 5.1.1
-      globby: 11.1.0
+      esbuild: 0.24.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))
+      picocolors: 1.1.1
+      postcss-load-config: 6.0.1(jiti@2.4.0)(postcss@8.4.49)(tsx@4.19.2)(yaml@2.6.0)
       resolve-from: 5.0.0
       rollup: 4.26.0
       source-map: 0.8.0-beta.0
-      sucrase: 3.34.0
+      sucrase: 3.35.0
+      tinyexec: 0.3.1
+      tinyglobby: 0.2.10
       tree-kill: 1.2.2
     optionalDependencies:
       postcss: 8.4.49
       typescript: 5.6.3
     transitivePeerDependencies:
+      - jiti
       - supports-color
-      - ts-node
-
-  tsup@8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3))(typescript@5.6.3):
-    dependencies:
-      bundle-require: 4.2.1(esbuild@0.21.5)
-      cac: 6.7.14
-      chokidar: 3.6.0
-      debug: 4.3.7(supports-color@8.1.1)
-      esbuild: 0.21.5
-      execa: 5.1.1
-      globby: 11.1.0
-      joycon: 3.1.1
-      postcss-load-config: 4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3))
-      resolve-from: 5.0.0
-      rollup: 4.26.0
-      source-map: 0.8.0-beta.0
-      sucrase: 3.34.0
-      tree-kill: 1.2.2
-    optionalDependencies:
-      postcss: 8.4.49
-      typescript: 5.6.3
-    transitivePeerDependencies:
-      - supports-color
-      - ts-node
-
-  tsup@8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3):
-    dependencies:
-      bundle-require: 4.2.1(esbuild@0.21.5)
-      cac: 6.7.14
-      chokidar: 3.6.0
-      debug: 4.3.7(supports-color@8.1.1)
-      esbuild: 0.21.5
-      execa: 5.1.1
-      globby: 11.1.0
-      joycon: 3.1.1
-      postcss-load-config: 4.0.1(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
-      resolve-from: 5.0.0
-      rollup: 4.26.0
-      source-map: 0.8.0-beta.0
-      sucrase: 3.34.0
-      tree-kill: 1.2.2
-    optionalDependencies:
-      postcss: 8.4.49
-      typescript: 5.6.3
-    transitivePeerDependencies:
-      - supports-color
-      - ts-node
+      - tsx
+      - yaml
 
   tsutils@3.21.0(typescript@5.6.3):
     dependencies:
@@ -32385,7 +32348,7 @@ snapshots:
   use-callback-ref@1.3.2(@types/react@18.3.12)(react@18.3.1):
     dependencies:
       react: 18.3.1
-      tslib: 2.4.1
+      tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.12
 
@@ -32399,7 +32362,7 @@ snapshots:
     dependencies:
       detect-node-es: 1.1.0
       react: 18.3.1
-      tslib: 2.4.1
+      tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.12
 
