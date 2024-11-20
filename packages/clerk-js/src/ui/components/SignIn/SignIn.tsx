@@ -147,7 +147,7 @@ function SignInRoot() {
     <SignUpContext.Provider
       value={{
         componentName: 'SignUp',
-        ...signInContext.signUpProps,
+        ...signInContext.__experimental?.signUpProps,
         ...(signInContext.__experimental?.combinedFlow ? { __experimental: { combinedFlow: true } } : {}),
       }}
     >
