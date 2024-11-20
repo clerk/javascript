@@ -567,9 +567,6 @@ importers:
       '@clerk/clerk-react':
         specifier: workspace:*
         version: link:../react
-      '@clerk/expo-passkeys':
-        specifier: workspace:*
-        version: link:../expo-passkeys
       '@clerk/shared':
         specifier: workspace:*
         version: link:../shared
@@ -595,6 +592,9 @@ importers:
       '@clerk/eslint-config-custom':
         specifier: workspace:*
         version: link:../eslint-config-custom
+      '@clerk/expo-passkeys':
+        specifier: workspace:*
+        version: link:../expo-passkeys
       '@types/base-64':
         specifier: ^1.0.2
         version: 1.0.2
