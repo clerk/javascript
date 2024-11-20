@@ -6,6 +6,7 @@
   "ui": "tui",
   "globalDependencies": [
     ".github/.cache-version",
+    ".npmrc",
     "jest.*.ts",
     "package.json",
     "pnpm-lock.yaml",
