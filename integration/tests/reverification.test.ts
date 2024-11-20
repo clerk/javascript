@@ -41,7 +41,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     utils.forEach(type => {
-      test.skip(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
+      test(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
@@ -72,7 +72,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         ).toBeVisible();
       });
 
-      test.skip(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
+      test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
