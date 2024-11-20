@@ -7,7 +7,7 @@ import type { Clerk } from './resources/internal';
 class FraudProtectionService {
   private inflightRequest: Promise<unknown> | null = null;
   private ticks = 0;
-  private readonly interval = 5;
+  private readonly interval = 6;
 
   public async execute<T extends () => Promise<any>>(cb: T): Promise<Awaited<ReturnType<T>>> {
     if (this.inflightRequest) {
@@ -27,8 +27,7 @@ class FraudProtectionService {
   }
 
   public async challengeHeartbeat(clerk: Clerk) {
-    this.ticks++;
-    if (!clerk.__unstable__environment?.displayConfig.captchaHeartbeat || this.ticks % this.interval) {
+    if (!clerk.__unstable__environment?.displayConfig.captchaHeartbeat || this.ticks++ % (this.interval - 1)) {
       return undefined;
     }
     return this.invisibleChallenge(clerk);
