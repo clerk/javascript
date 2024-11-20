@@ -49,10 +49,10 @@
     "publish:local": "pnpm dlx yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.17.0",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
-    "@clerk/vue": "0.0.5",
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "@clerk/vue": "workspace:*",
     "@nuxt/kit": "^3.14.159",
     "@nuxt/schema": "^3.14.159",
     "h3": "^1.13.0"

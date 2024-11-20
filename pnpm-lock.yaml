@@ -481,7 +481,7 @@ importers:
         version: link:../shared
       '@clerk/types':
         specifier: ^4.34.0
-        version: link:../types
+        version: 4.34.0
       '@radix-ui/primitive':
         specifier: ^1.1.0
         version: 1.1.0
@@ -801,16 +801,16 @@ importers:
   packages/nuxt:
     dependencies:
       '@clerk/backend':
-        specifier: 1.17.0
+        specifier: workspace:*
         version: link:../backend
       '@clerk/shared':
-        specifier: 2.15.0
+        specifier: workspace:*
         version: link:../shared
       '@clerk/types':
-        specifier: 4.34.0
+        specifier: workspace:*
         version: link:../types
       '@clerk/vue':
-        specifier: 0.0.5
+        specifier: workspace:*
         version: link:../vue
       '@nuxt/kit':
         specifier: ^3.14.159
@@ -2236,6 +2236,10 @@ packages:
 
   '@changesets/write@0.3.2':
     resolution: {integrity: sha512-kDxDrPNpUgsjDbWBvUo27PzKX4gqeKOlhibaOXDJA6kuBisGqNHv/HwGJrAu8U/dSf8ZEFIeHIPtvSlZI1kULw==}
+
+  '@clerk/types@4.34.0':
+    resolution: {integrity: sha512-4ghDvf80/sFlpx5HnmIl3vW7SOqEaTDwyKAw64H/E2ahgGUMk+qLVpxnBumTpowq+bGjfMVwbneDQOhtmYidoQ==}
+    engines: {node: '>=18.17.0'}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -16458,6 +16462,10 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 1.0.2
       prettier: 2.8.8
+
+  '@clerk/types@4.34.0':
+    dependencies:
+      csstype: 3.1.1
 
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
