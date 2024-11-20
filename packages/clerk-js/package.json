@@ -27,15 +27,14 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "headless",
-    "!dist/index.html",
-    "!dist/sandbox.js"
+    "headless"
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "bundlewatch": "pnpm dlx bundlewatch --config bundlewatch.config.json",
     "clean": "rimraf ./dist",

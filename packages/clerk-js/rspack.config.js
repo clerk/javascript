@@ -308,25 +308,30 @@ const entryForVariant = variant => {
  * @param {object} config
  * @param {'development'|'production'} config.mode
  * @param {boolean} config.analysis
+ * @param {object} config.env
  * @returns {(import('@rspack/core').Configuration)[]}
  */
-const prodConfig = ({ mode, analysis }) => {
+const prodConfig = ({ mode, env, analysis }) => {
+  const isSandbox = !!env.sandbox;
+
   const clerkBrowser = merge(
     entryForVariant(variants.clerkBrowser),
-    { entry: { sandbox: './sandbox/app.js' } },
+    isSandbox
+      ? {
+          entry: { sandbox: './sandbox/app.js' },
+          plugins: [
+            new rspack.HtmlRspackPlugin({
+              minify: false,
+              template: './sandbox/template.html',
+              inject: false,
+              hash: true,
+            }),
+          ],
+        }
+      : {},
     common({ mode }),
     commonForProd(),
     commonForProdChunked(),
-    {
-      plugins: [
-        new rspack.HtmlRspackPlugin({
-          minify: false,
-          template: './sandbox/template.html',
-          inject: false,
-          hash: true,
-        }),
-      ],
-    },
   );
 
   const clerkHeadless = merge(
@@ -498,5 +503,5 @@ module.exports = env => {
   const mode = env.production ? 'production' : 'development';
   const analysis = !!env.analysis;
 
-  return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig({ mode, env });
+  return isProduction(mode) ? prodConfig({ mode, env, analysis }) : devConfig({ mode, env });
 };
