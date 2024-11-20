@@ -26,7 +26,7 @@ interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
-const LEEWAY = 10;
+const LEEWAY = 11;
 // This value should have the same value as the INTERVAL_IN_MS in SessionCookiePoller
 const SYNC_LEEWAY = 5;
 

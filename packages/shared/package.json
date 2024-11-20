@@ -145,8 +145,8 @@
     "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
     "esbuild": "0.20.2",
-    "tsup": "*",
-    "typescript": "*"
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "react": "^18 || ^19.0.0-0",
