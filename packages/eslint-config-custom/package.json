@@ -25,7 +25,7 @@
     "eslint-plugin-unused-imports": "^3.2.0"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "publishConfig": {
     "access": "public"

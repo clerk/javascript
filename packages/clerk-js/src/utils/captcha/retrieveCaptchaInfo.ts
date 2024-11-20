@@ -18,7 +18,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
       : null,
     captchaURL: fapiClient
       .buildUrl({
-        path: captchaProvider == 'hcaptcha' ? 'hcaptcha/1/api.js' : 'cloudflare/turnstile/v0/api.js',
+        path: 'cloudflare/turnstile/v0/api.js',
         pathPrefix: '',
         search: '?render=explicit',
       })

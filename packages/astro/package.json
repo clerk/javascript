@@ -89,8 +89,8 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
-    "react": "18.3.1",
-    "typescript": "*"
+    "react": "catalog:react",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "astro": "^3.2.0 || ^4.0.0"
