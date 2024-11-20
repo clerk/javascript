@@ -66,8 +66,8 @@ export function _SignInStart(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, __experimental } = ctx;
-  const isCombinedFlow = __experimental?.combinedFlow || false;
+  const { afterSignInUrl, signInUrl, signUpUrl, waitlistUrl, __experimental } = ctx;
+  const isCombinedFlow = (__experimental?.combinedFlow && signInUrl === signUpUrl) || false;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
