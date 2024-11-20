@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.34.1
+
+### Patch Changes
+
+- Share hook return types ([#4583](https://github.com/clerk/javascript/pull/4583)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.34.0
 
 ### Minor Changes
