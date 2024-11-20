@@ -163,8 +163,8 @@ function addCurrentRouteIndicator(currentRoute) {
   if (!link) {
     return;
   }
-  link.classList.remove('text-gray-400', 'hover:bg-[#1D1D21]', 'hover:text-white');
-  link.classList.add('bg-[#1D1D21]', 'text-white');
+  link.removeAttribute('aria-current');
+  link.setAttribute('aria-current', 'page');
 }
 
 (async () => {
