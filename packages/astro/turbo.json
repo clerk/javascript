@@ -1,0 +1,10 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only",
+      "outputs": ["components/**", "dist/**"]
+    }
+  }
+}

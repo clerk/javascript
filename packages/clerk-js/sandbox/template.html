@@ -247,12 +247,12 @@
     <!-- This app is in the Team SDK organization. -->
     <script
       type="text/javascript"
-      src="/npm/clerk.browser.js"
+      src="/<%= htmlRspackPlugin.files.js[0] %>"
       data-clerk-publishable-key="pk_test_dG91Y2hlZC1sYWR5YmlyZC0yMy5jbGVyay5hY2NvdW50cy5kZXYk"
     ></script>
     <script
       type="text/javascript"
-      src="/app.js"
+      src="/<%= htmlRspackPlugin.files.js[1] %>"
     ></script>
   </body>
 </html>

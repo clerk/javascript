@@ -78,7 +78,7 @@
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
     "cookie": "0.7.0",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
@@ -86,9 +86,9 @@
     "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
-    "typescript": "*"
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",
