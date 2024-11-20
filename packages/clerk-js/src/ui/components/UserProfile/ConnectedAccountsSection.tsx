@@ -98,17 +98,13 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       })
     : window.location.href;
 
-  const [createExternalAccount] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-
-    return user.createExternalAccount({
+  const [createExternalAccount] = useReverification(() =>
+    user?.createExternalAccount({
       strategy: account.verification!.strategy as OAuthStrategy,
       redirectUrl,
       additionalScopes,
-    });
-  });
+    }),
+  );
 
   if (!user) {
     return null;

@@ -12,12 +12,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   const { onSuccess, onReset } = props;
   const { user } = useUser();
 
-  const [updateUsername] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.update({ username: usernameField.value });
-  });
+  const [updateUsername] = useReverification(() => user?.update({ username: usernameField.value }));
 
   const { userSettings } = useEnvironment();
   const card = useCardState();

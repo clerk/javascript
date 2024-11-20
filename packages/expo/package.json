@@ -62,7 +62,6 @@
   "dependencies": {
     "@clerk/clerk-js": "workspace:*",
     "@clerk/clerk-react": "workspace:*",
-    "@clerk/expo-passkeys": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
     "base-64": "^1.0.0",
@@ -71,6 +70,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
+    "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "18.3.12",
@@ -83,6 +83,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
+    "@clerk/expo-passkeys": ">=0.0.6",
     "expo-auth-session": ">=5",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
@@ -92,6 +93,9 @@
     "react-native": ">=0.73"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-passkeys": {
+      "optional": true
+    },
     "expo-local-authentication": {
       "optional": true
     },

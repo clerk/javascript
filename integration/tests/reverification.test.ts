@@ -41,7 +41,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     utils.forEach(type => {
-      test.skip(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
+      test(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
@@ -67,12 +67,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
           u.page.getByText(
-            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-mismatch"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"secondFactor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
+            /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-error"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"second_factor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
           ),
         ).toBeVisible();
       });
 
-      test.skip(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
+      test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
