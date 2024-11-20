@@ -460,7 +460,7 @@ export const plPL: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'aby przejść do {{applicationName}}',
       title: 'Zaloguj się',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Kod weryfikacyjny',

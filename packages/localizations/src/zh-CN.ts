@@ -450,7 +450,7 @@ export const zhCN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
       title: '登录',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '验证码',

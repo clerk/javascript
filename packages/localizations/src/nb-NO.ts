@@ -461,7 +461,7 @@ export const nbNO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',

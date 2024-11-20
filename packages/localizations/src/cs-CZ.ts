@@ -459,7 +459,7 @@ export const csCZ: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Přihlásit se',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Ověřovací kód',

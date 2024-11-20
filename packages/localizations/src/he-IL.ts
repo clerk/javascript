@@ -454,7 +454,7 @@ export const heIL: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'התחבר',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'קוד אימות',

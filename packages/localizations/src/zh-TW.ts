@@ -456,7 +456,7 @@ export const zhTW: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
       title: '登錄',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',

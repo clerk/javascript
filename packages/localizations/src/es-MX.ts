@@ -465,7 +465,7 @@ export const esMX: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Iniciar sesión',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',

@@ -457,7 +457,7 @@ export const thTH: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ',
       title: 'เข้าสู่ระบบ {{applicationName}}',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'รหัสการตรวจสอบ',

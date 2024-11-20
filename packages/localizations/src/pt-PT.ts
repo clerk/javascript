@@ -459,7 +459,7 @@ export const ptPT: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',

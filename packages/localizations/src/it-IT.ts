@@ -461,7 +461,7 @@ export const itIT: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Accedi',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Codice di verifica',

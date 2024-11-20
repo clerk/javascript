@@ -459,7 +459,7 @@ export const viVN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Đăng nhập',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Mã xác minh',

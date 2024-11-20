@@ -374,7 +374,7 @@ export function _SignInStart(): JSX.Element {
         <Card.Content>
           <Header.Root showLogo>
             {isCombinedFlow ? (
-              <Header.Title localizationKey={localizationKeys('signIn.start.titleCombined')} />
+              <Header.Title localizationKey={localizationKeys('signIn.start.__experimental_titleCombined')} />
             ) : (
               <>
                 <Header.Title localizationKey={localizationKeys('signIn.start.title')} />

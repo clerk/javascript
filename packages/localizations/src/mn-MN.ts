@@ -462,7 +462,7 @@ export const mnMN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       title: '{{applicationName}} руу нэвтрэх',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Баталгаажуулах код',

@@ -460,7 +460,7 @@ export const arSA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',

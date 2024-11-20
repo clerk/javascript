@@ -460,7 +460,7 @@ export const daDK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Log ind',
-      titleCombined: undefined,
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',
