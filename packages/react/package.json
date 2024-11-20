@@ -86,7 +86,7 @@
     "@clerk/themes": "workspace:*",
     "@types/node": "^18.19.33",
     "@types/semver": "^7.5.8",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "react": "^18 || ^19.0.0-0",

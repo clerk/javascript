@@ -73,7 +73,7 @@
     "@types/node": "^18.19.33",
     "cypress": "^13.9.0",
     "tsup": "*",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "@playwright/test": "^1",

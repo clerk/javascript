@@ -106,7 +106,7 @@
     "msw": "2.6.4",
     "npm-run-all": "^4.1.5",
     "tsup": "*",
-    "typescript": "*",
+    "typescript": "catalog:repo",
     "vitest-environment-miniflare": "2.14.4"
   },
   "engines": {

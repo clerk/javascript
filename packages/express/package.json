@@ -67,7 +67,7 @@
     "express": "^4.20.0",
     "supertest": "^6.3.4",
     "tsup": "*",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "express": "^4.17.0 || ^5.0.0"

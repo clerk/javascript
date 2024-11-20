@@ -18,6 +18,10 @@ catalogs:
     react-dom:
       specifier: 18.3.1
       version: 18.3.1
+  repo:
+    typescript:
+      specifier: 5.6.3
+      version: 5.6.3
 
 overrides:
   jest: 29.7.0
@@ -187,7 +191,7 @@ importers:
         specifier: ^2.0.6
         version: 2.2.3
       typescript:
-        specifier: ^5.6.3
+        specifier: catalog:repo
         version: 5.6.3
       verdaccio:
         specifier: ^5.26.3
@@ -227,7 +231,7 @@ importers:
         specifier: catalog:react
         version: 18.3.1
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/backend:
@@ -270,7 +274,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
       vitest-environment-miniflare:
         specifier: 2.14.4
@@ -322,7 +326,7 @@ importers:
         specifier: ^4.8.3
         version: 4.26.1
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/clerk-js:
@@ -437,7 +441,7 @@ importers:
         specifier: ^9.3.0
         version: 9.5.1(typescript@5.6.3)(webpack@5.94.0)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
       webpack-merge:
         specifier: ^5.9.0
@@ -468,7 +472,7 @@ importers:
         specifier: ^20.14.8
         version: 20.17.5
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/elements:
@@ -538,7 +542,7 @@ importers:
         specifier: ^4.9.0
         version: 4.26.1
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/eslint-config-custom:
@@ -571,7 +575,7 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(@typescript-eslint/eslint-plugin@6.9.0(@typescript-eslint/parser@6.21.0(eslint@8.49.0)(typescript@5.6.3))(eslint@8.49.0)(typescript@5.6.3))(eslint@8.49.0)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/expo:
@@ -638,7 +642,7 @@ importers:
         specifier: ^0.73.9
         version: 0.73.9(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(react@18.3.1)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/expo-passkeys:
@@ -696,7 +700,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/fastify:
@@ -730,7 +734,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@20.17.5)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/localizations:
@@ -746,7 +750,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/nextjs:
@@ -795,7 +799,7 @@ importers:
         specifier: ^14.2.10
         version: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/nuxt:
@@ -826,7 +830,7 @@ importers:
         specifier: ^3.14.159
         version: 3.14.159(@parcel/watcher@2.4.1)(@types/node@22.9.0)(eslint@8.49.0)(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.26.0)(terser@5.31.1)(typescript@5.6.3)(vite@5.4.10(@types/node@22.9.0)(terser@5.31.1))(webpack-sources@3.2.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/react:
@@ -863,7 +867,7 @@ importers:
         specifier: ^7.5.8
         version: 7.5.8
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/remix:
@@ -918,7 +922,7 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/sdk-node:
@@ -955,7 +959,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/shared:
@@ -1007,7 +1011,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/tailwindcss-transformer:
@@ -1080,7 +1084,7 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
       vinxi:
         specifier: ^0.4.1
@@ -1117,7 +1121,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/themes:
@@ -1133,7 +1137,7 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config-custom
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/types:
@@ -1152,7 +1156,7 @@ importers:
         specifier: '*'
         version: 8.1.0(postcss@8.4.49)(ts-node@10.9.2(@types/node@18.19.63)(typescript@5.6.3))(typescript@5.6.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
 
   packages/ui:
@@ -1299,7 +1303,7 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0(rollup@4.26.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))(webpack-sources@3.2.3)
       typescript:
-        specifier: '*'
+        specifier: catalog:repo
         version: 5.6.3
       vue:
         specifier: 3.5.12

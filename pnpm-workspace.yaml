@@ -1,10 +1,11 @@
 packages:
   - 'packages/*'
 
-catalog:
-  typescript: 5.6.3
-
 catalogs:
+  # Can be referenced through "catalog:repo"
+  repo:
+    typescript: 5.6.3
+
   # Can be referenced through "catalog:react"
   react:
     react: 18.3.1

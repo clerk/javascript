@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "nuxt": "^3.14.159",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "engines": {
     "node": ">=18.17.0"

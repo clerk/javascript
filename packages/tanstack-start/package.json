@@ -68,7 +68,7 @@
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "esbuild-plugin-file-path-extensions": "^2.1.2",
-    "typescript": "*",
+    "typescript": "catalog:repo",
     "vinxi": "^0.4.1"
   },
   "peerDependencies": {

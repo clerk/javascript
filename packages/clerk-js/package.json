@@ -87,7 +87,7 @@
     "react-refresh-typescript": "^2.0.5",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.3.0",
-    "typescript": "*",
+    "typescript": "catalog:repo",
     "webpack-merge": "^5.9.0"
   },
   "peerDependencies": {

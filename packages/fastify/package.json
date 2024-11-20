@@ -51,7 +51,7 @@
     "@types/node": "^20.14.8",
     "fastify": "^5.0.0",
     "tsup": "*",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "fastify": ">=5"

@@ -80,7 +80,7 @@
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
     "react-native": "^0.73.9",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",

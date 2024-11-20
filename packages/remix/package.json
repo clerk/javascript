@@ -88,7 +88,7 @@
     "@types/node": "^18.19.33",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",

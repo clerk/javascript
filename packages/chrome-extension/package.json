@@ -61,7 +61,7 @@
     "@types/webextension-polyfill": "^0.10.7",
     "tsup": "*",
     "type-fest": "^4.8.3",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "react": ">=18",

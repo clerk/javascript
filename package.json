@@ -103,7 +103,7 @@
     "tsup": "^8.0.1",
     "turbo": "^2.0.14",
     "turbo-ignore": "^2.0.6",
-    "typescript": "^5.6.3",
+    "typescript": "catalog:repo",
     "verdaccio": "^5.26.3",
     "vitest": "2.1.4",
     "zx": "^7.2.3"
