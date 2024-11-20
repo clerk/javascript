@@ -465,7 +465,7 @@ export interface Clerk {
   /**
    * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
    */
-  buildWaitlistUrl(): string;
+  buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
    *

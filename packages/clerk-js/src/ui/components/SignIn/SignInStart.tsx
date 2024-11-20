@@ -337,6 +337,19 @@ export function _SignInStart(): JSX.Element {
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else {
+      if (isCombinedFlow && SIGN_UP_MODES.WAITLIST === userSettings.signUp.mode) {
+        const attribute = getSignUpAttributeFromIdentifier(identifierField);
+        const waitlistUrl = clerk.buildWaitlistUrl(
+          attribute === 'emailAddress'
+            ? {
+                initialValues: {
+                  [attribute]: identifierField.value,
+                },
+              }
+            : {},
+        );
+        return navigate(waitlistUrl);
+      }
       if (isCombinedFlow) {
         const attribute = getSignUpAttributeFromIdentifier(identifierField);
         clerk.client.signUp[attribute] = identifierField.value;

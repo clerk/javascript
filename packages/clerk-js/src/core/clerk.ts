@@ -1044,14 +1044,13 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
   }
 
-  public buildWaitlistUrl(): string {
+  public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
     if (!this.environment || !this.environment.displayConfig) {
       return '';
     }
-
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
-
-    return buildURL({ base: waitlistUrl }, { stringify: true });
+    const initValues = new URLSearchParams(options?.initialValues || {});
+    return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
