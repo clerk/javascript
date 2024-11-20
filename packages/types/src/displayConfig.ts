@@ -4,7 +4,7 @@ import type { OAuthStrategy } from './strategies';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 export type CaptchaWidgetType = 'smart' | 'invisible' | null;
-export type CaptchaProvider = 'hcaptcha' | 'turnstile';
+export type CaptchaProvider = 'turnstile';
 
 export interface DisplayConfigJSON {
   object: 'display_config';
@@ -21,6 +21,7 @@ export interface DisplayConfigJSON {
   captcha_public_key_invisible: string | null;
   captcha_provider: CaptchaProvider;
   captcha_oauth_bypass: OAuthStrategy[] | null;
+  captcha_heartbeat?: boolean;
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
@@ -64,6 +65,7 @@ export interface DisplayConfigResource extends ClerkResource {
    * This can also be used to bypass the captcha for a specific OAuth provider on a per-instance basis.
    */
   captchaOauthBypass: OAuthStrategy[];
+  captchaHeartbeat: boolean;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
