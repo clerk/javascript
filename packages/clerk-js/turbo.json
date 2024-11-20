@@ -24,7 +24,8 @@
     },
     "build:sandbox": {
       "dependsOn": ["^build"],
-      "inputs": ["sandbox/**"]
+      "inputs": ["sandbox/**"],
+      "outputs": ["dist/**"]
     },
     "test": {
       "inputs": [
