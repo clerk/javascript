@@ -1,8 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
-const clerkNuxtLocal = `file:${process.cwd()}/packages/nuxt`;
-
 const nuxtNode = applicationConfig()
   .setName('nuxt-node')
   .useTemplate(templates['nuxt-node'])
@@ -12,7 +10,7 @@ const nuxtNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/nuxt', clerkNuxtLocal);
+  .addDependency('@clerk/nuxt', '*');
 
 export const nuxt = {
   node: nuxtNode,
