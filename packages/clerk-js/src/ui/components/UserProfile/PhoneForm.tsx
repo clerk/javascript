@@ -1,5 +1,5 @@
 import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
-import type { PhoneNumberResource } from '@clerk/types';
+import type { PhoneNumberResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
@@ -49,12 +49,9 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
-  const [createPhoneNumber] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.createPhoneNumber({ phoneNumber: phoneField.value });
-  });
+  const [createPhoneNumber] = useReverification(
+    (user: UserResource, opt: Parameters<UserResource['createPhoneNumber']>[0]) => user.createPhoneNumber(opt),
+  );
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
@@ -70,7 +67,7 @@ export const AddPhone = (props: AddPhoneProps) => {
     if (!user) {
       return;
     }
-    return createPhoneNumber()
+    return createPhoneNumber(user, { phoneNumber: phoneField.value })
       .then(res => {
         resourceRef.current = res;
         onSuccess();

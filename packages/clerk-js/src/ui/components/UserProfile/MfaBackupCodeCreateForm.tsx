@@ -19,12 +19,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   const { onSuccess } = props;
   const { user } = useUser();
   const card = useCardState();
-  const [createBackupCode] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.createBackupCode();
-  });
+  const [createBackupCode] = useReverification(() => user?.createBackupCode());
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
   React.useEffect(() => {
