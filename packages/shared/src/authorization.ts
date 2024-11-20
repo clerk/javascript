@@ -94,11 +94,11 @@ const validateReverificationConfig = (config: __experimental_ReverificationConfi
     return config;
   };
 
-  if (typeof config === 'string' && isValidVerificationType(config)) {
-    return convertConfigToObject.bind(null, config);
-  }
+  const isValidStringValue = typeof config === 'string' && isValidVerificationType(config);
+  const isValidObjectValue =
+    typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes);
 
-  if (typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes)) {
+  if (isValidStringValue || isValidObjectValue) {
     return convertConfigToObject.bind(null, config);
   }
 
@@ -145,7 +145,7 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experime
  * The returned function authorizes if both checks pass, or if at least one passes
  * when the other is indeterminate. Fails if userId is missing.
  */
-export const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
+const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
     if (!options.userId) {
       return false;
@@ -161,3 +161,5 @@ export const createCheckAuthorization = (options: AuthorizationOptions): CheckAu
     return [orgAuthorization, stepUpAuthorization].every(a => a === true);
   };
 };
+
+export { createCheckAuthorization, validateReverificationConfig };
