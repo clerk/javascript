@@ -1,4 +1,4 @@
-import { defer, type DataFunctionArgs } from '@remix-run/node';
+import { data, type DataFunctionArgs } from '@remix-run/node';
 import type { MetaFunction } from '@remix-run/react';
 import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
@@ -10,11 +10,10 @@ export const loader = (args: DataFunctionArgs) => {
     args,
     async ({ request }) => {
       const { user } = request;
-      const data: Promise<{ foo: string }> = new Promise(r => r({ foo: 'bar' }))
 
       console.log('root User:', user);
 
-      return defer({ user, data }, { headers: { 'x-clerk': '1' } })
+      return data({ user }, { headers: { 'x-clerk': '1' } })
     },
     { loadUser: true },
   );
