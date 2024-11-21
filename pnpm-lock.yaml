@@ -33,6 +33,11 @@ overrides:
   jest: 29.7.0
   jest-snapshot-prettier: npm:prettier@^3
 
+patchedDependencies:
+  yalc@1.0.0-pre.53:
+    hash: byjzap7g7dbnjcau2xvoufz7zi
+    path: patches/yalc@1.0.0-pre.53.patch
+
 importers:
 
   .:
@@ -205,6 +210,9 @@ importers:
       vitest:
         specifier: 2.1.4
         version: 2.1.4(@edge-runtime/vm@4.0.4)(@types/node@20.17.5)(jsdom@24.1.3)(msw@2.6.4(@types/node@20.17.5)(typescript@5.6.3))(terser@5.31.1)
+      yalc:
+        specifier: 1.0.0-pre.53
+        version: 1.0.0-pre.53(patch_hash=byjzap7g7dbnjcau2xvoufz7zi)
       zx:
         specifier: ^7.2.3
         version: 7.2.3
@@ -9477,6 +9485,9 @@ packages:
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
+  ignore-walk@3.0.4:
+    resolution: {integrity: sha512-PY6Ii8o1jMRA1z4F2hRkH/xN59ox43DavKvD3oDpfurRlOJyAHpifIwpbdv1n4jt4ov0jSpw3kQ4GhJnpBL6WQ==}
+
   ignore-walk@5.0.1:
     resolution: {integrity: sha512-yemi4pMf51WKT7khInJqAvsIGzoqYXblnsz0ql8tM+yi1EKYTY1evX4NAbJrLL/Aanr2HyZeluqU+Oi7MGHokw==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
@@ -11409,9 +11420,15 @@ packages:
     resolution: {integrity: sha512-D6MUW4K/VzoJ4rJ01JFKxDrtY1v9wrgzCX5f2qj/lzH1m/lW6MhUZFKerVsnyjOhOsYzI9Kqqak+10l4LvLpMw==}
     engines: {node: '>=4'}
 
+  npm-bundled@1.1.2:
+    resolution: {integrity: sha512-x5DHup0SuyQcmL3s7Rx/YQ8sbw/Hzg0rj48eN0dV7hf5cmQq5PXIeioroH3raV1QC1yh3uTYuMThvEQF3iKgGQ==}
+
   npm-bundled@2.0.1:
     resolution: {integrity: sha512-gZLxXdjEzE/+mOstGDqR6b0EkhJ+kM6fxM6vUuckuctuVPh80Q6pw/rSZj9s4Gex9GxWtIicO1pc8DB9KZWudw==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
+
+  npm-normalize-package-bin@1.0.1:
+    resolution: {integrity: sha512-EPfafl6JL5/rU+ot6P3gRSCpPDW5VmIzX959Ob1+ySFUuuYHWHekXpwdUZcKP5C+DS4GEtdJluwBjnsNDl+fSA==}
 
   npm-normalize-package-bin@2.0.0:
     resolution: {integrity: sha512-awzfKUO7v0FscrSpRoogyNm0sajikhBWpU0QMrW09AMi9n1PoKU6WaIqUzuJSQnpciZZmJ/jMZ2Egfmb/9LiWQ==}
@@ -11423,6 +11440,11 @@ packages:
 
   npm-package-arg@7.0.0:
     resolution: {integrity: sha512-xXxr8y5U0kl8dVkz2oK7yZjPBvqM2fwaO5l3Yg13p03v8+E3qQcD0JNhHzjL1vyGgxcKkD0cco+NLR72iuPk3g==}
+
+  npm-packlist@2.2.2:
+    resolution: {integrity: sha512-Jt01acDvJRhJGthnUJVF/w6gumWOZxO7IkpY/lsX9//zqQgnF7OJaxgQXcerd4uQOLu7W5bkb4mChL9mdfm+Zg==}
+    engines: {node: '>=10'}
+    hasBin: true
 
   npm-packlist@5.1.3:
     resolution: {integrity: sha512-263/0NGrn32YFYi4J533qzrQ/krmmrWwhKkzwTuM4f/07ug51odoaNjUexxO4vxlzURHcmYMH1QjvHjsNDKLVg==}
@@ -15097,6 +15119,10 @@ packages:
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
+
+  yalc@1.0.0-pre.53:
+    resolution: {integrity: sha512-tpNqBCpTXplnduzw5XC+FF8zNJ9L/UXmvQyyQj7NKrDNavbJtHvzmZplL5ES/RCnjX7JR7W9wz5GVDXVP3dHUQ==}
+    hasBin: true
 
   yallist@2.1.2:
     resolution: {integrity: sha512-ncTzHV7NvsQZkYe1DW7cbDLm0YpzHmZF5r/iyP3ZnQtMiJ+pjzisCiMNI+Sj+xQF5pXhSHxSB3uDbsBTzY/c2A==}
@@ -26208,6 +26234,10 @@ snapshots:
 
   ieee754@1.2.1: {}
 
+  ignore-walk@3.0.4:
+    dependencies:
+      minimatch: 3.1.2
+
   ignore-walk@5.0.1:
     dependencies:
       minimatch: 5.1.6
@@ -28857,9 +28887,15 @@ snapshots:
       query-string: 5.1.1
       sort-keys: 2.0.0
 
+  npm-bundled@1.1.2:
+    dependencies:
+      npm-normalize-package-bin: 1.0.1
+
   npm-bundled@2.0.1:
     dependencies:
       npm-normalize-package-bin: 2.0.0
+
+  npm-normalize-package-bin@1.0.1: {}
 
   npm-normalize-package-bin@2.0.0: {}
 
@@ -28876,6 +28912,13 @@ snapshots:
       osenv: 0.1.5
       semver: 5.7.2
       validate-npm-package-name: 3.0.0
+
+  npm-packlist@2.2.2:
+    dependencies:
+      glob: 7.2.3
+      ignore-walk: 3.0.4
+      npm-bundled: 1.1.2
+      npm-normalize-package-bin: 1.0.1
 
   npm-packlist@5.1.3:
     dependencies:
@@ -33236,6 +33279,17 @@ snapshots:
   y18n@4.0.3: {}
 
   y18n@5.0.8: {}
+
+  yalc@1.0.0-pre.53(patch_hash=byjzap7g7dbnjcau2xvoufz7zi):
+    dependencies:
+      chalk: 4.1.2
+      detect-indent: 6.1.0
+      fs-extra: 8.1.0
+      glob: 7.2.3
+      ignore: 5.2.4
+      ini: 2.0.0
+      npm-packlist: 2.2.2
+      yargs: 16.2.0
 
   yallist@2.1.2: {}
 
