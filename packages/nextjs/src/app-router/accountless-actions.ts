@@ -6,15 +6,15 @@ import { redirect, RedirectType } from 'next/navigation';
 import { getAccountlessCookieName } from '../server/accountless';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 
-export async function syncAccountlessKeysAction(args: AccountlessApplication): Promise<void> {
-  const { claimUrl, publishableKey, secretKey } = args;
+export async function syncAccountlessKeysAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
+  const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
 
   // TODO-ACCOUNTLESS: Do we even need this ? I think setting the cookie will reset the router cache.
-  redirect('/clerk-sync-accountless', RedirectType.replace);
+  redirect(`/clerk-sync-accountless?returnUrl=${returnUrl}`, RedirectType.replace);
 }
 
 export async function createAccountlessKeysAction(): Promise<null | AccountlessApplication> {

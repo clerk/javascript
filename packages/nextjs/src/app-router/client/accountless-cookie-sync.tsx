@@ -9,8 +9,9 @@ const isBrokenNextVersion = nextPkg.version.startsWith('13.') || nextPkg.version
 export function AccountlessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   useEffect(() => {
     if (!isBrokenNextVersion) {
-      void import('../accountless-actions.js').then(m => m.syncAccountlessKeysAction(props));
-      // void syncAccountlessKeysAction(props);
+      void import('../accountless-actions.js').then(m =>
+        m.syncAccountlessKeysAction({ ...props, returnUrl: window.location.href }),
+      );
     }
   }, []);
 

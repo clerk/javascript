@@ -226,12 +226,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const isSyncAccountless = request.nextUrl.pathname === '/clerk-sync-accountless';
       if (isSyncAccountless) {
+        const returnUrl = request.nextUrl.searchParams.get('returnUrl');
         const url = new URL(request.url);
         url.pathname = '';
 
         const response = new NextResponse(null, {
           status: 307,
-          headers: { location: url.toString() },
+          headers: { location: returnUrl || url.toString() },
         });
         return response;
       }
