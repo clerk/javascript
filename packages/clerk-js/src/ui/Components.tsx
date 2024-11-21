@@ -23,6 +23,7 @@ import type { AppearanceCascade } from './customizables/parseAppearance';
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
+  AccountlessPrompt,
   BlankCaptchaModal,
   CreateOrganizationModal,
   ImpersonationFab,
@@ -513,6 +514,12 @@ const Components = (props: ComponentsProps) => {
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+
+        {state.options?.__internal_claimAccountlessKeysUrl && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
           </LazyImpersonationFabProvider>
         )}
 
