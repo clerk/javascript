@@ -84,7 +84,7 @@ export async function ClerkProvider(
             {...mergeNextClerkPropsWithEnv({
               ...rest,
               publishableKey: newOrReadKeys.publishableKey,
-              claimAccountlessKeysUrl: newOrReadKeys.claimUrl,
+              __internal_claimAccountlessKeysUrl: newOrReadKeys.claimUrl,
             })}
             nonce={await nonce}
             initialState={await statePromise}

@@ -19,7 +19,7 @@ export const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
   return React.cloneElement(children, {
     key: state?.publishableKey,
     publishableKey: state?.publishableKey,
-    claimAccountlessKeysUrl: state?.claimUrl,
+    __internal_claimAccountlessKeysUrl: state?.claimUrl,
     __internal_bypassMissingPk: true,
   } as any);
 };
