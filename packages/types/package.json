@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "4.34.0",
+  "version": "4.34.1",
   "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
@@ -41,8 +41,8 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^18.19.33",
-    "tsup": "*",
-    "typescript": "*"
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo"
   },
   "engines": {
     "node": ">=18.17.0"

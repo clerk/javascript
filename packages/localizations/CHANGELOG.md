@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.6.5
+
+### Patch Changes
+
+- Improve `el-GR` localization. ([#4593](https://github.com/clerk/javascript/pull/4593)) by [@dikaioai](https://github.com/dikaioai)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745)]:
+  - @clerk/types@4.34.1
+
 ## 3.6.4
 
 ### Patch Changes

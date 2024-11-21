@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-sdk-node",
-  "version": "5.0.66",
+  "version": "5.0.67",
   "description": "Clerk server SDK for usage with node",
   "keywords": [
     "clerk",
@@ -53,10 +53,10 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "1.17.0",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
-    "tslib": "2.4.1"
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
@@ -64,8 +64,8 @@
     "@types/node": "^18.19.33",
     "nock": "^13.0.7",
     "npm-run-all": "^4.1.5",
-    "tsup": "*",
-    "typescript": "*"
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo"
   },
   "engines": {
     "node": ">=18.17.0"

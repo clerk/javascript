@@ -55,7 +55,7 @@ Make sure the following environment variables are set in a `.env` file in your N
 
 ```
 NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[publishable-key]
-CLERK_SECRET_KEY=[secret-key]
+NUXT_CLERK_SECRET_KEY=[secret-key]
 ```
 
 Then, add `@clerk/nuxt` to the `modules` section of `nuxt.config.ts`:

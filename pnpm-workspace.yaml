@@ -1,2 +1,16 @@
 packages:
   - 'packages/*'
+
+catalogs:
+  # Can be referenced through "catalog:react"
+  react:
+    react: 18.3.1
+    react-dom: 18.3.1
+    '@types/react': 18.3.12
+    '@types/react-dom': 18.3.1
+
+  # Can be referenced through "catalog:repo"
+  repo:
+    tslib: 2.4.1
+    tsup: 8.3.5
+    typescript: 5.6.3

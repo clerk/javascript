@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -51,13 +51,13 @@
     "test:ci": "vitest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0"
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "typescript": "*",
+    "typescript": "catalog:repo",
     "vue": "3.5.12"
   },
   "peerDependencies": {
