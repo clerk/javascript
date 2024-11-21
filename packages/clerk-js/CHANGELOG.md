@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.34.5
+
+### Patch Changes
+
+- Collect captcha token on load ([#4623](https://github.com/clerk/javascript/pull/4623)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.34.4
 
 ### Patch Changes
