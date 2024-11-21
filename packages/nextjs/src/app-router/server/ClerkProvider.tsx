@@ -54,50 +54,46 @@ export async function ClerkProvider(
     }
   }
 
-  const dynamicConfig = await getDynamicConfig();
-
-  let publishableKey = rest.publishableKey || dynamicConfig.publishableKey;
+  const propsWithEnvs = mergeNextClerkPropsWithEnv({
+    ...rest,
+  });
 
   let output = (
     <ClientClerkProvider
-      {...mergeNextClerkPropsWithEnv({
-        ...dynamicConfig,
-        ...rest,
-        publishableKey,
-      })}
+      {...mergeNextClerkPropsWithEnv(rest)}
       nonce={await nonce}
       initialState={await statePromise}
     >
       {children}
     </ClientClerkProvider>
   );
+  if (!propsWithEnvs.publishableKey && !isNextWithUnstableServerActions && process.env.NODE_ENV === 'development') {
+    const dynamicConfig = await getDynamicConfig();
 
-  const res =
-    (!publishableKey || dynamicConfig.accountlessMode) && !isNextWithUnstableServerActions
+    const newOrReadKeys = dynamicConfig.accountlessMode
       ? await import('../../server/accountless-node.js').then(mod => mod.createAccountlessKeys())
       : undefined;
 
-  if (res && !isNextWithUnstableServerActions) {
-    const AccountlessCookieSync = await import('../client/accountless-cookie-sync.js').then(
-      mod => mod.AccountlessCookieSync,
-    );
-    publishableKey = res.publishableKey;
-
-    output = (
-      <AccountlessCookieSync {...res}>
-        <ClientClerkProvider
-          {...mergeNextClerkPropsWithEnv({
-            ...dynamicConfig,
-            ...rest,
-            publishableKey,
-          })}
-          nonce={await nonce}
-          initialState={await statePromise}
-        >
-          {children}
-        </ClientClerkProvider>
-      </AccountlessCookieSync>
-    );
+    if (newOrReadKeys) {
+      const AccountlessCookieSync = await import('../client/accountless-cookie-sync.js').then(
+        mod => mod.AccountlessCookieSync,
+      );
+      output = (
+        <AccountlessCookieSync {...newOrReadKeys}>
+          <ClientClerkProvider
+            {...mergeNextClerkPropsWithEnv({
+              ...rest,
+              publishableKey: newOrReadKeys.publishableKey,
+              claimAccountlessKeysUrl: newOrReadKeys.claimUrl,
+            })}
+            nonce={await nonce}
+            initialState={await statePromise}
+          >
+            {children}
+          </ClientClerkProvider>
+        </AccountlessCookieSync>
+      );
+    }
   }
 
   if (dynamic) {

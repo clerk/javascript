@@ -189,7 +189,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       },
     ] satisfies RenderingModeTestCase[]
   ).forEach(({ name, type, page }) => {
-    test.skip(`ClerkProvider rendering modes - ${name}`, () => {
+    test(`ClerkProvider rendering modes - ${name}`, () => {
       // Get the indicator from the build output
       const indicator = getIndicator(app.buildOutput, type);
 
