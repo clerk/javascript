@@ -1,6 +1,5 @@
-import { data, type LoaderFunctionArgs } from '@remix-run/node';
-import type { MetaFunction } from '@remix-run/react';
-import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
+import { data, type LoaderFunctionArgs , MetaFunction } from 'react-router';
+import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
 import { ClerkApp } from '@clerk/remix';
 import { Suspense } from 'react';

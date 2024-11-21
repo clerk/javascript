@@ -3,9 +3,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "remix vite:dev",
-    "build": "remix vite:build",
-    "start": "remix-serve ./build/server/index.js",
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "start": "react-router-serve ./build/server/index.js",
     "clean": "rm -rf .cache build"
   },
   "dependencies": {
@@ -14,17 +14,16 @@
     "@clerk/remix": "^4.2.54",
     "@clerk/shared": "^2.16.0",
     "@clerk/types": "^4.34.1",
-    "@remix-run/node": "^2.0.0",
-    "@remix-run/react": "^2.0.0",
-    "@remix-run/serve": "^2.0.0",
+    "@react-router/node": "7.0.0-pre.6",
+    "@react-router/serve": "7.0.0-pre.6",
     "isbot": "^3.6.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router": "7.0.0-pre.6"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.14.0",
-    "@remix-run/fs-routes": "^2.14.0",
-    "@remix-run/route-config": "^2.14.0",
+    "@react-router/dev": "7.0.0-pre.6",
+    "@react-router/fs-routes": "7.0.0-pre.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
