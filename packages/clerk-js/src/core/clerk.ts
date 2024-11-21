@@ -1828,8 +1828,8 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    this.#authService?.forceRefreshSessionToken();
     this.#clearClerkQueryParams();
+
     this.#handleImpersonationFab();
     return true;
   };
