@@ -1972,14 +1972,18 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    if (this.isCombinedFlow() && key === 'signUpUrl') {
-      return this.buildUrlWithAuth(`${this.#options.signInUrl}/create}`);
-    }
-
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    const combinedFlowSignUpUrl = `${this.#options.signInUrl}#/create`;
+    const baseUrl = this.isCombinedFlow() && key === 'signUpUrl' ? combinedFlowSignUpUrl : signInOrUpUrl;
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
-    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    const url = buildURL(
+      {
+        base: baseUrl,
+        hashSearchParams: [initValues, redirectUrls],
+      },
+      { stringify: true },
+    );
     return this.buildUrlWithAuth(url);
   };
 

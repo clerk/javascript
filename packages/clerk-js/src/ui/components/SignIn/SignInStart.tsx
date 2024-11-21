@@ -353,7 +353,8 @@ export function _SignInStart(): JSX.Element {
       if (isCombinedFlow) {
         const attribute = getSignUpAttributeFromIdentifier(identifierField);
         clerk.client.signUp[attribute] = identifierField.value;
-        return navigate('create');
+        const createUrl = clerk.buildSignUpUrl();
+        return navigate(createUrl);
       }
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
