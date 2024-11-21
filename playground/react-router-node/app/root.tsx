@@ -1,7 +1,7 @@
 import { data, type LoaderFunctionArgs , MetaFunction } from 'react-router';
 import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp } from '@clerk/remix';
+import { rootAuthLoader } from '@clerk/react-router/ssr.server';
+import { ClerkApp } from '@clerk/react-router';
 import { Suspense } from 'react';
 
 export const loader = (args: LoaderFunctionArgs) => {

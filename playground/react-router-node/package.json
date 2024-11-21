@@ -9,11 +9,11 @@
     "clean": "rm -rf .cache build"
   },
   "dependencies": {
-    "@clerk/backend": "^1.17.1",
-    "@clerk/clerk-react": "^5.16.1",
-    "@clerk/remix": "^4.2.54",
-    "@clerk/shared": "^2.16.0",
-    "@clerk/types": "^4.34.1",
+    "@clerk/backend": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/react-router": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "@react-router/node": "7.0.0-pre.6",
     "@react-router/serve": "7.0.0-pre.6",
     "isbot": "^3.6.5",

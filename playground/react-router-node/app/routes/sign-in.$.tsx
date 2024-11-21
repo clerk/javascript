@@ -1,4 +1,4 @@
-import { SignIn } from '@clerk/remix';
+import { SignIn } from '@clerk/react-router';
 
 export default function SignInPage() {
   return (

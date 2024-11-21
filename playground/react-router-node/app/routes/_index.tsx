@@ -1,6 +1,6 @@
 import type { Route } from "./+types/_index";
-import { getAuth } from '@clerk/remix/ssr.server';
-import { ClerkLoaded, SignedIn, useUser } from '@clerk/remix';
+import { getAuth } from '@clerk/react-router/ssr.server';
+import { ClerkLoaded, SignedIn, useUser } from '@clerk/react-router';
 import { Link } from 'react-router';
 
 export async function loader(args: Route.LoaderArgs) {

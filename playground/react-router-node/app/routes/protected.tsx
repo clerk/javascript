@@ -1,5 +1,5 @@
-import { UserButton } from '@clerk/remix';
-import { getAuth } from '@clerk/remix/ssr.server';
+import { UserButton } from '@clerk/react-router';
+import { getAuth } from '@clerk/react-router/ssr.server';
 import type { LoaderFunction } from 'react-router';
 import { redirect } from 'react-router';
 
