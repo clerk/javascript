@@ -1971,6 +1971,11 @@ export class Clerk implements ClerkInterface {
     if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
+    if (this.isCombinedFlow() && key === 'signUpUrl') {
+      return this.buildUrlWithAuth(`${this.#options.signInUrl}/create}`);
+    }
+
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
