@@ -351,6 +351,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  public isCombinedFlow(): boolean {
+    return this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
