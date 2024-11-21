@@ -4,6 +4,16 @@
     "#components": {
       "react-server": "./components.server.js",
       "default": "./components.client.js"
+    },
+    "#fs": {
+      "edge-light": "./runtime/browser/fs.js",
+      "worker": "./runtime/browser/fs.js",
+      "browser": "./runtime/browser/fs.js",
+      "node": {
+        "require": "./runtime/node/fs.js",
+        "import": "./runtime/node/fs.js"
+      },
+      "default": "./runtime/browser/fs.js"
     }
   }
 }

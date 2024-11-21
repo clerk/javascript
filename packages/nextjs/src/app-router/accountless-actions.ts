@@ -2,11 +2,9 @@
 import type { AccountlessApplication } from '@clerk/backend';
 import { getCookies } from 'ezheaders';
 import { redirect, RedirectType } from 'next/navigation';
-import nextPkg from 'next/package.json';
 
 import { getAccountlessCookieName } from '../server/accountless';
-
-const isNext13 = nextPkg.version.startsWith('13.');
+import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 
 export async function syncAccountlessKeysAction(args: AccountlessApplication): Promise<void> {
   const { claimUrl, publishableKey, secretKey } = args;
@@ -20,34 +18,22 @@ export async function syncAccountlessKeysAction(args: AccountlessApplication): P
 }
 
 export async function createAccountlessKeysAction(): Promise<null | AccountlessApplication> {
-  if (process.env.NODE_ENV !== 'development' || isNext13) {
+  if (process.env.NODE_ENV !== 'development' || isNextWithUnstableServerActions) {
     return null;
   }
 
-  let one;
-  try {
-    require('fs');
-    one = true;
-  } catch {
-    one = false;
-  }
-  if (!one) {
+  const result = await import('../server/accountless-node.js').then(m => m.createAccountlessKeys());
+
+  if (!result) {
     return null;
   }
-  return null;
 
-  // const result = await import('../server/accountless-node.js').then(m => m.createAccountlessKeys());
-  //
-  // if (!result) {
-  //   return null;
-  // }
-  //
-  // const { claimUrl, publishableKey, secretKey } = result;
-  //
-  // void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-  //   secure: false,
-  //   httpOnly: false,
-  // });
-  //
-  // return result;
+  const { claimUrl, publishableKey, secretKey } = result;
+
+  void (await getCookies()).set(getAccountlessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+    secure: false,
+    httpOnly: false,
+  });
+
+  return result;
 }

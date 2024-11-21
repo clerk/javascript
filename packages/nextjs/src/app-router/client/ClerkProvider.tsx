@@ -1,23 +1,21 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
-import nextPkg from 'next/package.json';
-import React, { useEffect, useTransition } from 'react';
+import React, { lazy, Suspense, useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
-const isNext13 = nextPkg.version.startsWith('13.');
-
-// const LazyAccountlessCreator = lazy(() =>
-//   import('./lazy-accountless-creator.js').then(m => ({ default: m.AccountlessCreateKeys })),
-// );
+const LazyAccountlessCreator = lazy(() =>
+  import('./lazy-accountless-creator.js').then(m => ({ default: m.AccountlessCreateKeys })),
+);
 
 declare global {
   export interface Window {
@@ -30,7 +28,7 @@ declare global {
   }
 }
 
-const __ClientClerkProvider = (props: NextClerkProviderProps) => {
+const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
@@ -108,18 +106,18 @@ const __ClientClerkProvider = (props: NextClerkProviderProps) => {
 };
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  if (
-    mergeNextClerkPropsWithEnv({
-      ...props,
-    }).publishableKey ||
-    isNext13
-  ) {
-    return <__ClientClerkProvider {...props} />;
+  const { children, ...rest } = props;
+  const safePk = mergeNextClerkPropsWithEnv(rest).publishableKey;
+
+  if (safePk || isNextWithUnstableServerActions) {
+    return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
   return (
-    // <AccountlessCreateKeys>
-    <__ClientClerkProvider {...props} />
-    // </AccountlessCreateKeys>
+    <Suspense>
+      <LazyAccountlessCreator>
+        <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
+      </LazyAccountlessCreator>
+    </Suspense>
   );
 };

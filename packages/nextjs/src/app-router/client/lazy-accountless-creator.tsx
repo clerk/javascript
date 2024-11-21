@@ -9,7 +9,6 @@ export const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
   useEffect(() => {
     React.startTransition(() => {
       fetchKeys();
-      // createAccountlessKeysAction();
     });
   }, []);
 

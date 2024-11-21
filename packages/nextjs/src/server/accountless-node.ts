@@ -1,46 +1,22 @@
 import type { AccountlessApplication } from '@clerk/backend';
 
+// @ts-ignore
+import fsModule from '#fs';
+
 import { createClerkClientWithOptions } from './createClerkClient';
 
 const CLERK_HIDDEN = '.clerk';
 
-const isSafeFs = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  try {
-    require('node:fs');
-    return true;
-  } catch {
-    return true;
-  }
-};
-
-const loadFs = (): any => {
-  if (isSafeFs()) {
-    return require('node:fs');
-  }
-  return undefined;
-};
-
-const loadPath = (): any => {
-  if (isSafeFs()) {
-    return require('node:path');
-  }
-  return undefined;
-};
-
 function updateGitignore() {
-  const fs = loadFs();
-  if (!fs) {
+  if (!fsModule.fs) {
     return;
   }
-  const { existsSync, writeFileSync, readFileSync, appendFileSync } = fs;
-  const path = loadPath();
-  if (!path) {
+  const { existsSync, writeFileSync, readFileSync, appendFileSync } = fsModule.fs;
+
+  if (!fsModule.path) {
     return;
   }
-  const gitignorePath = path.join(process.cwd(), '.gitignore');
+  const gitignorePath = fsModule.path.join(process.cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
   }
@@ -54,21 +30,19 @@ function updateGitignore() {
 
 const CLERK_LOCK = 'clerk.lock';
 const getClerkPath = () => {
-  const path = loadPath();
-  if (!path) {
+  if (!fsModule.path) {
     return '';
   }
-  return path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
+  return fsModule.path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
 };
 
 let isCreatingFile = false;
 
 function safeParseClerkFile(): AccountlessApplication | undefined {
-  const fs = loadFs();
-  if (!fs) {
-    return undefined;
+  if (!fsModule.fs) {
+    return;
   }
-  const { readFileSync } = fs;
+  const { readFileSync } = fsModule.fs;
   try {
     const CLERK_PATH = getClerkPath();
     let fileAsString;
@@ -84,18 +58,22 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
 }
 
 async function createAccountlessKeys(): Promise<AccountlessApplication | undefined> {
-  const fs = loadFs();
-  if (!fs) {
+  if (!fsModule.fs) {
+    console.log('fsModule.fs not found');
     return;
   }
-  const { existsSync, writeFileSync, mkdirSync, rmSync } = fs;
+  const { existsSync, writeFileSync, mkdirSync, rmSync } = fsModule.fs;
   if (isCreatingFile) {
+    console.log('isCreatingFile');
     return undefined;
   }
 
   if (existsSync(CLERK_LOCK)) {
+    console.log('lock exists');
     return undefined;
   }
+
+  console.log('should create file');
 
   isCreatingFile = true;
 
@@ -107,8 +85,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
 
   const CLERK_PATH = getClerkPath();
 
-  const path = loadPath();
-  mkdirSync(path ? path.dirname(CLERK_PATH) : '', { recursive: true });
+  mkdirSync(fsModule.path ? fsModule.path.dirname(CLERK_PATH) : '', { recursive: true });
   updateGitignore();
 
   const envVarsMap = safeParseClerkFile();

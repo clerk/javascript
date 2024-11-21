@@ -1,7 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
-import nextPkg from 'next/package.json';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
@@ -9,10 +8,9 @@ import { getDynamicAuthData } from '../../server/buildClerkProps';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNext13, isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
-
-const isNext13 = nextPkg.version.startsWith('13.');
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const request = await buildRequestLike();
@@ -20,18 +18,6 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
 
   return data;
 });
-
-const isSafeFs = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  try {
-    require('fs');
-    return true;
-  } catch {
-    return true;
-  }
-};
 
 const getDynamicConfig = React.cache(async function getDynamicClerkState() {
   const request = await buildRequestLike();
@@ -87,16 +73,17 @@ export async function ClerkProvider(
   );
 
   const res =
-    (!publishableKey || dynamicConfig.accountlessMode) && !isNext13 && isSafeFs()
+    (!publishableKey || dynamicConfig.accountlessMode) && !isNextWithUnstableServerActions
       ? await import('../../server/accountless-node.js').then(mod => mod.createAccountlessKeys())
       : undefined;
-  if (res && !isNext13) {
-    const AccountlessCookieSync = require('../client/accountless-cookie-sync.js').AccountlessCookieSync;
-    // @ts-ignore
+
+  if (res && !isNextWithUnstableServerActions) {
+    const AccountlessCookieSync = await import('../client/accountless-cookie-sync.js').then(
+      mod => mod.AccountlessCookieSync,
+    );
     publishableKey = res.publishableKey;
 
     output = (
-      // @ts-ignore
       <AccountlessCookieSync {...res}>
         <ClientClerkProvider
           {...mergeNextClerkPropsWithEnv({

@@ -5,14 +5,14 @@ import nextPkg from 'next/package.json';
 import type { PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
-const isNext13 = nextPkg.version.startsWith('13.');
+const isBrokenNextVersion = nextPkg.version.startsWith('13.') || nextPkg.version.startsWith('14.0');
 export function AccountlessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
-  if (!isNext13) {
-    useEffect(() => {
+  useEffect(() => {
+    if (!isBrokenNextVersion) {
       void import('../accountless-actions.js').then(m => m.syncAccountlessKeysAction(props));
       // void syncAccountlessKeysAction(props);
-    }, []);
-  }
+    }
+  }, []);
 
   return props.children;
 }
