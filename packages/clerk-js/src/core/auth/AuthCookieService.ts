@@ -1,12 +1,10 @@
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import type { EnvironmentResource } from '@clerk/types';
+import type { Clerk, EnvironmentResource } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
-import type { Clerk } from '../resources/internal';
-import { SessionTokenCache } from '../tokenCache';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
@@ -103,19 +101,6 @@ export class AuthCookieService {
     }
 
     return setDevBrowserJWTInURL(url, devBrowserJwt);
-  }
-
-  /**
-   * Will refresh the session token immediately once
-   * if the captcha heartbeat flag is enabled.
-   * We want to do this to ensure that we collect at least one token
-   * even for short-lived sessions.
-   */
-  public forceRefreshSessionToken() {
-    if (this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat) {
-      SessionTokenCache.clear();
-      void this.refreshSessionToken();
-    }
   }
 
   private startPollingForToken() {
