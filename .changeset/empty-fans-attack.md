@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Add new internall UI component for accountless.
+Add new internal UI component for accountless.
