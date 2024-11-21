@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.16.0
+
+### Minor Changes
+
+- Change `useReverification` to handle error in a callback, but still allow an error to be thrown via options. ([#4564](https://github.com/clerk/javascript/pull/4564)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Share hook return types ([#4583](https://github.com/clerk/javascript/pull/4583)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745)]:
+  - @clerk/types@4.34.1
+
 ## 2.15.0
 
 ### Minor Changes
