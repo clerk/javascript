@@ -1,7 +1,8 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import React, { lazy, Suspense, useEffect, useTransition } from 'react';
+import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
@@ -13,8 +14,8 @@ import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
-const LazyAccountlessCreator = lazy(() =>
-  import('./lazy-accountless-creator.js').then(m => ({ default: m.AccountlessCreateKeys })),
+const LazyAccountlessCreator = dynamic(() =>
+  import('./lazy-accountless-creator.js').then(m => m.AccountlessCreateKeys),
 );
 
 declare global {
@@ -114,10 +115,8 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   }
 
   return (
-    <Suspense>
-      <LazyAccountlessCreator>
-        <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
-      </LazyAccountlessCreator>
-    </Suspense>
+    <LazyAccountlessCreator>
+      <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
+    </LazyAccountlessCreator>
   );
 };
