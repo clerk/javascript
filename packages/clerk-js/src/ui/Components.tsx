@@ -23,6 +23,7 @@ import type { AppearanceCascade } from './customizables/parseAppearance';
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
+  AccountlessPrompt,
   BlankCaptchaModal,
   CreateOrganizationModal,
   ImpersonationFab,
@@ -101,6 +102,7 @@ export type ComponentControls = {
   prefetch: (component: 'organizationSwitcher') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
+  mountAccountlessPrompt: (url: string) => void;
 };
 
 interface HtmlNodeOptions {
@@ -132,6 +134,7 @@ interface ComponentsState {
   waitlistModal: null | WaitlistProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
+  accountlessPrompt: string | null;
 }
 
 let portalCt = 0;
@@ -213,6 +216,7 @@ const Components = (props: ComponentsProps) => {
     blankCaptchaModal: null,
     nodes: new Map(),
     impersonationFab: false,
+    accountlessPrompt: null,
   });
 
   const {
@@ -319,6 +323,10 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.mountAccountlessPrompt = (url: string) => {
+      setState(s => ({ ...s, accountlessPrompt: url }));
     };
 
     componentsControls.prefetch = component => {
@@ -513,6 +521,12 @@ const Components = (props: ComponentsProps) => {
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+
+        {state.accountlessPrompt && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <AccountlessPrompt url={state.accountlessPrompt} />
           </LazyImpersonationFabProvider>
         )}
 
