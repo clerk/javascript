@@ -1831,6 +1831,7 @@ export class Clerk implements ClerkInterface {
     this.#clearClerkQueryParams();
 
     this.#handleImpersonationFab();
+    this.#handleAccountlessPrompt();
     return true;
   };
 
@@ -1956,6 +1957,14 @@ export class Clerk implements ClerkInterface {
       const isImpersonating = !!session?.actor;
       if (isImpersonating) {
         void this.#componentControls?.ensureMounted().then(controls => controls.mountImpersonationFab());
+      }
+    });
+  };
+
+  #handleAccountlessPrompt = () => {
+    void this.#componentControls?.ensureMounted().then(controls => {
+      if (this.#options.claimAccountlessKeysUrl) {
+        controls.mountAccountlessPrompt(this.#options.claimAccountlessKeysUrl);
       }
     });
   };
