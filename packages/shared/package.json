@@ -124,7 +124,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",

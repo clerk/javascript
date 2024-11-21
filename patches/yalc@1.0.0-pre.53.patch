@@ -11,7 +11,7 @@ index 930c1ca9954777dd1492a9e2373029d4644804cc..01e709cffb2a100bc6b0089edf91527d
    },
    "devDependencies": {
 diff --git a/src/copy.js b/src/copy.js
-index 3a6dca7b7a6ffde2527e7866f923c56f7d7061b8..9f84150a5d139562545c57965ad0f7488a8a050c 100644
+index 3a6dca7b7a6ffde2527e7866f923c56f7d7061b8..19ac807a17779219800a0230b0620a5dfd4c641d 100644
 --- a/src/copy.js
 +++ b/src/copy.js
 @@ -56,6 +56,7 @@ var fs_extra_1 = __importDefault(require("fs-extra"));
@@ -22,13 +22,13 @@ index 3a6dca7b7a6ffde2527e7866f923c56f7d7061b8..9f84150a5d139562545c57965ad0f748
  var _1 = require(".");
  var _2 = require(".");
  var shortSignatureLength = 8;
-@@ -120,6 +121,38 @@ var resolveWorkspaceDepVersion = function (version, pkgName, workingDir) {
+@@ -120,6 +121,19 @@ var resolveWorkspaceDepVersion = function (version, pkgName, workingDir) {
          return '*';
      }
  };
 +var resolveCatalogDepVersion = function (subCatalog, pkgName, workingDir) {
 +    var _a;
-+    var workspaceFilePath = path_1.join(workingDir, 'pnpm-workspace.yaml');
++    var workspaceFilePath = path_1.join(workingDir, '../../pnpm-workspace.yaml');
 +    var workspaceContent = fs_extra_1.default.readFileSync(workspaceFilePath, 'utf8');
 +    var workspaceYaml = yaml_1.parse(workspaceContent);
 +    if (!workspaceYaml) {
@@ -37,44 +37,25 @@ index 3a6dca7b7a6ffde2527e7866f923c56f7d7061b8..9f84150a5d139562545c57965ad0f748
 +    var packages = subCatalog && subCatalog.length > 0
 +        ? ((_a = workspaceYaml === null || workspaceYaml === void 0 ? void 0 : workspaceYaml.catalogs) === null || _a === void 0 ? void 0 : _a[subCatalog]) || []
 +        : (workspaceYaml === null || workspaceYaml === void 0 ? void 0 : workspaceYaml.catalog) || [];
-+    try {
-+        for (var _i = 0, packages_1 = packages; _i < packages_1.length; _i++) {
-+            var pkgPattern = packages_1[_i];
-+            var potentialPath = path_1.join(workingDir, pkgPattern, pkgName, 'package.json');
-+            try {
-+                var resolvedPackage = require.resolve(potentialPath);
-+                var pkgManifest = require(resolvedPackage);
-+                return pkgManifest.version || '*';
-+            }
-+            catch (_b) {
-+                continue; // Try the next pattern
-+            }
-+        }
-+        console.warn("Could not find a package matching " + pkgName + " in catalog.");
-+        return '*';
-+    }
-+    catch (e) {
-+        console.error('Error reading pnpm-workspace.yaml:', e);
-+        return '*';
-+    }
++    return packages[pkgName] || '*';
 +};
  var resolveWorkspaces = function (pkg, workingDir) {
      var resolveDeps = function (deps) {
          return deps
-@@ -130,6 +163,12 @@ var resolveWorkspaces = function (pkg, workingDir) {
+@@ -130,6 +144,12 @@ var resolveWorkspaces = function (pkg, workingDir) {
                      console.log("Resolving workspace package " + depPkgName + " version ==> " + resolved);
                      return resolved;
                  }
 +                if (val.startsWith('catalog:')) {
-+                    var version = val.split(':')[1];
-+                    var resolved = resolveCatalogDepVersion(version, depPkgName, workingDir);
++                    var subCatalog = val.split(':')[1];
++                    var resolved = resolveCatalogDepVersion(subCatalog, depPkgName, workingDir);
 +                    console.log("Resolving catalog package " + depPkgName + " version ==> " + resolved);
 +                    return resolved;
 +                }
                  return val;
              })
              : deps;
-@@ -160,9 +199,9 @@ exports.copyPackageToStore = function (options) { return __awaiter(void 0, void
+@@ -160,9 +180,9 @@ exports.copyPackageToStore = function (options) { return __awaiter(void 0, void
              case 2:
                  npmList = _c.sent();
                  filesToCopy = npmList.filter(function (f) { return !ignoreRule.ignores(f); });

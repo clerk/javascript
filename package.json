@@ -47,7 +47,7 @@
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm dlx yalc push --replace --sig; cd '../../'; done"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
