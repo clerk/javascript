@@ -327,8 +327,13 @@ export function _SignInStart(): JSX.Element {
       (e: ClerkAPIError) =>
         e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
     );
+
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
+    );
+    const accountDoesNotExistError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) =>
+        e.code === ERROR_CODES.INVITATION_ACCOUNT_NOT_EXISTS || e.code === ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND,
     );
 
     if (instantPasswordError) {
@@ -336,9 +341,10 @@ export function _SignInStart(): JSX.Element {
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
-    } else {
-      if (isCombinedFlow && userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
-        const attribute = getSignUpAttributeFromIdentifier(identifierField);
+    } else if (isCombinedFlow && accountDoesNotExistError) {
+      const attribute = getSignUpAttributeFromIdentifier(identifierField);
+
+      if (userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
         const waitlistUrl = clerk.buildWaitlistUrl(
           attribute === 'emailAddress'
             ? {
@@ -350,12 +356,14 @@ export function _SignInStart(): JSX.Element {
         );
         return navigate(waitlistUrl);
       }
-      if (isCombinedFlow) {
-        const attribute = getSignUpAttributeFromIdentifier(identifierField);
-        clerk.client.signUp[attribute] = identifierField.value;
-        const createUrl = clerk.buildSignUpUrl();
-        return navigate(createUrl);
+
+      clerk.client.signUp[attribute] = identifierField.value;
+      const paramsToForward = new URLSearchParams();
+      if (organizationTicket) {
+        paramsToForward.set('__clerk_ticket', organizationTicket);
       }
+      return navigate(`create?${paramsToForward.toString()}`);
+    } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
   };

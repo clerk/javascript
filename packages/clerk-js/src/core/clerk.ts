@@ -351,7 +351,7 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public isCombinedFlow(): boolean {
+  #isCombinedFlow(): boolean {
     return this.#options.signInUrl === this.#options.signUpUrl;
   }
 
@@ -1973,13 +1973,12 @@ export class Clerk implements ClerkInterface {
     }
 
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
-    const combinedFlowSignUpUrl = `${this.#options.signInUrl}#/create`;
-    const baseUrl = this.isCombinedFlow() && key === 'signUpUrl' ? combinedFlowSignUpUrl : signInOrUpUrl;
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
     const url = buildURL(
       {
-        base: baseUrl,
+        base: signInOrUpUrl,
+        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
         hashSearchParams: [initValues, redirectUrls],
       },
       { stringify: true },
