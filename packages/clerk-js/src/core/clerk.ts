@@ -1963,8 +1963,10 @@ export class Clerk implements ClerkInterface {
 
   #handleAccountlessPrompt = () => {
     void this.#componentControls?.ensureMounted().then(controls => {
-      if (this.#options.claimAccountlessKeysUrl) {
-        controls.mountAccountlessPrompt(this.#options.claimAccountlessKeysUrl);
+      if (this.#options.__internal_claimAccountlessKeysUrl) {
+        controls.updateProps({
+          options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+        });
       }
     });
   };
