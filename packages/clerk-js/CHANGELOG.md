@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.34.5
+
+### Patch Changes
+
+- Collect captcha token on load ([#4623](https://github.com/clerk/javascript/pull/4623)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.34.4
+
+### Patch Changes
+
+- Fixes issue where `FormFeedback` was rendering two elements with the same `id` attribute leading to invalid markup. ([#4552](https://github.com/clerk/javascript/pull/4552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `sign_up_restricted_waitlist` error encountered in an oauth flow ([#4603](https://github.com/clerk/javascript/pull/4603)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Exclude `_clerk_session_id` query param from `/waitlist` endpoint ([#4594](https://github.com/clerk/javascript/pull/4594)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`7510d5cf0ac4d2994849931de8dda75cf605f840`](https://github.com/clerk/javascript/commit/7510d5cf0ac4d2994849931de8dda75cf605f840), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+  - @clerk/localizations@3.6.5
+
 ## 5.34.3
 
 ### Patch Changes

@@ -1,5 +1,26 @@
 # Change Log
 
+## 2.3.8
+
+### Patch Changes
+
+- Updated dependencies [[`b9a93fd86c2a0285d8e1bb9e9ffac2c979aab947`](https://github.com/clerk/javascript/commit/b9a93fd86c2a0285d8e1bb9e9ffac2c979aab947)]:
+  - @clerk/clerk-js@5.34.5
+
+## 2.3.7
+
+### Patch Changes
+
+- - Replaced import { Buffer } from 'node:buffer' with import { Buffer } from 'buffer'. ([#4601](https://github.com/clerk/javascript/pull/4601)) by [@AlexNti](https://github.com/AlexNti)
+
+  - Moved @clerk/expo-passkeys to a devDependency in @clerk/clerk-expo.
+
+- Updated dependencies [[`03482f347741e6ceef2e654de1b101dc59477f90`](https://github.com/clerk/javascript/commit/03482f347741e6ceef2e654de1b101dc59477f90), [`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`152f0b8eeb7687a1fcff75b7395bf8f57ef04591`](https://github.com/clerk/javascript/commit/152f0b8eeb7687a1fcff75b7395bf8f57ef04591), [`aba63de16e677b5896cdf5bc40fa2322480efe7a`](https://github.com/clerk/javascript/commit/aba63de16e677b5896cdf5bc40fa2322480efe7a), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/clerk-js@5.34.4
+  - @clerk/clerk-react@5.16.1
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+
 ## 2.3.6
 
 ### Patch Changes
