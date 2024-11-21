@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:yalc": "pnpm yalc && rm -rf .next && next dev --port 4011",
-    "yalc": "yalc add @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
-    "dev": "rm -rf .next && next dev --port 4011",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build:playground": "next build",
+    "dev:playground": "rm -rf .next && next dev --port 4011",
+    "lint:playground": "next lint",
+    "start:playground": "next start"
   },
   "dependencies": {
     "@clerk/nextjs": "canary",

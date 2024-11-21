@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@clerk/chrome-extension": "file:.yalc/@clerk/chrome-extension",
-    "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/localizations": "file:.yalc/@clerk/localizations",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/themes": "file:.yalc/@clerk/themes",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/chrome-extension": "workspace:*",
+    "@clerk/clerk-js": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/localizations": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/themes": "workspace:*",
+    "@clerk/types": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
@@ -32,8 +32,7 @@
     "vite": "^4.5.0"
   },
   "scripts": {
-    "build": "vite build",
-    "dev": "pnpm yalc:add && nodemon",
-    "yalc:add": "yalc add -- @clerk/chrome-extension @clerk/clerk-react @clerk/clerk-js @clerk/localizations @clerk/themes @clerk/types @clerk/shared"
+    "build:playground": "vite build",
+    "dev:playground": "pnpm nodemon"
   }
 }

@@ -4,18 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "dev:yalc": "pnpm yalc && vite",
-    "yalc": "yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
+    "build:playground": "tsc && vite build",
+    "dev:playground": "vite",
+    "lint:playground": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/clerk-js": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0"

@@ -2,18 +2,17 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev",
-    "start": "remix-serve build",
-    "clean": "rm -rf .cache build",
-    "yalc:add": "yalc add -- @clerk/types @clerk/shared @clerk/backend @clerk/remix @clerk/clerk-react"
+    "build:playground": "remix build",
+    "clean:playground": "rm -rf .cache build",
+    "dev:playground": "remix dev",
+    "start:playground": "remix-serve build"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/remix": "file:.yalc/@clerk/remix",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/backend": "workspace:*",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/remix": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "@remix-run/node": "^2.0.0",
     "@remix-run/react": "^2.0.0",
     "@remix-run/serve": "^2.0.0",

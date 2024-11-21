@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "ts-node ./src/server.ts"
+    "start:playground": "ts-node ./src/server.ts"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
-    "@clerk/shared": "file:.yalc/@clerk/shared",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -15,10 +15,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build:playground": "react-scripts build",
+    "eject:playground": "react-scripts eject",
+    "start:playground": "react-scripts start",
+    "test:playground": "react-scripts test"
   },
   "eslintConfig": {
     "extends": [

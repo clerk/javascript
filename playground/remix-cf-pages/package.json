@@ -2,18 +2,17 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build:playground": "remix build",
     "dev:remix": "remix watch",
     "dev:wrangler": "cross-env NODE_ENV=development wrangler pages dev ./public",
-    "dev": "remix build && run-p \"dev:*\"",
-    "start": "cross-env NODE_ENV=production pnpm dev:wrangler",
-    "typecheck": "tsc -b",
-    "yalc:add": "yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
+    "dev:playground": "remix build && run-p \"dev:*\"",
+    "start:playground": "cross-env NODE_ENV=production pnpm dev:wrangler",
+    "typecheck:playground": "tsc -b"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/remix": "file:.yalc/@clerk/remix",
-    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/backend": "workspace:*",
+    "@clerk/remix": "workspace:*",
+    "@clerk/types": "workspace:*",
     "@remix-run/cloudflare": "^2.0.0",
     "@remix-run/cloudflare-pages": "^2.0.0",
     "@remix-run/react": "^2.0.0",
