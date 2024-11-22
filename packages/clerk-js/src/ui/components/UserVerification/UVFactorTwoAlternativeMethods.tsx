@@ -1,4 +1,4 @@
-import type { __experimental_SessionVerificationSecondFactor } from '@clerk/types';
+import type { SessionVerificationSecondFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -10,8 +10,8 @@ import { HavingTrouble } from './HavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
-  onFactorSelected: (factor: __experimental_SessionVerificationSecondFactor) => void;
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null;
+  onFactorSelected: (factor: SessionVerificationSecondFactor) => void;
+  supportedSecondFactors: SessionVerificationSecondFactor[] | null;
 };
 
 export const UVFactorTwoAlternativeMethods = (props: AlternativeMethodsProps) => {
@@ -41,12 +41,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title
-              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.title')}
-            />
-            <Header.Subtitle
-              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.subtitle')}
-            />
+            <Header.Title localizationKey={localizationKeys('userVerification.alternativeMethods.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('userVerification.alternativeMethods.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -80,11 +76,9 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
         <Card.Footer>
           <Card.Action elementId='havingTrouble'>
-            <Card.ActionText
-              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionText')}
-            />
+            <Card.ActionText localizationKey={localizationKeys('userVerification.alternativeMethods.actionText')} />
             <Card.ActionLink
-              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionLink')}
+              localizationKey={localizationKeys('userVerification.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
@@ -94,16 +88,16 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   );
 };
 
-export function getButtonLabel(factor: __experimental_SessionVerificationSecondFactor): LocalizationKey {
+export function getButtonLabel(factor: SessionVerificationSecondFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
-      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__phoneCode', {
+      return localizationKeys('userVerification.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'totp':
-      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__totp');
+      return localizationKeys('userVerification.alternativeMethods.blockButton__totp');
     case 'backup_code':
-      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__backupCode');
+      return localizationKeys('userVerification.alternativeMethods.blockButton__backupCode');
     default:
       throw `Invalid verification strategy: "${(factor as any).strategy}"`;
   }

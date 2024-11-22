@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';

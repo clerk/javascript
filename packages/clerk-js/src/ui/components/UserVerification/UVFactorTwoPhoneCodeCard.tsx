@@ -12,17 +12,17 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
 
   const prepare = () => {
     const { phoneNumberId, strategy } = props.factor;
-    return session!.__experimental_prepareSecondFactorVerification({ phoneNumberId, strategy });
+    return session!.prepareSecondFactorVerification({ phoneNumberId, strategy });
   };
 
   return (
     <Flow.Part part='phoneCode2Fa'>
       <UVFactorTwoCodeForm
         {...props}
-        cardTitle={localizationKeys('__experimental_userVerification.phoneCodeMfa.title')}
-        cardSubtitle={localizationKeys('__experimental_userVerification.phoneCodeMfa.subtitle')}
-        inputLabel={localizationKeys('__experimental_userVerification.phoneCodeMfa.formTitle')}
-        resendButton={localizationKeys('__experimental_userVerification.phoneCodeMfa.resendButton')}
+        cardTitle={localizationKeys('userVerification.phoneCodeMfa.title')}
+        cardSubtitle={localizationKeys('userVerification.phoneCodeMfa.subtitle')}
+        inputLabel={localizationKeys('userVerification.phoneCodeMfa.formTitle')}
+        resendButton={localizationKeys('userVerification.phoneCodeMfa.resendButton')}
         prepare={prepare}
       />
     </Flow.Part>

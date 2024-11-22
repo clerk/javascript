@@ -20,12 +20,12 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'phone_code' }],
     });
 
-    fixtures.session?.__experimental_prepareSecondFactorVerification.mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'phone_code' }],
     });
@@ -43,12 +43,12 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'totp' }],
     });
 
-    fixtures.session?.__experimental_prepareSecondFactorVerification.mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'totp' }],
     });
@@ -65,12 +65,12 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'backup_code' }],
     });
 
-    fixtures.session?.__experimental_prepareSecondFactorVerification.mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'backup_code' }],
     });
@@ -88,7 +88,7 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      fixtures.session?.__experimental_startVerification.mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_first_factor',
       });
       render(<UserVerificationFactorTwo />, { wrapper });
@@ -102,17 +102,17 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      fixtures.session?.__experimental_startVerification.mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [{ strategy: 'phone_code' }],
       });
 
-      fixtures.session?.__experimental_prepareSecondFactorVerification.mockResolvedValue({
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [{ strategy: 'phone_code' }],
       });
 
-      fixtures.session?.__experimental_attemptSecondFactorVerification.mockResolvedValue({
+      fixtures.session?.attemptSecondFactorVerification.mockResolvedValue({
         status: 'complete',
         supportedSecondFactors: [],
         session: {

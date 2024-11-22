@@ -1,6 +1,6 @@
 'use client';
 import { useState, useTransition } from 'react';
-import { __experimental_useReverification as useReverification } from '@clerk/nextjs';
+import { useReverification } from '@clerk/nextjs';
 import { logUserIdActionReverification } from '@/app/(reverification)/actions';
 
 function Page() {
