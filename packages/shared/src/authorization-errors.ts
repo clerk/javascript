@@ -16,7 +16,7 @@ type ReverificationError<M extends { metadata?: any } = { metadata: unknown }> =
 const reverificationError = <MC extends ReverificationConfig>(
   missingConfig?: MC,
 ): ReverificationError<{
-  metadata: {
+  metadata?: {
     reverification?: MC;
   };
 }> => ({
