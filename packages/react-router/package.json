@@ -86,6 +86,7 @@
     "@types/node": "^18.19.33",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "esbuild-fix-imports-plugin": "^1.0.6",
     "react-router": "7.0.0-pre.6",
     "typescript": "catalog:repo"
   },

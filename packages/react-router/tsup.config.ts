@@ -1,3 +1,4 @@
+import { fixExtensionsPlugin, fixFolderImportsPlugin } from 'esbuild-fix-imports-plugin';
 import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
@@ -23,6 +24,7 @@ export default defineConfig(overrideOptions => {
       JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
       __DEV__: `${isWatch}`,
     },
+    esbuildPlugins: [fixFolderImportsPlugin(), fixExtensionsPlugin()],
   };
 
   return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
