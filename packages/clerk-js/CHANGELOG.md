@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.34.6
+
+### Patch Changes
+
+- Catch and ignore any captcha errors during heartbeat ([#4629](https://github.com/clerk/javascript/pull/4629)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enable captcha for development instances ([#4620](https://github.com/clerk/javascript/pull/4620)) by [@issuedat](https://github.com/issuedat)
+
+- Add new internal UI component for accountless. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/types@4.34.2
+  - @clerk/localizations@3.6.6
+  - @clerk/shared@2.16.1
+
 ## 5.34.5
 
 ### Patch Changes
