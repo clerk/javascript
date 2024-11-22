@@ -20,7 +20,7 @@
     "allowJs": true,
     "target": "ES2019",
     "noEmitOnError": false,
-    "incremental": true
+    "incremental": false
   },
   "include": ["src"]
 }

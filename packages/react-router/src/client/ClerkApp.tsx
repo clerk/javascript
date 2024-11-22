@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLoaderData } from 'react-router';
 
 import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
 import { ClerkProvider } from './ReactRouterClerkProvider';
@@ -10,13 +9,13 @@ type ClerkAppOptions = Partial<
 >;
 
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
-  return () => {
+  return ({ loaderData }) => {
     let clerkState;
     const isSpaMode = inSpaMode();
 
     // Don't use `useLoaderData` to fetch the clerk state if we're in SPA mode
     if (!isSpaMode) {
-      const loaderData = useLoaderData<{ clerkState: any }>();
+      console.log({ loaderData });
       clerkState = loaderData.clerkState;
     }
 

@@ -16,6 +16,7 @@ export default defineConfig(overrideOptions => {
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],
     bundle: false,
     clean: true,
+    dts: true,
     minify: false,
     sourcemap: true,
     define: {
@@ -27,5 +28,5 @@ export default defineConfig(overrideOptions => {
     esbuildPlugins: [fixFolderImportsPlugin(), fixExtensionsPlugin()],
   };
 
-  return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
+  return runAfterLast([shouldPublish && 'pnpm publish:local'])(options);
 });
