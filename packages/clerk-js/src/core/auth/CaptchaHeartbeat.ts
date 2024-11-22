@@ -15,13 +15,13 @@ export class CaptchaHeartbeat {
       return;
     }
 
-    await this.sendCaptchaToken();
+    await this.challengeAndSend();
     this.timers.setInterval(() => {
-      void this.sendCaptchaToken();
+      void this.challengeAndSend();
     }, this.intervalInMs());
   }
 
-  private async sendCaptchaToken() {
+  private async challengeAndSend() {
     if (!this.clerk.client) {
       return;
     }
@@ -39,7 +39,6 @@ export class CaptchaHeartbeat {
   }
 
   private intervalInMs() {
-    const envInterval = this.clerk.__unstable__environment?.displayConfig.captchaHeartbeatIntervalMs;
-    return envInterval === undefined ? 10 * 60 * 1000 : envInterval;
+    return this.clerk.__unstable__environment?.displayConfig.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
   }
 }
