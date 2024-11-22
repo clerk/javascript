@@ -542,7 +542,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenUserVerification !== null) {
-      clerkjs.__internal_openUserVerification(this.preopenUserVerification);
+      clerkjs.__internal_openReverification(this.preopenUserVerification);
     }
 
     if (this.preopenOneTap !== null) {
@@ -688,17 +688,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openUserVerification = (props?: __internal_UserVerificationModalProps): void => {
+  __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__internal_openUserVerification(props);
+      this.clerkjs.__internal_openReverification(props);
     } else {
       this.preopenUserVerification = props;
     }
   };
 
-  __internal_closeUserVerification = (): void => {
+  __internal_closeReverification = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__internal_closeUserVerification();
+      this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
     }

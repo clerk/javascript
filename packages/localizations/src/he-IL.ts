@@ -833,7 +833,7 @@ export const heIL: LocalizationResource = {
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'השג עזרה',
       actionText: 'אין לך אף אחד מאלה?',

@@ -2,7 +2,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'Zatražite pomoć',
       actionText: 'Nemate ništa od ovoga?',

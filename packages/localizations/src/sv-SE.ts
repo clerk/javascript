@@ -853,7 +853,7 @@ export const svSE: LocalizationResource = {
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'Få hjälp',
       actionText: 'Har du inget av dessa?',

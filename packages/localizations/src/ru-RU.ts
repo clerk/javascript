@@ -869,7 +869,7 @@ export const ruRU: LocalizationResource = {
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'Получить помощь',
       actionText: 'У вас нет ничего из этого?',

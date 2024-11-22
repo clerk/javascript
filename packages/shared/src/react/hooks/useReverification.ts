@@ -34,7 +34,7 @@ type UseReverificationOptions = {
 };
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
-  openUIComponent: Clerk['__internal_openUserVerification'];
+  openUIComponent: Clerk['__internal_openReverification'];
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -129,17 +129,17 @@ function useReverification<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
-  const { __internal_openUserVerification } = useClerk();
+  const { __internal_openReverification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      openUIComponent: __internal_openUserVerification,
+      openUIComponent: __internal_openReverification,
       ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__internal_openUserVerification, fetcherRef.current, optionsRef.current]);
+  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
