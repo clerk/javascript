@@ -849,7 +849,7 @@ export const nlNL: LocalizationResource = {
       web3WalletButtonsBlockButton: undefined,
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'Krijg hulp',
       actionText: 'Heb je geen van deze?',

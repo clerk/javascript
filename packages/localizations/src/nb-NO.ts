@@ -853,7 +853,7 @@ export const nbNO: LocalizationResource = {
       web3WalletButtonsBlockButton: undefined,
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: undefined,
       actionText: undefined,

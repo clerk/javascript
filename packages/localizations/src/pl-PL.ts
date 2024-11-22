@@ -851,7 +851,7 @@ export const plPL: LocalizationResource = {
       web3WalletButtonsBlockButton: undefined,
     },
   },
-  userVerification: {
+  reverification: {
     alternativeMethods: {
       actionLink: 'Uzyskaj pomoc',
       actionText: 'Nie używasz żadnej z tych metod?',

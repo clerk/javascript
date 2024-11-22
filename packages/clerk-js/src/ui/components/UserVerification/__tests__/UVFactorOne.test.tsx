@@ -27,8 +27,8 @@ describe('UserVerificationFactorOne', () => {
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Enter your password');
-      getByText('Enter the password associated with your account');
+      getByText('Verification required');
+      getByText('Enter your password to continue');
       getByLabelText(/^password/i);
     });
   });
@@ -46,7 +46,7 @@ describe('UserVerificationFactorOne', () => {
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Check your email');
+      getByText('Verification required');
       getByLabelText(/Enter verification code/i);
     });
 
@@ -66,7 +66,7 @@ describe('UserVerificationFactorOne', () => {
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Check your phone');
+      getByText('Verification required');
       getByLabelText(/Enter verification code/i);
     });
 
@@ -93,7 +93,7 @@ describe('UserVerificationFactorOne', () => {
 
       const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
-      await waitFor(() => getByText('Enter your password'));
+      await waitFor(() => getByText('Verification required'));
       await userEvent.type(getByLabelText(/^password/i), 'testtest');
       await userEvent.click(getByText('Continue'));
 
@@ -123,7 +123,7 @@ describe('UserVerificationFactorOne', () => {
 
       const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
-      await waitFor(() => getByText('Enter your password'));
+      await waitFor(() => getByText('Verification required'));
       await userEvent.type(getByLabelText(/^password/i), 'testtest');
       await userEvent.click(screen.getByText('Continue'));
 

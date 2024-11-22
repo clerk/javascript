@@ -39,8 +39,8 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('userVerification.alternativeMethods.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('userVerification.alternativeMethods.subtitle')} />
+            <Header.Title localizationKey={localizationKeys('reverification.alternativeMethods.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('reverification.alternativeMethods.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -87,9 +87,9 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
 
         <Card.Footer>
           <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('userVerification.alternativeMethods.actionText')} />
+            <Card.ActionText localizationKey={localizationKeys('reverification.alternativeMethods.actionText')} />
             <Card.ActionLink
-              localizationKey={localizationKeys('userVerification.alternativeMethods.actionLink')}
+              localizationKey={localizationKeys('reverification.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
@@ -102,15 +102,15 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
 export function getButtonLabel(factor: SessionVerificationFirstFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'email_code':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__emailCode', {
+      return localizationKeys('reverification.alternativeMethods.blockButton__emailCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'phone_code':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__phoneCode', {
+      return localizationKeys('reverification.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'password':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__password');
+      return localizationKeys('reverification.alternativeMethods.blockButton__password');
     default:
       throw `Invalid sign in strategy: "${(factor as any).strategy}"`;
   }
