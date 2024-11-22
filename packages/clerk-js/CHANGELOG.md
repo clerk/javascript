@@ -1,5 +1,40 @@
 # Change Log
 
+## 5.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+- If a nonce is provided, it is now made available to Clerk's internal components. This allows the nonce to be passed in to style-src in CSPs and work correctly. ([#4509](https://github.com/clerk/javascript/pull/4509)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Include **BUILD_DISABLE_RHC** to allow for builds which remove remotely hosted code as it is a requirement for browser extensions. ([#4133](https://github.com/clerk/javascript/pull/4133)) by [@tmilewski](https://github.com/tmilewski)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/shared@2.17.0
+  - @clerk/types@4.35.0
+  - @clerk/localizations@3.7.0
+
 ## 5.34.6
 
 ### Patch Changes

@@ -1,5 +1,26 @@
 # Change Log
 
+## 2.17.0
+
+### Minor Changes
+
+- Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `__experimental_useReverification` -> `useReverification`
+    Also replaces the following APIs:
+  - `__experimental_reverificationError` -> `reverificationError`
+  - `__experimental_reverificationErrorResponse` -> `reverificationErrorResponse`
+  - `__experimental_isReverificationHint` -> `isReverificationHint`
+
+### Patch Changes
+
+- Gracefully handle missing reverification error metadata ([#4636](https://github.com/clerk/javascript/pull/4636)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/types@4.35.0
+
 ## 2.16.1
 
 ### Patch Changes
