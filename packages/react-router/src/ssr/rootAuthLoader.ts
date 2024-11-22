@@ -1,14 +1,14 @@
 import { decorateObjectWithResources } from '@clerk/backend/internal';
-import type { defer } from '@remix-run/server-runtime';
-import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
+// import type { defer } from '@remix-run/server-runtime';
+// import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
-  injectRequestStateIntoDeferredData,
+  // injectRequestStateIntoDeferredData,
   injectRequestStateIntoResponse,
   isRedirect,
   isResponse,
@@ -65,14 +65,14 @@ export const rootAuthLoader: RootAuthLoader = async (
   assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
   // When using defer(), we need to inject the clerk auth state into its internal data object.
-  if (isDeferredData(handlerResult)) {
-    return injectRequestStateIntoDeferredData(
-      // This is necessary because the DeferredData type is not exported from remix.
-      handlerResult as unknown as ReturnType<typeof defer>,
-      requestState,
-      args.context,
-    );
-  }
+  // if (isDeferredData(handlerResult)) {
+  //   return injectRequestStateIntoDeferredData(
+  //     // This is necessary because the DeferredData type is not exported from remix.
+  //     handlerResult as unknown as ReturnType<typeof defer>,
+  //     requestState,
+  //     args.context,
+  //   );
+  // }
 
   if (isResponse(handlerResult)) {
     try {

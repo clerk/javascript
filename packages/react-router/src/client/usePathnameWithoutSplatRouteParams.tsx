@@ -1,4 +1,4 @@
-import { useLocation, useParams } from '@remix-run/react';
+import { useLocation, useParams } from 'react-router';
 
 export const usePathnameWithoutSplatRouteParams = () => {
   const params = useParams();

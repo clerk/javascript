@@ -1,5 +1,5 @@
-import { useLoaderData } from '@remix-run/react';
 import React from 'react';
+import { useLoaderData } from 'react-router';
 
 import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
 import { ClerkProvider } from './RemixClerkProvider';

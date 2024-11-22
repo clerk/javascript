@@ -27,22 +27,27 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     },
     "./ssr.server": {
       "types": "./dist/ssr/index.d.ts",
-      "default": "./dist/ssr/index.js"
+      "import": "./dist/ssr/index.mjs",
+      "require": "./dist/ssr/index.js"
     },
     "./api.server": {
       "types": "./dist/api/index.d.ts",
-      "default": "./dist/api/index.js"
+      "import": "./dist/api/index.mjs",
+      "require": "./dist/api/index.js"
     },
     "./errors": {
       "types": "./dist/errors.d.ts",
-      "default": "./dist/errors.js"
+      "import": "./dist/errors.mjs",
+      "require": "./dist/errors.js"
     }
   },
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
@@ -69,7 +74,8 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
-    "lint:publint": "publint"
+    "lint:publint": "publint",
+    "publish:local": "pnpm dlx yalc push --replace --sig"
   },
   "dependencies": {
     "@clerk/backend": "workspace:*",
@@ -81,20 +87,17 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
-    "@remix-run/react": "^2.0.0",
-    "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "react-router": "7.0.0-pre.6",
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "@remix-run/react": "^2.0.0",
-    "@remix-run/server-runtime": "^2.0.0",
     "react": ">=18",
     "react-dom": ">=18",
-    "react-router": "^7.0.0"
+    "react-router": "^7.0.0-pre.6"
   },
   "engines": {
     "node": ">=20.0.0"

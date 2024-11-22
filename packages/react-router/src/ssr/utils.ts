@@ -1,10 +1,11 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { AppLoadContext, defer } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime';
+// import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import cookie from 'cookie';
+import type { AppLoadContext } from 'react-router';
 
-import { getEnvVariable } from '../utils/utils';
+// import { json } from 'react-router';
+import * as utils from '../utils/utils';
 import type { RequestStateWithRedirectUrls } from './types';
 
 export function isResponse(value: any): value is Response {
@@ -48,11 +49,12 @@ export const injectRequestStateIntoResponse = async (
     clone.headers.append(key, value);
   });
 
-  return json({ ...(data || {}), ...clerkState }, clone);
+  // return json({ ...(data || {}), ...clerkState }, clone);
+  return Response.json({ ...(data || {}), ...clerkState }, clone);
 };
 
 export function injectRequestStateIntoDeferredData(
-  data: ReturnType<typeof defer>,
+  data: ReturnType<any>,
   requestState: RequestStateWithRedirectUrls,
   context: AppLoadContext,
 ) {
@@ -65,7 +67,6 @@ export function injectRequestStateIntoDeferredData(
     data.init.headers = new Headers(data.init.headers);
 
     headers.forEach((value, key) => {
-      // @ts-expect-error -- We are ensuring headers is defined above
       data.init.headers.append(key, value);
     });
   }
@@ -95,10 +96,10 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
-    __clerkJSUrl: getEnvVariable('CLERK_JS', context),
-    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
-    __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
-    __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
+    __clerkJSUrl: utils.getEnvVariable('CLERK_JS', context),
+    __clerkJSVersion: utils.getEnvVariable('CLERK_JS_VERSION', context),
+    __telemetryDisabled: isTruthy(utils.getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
+    __telemetryDebug: isTruthy(utils.getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
   });
 
   return {

@@ -1,6 +1,6 @@
-import { useLocation, useNavigate } from '@remix-run/react';
 import React from 'react';
 import type { NavigateOptions } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 type Resolve = (value?: unknown) => void;
 
