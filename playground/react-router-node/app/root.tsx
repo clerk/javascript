@@ -1,11 +1,12 @@
-import { defer, type DataFunctionArgs } from '@remix-run/node';
-import type { MetaFunction } from '@remix-run/react';
-import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp } from '@clerk/remix';
+// import { defer } from 'react-router';
+import type { MetaFunction } from 'react-router';
+import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
+import { rootAuthLoader } from '@clerk/react-router/ssr.server';
+import { ClerkApp } from '@clerk/react-router';
 import { Suspense } from 'react';
+import { DataStrategyFunctionArgs } from 'react-router';
 
-export const loader = (args: DataFunctionArgs) => {
+export const loader = (args: DataStrategyFunctionArgs) => {
   return rootAuthLoader(
     args,
     async ({ request }) => {
@@ -14,7 +15,7 @@ export const loader = (args: DataFunctionArgs) => {
 
       console.log('root User:', user);
 
-      return defer({ user, data }, { headers: { 'x-clerk': '1' } })
+      return Response.json({ user, data }, { headers: { 'x-clerk': '1' } })
     },
     { loadUser: true },
   );
@@ -28,7 +29,7 @@ export function headers({
   parentHeaders: Headers;
 }) {
   console.log(loaderHeaders)
-  return loaderHeaders 
+  return loaderHeaders
 }
 
 export const meta: MetaFunction = () => {

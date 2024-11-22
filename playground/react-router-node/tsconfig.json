@@ -1,7 +1,7 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "types": ["@remix-run/node", "vite/client"],
+    "types": ["@react-router/node", "vite/client"],
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",

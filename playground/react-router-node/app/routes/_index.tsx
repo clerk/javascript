@@ -1,7 +1,7 @@
-import type { LoaderFunction } from '@remix-run/node';
-import { getAuth } from '@clerk/remix/ssr.server';
-import { ClerkLoaded, SignedIn, useUser } from '@clerk/remix';
-import { Link } from '@remix-run/react';
+import type { LoaderFunction } from 'react-router';
+import { getAuth } from '@clerk/react-router/ssr.server';
+import { ClerkLoaded, SignedIn, useUser } from '@clerk/react-router';
+import { Link } from 'react-router';
 
 export const loader: LoaderFunction = async args => {
   return getAuth(args);
