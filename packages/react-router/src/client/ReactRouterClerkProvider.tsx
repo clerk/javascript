@@ -2,8 +2,8 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import { assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
-import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
-import type { ClerkState, RemixClerkProviderProps } from './types';
+import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
+import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -31,7 +31,7 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
  * during SSR.
  * This is a value that we pass automatically so it does not need to pollute the public API.
  */
-type ClerkProviderPropsWithState = RemixClerkProviderProps & {
+type ClerkProviderPropsWithState = ReactRouterClerkProviderProps & {
   clerkState: ClerkState;
 };
 
@@ -103,7 +103,7 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
   };
 
   return (
-    <ClerkRemixOptionsProvider options={mergedProps}>
+    <ClerkReactRouterOptionsProvider options={mergedProps}>
       <ReactClerkProvider
         routerPush={(to: string) => awaitableNavigateRef.current?.(to)}
         routerReplace={(to: string) => awaitableNavigateRef.current?.(to, { replace: true })}
@@ -114,6 +114,6 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
       >
         {children}
       </ReactClerkProvider>
-    </ClerkRemixOptionsProvider>
+    </ClerkReactRouterOptionsProvider>
   );
 }

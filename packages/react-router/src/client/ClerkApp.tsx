@@ -2,11 +2,11 @@ import React from 'react';
 import { useLoaderData } from 'react-router';
 
 import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
-import { ClerkProvider } from './RemixClerkProvider';
-import type { RemixClerkProviderProps } from './types';
+import { ClerkProvider } from './ReactRouterClerkProvider';
+import type { ReactRouterClerkProviderProps } from './types';
 
 type ClerkAppOptions = Partial<
-  Omit<RemixClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState'>
+  Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState'>
 >;
 
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
@@ -28,7 +28,7 @@ export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
       <ClerkProvider
         /* @ts-ignore The type of opts cannot be inferred by TS automatically because of the complex
          * discriminated unions required for the router props and multidomain feature   */
-        {...(opts as RemixClerkProviderProps)}
+        {...(opts as ReactRouterClerkProviderProps)}
         clerkState={clerkState}
       >
         <App />

@@ -7,11 +7,11 @@ or come say hi in our discord server: https://clerk.com/discord
 `;
 };
 
-const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, simply wrap the App component with ClerkApp and make it the default export.
+const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, wrap the App component with ClerkApp and make it the default export.
 Example:
 
-import { ClerkApp } from '@clerk/remix';
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
+import { ClerkApp } from '@clerk/react-router';
+import { rootAuthLoader } from '@clerk/react-router/ssr.server';
 
 export const loader: LoaderFunction = args => rootAuthLoader(args)
 
@@ -70,7 +70,7 @@ export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) =>
 `);
 
 export const noSecretKeyError = createErrorMessage(`
-A secretKey must be provided in order to use SSR and the exports from @clerk/remix/api.');
+A secretKey must be provided in order to use SSR and the exports from @clerk/react-router/api.');
 If your runtime supports environment variables, you can add a CLERK_SECRET_KEY variable to your config.
 Otherwise, you can pass a secretKey parameter to rootAuthLoader or getAuth.
 `);
