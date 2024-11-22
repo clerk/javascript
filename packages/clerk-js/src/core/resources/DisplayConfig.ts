@@ -85,7 +85,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     // These are the OAuth strategies we used to bypass the captcha for by default
     // before the introduction of the captcha_oauth_bypass field
     this.captchaOauthBypass = data.captcha_oauth_bypass || ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
-    this.captchaHeartbeat = data.captcha_heartbeat || true;
+    this.captchaHeartbeat = data.captcha_heartbeat || false;
     this.captchaHeartbeatIntervalMs = data.captcha_heartbeat_interval_ms;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;

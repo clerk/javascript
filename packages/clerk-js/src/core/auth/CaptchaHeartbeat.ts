@@ -35,7 +35,7 @@ export class CaptchaHeartbeat {
   }
 
   private isEnabled() {
-    return this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
+    return !!this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
   }
 
   private intervalInMs() {
