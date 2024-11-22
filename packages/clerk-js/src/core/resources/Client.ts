@@ -94,6 +94,10 @@ export class Client extends BaseResource implements ClientResource {
       .toString();
   }
 
+  public sendCaptchaToken(params: unknown): Promise<ClientResource> {
+    return this._basePatch({ body: params });
+  }
+
   fromJSON(data: ClientJSON | null): this {
     if (data) {
       this.id = data.id;
