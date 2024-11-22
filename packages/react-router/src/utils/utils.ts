@@ -1,4 +1,4 @@
-import type { AppLoadContext } from 'react-router-dom';
+import type { AppLoadContext } from 'react-router';
 
 import type { ClerkState } from '../client/types';
 import { invalidClerkStatePropError, noClerkStateError, publishableKeyMissingErrorInSpaMode } from './errors';

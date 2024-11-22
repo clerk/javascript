@@ -1,18 +1,21 @@
-import { data, type LoaderFunctionArgs , MetaFunction } from 'react-router';
+// import { defer } from 'react-router';
+import type { MetaFunction } from 'react-router';
 import { Await, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
 import { rootAuthLoader } from '@clerk/react-router/ssr.server';
 import { ClerkApp } from '@clerk/react-router';
 import { Suspense } from 'react';
+import { DataStrategyFunctionArgs } from 'react-router';
 
-export const loader = (args: LoaderFunctionArgs) => {
+export const loader = (args: DataStrategyFunctionArgs) => {
   return rootAuthLoader(
     args,
     async ({ request }) => {
       const { user } = request;
+      const data: Promise<{ foo: string }> = new Promise(r => r({ foo: 'bar' }))
 
       console.log('root User:', user);
 
-      return data({ user }, { headers: { 'x-clerk': '1' } })
+      return Response.json({ user, data }, { headers: { 'x-clerk': '1' } })
     },
     { loadUser: true },
   );
@@ -26,7 +29,7 @@ export function headers({
   parentHeaders: Headers;
 }) {
   console.log(loaderHeaders)
-  return loaderHeaders 
+  return loaderHeaders
 }
 
 export const meta: MetaFunction = () => {

@@ -8,7 +8,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { LoaderFunction } from 'react-router-dom';
+import type { DataStrategyFunctionArgs, LoaderFunction } from 'react-router';
 
 export type GetAuthReturn = Promise<AuthObject>;
 
@@ -62,8 +62,7 @@ type ObjectLike = Record<string, unknown> | null;
  */
 export type RootAuthLoaderCallbackReturn = Promise<Response> | Response | Promise<ObjectLike> | ObjectLike;
 
-// TODO(v7): Fix this
-export type LoaderFunctionArgs = any;
+export type LoaderFunctionArgs = DataStrategyFunctionArgs;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {

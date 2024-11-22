@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData } from 'react-router';
 
 import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
 import { ClerkProvider } from './RemixClerkProvider';

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { NavigateOptions } from 'react-router';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 type Resolve = (value?: unknown) => void;
 

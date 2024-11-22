@@ -1,4 +1,4 @@
-import { PassThrough } from 'stream';
+import { PassThrough } from 'node:stream';
 import type { EntryContext } from 'react-router';
 import { ServerRouter } from 'react-router';
 import isbot from 'isbot';

@@ -1,4 +1,4 @@
 export * from './RemixClerkProvider';
 export { ClerkApp } from './ClerkApp';
-export { WithClerkState } from './types';
+export type { WithClerkState } from './types';
 export { SignIn, SignUp } from './uiComponents';
