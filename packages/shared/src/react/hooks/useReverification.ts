@@ -52,7 +52,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
          */
         const resolvers = createDeferredPromise();
 
-        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata.reverification);
+        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
         /**
          * On success resolve the pending promise

@@ -79,7 +79,11 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   return null;
 };
 
-const validateReverificationConfig = (config: ReverificationConfig | undefined) => {
+const validateReverificationConfig = (config: ReverificationConfig | undefined | null) => {
+  if (!config) {
+    return false;
+  }
+
   const convertConfigToObject = (config: ReverificationConfig) => {
     if (typeof config === 'string') {
       return TYPES_TO_OBJECTS[config];
