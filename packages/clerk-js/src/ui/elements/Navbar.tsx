@@ -104,7 +104,11 @@ export const NavBar = (props: NavBarProps) => {
             minHeight: t.space.$8,
           })}
         >
-          <Span localizationKey={r.name} />
+          <Span
+            elementDescriptor={descriptors.navbarButtonText}
+            elementId={descriptors.navbarButtonText.setId(r.id as any)}
+            localizationKey={r.name}
+          />
         </NavButton>
       ))}
     </Col>

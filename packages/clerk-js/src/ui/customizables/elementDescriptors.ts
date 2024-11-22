@@ -249,6 +249,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'navbarButtons',
   'navbarButton',
   'navbarButtonIcon',
+  'navbarButtonText',
   'navbarMobileMenuRow',
   'navbarMobileMenuButton',
   'navbarMobileMenuButtonIcon',
