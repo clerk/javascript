@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useCoreSignUp, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -65,7 +65,6 @@ export function _SignInStart(): JSX.Element {
   const status = useLoadingStatus();
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();
-  const signUp = useCoreSignUp();
   const { navigate } = useRouter();
   const options = useOptions();
   const ctx = useSignInContext();
@@ -379,6 +378,7 @@ export function _SignInStart(): JSX.Element {
         redirectUrl: '',
         redirectUrlComplete: '',
         clerk,
+        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
