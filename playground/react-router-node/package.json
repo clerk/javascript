@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@react-router/dev": "7.0.0-pre.6",
-    "@react-router/fs-routes": "7.0.0-pre.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
