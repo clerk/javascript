@@ -41,8 +41,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('userVerification.alternativeMethods.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('userVerification.alternativeMethods.subtitle')} />
+            <Header.Title localizationKey={localizationKeys('reverification.alternativeMethods.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('reverification.alternativeMethods.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -76,9 +76,9 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
         <Card.Footer>
           <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('userVerification.alternativeMethods.actionText')} />
+            <Card.ActionText localizationKey={localizationKeys('reverification.alternativeMethods.actionText')} />
             <Card.ActionLink
-              localizationKey={localizationKeys('userVerification.alternativeMethods.actionLink')}
+              localizationKey={localizationKeys('reverification.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
@@ -91,13 +91,13 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SessionVerificationSecondFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__phoneCode', {
+      return localizationKeys('reverification.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'totp':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__totp');
+      return localizationKeys('reverification.alternativeMethods.blockButton__totp');
     case 'backup_code':
-      return localizationKeys('userVerification.alternativeMethods.blockButton__backupCode');
+      return localizationKeys('reverification.alternativeMethods.blockButton__backupCode');
     default:
       throw `Invalid verification strategy: "${(factor as any).strategy}"`;
   }

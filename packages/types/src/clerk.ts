@@ -167,12 +167,12 @@ export interface Clerk {
    * Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
-  __internal_openUserVerification: (props?: __internal_UserVerificationModalProps) => void;
+  __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
    */
-  __internal_closeUserVerification: () => void;
+  __internal_closeReverification: () => void;
 
   /**
    * Opens the Google One Tap component.

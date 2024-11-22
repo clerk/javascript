@@ -5,10 +5,10 @@
 Drop experimental tag related to reverification.
 
 Properties of Clerk class:
-- `__experimental_openUserVerification` -> `__internal_openUserVerification`
-- `__experimental_closeUserVerification` -> `__internal_closeUserVerification`
-- `__experimental_UserVerificationProps` -> `__internal_UserVerificationProps`
-- `__experimental_UserVerificationModalProps` -> `__internal_UserVerificationModalProps`
+- `__experimental_openUserVerification` -> `__internal_openReverification`
+- `__experimental_closeUserVerification` -> `__internal_closeReverification`
+- `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+- `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
 
 Properties of `Session`:
 - `__experimental_factorVerificationAge` -> `factorVerificationAge`
@@ -30,4 +30,4 @@ Properties of  `IntialState`:
 - `__experimental_factorVerificationAge` -> `factorVerificationAge`
 
 Localization types:
-All properties of `__experimental_userVerification` are moved to `userVerification` 
+All properties of `__experimental_userVerification` are moved to `reverification` 

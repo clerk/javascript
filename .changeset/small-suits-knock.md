@@ -2,4 +2,4 @@
 '@clerk/localizations': minor
 ---
 
-Moves all properties under `__experimental_userVerification` to `userVerification`. This affects all languages.
+Moves all properties under `__experimental_userVerification` to `reverification`. This affects all languages.
