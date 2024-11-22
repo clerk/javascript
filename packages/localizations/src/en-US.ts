@@ -865,7 +865,7 @@ export const enUS: LocalizationResource = {
       title: 'Use another method',
     },
     backupCodeMfa: {
-      subtitle: 'Your backup code is the one you got when setting up two-step authentication.',
+      subtitle: 'Enter the backup code you received when setting up two-step authentication',
       title: 'Enter a backup code',
     },
     emailCode: {
@@ -875,7 +875,7 @@ export const enUS: LocalizationResource = {
       title: 'Verification required',
     },
     noAvailableMethods: {
-      message: 'Cannot proceed with verification. No suitable authentication factor is configured.',
+      message: 'Cannot proceed with verification. No suitable authentication factor is configured',
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
