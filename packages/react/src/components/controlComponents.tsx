@@ -164,6 +164,9 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignUp');
 
+/**
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
     void clerk.redirectToUserProfile();
@@ -172,6 +175,9 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
   return null;
 }, 'RedirectToUserProfile');
 
+/**
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
     void clerk.redirectToOrganizationProfile();
@@ -180,6 +186,9 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   return null;
 }, 'RedirectToOrganizationProfile');
 
+/**
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
     void clerk.redirectToCreateOrganization();
