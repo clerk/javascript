@@ -1,6 +1,6 @@
 import type { LoaderFunction } from 'react-router';
 import { getAuth } from '@clerk/react-router/ssr.server';
-import { ClerkLoaded, SignedIn, useUser } from '@clerk/react-router';
+import { ClerkLoaded, SignedIn, useUser, UserButton } from '@clerk/react-router';
 import { Link } from 'react-router';
 
 export async function loader(args: LoaderFunction) {
@@ -39,7 +39,7 @@ export default function Index() {
           </li>
           <li>
             SignedIn:
-            <SignedIn>Signed In!</SignedIn>
+            <SignedIn><p>You're signed in!</p><UserButton /></SignedIn>
           </li>
         </ul>
       </div>
