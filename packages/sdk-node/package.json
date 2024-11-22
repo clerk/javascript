@@ -43,7 +43,7 @@
     "build": "pnpm clean && tsup",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "publish:local": "pnpm dlx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "clean": "rimraf ./dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
