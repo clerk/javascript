@@ -29,7 +29,7 @@ const reverificationError = <MC extends ReverificationConfig>(
   },
 });
 
-const reverificationErrorResponse = (...args: Parameters<typeof __experimental_reverificationError>) =>
+const reverificationErrorResponse = (...args: Parameters<typeof reverificationError>) =>
   new Response(JSON.stringify(reverificationError(...args)), {
     status: 403,
   });
@@ -44,4 +44,4 @@ const isReverificationHint = (result: any): result is ReturnType<typeof reverifi
   );
 };
 
-export { reverificationMismatch, reverificationMismatchResponse, isReverificationHint };
+export { reverificationError, reverificationErrorResponse, isReverificationHint };
