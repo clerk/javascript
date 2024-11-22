@@ -10,14 +10,13 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const options: Options = {
-    format: ['cjs', 'esm'],
+    format: ['esm'],
     outDir: './dist',
     entry: ['./src/**/*.{ts,tsx,js,jsx}'],
     bundle: false,
     clean: true,
     minify: false,
     sourcemap: true,
-    legacyOutput: false,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

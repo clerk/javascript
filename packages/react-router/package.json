@@ -24,30 +24,26 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./ssr.server": {
       "types": "./dist/ssr/index.d.ts",
-      "import": "./dist/ssr/index.mjs",
-      "require": "./dist/ssr/index.js"
+      "import": "./dist/ssr/index.js"
     },
     "./api.server": {
       "types": "./dist/api/index.d.ts",
-      "import": "./dist/api/index.mjs",
-      "require": "./dist/api/index.js"
+      "import": "./dist/api/index.js"
     },
     "./errors": {
       "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.mjs",
-      "require": "./dist/errors.js"
+      "import": "./dist/errors.js"
     }
   },
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
