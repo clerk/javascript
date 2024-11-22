@@ -99,6 +99,7 @@ import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
+import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
 import {
   clerkErrorInitFailed,
@@ -178,6 +179,7 @@ export class Clerk implements ClerkInterface {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
+  #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
@@ -1828,8 +1830,9 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    this.#captchaHeartbeat = new CaptchaHeartbeat(this);
+    void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
-
     this.#handleImpersonationFab();
     this.#handleAccountlessPrompt();
     return true;
