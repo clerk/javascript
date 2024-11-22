@@ -47,11 +47,7 @@ const TYPES_TO_OBJECTS: TypesToConfig = {
   },
 };
 
-const ALLOWED_LEVELS = new Set<SessionVerificationLevel>([
-  'first_factor',
-  'second_factor',
-  'multi_factor',
-]);
+const ALLOWED_LEVELS = new Set<SessionVerificationLevel>(['first_factor', 'second_factor', 'multi_factor']);
 
 const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
