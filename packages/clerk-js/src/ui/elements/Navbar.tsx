@@ -2,7 +2,7 @@ import { createContextAndHook } from '@clerk/shared/react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Heading, Icon, Text, useLocalizations } from '../customizables';
+import { Button, Col, descriptors, Flex, Heading, Icon, Span, Text, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useNavigateToFlowStart, usePopover } from '../hooks';
 import { Menu } from '../icons';
@@ -47,7 +47,6 @@ export const NavBar = (props: NavBarProps) => {
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
-  const { t } = useLocalizations();
   const router = useRouter();
 
   const handleNavigate = (route: NavbarRoute) => {
@@ -105,7 +104,7 @@ export const NavBar = (props: NavBarProps) => {
             minHeight: t.space.$8,
           })}
         >
-          {t(r.name)}
+          <Span localizationKey={r.name} />
         </NavButton>
       ))}
     </Col>
