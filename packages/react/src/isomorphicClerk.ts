@@ -61,7 +61,6 @@ import type {
 import { isConstructor } from './utils';
 
 if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
-  // @ts-expect-error -- TODO: Fix typing
   globalThis.__BUILD_DISABLE_RHC__ = false;
 }
 
