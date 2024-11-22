@@ -1735,7 +1735,6 @@ export class Clerk implements ClerkInterface {
     if (this.#options.signInUrl) {
       this.#assertSignInFormatAndOrigin(this.#options.signInUrl, window.location.origin);
     }
-    this.#authService;
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
