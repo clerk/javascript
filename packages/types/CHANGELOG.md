@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.34.2
+
+### Patch Changes
+
+- Add `__internal_claimAccountlessKeysUrl` to `ClerkOptions`. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.34.1
 
 ### Patch Changes
