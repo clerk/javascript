@@ -6,9 +6,11 @@
   "ui": "tui",
   "globalDependencies": [
     ".github/.cache-version",
+    ".npmrc",
     "jest.*.ts",
     "package.json",
-    "package-lock.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     "tsconfig.json",
     "tsconfig.*.json",
     "scripts/subpath-workaround.mjs"
@@ -209,6 +211,18 @@
     },
     "//#test:integration:tanstack-router": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-start#build", "@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:vue": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/vue#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:nuxt": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/vue#build", "@clerk/nuxt#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"

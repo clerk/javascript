@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build": "vite build",
-    "dev": "npm run yalc:add && nodemon",
+    "dev": "pnpm yalc:add && nodemon",
     "yalc:add": "yalc add -- @clerk/chrome-extension @clerk/clerk-react @clerk/clerk-js @clerk/localizations @clerk/themes @clerk/types @clerk/shared"
   }
 }

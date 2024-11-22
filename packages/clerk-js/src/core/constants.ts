@@ -13,6 +13,7 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
 export const CLERK_SYNCED = '__clerk_synced';
+export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
 export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
 export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
@@ -26,6 +27,11 @@ export const ERROR_CODES = {
   USER_LOCKED: 'user_locked',
   EXTERNAL_ACCOUNT_NOT_FOUND: 'external_account_not_found',
   SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
+  SIGN_UP_MODE_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',
+  ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING: 'enterprise_sso_user_attribute_missing',
+  ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'enterprise_sso_email_address_domain_mismatch',
+  ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH: 'enterprise_sso_hosted_domain_mismatch',
+  SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];

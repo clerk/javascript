@@ -124,8 +124,8 @@ describe('MemoryTokenCache', () => {
 
       expect(cache.get(key)).toMatchObject(key);
 
-      // 45s since token created
-      jest.advanceTimersByTime(45 * 1000);
+      // 44s since token created
+      jest.advanceTimersByTime(44 * 1000);
       expect(cache.get(key)).toMatchObject(key);
 
       // 46s since token created

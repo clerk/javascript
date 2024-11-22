@@ -1,7 +1,9 @@
+import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
+import type { CaptchaOptions } from './types';
 
 // We use the explicit render mode to be able to control when the widget is rendered.
 // CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
@@ -41,6 +43,10 @@ interface RenderOptions {
    */
   'error-callback'?: (errorCode: string) => void;
   /**
+   * A JavaScript callback invoked before the challenge enters interactive mode.
+   */
+  'before-interactive-callback'?: () => void;
+  /**
    * A JavaScript callback invoked when a given client/browser is not supported by the widget.
    */
   'unsupported-callback'?: () => boolean;
@@ -69,7 +75,6 @@ declare global {
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
-
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
@@ -112,58 +117,74 @@ async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
  * - If the widgetType is 'smart', the captcha widget is rendered in a div with the id 'clerk-captcha'. If the div does
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
-export const getTunstileToken = async (captchaOptions: {
-  siteKey: string;
-  scriptUrl: string;
-  widgetType: CaptchaWidgetType;
-  invisibleSiteKey: string;
-}) => {
-  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = captchaOptions;
-  let captchaToken = '',
-    id = '';
-  let isInvisibleWidget = !widgetType || widgetType === 'invisible';
+export const getTurnstileToken = async (opts: CaptchaOptions) => {
+  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = opts;
+  const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
+  const captcha: Turnstile = await loadCaptcha(scriptUrl);
+  const errorCodes: (string | number)[] = [];
+
+  let captchaToken = '';
+  let id = '';
   let turnstileSiteKey = siteKey;
+  let retries = 0;
+  let widgetContainerQuerySelector: string | undefined;
+  // The backend uses this to determine which Turnstile site-key was used in order to verify the token
+  let captchaWidgetType: CaptchaWidgetType = null;
 
-  let widgetDiv: HTMLElement | null = null;
+  // modal
+  if (modalContainerQuerySelector && modalWrapperQuerySelector) {
+    // if invisible is selected but modal is provided,
+    // we're going to render the invisible widget in the modal
+    // but we won't show the modal as it will never escalate to interactive mode
+    captchaWidgetType = widgetType;
+    widgetContainerQuerySelector = modalContainerQuerySelector;
+    await openModal?.();
+    await waitForElement(modalContainerQuerySelector);
+  }
 
-  const createInvisibleDOMElement = () => {
+  // smart widget with container provided by user
+  if (!widgetContainerQuerySelector && widgetType === 'smart') {
+    const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleDiv) {
+      captchaWidgetType = 'smart';
+      widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
+      visibleDiv.style.display = 'block';
+    } else {
+      console.error(
+        'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
+      );
+    }
+  }
+
+  // invisible widget for which we create the container automatically
+  if (!widgetContainerQuerySelector) {
+    turnstileSiteKey = invisibleSiteKey;
+    captchaWidgetType = 'invisible';
+    widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
     document.body.appendChild(div);
-    return div;
-  };
+  }
 
-  const captcha: Turnstile = await loadCaptcha(scriptUrl);
-  let retries = 0;
-  const errorCodes: (string | number)[] = [];
-
-  const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
+  const handleCaptchaTokenGeneration = async (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        if (isInvisibleWidget) {
-          widgetDiv = createInvisibleDOMElement();
-        } else {
-          const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
-          if (visibleDiv) {
-            visibleDiv.style.display = 'block';
-            widgetDiv = visibleDiv;
-          } else {
-            console.error(
-              'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
-            );
-            widgetDiv = createInvisibleDOMElement();
-            isInvisibleWidget = true;
-            turnstileSiteKey = invisibleSiteKey;
-          }
-        }
-
-        const id = captcha.render(isInvisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
+        const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
+            closeModal?.();
             resolve([token, id]);
+          },
+          'before-interactive-callback': async () => {
+            if (modalWrapperQuerySelector) {
+              const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
+              el?.style.setProperty('visibility', 'visible');
+              el?.style.setProperty('pointer-events', 'all');
+              return;
+            }
           },
           'error-callback': function (errorCode) {
             errorCodes.push(errorCode);
@@ -209,14 +230,17 @@ export const getTunstileToken = async (captchaOptions: {
       captchaError: e,
     };
   } finally {
-    if (widgetDiv) {
-      if (isInvisibleWidget) {
-        document.body.removeChild(widgetDiv as HTMLElement);
-      } else {
-        (widgetDiv as HTMLElement).style.display = 'none';
-      }
+    // cleanup
+    closeModal?.();
+    const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
+    if (invisibleWidget) {
+      document.body.removeChild(invisibleWidget);
+    }
+    const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleWidget) {
+      visibleWidget.style.display = 'none';
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
+  return { captchaToken, captchaWidgetType };
 };

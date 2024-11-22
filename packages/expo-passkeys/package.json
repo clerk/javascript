@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-passkeys",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "description": "Passkeys library to be used with Clerk for expo",
   "keywords": [
     "react-native",
@@ -17,30 +17,28 @@
   "repository": "git+https://github.com/clerk/javascript.git",
   "license": "MIT",
   "author": "Clerk",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "EXPO_NONINTERACTIVE=1 expo-module build && expo-module prepare",
-    "build:watch": "expo-module build",
-    "clean": "expo-module clean",
-    "expo-module": "expo-module",
-    "lint": "expo-module lint",
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "lint": "eslint src/",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
-    "prepublishOnly": "expo-module prepublishOnly"
+    "publish:local": "pnpm dlx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/shared": "2.12.1",
-    "@clerk/types": "4.32.0"
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "expo-modules-core": "1.12.26"
   },
-  "devDependencies": {
-    "expo-module-scripts": "^3.5.2",
-    "expo-modules-core": "^1.12.19"
-  },
+  "devDependencies": {},
   "peerDependencies": {
     "expo": "*",
     "react": "*",
     "react-native": "*"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

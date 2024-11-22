@@ -20,17 +20,13 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy }) => {
   const isModal = mode === 'modal';
 
   const [createExternalAccount] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
     const redirectUrl = isModal
       ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
       : window.location.href;
     const additionalScopes = additionalOAuthScopes ? additionalOAuthScopes[socialProvider] : [];
 
-    return user.createExternalAccount({
+    return user?.createExternalAccount({
       strategy,
       redirectUrl,
       additionalScopes,

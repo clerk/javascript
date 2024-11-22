@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
       errors: 'src/errors.ts',
     },
     dts: true,
-    onSuccess: shouldPublish ? 'npm run publish:local' : undefined,
+    onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,

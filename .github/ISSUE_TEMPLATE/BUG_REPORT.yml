@@ -76,7 +76,7 @@ body:
     attributes:
       label: Environment
       render: Shell
-      description: Run "npx envinfo --system --browsers --binaries --npmPackages" in your project directory and paste the output here.
+      description: Run "pnpm dlx envinfo --system --browsers --binaries --npmPackages" in your project directory and paste the output here.
       placeholder: |
         You'll get an output similar to this:
 

@@ -20,4 +20,4 @@ export { decorateObjectWithResources, stripPrivateDataFromObject } from './util/
 export { createClerkRequest } from './tokens/clerkRequest';
 export type { ClerkRequest } from './tokens/clerkRequest';
 
-export { reverificationMismatch, reverificationMismatchResponse } from '@clerk/shared/authorization-errors';
+export { reverificationError, reverificationErrorResponse } from '@clerk/shared/authorization-errors';

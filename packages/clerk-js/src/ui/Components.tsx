@@ -23,6 +23,8 @@ import type { AppearanceCascade } from './customizables/parseAppearance';
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
+  AccountlessPrompt,
+  BlankCaptchaModal,
   CreateOrganizationModal,
   ImpersonationFab,
   OrganizationProfileModal,
@@ -68,7 +70,8 @@ export type ComponentControls = {
       | 'organizationProfile'
       | 'createOrganization'
       | 'userVerification'
-      | 'waitlist',
+      | 'waitlist'
+      | 'blankCaptcha',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -90,7 +93,8 @@ export type ComponentControls = {
       | 'organizationProfile'
       | 'createOrganization'
       | 'userVerification'
-      | 'waitlist',
+      | 'waitlist'
+      | 'blankCaptcha',
     options?: {
       notify?: boolean;
     },
@@ -124,6 +128,7 @@ interface ComponentsState {
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
@@ -206,6 +211,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal: null,
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
+    blankCaptchaModal: null,
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -219,6 +225,7 @@ const Components = (props: ComponentsProps) => {
     organizationProfileModal,
     createOrganizationModal,
     waitlistModal,
+    blankCaptchaModal,
     nodes,
   } = state;
 
@@ -455,6 +462,24 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedBlankCaptchaModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'blankCaptcha' as any}
+      componentAppearance={{}}
+      flowName={'blankCaptcha'}
+      onClose={() => componentsControls.closeModal('blankCaptcha')}
+      onExternalNavigate={() => componentsControls.closeModal('blankCaptcha')}
+      startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
+      componentName={'BlankCaptchaModal'}
+      canCloseModal={false}
+      modalId={'cl-modal-captcha-wrapper'}
+      modalStyle={{ visibility: 'hidden', pointerEvents: 'none' }}
+    >
+      <BlankCaptchaModal />
+    </LazyModalRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -484,9 +509,17 @@ const Components = (props: ComponentsProps) => {
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
+        {blankCaptchaModal && mountedBlankCaptchaModal}
+
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+
+        {state.options?.__internal_claimAccountlessKeysUrl && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
           </LazyImpersonationFabProvider>
         )}
 

@@ -4,36 +4,43 @@ type ClerkError<T> = {
   clerk_error: T;
 };
 
-type ReverificationMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
+const REVERIFICATION_REASON = 'reverification-error';
+
+type ReverificationError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
   {
     type: 'forbidden';
-    reason: 'reverification-mismatch';
+    reason: typeof REVERIFICATION_REASON;
   } & M
 >;
 
-const reverificationMismatch = <MC extends ReverificationConfig>(missingConfig?: MC) =>
-  ({
-    clerk_error: {
-      type: 'forbidden',
-      reason: 'reverification-mismatch',
-      metadata: {
-        reverification: missingConfig,
-      },
+const reverificationError = <MC extends ReverificationConfig>(
+  missingConfig?: MC,
+): ReverificationError<{
+  metadata: {
+    reverification?: MC;
+  };
+}> => ({
+  clerk_error: {
+    type: 'forbidden',
+    reason: REVERIFICATION_REASON,
+    metadata: {
+      reverification: missingConfig,
     },
-  }) satisfies ReverificationMismatchError;
+  },
+});
 
-const reverificationMismatchResponse = (...args: Parameters<typeof reverificationMismatch>) =>
-  new Response(JSON.stringify(reverificationMismatch(...args)), {
+const reverificationErrorResponse = (...args: Parameters<typeof __experimental_reverificationError>) =>
+  new Response(JSON.stringify(reverificationError(...args)), {
     status: 403,
   });
 
-const isReverificationHint = (result: any): result is ReturnType<typeof reverificationMismatch> => {
+const isReverificationHint = (result: any): result is ReturnType<typeof reverificationError> => {
   return (
     result &&
     typeof result === 'object' &&
     'clerk_error' in result &&
     result.clerk_error?.type === 'forbidden' &&
-    result.clerk_error?.reason === 'reverification-mismatch'
+    result.clerk_error?.reason === REVERIFICATION_REASON
   );
 };
 

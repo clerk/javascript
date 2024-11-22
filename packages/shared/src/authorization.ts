@@ -29,27 +29,31 @@ type CheckStepUpAuthorization = (
 ) => boolean | null;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
-  veryStrict: {
+  strict_mfa: {
     afterMinutes: 10,
-    level: 'multiFactor',
+    level: 'multi_factor',
   },
   strict: {
     afterMinutes: 10,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   moderate: {
     afterMinutes: 60,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   lax: {
     afterMinutes: 1_440,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
 };
 
-const ALLOWED_LEVELS = new Set<SessionVerificationLevel>(['firstFactor', 'secondFactor', 'multiFactor']);
+const ALLOWED_LEVELS = new Set<SessionVerificationLevel>([
+  'first_factor',
+  'second_factor',
+  'multi_factor',
+]);
 
-const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['veryStrict', 'strict', 'moderate', 'lax']);
+const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
@@ -87,11 +91,11 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined) 
     return config;
   };
 
-  if (typeof config === 'string' && isValidVerificationType(config)) {
-    return convertConfigToObject.bind(null, config);
-  }
+  const isValidStringValue = typeof config === 'string' && isValidVerificationType(config);
+  const isValidObjectValue =
+    typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes);
 
-  if (typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes)) {
+  if (isValidStringValue || isValidObjectValue) {
     return convertConfigToObject.bind(null, config);
   }
 
@@ -123,11 +127,11 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVeri
   const isValidFactor2 = factor2Age !== -1 ? afterMinutes > factor2Age : null;
 
   switch (level) {
-    case 'firstFactor':
+    case 'first_factor':
       return isValidFactor1;
-    case 'secondFactor':
+    case 'second_factor':
       return factor2Age !== -1 ? isValidFactor2 : isValidFactor1;
-    case 'multiFactor':
+    case 'multi_factor':
       return factor2Age === -1 ? isValidFactor1 : isValidFactor1 && isValidFactor2;
   }
 };
@@ -138,7 +142,7 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVeri
  * The returned function authorizes if both checks pass, or if at least one passes
  * when the other is indeterminate. Fails if userId is missing.
  */
-export const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
+const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
     if (!options.userId) {
       return false;
@@ -154,3 +158,5 @@ export const createCheckAuthorization = (options: AuthorizationOptions): CheckAu
     return [orgAuthorization, stepUpAuthorization].every(a => a === true);
   };
 };
+
+export { createCheckAuthorization, validateReverificationConfig };

@@ -191,12 +191,7 @@ const AddPasskeyButton = () => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
-  const [createPasskey] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.createPasskey();
-  });
+  const [createPasskey] = useReverification(() => user?.createPasskey());
 
   const handleCreatePasskey = async () => {
     if (!user) {

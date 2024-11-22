@@ -15,7 +15,7 @@ export interface SessionVerificationResource extends ClerkResource {
 
 export type SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
-export type SessionVerificationTypes = 'veryStrict' | 'strict' | 'moderate' | 'lax';
+export type SessionVerificationTypes = 'strict_mfa' | 'strict' | 'moderate' | 'lax';
 
 export type ReverificationConfig =
   | SessionVerificationTypes
@@ -24,7 +24,7 @@ export type ReverificationConfig =
       afterMinutes: SessionVerificationAfterMinutes;
     };
 
-export type SessionVerificationLevel = 'firstFactor' | 'secondFactor' | 'multiFactor';
+export type SessionVerificationLevel = 'first_factor' | 'second_factor' | 'multi_factor';
 export type SessionVerificationAfterMinutes = number;
 
 export type SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;

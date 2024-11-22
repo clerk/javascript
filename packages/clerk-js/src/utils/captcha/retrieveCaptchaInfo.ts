@@ -5,6 +5,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
   const _environment = clerk.__unstable__environment;
   const fapiClient = createFapiClient(clerk);
   const captchaProvider = _environment ? _environment.displayConfig.captchaProvider : 'turnstile';
+
   return {
     captchaSiteKey: _environment ? _environment.displayConfig.captchaPublicKey : null,
     captchaWidgetType: _environment ? _environment.displayConfig.captchaWidgetType : null,
@@ -17,7 +18,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
       : null,
     captchaURL: fapiClient
       .buildUrl({
-        path: captchaProvider == 'hcaptcha' ? 'hcaptcha/1/api.js' : 'cloudflare/turnstile/v0/api.js',
+        path: 'cloudflare/turnstile/v0/api.js',
         pathPrefix: '',
         search: '?render=explicit',
       })

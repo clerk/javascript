@@ -221,6 +221,11 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.USER_LOCKED:
           case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
           case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
+          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
+          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
             card.setError(error);
             break;
           default:
@@ -444,7 +449,10 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   useLayoutEffect(() => {
     const intervalId = setInterval(() => {
       if (ref?.current) {
-        const autofilled = window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart';
+        const autofilled =
+          window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart' ||
+          // https://github.com/facebook/react/issues/1159#issuecomment-1025423604
+          !!ref.current?.matches('*:-webkit-autofill');
         if (autofilled) {
           setAutofilled(autofilled);
           clearInterval(intervalId);

@@ -39,7 +39,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkLive,
         });
 
-        expect(context.suffixedCookies).toBe(false);
+        expect(context.usesSuffixedCookies()).toBe(false);
         expect(context.sessionTokenInCookie).toBe(session);
         expect(context.clientUat.toString()).toBe(clientUat);
       });
@@ -60,7 +60,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkLive,
         });
 
-        expect(context.suffixedCookies).toBe(false);
+        expect(context.usesSuffixedCookies()).toBe(false);
         expect(context.sessionTokenInCookie).toBe(newSession);
         expect(context.clientUat.toString()).toBe(clientUat);
         expect(context.devBrowserToken).toBe('__clerk_db_jwt');
@@ -80,7 +80,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkTest,
         });
 
-        expect(context.suffixedCookies).toBe(false);
+        expect(context.usesSuffixedCookies()).toBe(false);
         expect(context.sessionTokenInCookie).toBe(session);
         expect(context.clientUat.toString()).toBe(clientUat);
       });
@@ -99,7 +99,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkLive,
         });
 
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe('0');
       });
@@ -119,7 +119,7 @@ describe('AuthenticateContext', () => {
         const context = await createAuthenticateContext(clerkRequest, {
           publishableKey: pkLive,
         });
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe(suffixedClientUat);
       });
@@ -137,7 +137,7 @@ describe('AuthenticateContext', () => {
         const context = await createAuthenticateContext(clerkRequest, {
           publishableKey: pkLive,
         });
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe(suffixedClientUat);
       });
@@ -166,7 +166,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkTest,
         });
 
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe('0');
         expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
@@ -188,7 +188,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkTest,
         });
 
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe('0');
         expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
@@ -207,7 +207,7 @@ describe('AuthenticateContext', () => {
           publishableKey: pkLive,
         });
 
-        expect(context.suffixedCookies).toBe(true);
+        expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBeUndefined();
         expect(context.clientUat.toString()).toBe('0');
       });

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.19.1",
+  "version": "0.19.5",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -51,19 +51,19 @@
     "dist"
   ],
   "scripts": {
-    "app:build": "(cd examples/nextjs && npm run build --turbo)",
-    "app:dev": "(cd examples/nextjs && npm run dev --turbo)",
-    "app:dev:debug": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run dev --turbo)",
-    "app:dev:debug:server": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true CLERK_ELEMENTS_DEBUG_SERVER=true npm run dev --turbo)",
-    "app:dev:debug:ui": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG_UI=true npm run dev --turbo)",
-    "app:e2e": "(cd examples/nextjs && npm run e2e)",
-    "app:lint": "(cd examples/nextjs && npm run lint)",
+    "app:build": "(cd examples/nextjs && pnpm build)",
+    "app:dev": "(cd examples/nextjs && pnpm dev)",
+    "app:dev:debug": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true pnpm dev)",
+    "app:dev:debug:server": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true CLERK_ELEMENTS_DEBUG_SERVER=true pnpm dev)",
+    "app:dev:debug:ui": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG_UI=true pnpm dev)",
+    "app:e2e": "(cd examples/nextjs && pnpm e2e)",
+    "app:lint": "(cd examples/nextjs && pnpm lint)",
     "build": "tsup --env.NODE_ENV production",
     "build:analyze": "tsup --env.NODE_ENV production --metafile; open https://esbuild.github.io/analyze/",
     "build:declarations": "tsc --env.NODE_ENV production -p tsconfig.json",
     "dev": "tsup --env.NODE_ENV development --watch",
-    "dev:example": "concurrently \"npm run dev\" \"npm run app:dev\"",
-    "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"npm run dev -w @clerk/ui\" \"cd ../ui/theme-builder && npm run dev\"",
+    "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
+    "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"pnpm dev -w @clerk/ui\" \"cd ../ui/theme-builder && pnpm dev\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution",
     "lint:publint": "publint",
@@ -71,7 +71,10 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/types": "^4.32.0",
+    "@clerk/clerk-react": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@xstate/react": "^4.1.1",
@@ -79,22 +82,19 @@
     "xstate": "^5.15.0"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "5.15.3",
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/shared": "2.12.1",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@statelyai/inspect": "^0.4.0",
     "@types/node": "^18.19.33",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
     "concurrently": "^8.2.2",
     "next": "^14.2.10",
-    "tslib": "2.4.1",
-    "tsup": "*",
+    "tslib": "catalog:repo",
+    "tsup": "catalog:repo",
     "type-fest": "^4.9.0",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "@clerk/shared": "2.x",
     "next": "^13.5.4 || ^14.0.3 || ^15",
     "react": "^18.0.0 || ^19.0.0-beta",
     "react-dom": "^18.0.0 || ^19.0.0-beta"

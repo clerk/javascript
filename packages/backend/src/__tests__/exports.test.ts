@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expect, it } from 'vitest';
 
 import * as errorExports from '../errors';
@@ -42,8 +44,8 @@ describe('subpath /internal exports', () => {
         "debugRequestState",
         "decorateObjectWithResources",
         "makeAuthObjectSerializable",
-        "reverificationMismatch",
-        "reverificationMismatchResponse",
+        "reverificationError",
+        "reverificationErrorResponse",
         "signedInAuthObject",
         "signedOutAuthObject",
         "stripPrivateDataFromObject",

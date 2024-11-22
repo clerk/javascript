@@ -60,7 +60,7 @@ export function base64urlToArrayBuffer(base64url: string) {
   return buffer;
 }
 
-export function arrayBufferToBase64Url(buffer) {
+export function arrayBufferToBase64Url(buffer: ArrayBufferLike) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
 

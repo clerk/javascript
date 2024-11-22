@@ -1,21 +1,21 @@
 'use server';
 
-import { auth, reverificationMismatch } from '@clerk/nextjs/server';
-
+import { auth, reverificationError } from '@clerk/nextjs/server';
+import { ReverificationConfig } from '@clerk/types';
 const logUserIdActionReverification = async () => {
   const { userId, has } = await auth.protect();
 
   const config = {
-    level: 'secondFactor',
+    level: 'second_factor',
     afterMinutes: 1,
-  } as const;
+  } satisfies ReverificationConfig;
 
   const userNeedsReverification = !has({
     reverification: config,
   });
 
   if (userNeedsReverification) {
-    return reverificationMismatch(config);
+    return reverificationError(config);
   }
 
   return {

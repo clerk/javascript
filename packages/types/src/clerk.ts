@@ -738,9 +738,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        rethrowOfflineNetworkErrors: boolean;
       },
       Record<string, any>
     >;
+
+    __internal_claimAccountlessKeysUrl?: string;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
