@@ -1,5 +1,5 @@
 import type {
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -23,7 +23,7 @@ export type {
   CreateOrganizationProps,
   OrganizationListProps,
   WaitlistProps,
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationProps,
 };
 
 export type AvailableComponentProps =
@@ -36,7 +36,7 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | __experimental_UserVerificationProps;
+  | __internal_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -45,7 +45,7 @@ export type SignInCtx = SignInProps & {
   mode?: ComponentMode;
 };
 
-export type UserVerificationCtx = __experimental_UserVerificationProps & {
+export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };

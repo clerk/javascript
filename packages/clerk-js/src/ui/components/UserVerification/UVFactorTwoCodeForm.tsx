@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { __experimental_SessionVerificationResource, PhoneCodeFactor, TOTPFactor } from '@clerk/types';
+import type { PhoneCodeFactor, SessionVerificationResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import type { VerificationCodeCardProps } from '../../elements';
@@ -12,7 +12,7 @@ export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlterna
   factor: PhoneCodeFactor | TOTPFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
-  prepare?: () => Promise<__experimental_SessionVerificationResource>;
+  prepare?: () => Promise<SessionVerificationResource>;
 };
 
 type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
@@ -45,7 +45,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     session!
-      .__experimental_attemptSecondFactorVerification({ strategy: props.factor.strategy, code })
+      .attemptSecondFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);

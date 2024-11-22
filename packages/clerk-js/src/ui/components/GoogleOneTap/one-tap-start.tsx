@@ -1,6 +1,7 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 import { useEffect, useRef } from 'react';
 
+import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
 import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
@@ -33,7 +34,13 @@ function _OneTapStart(): JSX.Element | null {
   const shouldLoadGIS = !user?.id && !!environmentClientID;
 
   async function initializeGIS() {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Google Identity Services');
+      return undefined;
+    }
+
     const google = await loadGIS();
+
     google.accounts.id.initialize({
       client_id: environmentClientID!,
       callback: oneTapCallback,
@@ -42,6 +49,7 @@ function _OneTapStart(): JSX.Element | null {
       auto_select: false,
       use_fedcm_for_prompt: ctx.fedCmSupport,
     });
+
     return google;
   }
 

@@ -306,7 +306,7 @@ type _LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
   };
-  __experimental_userVerification: {
+  reverification: {
     password: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

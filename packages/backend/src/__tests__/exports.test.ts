@@ -37,8 +37,6 @@ describe('subpath /internal exports', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
         "AuthStatus",
-        "__experimental_reverificationError",
-        "__experimental_reverificationErrorResponse",
         "constants",
         "createAuthenticateRequest",
         "createClerkRequest",
@@ -46,6 +44,8 @@ describe('subpath /internal exports', () => {
         "debugRequestState",
         "decorateObjectWithResources",
         "makeAuthObjectSerializable",
+        "reverificationError",
+        "reverificationErrorResponse",
         "signedInAuthObject",
         "signedOutAuthObject",
         "stripPrivateDataFromObject",
