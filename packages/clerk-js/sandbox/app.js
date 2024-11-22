@@ -153,6 +153,9 @@ const routes = {
   '/waitlist': () => {
     Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
   },
+  '/accountless': () => {
+    Clerk.__unstable__updateProps({ options: { __internal_claimAccountlessKeysUrl: '/test-url' } });
+  },
 };
 
 /**

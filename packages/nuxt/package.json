@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -46,7 +46,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
     "@clerk/backend": "workspace:*",

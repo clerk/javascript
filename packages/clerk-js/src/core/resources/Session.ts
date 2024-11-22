@@ -275,20 +275,15 @@ export class Session extends BaseResource implements SessionResource {
     // this handles all getToken invocations with skipCache: true
     await fraudProtection.blockUntilReady();
 
-    const createTokenWithCaptchaProtection = async () => {
-      const heartbeatParams = skipCache ? undefined : await fraudProtection.challengeHeartbeat(Session.clerk);
-      return Token.create(path, { ...params, ...heartbeatParams }).catch(e => {
-        if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-          return fraudProtection.execute(async () => {
-            const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
-            return Token.create(path, { ...params, ...captchaParams });
-          });
-        }
-        throw e;
-      });
-    };
-
-    const tokenResolver = createTokenWithCaptchaProtection();
+    const tokenResolver = Token.create(path, params).catch(e => {
+      if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+        return fraudProtection.execute(async () => {
+          const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
+          return Token.create(path, { ...params, ...captchaParams });
+        });
+      }
+      throw e;
+    });
 
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {

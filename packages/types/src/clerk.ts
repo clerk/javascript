@@ -746,6 +746,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
       Record<string, any>
     >;
 
+    __internal_claimAccountlessKeysUrl?: string;
+
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
      */
