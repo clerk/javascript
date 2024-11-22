@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useCoreSignUp, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -25,6 +25,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { getSignUpAttributeFromIdentifier } from './utils';
@@ -64,6 +65,7 @@ export function _SignInStart(): JSX.Element {
   const status = useLoadingStatus();
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();
+  const signUp = useCoreSignUp();
   const { navigate } = useRouter();
   const options = useOptions();
   const ctx = useSignInContext();
@@ -363,7 +365,21 @@ export function _SignInStart(): JSX.Element {
       if (organizationTicket) {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
-      return navigate(`create?${paramsToForward.toString()}`);
+
+      if (attribute === 'emailAddress' || attribute === 'phoneNumber') {
+        paramsToForward.set('autoSubmit', 'true');
+      }
+
+      return handleCombinedFlowTransfer({
+        identifierAttribute: attribute,
+        identifier: identifierField.value,
+        signUpMode: userSettings.signUp.mode,
+        navigate,
+        organizationTicket,
+        redirectUrl: '',
+        redirectUrlComplete: '',
+        clerk,
+      });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
