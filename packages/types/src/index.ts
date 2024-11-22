@@ -13,6 +13,7 @@ export * from './environment';
 export * from './externalAccount';
 export * from './enterpriseAccount';
 export * from './factors';
+export * from './hooks';
 export * from './identificationLink';
 export * from './identifiers';
 export * from './image';

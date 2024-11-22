@@ -20,7 +20,7 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -86,7 +86,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -105,7 +105,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
           node-version: ${{ matrix.node-version }}
@@ -118,7 +118,7 @@ jobs:
         run: |
           if [ "${{ matrix.node-version }}" == "18" ]; then
             echo "Running tests on Node 18 only for packages with LTS support."
-            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue"
+            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt"
           else
             echo "Running tests for all packages on Node 20."
             pnpm turbo test $TURBO_ARGS
@@ -137,13 +137,13 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
       fail-fast: false
       matrix:
-        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue']
+        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue', 'nuxt']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -184,7 +184,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -211,6 +211,9 @@ jobs:
         with:
           publish-cmd: |
             if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}

@@ -6,7 +6,7 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "clean": "rm -rf .cache build",
-    "yalc:add": "yalc add -- @clerk/types @clerk/shared @clerk/backend @clerk/remix @clerk/clerk-react"
+    "yalc:add": "pnpm yalc add -- @clerk/types @clerk/shared @clerk/backend @clerk/remix @clerk/clerk-react"
   },
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",

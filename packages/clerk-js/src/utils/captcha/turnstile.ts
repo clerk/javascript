@@ -129,14 +129,14 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let retries = 0;
   let widgetContainerQuerySelector: string | undefined;
   // The backend uses this to determine which Turnstile site-key was used in order to verify the token
-  let captchaWidgetTypeUsed: CaptchaWidgetType = null;
+  let captchaWidgetType: CaptchaWidgetType = null;
 
   // modal
   if (modalContainerQuerySelector && modalWrapperQuerySelector) {
     // if invisible is selected but modal is provided,
     // we're going to render the invisible widget in the modal
     // but we won't show the modal as it will never escalate to interactive mode
-    captchaWidgetTypeUsed = widgetType;
+    captchaWidgetType = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
     await openModal?.();
     await waitForElement(modalContainerQuerySelector);
@@ -146,7 +146,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   if (!widgetContainerQuerySelector && widgetType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
-      captchaWidgetTypeUsed = 'smart';
+      captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
       visibleDiv.style.display = 'block';
     } else {
@@ -159,7 +159,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   // invisible widget for which we create the container automatically
   if (!widgetContainerQuerySelector) {
     turnstileSiteKey = invisibleSiteKey;
-    captchaWidgetTypeUsed = 'invisible';
+    captchaWidgetType = 'invisible';
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
@@ -242,5 +242,5 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: captchaWidgetTypeUsed };
+  return { captchaToken, captchaWidgetType };
 };

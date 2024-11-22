@@ -155,13 +155,18 @@ export class ClerkRuntimeError extends Error {
   code: string;
 
   constructor(message: string, { code }: { code: string }) {
-    super(message);
+    const prefix = '🔒 Clerk:';
+    const regex = new RegExp(prefix.replace(' ', '\\s*'), 'i');
+    const sanitized = message.replace(regex, '');
+    const _message = `${prefix} ${sanitized.trim()}\n\n(code="${code}")\n`;
+    super(_message);
 
     Object.setPrototypeOf(this, ClerkRuntimeError.prototype);
 
     this.code = code;
-    this.message = message;
+    this.message = _message;
     this.clerkRuntimeError = true;
+    this.name = 'ClerkRuntimeError';
   }
 
   /**

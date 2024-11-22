@@ -38,7 +38,7 @@ jobs:
 
       - name: Version packages for canary
         id: version-packages
-        run: pnpm version:canary | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:canary | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'

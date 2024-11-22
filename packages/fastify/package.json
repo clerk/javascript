@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.0.16",
+  "version": "2.0.18",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -35,14 +35,14 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/backend": "1.16.4",
-    "@clerk/shared": "2.14.0",
-    "@clerk/types": "4.34.0",
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "cookies": "0.8.0",
     "fastify-plugin": "^5.0.1"
   },
@@ -50,8 +50,8 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^20.14.8",
     "fastify": "^5.0.0",
-    "tsup": "*",
-    "typescript": "*"
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "fastify": ">=5"

@@ -87,7 +87,7 @@ jobs:
 
       - name: Version packages for snapshot
         id: version-packages
-        run: pnpm version:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'

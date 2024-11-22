@@ -1,5 +1,49 @@
 # Change Log
 
+## 5.34.5
+
+### Patch Changes
+
+- Collect captcha token on load ([#4623](https://github.com/clerk/javascript/pull/4623)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.34.4
+
+### Patch Changes
+
+- Fixes issue where `FormFeedback` was rendering two elements with the same `id` attribute leading to invalid markup. ([#4552](https://github.com/clerk/javascript/pull/4552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `sign_up_restricted_waitlist` error encountered in an oauth flow ([#4603](https://github.com/clerk/javascript/pull/4603)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Exclude `_clerk_session_id` query param from `/waitlist` endpoint ([#4594](https://github.com/clerk/javascript/pull/4594)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`7510d5cf0ac4d2994849931de8dda75cf605f840`](https://github.com/clerk/javascript/commit/7510d5cf0ac4d2994849931de8dda75cf605f840), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+  - @clerk/localizations@3.6.5
+
+## 5.34.3
+
+### Patch Changes
+
+- Block /tokens requests until fraud detection completes by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enforce uppercase rendering for `<ProviderInitialIcon />`. ([#4578](https://github.com/clerk/javascript/pull/4578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the password field would not render during autofill event until the user interacted with the screen. ([#4560](https://github.com/clerk/javascript/pull/4560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da)]:
+  - @clerk/shared@2.15.0
+
+## 5.34.2
+
+### Patch Changes
+
+- Display logo in `<Waitlist />` component ([#4561](https://github.com/clerk/javascript/pull/4561)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Correctly handle async requires_captcha error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.34.1
 
 ### Patch Changes

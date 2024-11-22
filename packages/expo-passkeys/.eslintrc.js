@@ -4,4 +4,12 @@ module.exports = {
   settings: {
     'import/ignore': ['node_modules/react-native/index\\.js$'],
   },
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: ['node:*'],
+      },
+    ],
+  },
 };

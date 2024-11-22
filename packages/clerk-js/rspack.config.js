@@ -308,11 +308,27 @@ const entryForVariant = variant => {
  * @param {object} config
  * @param {'development'|'production'} config.mode
  * @param {boolean} config.analysis
+ * @param {object} config.env
  * @returns {(import('@rspack/core').Configuration)[]}
  */
-const prodConfig = ({ mode, analysis }) => {
+const prodConfig = ({ mode, env, analysis }) => {
+  const isSandbox = !!env.sandbox;
+
   const clerkBrowser = merge(
     entryForVariant(variants.clerkBrowser),
+    isSandbox
+      ? {
+          entry: { sandbox: './sandbox/app.js' },
+          plugins: [
+            new rspack.HtmlRspackPlugin({
+              minify: false,
+              template: './sandbox/template.html',
+              inject: false,
+              hash: true,
+            }),
+          ],
+        }
+      : {},
     common({ mode }),
     commonForProd(),
     commonForProdChunked(),
@@ -404,6 +420,7 @@ const devConfig = ({ mode, env }) => {
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
   const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
+  const isSandbox = !!env.sandbox;
 
   /** @type {() => import('@rspack/core').Configuration} */
   const commonForDev = () => {
@@ -411,12 +428,20 @@ const devConfig = ({ mode, env }) => {
       module: {
         rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
       },
-      plugins: [new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } }))],
+      plugins: [
+        new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
+        isSandbox &&
+          new rspack.HtmlRspackPlugin({
+            minify: false,
+            template: './sandbox/template.html',
+            inject: false,
+          }),
+      ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
       output: {
-        publicPath: `${devUrl.origin}/npm`,
+        publicPath: isSandbox ? `` : `${devUrl.origin}/npm`,
         crossOriginLoading: 'anonymous',
-        filename: `${variant}.js`,
+        filename: `[name].js`,
         libraryTarget: 'umd',
       },
       optimization: {
@@ -430,6 +455,11 @@ const devConfig = ({ mode, env }) => {
         hot: true,
         liveReload: false,
         client: { webSocketURL: `auto://${devUrl.host}/ws` },
+        ...(isSandbox
+          ? {
+              historyApiFallback: true,
+            }
+          : {}),
       },
     };
   };
@@ -444,6 +474,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
+      isSandbox ? { entry: { sandbox: './sandbox/app.js' } } : {},
       common({ mode }),
       commonForDev(),
     ),
@@ -472,5 +503,5 @@ module.exports = env => {
   const mode = env.production ? 'production' : 'development';
   const analysis = !!env.analysis;
 
-  return isProduction(mode) ? prodConfig({ mode, analysis }) : devConfig({ mode, env });
+  return isProduction(mode) ? prodConfig({ mode, env, analysis }) : devConfig({ mode, env });
 };

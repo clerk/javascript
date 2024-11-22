@@ -22,10 +22,10 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
 import { unixEpochToDate } from '../../utils/date';
 import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
+import { fraudProtection } from '../fraudProtection';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -272,19 +272,18 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    const createTokenWithCaptchaProtection = async () => {
-      try {
-        return Token.create(path, params);
-      } catch (e) {
-        if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-          const captchaParams = await this.#triggerCaptchaChallenge();
-          return Token.create(path, { ...params, ...captchaParams });
-        }
-        throw e;
-      }
-    };
+    // this handles all getToken invocations with skipCache: true
+    await fraudProtection.blockUntilReady();
 
-    const tokenResolver = createTokenWithCaptchaProtection();
+    const tokenResolver = Token.create(path, params).catch(e => {
+      if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+        return fraudProtection.execute(async () => {
+          const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
+          return Token.create(path, { ...params, ...captchaParams });
+        });
+      }
+      throw e;
+    });
 
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
@@ -294,26 +293,5 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
     });
-  }
-
-  async #triggerCaptchaChallenge() {
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
-      retrieveCaptchaInfo(Session.clerk);
-
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
-      return getCaptchaToken({
-        siteKey: captchaSiteKey,
-        widgetType: captchaWidgetType,
-        invisibleSiteKey: captchaPublicKeyInvisible,
-        scriptUrl: captchaURL,
-        captchaProvider,
-        modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
-        modalContainerQuerySelector: '#cl-modal-captcha-container',
-        openModal: () => Session.clerk.__internal_openBlankCaptchaModal(),
-        closeModal: () => Session.clerk.__internal_closeBlankCaptchaModal(),
-      });
-    }
-
-    return {};
   }
 }

@@ -5,7 +5,8 @@
     "**/.yalc": true,
     "**/node_modules": true,
     ".temp_integration": true,
-    "packages/*/dist": true
+    "packages/*/dist": true,
+    "pnpm-lock.yaml": true,
   },
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsdk": "node_modules/typescript/lib",
@@ -23,4 +24,5 @@
       "url": "https://json.schemastore.org/chrome-manifest.json"
     }
   ],
+  "npm.packageManager": "pnpm",
 }
