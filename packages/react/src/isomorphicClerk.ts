@@ -60,6 +60,10 @@ import type {
 } from './types';
 import { isConstructor } from './utils';
 
+if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+  globalThis.__BUILD_DISABLE_RHC__ = false;
+}
+
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
@@ -461,7 +465,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
+      } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
           await loadClerkJsScript({

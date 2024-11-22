@@ -27,7 +27,8 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "headless"
+    "headless",
+    "no-rhc"
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
