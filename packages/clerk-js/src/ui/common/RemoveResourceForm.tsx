@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification } from '@clerk/shared/react';
+import { useReverification } from '@clerk/shared/react';
 
 import { localizationKeys, Text } from '../customizables';
 import type { FormProps } from '../elements';

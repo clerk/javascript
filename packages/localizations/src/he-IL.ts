@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: 'השג עזרה',
-      actionText: 'אין לך אף אחד מאלה?',
-      blockButton__backupCode: 'השתמש בקוד גיבוי',
-      blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
-      blockButton__password: 'המשך עם הסיסמה שלך',
-      blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
-      blockButton__totp: 'השתמש באפליקציית האימות שלך',
-      getHelp: {
-        blockButton__emailSupport: 'תמיכה באימייל',
-        content: 'אם יש לך בעיה באימות חשבונך, שלח לנו אימייל ואנחנו ניצור איתך קשר על מנת לשחזר את הגישה בהקדם האפשרי',
-        title: 'השג עזרה',
-      },
-      subtitle: 'נתקלת בבעיות? אתה יכול להשתמש בכל אחת מהשיטות הללו עבור אימות',
-      title: 'השתמש בשיטה אחרת',
-    },
-    backupCodeMfa: {
-      subtitle: 'קוד הגיבוי שלך הוא הקוד שקיבלת כאשר הגדרת את האימות הדו-שלבי',
-      title: 'הכנס את קוד הגיבוי',
-    },
-    emailCode: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'המשך ל {{applicationName}}',
-      title: 'בדוק את האימייל שלך',
-    },
-    noAvailableMethods: {
-      message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
-      subtitle: 'קרתה תקלה',
-      title: 'לא ניתן לאמת את חשבונך',
-    },
-    password: {
-      actionLink: 'השתמש בשיטה אחרת',
-      subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
-      title: 'הכנס סיסמה',
-    },
-    phoneCode: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'להמשך ל {{applicationName}}',
-      title: 'בדוק את הטלפון שלך',
-    },
-    phoneCodeMfa: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'להמשך, אנא הכנס את קוד האימות שנשלח לטלפון שלך',
-      title: 'בדוק את הטלפון שלך',
-    },
-    totpMfa: {
-      formTitle: 'קוד אימות',
-      subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
-      title: 'אימות דו-שלבי',
-    },
-  },
   backButton: 'חזור',
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
@@ -886,6 +831,61 @@ export const heIL: LocalizationResource = {
       successMessage: 'הארנק התווסף לחשבון שלך.',
       title: 'הוסף ארנק web3',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  userVerification: {
+    alternativeMethods: {
+      actionLink: 'השג עזרה',
+      actionText: 'אין לך אף אחד מאלה?',
+      blockButton__backupCode: 'השתמש בקוד גיבוי',
+      blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
+      blockButton__password: 'המשך עם הסיסמה שלך',
+      blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
+      blockButton__totp: 'השתמש באפליקציית האימות שלך',
+      getHelp: {
+        blockButton__emailSupport: 'תמיכה באימייל',
+        content: 'אם יש לך בעיה באימות חשבונך, שלח לנו אימייל ואנחנו ניצור איתך קשר על מנת לשחזר את הגישה בהקדם האפשרי',
+        title: 'השג עזרה',
+      },
+      subtitle: 'נתקלת בבעיות? אתה יכול להשתמש בכל אחת מהשיטות הללו עבור אימות',
+      title: 'השתמש בשיטה אחרת',
+    },
+    backupCodeMfa: {
+      subtitle: 'קוד הגיבוי שלך הוא הקוד שקיבלת כאשר הגדרת את האימות הדו-שלבי',
+      title: 'הכנס את קוד הגיבוי',
+    },
+    emailCode: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'המשך ל {{applicationName}}',
+      title: 'בדוק את האימייל שלך',
+    },
+    noAvailableMethods: {
+      message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
+      subtitle: 'קרתה תקלה',
+      title: 'לא ניתן לאמת את חשבונך',
+    },
+    password: {
+      actionLink: 'השתמש בשיטה אחרת',
+      subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
+      title: 'הכנס סיסמה',
+    },
+    phoneCode: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשך ל {{applicationName}}',
+      title: 'בדוק את הטלפון שלך',
+    },
+    phoneCodeMfa: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשך, אנא הכנס את קוד האימות שנשלח לטלפון שלך',
+      title: 'בדוק את הטלפון שלך',
+    },
+    totpMfa: {
+      formTitle: 'קוד אימות',
+      subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
+      title: 'אימות דו-שלבי',
     },
   },
   waitlist: {

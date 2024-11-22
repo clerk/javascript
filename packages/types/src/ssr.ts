@@ -20,5 +20,5 @@ export type InitialState = Serializable<{
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: OrganizationResource | undefined;
-  __experimental_factorVerificationAge: [number, number];
+  factorVerificationAge: [number, number];
 }>;

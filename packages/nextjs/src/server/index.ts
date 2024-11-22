@@ -67,7 +67,4 @@ export type {
 /**
  * Utilities for reverification
  */
-export {
-  __experimental_reverificationErrorResponse,
-  __experimental_reverificationError,
-} from '@clerk/backend/internal';
+export { reverificationErrorResponse, reverificationError } from '@clerk/backend/internal';
