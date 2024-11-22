@@ -32,7 +32,7 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
  * This is a value that we pass automatically so it does not need to pollute the public API.
  */
 type ClerkProviderPropsWithState = ReactRouterClerkProviderProps & {
-  clerkState: ClerkState;
+  clerkState?: ClerkState;
 };
 
 export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {

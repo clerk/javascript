@@ -2,14 +2,19 @@ import React from 'react';
 
 import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
 import { ClerkProvider } from './ReactRouterClerkProvider';
-import type { ReactRouterClerkProviderProps } from './types';
+import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 
 type ClerkAppOptions = Partial<
   Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState'>
 >;
 
+type LoaderData = {
+  data: any;
+  clerkState: ClerkState;
+};
+
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
-  return ({ loaderData }) => {
+  return ({ loaderData }: { loaderData: LoaderData }) => {
     let clerkState;
     const isSpaMode = inSpaMode();
 
