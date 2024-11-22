@@ -48,6 +48,11 @@ class FraudProtectionService {
         widgetType: 'invisible',
         scriptUrl: captchaURL,
         captchaProvider: 'turnstile',
+      }).catch(e => {
+        if (e.captchaError) {
+          return { captchaError: e.captchaError };
+        }
+        return undefined;
       });
     }
 
@@ -77,6 +82,11 @@ class FraudProtectionService {
         modalContainerQuerySelector: '#cl-modal-captcha-container',
         openModal: () => clerk.__internal_openBlankCaptchaModal(),
         closeModal: () => clerk.__internal_closeBlankCaptchaModal(),
+      }).catch(e => {
+        if (e.captchaError) {
+          return { captchaError: e.captchaError };
+        }
+        return undefined;
       });
     }
 
