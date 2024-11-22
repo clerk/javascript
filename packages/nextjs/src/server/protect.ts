@@ -65,14 +65,14 @@ export function createProtect(opts: {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
         return redirectToSignIn();
       }
-      return notFound();
+      notFound();
     };
 
     const handleUnauthorized = () => {
       if (unauthorizedUrl) {
         return redirect(unauthorizedUrl);
       }
-      return notFound();
+      notFound();
     };
 
     /**
