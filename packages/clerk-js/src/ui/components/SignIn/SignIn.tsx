@@ -6,6 +6,7 @@ import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../
 import {
   SignInContext,
   SignUpContext,
+  useOptions,
   useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
@@ -36,6 +37,7 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
+  const options = useOptions();
 
   return (
     <Flow.Root flow='signIn'>
@@ -74,7 +76,7 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
-        {signInContext.__experimental?.combinedFlow && (
+        {options.experimental?.combinedFlow && (
           <Route path='create'>
             <Route
               path='verify-email-address'
@@ -148,7 +150,6 @@ function SignInRoot() {
       value={{
         componentName: 'SignUp',
         ...signInContext.__experimental?.signUpProps,
-        ...(signInContext.__experimental?.combinedFlow ? { __experimental: { combinedFlow: true } } : {}),
       }}
     >
       <SignInRoutes />

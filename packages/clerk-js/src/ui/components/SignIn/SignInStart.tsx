@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -65,9 +65,10 @@ export function _SignInStart(): JSX.Element {
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
+  const options = useOptions();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signInUrl, signUpUrl, waitlistUrl, __experimental } = ctx;
-  const isCombinedFlow = (__experimental?.combinedFlow && signInUrl === signUpUrl) || false;
+  const { afterSignInUrl, signInUrl, signUpUrl, waitlistUrl } = ctx;
+  const isCombinedFlow = (options?.experimental?.combinedFlow && signInUrl === signUpUrl) || false;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),

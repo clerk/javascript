@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -39,8 +39,9 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const { afterSignUpUrl, signInUrl, signUpUrl, unsafeMetadata, __experimental } = ctx;
-  const isCombinedFlow = (__experimental?.combinedFlow && signInUrl === signUpUrl) || false;
+  const options = useOptions();
+  const { afterSignUpUrl, signInUrl, signUpUrl, unsafeMetadata } = ctx;
+  const isCombinedFlow = (options.experimental?.combinedFlow && signInUrl === signUpUrl) || false;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
