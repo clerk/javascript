@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { __experimental_SessionVerificationLevel } from '@clerk/types';
+import type { SessionVerificationLevel } from '@clerk/types';
 import { useMemo } from 'react';
 
 import { useUserVerification } from '../../contexts';
@@ -12,7 +12,7 @@ const useUserVerificationSessionKey = () => {
     () =>
       ({
         level: level || 'second_factor',
-      }) satisfies { level: __experimental_SessionVerificationLevel },
+      }) satisfies { level: SessionVerificationLevel },
     [level],
   );
 };
