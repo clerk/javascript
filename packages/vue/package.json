@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -46,7 +46,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig",
+    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%"
   },
