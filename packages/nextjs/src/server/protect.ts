@@ -66,6 +66,7 @@ export function createProtect(opts: {
         return redirectToSignIn();
       }
       notFound();
+      return;
     };
 
     const handleUnauthorized = () => {
@@ -73,6 +74,7 @@ export function createProtect(opts: {
         return redirect(unauthorizedUrl);
       }
       notFound();
+      return;
     };
 
     /**
