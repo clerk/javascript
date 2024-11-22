@@ -3,9 +3,9 @@ import { getAuth } from '@clerk/react-router/ssr.server';
 import { ClerkLoaded, SignedIn, useUser } from '@clerk/react-router';
 import { Link } from 'react-router';
 
-export const loader: LoaderFunction = async args => {
-  return getAuth(args);
-};
+export async function loader(args: LoaderFunction) {
+  return getAuth(args)
+}
 
 export default function Index() {
   const user = useUser();

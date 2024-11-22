@@ -1,5 +1,6 @@
 packages:
   - 'packages/*'
+  - 'playground/react-router-node'
 
 catalogs:
   # Can be referenced through "catalog:react"
