@@ -62,7 +62,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
   const astroMiddleware: AstroMiddleware = async (context, next) => {
     // if the current page is prerendered, do nothing
-    if (context.isPrerendered) {
+    if ('isPrerendered' in context && context.isPrerendered) {
       return next();
     }
 
