@@ -7,7 +7,10 @@ import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPM
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
-export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
+export type BaseFetchOptions = ClerkResourceReloadParams & {
+  forceUpdateClient?: boolean;
+  saveResponse?: (payload: any) => Promise<void>;
+};
 
 export type BaseMutateParams = {
   action?: string;
@@ -159,7 +162,10 @@ export abstract class BaseResource {
       opts,
     );
 
-    return this.fromJSON((json?.response || json) as J);
+    const data = json?.response || (json as J);
+    await opts?.saveResponse?.(data);
+
+    return this.fromJSON(data);
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>({

@@ -57,7 +57,6 @@ const unboundCreateFixtures = (
     const environmentMock = new Environment(baseEnvironment);
     Environment.getInstance().fetch = jest.fn(() => Promise.resolve(environmentMock));
 
-    // @ts-expect-error
     const clientMock = new Client(baseClient);
     Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
 

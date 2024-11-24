@@ -33,11 +33,13 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.fromJSON(data);
   }
 
-  fetch({ touch }: { touch: boolean } = { touch: false }): Promise<Environment> {
+  fetch(
+    { touch, saveResponse }: { touch: boolean; saveResponse?: (payload: string) => Promise<void> } = { touch: false },
+  ): Promise<Environment> {
     if (touch) {
       return this._basePatch({});
     }
-    return this._baseGet();
+    return this._baseGet({ saveResponse });
   }
 
   isSingleSession = (): boolean => {

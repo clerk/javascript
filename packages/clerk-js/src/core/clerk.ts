@@ -193,10 +193,10 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
 
-  public __internal_getEnvironment: (() => Promise<EnvironmentResource>) | undefined;
-  public __internal_getClient: (() => Promise<ClientResource>) | undefined;
-  public __internal_setEnvironment: ((environment: EnvironmentResource) => Promise<void>) | undefined;
-  public __internal_setClient: ((client: ClientResource) => Promise<void>) | undefined;
+  public __internal_getEnvironment: (() => Promise<any>) | undefined;
+  public __internal_getClient: (() => Promise<any>) | undefined;
+  public __internal_setEnvironment: ((environment: any) => Promise<void>) | undefined;
+  public __internal_setClient: ((client: any) => Promise<void>) | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -1847,19 +1847,17 @@ export class Clerk implements ClerkInterface {
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
     let environment, client;
     try {
-      const [fetchedEnv, fetchedClient] = await Promise.all([
-        Environment.getInstance().fetch({ touch: false }),
-        Client.getInstance().fetch(),
+      [environment, client] = await Promise.all([
+        Environment.getInstance().fetch({ touch: false, saveResponse: this.__internal_setEnvironment }),
+        Client.getInstance().fetch({ saveResponse: this.__internal_setClient }),
       ]);
-      environment = fetchedEnv;
-      client = fetchedClient;
-      await this.__internal_setEnvironment?.(fetchedEnv);
-      await this.__internal_setClient?.(fetchedClient);
     } catch (err) {
       if (isClerkRuntimeError(err) && err.code === 'network_error') {
         console.log('Clerk: using cached environment and client');
-        environment = await this.__internal_getEnvironment?.();
-        client = await this.__internal_getClient?.();
+        const cachedEnvironment = await this.__internal_getEnvironment?.();
+        const cachedClient = await this.__internal_getClient?.();
+        environment = new Environment(cachedEnvironment);
+        client = new Client(cachedClient);
       } else {
         throw err;
       }

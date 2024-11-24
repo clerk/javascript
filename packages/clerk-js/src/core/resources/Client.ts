@@ -28,7 +28,7 @@ export class Client extends BaseResource implements ClientResource {
     return !!resource && resource instanceof Client;
   }
 
-  private constructor(data: ClientJSON | null = null) {
+  constructor(data: ClientJSON | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -49,8 +49,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch(): Promise<this> {
-    return this._baseGet();
+  fetch({ saveResponse }: { saveResponse?: (payload: string) => Promise<void> } = {}): Promise<this> {
+    return this._baseGet({ saveResponse });
   }
 
   async destroy(): Promise<void> {

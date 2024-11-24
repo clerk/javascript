@@ -72,6 +72,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "catalog:react",
@@ -85,6 +86,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "expo-auth-session": ">=5",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
