@@ -1,5 +1,11 @@
 # @clerk/astro
 
+## 1.4.17
+
+### Patch Changes
+
+- Ignore pre-rendered files in Clerk Middleware ([#4640](https://github.com/clerk/javascript/pull/4640)) by [@jlengstorf](https://github.com/jlengstorf)
+
 ## 1.4.16
 
 ### Patch Changes
