@@ -2,4 +2,4 @@
 '@clerk/astro': patch
 ---
 
-ignore prerendered files in middleware
+Ignore pre-rendered files in Clerk Middleware
