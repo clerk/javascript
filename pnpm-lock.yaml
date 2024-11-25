@@ -922,8 +922,8 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6
       react-router:
-        specifier: 7.0.0-pre.6
-        version: 7.0.0-pre.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 7.0.1
+        version: 7.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -12678,8 +12678,8 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react-router@7.0.0-pre.6:
-    resolution: {integrity: sha512-ln9gXs3ilZLGdggPetKYWzxrmMNykTipWxSXHUcB0qSJECkPTe3NcKo8fJx6dQfS4gS1zhCXGpHWRVasinnxOw==}
+  react-router@7.0.1:
+    resolution: {integrity: sha512-WVAhv9oWCNsja5AkK6KLpXJDSJCQizOIyOd4vvB/+eHGbYx5vkhcmcmwWjQ9yqkRClogi+xjEg9fNEOd5EX/tw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -30317,7 +30317,7 @@ snapshots:
       '@remix-run/router': 1.9.0
       react: 18.3.1
 
-  react-router@7.0.0-pre.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@types/cookie': 0.6.0
       cookie: 1.0.2
