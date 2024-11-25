@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __experimental_SessionVerificationResource } from '@clerk/types';
+import type { SessionVerificationResource } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -16,7 +16,7 @@ const useAfterVerification = () => {
   const { navigate } = useRouter();
 
   const handleVerificationResponse = useCallback(
-    async (sessionVerification: __experimental_SessionVerificationResource) => {
+    async (sessionVerification: SessionVerificationResource) => {
       setCache({
         data: sessionVerification,
         isLoading: false,

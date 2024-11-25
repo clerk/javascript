@@ -61,6 +61,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [handler, options] = parseHandlerAndOptions(args);
 
   const astroMiddleware: AstroMiddleware = async (context, next) => {
+    // if the current page is prerendered, do nothing
+    if ('isPrerendered' in context && context.isPrerendered) {
+      return next();
+    }
+
     const clerkRequest = createClerkRequest(context.request);
 
     clerkClient(context).telemetry.record(

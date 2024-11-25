@@ -11,10 +11,10 @@ export const UVFactorOneEmailCodeCard = (props: UVFactorOneEmailCodeCardProps) =
     <Flow.Part part='emailCode'>
       <UVFactorOneCodeForm
         {...props}
-        cardTitle={localizationKeys('__experimental_userVerification.emailCode.title')}
-        cardSubtitle={localizationKeys('__experimental_userVerification.emailCode.subtitle')}
-        inputLabel={localizationKeys('__experimental_userVerification.emailCode.formTitle')}
-        resendButton={localizationKeys('__experimental_userVerification.emailCode.resendButton')}
+        cardTitle={localizationKeys('reverification.emailCode.title')}
+        cardSubtitle={localizationKeys('reverification.emailCode.subtitle')}
+        inputLabel={localizationKeys('reverification.emailCode.formTitle')}
+        resendButton={localizationKeys('reverification.emailCode.resendButton')}
       />
     </Flow.Part>
   );

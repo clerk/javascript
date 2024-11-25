@@ -51,8 +51,8 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
 }
 
 function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolean {
-  const prevFVA = prev.__experimental_factorVerificationAge;
-  const nextFVA = next.__experimental_factorVerificationAge;
+  const prevFVA = prev.factorVerificationAge;
+  const nextFVA = next.factorVerificationAge;
   if (prevFVA !== null && nextFVA !== null) {
     return prevFVA[0] !== nextFVA[0] || prevFVA[1] !== nextFVA[1];
   }

@@ -67,8 +67,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     setAuthState(authContext);
   }, [authContext]);
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
-    authState;
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authState;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -84,7 +83,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     getToken,
     signOut,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
   });
 };
 
@@ -100,7 +99,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
     signOut,
     getToken,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
   } = authObject ?? {};
 
   const derivedHas = useCallback(
@@ -113,10 +112,10 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
         orgId,
         orgRole,
         orgPermissions,
-        __experimental_factorVerificationAge,
+        factorVerificationAge,
       })(params);
     },
-    [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
+    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
   );
 
   if (sessionId === undefined && userId === undefined) {
