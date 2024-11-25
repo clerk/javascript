@@ -114,7 +114,9 @@ runs:
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install PNPM Dependencies
-      run: pnpm install 
+      env:
+        CYPRESS_INSTALL_BINARY: 0
+      run: pnpm install
       shell: bash
 
     - name: Get Playwright Version
