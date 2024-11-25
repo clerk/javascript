@@ -1,7 +1,6 @@
 import type { LoadedClerk, SignUpModes } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
-import { completeSignUpFlow } from '../SignUp/util';
 
 type HandleCombinedFlowTransferProps = {
   identifierAttribute: 'emailAddress' | 'phoneNumber';
@@ -9,8 +8,7 @@ type HandleCombinedFlowTransferProps = {
   signUpMode: SignUpModes;
   navigate: (to: string) => Promise<unknown>;
   organizationTicket?: string;
-  redirectUrl?: string;
-  redirectUrlComplete?: string;
+  afterSignUpUrl: string;
   clerk: LoadedClerk;
   handleError: (err: any) => void;
 };
@@ -25,8 +23,7 @@ export function handleCombinedFlowTransfer({
   signUpMode,
   navigate,
   organizationTicket,
-  redirectUrl,
-  redirectUrlComplete,
+  afterSignUpUrl,
   clerk,
   handleError,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
@@ -56,17 +53,19 @@ export function handleCombinedFlowTransfer({
       .create({
         [identifierAttribute]: identifierValue,
       })
-      .then(res =>
-        completeSignUpFlow({
-          signUp: res,
-          verifyEmailPath: 'create/verify-email-address',
-          verifyPhonePath: 'create/verify-phone-number',
-          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: redirectUrlComplete }),
-          navigate,
-          redirectUrl,
-          redirectUrlComplete,
-        }),
-      )
+      .then(res => {
+        if (res.status === 'complete') {
+          return clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl });
+        } else if (res.status === 'missing_requirements') {
+          if (res.unverifiedFields?.includes('email_address') && 'create/verify-email-address') {
+            return navigate('create/verify-email-address');
+          }
+          if (res.unverifiedFields?.includes('phone_number') && 'create/verify-phone-number') {
+            return navigate('create/verify-phone-number');
+          }
+        }
+        return;
+      })
       .catch(err => handleError(err));
   }
 

@@ -365,17 +365,13 @@ export function _SignInStart(): JSX.Element {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
 
-      const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
-      const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
       return handleCombinedFlowTransfer({
         identifierAttribute: attribute as 'emailAddress' | 'phoneNumber',
         identifierValue: identifierField.value,
         signUpMode: userSettings.signUp.mode,
         navigate,
         organizationTicket,
-        redirectUrl,
-        redirectUrlComplete,
+        afterSignUpUrl: ctx.afterSignUpUrl || '/',
         clerk,
         handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
       });
