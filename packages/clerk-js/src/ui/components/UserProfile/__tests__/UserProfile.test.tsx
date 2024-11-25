@@ -45,10 +45,10 @@ describe('UserProfile', () => {
 
       props.setProps({ customPages });
       render(<UserProfile />, { wrapper });
-      const profileElements = screen.getAllByText(/Profile/i);
-      expect(profileElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
-      const securityElements = screen.getAllByText(/Security/i);
-      expect(securityElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
+      const profileElements = screen.getAllByRole('button', { name: /Profile/i });
+      expect(profileElements.length).toBeGreaterThan(0);
+      const securityElements = screen.getAllByRole('button', { name: /Security/i });
+      expect(securityElements.length).toBeGreaterThan(0);
       const customElements = screen.getAllByRole('button', { name: /Custom1/i });
       expect(customElements.length).toBeGreaterThan(0);
       const externalElements = screen.getAllByRole('button', { name: /ExternalLink/i });
