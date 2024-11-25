@@ -356,6 +356,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  #isCombinedFlow(): boolean {
+    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -2023,10 +2027,18 @@ export class Clerk implements ClerkInterface {
     if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
-    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    const url = buildURL(
+      {
+        base: signInOrUpUrl,
+        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashSearchParams: [initValues, redirectUrls],
+      },
+      { stringify: true },
+    );
     return this.buildUrlWithAuth(url);
   };
 
