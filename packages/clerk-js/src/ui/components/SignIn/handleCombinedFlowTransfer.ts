@@ -1,9 +1,10 @@
 import type { LoadedClerk, SignUpModes } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
+import { completeSignUpFlow } from '../SignUp/util';
 
 type HandleCombinedFlowTransferProps = {
-  identifierAttribute: 'emailAddress' | 'phoneNumber';
+  identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username';
   identifierValue: string;
   signUpMode: SignUpModes;
   navigate: (to: string) => Promise<unknown>;
@@ -11,6 +12,8 @@ type HandleCombinedFlowTransferProps = {
   afterSignUpUrl: string;
   clerk: LoadedClerk;
   handleError: (err: any) => void;
+  redirectUrl?: string;
+  redirectUrlComplete?: string;
 };
 
 /**
@@ -26,6 +29,8 @@ export function handleCombinedFlowTransfer({
   afterSignUpUrl,
   clerk,
   handleError,
+  redirectUrl,
+  redirectUrlComplete,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -54,17 +59,15 @@ export function handleCombinedFlowTransfer({
         [identifierAttribute]: identifierValue,
       })
       .then(res => {
-        if (res.status === 'complete') {
-          return clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl });
-        } else if (res.status === 'missing_requirements') {
-          if (res.unverifiedFields?.includes('email_address')) {
-            return navigate('create/verify-email-address');
-          }
-          if (res.unverifiedFields?.includes('phone_number')) {
-            return navigate('create/verify-phone-number');
-          }
-        }
-        return;
+        return completeSignUpFlow({
+          signUp: res,
+          verifyEmailPath: 'create/verify-email-address',
+          verifyPhonePath: 'create/verify-phone-number',
+          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
+          navigate,
+          redirectUrl,
+          redirectUrlComplete,
+        });
       })
       .catch(err => handleError(err));
   }

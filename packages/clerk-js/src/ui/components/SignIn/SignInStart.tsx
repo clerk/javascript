@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -68,6 +68,7 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useRouter();
   const options = useOptions();
   const ctx = useSignInContext();
+  const signUpCtx = useSignUpContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
   const isCombinedFlow = (options?.experimental?.combinedFlow && options.signInUrl === options.signUpUrl) || false;
   const supportEmail = useSupportEmail();
@@ -365,15 +366,20 @@ export function _SignInStart(): JSX.Element {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
 
+      const redirectUrl = buildSSOCallbackURL(signUpCtx, displayConfig.signUpUrl);
+      const redirectUrlComplete = signUpCtx.afterSignUpUrl || '/';
+
       return handleCombinedFlowTransfer({
-        identifierAttribute: attribute as 'emailAddress' | 'phoneNumber',
-        identifierValue: identifierField.value,
-        signUpMode: userSettings.signUp.mode,
-        navigate,
-        organizationTicket,
-        afterSignUpUrl: ctx.afterSignUpUrl || '/',
+        afterSignUpUrl: signUpCtx.afterSignUpUrl || '/',
         clerk,
         handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
+        identifierAttribute: attribute,
+        identifierValue: identifierField.value,
+        navigate,
+        organizationTicket,
+        signUpMode: userSettings.signUp.mode,
+        redirectUrl,
+        redirectUrlComplete,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
