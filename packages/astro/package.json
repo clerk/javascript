@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "1.4.15",
+  "version": "1.4.17",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",

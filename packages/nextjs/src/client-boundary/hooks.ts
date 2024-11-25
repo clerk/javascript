@@ -10,7 +10,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-  __experimental_useReverification,
+  useReverification,
 } from '@clerk/clerk-react';
 
 export {

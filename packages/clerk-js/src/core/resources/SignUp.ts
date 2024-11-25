@@ -37,6 +37,7 @@ import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
+  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -79,31 +80,41 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
-      retrieveCaptchaInfo(SignUp.clerk);
 
-    if (
-      !this.shouldBypassCaptchaForAttempt(params) &&
-      canUseCaptcha &&
-      captchaSiteKey &&
-      captchaURL &&
-      captchaPublicKeyInvisible
-    ) {
-      try {
-        const captchaParams = await getCaptchaToken({
-          siteKey: captchaSiteKey,
-          widgetType: captchaWidgetType,
-          invisibleSiteKey: captchaPublicKeyInvisible,
-          scriptUrl: captchaURL,
-          captchaProvider,
-        });
-        paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
-        paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
-      } catch (e) {
-        if (e.captchaError) {
-          paramsWithCaptcha.captchaError = e.captchaError;
-        } else {
-          throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+    if (!__BUILD_DISABLE_RHC__) {
+      const {
+        captchaSiteKey,
+        canUseCaptcha,
+        captchaURL,
+        captchaWidgetType,
+        captchaProvider,
+        captchaPublicKeyInvisible,
+      } = retrieveCaptchaInfo(SignUp.clerk);
+
+      if (
+        !this.shouldBypassCaptchaForAttempt(params) &&
+        canUseCaptcha &&
+        captchaSiteKey &&
+        captchaURL &&
+        captchaPublicKeyInvisible
+      ) {
+        try {
+          const captchaParams = await getCaptchaToken({
+            siteKey: captchaSiteKey,
+            widgetType: captchaWidgetType,
+            invisibleSiteKey: captchaPublicKeyInvisible,
+            scriptUrl: captchaURL,
+            captchaProvider,
+          });
+
+          paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
+          paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
+        } catch (e) {
+          if (e.captchaError) {
+            paramsWithCaptcha.captchaError = e.captchaError;
+          } else {
+            throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+          }
         }
       }
     }
@@ -196,6 +207,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return this;
+    }
+
     const {
       generateSignature,
       identifier,
@@ -244,6 +260,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return this;
+    }
+
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -259,6 +280,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return this;
+    }
+
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,

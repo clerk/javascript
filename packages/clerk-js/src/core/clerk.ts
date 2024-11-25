@@ -9,7 +9,7 @@ import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared
 import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
+  __internal_UserVerificationModalProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -109,6 +109,7 @@ import {
   clerkMissingSignInUrlAsSatellite,
   clerkOAuthCallbackDidNotCompleteSignInSignUp,
   clerkRedirectUrlIsMissingScheme,
+  clerkUnsupportedEnvironmentWarning,
 } from './errors';
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
@@ -175,7 +176,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #publishableKey: string = '';
+  #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
@@ -263,7 +264,9 @@ export class Clerk implements ClerkInterface {
     const publishableKey = parsePublishableKey(this.publishableKey);
 
     if (!publishableKey) {
-      return errorThrower.throwInvalidPublishableKeyError({ key: this.publishableKey });
+      return errorThrower.throwInvalidPublishableKeyError({
+        key: this.publishableKey,
+      });
     }
 
     return publishableKey.frontendApi;
@@ -422,7 +425,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -437,6 +440,11 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
+  public __internal_closeReverification = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
+  };
+
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
     this.assertComponentsReady(this.#componentControls);
     return this.#componentControls
@@ -449,11 +457,6 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
-  };
-
-  public __experimental_closeUserVerification = (): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -557,7 +560,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+    if (props?.__experimental?.newComponents && this.__experimental_ui) {
       this.__experimental_ui.mount('SignIn', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
@@ -583,7 +586,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+    if (props?.__experimental?.newComponents && this.__experimental_ui) {
       this.__experimental_ui.mount('SignUp', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
@@ -1325,7 +1328,13 @@ export class Clerk implements ClerkInterface {
         signUp,
         verifyEmailPath:
           params.verifyEmailAddressUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+          buildURL(
+            {
+              base: displayConfig.signUpUrl,
+              hashPath: '/verify-email-address',
+            },
+            { stringify: true },
+          ),
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
@@ -1486,6 +1495,11 @@ export class Clerk implements ClerkInterface {
   public authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Google One Tap');
+      return this.client!.signIn; // TODO: Remove not null assertion
+    }
+
     return this.client?.signIn
       .create({
         strategy: 'google_one_tap',
@@ -1504,11 +1518,27 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_metamask_signature',
+    });
   };
 
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
-    await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_wallet_signature' });
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_coinbase_wallet_signature',
+    });
   };
 
   public authenticateWithWeb3 = async ({
@@ -1519,6 +1549,11 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return;
+    }
+
     if (!this.client || !this.environment) {
       return;
     }
@@ -1532,7 +1567,11 @@ export class Clerk implements ClerkInterface {
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
+      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
+        identifier,
+        generateSignature,
+        strategy,
+      });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
@@ -1642,7 +1681,10 @@ export class Clerk implements ClerkInterface {
     // 2. clerk-js initializes propA with a default value
     // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
     // 4. If we don't merge the new props with the current options, propA will be reset to undefined
-    const props = { ..._props, options: this.#initOptions({ ...this.#options, ..._props.options }) };
+    const props = {
+      ..._props,
+      options: this.#initOptions({ ...this.#options, ..._props.options }),
+    };
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
