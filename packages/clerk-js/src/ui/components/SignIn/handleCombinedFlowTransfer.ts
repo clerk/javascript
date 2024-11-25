@@ -1,6 +1,19 @@
-// @ts-nocheck
+import type { LoadedClerk, SignUpModes } from '@clerk/types';
+
 import { SIGN_UP_MODES } from '../../../core/constants';
 import { completeSignUpFlow } from '../SignUp/util';
+
+type HandleCombinedFlowTransferProps = {
+  identifierAttribute: 'emailAddress' | 'phoneNumber';
+  identifierValue: string;
+  signUpMode: SignUpModes;
+  navigate: (to: string) => Promise<unknown>;
+  organizationTicket?: string;
+  redirectUrl?: string;
+  redirectUrlComplete?: string;
+  clerk: LoadedClerk;
+  handleError: (err: any) => void;
+};
 
 /**
  * This function is used to handle transfering from a sign in to a sign up when SignIn is rendered as the combined flow.
@@ -8,7 +21,7 @@ import { completeSignUpFlow } from '../SignUp/util';
  */
 export function handleCombinedFlowTransfer({
   identifierAttribute,
-  identifier,
+  identifierValue,
   signUpMode,
   navigate,
   organizationTicket,
@@ -16,13 +29,13 @@ export function handleCombinedFlowTransfer({
   redirectUrlComplete,
   clerk,
   handleError,
-}) {
+}: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
       identifierAttribute === 'emailAddress'
         ? {
             initialValues: {
-              [identifierAttribute]: identifier,
+              [identifierAttribute]: identifierValue,
             },
           }
         : {},
@@ -30,7 +43,7 @@ export function handleCombinedFlowTransfer({
     return navigate(waitlistUrl);
   }
 
-  clerk.client.signUp[identifierAttribute] = identifier;
+  clerk.client.signUp[identifierAttribute] = identifierValue;
   const paramsToForward = new URLSearchParams();
   if (organizationTicket) {
     paramsToForward.set('__clerk_ticket', organizationTicket);
@@ -41,14 +54,14 @@ export function handleCombinedFlowTransfer({
   if (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber') {
     return clerk.client.signUp
       .create({
-        [identifierAttribute]: identifier,
+        [identifierAttribute]: identifierValue,
       })
       .then(res =>
         completeSignUpFlow({
           signUp: res,
           verifyEmailPath: 'create/verify-email-address',
           verifyPhonePath: 'create/verify-phone-number',
-          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: clerk.afterSignUpUrl }),
+          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: redirectUrlComplete }),
           navigate,
           redirectUrl,
           redirectUrlComplete,

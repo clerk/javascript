@@ -365,18 +365,17 @@ export function _SignInStart(): JSX.Element {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
 
-      if (attribute === 'emailAddress' || attribute === 'phoneNumber') {
-        paramsToForward.set('autoSubmit', 'true');
-      }
+      const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+      const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
       return handleCombinedFlowTransfer({
-        identifierAttribute: attribute,
-        identifier: identifierField.value,
+        identifierAttribute: attribute as 'emailAddress' | 'phoneNumber',
+        identifierValue: identifierField.value,
         signUpMode: userSettings.signUp.mode,
         navigate,
         organizationTicket,
-        redirectUrl: '',
-        redirectUrlComplete: '',
+        redirectUrl,
+        redirectUrlComplete,
         clerk,
         handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
       });

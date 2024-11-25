@@ -37,6 +37,14 @@ export const completeSignUpFlow = ({
     if (signUp.unverifiedFields?.includes('phone_number') && verifyPhonePath) {
       return navigate(verifyPhonePath);
     }
+    // Combined flow
+    if (
+      signUp.missingFields.some(mf =>
+        ['email_address', 'phone_number', 'username', 'first_name', 'last_name'].includes(mf),
+      )
+    ) {
+      return navigate('../../create/continue');
+    }
   }
   return;
 };

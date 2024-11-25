@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
+import { withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
@@ -34,7 +34,7 @@ function _SignUpStart(): JSX.Element {
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
-  const { userSettings, displayConfig } = useEnvironment();
+  const { userSettings } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
   const { setActive } = useClerk();
@@ -231,9 +231,6 @@ function _SignUpStart(): JSX.Element {
     card.setLoading();
     card.setError(undefined);
 
-    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
-    const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
     return signUp
       .create(buildRequest(fieldsToSubmit))
       .then(res =>
@@ -243,8 +240,6 @@ function _SignUpStart(): JSX.Element {
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
-          redirectUrl,
-          redirectUrlComplete,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
