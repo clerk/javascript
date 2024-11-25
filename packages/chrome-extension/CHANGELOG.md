@@ -1,5 +1,76 @@
 # Change Log
 
+## 2.0.0
+
+### Major Changes
+
+- Consume packages with remotely hosted code removed as required by Manifest v3. ([#4133](https://github.com/clerk/javascript/pull/4133)) by [@tmilewski](https://github.com/tmilewski)
+
+- #### Permission Updates (BREAKING) ([#4133](https://github.com/clerk/javascript/pull/4133)) by [@tmilewski](https://github.com/tmilewski)
+
+  The `storage` entry in `host_permissions` is now required for all extensions.
+  While it's likely that this is already enabled in your extension, this change is to ensure that Clerk can store the necessary data for the extension to function properly.
+
+  **How to Update:** Add the following to your `manifest.json` file:
+
+  ```json
+  {
+    "host_permissions": ["storage"]
+  }
+  ```
+
+  #### Introducing `syncHost` (BREAKING)
+
+  In an effort to make the handling of sync hosts more deterministic, we have introduced a new parameter `syncHost` to `<ClerkProvider>`
+
+  **How to Update:** Replace `syncSessionWithTab` with `syncHost` in the `<ClerkProvider>` component and set `syncHost` to the host that you intend to synchronize with.
+
+  #### Service Workers `createClerkClient`
+
+  We've introduced a new method `createClerkClient` to handle background tasks in your extension!
+
+  ```ts
+  import { createClerkClient } from '@clerk/chrome-extension/background';
+
+  // Create a new Clerk instance and get a fresh token for the user
+  async function getToken() {
+    const clerk = await createClerkClient({
+      publishableKey: process.env.PLASMO_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    });
+    return await clerk.session?.getToken();
+  }
+
+  // Create a listener to listen for messages from content scripts
+  // NOTE: A runtime listener cannot be async.
+  //       It must return true, in order to keep the connection open and send a response later.
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    // You can use the token in the listener to perform actions on behalf of the user
+    // OR send the token back to the content script
+    getToken().then(token => sendResponse({ token }));
+    return true;
+  });
+  ```
+
+### Patch Changes
+
+- Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Replaces `__experimental_useReverification` with `useReverification`
+
+- Updated dependencies [[`4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d`](https://github.com/clerk/javascript/commit/4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69), [`7c27b0cfda6ace9693e9c184392481b00f24a64d`](https://github.com/clerk/javascript/commit/7c27b0cfda6ace9693e9c184392481b00f24a64d)]:
+  - @clerk/clerk-js@5.35.0
+  - @clerk/clerk-react@5.17.0
+  - @clerk/shared@2.17.0
+
+## 1.3.40
+
+### Patch Changes
+
+- Updated dependencies [[`727c218f8f176bcde73995dafb503a594e16669b`](https://github.com/clerk/javascript/commit/727c218f8f176bcde73995dafb503a594e16669b), [`0c477281ba1034a485b1d053472990e70ac3aa78`](https://github.com/clerk/javascript/commit/0c477281ba1034a485b1d053472990e70ac3aa78), [`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/clerk-js@5.34.6
+  - @clerk/clerk-react@5.16.2
+  - @clerk/shared@2.16.1
+
 ## 1.3.39
 
 ### Patch Changes

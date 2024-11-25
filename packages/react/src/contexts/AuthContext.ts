@@ -9,7 +9,7 @@ export type AuthContextValue = {
   orgRole: OrganizationCustomRoleKey | null | undefined;
   orgSlug: string | null | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
-  __experimental_factorVerificationAge: [number, number] | null;
+  factorVerificationAge: [number, number] | null;
 };
 
 export const [AuthContext, useAuthContext] = createContextAndHook<AuthContextValue>('AuthContext');

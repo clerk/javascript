@@ -38,14 +38,14 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
 
   const prepare = () => {
     void session!
-      .__experimental_prepareFirstFactorVerification(props.factor)
+      .prepareFirstFactorVerification(props.factor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     session!
-      .__experimental_attemptFirstFactorVerification({ strategy: props.factor.strategy, code })
+      .attemptFirstFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);
