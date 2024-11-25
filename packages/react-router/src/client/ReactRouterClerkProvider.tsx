@@ -1,9 +1,10 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import { assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
+import { assertPublishableKeyInSpaMode, assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
+import { PassedHooksProvider } from './PassedHooksContext';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
-import type { ClerkState, ReactRouterClerkProviderProps } from './types';
+import type { ClerkState, PassedHooks, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -27,15 +28,14 @@ const SDK_METADATA = {
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
 /**
- * Internal type that includes the initial state prop that is passed to the ClerkProvider
- * during SSR.
+ * Internal type that includes the initial state prop that is passed to the ClerkProvider during SSR.
  * This is a value that we pass automatically so it does not need to pollute the public API.
  */
 type ClerkProviderPropsWithState = ReactRouterClerkProviderProps & {
   clerkState?: ClerkState;
 };
 
-export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
+function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
   const isSpaMode = inSpaMode();
 
@@ -117,3 +117,42 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
     </ClerkReactRouterOptionsProvider>
   );
 }
+
+type ClerkReactRouterOptions = Partial<
+  Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>
+>;
+
+type LoaderData = {
+  data: any;
+  clerkState: ClerkState;
+};
+
+type ClerkProviderProps = ClerkReactRouterOptions &
+  PassedHooks & {
+    loaderData: LoaderData;
+  };
+
+export const ClerkProvider = ({ children, loaderData, navigate, location, params, ...opts }: ClerkProviderProps) => {
+  let clerkState;
+  const isSpaMode = inSpaMode();
+
+  // Don't use `loaderData` to fetch the clerk state if we're in SPA mode
+  if (!isSpaMode) {
+    clerkState = loaderData.clerkState;
+  }
+
+  if (isSpaMode) {
+    assertPublishableKeyInSpaMode(opts.publishableKey);
+  }
+
+  return (
+    <PassedHooksProvider options={{ navigate, location, params }}>
+      <ClerkProviderBase
+        {...(opts as ReactRouterClerkProviderProps)}
+        clerkState={clerkState}
+      >
+        {children}
+      </ClerkProviderBase>
+    </PassedHooksProvider>
+  );
+};

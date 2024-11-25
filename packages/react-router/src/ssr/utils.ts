@@ -1,10 +1,8 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
-// import type { AppLoadContext, defer } from '@remix-run/server-runtime';
 import cookie from 'cookie';
-import type { AppLoadContext } from 'react-router';
+import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
-// import { json } from 'react-router';
 import * as utils from '../utils/utils';
 import type { RequestStateWithRedirectUrls } from './types';
 
@@ -15,6 +13,17 @@ export function isResponse(value: any): value is Response {
     typeof value.statusText === 'string' &&
     typeof value.headers === 'object' &&
     typeof value.body !== 'undefined'
+  );
+}
+
+export function isDataWithResponseInit(value: any): value is UNSAFE_DataWithResponseInit<unknown> {
+  return (
+    typeof value === 'object' &&
+    value != null &&
+    'type' in value &&
+    'data' in value &&
+    'init' in value &&
+    value.type === 'DataWithResponseInit'
   );
 }
 
@@ -43,36 +52,13 @@ export const injectRequestStateIntoResponse = async (
   const { clerkState, headers } = getResponseClerkState(requestState, context);
 
   // set the correct content-type header in case the user returned a `Response` directly
-  // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
   headers.forEach((value, key) => {
     clone.headers.append(key, value);
   });
 
-  // return json({ ...(data || {}), ...clerkState }, clone);
   return Response.json({ ...(data || {}), ...clerkState }, clone);
 };
-
-export function injectRequestStateIntoDeferredData(
-  data: ReturnType<any>,
-  requestState: RequestStateWithRedirectUrls,
-  context: AppLoadContext,
-) {
-  const { clerkState, headers } = getResponseClerkState(requestState, context);
-
-  // Avoid creating a new object here to retain referential equality.
-  data.data.clerkState = clerkState.clerkState;
-
-  if (typeof data.init !== 'undefined') {
-    data.init.headers = new Headers(data.init.headers);
-
-    headers.forEach((value, key) => {
-      data.init.headers.append(key, value);
-    });
-  }
-
-  return data;
-}
 
 /**
  * Returns the clerk state object and observability headers to be injected into a loader response.

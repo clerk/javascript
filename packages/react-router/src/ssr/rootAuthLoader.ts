@@ -1,15 +1,13 @@
 import { decorateObjectWithResources } from '@clerk/backend/internal';
 
-// import type { defer } from '@remix-run/server-runtime';
-// import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
-  // injectRequestStateIntoDeferredData,
   injectRequestStateIntoResponse,
+  isDataWithResponseInit,
   isRedirect,
   isResponse,
 } from './utils';
@@ -33,7 +31,7 @@ interface RootAuthLoader {
 /**
  * Makes authorization state available in your application by wrapping the root loader.
  *
- * @see https://clerk.com/docs/quickstarts/remix
+ * @see https://clerk.com/docs/quickstarts/react-router
  */
 export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
@@ -64,16 +62,6 @@ export const rootAuthLoader: RootAuthLoader = async (
   const handlerResult = await handler(args);
   assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
-  // When using defer(), we need to inject the clerk auth state into its internal data object.
-  // if (isDeferredData(handlerResult)) {
-  //   return injectRequestStateIntoDeferredData(
-  //     // This is necessary because the DeferredData type is not exported from remix.
-  //     handlerResult as unknown as ReturnType<typeof defer>,
-  //     requestState,
-  //     args.context,
-  //   );
-  // }
-
   if (isResponse(handlerResult)) {
     try {
       // respect and pass-through any redirects without modifying them
@@ -83,6 +71,20 @@ export const rootAuthLoader: RootAuthLoader = async (
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
       return injectRequestStateIntoResponse(handlerResult, requestState, args.context);
+    } catch (e) {
+      throw new Error(invalidRootLoaderCallbackReturn);
+    }
+  }
+
+  if (isDataWithResponseInit(handlerResult)) {
+    try {
+      // clone and try to inject requestState into all json-like responses
+      // if this fails, the user probably didn't return a json object or a valid json string
+      return injectRequestStateIntoResponse(
+        new Response(JSON.stringify(handlerResult.data), handlerResult.init ?? undefined),
+        requestState,
+        args.context,
+      );
     } catch (e) {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
