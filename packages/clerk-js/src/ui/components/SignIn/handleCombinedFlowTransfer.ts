@@ -57,10 +57,10 @@ export function handleCombinedFlowTransfer({
         if (res.status === 'complete') {
           return clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl });
         } else if (res.status === 'missing_requirements') {
-          if (res.unverifiedFields?.includes('email_address') && 'create/verify-email-address') {
+          if (res.unverifiedFields?.includes('email_address')) {
             return navigate('create/verify-email-address');
           }
-          if (res.unverifiedFields?.includes('phone_number') && 'create/verify-phone-number') {
+          if (res.unverifiedFields?.includes('phone_number')) {
             return navigate('create/verify-phone-number');
           }
         }
