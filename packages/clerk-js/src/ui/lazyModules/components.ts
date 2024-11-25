@@ -16,7 +16,9 @@ const componentImportPaths = {
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
-  AccountlessPrompt: () => import(/* webpackChunkName: "accountlessPrompt" */ './../components/AccountlessPrompt'),
+  AccountlessPrompt: __DEV__
+    ? () => import(/* webpackChunkName: "accountlessPrompt" */ './../components/AccountlessPrompt')
+    : () => null,
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -84,9 +86,10 @@ export const BlankCaptchaModal = lazy(() =>
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
-export const AccountlessPrompt = lazy(() =>
-  componentImportPaths.AccountlessPrompt().then(module => ({ default: module.AccountlessPrompt })),
-);
+export const AccountlessPrompt = __DEV__
+  ? // @ts-expect-error Types are broken due to __DEV__
+    lazy(() => componentImportPaths.AccountlessPrompt().then(module => ({ default: module.AccountlessPrompt })))
+  : () => null;
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();

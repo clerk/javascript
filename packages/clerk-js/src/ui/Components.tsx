@@ -517,11 +517,13 @@ const Components = (props: ComponentsProps) => {
           </LazyImpersonationFabProvider>
         )}
 
-        {state.options?.__internal_claimAccountlessKeysUrl && (
-          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-            <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
-          </LazyImpersonationFabProvider>
-        )}
+        {__DEV__
+          ? state.options?.__internal_claimAccountlessKeysUrl && (
+              <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+                <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
+              </LazyImpersonationFabProvider>
+            )
+          : null}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>
