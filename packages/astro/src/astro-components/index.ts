@@ -24,3 +24,4 @@ export { OrganizationProfile } from './interactive/OrganizationProfile';
 export { OrganizationSwitcher } from './interactive/OrganizationSwitcher';
 export { default as OrganizationList } from './interactive/OrganizationList.astro';
 export { default as GoogleOneTap } from './interactive/GoogleOneTap.astro';
+export { default as Waitlist } from './interactive/Waitlist.astro';
