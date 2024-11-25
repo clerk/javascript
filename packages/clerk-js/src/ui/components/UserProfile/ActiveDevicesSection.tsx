@@ -15,8 +15,6 @@ export const ActiveDevicesSection = () => {
 
   const { data: sessions, isLoading } = useFetch(user?.getSessions, 'user-sessions');
 
-  console.log('alll', sessions);
-
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.activeDevicesSection.title')}
