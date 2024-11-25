@@ -926,9 +926,9 @@ importers:
       '@types/react-dom':
         specifier: catalog:react
         version: 18.3.1
-      esbuild-fix-imports-plugin:
-        specifier: ^1.0.6
-        version: 1.0.6
+      esbuild-plugin-file-path-extensions:
+        specifier: ^2.1.3
+        version: 2.1.3
       react-router:
         specifier: 7.0.1
         version: 7.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -8242,11 +8242,12 @@ packages:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==}
     engines: {node: '>= 0.4'}
 
-  esbuild-fix-imports-plugin@1.0.6:
-    resolution: {integrity: sha512-3gAogd5LPB/GSJj/dXwRZjU8QgPM2yqXoE/8oJcl+NGprdO9sTpVrIhuwk3RYDHZlEH7tCzYogwT1pZtjretiQ==}
-
   esbuild-plugin-file-path-extensions@2.1.2:
     resolution: {integrity: sha512-c9ncPyXg2ykUFBZ3HwErs39EN0jdJHHMb2un/fAYHR41ZgnsHMXM1FlG8W3MV+NXRi64dFSybS9FZcaHO0Ge5Q==}
+    engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
+  esbuild-plugin-file-path-extensions@2.1.3:
+    resolution: {integrity: sha512-yLriKqLz32F0zGDqrfuTx8aENTVnf0l0HZ6qAgPhQpxFIcrZRNc4DfXjZs8pq0VPeBazzpb3WJ05B0S6s3ucSQ==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
   esbuild@0.20.2:
@@ -24537,9 +24538,9 @@ snapshots:
       is-date-object: 1.0.5
       is-symbol: 1.0.4
 
-  esbuild-fix-imports-plugin@1.0.6: {}
-
   esbuild-plugin-file-path-extensions@2.1.2: {}
+
+  esbuild-plugin-file-path-extensions@2.1.3: {}
 
   esbuild@0.20.2:
     optionalDependencies:
