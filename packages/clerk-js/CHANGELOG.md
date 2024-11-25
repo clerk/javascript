@@ -1,5 +1,80 @@
 # Change Log
 
+## 5.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+- If a nonce is provided, it is now made available to Clerk's internal components. This allows the nonce to be passed in to style-src in CSPs and work correctly. ([#4509](https://github.com/clerk/javascript/pull/4509)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Include **BUILD_DISABLE_RHC** to allow for builds which remove remotely hosted code as it is a requirement for browser extensions. ([#4133](https://github.com/clerk/javascript/pull/4133)) by [@tmilewski](https://github.com/tmilewski)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/shared@2.17.0
+  - @clerk/types@4.35.0
+  - @clerk/localizations@3.7.0
+
+## 5.34.6
+
+### Patch Changes
+
+- Catch and ignore any captcha errors during heartbeat ([#4629](https://github.com/clerk/javascript/pull/4629)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enable captcha for development instances ([#4620](https://github.com/clerk/javascript/pull/4620)) by [@issuedat](https://github.com/issuedat)
+
+- Add new internal UI component for accountless. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/types@4.34.2
+  - @clerk/localizations@3.6.6
+  - @clerk/shared@2.16.1
+
+## 5.34.5
+
+### Patch Changes
+
+- Collect captcha token on load ([#4623](https://github.com/clerk/javascript/pull/4623)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.34.4
+
+### Patch Changes
+
+- Fixes issue where `FormFeedback` was rendering two elements with the same `id` attribute leading to invalid markup. ([#4552](https://github.com/clerk/javascript/pull/4552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `sign_up_restricted_waitlist` error encountered in an oauth flow ([#4603](https://github.com/clerk/javascript/pull/4603)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Exclude `_clerk_session_id` query param from `/waitlist` endpoint ([#4594](https://github.com/clerk/javascript/pull/4594)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`7510d5cf0ac4d2994849931de8dda75cf605f840`](https://github.com/clerk/javascript/commit/7510d5cf0ac4d2994849931de8dda75cf605f840), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+  - @clerk/localizations@3.6.5
+
 ## 5.34.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -79,7 +79,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "publish:local": "pnpm dlx yalc push --replace --sig",
+    "publish:local": "pnpm yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
