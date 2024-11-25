@@ -1876,7 +1876,7 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__DEV__) {
+    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
       this.#handleAccountlessPrompt();
     }
     return true;
@@ -2009,7 +2009,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleAccountlessPrompt = () => {
-    if (__DEV__) {
+    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
       void this.#componentControls?.ensureMounted().then(controls => {
         if (this.#options.__internal_claimAccountlessKeysUrl) {
           controls.updateProps({
