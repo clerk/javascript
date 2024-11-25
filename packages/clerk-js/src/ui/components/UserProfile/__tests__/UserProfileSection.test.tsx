@@ -51,7 +51,7 @@ describe('ProfileSection', () => {
     });
   });
 
-  describe('with SAML', () => {
+  describe('with Enterprise SSO', () => {
     it('disables the first & last name inputs if user has active enterprise connections', async () => {
       const emailAddress = 'george@jungle.com';
       const firstName = 'George';
@@ -59,7 +59,7 @@ describe('ProfileSection', () => {
 
       const config = createFixtures.config(f => {
         f.withEmailAddress();
-        f.withSaml();
+        f.withEnterpriseSso();
         f.withName();
         f.withUser({
           first_name: firstName,
@@ -134,7 +134,7 @@ describe('ProfileSection', () => {
 
       const config = createFixtures.config(f => {
         f.withEmailAddress();
-        f.withSaml();
+        f.withEnterpriseSso();
         f.withName();
         f.withUser({
           first_name: firstName,
