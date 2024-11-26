@@ -16,6 +16,7 @@ test.describe('custom middleware @nuxt', () => {
         'nuxt.config.js',
         () => `export default defineNuxtConfig({
           modules: ['@clerk/nuxt'],
+          devtools: { enabled: false },
           clerk: {
             skipServerMiddleware: true
           }
