@@ -84,7 +84,7 @@ const notificationAnimation = keyframes`
 const outAnimation = keyframes`
   0% {
     opacity:1;
-    translateY(0px);
+    translateY: (0px);
     max-height: 6rem;
     visibility: visible;
   }  
