@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.0.18",
+  "version": "2.0.20",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -35,7 +35,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"
   },

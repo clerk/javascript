@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.3.16",
+  "version": "1.3.18",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -49,7 +49,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"

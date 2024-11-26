@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
@@ -164,24 +165,36 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignUp');
 
+/**
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToUserProfile', 'Use the `redirectToUserProfile()` method instead.');
     void clerk.redirectToUserProfile();
   }, []);
 
   return null;
 }, 'RedirectToUserProfile');
 
+/**
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToOrganizationProfile', 'Use the `redirectToOrganizationProfile()` method instead.');
     void clerk.redirectToOrganizationProfile();
   }, []);
 
   return null;
 }, 'RedirectToOrganizationProfile');
 
+/**
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToCreateOrganization', 'Use the `redirectToCreateOrganization()` method instead.');
     void clerk.redirectToCreateOrganization();
   }, []);
 

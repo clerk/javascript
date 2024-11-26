@@ -1,5 +1,55 @@
 # Change Log
 
+## 4.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+  Renaming
+
+  - `__experimental_SessionVerificationResource` -> `SessionVerificationResource`
+  - `__experimental_SessionVerificationStatus` -> `SessionVerificationStatus`
+  - `__experimental_SessionVerificationLevel` -> `SessionVerificationLevel`
+  - `__experimental_ReverificationConfig` -> `ReverificationConfig`
+
+  `CheckAuthorizationParamsWithCustomPermissions` and `CheckAuthorizationParams` now include `reverification?: ReverificationConfig;`
+
+  Properties of `IntialState`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+
+  Localization types:
+  All properties of `__experimental_userVerification` are moved to `reverification`
+
+### Patch Changes
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.34.2
+
+### Patch Changes
+
+- Add `__internal_claimAccountlessKeysUrl` to `ClerkOptions`. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.34.1
 
 ### Patch Changes

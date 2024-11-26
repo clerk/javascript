@@ -1,5 +1,17 @@
 const errorPrefix = 'ClerkJS:';
 
+/**
+ * Used to log a warning when a Clerk feature is used in an unsupported environment.
+ * (Development Only)
+ *
+ * @param strategy The strategy that is not supported in the current environment.
+ * @returns void
+ * @note This is a warning and not an error because the application will still work, but the feature will not be available.
+ */
+export function clerkUnsupportedEnvironmentWarning(strategy: string) {
+  console.warn(`${errorPrefix} ${strategy} is not supported in this environment.`);
+}
+
 export function clerkNetworkError(url: string, e: Error): never {
   throw new Error(`${errorPrefix} Network error at "${url}" - ${e}. Please try again.`);
 }
@@ -8,7 +20,7 @@ export function clerkErrorInitFailed(): never {
   throw new Error(`${errorPrefix} Something went wrong initializing Clerk.`);
 }
 
-export function clerkErrorDevInitFailed(msg: string = ''): never {
+export function clerkErrorDevInitFailed(msg = ''): never {
   throw new Error(`${errorPrefix} Something went wrong initializing Clerk in development mode.${msg && ` ${msg}`}`);
 }
 

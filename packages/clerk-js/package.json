@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.34.5",
+  "version": "5.35.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -27,7 +27,8 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "headless"
+    "headless",
+    "no-rhc"
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",

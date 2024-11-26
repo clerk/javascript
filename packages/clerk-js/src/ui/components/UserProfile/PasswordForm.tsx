@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/types';
 import { useRef } from 'react';
 

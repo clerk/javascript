@@ -2,13 +2,6 @@ import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type {
-  __experimental_SessionVerificationJSON,
-  __experimental_SessionVerificationResource,
-  __experimental_SessionVerifyAttemptFirstFactorParams,
-  __experimental_SessionVerifyAttemptSecondFactorParams,
-  __experimental_SessionVerifyCreateParams,
-  __experimental_SessionVerifyPrepareFirstFactorParams,
-  __experimental_SessionVerifyPrepareSecondFactorParams,
   ActJWTClaim,
   CheckAuthorization,
   EmailCodeConfig,
@@ -18,6 +11,13 @@ import type {
   SessionJSON,
   SessionResource,
   SessionStatus,
+  SessionVerificationJSON,
+  SessionVerificationResource,
+  SessionVerifyAttemptFirstFactorParams,
+  SessionVerifyAttemptSecondFactorParams,
+  SessionVerifyCreateParams,
+  SessionVerifyPrepareFirstFactorParams,
+  SessionVerifyPrepareSecondFactorParams,
   TokenResource,
   UserResource,
 } from '@clerk/types';
@@ -41,7 +41,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
-  __experimental_factorVerificationAge: [number, number] | null = null;
+  factorVerificationAge: [number, number] | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -94,7 +94,7 @@ export class Session extends BaseResource implements SessionResource {
     const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
     return createCheckAuthorization({
       userId: this.user?.id,
-      __experimental_factorVerificationAge: this.__experimental_factorVerificationAge,
+      factorVerificationAge: this.factorVerificationAge,
       orgId: activeMembership?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
@@ -121,9 +121,7 @@ export class Session extends BaseResource implements SessionResource {
     return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
   }
 
-  __experimental_startVerification = async ({
-    level,
-  }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
+  startVerification = async ({ level }: SessionVerifyCreateParams): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
@@ -132,14 +130,14 @@ export class Session extends BaseResource implements SessionResource {
           level,
         } as any,
       })
-    )?.response as unknown as __experimental_SessionVerificationJSON;
+    )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
   };
 
-  __experimental_prepareFirstFactorVerification = async (
-    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
-  ): Promise<__experimental_SessionVerificationResource> => {
+  prepareFirstFactorVerification = async (
+    factor: SessionVerifyPrepareFirstFactorParams,
+  ): Promise<SessionVerificationResource> => {
     let config;
     switch (factor.strategy) {
       case 'email_code':
@@ -164,49 +162,49 @@ export class Session extends BaseResource implements SessionResource {
           strategy: factor.strategy,
         } as any,
       })
-    )?.response as unknown as __experimental_SessionVerificationJSON;
+    )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
   };
 
-  __experimental_attemptFirstFactorVerification = async (
-    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
-  ): Promise<__experimental_SessionVerificationResource> => {
+  attemptFirstFactorVerification = async (
+    attemptFactor: SessionVerifyAttemptFirstFactorParams,
+  ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
         body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
       })
-    )?.response as unknown as __experimental_SessionVerificationJSON;
+    )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
   };
 
-  __experimental_prepareSecondFactorVerification = async (
-    params: __experimental_SessionVerifyPrepareSecondFactorParams,
-  ): Promise<__experimental_SessionVerificationResource> => {
+  prepareSecondFactorVerification = async (
+    params: SessionVerifyPrepareSecondFactorParams,
+  ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/prepare_second_factor`,
         body: params as any,
       })
-    )?.response as unknown as __experimental_SessionVerificationJSON;
+    )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
   };
 
-  __experimental_attemptSecondFactorVerification = async (
-    params: __experimental_SessionVerifyAttemptSecondFactorParams,
-  ): Promise<__experimental_SessionVerificationResource> => {
+  attemptSecondFactorVerification = async (
+    params: SessionVerifyAttemptSecondFactorParams,
+  ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
         body: params as any,
       })
-    )?.response as unknown as __experimental_SessionVerificationJSON;
+    )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
   };
@@ -220,7 +218,7 @@ export class Session extends BaseResource implements SessionResource {
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
-    this.__experimental_factorVerificationAge = data.factor_verification_age;
+    this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
@@ -275,20 +273,15 @@ export class Session extends BaseResource implements SessionResource {
     // this handles all getToken invocations with skipCache: true
     await fraudProtection.blockUntilReady();
 
-    const createTokenWithCaptchaProtection = async () => {
-      const heartbeatParams = skipCache ? undefined : await fraudProtection.challengeHeartbeat(Session.clerk);
-      return Token.create(path, { ...params, ...heartbeatParams }).catch(e => {
-        if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-          return fraudProtection.execute(async () => {
-            const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
-            return Token.create(path, { ...params, ...captchaParams });
-          });
-        }
-        throw e;
-      });
-    };
-
-    const tokenResolver = createTokenWithCaptchaProtection();
+    const tokenResolver = Token.create(path, params).catch(e => {
+      if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+        return fraudProtection.execute(async () => {
+          const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
+          return Token.create(path, { ...params, ...captchaParams });
+        });
+      }
+      throw e;
+    });
 
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {

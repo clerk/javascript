@@ -2,15 +2,13 @@ import type { Clerk } from '@clerk/types';
 import { useMemo, useRef } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
-import { __experimental_isReverificationHint, __experimental_reverificationError } from '../../authorization-errors';
+import { isReverificationHint, reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '../../error';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
-async function resolveResult<T>(
-  result: Promise<T> | T,
-): Promise<T | ReturnType<typeof __experimental_reverificationError>> {
+async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
     if (r instanceof Response) {
@@ -20,7 +18,7 @@ async function resolveResult<T>(
   } catch (e) {
     // Treat fapi assurance as an assurance hint
     if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
-      return __experimental_reverificationError();
+      return reverificationError();
     }
 
     // rethrow
@@ -36,7 +34,7 @@ type UseReverificationOptions = {
 };
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
-  openUIComponent: Clerk['__experimental_openUserVerification'];
+  openUIComponent: Clerk['__internal_openReverification'];
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -48,13 +46,13 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
     return (async (...args: Parameters<Fetcher>) => {
       let result = await resolveResult(fetcher(...args));
 
-      if (__experimental_isReverificationHint(result)) {
+      if (isReverificationHint(result)) {
         /**
          * Create a promise
          */
         const resolvers = createDeferredPromise();
 
-        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata.reverification);
+        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
         /**
          * On success resolve the pending promise
@@ -127,21 +125,21 @@ type UseReverificationResult<
  *   return <button onClick={fetchBalance}>...</button>
  * }
  */
-function __experimental_useReverification<
+function useReverification<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
-  const { __experimental_openUserVerification } = useClerk();
+  const { __internal_openReverification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      openUIComponent: __experimental_openUserVerification,
+      openUIComponent: __internal_openReverification,
       ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__experimental_openUserVerification, fetcherRef.current, optionsRef.current]);
+  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
@@ -152,4 +150,4 @@ function __experimental_useReverification<
   return handleReverification;
 }
 
-export { __experimental_useReverification };
+export { useReverification };
