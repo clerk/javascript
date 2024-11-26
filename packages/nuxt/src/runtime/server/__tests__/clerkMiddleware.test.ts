@@ -58,7 +58,7 @@ describe('clerkMiddleware(params)', () => {
       '/',
       eventHandler(event => event.context.auth),
     );
-    const response = await handler(new Request(new URL('/', 'http://localhostx')));
+    const response = await handler(new Request(new URL('/', 'http://localhost')));
 
     expect(response.status).toBe(200);
     expect(authenticateRequestMock).toHaveBeenCalledWith(expect.any(Request), expect.objectContaining(MOCK_OPTIONS));
