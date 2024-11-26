@@ -9,12 +9,12 @@ const CLERK_HIDDEN = '.clerk';
 
 function updateGitignore() {
   if (!fsModule.fs) {
-    return;
+    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
   }
   const { existsSync, writeFileSync, readFileSync, appendFileSync } = fsModule.fs;
 
   if (!fsModule.path) {
-    return;
+    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
   const gitignorePath = fsModule.path.join(process.cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
@@ -31,7 +31,7 @@ function updateGitignore() {
 const CLERK_LOCK = 'clerk.lock';
 const getClerkPath = () => {
   if (!fsModule.path) {
-    return '';
+    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
   return fsModule.path.join(process.cwd(), '.clerk', '.tmp', 'accountless.json');
 };
@@ -40,7 +40,7 @@ let isCreatingFile = false;
 
 function safeParseClerkFile(): AccountlessApplication | undefined {
   if (!fsModule.fs) {
-    return;
+    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
   }
   const { readFileSync } = fsModule.fs;
   try {
@@ -59,21 +59,16 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
 
 async function createAccountlessKeys(): Promise<AccountlessApplication | undefined> {
   if (!fsModule.fs) {
-    console.log('fsModule.fs not found');
-    return;
+    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
   }
   const { existsSync, writeFileSync, mkdirSync, rmSync } = fsModule.fs;
   if (isCreatingFile) {
-    console.log('isCreatingFile');
     return undefined;
   }
 
   if (existsSync(CLERK_LOCK)) {
-    console.log('lock exists');
     return undefined;
   }
-
-  console.log('should create file');
 
   isCreatingFile = true;
 

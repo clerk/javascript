@@ -14,6 +14,10 @@ import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
+/**
+ * Accountless creator should only be loaded if the conditions below are met.
+ * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
+ */
 const LazyAccountlessCreator = dynamic(() =>
   import('./lazy-accountless-creator.js').then(m => m.AccountlessCreateKeys),
 );

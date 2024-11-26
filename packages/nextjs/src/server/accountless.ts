@@ -8,6 +8,7 @@ const getAccountlessCookieName = (): string => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const PATH = process.env.PWD;
 
+  // Handle gracefully missing PWD
   if (!PATH) {
     return `${accountlessCookiePrefix}${0}`;
   }

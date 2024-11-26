@@ -3,7 +3,7 @@ import { constants } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
-import { handleValueOrFn } from '@clerk/shared/utils';
+import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
@@ -248,7 +248,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  if (requestData.secretKey && !ENCRYPTION_KEY && process.env.NODE_ENV === 'production') {
+  if (requestData.secretKey && !ENCRYPTION_KEY && isProductionEnvironment()) {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
@@ -257,10 +257,9 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  const maybeAccountlessKey =
-    process.env.NODE_ENV === 'production'
-      ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
-      : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+  const maybeAccountlessKey = isProductionEnvironment()
+    ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
+    : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
 
   return AES.encrypt(JSON.stringify(requestData), maybeAccountlessKey).toString();
 }
@@ -276,10 +275,9 @@ export function decryptClerkRequestData(
     return {};
   }
 
-  const maybeAccountlessKey =
-    process.env.NODE_ENV === 'production'
-      ? ENCRYPTION_KEY || SECRET_KEY
-      : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+  const maybeAccountlessKey = isProductionEnvironment()
+    ? ENCRYPTION_KEY || SECRET_KEY
+    : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
 
   try {
     const decryptedBytes = AES.decrypt(encryptedRequestData, maybeAccountlessKey);

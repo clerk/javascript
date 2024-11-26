@@ -22,7 +22,7 @@ export default defineConfig(overrideOptions => {
     bundle: false,
     clean: true,
     minify: false,
-    external: ['#crypto', '#fs'],
+    external: ['#fs'],
     sourcemap: true,
     legacyOutput: true,
     define: {

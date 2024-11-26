@@ -68,6 +68,9 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
   if (!propsWithEnvs.publishableKey && !isNextWithUnstableServerActions && process.env.NODE_ENV === 'development') {
+    /**
+     * Attention: Moving this call outside the conditional will cause the ClerkProvider to opt-in all routes into dynamic rendering.
+     */
     const dynamicConfig = await getDynamicConfig();
 
     const newOrReadKeys = dynamicConfig.accountlessMode

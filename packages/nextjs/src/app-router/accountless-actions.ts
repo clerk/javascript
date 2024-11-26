@@ -17,7 +17,7 @@ export async function syncAccountlessKeysAction(args: AccountlessApplication & {
   redirect(`/clerk-sync-accountless?returnUrl=${returnUrl}`, RedirectType.replace);
 }
 
-export async function createAccountlessKeysAction(): Promise<null | AccountlessApplication> {
+export async function createAccountlessKeysAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
   if (process.env.NODE_ENV !== 'development' || isNextWithUnstableServerActions) {
     return null;
   }
@@ -35,5 +35,8 @@ export async function createAccountlessKeysAction(): Promise<null | AccountlessA
     httpOnly: false,
   });
 
-  return result;
+  return {
+    claimUrl,
+    publishableKey,
+  };
 }
