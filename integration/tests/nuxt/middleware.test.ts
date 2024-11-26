@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });
+  test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
@@ -66,7 +66,7 @@ test.describe('custom middleware @nuxt', () => {
     // Verify unauthorized access is blocked
     await u.page.goToAppHome();
     await u.po.expect.toBeSignedOut();
-    await u.page.goToRelative('/me');
+    await u.page.goToRelative('/me', { timeout: 30000 });
     await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible();
 
     // Sign in flow
@@ -77,7 +77,7 @@ test.describe('custom middleware @nuxt', () => {
     await u.page.waitForAppUrl('/');
 
     // Verify authorized access works
-    await u.page.goToRelative('/me');
+    await u.page.goToRelative('/me', { timeout: 30000 });
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
