@@ -22,6 +22,21 @@ test.describe('custom middleware @nuxt', () => {
         });`,
       )
       .addFile(
+        'server/middleware/clerk.js',
+        () => `import { clerkMiddleware } from '@clerk/nuxt/server';
+
+        export default clerkMiddleware((event) => {
+          const { userId } = event.context.auth
+          if (!userId && event.path === '/api/me') {
+            throw createError({
+              statusCode: 401,
+              statusMessage: 'You are not authorized to access this resource.'
+            })
+          }
+        });
+      `,
+      )
+      .addFile(
         'pages/me.vue',
         () => `<script setup>
         const { data, error } = await useFetch('/api/me');
@@ -30,22 +45,8 @@ test.describe('custom middleware @nuxt', () => {
         <template>
           <div v-if="data">Hello, {{ data.firstName }}</div>
           <div v-else-if="error">{{ error.statusMessage }}</div>
+          <div v-else>Unknown status</div>
         </template>`,
-      )
-      .addFile(
-        'server/middleware/clerk.js',
-        () => `import { clerkMiddleware } from '@clerk/nuxt/server';
-
-        export default clerkMiddleware((event) => {
-          const { userId } = event.context.auth
-          if (!userId && event.path.includes('/api/me')) {
-            throw createError({
-              statusCode: 401,
-              statusMessage: 'You are not authorized to access this resource.'
-            })
-          }
-        });
-      `,
       )
       .commit();
 
@@ -67,7 +68,8 @@ test.describe('custom middleware @nuxt', () => {
     await u.page.goToAppHome();
     await u.po.expect.toBeSignedOut();
     await u.page.goToRelative('/me');
-    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible({ timeout: 20000 });
+    console.log('Page content', await u.page.content());
+    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible();
 
     // Sign in flow
     await u.page.goToRelative('/sign-in');
