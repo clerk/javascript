@@ -1,11 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import type {
-  ActJWTClaim,
-  CheckAuthorizationWithCustomPermissions,
-  GetToken,
-  OrganizationCustomRoleKey,
-  SignOut,
-} from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -14,63 +8,6 @@ import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
-
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
-
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: undefined;
-      orgId: undefined;
-      orgRole: undefined;
-      orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: string;
-      orgRole: OrganizationCustomRoleKey;
-      orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
 
 type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 
@@ -130,8 +67,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     setAuthState(authContext);
   }, [authContext]);
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
-    authState;
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authState;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -147,7 +83,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     getToken,
     signOut,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
   });
 };
 
@@ -163,7 +99,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
     signOut,
     getToken,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
   } = authObject ?? {};
 
   const derivedHas = useCallback(
@@ -176,10 +112,10 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
         orgId,
         orgRole,
         orgPermissions,
-        __experimental_factorVerificationAge,
+        factorVerificationAge,
       })(params);
     },
-    [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
+    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
   );
 
   if (sessionId === undefined && userId === undefined) {

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.15.4",
+  "version": "5.17.1",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -66,28 +66,27 @@
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.13.0",
-    "@clerk/types": "4.33.0",
-    "tslib": "2.4.1"
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@clerk/themes": "2.1.44",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@clerk/localizations": "workspace:*",
+    "@clerk/themes": "workspace:*",
     "@types/node": "^18.19.33",
-    "@types/react": "*",
-    "@types/react-dom": "*",
     "@types/semver": "^7.5.8",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "react": "^18 || ^19.0.0-0",

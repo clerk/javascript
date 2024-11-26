@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expect, it } from 'vitest';
 
 import * as errorExports from '../errors';
@@ -35,8 +37,6 @@ describe('subpath /internal exports', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
         "AuthStatus",
-        "__experimental_reverificationMismatch",
-        "__experimental_reverificationMismatchResponse",
         "constants",
         "createAuthenticateRequest",
         "createClerkRequest",
@@ -44,6 +44,8 @@ describe('subpath /internal exports', () => {
         "debugRequestState",
         "decorateObjectWithResources",
         "makeAuthObjectSerializable",
+        "reverificationError",
+        "reverificationErrorResponse",
         "signedInAuthObject",
         "signedOutAuthObject",
         "stripPrivateDataFromObject",

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/dev-cli",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "CLI tool designed to simplify the process of iterating on packages within the clerk/javascript repository",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -29,9 +29,9 @@
     "jscodeshift": "^0.16.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/node": "^20.14.8",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "engines": {
     "node": ">=18.17.0"

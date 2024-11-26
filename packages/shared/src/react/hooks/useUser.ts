@@ -1,11 +1,6 @@
-import type { UserResource } from '@clerk/types';
+import type { UseUserReturn } from '@clerk/types';
 
 import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
-
-type UseUserReturn =
-  | { isLoaded: false; isSignedIn: undefined; user: undefined }
-  | { isLoaded: true; isSignedIn: false; user: null }
-  | { isLoaded: true; isSignedIn: true; user: UserResource };
 
 /**
  * Returns the current auth state and if a user is signed in, the user object.

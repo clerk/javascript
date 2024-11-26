@@ -1,48 +1,47 @@
-import type { __experimental_ReverificationConfig } from '@clerk/types';
+import type { ReverificationConfig } from '@clerk/types';
 
 type ClerkError<T> = {
   clerk_error: T;
 };
 
-type ReverificationMismatchError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
+const REVERIFICATION_REASON = 'reverification-error';
+
+type ReverificationError<M extends { metadata?: any } = { metadata: unknown }> = ClerkError<
   {
     type: 'forbidden';
-    reason: 'reverification-mismatch';
+    reason: typeof REVERIFICATION_REASON;
   } & M
 >;
 
-const __experimental_reverificationMismatch = <MC extends __experimental_ReverificationConfig>(missingConfig?: MC) =>
-  ({
-    clerk_error: {
-      type: 'forbidden',
-      reason: 'reverification-mismatch',
-      metadata: {
-        reverification: missingConfig,
-      },
+const reverificationError = <MC extends ReverificationConfig>(
+  missingConfig?: MC,
+): ReverificationError<{
+  metadata?: {
+    reverification?: MC;
+  };
+}> => ({
+  clerk_error: {
+    type: 'forbidden',
+    reason: REVERIFICATION_REASON,
+    metadata: {
+      reverification: missingConfig,
     },
-  }) satisfies ReverificationMismatchError;
+  },
+});
 
-const __experimental_reverificationMismatchResponse = (
-  ...args: Parameters<typeof __experimental_reverificationMismatch>
-) =>
-  new Response(JSON.stringify(__experimental_reverificationMismatch(...args)), {
+const reverificationErrorResponse = (...args: Parameters<typeof reverificationError>) =>
+  new Response(JSON.stringify(reverificationError(...args)), {
     status: 403,
   });
 
-const __experimental_isReverificationHint = (
-  result: any,
-): result is ReturnType<typeof __experimental_reverificationMismatch> => {
+const isReverificationHint = (result: any): result is ReturnType<typeof reverificationError> => {
   return (
     result &&
     typeof result === 'object' &&
     'clerk_error' in result &&
     result.clerk_error?.type === 'forbidden' &&
-    result.clerk_error?.reason === 'reverification-mismatch'
+    result.clerk_error?.reason === REVERIFICATION_REASON
   );
 };
 
-export {
-  __experimental_reverificationMismatch,
-  __experimental_reverificationMismatchResponse,
-  __experimental_isReverificationHint,
-};
+export { reverificationError, reverificationErrorResponse, isReverificationHint };

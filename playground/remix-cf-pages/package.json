@@ -6,9 +6,9 @@
     "dev:remix": "remix watch",
     "dev:wrangler": "cross-env NODE_ENV=development wrangler pages dev ./public",
     "dev": "remix build && run-p \"dev:*\"",
-    "start": "cross-env NODE_ENV=production npm run dev:wrangler",
+    "start": "cross-env NODE_ENV=production pnpm dev:wrangler",
     "typecheck": "tsc -b",
-    "yalc:add": "yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
+    "yalc:add": "pnpm yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
   },
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",

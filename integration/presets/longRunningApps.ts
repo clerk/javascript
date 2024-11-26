@@ -6,6 +6,7 @@ import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
 import { next } from './next';
+import { nuxt } from './nuxt';
 import { react } from './react';
 import { remix } from './remix';
 import { tanstack } from './tanstack';
@@ -39,6 +40,7 @@ export const createLongRunningApps = () => {
     { id: 'tanstack.start', config: tanstack.start, env: envs.withEmailCodes },
     { id: 'tanstack.router', config: tanstack.router, env: envs.withEmailCodes },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
+    { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

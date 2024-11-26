@@ -11,7 +11,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:import/recommended',
     'prettier',
-    'turbo',
+    'eslint-config-turbo',
     require.resolve('./rules/variables'),
   ],
   plugins: ['simple-import-sort', 'unused-imports'],
@@ -52,6 +52,7 @@ module.exports = {
         ],
       },
     ],
+    'turbo/no-undeclared-env-vars': 'error',
   },
   overrides: [
     {

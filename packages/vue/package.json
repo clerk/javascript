@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "0.0.3",
+  "version": "0.0.9",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -29,6 +29,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.js"
     }
   },
   "main": "./dist/index.js",
@@ -38,21 +42,23 @@
   ],
   "scripts": {
     "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace --sig",
+    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.13.0",
-    "@clerk/types": "4.33.0"
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "typescript": "*"
+    "typescript": "catalog:repo",
+    "vue": "3.5.12"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
