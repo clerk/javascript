@@ -42,7 +42,7 @@ function SignInRoutes(): JSX.Element {
   if (
     process.env.NODE_ENV === 'development' &&
     signInContext.__experimental?.signUpProps &&
-    options.signInUrl !== signInContext.signInUrl
+    signInContext.signInUrl !== signInContext.signUpUrl
   ) {
     console.warn(
       `'Clerk: Your using signUpProps within the <SignIn /> component, if you are intending to use the combined flow, ensure your signInUrl is the same as the signUpUrl.`,
