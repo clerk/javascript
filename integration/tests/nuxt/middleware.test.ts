@@ -69,7 +69,6 @@ test.describe('custom middleware @nuxt', () => {
     await u.page.goToAppHome();
     await u.po.expect.toBeSignedOut();
     await u.page.goToRelative('/me');
-    console.log('Page content', await u.page.content());
     await expect(u.page.getByText('401: You are not authorized to access this resource')).toBeVisible();
 
     // Sign in flow

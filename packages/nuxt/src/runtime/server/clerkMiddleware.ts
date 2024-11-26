@@ -3,15 +3,15 @@ import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { EventHandler } from 'h3';
-import { createError, eventHandler, isEventHandler, setResponseHeader } from 'h3';
+import { createError, eventHandler, setResponseHeader } from 'h3';
 
 import { clerkClient } from './clerkClient';
 import { createInitialState, toWebRequest } from './utils';
 
 function parseHandlerAndOptions(args: unknown[]) {
   return [
-    isEventHandler(args[0]) ? args[0] : undefined,
-    (args.length === 2 ? args[1] : isEventHandler(args[0]) ? {} : args[0]) || {},
+    typeof args[0] === 'function' ? args[0] : undefined,
+    (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
   ] as [EventHandler | undefined, AuthenticateRequestOptions];
 }
 
