@@ -22,12 +22,15 @@ test.describe('custom middleware @nuxt', () => {
         });`,
       )
       .addFile(
-        'server/api/protected.js',
-        () => `export default eventHandler((event) => {
-            const { userId } = event.context.auth
+        'pages/me.vue',
+        () => `<script setup>
+        const { data, error } = await useFetch('/api/me');
+        </script>
 
-            return userId
-        });`,
+        <template>
+          <div v-if="data">Hello, {{ data.firstName }}</div>
+          <div v-else-if="error">{{ error.statusMessage }}</div>
+        </template>`,
       )
       .addFile(
         'server/middleware/clerk.js',
@@ -35,10 +38,10 @@ test.describe('custom middleware @nuxt', () => {
 
         export default clerkMiddleware((event) => {
           const { userId } = event.context.auth
-          if (!userId && event.path === '/api/protected') {
+          if (!userId && event.path === '/api/me') {
             throw createError({
               statusCode: 401,
-              statusMessage: 'Unauthorized'
+              statusMessage: 'You are not authorized to access this resource.'
             })
           }
         });
@@ -58,28 +61,24 @@ test.describe('custom middleware @nuxt', () => {
   test('guard API route with custom middleware', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser();
-    const user = await u.services.users.createBapiUser(fakeUser);
+    await u.services.users.createBapiUser(fakeUser);
 
+    // Verify unauthorized access is blocked
     await u.page.goToAppHome();
-
     await u.po.expect.toBeSignedOut();
+    await u.page.goToRelative('/me');
+    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible();
 
-    let response = await u.page.goToRelative('/api/protected', { timeout: 5 * 60 * 1000 });
-
-    expect(response.status()).toBe(401);
-    expect(response.statusText()).toBe('Unauthorized');
-
+    // Sign in flow
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
-
     await u.page.waitForAppUrl('/');
 
-    response = await u.page.goToRelative('/api/protected', { timeout: 5 * 60 * 1000 });
-
-    expect(response.status()).toBe(200);
-    expect(await response.text()).toBe(user.id);
+    // Verify authorized access works
+    await u.page.goToRelative('/me');
+    await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
   });
