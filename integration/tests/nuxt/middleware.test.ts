@@ -38,7 +38,7 @@ test.describe('custom middleware @nuxt', () => {
 
         export default clerkMiddleware((event) => {
           const { userId } = event.context.auth
-          if (!userId && event.path === '/api/me') {
+          if (!userId && event.path.includes('/api/me')) {
             throw createError({
               statusCode: 401,
               statusMessage: 'You are not authorized to access this resource.'
@@ -66,8 +66,8 @@ test.describe('custom middleware @nuxt', () => {
     // Verify unauthorized access is blocked
     await u.page.goToAppHome();
     await u.po.expect.toBeSignedOut();
-    await u.page.goToRelative('/me', { timeout: 30000 });
-    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible({ timeout: 30000 });
+    await u.page.goToRelative('/me');
+    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible({ timeout: 20000 });
 
     // Sign in flow
     await u.page.goToRelative('/sign-in');
@@ -77,7 +77,7 @@ test.describe('custom middleware @nuxt', () => {
     await u.page.waitForAppUrl('/');
 
     // Verify authorized access works
-    await u.page.goToRelative('/me', { timeout: 30000 });
+    await u.page.goToRelative('/me');
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
