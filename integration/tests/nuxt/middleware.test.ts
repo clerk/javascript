@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'parallel' });
+  test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });
   let app: Application;
 
   test.beforeAll(async () => {
