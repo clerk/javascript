@@ -45,7 +45,7 @@ test.describe('custom middleware @nuxt', () => {
 
         <template>
           <div v-if="data">Hello, {{ data.firstName }}</div>
-          <div v-else-if="error">{{ error.statusMessage }}</div>
+          <div v-else-if="error">{{ error.statusCode }}: {{ error.statusMessage }}</div>
           <div v-else>Unknown status</div>
         </template>`,
       )
@@ -70,7 +70,7 @@ test.describe('custom middleware @nuxt', () => {
     await u.po.expect.toBeSignedOut();
     await u.page.goToRelative('/me');
     console.log('Page content', await u.page.content());
-    await expect(u.page.getByText('You are not authorized to access this resource')).toBeVisible();
+    await expect(u.page.getByText('401: You are not authorized to access this resource')).toBeVisible();
 
     // Sign in flow
     await u.page.goToRelative('/sign-in');
