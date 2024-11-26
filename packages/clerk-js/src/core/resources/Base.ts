@@ -9,7 +9,7 @@ import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
-  saveResponse?: (payload: any) => Promise<void>;
+  fetchMaxTries?: number;
 };
 
 export type BaseMutateParams = {
@@ -61,9 +61,10 @@ export abstract class BaseResource {
     }
 
     let fapiResponse: FapiResponse<J>;
+    const { fetchMaxTries } = opts;
 
     try {
-      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
+      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
@@ -162,10 +163,7 @@ export abstract class BaseResource {
       opts,
     );
 
-    const data = json?.response || (json as J);
-    await opts?.saveResponse?.(data);
-
-    return this.fromJSON(data);
+    return this.fromJSON(json?.response || (json as J));
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>({

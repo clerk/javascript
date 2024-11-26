@@ -49,8 +49,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ saveResponse }: { saveResponse?: (payload: string) => Promise<void> } = {}): Promise<this> {
-    return this._baseGet({ saveResponse });
+  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries });
   }
 
   async destroy(): Promise<void> {
@@ -112,6 +112,19 @@ export class Client extends BaseResource implements ClientResource {
 
     return this;
   }
+
+  // toJSON() {
+  //   return {
+  //     id: this.id,
+  //     sessions: this.sessions.map(s => s.toJSON()),
+  //     sign_up: this.signUp.toJSON(),
+  //     sign_in: this.signIn.toJSON(),
+  //     last_active_session_id: this.lastActiveSessionId,
+  //     cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
+  //     created_at: this.createdAt ? this.createdAt.getTime() : null,
+  //     updated_at: this.updatedAt ? this.updatedAt.getTime() : null,
+  //   };
+  // }
 
   protected path(): string {
     return this.pathRoot;

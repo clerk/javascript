@@ -25,6 +25,10 @@ type FapiQueryStringParameters = {
   rotating_token_nonce?: string;
 };
 
+type FapiRequestOptions = {
+  fetchMaxTries?: number;
+};
+
 export type FapiResponse<T> = Response & {
   payload: FapiResponseJSON<T> | null;
 };
@@ -54,7 +58,7 @@ export interface FapiClient {
 
   onBeforeRequest(callback: FapiRequestCallback<unknown>): void;
 
-  request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
+  request<T>(requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>>;
 }
 
 // List of paths that should not receive the session ID parameter in the URL
@@ -172,7 +176,10 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     });
   }
 
-  async function request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>> {
+  async function request<T>(
+    requestInit: FapiRequestInit,
+    { fetchMaxTries }: FapiRequestOptions,
+  ): Promise<FapiResponse<T>> {
     // eslint-disable-next-line prefer-const
     let { method = 'GET', body } = requestInit;
 
@@ -225,7 +232,8 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
-        const maxTries = isBrowserOnline() ? 4 : 11;
+        let maxTries = isBrowserOnline() ? 4 : 11;
+        maxTries = fetchMaxTries ?? maxTries;
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'

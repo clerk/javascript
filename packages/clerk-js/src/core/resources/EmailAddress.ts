@@ -92,4 +92,13 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }
+
+  // toJSON() {
+  //   return {
+  //     id: this.id,
+  //     email_address: this.emailAddress,
+  //     verification: this.verification.toJSON(),
+  //     linked_to: this.linkedTo.map(link => link.toJSON()),
+  //   };
+  // }
 }

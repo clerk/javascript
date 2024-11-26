@@ -606,9 +606,6 @@ importers:
       '@clerk/types':
         specifier: workspace:*
         version: link:../types
-      '@react-native-async-storage/async-storage':
-        specifier: ^2.1.0
-        version: 2.1.0(react-native@0.73.9(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(react@18.3.1))
       base-64:
         specifier: ^1.0.0
         version: 1.0.0
@@ -631,6 +628,9 @@ importers:
       '@clerk/expo-passkeys':
         specifier: workspace:*
         version: link:../expo-passkeys
+      '@react-native-async-storage/async-storage':
+        specifier: ^2.1.0
+        version: 2.1.0(react-native@0.73.9(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(react@18.3.1))
       '@types/base-64':
         specifier: ^1.0.2
         version: 1.0.2

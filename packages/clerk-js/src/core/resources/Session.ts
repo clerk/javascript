@@ -174,7 +174,7 @@ export class Session extends BaseResource implements SessionResource {
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
-        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+        body: { ...attemptFactor, strategy: attemptFactor.strategy },
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -234,6 +234,24 @@ export class Session extends BaseResource implements SessionResource {
 
     return this;
   }
+
+  // toJSON() {
+  //   return {
+  //     id: this.id,
+  //     status: this.status,
+  //     expire_at: this.expireAt.getTime(),
+  //     abandon_at: this.abandonAt.getTime(),
+  //     factor_verification_age: this.__experimental_factorVerificationAge,
+  //     last_active_at: this.lastActiveAt.getTime(),
+  //     last_active_organization_id: this.lastActiveOrganizationId,
+  //     actor: this.actor,
+  //     user: this.user?.toJSON(),
+  //     public_user_data: this.publicUserData.toJSON(),
+  //     last_active_token: this.lastActiveToken?.toJSON(),
+  //     created_at: this.createdAt.getTime(),
+  //     updated_at: this.updatedAt.getTime(),
+  //   };
+  // }
 
   private async _getToken(options?: GetTokenOptions): Promise<string | null> {
     if (!this.user) {

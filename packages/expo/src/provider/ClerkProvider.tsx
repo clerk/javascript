@@ -55,6 +55,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
           : null
       }
       standardBrowser={!isNative()}
+      __internal_initializeFromCache
     >
       {children}
     </ClerkReactProvider>

@@ -5,12 +5,11 @@ import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
 } from '@clerk/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
-import { isNative } from '../../utils';
+import { createAsyncStorage, isNative } from '../../utils';
 import type { BuildClerkOptions } from './types';
 
 const KEY = '__clerk_client_jwt';
@@ -43,6 +42,14 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
       __internal_clerk = clerk = new ClerkClass(publishableKey);
+      const asyncStorage = createAsyncStorage(publishableKey);
+
+      __internal_clerk.addListener(({ client }) => {
+        void asyncStorage.setClient(client);
+        // @ts-expect-error - This is an internal API
+        const environment = __internal_clerk?.__unstable__environment;
+        void asyncStorage.setEnvironment(environment);
+      });
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -84,29 +91,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         };
 
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_setClient = async (client: any) => {
-          console.log('setting client: ', client);
-          await AsyncStorage.setItem('clerk_client', JSON.stringify(client));
+        __internal_clerk.__internal_getCachedClient = async () => {
+          return asyncStorage.getClient();
         };
 
         // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_getClient = async () => {
-          const client = await AsyncStorage.getItem('clerk_client');
-          console.log('using client: ', client);
-          return client ? JSON.parse(client) : null;
-        };
-
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_setEnvironment = async (environment: any) => {
-          console.log('setting environment: ', environment);
-          await AsyncStorage.setItem('clerk_environment', JSON.stringify(environment));
-        };
-
-        // @ts-expect-error - This is an internal API
-        __internal_clerk.__internal_getEnvironment = async () => {
-          const environment = await AsyncStorage.getItem('clerk_environment');
-          console.log('using environment: ', environment);
-          return environment ? JSON.parse(environment) : null;
+        __internal_clerk.__internal_getCachedEnvironment = async () => {
+          return asyncStorage.getEnvironment();
         };
       }
 

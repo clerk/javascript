@@ -57,6 +57,20 @@ export class Verification extends BaseResource implements VerificationResource {
     }
     return this;
   }
+
+  public toJSON() {
+    return {
+      status: this.status,
+      strategy: this.strategy,
+      nonce: this.nonce,
+      message: this.message,
+      external_verification_redirect_url: this.externalVerificationRedirectURL?.toString() || null,
+      attempts: this.attempts,
+      expire_at: this.expireAt?.getTime(),
+      error: this.error,
+      verified_at_client: this.verifiedAtClient,
+    };
+  }
 }
 
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {

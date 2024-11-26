@@ -18,6 +18,7 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClientJSON,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -194,10 +195,8 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
 
-  public __internal_getEnvironment: (() => Promise<any>) | undefined;
-  public __internal_getClient: (() => Promise<any>) | undefined;
-  public __internal_setEnvironment: ((environment: any) => Promise<void>) | undefined;
-  public __internal_setClient: ((client: any) => Promise<void>) | undefined;
+  public __internal_getCachedEnvironment: (() => Promise<EnvironmentJSON>) | undefined;
+  public __internal_getCachedClient: (() => Promise<ClientJSON>) | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -348,7 +347,7 @@ export class Clerk implements ClerkInterface {
     if (this.#options.standardBrowser) {
       this.#loaded = await this.#loadInStandardBrowser();
     } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
+      this.#loaded = await this.#loadInNonStandardBrowser(options?.__internal_initializeFromCache);
     }
 
     if (BUILD_ENABLE_NEW_COMPONENTS) {
@@ -1886,18 +1885,18 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 
-  #loadInNonStandardBrowser = async (): Promise<boolean> => {
+  #loadInNonStandardBrowser = async (fallbackToCachedValues?: boolean): Promise<boolean> => {
     let environment, client;
+    const fetchMaxTries = fallbackToCachedValues ? 1 : undefined;
     try {
       [environment, client] = await Promise.all([
-        Environment.getInstance().fetch({ touch: false, saveResponse: this.__internal_setEnvironment }),
-        Client.getInstance().fetch({ saveResponse: this.__internal_setClient }),
+        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
+        Client.getInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
       if (isClerkRuntimeError(err) && err.code === 'network_error') {
-        console.log('Clerk: using cached environment and client');
-        const cachedEnvironment = await this.__internal_getEnvironment?.();
-        const cachedClient = await this.__internal_getClient?.();
+        const cachedEnvironment = await this.__internal_getCachedEnvironment?.();
+        const cachedClient = await this.__internal_getCachedClient?.();
         environment = new Environment(cachedEnvironment);
         client = new Client(cachedClient);
       } else {
