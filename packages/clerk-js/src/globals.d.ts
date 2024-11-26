@@ -1,7 +1,9 @@
 declare global {
   const __DEV__: boolean;
+  const __BUILD_FLAG_ACCOUNTLESS_UI__: boolean;
   const __PKG_NAME__: string;
   const __PKG_VERSION__: string;
+  const __BUILD_DISABLE_RHC__: string;
 
   interface Window {
     __unstable__onBeforeSetActive: () => Promise<void> | void;

@@ -8,7 +8,7 @@
     "dev": "remix build && run-p \"dev:*\"",
     "start": "cross-env NODE_ENV=production pnpm dev:wrangler",
     "typecheck": "tsc -b",
-    "yalc:add": "yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
+    "yalc:add": "pnpm yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
   },
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",

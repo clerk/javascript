@@ -7,4 +7,4 @@ export { useSessionList } from './useSessionList';
 export { useUser } from './useUser';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
-export { __experimental_useReverification } from './useReverification';
+export { useReverification } from './useReverification';

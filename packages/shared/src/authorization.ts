@@ -1,22 +1,19 @@
 import type {
-  __experimental_ReverificationConfig,
-  __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationTypes,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  ReverificationConfig,
+  SessionVerificationLevel,
+  SessionVerificationTypes,
 } from '@clerk/types';
 
-type TypesToConfig = Record<
-  __experimental_SessionVerificationTypes,
-  Exclude<__experimental_ReverificationConfig, __experimental_SessionVerificationTypes>
->;
+type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
 type AuthorizationOptions = {
   userId: string | null | undefined;
   orgId: string | null | undefined;
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
-  __experimental_factorVerificationAge: [number, number] | null;
+  factorVerificationAge: [number, number] | null;
 };
 
 type CheckOrgAuthorization = (
@@ -26,9 +23,9 @@ type CheckOrgAuthorization = (
 
 type CheckStepUpAuthorization = (
   params: {
-    __experimental_reverification?: __experimental_ReverificationConfig;
+    reverification?: ReverificationConfig;
   },
-  { __experimental_factorVerificationAge }: AuthorizationOptions,
+  { factorVerificationAge }: AuthorizationOptions,
 ) => boolean | null;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
@@ -50,13 +47,9 @@ const TYPES_TO_OBJECTS: TypesToConfig = {
   },
 };
 
-const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>([
-  'first_factor',
-  'second_factor',
-  'multi_factor',
-]);
+const ALLOWED_LEVELS = new Set<SessionVerificationLevel>(['first_factor', 'second_factor', 'multi_factor']);
 
-const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
+const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
@@ -86,8 +79,12 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   return null;
 };
 
-const validateReverificationConfig = (config: __experimental_ReverificationConfig | undefined) => {
-  const convertConfigToObject = (config: __experimental_ReverificationConfig) => {
+const validateReverificationConfig = (config: ReverificationConfig | undefined | null) => {
+  if (!config) {
+    return false;
+  }
+
+  const convertConfigToObject = (config: ReverificationConfig) => {
     if (typeof config === 'string') {
       return TYPES_TO_OBJECTS[config];
     }
@@ -111,18 +108,18 @@ const validateReverificationConfig = (config: __experimental_ReverificationConfi
  * Handles different verification levels (first factor, second factor, multi-factor).
  * @returns null, if requirements or verification data are missing.
  */
-const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experimental_factorVerificationAge }) => {
-  if (!params.__experimental_reverification || !__experimental_factorVerificationAge) {
+const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVerificationAge }) => {
+  if (!params.reverification || !factorVerificationAge) {
     return null;
   }
 
-  const isValidReverification = validateReverificationConfig(params.__experimental_reverification);
+  const isValidReverification = validateReverificationConfig(params.reverification);
   if (!isValidReverification) {
     return null;
   }
 
   const { level, afterMinutes } = isValidReverification();
-  const [factor1Age, factor2Age] = __experimental_factorVerificationAge;
+  const [factor1Age, factor2Age] = factorVerificationAge;
 
   // -1 indicates the factor group (1fa,2fa) is not enabled
   // -1 for 1fa is not a valid scenario, but we need to make sure we handle it properly

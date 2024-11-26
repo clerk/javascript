@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.4.1",
+  "version": "6.5.0",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -61,7 +61,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig",
+    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest"
   },
   "dependencies": {

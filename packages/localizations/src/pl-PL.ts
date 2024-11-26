@@ -14,62 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: 'Uzyskaj pomoc',
-      actionText: 'Nie używasz żadnej z tych metod?',
-      blockButton__backupCode: 'Użyj kodu zapasowego',
-      blockButton__emailCode: 'Wyślij kod e-mailem do {{identifier}}',
-      blockButton__password: 'Zaloguj się za pomocą hasła',
-      blockButton__phoneCode: 'Wyślij kod SMS-em do {{identifier}}',
-      blockButton__totp: 'Użyj aplikacji uwierzytelniającej',
-      getHelp: {
-        blockButton__emailSupport: 'Skontaktuj się z pomocą',
-        content:
-          'Jeśli masz problem z weryfikacją konta, wyślij do nas e-mail, a postaramy się jak najszybciej przywrócić dostęp.',
-        title: 'Uzyskaj wsparcie',
-      },
-      subtitle: 'Masz problem? Możesz użyć dowolnej z tych metod weryfikacji.',
-      title: 'Użyj innej metody',
-    },
-    backupCodeMfa: {
-      subtitle: 'Twój kod zapasowy to ten, który otrzymałeś podczas konfigurowania uwierzytelniania dwuetapowego.',
-      title: 'Wprowadź kod zapasowy',
-    },
-    emailCode: {
-      formTitle: 'Kod weryfikacyjny',
-      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
-      subtitle: 'aby kontynuować w {{applicationName}}',
-      title: 'Sprawdź swoją pocztę e-mail',
-    },
-    noAvailableMethods: {
-      message: 'Nie można kontynuować weryfikacji. Brak dostępnych czynników uwierzytelniania.',
-      subtitle: 'Wystąpił błąd',
-      title: 'Nie możemy zweryfikować twojego konta',
-    },
-    password: {
-      actionLink: 'Użyj innej metody',
-      subtitle: 'Wprowadź hasło powiązane z twoim kontem',
-      title: 'Wprowadź swoje hasło',
-    },
-    phoneCode: {
-      formTitle: 'Kod weryfikacyjny',
-      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
-      subtitle: 'aby kontynuować w {{applicationName}}',
-      title: 'Sprawdź swój telefon',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Kod weryfikacyjny',
-      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
-      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wysłany na twój telefon',
-      title: 'Sprawdź swój telefon',
-    },
-    totpMfa: {
-      formTitle: 'Kod weryfikacyjny',
-      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez swoją aplikację uwierzytelniającą',
-      title: 'Weryfikacja dwuetapowa',
-    },
-  },
   backButton: 'Powrót',
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
@@ -905,6 +849,62 @@ export const plPL: LocalizationResource = {
       successMessage: 'Portfel został dodany do Twojego konta.',
       title: 'Dodaj portfel web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Uzyskaj pomoc',
+      actionText: 'Nie używasz żadnej z tych metod?',
+      blockButton__backupCode: 'Użyj kodu zapasowego',
+      blockButton__emailCode: 'Wyślij kod e-mailem do {{identifier}}',
+      blockButton__password: 'Zaloguj się za pomocą hasła',
+      blockButton__phoneCode: 'Wyślij kod SMS-em do {{identifier}}',
+      blockButton__totp: 'Użyj aplikacji uwierzytelniającej',
+      getHelp: {
+        blockButton__emailSupport: 'Skontaktuj się z pomocą',
+        content:
+          'Jeśli masz problem z weryfikacją konta, wyślij do nas e-mail, a postaramy się jak najszybciej przywrócić dostęp.',
+        title: 'Uzyskaj wsparcie',
+      },
+      subtitle: 'Masz problem? Możesz użyć dowolnej z tych metod weryfikacji.',
+      title: 'Użyj innej metody',
+    },
+    backupCodeMfa: {
+      subtitle: 'Twój kod zapasowy to ten, który otrzymałeś podczas konfigurowania uwierzytelniania dwuetapowego.',
+      title: 'Wprowadź kod zapasowy',
+    },
+    emailCode: {
+      formTitle: 'Kod weryfikacyjny',
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+      subtitle: 'aby kontynuować w {{applicationName}}',
+      title: 'Sprawdź swoją pocztę e-mail',
+    },
+    noAvailableMethods: {
+      message: 'Nie można kontynuować weryfikacji. Brak dostępnych czynników uwierzytelniania.',
+      subtitle: 'Wystąpił błąd',
+      title: 'Nie możemy zweryfikować twojego konta',
+    },
+    password: {
+      actionLink: 'Użyj innej metody',
+      subtitle: 'Wprowadź hasło powiązane z twoim kontem',
+      title: 'Wprowadź swoje hasło',
+    },
+    phoneCode: {
+      formTitle: 'Kod weryfikacyjny',
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+      subtitle: 'aby kontynuować w {{applicationName}}',
+      title: 'Sprawdź swój telefon',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Kod weryfikacyjny',
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wysłany na twój telefon',
+      title: 'Sprawdź swój telefon',
+    },
+    totpMfa: {
+      formTitle: 'Kod weryfikacyjny',
+      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez swoją aplikację uwierzytelniającą',
+      title: 'Weryfikacja dwuetapowa',
     },
   },
   waitlist: {

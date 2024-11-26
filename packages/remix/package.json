@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.2.54",
+  "version": "4.2.56",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -70,7 +70,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace  --sig"
+    "publish:local": "pnpm yalc push --replace  --sig"
   },
   "dependencies": {
     "@clerk/backend": "workspace:*",

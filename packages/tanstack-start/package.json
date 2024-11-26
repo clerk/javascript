@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -51,7 +51,7 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
     "@clerk/backend": "workspace:*",

@@ -3,8 +3,8 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationModalProps,
+  __internal_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -59,6 +59,10 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor } from './utils';
+
+if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+  globalThis.__BUILD_DISABLE_RHC__ = false;
+}
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -174,7 +178,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
-  private preopenUserVerification?: null | __experimental_UserVerificationProps = null;
+  private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -469,7 +473,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
+      } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
           await loadClerkJsScript({
@@ -546,7 +550,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenUserVerification !== null) {
-      clerkjs.__experimental_openUserVerification(this.preopenUserVerification);
+      clerkjs.__internal_openReverification(this.preopenUserVerification);
     }
 
     if (this.preopenOneTap !== null) {
@@ -692,17 +696,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_openUserVerification(props);
+      this.clerkjs.__internal_openReverification(props);
     } else {
       this.preopenUserVerification = props;
     }
   };
 
-  __experimental_closeUserVerification = (): void => {
+  __internal_closeReverification = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_closeUserVerification();
+      this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
     }

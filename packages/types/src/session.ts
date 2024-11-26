@@ -16,9 +16,9 @@ import type {
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type {
-  __experimental_ReverificationConfig,
-  __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationResource,
+  ReverificationConfig,
+  SessionVerificationLevel,
+  SessionVerificationResource,
 } from './sessionVerification';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
@@ -28,7 +28,11 @@ export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boole
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
-export type CheckAuthorizationParamsWithCustomPermissions = (
+type WithReverification<T> = T & {
+  reverification?: ReverificationConfig;
+};
+
+export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -38,13 +42,11 @@ export type CheckAuthorizationParamsWithCustomPermissions = (
       permission: OrganizationCustomPermissionKey;
     }
   | { role?: never; permission?: never }
-) & {
-  __experimental_reverification?: __experimental_ReverificationConfig;
-};
+>;
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 
-type CheckAuthorizationParams = (
+type CheckAuthorizationParams = WithReverification<
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
@@ -57,9 +59,7 @@ type CheckAuthorizationParams = (
       role?: never;
       permission?: never;
     }
-) & {
-  __experimental_reverification?: __experimental_ReverificationConfig;
-};
+>;
 
 export interface SessionResource extends ClerkResource {
   id: string;
@@ -70,9 +70,8 @@ export interface SessionResource extends ClerkResource {
    * Factor Verification Age
    * Each item represents the minutes that have passed since the last time a first or second factor were verified.
    * [fistFactorAge, secondFactorAge]
-   * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_factorVerificationAge: [number, number] | null;
+  factorVerificationAge: [number, number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
@@ -88,21 +87,19 @@ export interface SessionResource extends ClerkResource {
   createdAt: Date;
   updatedAt: Date;
 
-  __experimental_startVerification: (
-    params: __experimental_SessionVerifyCreateParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_prepareFirstFactorVerification: (
-    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_attemptFirstFactorVerification: (
-    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_prepareSecondFactorVerification: (
-    params: __experimental_SessionVerifyPrepareSecondFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_attemptSecondFactorVerification: (
-    params: __experimental_SessionVerifyAttemptSecondFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
+  startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
+  prepareFirstFactorVerification: (
+    factor: SessionVerifyPrepareFirstFactorParams,
+  ) => Promise<SessionVerificationResource>;
+  attemptFirstFactorVerification: (
+    attemptFactor: SessionVerifyAttemptFirstFactorParams,
+  ) => Promise<SessionVerificationResource>;
+  prepareSecondFactorVerification: (
+    params: SessionVerifyPrepareSecondFactorParams,
+  ) => Promise<SessionVerificationResource>;
+  attemptSecondFactorVerification: (
+    params: SessionVerifyAttemptSecondFactorParams,
+  ) => Promise<SessionVerificationResource>;
 }
 
 export interface ActiveSessionResource extends SessionResource {
@@ -152,15 +149,12 @@ export type GetTokenOptions = {
 };
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
-export type __experimental_SessionVerifyCreateParams = {
-  level: __experimental_SessionVerificationLevel;
+export type SessionVerifyCreateParams = {
+  level: SessionVerificationLevel;
 };
 
-export type __experimental_SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
-export type __experimental_SessionVerifyAttemptFirstFactorParams =
-  | EmailCodeAttempt
-  | PhoneCodeAttempt
-  | PasswordAttempt;
+export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
+export type SessionVerifyAttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt;
 
-export type __experimental_SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
-export type __experimental_SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+export type SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
