@@ -6,7 +6,7 @@ export default eventHandler(async event => {
   if (!userId) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: event.path,
     });
   }
 
