@@ -39,6 +39,16 @@ function SignInRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
   const options = useOptions();
 
+  if (
+    process.env.NODE_ENV === 'development' &&
+    signInContext.__experimental?.signUpProps &&
+    options.signInUrl !== signInContext.signInUrl
+  ) {
+    console.warn(
+      `'Clerk: Your using signUpProps within the <SignIn /> component, if you are intending to use the combined flow, ensure your signInUrl is the same as the signUpUrl.`,
+    );
+  }
+
   return (
     <Flow.Root flow='signIn'>
       <Switch>
