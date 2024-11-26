@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 0.0.9
+
+### Patch Changes
+
+- Add deprecation notices for the following components: ([#4631](https://github.com/clerk/javascript/pull/4631)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  - `RedirectToUserProfile`
+  - `RedirectToOrganizationProfile`
+  - `RedirectToCreateOrganization`
+
 ## 0.0.8
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @clerk/astro
 
+## 1.5.0
+
+### Minor Changes
+
+- Introduce `<Waitlist />` component for Astro ([#4650](https://github.com/clerk/javascript/pull/4650)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 1.4.17
 
 ### Patch Changes
