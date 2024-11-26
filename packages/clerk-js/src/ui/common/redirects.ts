@@ -9,12 +9,13 @@ export function buildEmailLinkRedirectUrl(
   baseUrl: string | undefined = '',
 ): string {
   const { routing, authQueryString, path } = ctx;
+  const isCombinedFlow = 'signInUrl' in ctx && 'signUpUrl' in ctx && ctx.signInUrl === ctx.signUpUrl;
   return buildRedirectUrl({
     routing,
     baseUrl,
     authQueryString,
     path,
-    endpoint: MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint: isCombinedFlow ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
 }
 
