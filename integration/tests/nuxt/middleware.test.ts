@@ -5,7 +5,7 @@ import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });
+  test.describe.configure({ mode: 'parallel' });
   let app: Application;
 
   test.beforeAll(async () => {
@@ -64,7 +64,7 @@ test.describe('custom middleware @nuxt', () => {
 
     await u.po.expect.toBeSignedOut();
 
-    let response = await u.page.goToRelative('/api/protected');
+    let response = await u.page.goToRelative('/api/protected', { timeout: 5 * 60 * 1000 });
 
     expect(response.status()).toBe(401);
     expect(response.statusText()).toBe('Unauthorized');
@@ -76,7 +76,7 @@ test.describe('custom middleware @nuxt', () => {
 
     await u.page.waitForAppUrl('/');
 
-    response = await u.page.goToRelative('/api/protected');
+    response = await u.page.goToRelative('/api/protected', { timeout: 5 * 60 * 1000 });
 
     expect(response.status()).toBe(200);
     expect(await response.text()).toBe(user.id);
