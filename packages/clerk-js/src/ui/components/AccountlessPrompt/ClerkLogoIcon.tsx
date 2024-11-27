@@ -1,4 +1,4 @@
-const ClerkLogoIcon = () => {
+export function ClerkLogoIcon() {
   return (
     <svg
       width='16'
@@ -233,6 +233,4 @@ const ClerkLogoIcon = () => {
       </defs>
     </svg>
   );
-};
-
-export default ClerkLogoIcon;
+}

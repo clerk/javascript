@@ -7,7 +7,8 @@ import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Link, Text } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
-import ClerkLogoIcon from './ClerkLogoIcon';
+import { ClerkLogoIcon } from './ClerkLogoIcon';
+import { KeySlashIcon } from './KeySlashIcon';
 
 type AccountlessPromptProps = {
   url?: string;
@@ -64,8 +65,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
   // const eyeHeight = eyeWidth;
   const bottomProperty = '--cl-impersonation-fab-bottom';
   const rightProperty = '--cl-impersonation-fab-right';
-  const defaultBottom = 109;
-  const defaultRight = 23;
+  const defaultBottom = 50;
+  const defaultRight = 50;
 
   const handleResize = () => {
     const current = containerRef.current;
@@ -132,7 +133,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
         align='center'
         onMouseEnter={() => setIsExpanded(true)}
         sx={t => ({
-          touchAction: 'none', //for drag to work on mobile consistently
+          //   touchAction: 'none', //for drag to work on mobile consistently
           position: 'fixed',
           bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
@@ -168,50 +169,142 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
         >
           <Flex
             sx={t => ({
-              align: 'center',
+              alignItems: 'center',
               gap: t.space.$2,
             })}
           >
-            <ClerkLogoIcon />
+            <div
+              css={css`
+                perspective: 1000px;
+                position: relative;
+                width: 24px;
+                height: 24px;
+                transform-style: preserve-3d;
+                animation: ${isExpanded
+                  ? 'coinFlipAnimation 5s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.5s'
+                  : 'none'};
+
+                @keyframes coinFlipAnimation {
+                  0%,
+                  20% {
+                    transform: rotateY(0deg);
+                  }
+                  30%,
+                  40% {
+                    transform: rotateY(180deg);
+                  }
+                  45%,
+                  65% {
+                    transform: rotateY(180deg);
+                  }
+                  75%,
+                  85% {
+                    transform: rotateY(360deg);
+                  }
+                  90%,
+                  100% {
+                    transform: rotateY(360deg);
+                  }
+                }
+              `}
+            >
+              <span
+                className='coin-flip-front'
+                css={css`
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  backface-visibility: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                `}
+              >
+                <ClerkLogoIcon />
+              </span>
+
+              <span
+                className='coin-flip-back'
+                css={css`
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  backface-visibility: hidden;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transform: rotateY(180deg);
+                `}
+              >
+                <KeySlashIcon />
+              </span>
+            </div>
 
             <p
               data-text='Clerk is in keyless mode'
               css={css`
                 color: #d9d9d9;
                 font-size: 0.875rem;
-                font-weight: 500;
+                font-weight: 400;
                 position: relative;
+                isolation: isolate;
 
-                &::before {
+                &::after {
                   content: attr(data-text);
+                  z-index: 1;
                   position: absolute;
                   left: 0;
                   top: 0;
-                  /* width: 2.5rem;
-                  height: 4.6875rem;
-                  white-space: nowrap; */
                   color: transparent;
                   background: linear-gradient(
-                    90deg,
+                    100deg,
                     transparent 0%,
-                    transparent 30%,
-                    rgb(255, 224, 68) 50%,
+                    transparent 45%,
+                    rgb(198, 179, 86) 50%,
+                    rgb(198, 179, 86) 55%,
                     transparent 60%,
                     transparent 100%
                   );
                   background-size: 200% 100%;
                   -webkit-background-clip: text;
                   background-clip: text;
-                  filter: blur(0.7px);
-                  animation: text-shimmer 3s infinite linear;
+                  filter: blur(1px);
+                  animation: text-shimmer 3.7s infinite linear;
+                }
+
+                &::before {
+                  z-index: 2;
+                  content: attr(data-text);
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  color: transparent;
+
+                  background: linear-gradient(
+                    100deg,
+                    transparent 0%,
+                    transparent 45%,
+                    rgba(240, 214, 83, 0.7) 50%,
+                    rgb(240, 214, 83) 52%,
+                    rgb(240, 214, 83) 56%,
+                    rgba(240, 214, 83, 0.7) 60%,
+                    transparent 65%,
+                    transparent 100%
+                  );
+
+                  background-size: 200% 100%;
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  animation: text-shimmer 3.7s infinite linear;
                 }
 
                 @keyframes text-shimmer {
                   0% {
-                    background-position: 200% 0;
+                    background-position: 120% center;
                   }
+                  30%,
                   100% {
-                    background-position: -200% 0;
+                    background-position: -60% center;
                   }
                 }
               `}
@@ -249,6 +342,29 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           </Flex>
         </Flex>
 
+        <Text
+          sx={t => ({
+            display: `${isExpanded ? 'block' : 'none'}`,
+            color: '#B4B4B4',
+            fontSize: t.fontSizes.$sm,
+            fontWeight: t.fontWeights.$normal,
+            // transition: `all 200ms fadeIn`,
+          })}
+        >
+          We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
+          <a
+            href='/'
+            css={css`
+              text-decoration: underline solid;
+              :hover {
+                color: #eeeeee;
+              }
+            `}
+          >
+            Learn more
+          </a>
+        </Text>
+
         <button
           type='button'
           css={css`
@@ -267,9 +383,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             white-space: nowrap;
             cursor: pointer;
             user-select: none;
-            transition:
-              all 200ms ease,
-              box-shadow 500ms ease;
+            transition: all 200ms cubic-bezier(0.6, 0.6, 0, 1);
+
             background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #636363;
             box-shadow:
               0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -278,10 +393,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition:
-              all 200ms ease,
-              box-shadow 500ms ease;
-            animation: small-btn-glow 3s infinite;
+            animation: small-btn-glow 4s infinite 1s;
 
             ${isExpanded &&
             ` right: 0.75rem;
@@ -290,6 +402,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
               color: #FDE047;
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+              animation: expanded-btn-glow 2s infinite;
               box-shadow:
                 0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
                 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -297,7 +410,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                 0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                 0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
 
-               animation: expanded-btn-glow 2s infinite;
             `}
 
             @keyframes expanded-btn-glow {
@@ -319,9 +431,39 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
               }
             }
+
             @keyframes small-btn-glow {
               0%,
+              20% {
+                box-shadow:
+                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+              45% {
+                box-shadow:
+                  0px 0px 6px 0px #fde047 inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+              70%,
               100% {
+                box-shadow:
+                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+            }
+
+            /* @keyframes small-btn-glow {
+              0%,
+              20% {
                 box-shadow:
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -337,34 +479,11 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                   0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
               }
-            }
+            } */
           `}
         >
           Claim keys
         </button>
-
-        <Text
-          sx={t => ({
-            display: `${isExpanded ? 'block' : 'none'}`,
-            color: '#B4B4B4',
-            fontSize: t.fontSizes.$sm,
-            fontWeight: t.fontWeights.$normal,
-          })}
-        >
-          We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
-          <a
-            href='/'
-            css={css`
-              text-decoration: underline solid;
-              transition: color 145ms ease;
-              :hover {
-                color: #eeeeee;
-              }
-            `}
-          >
-            Learn more
-          </a>
-        </Text>
       </Flex>
     </Portal>
   );
