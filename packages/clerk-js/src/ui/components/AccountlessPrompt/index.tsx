@@ -123,18 +123,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
     return null;
   }
 
-  //   const keyframes = css`
-  //     @keyframes expanded-btn-glow {
-  //       0%,
-  //       100% {
-  //         box-shadow: 0px 0px 3px 0px rgba(253, 224, 71, 0) inset;
-  //       }
-  //       50% {
-  //         box-shadow: 0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset;
-  //       }
-  //     }
-  //   `;
-
   return (
     <Portal>
       <Flex
@@ -158,7 +146,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-
           transition:
             'width 200ms cubic-bezier(0.6, 0.6, 0, 1), height 200ms cubic-bezier(0.34, 1.2, 0.64, 1), border-radius 200ms cubic-bezier(0.6, 0.6, 0, 1)',
 
@@ -186,9 +173,51 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             })}
           >
             <ClerkLogoIcon />
-            <Text sx={t => ({ color: '#D9D9D9', fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+
+            <p
+              data-text='Clerk is in keyless mode'
+              css={css`
+                color: #d9d9d9;
+                font-size: 0.875rem;
+                font-weight: 500;
+                position: relative;
+
+                &::before {
+                  content: attr(data-text);
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  /* width: 2.5rem;
+                  height: 4.6875rem;
+                  white-space: nowrap; */
+                  color: transparent;
+                  background: linear-gradient(
+                    90deg,
+                    transparent 0%,
+                    transparent 30%,
+                    rgb(255, 224, 68) 50%,
+                    transparent 60%,
+                    transparent 100%
+                  );
+                  background-size: 200% 100%;
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  filter: blur(0.7px);
+                  animation: text-shimmer 3s infinite linear;
+                }
+
+                @keyframes text-shimmer {
+                  0% {
+                    background-position: 200% 0;
+                  }
+                  100% {
+                    background-position: -200% 0;
+                  }
+                }
+              `}
+            >
               Clerk is in keyless mode
-            </Text>
+            </p>
           </Flex>
 
           <Flex
@@ -249,7 +278,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            /* // TODO: proper transition */
             transition:
               all 200ms ease,
               box-shadow 500ms ease;
