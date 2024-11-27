@@ -124,24 +124,26 @@ function mountIndex(element) {
 
 /**
  * @param {HTMLDivElement} element
+ * @param {Record<typeof AVAILABLE_COMPONENTS[number], ComponentPropsControl>} props
  */
-function mountOpenSignInButton(element) {
+function mountOpenSignInButton(element, props) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign In';
   button.onclick = () => {
-    Clerk.openSignUp();
+    Clerk.openSignUp(props);
   };
   element.appendChild(button);
 }
 
 /**
  * @param {HTMLDivElement} element
+ * @param {Record<typeof AVAILABLE_COMPONENTS[number], ComponentPropsControl>} props
  */
-function mountOpenSignUpButton(element) {
+function mountOpenSignUpButton(element, props) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign Up';
   button.onclick = () => {
-    Clerk.openSignUp();
+    Clerk.openSignUp(props);
   };
   element.appendChild(button);
 }
@@ -183,10 +185,10 @@ const routes = {
     Clerk.__unstable__updateProps({ options: { __internal_claimAccountlessKeysUrl: '/test-url' } });
   },
   '/open-sign-in': () => {
-    mountOpenSignInButton(app);
+    mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
   },
   '/open-sign-up': () => {
-    mountOpenSignUpButton(app);
+    mountOpenSignUpButton(app, componentControls.signUp.getProps() ?? {});
   },
 };
 
