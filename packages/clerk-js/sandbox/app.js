@@ -9,6 +9,7 @@
  */
 
 const AVAILABLE_COMPONENTS = /** @type {const} */ ([
+  'clerk', // While not a component, we want to support passing options to the Clerk class.
   'signIn',
   'signUp',
   'userButton',
@@ -80,6 +81,7 @@ function buildComponentControls(component) {
  * @type {Record<typeof AVAILABLE_COMPONENTS[number], ComponentPropsControl>}
  */
 const componentControls = {
+  clerk: buildComponentControls('clerk'),
   signIn: buildComponentControls('signIn'),
   signUp: buildComponentControls('signUp'),
   userButton: buildComponentControls('userButton'),
@@ -176,6 +178,7 @@ function addCurrentRouteIndicator(currentRoute) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
     await Clerk.load({
+      ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
       waitlistUrl: '/waitlist',

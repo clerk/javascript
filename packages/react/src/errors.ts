@@ -1,5 +1,6 @@
 export {
   isClerkAPIResponseError,
+  isClerkRuntimeError,
   isEmailLinkError,
   isKnownError,
   isMetamaskError,
