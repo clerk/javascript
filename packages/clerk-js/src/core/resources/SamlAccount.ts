@@ -52,6 +52,21 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
 
     return this;
   }
+
+  public toJSON(): SamlAccountJSON {
+    return {
+      object: 'saml_account',
+      id: this.id,
+      provider: this.provider,
+      provider_user_id: this.providerUserId,
+      active: this.active,
+      email_address: this.emailAddress,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      verification: this.verification?.toJSON(),
+      saml_connection: this.samlConnection?.toJSON(),
+    };
+  }
 }
 
 export class SamlAccountConnection extends BaseResource implements SamlAccountConnectionResource {
@@ -87,5 +102,22 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
     }
 
     return this;
+  }
+
+  public toJSON(): SamlAccountConnectionJSON {
+    return {
+      object: 'saml_account_connection',
+      id: this.id,
+      name: this.name,
+      domain: this.domain,
+      active: this.active,
+      provider: this.provider,
+      sync_user_attributes: this.syncUserAttributes,
+      allow_subdomains: this.allowSubdomains,
+      allow_idp_initiated: this.allowIdpInitiated,
+      disable_additional_identifications: this.disableAdditionalIdentifications,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

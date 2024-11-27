@@ -1,4 +1,4 @@
-import { parseError } from '@clerk/shared/error';
+import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
   PasskeyVerificationResource,
@@ -52,22 +52,24 @@ export class Verification extends BaseResource implements VerificationResource {
         this.externalVerificationRedirectURL = null;
       }
       this.attempts = data.attempts;
-      this.expireAt = unixEpochToDate(data.expire_at);
+      this.expireAt = unixEpochToDate(data.expire_at || undefined);
       this.error = data.error ? parseError(data.error) : null;
     }
     return this;
   }
 
-  public toJSON() {
+  public toJSON(): VerificationJSON {
     return {
+      object: 'verification',
+      id: this.id || '',
       status: this.status,
       strategy: this.strategy,
       nonce: this.nonce,
       message: this.message,
       external_verification_redirect_url: this.externalVerificationRedirectURL?.toString() || null,
       attempts: this.attempts,
-      expire_at: this.expireAt?.getTime(),
-      error: this.error,
+      expire_at: this.expireAt?.getTime() || null,
+      error: errorToJSON(this.error),
       verified_at_client: this.verifiedAtClient,
     };
   }
@@ -114,6 +116,15 @@ export class SignUpVerifications implements SignUpVerificationsResource {
       this.externalAccount = new Verification(null);
     }
   }
+
+  public toJSON(): SignUpVerificationsJSON {
+    return {
+      email_address: this.emailAddress.toJSON(),
+      phone_number: this.phoneNumber.toJSON(),
+      web3_wallet: this.web3Wallet.toJSON(),
+      external_account: this.externalAccount.toJSON(),
+    };
+  }
 }
 
 export class SignUpVerification extends Verification {
@@ -129,5 +140,13 @@ export class SignUpVerification extends Verification {
       this.nextAction = '';
       this.supportedStrategies = [];
     }
+  }
+
+  public toJSON(): SignUpVerificationJSON {
+    return {
+      ...super.toJSON(),
+      next_action: this.nextAction,
+      supported_strategies: this.supportedStrategies,
+    };
   }
 }

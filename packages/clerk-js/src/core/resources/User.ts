@@ -372,40 +372,46 @@ export class User extends BaseResource implements UserResource {
       this.legalAcceptedAt = unixEpochToDate(data.legal_accepted_at);
     }
 
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = unixEpochToDate(data.updated_at || undefined);
+    this.createdAt = unixEpochToDate(data.created_at || undefined);
     return this;
   }
 
-  // toJSON() {
-  //   return {
-  //     id: this.id,
-  //     external_id: this.externalId,
-  //     first_name: this.firstName,
-  //     last_name: this.lastName,
-  //     username: this.username,
-  //     public_metadata: this.publicMetadata,
-  //     unsafe_metadata: this.unsafeMetadata,
-  //     image_url: this.imageUrl,
-  //     has_image: this.hasImage,
-  //     email_addresses: this.emailAddresses.map(ea => ea.toJSON()),
-  //     phone_numbers: this.phoneNumbers.map(ph => ph.toJSON()),
-  //     web3_wallets: this.web3Wallets.map(ph => ph.toJSON()),
-  //     external_accounts: this.externalAccounts.map(ea => ea.toJSON()),
-  //     passkeys: this.passkeys.map(passkey => passkey.toJSON()),
-  //     organization_memberships: this.organizationMemberships.map(om => om.toJSON()),
-  //     saml_accounts: this.samlAccounts.map(sa => sa.toJSON()),
-  //     enterprise_accounts: this.enterpriseAccounts.map(ea => ea.toJSON()),
-  //     totp_enabled: this.totpEnabled,
-  //     backup_code_enabled: this.backupCodeEnabled,
-  //     two_factor_enabled: this.twoFactorEnabled,
-  //     create_organization_enabled: this.createOrganizationEnabled,
-  //     create_organizations_limit: this.createOrganizationsLimit,
-  //     delete_self_enabled: this.deleteSelfEnabled,
-  //     last_sign_in_at: this.lastSignInAt?.getTime() || null,
-  //     legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
-  //     updated_at: this.updatedAt?.getTime(),
-  //     created_at: this.createdAt?.getTime(),
-  //   };
-  // }
+  public toJSON(): UserJSON {
+    return {
+      object: 'user',
+      id: this.id,
+      external_id: this.externalId,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      username: this.username,
+      public_metadata: this.publicMetadata,
+      unsafe_metadata: this.unsafeMetadata,
+      image_url: this.imageUrl,
+      has_image: this.hasImage,
+      email_addresses: this.emailAddresses.map(ea => ea.toJSON()),
+      phone_numbers: this.phoneNumbers.map(ph => ph.toJSON()),
+      web3_wallets: this.web3Wallets.map(ph => ph.toJSON()),
+      external_accounts: this.externalAccounts.map(ea => ea.toJSON()),
+      passkeys: this.passkeys.map(passkey => passkey.toJSON()),
+      organization_memberships: this.organizationMemberships.map(om => om.toJSON()),
+      saml_accounts: this.samlAccounts.map(sa => sa.toJSON()),
+      enterprise_accounts: this.enterpriseAccounts.map(ea => ea.toJSON()),
+      totp_enabled: this.totpEnabled,
+      backup_code_enabled: this.backupCodeEnabled,
+      two_factor_enabled: this.twoFactorEnabled,
+      create_organization_enabled: this.createOrganizationEnabled,
+      create_organizations_limit: this.createOrganizationsLimit,
+      delete_self_enabled: this.deleteSelfEnabled,
+      primary_email_address_id: this.primaryEmailAddressId,
+      primary_phone_number_id: this.primaryPhoneNumberId,
+      primary_web3_wallet_id: this.primaryWeb3WalletId,
+      password_enabled: this.passwordEnabled,
+      profile_image_id: this.imageUrl,
+      last_sign_in_at: this.lastSignInAt?.getTime() || null,
+      legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
+      updated_at: this.updatedAt?.getTime() || null,
+      created_at: this.createdAt?.getTime() || null,
+    };
+  }
 }

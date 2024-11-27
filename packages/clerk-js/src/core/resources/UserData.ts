@@ -20,4 +20,13 @@ export class UserData implements IUserData {
 
     return this;
   }
+
+  public toJSON(): UserDataJSON {
+    return {
+      first_name: this.firstName,
+      last_name: this.lastName,
+      image_url: this.imageUrl,
+      has_image: this.hasImage,
+    };
+  }
 }

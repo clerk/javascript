@@ -79,6 +79,20 @@ export class OrganizationMembership extends BaseResource implements Organization
     return this;
   }
 
+  public toJSON(): OrganizationMembershipJSON {
+    return {
+      object: 'organization_membership',
+      id: this.id,
+      organization: this.organization.toJSON(),
+      public_metadata: this.publicMetadata,
+      public_user_data: this.publicUserData.toJSON(),
+      permissions: this.permissions,
+      role: this.role,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
+  }
+
   public reload(_?: ClerkResourceReloadParams): Promise<this> {
     clerkUnsupportedReloadMethod('OrganizationMembership');
   }

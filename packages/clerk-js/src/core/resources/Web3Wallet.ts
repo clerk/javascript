@@ -59,4 +59,13 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
     this.verification = new Verification(data.verification);
     return this;
   }
+
+  public toJSON(): Web3WalletJSON {
+    return {
+      object: 'web3_wallet',
+      id: this.id,
+      web3_wallet: this.web3Wallet,
+      verification: this.verification.toJSON(),
+    };
+  }
 }

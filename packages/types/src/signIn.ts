@@ -105,6 +105,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  toJSON: () => SignInJSON;
 }
 
 export type SignInStatus =
@@ -239,15 +240,15 @@ export type SignInStrategy =
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
   id: string;
-  status: SignInStatus;
+  status: SignInStatus | null;
   /**
    * @deprecated This attribute will be removed in the next major version
    */
   supported_identifiers: SignInIdentifier[];
-  identifier: string;
+  identifier: string | null;
   user_data: UserDataJSON;
-  supported_first_factors: SignInFirstFactorJSON[];
-  supported_second_factors: SignInSecondFactorJSON[];
+  supported_first_factors: SignInFirstFactorJSON[] | null;
+  supported_second_factors: SignInSecondFactorJSON[] | null;
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;

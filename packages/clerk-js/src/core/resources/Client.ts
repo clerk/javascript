@@ -106,25 +106,27 @@ export class Client extends BaseResource implements ClientResource {
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
-      this.createdAt = unixEpochToDate(data.created_at);
-      this.updatedAt = unixEpochToDate(data.updated_at);
+      this.createdAt = unixEpochToDate(data.created_at || undefined);
+      this.updatedAt = unixEpochToDate(data.updated_at || undefined);
     }
 
     return this;
   }
 
-  // toJSON() {
-  //   return {
-  //     id: this.id,
-  //     sessions: this.sessions.map(s => s.toJSON()),
-  //     sign_up: this.signUp.toJSON(),
-  //     sign_in: this.signIn.toJSON(),
-  //     last_active_session_id: this.lastActiveSessionId,
-  //     cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
-  //     created_at: this.createdAt ? this.createdAt.getTime() : null,
-  //     updated_at: this.updatedAt ? this.updatedAt.getTime() : null,
-  //   };
-  // }
+  public toJSON(): ClientJSON {
+    return {
+      object: 'client',
+      status: null,
+      id: this.id || '',
+      sessions: this.sessions.map(s => s.toJSON()),
+      sign_up: this.signUp.toJSON(),
+      sign_in: this.signIn.toJSON(),
+      last_active_session_id: this.lastActiveSessionId,
+      cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
+      created_at: this.createdAt?.getTime() ?? null,
+      updated_at: this.updatedAt?.getTime() ?? null,
+    };
+  }
 
   protected path(): string {
     return this.pathRoot;

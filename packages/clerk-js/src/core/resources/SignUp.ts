@@ -379,6 +379,33 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
+  public toJSON(): SignUpJSON {
+    return {
+      object: 'sign_up',
+      id: this.id || '',
+      status: this.status || null,
+      required_fields: this.requiredFields,
+      optional_fields: this.optionalFields,
+      missing_fields: this.missingFields,
+      unverified_fields: this.unverifiedFields,
+      verifications: this.verifications.toJSON(),
+      username: this.username,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      email_address: this.emailAddress,
+      phone_number: this.phoneNumber,
+      has_password: this.hasPassword,
+      unsafe_metadata: this.unsafeMetadata,
+      created_session_id: this.createdSessionId,
+      created_user_id: this.createdUserId,
+      abandon_at: this.abandonAt,
+      web3_wallet: this.web3wallet,
+      legal_accepted_at: this.legalAcceptedAt,
+      external_account: this.externalAccount,
+      external_account_strategy: this.externalAccount?.strategy,
+    };
+  }
+
   /**
    * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
    */

@@ -1,3 +1,5 @@
+import type { SamlAccountConnectionJSON } from 'json';
+
 import type { ClerkResource } from './resource';
 
 export interface SamlAccountConnectionResource extends ClerkResource {
@@ -12,4 +14,5 @@ export interface SamlAccountConnectionResource extends ClerkResource {
   disableAdditionalIdentifications: boolean;
   createdAt: Date;
   updatedAt: Date;
+  toJSON: () => SamlAccountConnectionJSON;
 }
