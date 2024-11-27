@@ -21,3 +21,5 @@ export const SDK_METADATA = {
 
 export const TELEMETRY_DISABLED = isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED);
 export const TELEMETRY_DEBUG = isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG);
+
+export const ALLOW_ACCOUNTLESS = isTruthy(process.env.NEXT_PUBLIC_CLERK_ACCOUNTLESS);

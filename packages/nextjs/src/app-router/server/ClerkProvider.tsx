@@ -1,10 +1,12 @@
 import type { AuthObject } from '@clerk/backend';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { ALLOW_ACCOUNTLESS } from '../../server/constants';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -67,7 +69,13 @@ export async function ClerkProvider(
       {children}
     </ClientClerkProvider>
   );
-  if (!propsWithEnvs.publishableKey && !isNextWithUnstableServerActions && process.env.NODE_ENV === 'development') {
+
+  const hasMissingPk = !propsWithEnvs.publishableKey;
+
+  const shouldRunAsAccountless =
+    hasMissingPk && !isNextWithUnstableServerActions && isDevelopmentEnvironment() && ALLOW_ACCOUNTLESS;
+
+  if (shouldRunAsAccountless) {
     /**
      * Attention: Moving this call outside the conditional will cause the ClerkProvider to opt-in all routes into dynamic rendering.
      */

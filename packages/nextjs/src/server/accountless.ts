@@ -1,6 +1,9 @@
 import type { AccountlessApplication } from '@clerk/backend';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import hex from 'crypto-js/enc-hex';
 import sha256 from 'crypto-js/sha256';
+
+import { ALLOW_ACCOUNTLESS } from './constants';
 
 const accountlessCookiePrefix = `__clerk_acc_`;
 
@@ -28,7 +31,7 @@ function hashString(str: string) {
 function getAccountlessCookieValue(
   getter: (cookieName: string) => string | undefined,
 ): AccountlessApplication | undefined {
-  if (process.env.NODE_ENV !== 'development') {
+  if (!isDevelopmentEnvironment() || !ALLOW_ACCOUNTLESS) {
     return undefined;
   }
 

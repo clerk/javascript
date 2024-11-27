@@ -2,6 +2,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +10,7 @@ import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { getAccountlessCookieValue } from './accountless';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { ALLOW_ACCOUNTLESS, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
@@ -220,7 +221,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     });
 
     const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (process.env.NODE_ENV === 'production') {
+      if (!isDevelopmentEnvironment() || !ALLOW_ACCOUNTLESS) {
         return baseNextMiddleware(request, event);
       }
 
