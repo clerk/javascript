@@ -1,4 +1,5 @@
 import type { AccountlessApplication } from '@clerk/backend';
+import { logger } from '@clerk/shared/logger';
 
 // @ts-ignore
 import fsModule from '#fs';
@@ -57,6 +58,38 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
   }
 }
 
+const createMessage = (isNew: boolean, keys: AccountlessApplication) => {
+  return `\x1b[35m
+         ..:::::.
+    .::::::::::::                    %%+                         :%%:
+  .:::::::..:::                      %%+                         :%%:
+ .::::.                              %%+                         :%%:
+ ::::    +%%#            =%%%%%%%-   %%+    =%%%%%%*    -%%:*%%% :%%:    +%%=
+::::.   %%%%%%=        :%%%-   :#*   %%+  :%%#:   +%%-  -%%%%*=- :%%:  -%%*
+::::.   %%%%%%=        %%#           %%+  #%*      *%%  -%%+     :%%: #%%.
+ ::::    +%%#         -%%-           %%+  %%%%%%%%%%%%  -%%.     :%%%%%%%+
+ .::                   %%%           %%+  #%#           -%%.     :%%%* :%%*
+       %%%#*#%%+        %%%#- :#%%.  %%+   %%%%- :#%%:  -%%.     :%%:    %%#
+     #%%%%%%%%%%%=        +%%%%%+    %%+     +%%%%%=    -%%.     :%%:     #%%
+      :*#%%%%##+
+  \x1b[0m
+
+       #
+      # #    ####   ####   ####  #    # #    # ##### #      ######  ####   ####
+     #   #  #    # #    # #    # #    # ##   #   #   #      #      #      #
+    #     # #      #      #    # #    # # #  #   #   #      #####   ####   ####
+    ####### #      #      #    # #    # #  # #   #   #      #           #      #
+    #     # #    # #    # #    # #    # #   ##   #   #      #      #    # #    #
+    #     #  ####   ####   ####   ####  #    #   #   ###### ######  ####   ####
+
+  \n\x1b[35m\n[Clerk]:\x1b[0m You are running on accountless mode. Your${isNew ? ' new ' : ' '}temporary keys are:
+
+\x1b[35mPublishable key:\x1b[0m ${keys.publishableKey}
+\x1b[35mSecret key:\x1b[0m ${keys.secretKey}
+
+You can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
+};
+
 async function createAccountlessKeys(): Promise<AccountlessApplication | undefined> {
   if (!fsModule.fs) {
     throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
@@ -88,6 +121,9 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
   if (envVarsMap?.publishableKey && envVarsMap?.secretKey) {
     isCreatingFile = false;
     rmSync(CLERK_LOCK, { force: true, recursive: true });
+
+    logger.logOnce(createMessage(false, envVarsMap));
+
     return envVarsMap;
   }
 
@@ -99,7 +135,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
 
   const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
 
-  console.log('--- new keys', accountlessApplication);
+  logger.logOnce(createMessage(true, accountlessApplication));
 
   writeFileSync(CLERK_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
