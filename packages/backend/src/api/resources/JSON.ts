@@ -416,3 +416,13 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface UserTotpJSON extends ClerkResourceJSON {
+  secret: string | null;
+  uri: string | null;
+  verified: boolean;
+  backup_codes: string[] | null;
+  created_at: number;
+  updated_at: number;
+  [key: string]: any;
+}
