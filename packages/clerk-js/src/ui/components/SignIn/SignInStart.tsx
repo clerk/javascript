@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -25,6 +25,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { getSignUpAttributeFromIdentifier } from './utils';
@@ -67,6 +68,7 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useRouter();
   const options = useOptions();
   const ctx = useSignInContext();
+  const signUpCtx = useSignUpContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
   const isCombinedFlow = (options?.experimental?.combinedFlow && options.signInUrl === options.signUpUrl) || false;
   const supportEmail = useSupportEmail();
@@ -363,7 +365,22 @@ export function _SignInStart(): JSX.Element {
       if (organizationTicket) {
         paramsToForward.set('__clerk_ticket', organizationTicket);
       }
-      return navigate(`create?${paramsToForward.toString()}`);
+
+      const redirectUrl = buildSSOCallbackURL(signUpCtx, displayConfig.signUpUrl);
+      const redirectUrlComplete = signUpCtx.afterSignUpUrl || '/';
+
+      return handleCombinedFlowTransfer({
+        afterSignUpUrl: signUpCtx.afterSignUpUrl || '/',
+        clerk,
+        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
+        identifierAttribute: attribute,
+        identifierValue: identifierField.value,
+        navigate,
+        organizationTicket,
+        signUpMode: userSettings.signUp.mode,
+        redirectUrl,
+        redirectUrlComplete,
+      });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }

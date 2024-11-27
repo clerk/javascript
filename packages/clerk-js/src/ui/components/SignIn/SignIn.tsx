@@ -107,6 +107,7 @@ function SignInRoutes(): JSX.Element {
                 redirectUrlComplete={signUpContext.afterSignUpUrl}
                 verifyEmailPath='../verify-email-address'
                 verifyPhonePath='../verify-phone-number'
+                continuePath='../continue'
               />
             </Route>
             <Route path='continue'>

@@ -4,6 +4,7 @@ type CompleteSignUpFlowProps = {
   signUp: SignUpResource;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
+  continuePath?: string;
   navigate: (to: string) => Promise<unknown>;
   handleComplete?: () => Promise<void>;
   redirectUrl?: string;
@@ -14,6 +15,7 @@ export const completeSignUpFlow = ({
   signUp,
   verifyEmailPath,
   verifyPhonePath,
+  continuePath,
   navigate,
   handleComplete,
   redirectUrl = '',
@@ -36,6 +38,10 @@ export const completeSignUpFlow = ({
     }
     if (signUp.unverifiedFields?.includes('phone_number') && verifyPhonePath) {
       return navigate(verifyPhonePath);
+    }
+
+    if (continuePath) {
+      return navigate(continuePath);
     }
   }
   return;
