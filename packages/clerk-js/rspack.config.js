@@ -323,7 +323,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkBrowser),
     isSandbox
       ? {
-          entry: { sandbox: './sandbox/app.js' },
+          entry: { sandbox: './sandbox/app.ts' },
           plugins: [
             new rspack.HtmlRspackPlugin({
               minify: false,
@@ -530,7 +530,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      isSandbox ? { entry: { sandbox: './sandbox/app.js' } } : {},
+      isSandbox ? { entry: { sandbox: './sandbox/app.ts' } } : {},
       common({ mode }),
       commonForDev(),
     ),
