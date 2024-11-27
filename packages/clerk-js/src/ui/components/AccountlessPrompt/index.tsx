@@ -123,6 +123,18 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
     return null;
   }
 
+  //   const keyframes = css`
+  //     @keyframes expanded-btn-glow {
+  //       0%,
+  //       100% {
+  //         box-shadow: 0px 0px 3px 0px rgba(253, 224, 71, 0) inset;
+  //       }
+  //       50% {
+  //         box-shadow: 0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset;
+  //       }
+  //     }
+  //   `;
+
   return (
     <Portal>
       <Flex
@@ -136,31 +148,30 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           position: 'fixed',
           bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
-          padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
-          height: `${t.sizes.$10}`,
-          width: '297px',
-          borderRadius: '20px',
           zIndex: t.zIndices.$fab,
-          boxShadow: t.shadows.$fabShadow,
-          color: t.colors.$whiteAlpha600,
-          fontWeight: t.fontWeights.$semibold,
+          height: `${t.sizes.$10}`,
+          width: '18.5625rem',
+          padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
+          borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
-          transition: `width ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}, borderRadius ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}, height 200ms cubic-bezier(0.34, 1.2, 0.64, 1)`,
 
-          // custom
-          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.00) 100%), #1F1F1F',
+          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
+          boxShadow:
+            '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
+
+          transition:
+            'width 200ms cubic-bezier(0.6, 0.6, 0, 1), height 200ms cubic-bezier(0.34, 1.2, 0.64, 1), border-radius 200ms cubic-bezier(0.6, 0.6, 0, 1)',
 
           ...(isExpanded && {
             flexDirection: 'column',
+            height: '8.75rem',
+            width: '16.125rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
-            height: '140px',
-            width: '258PX',
             borderRadius: `${t.radii.$xl}`,
           }),
         })}
       >
-        {/* // TODO: add clerk logo + key icon */}
         <Flex
           sx={{
             width: '100%',
@@ -168,10 +179,14 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             alignItems: 'center',
           }}
         >
-          <Flex align='center'>
+          <Flex
+            sx={t => ({
+              align: 'center',
+              gap: t.space.$2,
+            })}
+          >
             <ClerkLogoIcon />
-
-            <Text sx={t => ({ color: t.colors.$white, fontSize: t.fontSizes.$md, fontWeight: t.fontWeights.$medium })}>
+            <Text sx={t => ({ color: '#D9D9D9', fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
               Clerk is in keyless mode
             </Text>
           </Flex>
@@ -180,9 +195,9 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             as='span'
             onClick={() => setIsExpanded(false)}
             sx={t => ({
-              cursor: 'pointer',
-              color: t.colors.$whiteAlpha400,
               display: `${isExpanded ? 'block' : 'none'}`,
+              cursor: 'pointer',
+              color: '#8C8C8C',
               transition: `color ${t.transitionDuration.$fast} ${t.transitionTiming.$common}`,
               ':hover': { color: t.colors.$whiteAlpha800 },
             })}
@@ -209,111 +224,118 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           type='button'
           css={css`
             position: absolute;
-            right: 6px;
-            bottom: 6px;
-
-            height: 28px;
-            width: 82px;
-
-            overflow: hidden;
-            padding: 4px 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 16px;
-            border: none;
-            cursor: pointer;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            line-height: 16px;
+            right: 0.375rem;
+            bottom: 0.375rem;
+            height: 1.75rem;
+            width: 5.125rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
             letter-spacing: 0.12px;
+            color: white;
             text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
             white-space: nowrap;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%),
-              var(--Gray-gray-1100, #636363);
+            cursor: pointer;
+            user-select: none;
+            transition:
+              all 200ms ease,
+              box-shadow 500ms ease;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #636363;
             box-shadow:
-              0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
               0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
               0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
               0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-              0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+              0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
+            /* // TODO: proper transition */
             transition:
               all 200ms ease,
               box-shadow 500ms ease;
             animation: small-btn-glow 3s infinite;
 
             ${isExpanded &&
-            `
-              position: absolute;
-              right: 12px;
-              bottom: 12px;
-              height: 28px;
-              width: 234px;
-              padding: 4px 10px 4px 10px;
-              padding-bottom: 4px;
-              color: #fde047;
-              border: none;
-              border-radius: 6px;
+            ` right: 0.75rem;
+              bottom: 0.75rem;
+              width: 14.625rem;
+              color: #FDE047;
+              border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
               box-shadow:
                 0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
                 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-  				  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                 0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                 0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              animation: expanded-btn-glow 2s infinite;
+
+               animation: expanded-btn-glow 2s infinite;
             `}
+
+            @keyframes expanded-btn-glow {
+              0%,
+              100% {
+                box-shadow:
+                  0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+              50% {
+                box-shadow:
+                  0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+            }
+            @keyframes small-btn-glow {
+              0%,
+              100% {
+                box-shadow:
+                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+              50% {
+                box-shadow:
+                  0px 0px 6px 0px #fde047 inset,
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              }
+            }
           `}
         >
-          Claim test
-        </button>
-        {/* <Button
-          textVariant='buttonSmall'
-          sx={t => ({
-            width: '82px',
-            height: '28px',
-            position: 'absolute',
-            borderRadius: `16px`,
-            right: `${t.space.$1x5}`,
-            bottom: `${t.space.$1x5}`,
-            whiteSpace: 'nowrap',
-            color: t.colors.$white,
-            background: ' #636363',
-
-            ':hover': {
-              //to add
-            },
-
-            ...(isExpanded && {
-              width: '234px',
-              transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`,
-              borderRadius: isExpanded ? t.radii.$md : '16px',
-              right: isExpanded ? t.space.$3 : t.space.$1x5,
-              bottom: isExpanded ? t.space.$3 : t.space.$1x5,
-              position: 'absolute',
-              height: '28px',
-              whiteSpace: 'nowrap',
-              color: '#FDE047',
-              // custom
-              background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545',
-              boxShadow:
-                '0px 0px 3px 0px rgba(253, 224, 71, 0.00) inset, 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(0, 0, 0, 0.12), 0px 1.5px 2px 0px rgba(0, 0, 0, 0.48)',
-            }),
-          })}
-        >
           Claim keys
-        </Button> */}
+        </button>
+
         <Text
           sx={t => ({
-            color: t.colors.$whiteAlpha600,
             display: `${isExpanded ? 'block' : 'none'}`,
+            color: '#B4B4B4',
             fontSize: t.fontSizes.$sm,
             fontWeight: t.fontWeights.$normal,
           })}
         >
-          We noticed your app was running without API Keys. Claim this instance by linking a Clerk account. Learn more
+          We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
+          <a
+            href='/'
+            css={css`
+              text-decoration: underline solid;
+              transition: color 145ms ease;
+              :hover {
+                color: #eeeeee;
+              }
+            `}
+          >
+            Learn more
+          </a>
         </Text>
       </Flex>
     </Portal>
