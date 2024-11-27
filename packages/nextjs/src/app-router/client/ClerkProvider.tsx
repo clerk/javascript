@@ -25,10 +25,12 @@ declare global {
   }
 }
 
+const isDeprecatedNextjsVersion = nextPackage.version.startsWith('13.') || nextPackage.version.startsWith('14.0');
+
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  if (nextPackage.version.startsWith('13.') || nextPackage.version.startsWith('14.0')) {
+  if (isDeprecatedNextjsVersion) {
     logger.warnOnce(
-      `\n\x1b[43m----------\n[Clerk]: Your current nextjs version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to >= next@14.2 .\n----------\x1b[0m\n`,
+      `\n\x1b[43m----------\n[Clerk]: Your current Next.js version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to next@14.1.0 or later.\n----------\x1b[0m\n`,
     );
   }
 
