@@ -122,6 +122,30 @@ function mountIndex(element) {
   element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
+/**
+ * @param {HTMLDivElement} element
+ */
+function mountOpenSignInButton(element) {
+  const button = document.createElement('button');
+  button.textContent = 'Open Sign In';
+  button.onclick = () => {
+    Clerk.openSignUp();
+  };
+  element.appendChild(button);
+}
+
+/**
+ * @param {HTMLDivElement} element
+ */
+function mountOpenSignUpButton(element) {
+  const button = document.createElement('button');
+  button.textContent = 'Open Sign Up';
+  button.onclick = () => {
+    Clerk.openSignUp();
+  };
+  element.appendChild(button);
+}
+
 /** @typedef {keyof typeof routes} Route */
 
 const routes = {
@@ -157,6 +181,12 @@ const routes = {
   },
   '/accountless': () => {
     Clerk.__unstable__updateProps({ options: { __internal_claimAccountlessKeysUrl: '/test-url' } });
+  },
+  '/open-sign-in': () => {
+    mountOpenSignInButton(app);
+  },
+  '/open-sign-up': () => {
+    mountOpenSignUpButton(app);
   },
 };
 
