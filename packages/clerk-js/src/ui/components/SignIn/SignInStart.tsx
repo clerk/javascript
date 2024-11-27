@@ -257,7 +257,7 @@ export function _SignInStart(): JSX.Element {
     } as SignInCreateParams;
   };
 
-  const safePasswordSignInForSamlInstance = (
+  const safePasswordSignInForEnterpriseSSOInstance = (
     signInCreatePromise: Promise<SignInResource>,
     fields: Array<FormControlState<string>>,
   ) => {
@@ -269,7 +269,10 @@ export function _SignInStart(): JSX.Element {
        * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
+      if (
+        !passwordField ||
+        signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')
+      ) {
         return signInResource;
       }
       return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
@@ -278,7 +281,7 @@ export function _SignInStart(): JSX.Element {
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     try {
-      const res = await safePasswordSignInForSamlInstance(signIn.create(buildSignInParams(fields)), fields);
+      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
       switch (res.status) {
         case 'needs_identifier':
