@@ -266,7 +266,7 @@ export function _SignInStart(): JSX.Element {
         return signInResource;
       }
       /**
-       * For EnterpriseSSO enabled instances, perform sign in with password only when it is allowed for the identified user.
+       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
       if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {

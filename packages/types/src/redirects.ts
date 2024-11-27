@@ -66,7 +66,7 @@ export type AuthenticateWithRedirectParams = {
 
   /**
    * One of the supported OAuth providers you can use to authenticate with, eg 'oauth_google'.
-   * Alternatively `saml` or `enteprise_sso`, to authenticate with Enterprise Single Sign On.
+   * Alternatively `saml` or `enterprise_sso`, to authenticate with Enterprise SSO.
    */
   strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
 
