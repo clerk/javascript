@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.35.1
+
+### Patch Changes
+
+- Fix a bug where the the Clerk event listener was not emitting updates when a Session's user data changes. ([#4661](https://github.com/clerk/javascript/pull/4661)) by [@BRKalow](https://github.com/BRKalow)
+
+- Bug fix: Being able to revoke a session from UserProfile. ([#4653](https://github.com/clerk/javascript/pull/4653)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.35.0
 
 ### Minor Changes
