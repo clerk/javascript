@@ -98,6 +98,24 @@ function mountIndex(element: HTMLDivElement) {
   element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
+function mountOpenSignInButton(element: HTMLDivElement, props) {
+  const button = document.createElement('button');
+  button.textContent = 'Open Sign In';
+  button.onclick = () => {
+    Clerk?.openSignUp(props);
+  };
+  element.appendChild(button);
+}
+
+function mountOpenSignUpButton(element: HTMLDivElement, props) {
+  const button = document.createElement('button');
+  button.textContent = 'Open Sign Up';
+  button.onclick = () => {
+    Clerk?.openSignUp(props);
+  };
+  element.appendChild(button);
+}
+
 function addCurrentRouteIndicator(currentRoute: string) {
   const link = document.querySelector(`a[href="${currentRoute}"]`);
   if (!link) {
@@ -143,6 +161,12 @@ function addCurrentRouteIndicator(currentRoute: string) {
     },
     '/accountless': () => {
       Clerk.__unstable__updateProps({ options: { __internal_claimAccountlessKeysUrl: '/test-url' } });
+    },
+    '/open-sign-in': () => {
+      mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
+    },
+    '/open-sign-up': () => {
+      mountOpenSignUpButton(app, componentControls.signUp.getProps() ?? {});
     },
   };
 
