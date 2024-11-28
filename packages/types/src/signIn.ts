@@ -6,6 +6,8 @@ import type {
   EmailCodeFactor,
   EmailLinkConfig,
   EmailLinkFactor,
+  EnterpriseSSOConfig,
+  EnterpriseSSOFactor,
   OAuthConfig,
   OauthFactor,
   PasskeyAttempt,
@@ -51,6 +53,7 @@ import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
+  EnterpriseSSOStrategy,
   GoogleOneTapStrategy,
   OAuthStrategy,
   PasskeyStrategy,
@@ -130,7 +133,8 @@ export type SignInFirstFactor =
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
   | OauthFactor
-  | SamlFactor;
+  | SamlFactor
+  | EnterpriseSSOFactor;
 
 export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
 
@@ -152,7 +156,8 @@ export type PrepareFirstFactorParams =
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
-  | SamlConfig;
+  | SamlConfig
+  | EnterpriseSSOConfig;
 
 export type AttemptFirstFactorParams =
   | PasskeyAttempt
@@ -169,7 +174,7 @@ export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupC
 
 export type SignInCreateParams = (
   | {
-      strategy: OAuthStrategy | SamlStrategy;
+      strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
@@ -234,7 +239,8 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | SamlStrategy;
+  | SamlStrategy
+  | EnterpriseSSOStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
