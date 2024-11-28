@@ -150,8 +150,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition:
-            'width 300ms cubic-bezier(0.34, 1.2, 0.64, 1), height 300ms cubic-bezier(0.34, 1.2, 0.64, 1), border-radius 200ms cubic-bezier(0.6, 0.6, 0, 1)',
+          transition: 'all 200ms cubic-bezier(0.34, 1.2, 0.64, 1)',
 
           ...(isExpanded && {
             flexDirection: 'column',
@@ -184,7 +183,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                 width: 1.5rem;
                 height: 1.5rem;
                 transform-style: preserve-3d;
-                animation: ${isExpanded ? 'coinFlipAnimation 7s infinite linear' : 'none'};
+                animation: ${isExpanded ? 'coinFlipAnimation 5.5s infinite linear' : 'none'};
 
                 @keyframes coinFlipAnimation {
                   0%,
@@ -319,7 +318,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
               `
 			  display: block;
 			  color: #8C8C8C;
-              cursor: pointer;
               transition: color 150ms ease-out;
               :hover {
                 color: #eeeeee;
@@ -415,6 +413,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
             animation: small-btn-glow 3.6s infinite;
+            animation-play-state: running !important;
 
             ${isExpanded &&
             ` right: 0.75rem;
