@@ -5,6 +5,7 @@ import { expo } from './expo';
 import { express } from './express';
 import { createLongRunningApps } from './longRunningApps';
 import { next } from './next';
+import { nuxt } from './nuxt';
 import { react } from './react';
 import { remix } from './remix';
 import { tanstack } from './tanstack';
@@ -20,6 +21,7 @@ export const appConfigs = {
   expo,
   astro,
   tanstack,
+  nuxt,
   secrets: {
     instanceKeys,
   },

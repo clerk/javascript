@@ -1,31 +1,48 @@
 import type { AuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
-import type { H3Event } from 'h3';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
 import { clerkClient } from './clerkClient';
 import { createInitialState, toWebRequest } from './utils';
 
-type Handler = (event: H3Event) => void;
+function parseHandlerAndOptions(args: unknown[]) {
+  return [
+    typeof args[0] === 'function' ? args[0] : undefined,
+    (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
+  ] as [EventHandler | undefined, AuthenticateRequestOptions];
+}
+
+interface ClerkMiddleware {
+  /**
+   * @example
+   * export default clerkMiddleware((event) => { ... }, options);
+   */
+  (handler: EventHandler, options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+
+  /**
+   * @example
+   * export default clerkMiddleware(options);
+   */
+  (options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+}
 
 /**
- * Integrates Clerk authentication into your Nuxt application through Middleware.
- *
- * @param handler Optional callback function to handle the authenticated request
+ * Middleware for Nuxt that handles authentication and authorization with Clerk.
  *
  * @example
- * Basic usage:
+ * Basic usage with options:
  * ```ts
- * import { clerkMiddleware } from '@clerk/nuxt/server'
- *
- * export default clerkMiddleware()
+ * export default clerkMiddleware({
+ *   authorizedParties: ['https://example.com']
+ * })
  * ```
  *
  * @example
  * With custom handler:
  * ```ts
- * import { clerkMiddleware } from '@clerk/nuxt/server'
- *
  * export default clerkMiddleware((event) => {
  *   // Access auth data from the event context
  *   const { auth } = event.context
@@ -39,12 +56,40 @@ type Handler = (event: H3Event) => void;
  *   }
  * })
  * ```
+ *
+ * @example
+ * With custom handler and options:
+ * ```ts
+ * export default clerkMiddleware((event) => {
+ *   // Access auth data from the event context
+ *   const { auth } = event.context
+ *
+ *   // Example: Require authentication for all API routes
+ *   if (!auth.userId && event.path.startsWith('/api')) {
+ *     throw createError({
+ *       statusCode: 401,
+ *       message: 'Unauthorized'
+ *     })
+ *   }
+ * }, {
+ *   authorizedParties: ['https://example.com']
+ * })
+ * ```
  */
-export function clerkMiddleware(handler?: Handler) {
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
+  const [handler, options] = parseHandlerAndOptions(args);
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
 
-    const requestState = await clerkClient(event).authenticateRequest(clerkRequest);
+    clerkClient(event).telemetry.record(
+      eventMethodCalled('clerkMiddleware', {
+        handler: Boolean(handler),
+        satellite: Boolean(options.isSatellite),
+        proxy: Boolean(options.proxyUrl),
+      }),
+    );
+
+    const requestState = await clerkClient(event).authenticateRequest(clerkRequest, options);
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
@@ -69,7 +114,7 @@ export function clerkMiddleware(handler?: Handler) {
 
     handler?.(event);
   });
-}
+};
 
 declare module 'h3' {
   interface H3EventContext {
