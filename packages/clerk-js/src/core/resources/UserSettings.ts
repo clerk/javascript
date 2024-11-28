@@ -90,6 +90,19 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return this;
   }
 
+  public toJSON(): UserSettingsJSON {
+    return {
+      social: this.social,
+      saml: this.saml,
+      attributes: this.attributes,
+      actions: this.actions,
+      sign_in: this.signIn,
+      sign_up: this.signUp,
+      password_settings: this.passwordSettings,
+      passkey_settings: this.passkeySettings,
+    } as any as UserSettingsJSON;
+  }
+
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {
     if (!attributes) {
       return [];

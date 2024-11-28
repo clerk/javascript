@@ -90,4 +90,5 @@ export interface DisplayConfigResource extends ClerkResource {
   privacyPolicyUrl: string;
   waitlistUrl: string;
   afterJoinWaitlistUrl: string;
+  toJSON: () => DisplayConfigJSON;
 }
