@@ -124,6 +124,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
     return null;
   }
 
+  const handleFocus = () => setIsExpanded(true);
+
   return (
     <Portal>
       <Flex
@@ -133,7 +135,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
         align='center'
         onMouseEnter={() => setIsExpanded(true)}
         sx={t => ({
-          //   touchAction: 'none', //for drag to work on mobile consistently
+          // touchAction: 'none', //for drag to work on mobile consistently
           position: 'fixed',
           bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
@@ -182,27 +184,26 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                 width: 1.5rem;
                 height: 1.5rem;
                 transform-style: preserve-3d;
-                animation: ${isExpanded ? 'coinFlipAnimation 3.6s infinite cubic-bezier(0.6, 0.2, 0.4, 0.9)' : 'none'};
+                animation: ${isExpanded ? 'coinFlipAnimation 7s infinite linear' : 'none'};
 
                 @keyframes coinFlipAnimation {
                   0%,
-                  35% {
-                    transform: rotateY(360deg);
+                  40% {
+                    transform: rotateY(0);
                   }
-                  35%,
-                  55% {
+                  50%,
+                  90% {
                     transform: rotateY(180deg);
                   }
-
-                  90%,
                   100% {
-                    transform: rotateY(360deg);
+                    transform: rotateY(0);
                   }
                 }
               `}
             >
               <span
                 className='coin-flip-front'
+                aria-hidden='true'
                 css={css`
                   position: absolute;
                   width: 100%;
@@ -218,15 +219,16 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
               <span
                 className='coin-flip-back'
+                aria-hidden='true'
                 css={css`
                   position: absolute;
                   width: 100%;
                   height: 100%;
                   backface-visibility: hidden;
+                  transform: rotateY(180deg);
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  transform: rotateY(180deg);
                 `}
               >
                 <KeySlashIcon />
@@ -261,7 +263,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                   background-size: 200% 100%;
                   -webkit-background-clip: text;
                   background-clip: text;
-                  filter: blur(1px);
+                  filter: blur(1.2px);
                   animation: text-shimmer 3.6s infinite linear;
                 }
 
@@ -306,16 +308,24 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             </p>
           </Flex>
 
-          <Flex
-            as='span'
+          <button
+            type='button'
+            aria-label='Close'
             onClick={() => setIsExpanded(false)}
-            sx={t => ({
-              display: `${isExpanded ? 'block' : 'none'}`,
-              cursor: 'pointer',
-              color: '#8C8C8C',
-              transition: `color ${t.transitionDuration.$fast} ${t.transitionTiming.$common}`,
-              ':hover': { color: t.colors.$whiteAlpha800 },
-            })}
+            css={css`
+              display: none;
+              cursor: pointer;
+              ${isExpanded &&
+              `
+			  display: block;
+			  color: #8C8C8C;
+              cursor: pointer;
+              transition: color 150ms ease-out;
+              :hover {
+                color: #eeeeee;
+              }
+              `}
+            `}
           >
             <svg
               width='16'
@@ -332,7 +342,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                 strokeLinejoin='round'
               />
             </svg>
-          </Flex>
+          </button>
         </Flex>
 
         <p
@@ -341,10 +351,10 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             color: #b4b4b4;
             font-size: 0.75rem;
             font-weight: 400;
-            line-height: 16px;
-            letter-spacing: 1%;
+            line-height: 1rem;
 
             ${isExpanded && `display:block`};
+
             animation: show-description 100ms ease-out forwards;
             transition: all ease-out;
 
@@ -364,6 +374,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           <a
             href='/'
             css={css`
+              cursor: pointer;
               text-decoration: underline solid;
               :hover {
                 color: #eeeeee;
@@ -376,6 +387,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
         <button
           type='button'
+          onFocus={handleFocus}
           css={css`
             position: absolute;
             right: 0.375rem;
@@ -443,8 +455,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
 
             @keyframes small-btn-glow {
               0%,
-              20%,
-              100% {
+              5%,
+              70% {
                 box-shadow:
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
