@@ -106,13 +106,13 @@ describe('PasswordSection', () => {
       });
     });
 
-    describe('with SAML', () => {
+    describe('with Enterprise SSO', () => {
       it('prevents setting a password if user has active enterprise connections', async () => {
         const emailAddress = 'george@jungle.com';
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             enterprise_accounts: [
@@ -185,7 +185,7 @@ describe('PasswordSection', () => {
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             enterprise_accounts: [
@@ -315,13 +315,13 @@ describe('PasswordSection', () => {
       expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
     });
 
-    describe('with SAML', () => {
+    describe('with Enterprise SSO', () => {
       it('prevents changing a password if user has active enterprise connections', async () => {
         const emailAddress = 'george@jungle.com';
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             password_enabled: true,
             email_addresses: [emailAddress],
@@ -395,7 +395,7 @@ describe('PasswordSection', () => {
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             password_enabled: true,
             email_addresses: [emailAddress],

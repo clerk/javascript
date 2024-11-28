@@ -18,6 +18,7 @@ const withoutEnterpriseConnection = createFixtures.config(f => {
 const withInactiveEnterpriseConnection = createFixtures.config(f => {
   f.withSocialProvider({ provider: 'google' });
   f.withSocialProvider({ provider: 'github' });
+  f.withEnterpriseSso();
   f.withUser({
     enterprise_accounts: [
       {
@@ -67,6 +68,7 @@ const withInactiveEnterpriseConnection = createFixtures.config(f => {
 });
 
 const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
+  f.withEnterpriseSso();
   f.withUser({
     enterprise_accounts: [
       {
@@ -117,6 +119,7 @@ const withOAuthBuiltInEnterpriseConnection = createFixtures.config(f => {
 
 const withOAuthCustomEnterpriseConnection = (logoPublicUrl: string | null) =>
   createFixtures.config(f => {
+    f.withEnterpriseSso();
     f.withUser({
       enterprise_accounts: [
         {
@@ -166,6 +169,7 @@ const withOAuthCustomEnterpriseConnection = (logoPublicUrl: string | null) =>
   });
 
 const withSamlEnterpriseConnection = createFixtures.config(f => {
+  f.withEnterpriseSso();
   f.withUser({
     enterprise_accounts: [
       {
