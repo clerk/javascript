@@ -39,6 +39,10 @@
     "./local-credentials": {
       "types": "./dist/local-credentials/index.d.ts",
       "default": "./dist/local-credentials/index.js"
+    },
+    "./async-storage": {
+      "types": "./dist/async-storage/index.d.ts",
+      "default": "./dist/async-storage/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -48,7 +52,8 @@
     "dist",
     "web",
     "local-credentials",
-    "passkeys"
+    "passkeys",
+    "async-storage"
   ],
   "scripts": {
     "build": "tsup",
@@ -96,6 +101,9 @@
   },
   "peerDependenciesMeta": {
     "@clerk/expo-passkeys": {
+      "optional": true
+    },
+    "@react-native-async-storage/async-storage": {
       "optional": true
     },
     "expo-local-authentication": {

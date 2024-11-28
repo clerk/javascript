@@ -1,0 +1,4 @@
+{
+  "main": "../dist/async-storage/index.js",
+  "types": "../dist/async-storage/index.d.ts"
+}

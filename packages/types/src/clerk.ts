@@ -744,7 +744,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
     >;
 
     __internal_claimAccountlessKeysUrl?: string;
-    __internal_initializeFromCache?: boolean;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.

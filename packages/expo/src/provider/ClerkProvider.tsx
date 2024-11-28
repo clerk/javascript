@@ -21,6 +21,12 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_passkeys?: BuildClerkOptions['__experimental_passkeys'];
+  /**
+   *
+   *
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_asyncStorage?: BuildClerkOptions['__experimental_asyncStorage'];
 };
 
 const SDK_METADATA = {
@@ -29,7 +35,15 @@ const SDK_METADATA = {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, publishableKey, __experimental_passkeys, ...rest } = props;
+  const {
+    children,
+    tokenCache,
+    publishableKey,
+    __experimental_passkeys,
+    __experimental_asyncStorage,
+    experimental,
+    ...rest
+  } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   if (isWeb()) {
@@ -51,11 +65,16 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
               publishableKey: pk,
               tokenCache,
               __experimental_passkeys,
+              __experimental_asyncStorage,
             })
           : null
       }
       standardBrowser={!isNative()}
-      __internal_initializeFromCache
+      experimental={{
+        ...experimental,
+        // force the rethrowOfflineNetworkErrors flag to true if the asyncStorage is provided
+        rethrowOfflineNetworkErrors: !!__experimental_asyncStorage || experimental?.rethrowOfflineNetworkErrors,
+      }}
     >
       {children}
     </ClerkReactProvider>

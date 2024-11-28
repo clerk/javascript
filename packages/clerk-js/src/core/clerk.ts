@@ -347,7 +347,7 @@ export class Clerk implements ClerkInterface {
     if (this.#options.standardBrowser) {
       this.#loaded = await this.#loadInStandardBrowser();
     } else {
-      this.#loaded = await this.#loadInNonStandardBrowser(options?.__internal_initializeFromCache);
+      this.#loaded = await this.#loadInNonStandardBrowser();
     }
 
     if (BUILD_ENABLE_NEW_COMPONENTS) {
@@ -1885,9 +1885,13 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 
-  #loadInNonStandardBrowser = async (fallbackToCachedValues?: boolean): Promise<boolean> => {
+  private shouldFallbackToCachedValues = (): boolean => {
+    return !!this.__internal_getCachedClient && !!this.__internal_getCachedEnvironment;
+  };
+
+  #loadInNonStandardBrowser = async (): Promise<boolean> => {
     let environment, client;
-    const fetchMaxTries = fallbackToCachedValues ? 1 : undefined;
+    const fetchMaxTries = this.shouldFallbackToCachedValues() ? 1 : undefined;
     try {
       [environment, client] = await Promise.all([
         Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
