@@ -171,6 +171,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
+  private signInSuspendedCallback: (() => void) | undefined;
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -1665,6 +1666,14 @@ export class Clerk implements ClerkInterface {
     if (Clerk.mountComponentRenderer) {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
+  };
+
+  __internal_onSuspendedSignIn = (callback: () => void): void => {
+    this.signInSuspendedCallback = callback;
+  };
+
+  __internal_notifySuspendedSignIn = () => {
+    this.signInSuspendedCallback?.();
   };
 
   __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {

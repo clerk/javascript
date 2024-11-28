@@ -15,8 +15,9 @@ import type {
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { createContext, createElement, useContext } from 'react';
+import React, { createContext, createElement, Suspense, useContext, useEffect, useState } from 'react';
 
+import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import {
   organizationProfileLinkRenderedError,
   organizationProfilePageRenderedError,
@@ -215,7 +216,7 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   );
 };
 
-export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+const LegacySignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
   return (
     <Portal
       mount={clerk.mountSignIn}
@@ -224,7 +225,66 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
       props={props}
     />
   );
-}, 'SignIn');
+}, 'SignUp');
+
+const SuspendedSignIn = (props: SignInProps) => {
+  const clerk = useIsomorphicClerkContext();
+  // @ts-ignore
+  React.use(clerk.suspendedSignIn);
+
+  return (
+    <Portal
+      mount={clerk.mountSignIn}
+      unmount={clerk.unmountSignIn}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+};
+
+const SignInWithFallback = ({ fallback, ...props }: SignInProps & { fallback: React.ReactNode }) => {
+  const clerk = useIsomorphicClerkContext();
+  const [canUnmount, setUnmount] = useState(false);
+
+  useEffect(() => {
+    clerk.suspendedSignIn.then(() => setUnmount(true));
+  }, []);
+
+  return (
+    <>
+      <Suspense fallback={fallback}>
+        <SuspendedSignIn {...props} />
+      </Suspense>
+      {clerk.loaded && !canUnmount ? (
+        <div
+          hidden
+          style={{ background: 'red', width: '200px', height: '200px' }}
+        >
+          <Portal
+            mount={clerk.mountSignIn}
+            unmount={clerk.unmountSignIn}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+          />
+        </div>
+      ) : null}
+    </>
+  );
+};
+
+// @ts-ignore
+export const SignIn = ({ fallback, ...props }: SignInProps) => {
+  if (fallback) {
+    return (
+      <SignInWithFallback
+        fallback={fallback}
+        {...props}
+      />
+    );
+  }
+
+  return <LegacySignIn {...props} />;
+};
 
 export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
   return (

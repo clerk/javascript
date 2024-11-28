@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignInContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -23,7 +23,12 @@ function RedirectToSignIn() {
 }
 
 function SignInRoutes(): JSX.Element {
+  const clerk = useClerk();
   const signInContext = useSignInContext();
+
+  useEffect(() => {
+    (clerk as any).__internal_notifySuspendedSignIn();
+  }, []);
 
   return (
     <Flow.Root flow='signIn'>

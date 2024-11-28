@@ -1,7 +1,7 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
-import { handleValueOrFn } from '@clerk/shared/utils';
+import { createDeferredPromise, handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
@@ -170,6 +170,7 @@ type IsomorphicLoadedClerk = Without<
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   mountWaitlist: (node: HTMLDivElement, props: WaitlistProps) => void;
   client: ClientResource | undefined;
+  suspendedSignIn: Promise<unknown>;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -204,6 +205,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   >();
   private loadedListeners: Array<() => void> = [];
+  // private signInSuspendedCallback: (() => void) | undefined;
+  private suspenseSignInMounted = createDeferredPromise();
 
   #loaded = false;
   #domain: DomainOrProxyUrl['domain'];
@@ -216,6 +219,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get loaded(): boolean {
     return this.#loaded;
+  }
+
+  get suspendedSignIn(): Promise<unknown> {
+    return this.suspenseSignInMounted.promise;
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -523,6 +530,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
+
+    (clerkjs as any).__internal_onSuspendedSignIn(() => {
+      this.suspenseSignInMounted.resolve(true);
+    });
 
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
