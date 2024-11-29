@@ -195,8 +195,9 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
 
-  public __internal_getCachedEnvironment: (() => Promise<EnvironmentJSON>) | undefined;
-  public __internal_getCachedClient: (() => Promise<ClientJSON>) | undefined;
+  public __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSON | null; environment: EnvironmentJSON | null }>)
+    | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -1885,31 +1886,26 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 
-  private shouldFallbackToCachedValues = (): boolean => {
-    return !!this.__internal_getCachedClient && !!this.__internal_getCachedEnvironment;
+  private shouldFallbackToCachedResources = (): boolean => {
+    return !!this.__internal_getCachedResources;
   };
 
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
     let environment, client;
-    const fetchMaxTries = this.shouldFallbackToCachedValues() ? 1 : undefined;
+    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
     try {
       [environment, client] = await Promise.all([
         Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
         Client.getInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
-      if (isClerkRuntimeError(err) && err.code === 'network_error') {
-        const cachedEnvironment = await this.__internal_getCachedEnvironment?.();
-        const cachedClient = await this.__internal_getCachedClient?.();
-        environment = new Environment(cachedEnvironment);
-        client = new Client(cachedClient);
+      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+        const cachedResources = await this.__internal_getCachedResources?.();
+        environment = new Environment(cachedResources?.environment);
+        client = new Client(cachedResources?.client);
       } else {
         throw err;
       }
-    }
-
-    if (!environment || !client) {
-      return false;
     }
 
     this.updateClient(client);

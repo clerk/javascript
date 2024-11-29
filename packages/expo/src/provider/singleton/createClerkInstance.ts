@@ -2,6 +2,8 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import type { Clerk } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 import type {
+  ClientJSON,
+  EnvironmentJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
 } from '@clerk/types';
@@ -98,13 +100,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           });
 
           // @ts-expect-error - This is an internal API
-          __internal_clerk.__internal_getCachedClient = async () => {
-            return asyncStorage.getClient();
-          };
-
-          // @ts-expect-error - This is an internal API
-          __internal_clerk.__internal_getCachedEnvironment = async () => {
-            return asyncStorage.getEnvironment();
+          __internal_clerk.__internal_getCachedResources = async (): Promise<{
+            client: ClientJSON | null;
+            environment: EnvironmentJSON | null;
+          }> => {
+            const client = await asyncStorage.getClient();
+            const environment = await asyncStorage.getEnvironment();
+            return { client, environment };
           };
         }
       }
