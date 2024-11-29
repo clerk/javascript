@@ -87,10 +87,14 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           const asyncStorage = createAsyncStorage(publishableKey);
 
           __internal_clerk.addListener(({ client }) => {
-            void asyncStorage.setClient(client.toJSON());
+            if (client) {
+              void asyncStorage.setClient(client.toJSON());
+            }
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
-            void asyncStorage.setEnvironment(environment.toJSON());
+            if (environment) {
+              void asyncStorage.setEnvironment(environment.toJSON());
+            }
           });
 
           // @ts-expect-error - This is an internal API
