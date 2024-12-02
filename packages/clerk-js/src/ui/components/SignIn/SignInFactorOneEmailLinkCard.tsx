@@ -4,7 +4,7 @@ import type { EmailLinkFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildEmailLinkRedirectUrl } from '../../common/redirects';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
@@ -45,7 +45,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const startEmailLinkVerification = () => {
     startEmailLinkFlow({
       emailAddressId: props.factor.emailAddressId,
-      redirectUrl: buildEmailLinkRedirectUrl(signInContext, signInUrl),
+      redirectUrl: buildVerificationRedirectUrl(signInContext, signInUrl),
     })
       .then(res => handleVerificationResult(res))
       .catch(err => {
