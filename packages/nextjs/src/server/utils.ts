@@ -237,7 +237,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 }
 
-const ACCOUNTLESS_ENCRYPTION_KEY = 'clerk_accountless_dummy_key';
+const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
 
 /**
  * Encrypt request data propagated between server requests.
@@ -257,11 +257,11 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  const maybeAccountlessKey = isProductionEnvironment()
+  const maybeKeylessEncryptionKey = isProductionEnvironment()
     ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
-    : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+    : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
-  return AES.encrypt(JSON.stringify(requestData), maybeAccountlessKey).toString();
+  return AES.encrypt(JSON.stringify(requestData), maybeKeylessEncryptionKey).toString();
 }
 
 /**
@@ -275,12 +275,12 @@ export function decryptClerkRequestData(
     return {};
   }
 
-  const maybeAccountlessKey = isProductionEnvironment()
+  const maybeKeylessEncryptionKey = isProductionEnvironment()
     ? ENCRYPTION_KEY || SECRET_KEY
-    : ENCRYPTION_KEY || SECRET_KEY || ACCOUNTLESS_ENCRYPTION_KEY;
+    : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, maybeAccountlessKey);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, maybeKeylessEncryptionKey);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {

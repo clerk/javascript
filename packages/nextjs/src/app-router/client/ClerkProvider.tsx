@@ -11,7 +11,7 @@ import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEf
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
-import { canUseAccountless__client } from '../../utils/feature-flags';
+import { canUseKeyless__client } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
@@ -22,8 +22,8 @@ import { useAwaitableReplace } from './useAwaitableReplace';
  * Accountless creator should only be loaded if the conditions below are met.
  * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
  */
-const LazyAccountlessCreator = dynamic(() =>
-  import('./lazy-accountless-creator.js').then(m => m.AccountlessCreateKeys),
+const LazyCreateKeylessApplication = dynamic(() =>
+  import('./lazy-accountless-creator.js').then(m => m.CreateKeylessApplication),
 );
 
 declare global {
@@ -127,13 +127,13 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { children, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePublishableKey || !canUseAccountless__client) {
+  if (safePublishableKey || !canUseKeyless__client) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
   return (
-    <LazyAccountlessCreator>
+    <LazyCreateKeylessApplication>
       <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
-    </LazyAccountlessCreator>
+    </LazyCreateKeylessApplication>
   );
 };

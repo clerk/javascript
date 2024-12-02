@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
-import { createAccountlessKeysAction } from '../accountless-actions';
+import { createKeylessApplicationAction } from '../accountless-actions';
 
-export const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
+export const CreateKeylessApplication = (props: NextClerkProviderProps) => {
   const { children } = props;
-  const [state, fetchKeys] = React.useActionState(createAccountlessKeysAction, null);
+  const [state, fetchKeys] = React.useActionState(createKeylessApplicationAction, null);
   useEffect(() => {
     React.startTransition(() => {
       fetchKeys();
@@ -19,7 +19,7 @@ export const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
   return React.cloneElement(children, {
     key: state?.publishableKey,
     publishableKey: state?.publishableKey,
-    __internal_claimAccountlessKeysUrl: state?.claimUrl,
+    __internal_claimKeylessApplicationUrl: state?.claimUrl,
     __internal_bypassMissingPublishableKey: true,
   } as any);
 };

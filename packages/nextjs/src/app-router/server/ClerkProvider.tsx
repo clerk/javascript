@@ -7,7 +7,7 @@ import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthPr
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
-import { canUseAccountless__server } from '../../utils/feature-flags';
+import { canUseKeyless__server } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
@@ -69,38 +69,34 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  const hasMissingPk = !propsWithEnvs.publishableKey;
+  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless__server;
 
-  const shouldRunAsAccountless = hasMissingPk && canUseAccountless__server;
-
-  if (shouldRunAsAccountless) {
+  if (shouldRunAsKeyless) {
     /**
      * Attention: Moving this call outside the conditional will cause the ClerkProvider to opt-in all routes into dynamic rendering.
      */
     const dynamicConfig = await getDynamicConfig();
 
-    const newOrReadKeys = dynamicConfig.accountlessMode
-      ? await import('../../server/accountless-node.js').then(mod => mod.createAccountlessKeys())
+    const newOrReadKeys = dynamicConfig.keylessMode
+      ? await import('../../server/accountless-node.js').then(mod => mod.createOrReadKeyless())
       : undefined;
 
     if (newOrReadKeys) {
-      const AccountlessCookieSync = await import('../client/accountless-cookie-sync.js').then(
-        mod => mod.AccountlessCookieSync,
-      );
+      const KeylessCookieSync = await import('../client/accountless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
       output = (
-        <AccountlessCookieSync {...newOrReadKeys}>
+        <KeylessCookieSync {...newOrReadKeys}>
           <ClientClerkProvider
             {...mergeNextClerkPropsWithEnv({
               ...rest,
               publishableKey: newOrReadKeys.publishableKey,
-              __internal_claimAccountlessKeysUrl: newOrReadKeys.claimUrl,
+              __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
             })}
             nonce={await nonce}
             initialState={await statePromise}
           >
             {children}
           </ClientClerkProvider>
-        </AccountlessCookieSync>
+        </KeylessCookieSync>
       );
     }
   }

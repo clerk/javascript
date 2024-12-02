@@ -518,9 +518,9 @@ const Components = (props: ComponentsProps) => {
         )}
 
         {__BUILD_FLAG_ACCOUNTLESS_UI__
-          ? state.options?.__internal_claimAccountlessKeysUrl && (
+          ? state.options?.__internal_claimKeylessApplicationUrl && (
               <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-                <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
+                <AccountlessPrompt url={state.options.__internal_claimKeylessApplicationUrl} />
               </LazyImpersonationFabProvider>
             )
           : null}

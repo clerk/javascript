@@ -2012,9 +2012,9 @@ export class Clerk implements ClerkInterface {
   #handleAccountlessPrompt = () => {
     if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
       void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimAccountlessKeysUrl) {
+        if (this.#options.__internal_claimKeylessApplicationUrl) {
           controls.updateProps({
-            options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
           });
         }
       });

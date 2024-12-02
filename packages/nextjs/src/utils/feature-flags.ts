@@ -1,9 +1,9 @@
 import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 
-import { ALLOW_ACCOUNTLESS } from '../server/constants';
+import { ENABLE_KEYLESS } from '../server/constants';
 import { isNextWithUnstableServerActions } from './sdk-versions';
 
-const canUseAccountless__server = !isNextWithUnstableServerActions && isDevelopmentEnvironment() && ALLOW_ACCOUNTLESS;
-const canUseAccountless__client = !isNextWithUnstableServerActions && ALLOW_ACCOUNTLESS;
+const canUseKeyless__server = !isNextWithUnstableServerActions && isDevelopmentEnvironment() && ENABLE_KEYLESS;
+const canUseKeyless__client = !isNextWithUnstableServerActions && ENABLE_KEYLESS;
 
-export { canUseAccountless__client, canUseAccountless__server };
+export { canUseKeyless__client, canUseKeyless__server };

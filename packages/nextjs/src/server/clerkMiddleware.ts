@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { canUseAccountless__server } from '../utils/feature-flags';
-import { getAccountlessCookieValue } from './accountless';
+import { canUseKeyless__server } from '../utils/feature-flags';
+import { getKeylessCookieValue } from './accountless';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -94,14 +94,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
-        resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey,
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
         () => errorThrower.throwMissingPublishableKeyError(),
       );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || accountless?.secretKey, () =>
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -204,8 +204,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           domain,
           afterSignInUrl,
           afterSignUpUrl,
-          claimAccountlessKeysUrl: accountless?.publishableKey === publishableKey ? accountless?.claimUrl : undefined,
-          accountlessMode: accountless?.publishableKey === publishableKey,
+          claimKeylessApplicationUrl: keyless?.publishableKey === publishableKey ? keyless?.claimUrl : undefined,
+          keylessMode: keyless?.publishableKey === publishableKey,
         };
       }
 
@@ -221,12 +221,12 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     });
 
     const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (!canUseAccountless__server) {
+      if (!canUseKeyless__server) {
         return baseNextMiddleware(request, event);
       }
 
-      const isSyncAccountless = request.nextUrl.pathname === '/clerk-sync-accountless';
-      if (isSyncAccountless) {
+      const isSyncKeyless = request.nextUrl.pathname === '/clerk-sync-keyless';
+      if (isSyncKeyless) {
         const returnUrl = request.nextUrl.searchParams.get('returnUrl');
         const url = new URL(request.url);
         url.pathname = '';
@@ -240,11 +240,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const accountless = getAccountlessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
-      const isPkMissing = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || accountless?.publishableKey);
+      const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
 
-      if (isPkMissing) {
+      if (isMissingPublishableKey) {
         const res = NextResponse.next();
 
         setRequestHeadersOnNextResponse(res, request, {

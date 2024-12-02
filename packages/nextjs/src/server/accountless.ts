@@ -2,17 +2,17 @@ import type { AccountlessApplication } from '@clerk/backend';
 import hex from 'crypto-js/enc-hex';
 import sha256 from 'crypto-js/sha256';
 
-import { canUseAccountless__server } from '../utils/feature-flags';
+import { canUseKeyless__server } from '../utils/feature-flags';
 
-const accountlessCookiePrefix = `__clerk_acc_`;
+const keylessCookiePrefix = `__clerk_keys_`;
 
-const getAccountlessCookieName = (): string => {
+const getKeylessCookieName = (): string => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const PATH = process.env.PWD;
 
   // Handle gracefully missing PWD
   if (!PATH) {
-    return `${accountlessCookiePrefix}${0}`;
+    return `${keylessCookiePrefix}${0}`;
   }
 
   const lastThreeDirs = PATH.split('/').filter(Boolean).slice(-3).reverse().join('/');
@@ -20,32 +20,30 @@ const getAccountlessCookieName = (): string => {
   // Hash the resulting string
   const hash = hashString(lastThreeDirs);
 
-  return `${accountlessCookiePrefix}${hash}`;
+  return `${keylessCookiePrefix}${hash}`;
 };
 
 function hashString(str: string) {
   return sha256(str).toString(hex).slice(0, 16); // Take only the first 16 characters
 }
 
-function getAccountlessCookieValue(
-  getter: (cookieName: string) => string | undefined,
-): AccountlessApplication | undefined {
-  if (!canUseAccountless__server) {
+function getKeylessCookieValue(getter: (cookieName: string) => string | undefined): AccountlessApplication | undefined {
+  if (!canUseKeyless__server) {
     return undefined;
   }
 
-  const accountlessCookieName = getAccountlessCookieName();
-  let accountless;
+  const keylessCookieName = getKeylessCookieName();
+  let keyless;
 
   try {
-    if (accountlessCookieName) {
-      accountless = JSON.parse(getter(accountlessCookieName) || '{}');
+    if (keylessCookieName) {
+      keyless = JSON.parse(getter(keylessCookieName) || '{}');
     }
   } catch {
-    accountless = undefined;
+    keyless = undefined;
   }
 
-  return accountless;
+  return keyless;
 }
 
-export { getAccountlessCookieValue, getAccountlessCookieName };
+export { getKeylessCookieValue, getKeylessCookieName };

@@ -42,11 +42,11 @@ function updateGitignore() {
   }
 }
 
-const getAccountlessConfigurationPath = () => {
+const getKeylessConfigurationPath = () => {
   if (!nodeRuntime.path) {
     throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
-  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'accountless.json');
+  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'keyless.json');
 };
 
 let isCreatingFile = false;
@@ -57,7 +57,7 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
   }
   const { readFileSync } = nodeRuntime.fs;
   try {
-    const CONFIG_PATH = getAccountlessConfigurationPath();
+    const CONFIG_PATH = getKeylessConfigurationPath();
     let fileAsString;
     try {
       fileAsString = readFileSync(CONFIG_PATH, { encoding: 'utf-8' }) || '{}';
@@ -70,39 +70,11 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
   }
 }
 
-const createMessage = (isNew: boolean, keys: AccountlessApplication) => {
-  return `\x1b[35m
-         ..:::::.
-    .::::::::::::                    %%+                         :%%:
-  .:::::::..:::                      %%+                         :%%:
- .::::.                              %%+                         :%%:
- ::::    +%%#            =%%%%%%%-   %%+    =%%%%%%*    -%%:*%%% :%%:    +%%=
-::::.   %%%%%%=        :%%%-   :#*   %%+  :%%#:   +%%-  -%%%%*=- :%%:  -%%*
-::::.   %%%%%%=        %%#           %%+  #%*      *%%  -%%+     :%%: #%%.
- ::::    +%%#         -%%-           %%+  %%%%%%%%%%%%  -%%.     :%%%%%%%+
- .::                   %%%           %%+  #%#           -%%.     :%%%* :%%*
-       %%%#*#%%+        %%%#- :#%%.  %%+   %%%%- :#%%:  -%%.     :%%:    %%#
-     #%%%%%%%%%%%=        +%%%%%+    %%+     +%%%%%=    -%%.     :%%:     #%%
-      :*#%%%%##+
-  \x1b[0m
-
-       #
-      # #    ####   ####   ####  #    # #    # ##### #      ######  ####   ####
-     #   #  #    # #    # #    # #    # ##   #   #   #      #      #      #
-    #     # #      #      #    # #    # # #  #   #   #      #####   ####   ####
-    ####### #      #      #    # #    # #  # #   #   #      #           #      #
-    #     # #    # #    # #    # #    # #   ##   #   #      #      #    # #    #
-    #     #  ####   ####   ####   ####  #    #   #   ###### ######  ####   ####
-
-  \n\x1b[35m\n[Clerk]:\x1b[0m You are running on accountless mode. Your${isNew ? ' new ' : ' '}temporary keys are:
-
-\x1b[35mPublishable key:\x1b[0m ${keys.publishableKey}
-\x1b[35mSecret key:\x1b[0m ${keys.secretKey}
-
-You can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
+const createMessage = (keys: AccountlessApplication) => {
+  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running on keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 };
 
-async function createAccountlessKeys(): Promise<AccountlessApplication | undefined> {
+async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
   if (!nodeRuntime.fs) {
     // This should never happen.
     throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
@@ -130,7 +102,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
     },
   );
 
-  const CONFIG_PATH = getAccountlessConfigurationPath();
+  const CONFIG_PATH = getKeylessConfigurationPath();
 
   mkdirSync(nodeRuntime.path ? nodeRuntime.path.dirname(CONFIG_PATH) : '', { recursive: true });
   updateGitignore();
@@ -146,7 +118,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
     /**
      * Notify developers.
      */
-    logger.logOnce(createMessage(false, envVarsMap));
+    logger.logOnce(createMessage(envVarsMap));
 
     return envVarsMap;
   }
@@ -160,7 +132,7 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
   /**
    * Notify developers.
    */
-  logger.logOnce(createMessage(true, accountlessApplication));
+  logger.logOnce(createMessage(accountlessApplication));
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
@@ -177,4 +149,4 @@ async function createAccountlessKeys(): Promise<AccountlessApplication | undefin
   return accountlessApplication;
 }
 
-export { createAccountlessKeys };
+export { createOrReadKeyless };
