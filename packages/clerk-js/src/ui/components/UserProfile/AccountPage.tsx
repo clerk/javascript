@@ -12,7 +12,7 @@ import { UserProfileSection } from './UserProfileSection';
 import { Web3Section } from './Web3Section';
 
 export const AccountPage = withCardStateProvider(() => {
-  const { attributes, social } = useEnvironment().userSettings;
+  const { attributes, social, enterpriseSSO } = useEnvironment().userSettings;
   const card = useCardState();
   const { user } = useUser();
 
@@ -20,7 +20,7 @@ export const AccountPage = withCardStateProvider(() => {
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
-  const showEnterpriseAccounts = user && user.enterpriseAccounts.length > 0;
+  const showEnterpriseAccounts = user && enterpriseSSO.enabled;
   const showWeb3 = attributes.web3_wallet.enabled;
 
   const shouldAllowIdentificationCreation =

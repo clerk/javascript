@@ -1,7 +1,10 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { inBrowser } from '@clerk/shared/browser';
+import { logger } from '@clerk/shared/logger';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import nextPackage from 'next/package.json';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
@@ -10,6 +13,7 @@ import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { canUseAccountless__client } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -34,6 +38,15 @@ declare global {
 }
 
 const NextClientClerkProvider = (props: NextClerkProviderProps) => {
+  if (isNextWithUnstableServerActions) {
+    const deprecationWarning = `Clerk:\nYour current Next.js version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to next@14.1.0 or later.`;
+    if (inBrowser()) {
+      logger.warnOnce(deprecationWarning);
+    } else {
+      logger.logOnce(`\n\x1b[43m----------\n${deprecationWarning}\n----------\x1b[0m\n`);
+    }
+  }
+
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();

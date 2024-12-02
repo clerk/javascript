@@ -13,8 +13,12 @@ export type BackupCodeStrategy = 'backup_code';
 export type ResetPasswordPhoneCodeStrategy = 'reset_password_phone_code';
 export type ResetPasswordEmailCodeStrategy = 'reset_password_email_code';
 export type CustomOAuthStrategy = `oauth_custom_${string}`;
+export type EnterpriseSSOStrategy = 'enterprise_sso';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}` | CustomOAuthStrategy;
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
 
+/**
+ * @deprecated Use `EnterpriseSSOStrategy` instead
+ */
 export type SamlStrategy = 'saml';

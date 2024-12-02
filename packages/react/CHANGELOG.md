@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.17.2
+
+### Patch Changes
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/shared@2.17.1
+
+## 5.17.1
+
+### Patch Changes
+
+- Re-export `isClerkRuntimeError` from `@clerk/clerk-react/errors`. ([#4656](https://github.com/clerk/javascript/pull/4656)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add deprecation notices for the following components: ([#4631](https://github.com/clerk/javascript/pull/4631)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  - `RedirectToUserProfile`
+  - `RedirectToOrganizationProfile`
+  - `RedirectToCreateOrganization`
+
 ## 5.17.0
 
 ### Minor Changes

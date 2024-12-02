@@ -1,5 +1,24 @@
 # @clerk/nuxt
 
+## 0.0.6
+
+### Patch Changes
+
+- Allow custom middleware with options ([#4655](https://github.com/clerk/javascript/pull/4655)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d), [`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/backend@1.18.1
+  - @clerk/shared@2.17.1
+  - @clerk/vue@0.0.10
+
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`0a1807552dcf0501a97f60b4df0280525bca9743`](https://github.com/clerk/javascript/commit/0a1807552dcf0501a97f60b4df0280525bca9743)]:
+  - @clerk/vue@0.0.9
+
 ## 0.0.4
 
 ### Patch Changes
