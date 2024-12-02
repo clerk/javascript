@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { EmailAddressResource } from '@clerk/types';
+import type { EmailAddressResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
@@ -8,7 +8,7 @@ import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { emailLinksEnabledForInstance, getVerificationStrategy } from './utils';
+import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -26,7 +26,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
-  const strategy = getVerificationStrategy(emailAddressRef.current, preferEmailLinks);
+  const strategy = getEmailAddressVerificationStrategy(emailAddressRef.current, preferEmailLinks);
   const wizard = useWizard({
     defaultStep: emailAddressRef.current ? 1 : 0,
     onNextStep: () => card.setError(undefined),
@@ -82,6 +82,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
         headerSubtitle={
+          // TODO - Get localization per strategy
           preferEmailLinks
             ? localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
                 identifier: emailAddressRef.current?.emailAddress,
@@ -107,7 +108,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             onReset={onReset}
           />
         )}
-        {strategy === 'saml' && (
+        {strategy === 'enterprise_sso' && (
           <VerifyWithEnterpriseConnection
             nextStep={onSuccess}
             email={emailAddressRef.current as any}
@@ -118,3 +119,15 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     </Wizard>
   );
 });
+
+// TODO - Handle `preferEmailLinks`
+export const getEmailAddressVerificationStrategy = (
+  emailAddress: EmailAddressResource | undefined,
+  preferLinks: boolean,
+): PrepareEmailAddressVerificationParams['strategy'] => {
+  if (emailAddress?.matchesEnterpriseConnection) {
+    return 'enterprise_sso';
+  }
+
+  return preferLinks ? 'email_link' : 'email_code';
+};

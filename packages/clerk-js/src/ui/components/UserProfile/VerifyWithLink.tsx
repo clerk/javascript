@@ -2,7 +2,7 @@ import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildEmailLinkRedirectUrl } from '../../common/redirects';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
@@ -37,7 +37,7 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
     const { routing } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
 
-    const redirectUrl = buildEmailLinkRedirectUrl(profileContext, baseUrl);
+    const redirectUrl = buildVerificationRedirectUrl(profileContext, baseUrl);
     startEmailLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
