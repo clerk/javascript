@@ -1,10 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import type { PointerEventHandler } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Link, Text } from '../../customizables';
+import { descriptors, Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -14,128 +12,23 @@ type AccountlessPromptProps = {
   url?: string;
 };
 
-type FabContentProps = { title?: LocalizationKey | string; signOutText: LocalizationKey | string; url: string };
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const FabContent = ({ title, signOutText, url }: FabContentProps) => {
-  return (
-    <Col
-      sx={t => ({
-        width: '100%',
-        paddingLeft: t.sizes.$4,
-        paddingRight: t.sizes.$6,
-        whiteSpace: 'nowrap',
-      })}
-    >
-      <Text
-        colorScheme='secondary'
-        elementDescriptor={descriptors.impersonationFabTitle}
-        variant='buttonLarge'
-        truncate
-        localizationKey={title}
-      />
-      <Link
-        variant='buttonLarge'
-        elementDescriptor={descriptors.impersonationFabActionLink}
-        sx={t => ({
-          alignSelf: 'flex-start',
-          color: t.colors.$primary500,
-          ':hover': {
-            cursor: 'pointer',
-          },
-        })}
-        localizationKey={signOutText}
-        onClick={
-          () => (window.location.href = url)
-          // clerk-js has been loaded at this point so we can safely access session
-          // handleSignOutSessionClicked(session!)
-        }
-      />
-    </Col>
-  );
-};
-
-export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
-  // const { parsedInternalTheme } = useAppearance();
+export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  //essentials for calcs
-  // const eyeWidth = parsedInternalTheme.sizes.$16;
-  // const eyeHeight = eyeWidth;
   const bottomProperty = '--cl-impersonation-fab-bottom';
   const rightProperty = '--cl-impersonation-fab-right';
   const defaultBottom = 50;
   const defaultRight = 50;
-
-  const handleResize = () => {
-    const current = containerRef.current;
-    if (!current) {
-      return;
-    }
-
-    const offsetRight = window.innerWidth - current.offsetLeft - current.offsetWidth;
-    const offsetBottom = window.innerHeight - current.offsetTop - current.offsetHeight;
-
-    const outsideViewport = [current.offsetLeft, offsetRight, current.offsetTop, offsetBottom].some(o => o < 0);
-
-    if (outsideViewport) {
-      document.documentElement.style.setProperty(rightProperty, `${defaultRight}px`);
-      document.documentElement.style.setProperty(bottomProperty, `${defaultBottom}px`);
-    }
-  };
-
-  const onPointerDown: PointerEventHandler = () => {
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener(
-      'pointerup',
-      () => {
-        window.removeEventListener('pointermove', onPointerMove);
-        handleResize();
-      },
-      { once: true },
-    );
-  };
-
-  const onPointerMove = useCallback((e: PointerEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const current = containerRef.current;
-    if (!current) {
-      return;
-    }
-    const rightOffestBasedOnViewportAndContent = `${
-      window.innerWidth - current.offsetLeft - current.offsetWidth - e.movementX
-    }px`;
-    document.documentElement.style.setProperty(rightProperty, rightOffestBasedOnViewportAndContent);
-    document.documentElement.style.setProperty(bottomProperty, `${current.offsetTop - -e.movementY}px`);
-  }, []);
-
-  const repositionFabOnResize = () => {
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  };
-
-  useEffect(repositionFabOnResize, []);
-
-  if (!props.url) {
-    return null;
-  }
 
   const handleFocus = () => setIsExpanded(true);
 
   return (
     <Portal>
       <Flex
-        // ref={containerRef}
         elementDescriptor={descriptors.impersonationFab}
-        onPointerDown={onPointerDown}
         align='center'
         onMouseEnter={() => setIsExpanded(true)}
         sx={t => ({
-          // touchAction: 'none', //for drag to work on mobile consistently
           position: 'fixed',
           bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
           right: `var(${rightProperty}, ${defaultRight}px)`,
@@ -260,7 +153,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                     transparent 100%
                   );
                   background-size: 200% 100%;
-                  -webkit-background-clip: text;
                   background-clip: text;
                   filter: blur(1.2px);
                   animation: text-shimmer 3.6s infinite linear;
@@ -287,7 +179,6 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
                   );
 
                   background-size: 200% 100%;
-                  -webkit-background-clip: text;
                   background-clip: text;
                   animation: text-shimmer 3.6s infinite linear;
                 }
@@ -326,8 +217,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
             `}
           >
             <svg
-              width='16'
-              height='16'
+              width='1rem'
+              height='1rem'
               viewBox='0 0 16 16'
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
@@ -369,18 +260,19 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           `}
         >
           We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
-          <a
+          <Link
             href='/'
-            css={css`
-              cursor: pointer;
-              text-decoration: underline solid;
-              :hover {
-                color: #eeeeee;
-              }
-            `}
+            sx={t => ({
+              color: t.colors.$whiteAlpha600,
+              textDecoration: 'underline solid',
+              transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+              ':hover': {
+                color: t.colors.$whiteAlpha800,
+              },
+            })}
           >
             Learn more
-          </a>
+          </Link>
         </p>
 
         <button
