@@ -22,7 +22,7 @@ export default defineConfig(overrideOptions => {
     bundle: false,
     clean: true,
     minify: false,
-    external: ['#fs'],
+    external: ['#safe-node-apis'],
     sourcemap: true,
     legacyOutput: true,
     define: {

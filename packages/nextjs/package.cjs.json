@@ -5,15 +5,12 @@
       "react-server": "./components.server.js",
       "default": "./components.client.js"
     },
-    "#fs": {
-      "edge-light": "./runtime/browser/fs.js",
-      "worker": "./runtime/browser/fs.js",
-      "browser": "./runtime/browser/fs.js",
-      "node": {
-        "require": "./runtime/node/fs.js",
-        "import": "./runtime/node/fs.js"
-      },
-      "default": "./runtime/browser/fs.js"
+    "#safe-node-apis": {
+      "edge-light": "./runtime/browser/safe-node-apis.js",
+      "worker": "./runtime/browser/safe-node-apis.js",
+      "browser": "./runtime/browser/safe-node-apis.js",
+      "node": "./runtime/node/safe-node-apis.js",
+      "default": "./runtime/browser/safe-node-apis.js"
     }
   }
 }
