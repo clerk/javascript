@@ -3,7 +3,7 @@ import type { CustomMenuItem } from '@clerk/types';
 import { ref } from 'vue';
 
 import { MenuAction, MenuLink } from '../components/uiComponents';
-import { userButtonMenuItemLinkWrongProps, userButtonMenuItemsActionWrongsProps } from '../errors/messages';
+import { userButtonMenuItemActionWrongProps, userButtonMenuItemLinkWrongProps } from '../errors/messages';
 import type { AddCustomMenuItemParams, UserButtonActionProps, UserButtonLinkProps } from '../types';
 import { isThatComponent } from './componentValidation';
 import { useCustomElementPortal } from './useCustomElementPortal';
@@ -47,7 +47,7 @@ export const useUserButtonCustomMenuItems = () => {
           return;
         }
       } else {
-        logErrorInDevMode(userButtonMenuItemsActionWrongsProps);
+        logErrorInDevMode(userButtonMenuItemActionWrongProps);
         return;
       }
     }

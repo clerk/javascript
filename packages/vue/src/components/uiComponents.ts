@@ -15,7 +15,11 @@ import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, wat
 
 import { useClerk } from '../composables/useClerk';
 import { errorThrower } from '../errors/errorThrower';
-import { userButtonMenuActionRenderedError, userButtonMenuLinkRenderedError } from '../errors/messages';
+import {
+  userButtonMenuActionRenderedError,
+  userButtonMenuItemsRenderedError,
+  userButtonMenuLinkRenderedError,
+} from '../errors/messages';
 import { UserButtonInjectionKey, UserButtonMenuItemsInjectionKey } from '../keys';
 import type { CustomPortalsRendererProps, UserButtonActionProps, UserButtonLinkProps } from '../types';
 import { useUserButtonCustomMenuItems } from '../utils/useCustomMenuItems';
@@ -115,7 +119,7 @@ const MenuItems = defineComponent((_, { slots }) => {
   const ctx = inject(UserButtonInjectionKey);
 
   if (!ctx) {
-    throw new Error('UserButton.MenuItems must be used inside a UserButton component');
+    return errorThrower.throw(userButtonMenuItemsRenderedError);
   }
 
   provide(UserButtonMenuItemsInjectionKey, ctx);
