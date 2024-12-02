@@ -94,7 +94,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
       const response = await this.prepareVerification({
-        strategy: 'saml',
+        strategy: 'enterprise_sso',
         redirectUrl: redirectUrl,
       });
       if (!response.verification.externalVerificationRedirectURL) {
