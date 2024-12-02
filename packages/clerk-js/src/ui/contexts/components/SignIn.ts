@@ -71,7 +71,7 @@ export const useSignInContext = (): SignInContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
-  if (options.experimental?.combinedFlow && signInUrl === signUpUrl) {
+  if (options.experimental?.combinedFlow) {
     signUpUrl = buildURL(
       { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
       { stringify: true },
