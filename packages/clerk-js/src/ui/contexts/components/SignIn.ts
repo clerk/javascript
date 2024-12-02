@@ -37,7 +37,8 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, ...ctx } = context;
+  const { componentName, ..._ctx } = context;
+  const ctx = _ctx.__experimental?.combinedProps || _ctx;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
