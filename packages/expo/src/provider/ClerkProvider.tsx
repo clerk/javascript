@@ -22,11 +22,11 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
    */
   __experimental_passkeys?: BuildClerkOptions['__experimental_passkeys'];
   /**
-   *
+   * This cache is used to store the resources that Clerk fetches from the server when the network is offline.
    *
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_asyncStorage?: BuildClerkOptions['__experimental_asyncStorage'];
+  __experimental_resourceCache?: BuildClerkOptions['__experimental_resourceCache'];
 };
 
 const SDK_METADATA = {
@@ -40,8 +40,8 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     tokenCache,
     publishableKey,
     __experimental_passkeys,
-    __experimental_asyncStorage,
     experimental,
+    __experimental_resourceCache,
     ...rest
   } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
@@ -65,7 +65,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
               publishableKey: pk,
               tokenCache,
               __experimental_passkeys,
-              __experimental_asyncStorage,
+              __experimental_resourceCache,
             })
           : null
       }
@@ -73,7 +73,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       experimental={{
         ...experimental,
         // force the rethrowOfflineNetworkErrors flag to true if the asyncStorage is provided
-        rethrowOfflineNetworkErrors: !!__experimental_asyncStorage || experimental?.rethrowOfflineNetworkErrors,
+        rethrowOfflineNetworkErrors: !!__experimental_resourceCache || experimental?.rethrowOfflineNetworkErrors,
       }}
     >
       {children}

@@ -1,7 +1,5 @@
 import type {
-  ClientJSON,
   CredentialReturn,
-  EnvironmentJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -10,11 +8,9 @@ import type {
 
 import type { TokenCache } from '../../cache/types';
 
-export interface IAsyncStorage {
-  setEnvironment: (environmentJSON: EnvironmentJSON) => Promise<void>;
-  getEnvironment: () => Promise<EnvironmentJSON | null>;
-  setClient: (clientJSON: ClientJSON) => Promise<void>;
-  getClient: () => Promise<ClientJSON | null>;
+export interface IStorage {
+  set: (key: string, value: string) => Promise<void>;
+  get: (key: string) => Promise<string | null>;
 }
 
 export type BuildClerkOptions = {
@@ -38,5 +34,5 @@ export type BuildClerkOptions = {
     isSupported: () => boolean;
     isAutoFillSupported: () => Promise<boolean>;
   };
-  __experimental_asyncStorage?: (publishableKey: string) => IAsyncStorage;
+  __experimental_resourceCache?: () => IStorage;
 };

@@ -9,6 +9,7 @@ import type {
 } from '@clerk/types';
 import { Platform } from 'react-native';
 
+import { ClientResourceCache, EnvironmentResourceCache } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
@@ -27,7 +28,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
     const {
       publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '',
       tokenCache = MemoryTokenCache,
-      __experimental_asyncStorage: createAsyncStorage,
+      __experimental_resourceCache: createResourceCache,
     } = options || {};
 
     if (!__internal_clerk && !publishableKey) {
@@ -85,17 +86,18 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           return Promise.resolve(true);
         };
 
-        if (createAsyncStorage) {
-          const asyncStorage = createAsyncStorage(publishableKey);
+        if (createResourceCache) {
+          EnvironmentResourceCache.init({ publishableKey, storage: createResourceCache });
+          ClientResourceCache.init({ publishableKey, storage: createResourceCache });
 
           __internal_clerk.addListener(({ client }) => {
             if (client) {
-              void asyncStorage.setClient(client.toJSON());
+              void ClientResourceCache.save(client.toJSON());
             }
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
             if (environment) {
-              void asyncStorage.setEnvironment(environment.toJSON());
+              void EnvironmentResourceCache.save(environment.toJSON());
             }
           });
 
@@ -104,8 +106,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             client: ClientJSON | null;
             environment: EnvironmentJSON | null;
           }> => {
-            const client = await asyncStorage.getClient();
-            const environment = await asyncStorage.getEnvironment();
+            const environment = await EnvironmentResourceCache.load();
+            const client = await ClientResourceCache.load();
             return { client, environment };
           };
         }
