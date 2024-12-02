@@ -1,5 +1,17 @@
 # Change Log
 
+## 6.5.2
+
+### Patch Changes
+
+- Warn for deprecated support for `13.x` and `14.0.x` Next.js versions. ([#4657](https://github.com/clerk/javascript/pull/4657)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d), [`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/backend@1.18.1
+  - @clerk/clerk-react@5.17.2
+  - @clerk/shared@2.17.1
+
 ## 6.5.1
 
 ### Patch Changes
