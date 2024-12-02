@@ -20,6 +20,6 @@ export const AccountlessCreateKeys = (props: NextClerkProviderProps) => {
     key: state?.publishableKey,
     publishableKey: state?.publishableKey,
     __internal_claimAccountlessKeysUrl: state?.claimUrl,
-    __internal_bypassMissingPk: true,
+    __internal_bypassMissingPublishableKey: true,
   } as any);
 };

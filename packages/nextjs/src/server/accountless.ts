@@ -1,9 +1,8 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import hex from 'crypto-js/enc-hex';
 import sha256 from 'crypto-js/sha256';
 
-import { ALLOW_ACCOUNTLESS } from './constants';
+import { canUseAccountless__server } from '../utils/feature-flags';
 
 const accountlessCookiePrefix = `__clerk_acc_`;
 
@@ -25,13 +24,13 @@ const getAccountlessCookieName = (): string => {
 };
 
 function hashString(str: string) {
-  return sha256(str).toString(hex).slice(0, 16); // Take only the first 32 characters
+  return sha256(str).toString(hex).slice(0, 16); // Take only the first 16 characters
 }
 
 function getAccountlessCookieValue(
   getter: (cookieName: string) => string | undefined,
 ): AccountlessApplication | undefined {
-  if (!isDevelopmentEnvironment() || !ALLOW_ACCOUNTLESS) {
+  if (!canUseAccountless__server) {
     return undefined;
   }
 

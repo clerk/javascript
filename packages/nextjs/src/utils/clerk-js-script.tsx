@@ -14,7 +14,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
   const { domain, proxyUrl } = useClerk();
 
   /**
-   * If publishable key avoid appending an invalid script in the dom.
+   * If no publishable key, avoid appending an invalid script in the DOM.
    */
   if (!publishableKey) {
     return null;

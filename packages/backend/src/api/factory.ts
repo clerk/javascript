@@ -25,7 +25,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
 
   return {
     __experimental_accountlessApplications: new AccountlessApplicationAPI(
-      buildRequest({ ...options, skipSecretKey: true }),
+      buildRequest({ ...options, requireSecretKey: false }),
     ),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),

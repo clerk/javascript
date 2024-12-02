@@ -98,7 +98,7 @@ export function decorateRequest(
   res: Response,
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
-  publicRequestDate: Pick<
+  publicRequestData: Pick<
     AuthenticateRequestOptions,
     | 'publishableKey'
     | 'domain'
@@ -154,7 +154,7 @@ export function decorateRequest(
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
       ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
-      ...(publicRequestDate ? { ['x-clerk-public-request-config']: JSON.stringify(publicRequestDate) } : {}),
+      ...(publicRequestData ? { ['x-clerk-public-request-config']: JSON.stringify(publicRequestData) } : {}),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }

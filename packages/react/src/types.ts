@@ -55,7 +55,11 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    * Provide an initial state of the Clerk client during server-side rendering (SSR)
    */
   initialState?: InitialState;
-  __internal_bypassMissingPk?: boolean;
+  /**
+   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
+   * Defaults to `false`.
+   */
+  __internal_bypassMissingPublishableKey?: boolean;
 };
 
 export interface BrowserClerkConstructor {

@@ -1,12 +1,10 @@
 'use server';
 import type { AccountlessApplication } from '@clerk/backend';
-import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import { getCookies } from 'ezheaders';
 import { redirect, RedirectType } from 'next/navigation';
 
 import { getAccountlessCookieName } from '../server/accountless';
-import { ALLOW_ACCOUNTLESS } from '../server/constants';
-import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
+import { canUseAccountless__server } from '../utils/feature-flags';
 
 export async function syncAccountlessKeysAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
@@ -20,7 +18,7 @@ export async function syncAccountlessKeysAction(args: AccountlessApplication & {
 }
 
 export async function createAccountlessKeysAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
-  if (!isDevelopmentEnvironment() || isNextWithUnstableServerActions || !ALLOW_ACCOUNTLESS) {
+  if (!canUseAccountless__server) {
     return null;
   }
 

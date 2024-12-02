@@ -6,11 +6,10 @@ import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
-import { ALLOW_ACCOUNTLESS } from '../../server/constants';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
+import { canUseAccountless__client } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -113,9 +112,9 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { children, ...rest } = props;
-  const safePk = mergeNextClerkPropsWithEnv(rest).publishableKey;
+  const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePk || isNextWithUnstableServerActions || !ALLOW_ACCOUNTLESS) {
+  if (safePublishableKey || !canUseAccountless__client) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 

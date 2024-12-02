@@ -1,16 +1,15 @@
 import type { AuthObject } from '@clerk/backend';
-import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import type { InitialState, Without } from '@clerk/types';
 import { header } from 'ezheaders';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
-import { ALLOW_ACCOUNTLESS } from '../../server/constants';
 import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
+import { canUseAccountless__server } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { isNext13, isNextWithUnstableServerActions } from '../../utils/sdk-versions';
+import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
@@ -72,8 +71,7 @@ export async function ClerkProvider(
 
   const hasMissingPk = !propsWithEnvs.publishableKey;
 
-  const shouldRunAsAccountless =
-    hasMissingPk && !isNextWithUnstableServerActions && isDevelopmentEnvironment() && ALLOW_ACCOUNTLESS;
+  const shouldRunAsAccountless = hasMissingPk && canUseAccountless__server;
 
   if (shouldRunAsAccountless) {
     /**
