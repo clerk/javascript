@@ -2,11 +2,11 @@ import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildEmailLinkRedirectUrl } from '../../common/redirects';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
-import { useEnterpriseConnectionLink } from '../../hooks';
+import { useEnterpriseSsoLink } from '../../hooks';
 import { handleError } from '../../utils';
 
 type VerifyWithEnterpriseConnectionProps = {
@@ -19,7 +19,7 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   const { email, nextStep, onReset } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
-  const { startEnterpriseConnectionLinkFlow } = useEnterpriseConnectionLink(email);
+  const { startEnterpriseSsoLinkFlow } = useEnterpriseSsoLink(email);
   const { displayConfig } = useEnvironment();
 
   React.useEffect(() => {
@@ -36,14 +36,15 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
      */
     const { routing } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
-    const redirectUrl = buildEmailLinkRedirectUrl(profileContext, baseUrl);
-    startEnterpriseConnectionLinkFlow({ redirectUrl })
+    const redirectUrl = buildVerificationRedirectUrl(profileContext, baseUrl);
+    startEnterpriseSsoLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
   }
 
   return (
     <>
+      {/* TODO - Handle localization */}
       <VerificationLink
         resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
         onResendCodeClicked={startVerification}
