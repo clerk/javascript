@@ -162,7 +162,7 @@ export interface EmailAddressJSON extends ClerkResourceJSON {
   email_address: string;
   verification: VerificationJSON | null;
   linked_to: IdentificationLinkJSON[];
-  matches_enterprise_connection: boolean;
+  has_enterprise_sso: boolean;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {

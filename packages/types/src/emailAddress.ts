@@ -3,7 +3,7 @@ import type { ClerkResource } from './resource';
 import type { EmailAddressJSONSnapshot } from './snapshots';
 import type { EmailCodeStrategy, EmailLinkStrategy, EnterpriseSSOStrategy } from './strategies';
 import type {
-  CreateEmailLinkFlowReturn, CreateEnterpriseSsoFlowReturn,
+  CreateEmailLinkFlowReturn, CreateEnterpriseSsoLinkFlowReturn,
   StartEmailLinkFlowParams, StartEnterpriseSsoLinkFlowParams,
   VerificationResource
 } from './verification';
@@ -30,13 +30,13 @@ export interface EmailAddressResource extends ClerkResource {
   id: string;
   emailAddress: string;
   verification: VerificationResource;
-  matchesEnterpriseConnection: boolean;
+  hasEnterpriseSso: boolean;
   linkedTo: IdentificationLinkResource[];
   toString: () => string;
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
-  createEnterpriseSsoLinkFlow: () => CreateEnterpriseSsoFlowReturn<
+  createEnterpriseSsoLinkFlow: () => CreateEnterpriseSsoLinkFlowReturn<
     StartEnterpriseSsoLinkFlowParams,
     EmailAddressResource
   >;
