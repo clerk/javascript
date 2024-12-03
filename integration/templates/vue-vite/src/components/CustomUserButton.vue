@@ -33,7 +33,9 @@ const isActionClicked = ref(false);
       </UserButton.Action>
     </UserButton.MenuItems>
     <UserButton.UserProfilePage label="Terms" url="terms">
-        <div slot="label-icon">Icon</div>
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
         <div>
             <h1>Custom Terms Page</h1>
             <p>This is the custom terms page</p>
