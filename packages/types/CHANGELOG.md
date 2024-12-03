@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.36.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.35.1
 
 ### Patch Changes
