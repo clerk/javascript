@@ -6,9 +6,9 @@ const vite = applicationConfig()
   .useTemplate(templates['vue-vite'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
-  .addScript('dev', 'npm run dev')
-  .addScript('build', 'npm run build')
-  .addScript('serve', 'npm run preview')
+  .addScript('dev', 'pnpm dev')
+  .addScript('build', 'pnpm build')
+  .addScript('serve', 'pnpm preview')
   .addDependency('@clerk/vue', '*');
 
 export const vue = {
