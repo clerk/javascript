@@ -1667,6 +1667,8 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
       this.#setAccessors(session);
+
+      eventBus.dispatch(events.TokenUpdate, { token: this.session.lastActiveToken });
     }
 
     this.#emit();
