@@ -525,7 +525,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareSecondFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
