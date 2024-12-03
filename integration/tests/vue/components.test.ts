@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.context().clearCookies();
   });
 
-  test.skip('Clerk client loads and sign in button renders', async ({ page, context }) => {
+  test('Clerk client loads and sign in button renders', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
@@ -38,7 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByRole('link', { name: /Sign in/i })).toBeVisible();
   });
 
-  test.skip('render user button component when user completes sign in flow', async ({ page, context }) => {
+  test('render user button component when user completes sign in flow', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -103,7 +103,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedOut();
   });
 
-  test.skip('render user profile and current user data', async ({ page, context }) => {
+  test('render user profile and current user data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -116,14 +116,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
   });
 
-  test.skip('redirects to sign-in when unauthenticated', async ({ page, context }) => {
+  test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/profile');
     await u.page.waitForURL(`${app.serverUrl}/sign-in`);
     await u.po.signIn.waitForMounted();
   });
 
-  test.skip('renders <Protect /> component contents to admins', async ({ page, context }) => {
+  test('renders <Protect /> component contents to admins', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -137,7 +137,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByText('I am an admin')).toBeVisible();
   });
 
-  test.skip('<SignInButton /> renders and respects props', async ({ page, context }) => {
+  test('<SignInButton /> renders and respects props', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/unstyled');
     await u.po.expect.toBeSignedOut();
@@ -151,7 +151,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
   });
 
-  test.skip('<SignUpButton /> renders and respects props', async ({ page, context }) => {
+  test('<SignUpButton /> renders and respects props', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeAdmin = u.services.users.createFakeUser({
       fictionalEmail: true,
