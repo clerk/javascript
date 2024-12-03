@@ -1,7 +1,6 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
-import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
@@ -57,15 +56,5 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
         />
       </FormButtonContainer>
     </>
-  );
-};
-
-export const VerificationSuccessPage = () => {
-  return (
-    <EmailLinkStatusCard
-      title={localizationKeys('signUp.emailLink.verifiedSwitchTab.title')}
-      subtitle={localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitle')}
-      status='verified'
-    />
   );
 };

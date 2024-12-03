@@ -54,6 +54,8 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   const translationKey = getTranslationKeyByStrategy(strategy);
 
+  console.log({ strategy });
+
   return (
     <Wizard {...wizard.props}>
       <FormContainer
@@ -122,7 +124,7 @@ const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationPa
   }
 };
 
-function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
+function isEmailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;
   const { email_address } = userSettings.attributes;
   return email_address.enabled && email_address.verifications.includes('email_link');
@@ -136,5 +138,5 @@ const getEmailAddressVerificationStrategy = (
     return 'enterprise_sso';
   }
 
-  return emailLinksEnabledForInstance(env) ? 'email_link' : 'email_code';
+  return isEmailLinksEnabledForInstance(env) ? 'email_link' : 'email_code';
 };
