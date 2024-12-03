@@ -150,7 +150,7 @@ function SignInRoot() {
     <SignUpContext.Provider
       value={{
         componentName: 'SignUp',
-        ...signInContext.__experimental?.signUpProps,
+        ...signInContext.__experimental?.combinedProps,
       }}
     >
       <SignInRoutes />
