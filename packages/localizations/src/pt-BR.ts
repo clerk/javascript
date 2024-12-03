@@ -52,20 +52,20 @@ export const ptBR: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
-  formFieldInputPlaceholder__backupCode: undefined,
+  formFieldInputPlaceholder__backupCode: 'Insira o código de backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
-  formFieldInputPlaceholder__emailAddress: undefined,
-  formFieldInputPlaceholder__emailAddress_username: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Digite o endereço de e-mail',
+  formFieldInputPlaceholder__emailAddress_username: 'Digite seu e-mail ou nome de usuário',
   formFieldInputPlaceholder__emailAddresses: 'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
-  formFieldInputPlaceholder__organizationDomain: undefined,
-  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
-  formFieldInputPlaceholder__organizationName: undefined,
-  formFieldInputPlaceholder__organizationSlug: undefined,
-  formFieldInputPlaceholder__password: undefined,
-  formFieldInputPlaceholder__phoneNumber: undefined,
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__firstName: 'Digite seu primeiro nome',
+  formFieldInputPlaceholder__lastName: 'Digite seu sobrenome',
+  formFieldInputPlaceholder__organizationDomain: 'Digite o domínio da organização',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: 'Digite o e-mail associado ao domínio da organização',
+  formFieldInputPlaceholder__organizationName: 'Digite o nome da organização',
+  formFieldInputPlaceholder__organizationSlug: 'Digite o identificador da organização (slug)',
+  formFieldInputPlaceholder__password: 'Digite sua senha',
+  formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
+  formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -131,7 +131,7 @@ export const ptBR: LocalizationResource = {
       action__invite: 'Convidar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
-        tableHeader__actions: undefined,
+        tableHeader__actions: 'Ações',
         tableHeader__joined: 'Entrou',
         tableHeader__role: 'Função',
         tableHeader__user: 'Usuário',
@@ -396,14 +396,14 @@ export const ptBR: LocalizationResource = {
     },
     start: {
       actionLink: 'Registre-se',
-      actionLink__join_waitlist: undefined,
+      actionLink__join_waitlist: 'Entrar na lista de espera',
       actionLink__use_email: 'Usar e-mail',
       actionLink__use_email_username: 'Usar e-mail ou nome de usuário',
       actionLink__use_passkey: 'Ou use sua chave de acesso',
       actionLink__use_phone: 'Usar telefone',
       actionLink__use_username: 'Usar nome de usuário',
       actionText: 'Não possui uma conta?',
-      actionText__join_waitlist: undefined,
+      actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
     },
@@ -453,15 +453,16 @@ export const ptBR: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Eu concordo com a Política de Privacidade',
+        label__onlyTermsOfService: 'Eu concordo com os Termos de Serviço',
+        label__termsOfServiceAndPrivacyPolicy: 'Eu concordo com os Termos de Serviço e a Política de Privacidade',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Por favor, leia e aceite os termos para continuar',
+        title: 'Continuar',
       },
     },
+
     phoneCode: {
       formSubtitle: 'Insira o código enviado para seu telefone',
       formTitle: 'Código de verificação',
@@ -470,118 +471,105 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu telefone',
     },
     restrictedAccess: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__emailSupport: undefined,
-      blockButton__joinWaitlist: undefined,
-      subtitle: undefined,
-      subtitleWaitlist: undefined,
-      title: undefined,
+      actionLink: 'Entrar em contato com o suporte',
+      actionText: 'Precisa de ajuda?',
+      blockButton__emailSupport: 'Entre em contato por e-mail',
+      blockButton__joinWaitlist: 'Entrar na lista de espera',
+      subtitle: 'Você não tem acesso a esta área no momento.',
+      subtitleWaitlist: 'Aguardando acesso, você será notificado quando estiver disponível.',
+      title: 'Acesso restrito',
     },
+
     start: {
       actionLink: 'Entrar',
-      actionLink__use_email: undefined,
-      actionLink__use_phone: undefined,
+      actionLink__use_email: 'Usar e-mail',
+      actionLink__use_phone: 'Usar telefone',
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
     },
   },
-  socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
-  unstable__errors: {
-    already_a_member_in_organization: '{{email}} já é membro da organização.',
-    captcha_invalid:
-      'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
-    captcha_unavailable:
-      'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
-    form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
-    form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
-    form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
-    form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
-    form_identifier_not_found: 'Não foi possível encontrar o usuário.',
-    form_param_format_invalid: undefined,
-    form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
-    form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',
-    form_param_max_length_exceeded__first_name: 'O primeiro nome não deve exceder 256 caracteres.',
-    form_param_max_length_exceeded__last_name: 'O sobrenome não deve exceder 256 caracteres.',
-    form_param_max_length_exceeded__name: 'O nome não deve exceder 256 caracteres.',
-    form_param_nil: undefined,
-    form_param_value_invalid: undefined,
-    form_password_incorrect: 'Senha incorreta.',
-    form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
-    form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
-    form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
-    form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
-    form_password_size_in_bytes_exceeded:
-      'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
-    form_password_validation_failed: 'Senha incorreta',
-    form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
-    form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
-    identification_deletion_failed: 'Você não pode excluir sua última identificação.',
-    not_allowed_access: 'Acesso não permitido.',
-    organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
-    organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
-    organization_membership_quota_exceeded:
-      'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
-    organization_minimum_permissions_needed:
-      'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
-    passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
-    passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
-    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
-    passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
-    passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
-    passwordComplexity: {
-      maximumLength: 'menos de {{length}} caracteres',
-      minimumLength: '{{length}} ou mais caracteres',
-      requireLowercase: 'uma letra minúscula',
-      requireNumbers: 'um número',
-      requireSpecialCharacter: 'um caractere especial',
-      requireUppercase: 'uma letra maiúscula',
-      sentencePrefix: 'Sua senha deve conter',
+  start: {
+    actionLink: 'Entrar',
+    actionLink__use_email: 'Usar e-mail',
+    actionLink__use_phone: 'Usar telefone',
+    actionText: 'Possui uma conta?',
+    subtitle: 'para continuar em {{applicationName}}',
+    title: 'Criar sua conta',
+  },
+  form_password_incorrect: 'Senha incorreta.',
+  form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
+  form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
+  form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
+  form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
+  form_password_size_in_bytes_exceeded:
+    'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+  form_password_validation_failed: 'Senha incorreta',
+  form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
+  form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
+  identification_deletion_failed: 'Você não pode excluir sua última identificação.',
+  not_allowed_access: 'Acesso não permitido.',
+  organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
+  organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
+  organization_membership_quota_exceeded:
+    'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
+  organization_minimum_permissions_needed:
+    'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
+  passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
+  passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
+  passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
+  passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
+  passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
+  passwordComplexity: {
+    maximumLength: 'menos de {{length}} caracteres',
+    minimumLength: '{{length}} ou mais caracteres',
+    requireLowercase: 'uma letra minúscula',
+    requireNumbers: 'um número',
+    requireSpecialCharacter: 'um caractere especial',
+    requireUppercase: 'uma letra maiúscula',
+    sentencePrefix: 'Sua senha deve conter',
+  },
+  phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
+  zxcvbn: {
+    couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
+    goodPassword: 'Sua senha atende a todos os requisitos necessários.',
+    notEnough: 'Sua senha não é forte o suficiente.',
+    suggestions: {
+      allUppercase: 'Utilize apenas algumas letras maiúsculas, não todas.',
+      anotherWord: 'Adicione mais palavras que são menos comuns.',
+      associatedYears: 'Evite anos associados a você.',
+      capitalization: 'Utilize outras letras maiúsculas, além do que primeira.',
+      dates: 'Evite datas e anos associados a você.',
+      l33t: "Evite substituições previsíveis de letras, como '@' por 'a'.",
+      longerKeyboardPattern: 'Use padrões de teclado mais longos e mude a direção da digitação várias vezes.',
+      noNeed: 'Você pode criar senhas fortes sem usar símbolos, números ou letras maiúsculas.',
+      pwned: 'Se você usar esta senha em outro lugar, você deve mudá-la.',
+      recentYears: 'Evite anos recentes.',
+      repeated: 'Evite palavras e caracteres repetidos.',
+      reverseWords: 'Evite utilizar palavras comuns escritas de "trás para frente".',
+      sequences: 'Evite sequências comuns de caracteres.',
+      useWords: 'Use várias palavras, mas evite frases comuns.',
     },
-    phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
-    zxcvbn: {
-      couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
-      goodPassword: 'Sua senha atende a todos os requisitos necessários.',
-      notEnough: 'Sua senha não é forte o suficiente.',
-      suggestions: {
-        allUppercase: 'Utilize apenas algumas letras maiúsculas, não todas.',
-        anotherWord: 'Adicione mais palavras que são menos comuns.',
-        associatedYears: 'Evite anos associados a você.',
-        capitalization: 'Utilize outras letras maiúsculas, além do que primeira.',
-        dates: 'Evite datas e anos associados a você.',
-        l33t: "Evite substituições previsíveis de letras, como '@' por 'a'.",
-        longerKeyboardPattern: 'Use padrões de teclado mais longos e mude a direção da digitação várias vezes.',
-        noNeed: 'Você pode criar senhas fortes sem usar símbolos, números ou letras maiúsculas.',
-        pwned: 'Se você usar esta senha em outro lugar, você deve mudá-la.',
-        recentYears: 'Evite anos recentes.',
-        repeated: 'Evite palavras e caracteres repetidos.',
-        reverseWords: 'Evite utilizar palavras comuns escritas de "trás para frente".',
-        sequences: 'Evite sequências comuns de caracteres.',
-        useWords: 'Use várias palavras, mas evite frases comuns.',
-      },
-      warnings: {
-        common: 'Esta é uma senha comumente usada.',
-        commonNames: 'Nomes e sobrenomes comuns são fáceis de adivinhar.',
-        dates: 'Datas são fáceis de adivinhar.',
-        extendedRepeat: 'Padrões de caracteres repetidos, como "abcabcabc" são fáceis de adivinhar.',
-        keyPattern: 'Padrões curtos de teclado são fáceis de adivinhar.',
-        namesByThemselves: 'Nomes ou sobrenomes são fáceis de adivinhar.',
-        pwned: 'Sua senha foi exposta por uma violação de dados na Internet.',
-        recentYears: 'Anos recentes são fáceis de adivinhar.',
-        sequences: 'Sequências comuns de caracteres, como "abc" são fáceis de adivinhar.',
-        similarToCommon: 'Esta é semelhante a uma senha comumente usada.',
-        simpleRepeat: 'Caracteres repetidos, como "aaa" são fáceis de adivinhar.',
-        straightRow: 'Letras que vêm em sequência teclado são fáceis de adivinhar.',
-        topHundred: 'Esta é uma senha usada frequentemente.',
-        topTen: 'Esta é uma senha muito usada.',
-        userInputs: 'Não deve haver nenhum dado pessoal ou relacionado à página.',
-        wordByItself: 'Palavras simples são fáceis de adivinhar.',
-      },
+    warnings: {
+      common: 'Esta é uma senha comumente usada.',
+      commonNames: 'Nomes e sobrenomes comuns são fáceis de adivinhar.',
+      dates: 'Datas são fáceis de adivinhar.',
+      extendedRepeat: 'Padrões de caracteres repetidos, como "abcabcabc" são fáceis de adivinhar.',
+      keyPattern: 'Padrões curtos de teclado são fáceis de adivinhar.',
+      namesByThemselves: 'Nomes ou sobrenomes são fáceis de adivinhar.',
+      pwned: 'Sua senha foi exposta por uma violação de dados na Internet.',
+      recentYears: 'Anos recentes são fáceis de adivinhar.',
+      sequences: 'Sequências comuns de caracteres, como "abc" são fáceis de adivinhar.',
+      similarToCommon: 'Esta é semelhante a uma senha comumente usada.',
+      simpleRepeat: 'Caracteres repetidos, como "aaa" são fáceis de adivinhar.',
+      straightRow: 'Letras que vêm em sequência teclado são fáceis de adivinhar.',
+      topHundred: 'Esta é uma senha usada frequentemente.',
+      topTen: 'Esta é uma senha muito usada.',
+      userInputs: 'Não deve haver nenhum dado pessoal ou relacionado à página.',
+      wordByItself: 'Palavras simples são fáceis de adivinhar.',
     },
   },
+
   userButton: {
     action__addAccount: 'Adicionar conta',
     action__manageAccount: 'Gerenciar conta',
@@ -764,7 +752,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: undefined,
+        subtitle__disconnected: 'Sua conta foi desconectada. Por favor, conecte novamente para continuar.',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
@@ -854,76 +842,62 @@ export const ptBR: LocalizationResource = {
       subtitle__unavailableWallets: 'Não há carteiras Web3 disponíveis.',
       successMessage: 'A carteira foi adicionada à sua conta.',
       title: 'Adicionar carteira Web3',
-      web3WalletButtonsBlockButton: undefined,
+      web3WalletButtonsBlockButton: 'Conectar carteira Web3',
     },
   },
   reverification: {
     alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
+      actionLink: 'Solicitar ajuda', // Action link for requesting help
+      actionText: 'Não tem nenhum dos métodos? Tente outra forma.', // Alternative methods text
+      blockButton__backupCode: 'Usar código de backup', // Use backup code button
+      blockButton__emailCode: 'Enviar código para {{identifier}}', // Send email code button
+      blockButton__password: 'Usar senha', // Use password button
+      blockButton__phoneCode: 'Enviar código de telefone', // Send phone code button
+      blockButton__totp: 'Usar autenticação TOTP', // Use TOTP button
       getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
+        blockButton__emailSupport: 'Entrar em contato com o suporte', // Email support button
+        content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.', // Help content text
+        title: 'Ajuda', // Help title
       },
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.', // Subtitle for alternative methods
+      title: 'Métodos alternativos de verificação', // Title for alternative methods
     },
     backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Digite seu código de backup para continuar.', // Subtitle for backup code MFA
+      title: 'Verificação com código de backup', // Title for backup code MFA
     },
     emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Código enviado para seu e-mail', // Form title for email code
+      resendButton: 'Reenviar código', // Resend code button
+      subtitle: 'Verifique seu e-mail e insira o código para continuar.', // Subtitle for email code form
+      title: 'Verifique seu e-mail', // Title for email code form
     },
     noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.', // Message for no available methods
+      subtitle: 'Não há métodos de verificação disponíveis no momento.', // Subtitle for no available methods
+      title: 'Métodos de verificação indisponíveis', // Title for no available methods
     },
     password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Usar outro método', // Action link for using another method
+      subtitle: 'Digite sua senha para continuar.', // Subtitle for password form
+      title: 'Digite sua senha', // Title for password form
     },
     phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Código de verificação', // Form title for phone code
+      resendButton: 'Reenviar código', // Resend code button
+      subtitle: 'Verifique seu celular para o código de verificação.', // Subtitle for phone code form
+      title: 'Verifique seu celular', // Title for phone code form
     },
     phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Código de verificação', // Form title for phone code MFA
+      resendButton: 'Reenviar código', // Resend code button
+      subtitle: 'Verifique seu celular para o código de verificação.', // Subtitle for phone code MFA
+      title: 'Verifique seu celular', // Title for phone code MFA
     },
     totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
-  waitlist: {
-    start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Código de verificação TOTP', // Form title for TOTP MFA
+      subtitle: 'Digite o código de verificação gerado pelo seu aplicativo de autenticação.', // Subtitle for TOTP MFA
+      title: 'Autenticação TOTP', // Title for TOTP MFA
     },
   },
 } as const;

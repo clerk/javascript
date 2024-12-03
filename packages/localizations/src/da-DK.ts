@@ -131,7 +131,7 @@ export const daDK: LocalizationResource = {
       action__invite: 'Inviter',
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
-        tableHeader__actions: undefined,
+        tableHeader__actions: 'Handlinger',
         tableHeader__joined: 'Deltaget',
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruger',
