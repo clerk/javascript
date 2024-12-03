@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.7.2
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47)]:
+  - @clerk/types@4.36.0
+
 ## 3.7.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.18.0
+
+### Minor Changes
+
+- Replace `session_step_up_verification_required` with `session_reverification_required` as the Clerk API error code used for reverification. ([#4699](https://github.com/clerk/javascript/pull/4699)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47)]:
+  - @clerk/types@4.36.0
+
 ## 2.17.1
 
 ### Patch Changes
