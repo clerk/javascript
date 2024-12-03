@@ -1,11 +1,11 @@
 import type {
-  CreateEnterpriseSsoFlowReturn,
+  CreateEnterpriseSsoLinkFlowReturn,
   EmailAddressResource,
   StartEnterpriseSsoLinkFlowParams,
 } from '@clerk/types';
 import React from 'react';
 
-type EnterpriseSsoLinkEmailAddressReturn = CreateEnterpriseSsoFlowReturn<
+type EnterpriseSsoLinkEmailAddressReturn = CreateEnterpriseSsoLinkFlowReturn<
   StartEnterpriseSsoLinkFlowParams,
   EmailAddressResource
 >;
