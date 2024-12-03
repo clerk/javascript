@@ -706,9 +706,13 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     signUpUrl?: string;
     /**
-     * Optional array of domains used to validate against the query param of an auth redirect. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning passed to the console.
+     * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectOrigins?: Array<string | RegExp>;
+    /**
+     * An optional array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     */
+    allowedRedirectProtocols?: Array<string>;
     /**
      * This option defines that the application is a satellite application.
      */

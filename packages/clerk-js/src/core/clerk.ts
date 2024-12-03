@@ -958,7 +958,7 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
         `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
       );
@@ -2093,4 +2093,14 @@ export class Clerk implements ClerkInterface {
       // ignore
     }
   };
+
+  get #allowedRedirectProtocols() {
+    let allowedProtocols = ALLOWED_PROTOCOLS;
+
+    if (this.#options.allowedRedirectProtocols) {
+      allowedProtocols = allowedProtocols.concat(this.#options.allowedRedirectProtocols);
+    }
+
+    return allowedProtocols;
+  }
 }
