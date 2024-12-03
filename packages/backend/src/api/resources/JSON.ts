@@ -157,7 +157,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   public_metadata: OrganizationPublicMetadata | null;
   private_metadata?: OrganizationPrivateMetadata;
-  created_by: string;
+  created_by?: string;
   created_at: number;
   updated_at: number;
 }

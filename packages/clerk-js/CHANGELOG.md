@@ -1,5 +1,52 @@
 # Change Log
 
+## 5.37.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
+  - @clerk/localizations@3.7.2
+  - @clerk/types@4.36.0
+  - @clerk/shared@2.18.0
+
+## 5.36.0
+
+### Minor Changes
+
+- - Update the supported API version to `2024-10-01` that includes the following changes ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+    - Notification for new sign ins to users' accounts feature becomes available.
+    - The response for Sign Ins with an email address that matches a **SAML connection** is updated. Instead of responding with a status of `needs_identifier` the API will now return a status of `needs_first_factor` and the email address that matched will be returned in the identifier field. the only strategy that will be included in supported first factors is `enterprise_sso`
+
+    Read more in the [API Version docs](https://clerk.com/docs/backend-requests/versioning/available-versions#2024-10-01)
+
+  - Update components to use the new `enterprise_sso` strategy for sign ins / sign ups that match an enterprise connection and handle the new API response.
+
+    This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise SSO regardless of the underlying protocol used to authenticate the user.
+
+    For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+### Patch Changes
+
+- Fix a memory leak in email link flow polling. ([#4515](https://github.com/clerk/javascript/pull/4515)) by [@myandrienko](https://github.com/myandrienko)
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/localizations@3.7.1
+  - @clerk/shared@2.17.1
+
+## 5.35.1
+
+### Patch Changes
+
+- Fix a bug where the the Clerk event listener was not emitting updates when a Session's user data changes. ([#4661](https://github.com/clerk/javascript/pull/4661)) by [@BRKalow](https://github.com/BRKalow)
+
+- Bug fix: Being able to revoke a session from UserProfile. ([#4653](https://github.com/clerk/javascript/pull/4653)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.35.0
 
 ### Minor Changes

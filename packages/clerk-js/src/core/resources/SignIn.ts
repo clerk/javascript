@@ -14,6 +14,7 @@ import type {
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  EnterpriseSSOConfig,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -40,8 +41,10 @@ import type {
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
+  getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
 import {
@@ -122,6 +125,9 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'web3_coinbase_wallet_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
+      case 'web3_okx_wallet_signature':
+        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        break;
       case 'reset_password_phone_code':
         config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
         break;
@@ -133,6 +139,12 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: factor.redirectUrl,
           actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
         } as SamlConfig;
+        break;
+      case 'enterprise_sso':
+        config = {
+          redirectUrl: factor.redirectUrl,
+          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+        } as EnterpriseSSOConfig;
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -215,7 +227,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
 
     const { firstFactorVerification } =
-      strategy === 'saml' && this.id
+      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
         ? await this.prepareFirstFactor({
             strategy,
             redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
@@ -313,6 +325,20 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
+    });
+  };
+
+  public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return this;
+    }
+
+    const identifier = await getOKXWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithOKXWallet,
+      strategy: 'web3_okx_wallet_signature',
     });
   };
 
