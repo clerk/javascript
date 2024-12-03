@@ -103,6 +103,8 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithCoinbaseWallet: () => Promise<SignInResource>;
 
+  authenticateWithOKXWallet: () => Promise<SignInResource>;
+
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;

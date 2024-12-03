@@ -14,6 +14,7 @@ import type {
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithOKXWalletParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -77,6 +78,7 @@ import {
   errorThrower,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
@@ -1542,6 +1544,18 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_okx_wallet_signature',
+    });
+  };
+
   public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
@@ -1561,7 +1575,11 @@ export class Clerk implements ClerkInterface {
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
-      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
+      provider === 'metamask'
+        ? generateSignatureWithMetamask
+        : provider === 'coinbase_wallet'
+          ? generateSignatureWithCoinbaseWallet
+          : generateSignatureWithOKXWallet;
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
