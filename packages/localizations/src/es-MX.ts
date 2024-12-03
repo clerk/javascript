@@ -701,6 +701,12 @@ export const esMX: LocalizationResource = {
         resendButton: 'Reenviar enlace',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} será eliminado de esta cuenta.',
         messageLine2: 'Ya no podrá iniciar sesión con esta dirección de correo electrónico.',

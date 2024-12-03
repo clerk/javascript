@@ -710,6 +710,12 @@ export const ruRU: LocalizationResource = {
         resendButton: 'Отправить ссылку повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти с использованием этого адреса электронной почты.',

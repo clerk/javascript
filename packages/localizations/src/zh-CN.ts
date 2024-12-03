@@ -678,6 +678,12 @@ export const zhCN: LocalizationResource = {
         resendButton: '重发链接',
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电子邮件地址登录。',

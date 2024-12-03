@@ -702,6 +702,12 @@ export const elGR: LocalizationResource = {
         resendButton: 'Δεν λάβατε κάποιον σύνδεσμο; Επανάληψη αποστολής',
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: 'Η διεύθυνση {{identifier}} θα αφαιρεθεί από αυτόν τον λογαριασμό.',
         messageLine2: 'Δεν θα μπορείτε πλέον να συνδεθείτε χρησιμοποιώντας αυτήν τη διεύθυνση email.',
