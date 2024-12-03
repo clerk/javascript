@@ -54,8 +54,6 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   const translationKey = getTranslationKeyByStrategy(strategy);
 
-  console.log({ strategy });
-
   return (
     <Wizard {...wizard.props}>
       <FormContainer
