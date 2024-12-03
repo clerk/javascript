@@ -1,12 +1,13 @@
 import React from 'react';
 import type { NavigateOptions } from 'react-router';
-
-import { usePassedHooks } from './PassedHooksContext';
+import { useLocation, useNavigate } from 'react-router';
 
 type Resolve = (value?: unknown) => void;
 
 export const useAwaitableNavigate = () => {
-  const { navigate, location } = usePassedHooks();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const resolveFunctionsRef = React.useRef<Resolve[]>([]);
   const resolveAll = () => {
     resolveFunctionsRef.current.forEach(resolve => resolve());

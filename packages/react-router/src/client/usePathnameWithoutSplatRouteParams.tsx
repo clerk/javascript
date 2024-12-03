@@ -1,8 +1,8 @@
-import { usePassedHooks } from './PassedHooksContext';
+import { useLocation, useParams } from 'react-router';
 
 export const usePathnameWithoutSplatRouteParams = () => {
-  const { params, location } = usePassedHooks();
-  const { pathname } = location;
+  const params = useParams();
+  const { pathname } = useLocation();
 
   // Get the splat route params
   // Remix store splat route params in an object with a key of '*'

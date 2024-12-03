@@ -1,7 +1,6 @@
 import type { ClerkProviderProps } from '@clerk/clerk-react';
 import type { InitialState, Without } from '@clerk/types';
 import type React from 'react';
-import type { Location, NavigateFunction, Params } from 'react-router';
 
 export type ClerkState = {
   __type: 'clerkState';
@@ -39,12 +38,6 @@ export type ReactRouterClerkProviderProps = Without<ClerkProviderProps, 'publish
    */
   publishableKey?: string;
   children: React.ReactNode;
-};
-
-export type PassedHooks = {
-  navigate: NavigateFunction;
-  location: Location;
-  params: Readonly<Params<string>>;
 };
 
 declare global {

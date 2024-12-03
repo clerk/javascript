@@ -2,9 +2,8 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import { assertPublishableKeyInSpaMode, assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
-import { PassedHooksProvider } from './PassedHooksContext';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
-import type { ClerkState, PassedHooks, ReactRouterClerkProviderProps } from './types';
+import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -127,12 +126,11 @@ type LoaderData = {
   clerkState: ClerkState;
 };
 
-type ClerkProviderProps = ClerkReactRouterOptions &
-  PassedHooks & {
-    loaderData: LoaderData;
-  };
+type ClerkProviderProps = ClerkReactRouterOptions & {
+  loaderData: LoaderData;
+};
 
-export const ClerkProvider = ({ children, loaderData, navigate, location, params, ...opts }: ClerkProviderProps) => {
+export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {
   let clerkState;
   const isSpaMode = inSpaMode();
 
@@ -146,13 +144,11 @@ export const ClerkProvider = ({ children, loaderData, navigate, location, params
   }
 
   return (
-    <PassedHooksProvider options={{ navigate, location, params }}>
-      <ClerkProviderBase
-        {...(opts as ReactRouterClerkProviderProps)}
-        clerkState={clerkState}
-      >
-        {children}
-      </ClerkProviderBase>
-    </PassedHooksProvider>
+    <ClerkProviderBase
+      {...(opts as ReactRouterClerkProviderProps)}
+      clerkState={clerkState}
+    >
+      {children}
+    </ClerkProviderBase>
   );
 };
