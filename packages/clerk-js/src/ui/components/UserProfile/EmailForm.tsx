@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { EmailAddressResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
+import type { EmailAddressResource, EnvironmentResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
@@ -8,7 +8,6 @@ import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -26,7 +25,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
-  const strategy = getEmailAddressVerificationStrategy(emailAddressRef.current, preferEmailLinks);
+  const strategy = getEmailAddressVerificationStrategy(emailAddressRef.current, environment);
   const wizard = useWizard({
     defaultStep: emailAddressRef.current ? 1 : 0,
     onNextStep: () => card.setError(undefined),
@@ -82,8 +81,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
         headerSubtitle={
-          // TODO - Get localization per strategy
-          preferEmailLinks
+          strategy === 'enterprise_sso' || preferEmailLinks
             ? localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
                 identifier: emailAddressRef.current?.emailAddress,
               })
@@ -120,14 +118,19 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   );
 });
 
-// TODO - Handle `preferEmailLinks`
-export const getEmailAddressVerificationStrategy = (
+function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
+  const { userSettings } = env;
+  const { email_address } = userSettings.attributes;
+  return email_address.enabled && email_address.verifications.includes('email_link');
+}
+
+const getEmailAddressVerificationStrategy = (
   emailAddress: EmailAddressResource | undefined,
-  preferLinks: boolean,
+  env: EnvironmentResource,
 ): PrepareEmailAddressVerificationParams['strategy'] => {
-  if (emailAddress?.matchesEnterpriseConnection) {
+  if (emailAddress?.hasEnterpriseSso) {
     return 'enterprise_sso';
   }
 
-  return preferLinks ? 'email_link' : 'email_code';
+  return emailLinksEnabledForInstance(env) ? 'email_link' : 'email_code';
 };

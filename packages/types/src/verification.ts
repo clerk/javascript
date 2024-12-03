@@ -48,7 +48,7 @@ export interface StartEnterpriseSsoLinkFlowParams {
   redirectUrl: string;
 }
 
-export type CreateEnterpriseSsoFlowReturn<Params, Resource> = {
+export type CreateEnterpriseSsoLinkFlowReturn<Params, Resource> = {
   startEnterpriseSsoLinkFlow: (params: Params) => Promise<Resource>;
   cancelEnterpriseSsoLinkFlow: () => void;
 };

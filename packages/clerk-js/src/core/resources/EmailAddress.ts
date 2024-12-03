@@ -2,14 +2,14 @@ import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
-  CreateEnterpriseConnectionLinkFlowReturn,
+  CreateEnterpriseSsoLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressJSONSnapshot,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
   StartEmailLinkFlowParams,
-  StartEnterpriseConnectionLinkFlowParams,
+  StartEnterpriseSsoLinkFlowParams,
   VerificationResource,
 } from '@clerk/types';
 
@@ -19,7 +19,7 @@ import { BaseResource, IdentificationLink, Verification } from './internal';
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
   emailAddress = '';
-  matchesEnterpriseConnection = false;
+  hasEnterpriseSso = false;
   linkedTo: IdentificationLinkResource[] = [];
   verification!: VerificationResource;
 
@@ -81,15 +81,15 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
-  createEnterpriseSsoLinkFlow = (): CreateEnterpriseConnectionLinkFlowReturn<
-    StartEnterpriseConnectionLinkFlowParams,
+  createEnterpriseSsoLinkFlow = (): CreateEnterpriseSsoLinkFlowReturn<
+    StartEnterpriseSsoLinkFlowParams,
     EmailAddressResource
   > => {
     const { run, stop } = Poller();
 
     const startEnterpriseSsoLinkFlow = async ({
       redirectUrl,
-    }: StartEnterpriseConnectionLinkFlowParams): Promise<EmailAddressResource> => {
+    }: StartEnterpriseSsoLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
@@ -132,7 +132,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.verification = new Verification(data.verification);
-    this.matchesEnterpriseConnection = data.matches_enterprise_connection;
+    this.hasEnterpriseSso = data.has_enterprise_sso;
     this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }
