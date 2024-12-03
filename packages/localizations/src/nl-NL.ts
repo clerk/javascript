@@ -272,6 +272,62 @@ export const nlNL: LocalizationResource = {
   paginationButton__previous: 'Vorige',
   paginationRowText__displaying: 'Weergeven',
   paginationRowText__of: 'van',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Krijg hulp',
+      actionText: 'Heb je geen van deze?',
+      blockButton__backupCode: 'Backupcode gebruiken',
+      blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__password: 'Doorgaan met je wachtwoord',
+      blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
+      blockButton__totp: 'Use your authenticator app',
+      getHelp: {
+        blockButton__emailSupport: 'Email ondersteuning',
+        content:
+          'Als je moeite hebt om je account te verifiëren, email ons en we zullen met je werken om toegang te herstellen zo snel mogelijk.',
+        title: 'Krijg hulp',
+      },
+      subtitle: 'Problemen? Je kunt een van deze methoden gebruiken voor verificatie.',
+      title: 'Gebruik een andere methode',
+    },
+    backupCodeMfa: {
+      subtitle: 'Je backupcode is de code die je kreeg bij het installeren van tweestapsverificatie.',
+      title: 'Backupcode invoeren',
+    },
+    emailCode: {
+      formTitle: 'Verificatiecode',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je email',
+    },
+    noAvailableMethods: {
+      message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',
+      subtitle: 'Er is een fout opgetreden',
+      title: 'Kan je account niet verifiëren',
+    },
+    password: {
+      actionLink: 'Gebruik een andere methode',
+      subtitle: 'Voer het wachtwoord in dat bij je account hoort',
+      title: 'Voer je wachtwoord in',
+    },
+    phoneCode: {
+      formTitle: 'Verificatiecode',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je telefoon',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Verificatiecode',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je telefoon',
+    },
+    totpMfa: {
+      formTitle: 'Verificatiecode',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Tweestapsverificatie',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Account toevoegen',
@@ -849,62 +905,6 @@ export const nlNL: LocalizationResource = {
       successMessage: 'De portefeuille is toegevoegd aan dit account.',
       title: 'Web3 portefeuille toevoegen.',
       web3WalletButtonsBlockButton: 'Voeg een Web3-portefeuille toe',
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Krijg hulp',
-      actionText: 'Heb je geen van deze?',
-      blockButton__backupCode: 'Backupcode gebruiken',
-      blockButton__emailCode: 'Email code naar {{identifier}}',
-      blockButton__password: 'Doorgaan met je wachtwoord',
-      blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
-      blockButton__totp: 'Use your authenticator app',
-      getHelp: {
-        blockButton__emailSupport: 'Email ondersteuning',
-        content:
-          'Als je moeite hebt om je account te verifiëren, email ons en we zullen met je werken om toegang te herstellen zo snel mogelijk.',
-        title: 'Krijg hulp',
-      },
-      subtitle: 'Problemen? Je kunt een van deze methoden gebruiken voor verificatie.',
-      title: 'Gebruik een andere methode',
-    },
-    backupCodeMfa: {
-      subtitle: 'Je backupcode is de code die je kreeg bij het installeren van tweestapsverificatie.',
-      title: 'Backupcode invoeren',
-    },
-    emailCode: {
-      formTitle: 'Verificatiecode',
-      resendButton: 'Niet ontvangen? Opnieuw verzenden',
-      subtitle: 'om door te gaan naar {{applicationName}}',
-      title: 'Controleer je email',
-    },
-    noAvailableMethods: {
-      message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',
-      subtitle: 'Er is een fout opgetreden',
-      title: 'Kan je account niet verifiëren',
-    },
-    password: {
-      actionLink: 'Gebruik een andere methode',
-      subtitle: 'Voer het wachtwoord in dat bij je account hoort',
-      title: 'Voer je wachtwoord in',
-    },
-    phoneCode: {
-      formTitle: 'Verificatiecode',
-      resendButton: 'Niet ontvangen? Opnieuw verzenden',
-      subtitle: 'om door te gaan naar {{applicationName}}',
-      title: 'Controleer je telefoon',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Verificatiecode',
-      resendButton: 'Niet ontvangen? Opnieuw verzenden',
-      subtitle: 'om door te gaan naar {{applicationName}}',
-      title: 'Controleer je telefoon',
-    },
-    totpMfa: {
-      formTitle: 'Verificatiecode',
-      subtitle: 'om door te gaan naar {{applicationName}}',
-      title: 'Tweestapsverificatie',
     },
   },
   waitlist: {

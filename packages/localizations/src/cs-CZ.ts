@@ -848,7 +848,6 @@ export const csCZ: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Pokračovat s Web3 peněženkou',
     },
   },
-
   reverification: {
     alternativeMethods: {
       actionLink: 'Získat pomoc',

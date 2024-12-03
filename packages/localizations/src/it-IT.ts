@@ -859,19 +859,18 @@ export const itIT: LocalizationResource = {
       subtitle: 'Apri la tua app di autenticazione e inserisci il codice TOTP.',
       title: 'Verifica in due passaggi',
     },
-
-    waitlist: {
-      start: {
-        actionLink: 'Unisciti alla lista d’attesa',
-        actionText: 'Non vedi l’opzione? Unisciti alla lista d’attesa!',
-        formButton: 'Unisciti alla lista d’attesa',
-        subtitle: 'Siamo entusiasti di averti con noi! Ti avviseremo quando sarà disponibile.',
-        title: 'In attesa',
-      },
-      success: {
-        message: 'Sei stato aggiunto con successo alla lista d’attesa. Ti avviseremo quando sarà disponibile.',
-        title: 'Aggiunto alla lista d’attesa',
-      },
+  },
+  waitlist: {
+    start: {
+      actionLink: 'Unisciti alla lista d’attesa',
+      actionText: 'Non vedi l’opzione? Unisciti alla lista d’attesa!',
+      formButton: 'Unisciti alla lista d’attesa',
+      subtitle: 'Siamo entusiasti di averti con noi! Ti avviseremo quando sarà disponibile.',
+      title: 'In attesa',
+    },
+    success: {
+      message: 'Sei stato aggiunto con successo alla lista d’attesa. Ti avviseremo quando sarà disponibile.',
+      title: 'Aggiunto alla lista d’attesa',
     },
   },
 } as const;

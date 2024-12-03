@@ -397,7 +397,6 @@ export const bgBG: LocalizationResource = {
       actionLink__join_waitlist: 'Присъединете се към листата за изчакване',
       actionLink__use_email: 'Използвайте имейл',
       actionLink__use_email_username: 'Използвайте имейл или потребителско име',
-      blockButton__passkey: 'Използвай passkey',
       actionLink__use_phone: 'Използвайте телефон',
       actionLink__use_username: 'Използвайте потребителско име',
       actionText: 'Нямате акаунт?',
@@ -484,8 +483,6 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
     },
-    socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
-    socialButtonsBlockButtonManyInView: undefined,
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -901,19 +898,19 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Use your authenticator app to get the code.',
       title: 'Authenticator App MFA',
     },
-    waitlist: {
-      start: {
-        actionLink: 'Sign up',
-        actionText: "Don't have an account?",
-        formButton: 'Join waitlist',
-        subtitle: "Join our waitlist and we'll notify you once we are ready.",
-        title: 'Join our waitlist',
-      },
-      success: {
-        message: 'You have successfully joined the waitlist. We will notify you when access is available.',
-        subtitle: 'Thank you for your patience.',
-        title: 'Waitlist successful',
-      },
+  },
+  waitlist: {
+    start: {
+      actionLink: 'Sign up',
+      actionText: "Don't have an account?",
+      formButton: 'Join waitlist',
+      subtitle: "Join our waitlist and we'll notify you once we are ready.",
+      title: 'Join our waitlist',
+    },
+    success: {
+      message: 'You have successfully joined the waitlist. We will notify you when access is available.',
+      subtitle: 'Thank you for your patience.',
+      title: 'Waitlist successful',
     },
   },
 } as const;
