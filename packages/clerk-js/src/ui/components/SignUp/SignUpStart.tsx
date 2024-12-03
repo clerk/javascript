@@ -40,8 +40,8 @@ function _SignUpStart(): JSX.Element {
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const options = useOptions();
-  const { afterSignUpUrl, signInUrl, signUpUrl, unsafeMetadata } = ctx;
-  const isCombinedFlow = (options.experimental?.combinedFlow && signInUrl === signUpUrl) || false;
+  const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const isCombinedFlow = options.experimental?.combinedFlow || false;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );

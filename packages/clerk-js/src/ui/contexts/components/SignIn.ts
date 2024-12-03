@@ -37,7 +37,8 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, ...ctx } = context;
+  const { componentName, ..._ctx } = context;
+  const ctx = _ctx.__experimental?.combinedProps || _ctx;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
@@ -71,7 +72,7 @@ export const useSignInContext = (): SignInContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
-  if (options.experimental?.combinedFlow && signInUrl === signUpUrl) {
+  if (options.experimental?.combinedFlow) {
     signUpUrl = buildURL(
       { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
       { stringify: true },
