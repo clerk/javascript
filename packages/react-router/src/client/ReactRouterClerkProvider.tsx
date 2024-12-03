@@ -3,7 +3,7 @@ import React from 'react';
 
 import { assertPublishableKeyInSpaMode, assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
-import type { ClerkState, ReactRouterClerkProviderProps } from './types';
+import type { ClerkState, ReactRouterClerkProviderProps, ReactRouterComponentProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -121,13 +121,9 @@ type ClerkReactRouterOptions = Partial<
   Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>
 >;
 
-type LoaderData = {
-  data: any;
-  clerkState: ClerkState;
-};
-
+// TODO: Remove "any" on loaderData type
 type ClerkProviderProps = ClerkReactRouterOptions & {
-  loaderData: LoaderData;
+  loaderData: ReactRouterComponentProps['loaderData'];
 };
 
 export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {

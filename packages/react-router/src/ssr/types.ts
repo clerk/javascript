@@ -8,7 +8,35 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { DataStrategyFunctionArgs, LoaderFunction } from 'react-router';
+import type { LoaderFunction } from 'react-router';
+import type { CreateServerLoaderArgs } from 'react-router/route-module';
+
+type Func = (...args: any[]) => unknown;
+
+type RouteModule = {
+  meta?: Func;
+  links?: Func;
+  headers?: Func;
+  loader?: Func;
+  clientLoader?: Func;
+  action?: Func;
+  clientAction?: Func;
+  HydrateFallback?: unknown;
+  default?: unknown;
+  ErrorBoundary?: unknown;
+  [key: string]: unknown;
+};
+
+export type RouteInfo = {
+  parents: RouteInfo[];
+  module: RouteModule;
+  id: unknown;
+  file: string;
+  path: string;
+  params: unknown;
+  loaderData: unknown;
+  actionData: unknown;
+};
 
 export type GetAuthReturn = Promise<AuthObject>;
 
@@ -62,7 +90,8 @@ type ObjectLike = Record<string, unknown> | null;
  */
 export type RootAuthLoaderCallbackReturn = Promise<Response> | Response | Promise<ObjectLike> | ObjectLike;
 
-export type LoaderFunctionArgs = DataStrategyFunctionArgs;
+// TODO: Figure out how to use the Route.LoaderArgs from userland code
+export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
