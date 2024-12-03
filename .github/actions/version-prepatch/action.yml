@@ -14,8 +14,7 @@ runs:
     - name: Bump prepatch version
       id: bump-prepatch-version
       shell: bash
-      run: npm version prepatch --no-git-tag-version --preid=$TAG --workspace=$PACKAGE
+      run: pnpm version-packages prepatch --no-git-tag-version --preid=$TAG --workspace=$PACKAGE
       env:
         PACKAGE: ${{ inputs.package }}
         TAG: ${{ inputs.tag }}
-      

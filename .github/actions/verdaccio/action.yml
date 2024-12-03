@@ -26,14 +26,14 @@ runs:
   steps:
     - name: Update NPM Registry to Verdaccio
       shell: bash
-      run: npm set registry ${{ inputs.registry }}
+      run: pnpm set registry ${{ inputs.registry }}
 
     - name: Run Verdaccio (using publish config)
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
         sleep 5
-        npm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
+        pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
 
     - name: Publish to Verdaccio
       shell: bash
@@ -47,4 +47,4 @@ runs:
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
-        npm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
+        pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken

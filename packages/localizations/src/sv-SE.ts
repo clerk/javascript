@@ -14,62 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: 'Få hjälp',
-      actionText: 'Har du inget av dessa?',
-      blockButton__backupCode: 'Använd en reservkod',
-      blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
-      blockButton__password: 'Fortsätt med ditt lösenord',
-      blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
-      blockButton__totp: 'Använd din autentiseringsapp',
-      getHelp: {
-        blockButton__emailSupport: 'E-posta support',
-        content:
-          'Om du har problem med att verifiera ditt konto, maila oss så hjälper vi dig att återställa åtkomsten så snart som möjligt.',
-        title: 'Få hjälp',
-      },
-      subtitle: 'Har du problem? Du kan använda någon av dessa metoder för verifiering.',
-      title: 'Använd en annan metod',
-    },
-    backupCodeMfa: {
-      subtitle: 'Din reservkod är den du fick när du ställde in tvåstegsverifiering.',
-      title: 'Ange en reservkod',
-    },
-    emailCode: {
-      formTitle: 'Verifieringskod',
-      resendButton: 'Fick du ingen kod? Skicka igen',
-      subtitle: 'för att fortsätta till {{applicationName}}',
-      title: 'Kontrollera din e-post',
-    },
-    noAvailableMethods: {
-      message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
-      subtitle: 'Ett fel inträffade',
-      title: 'Kan inte verifiera ditt konto',
-    },
-    password: {
-      actionLink: 'Använd en annan metod',
-      subtitle: 'Ange lösenordet som är kopplat till ditt konto',
-      title: 'Ange ditt lösenord',
-    },
-    phoneCode: {
-      formTitle: 'Verifieringskod',
-      resendButton: 'Fick du ingen kod? Skicka igen',
-      subtitle: 'för att fortsätta till {{applicationName}}',
-      title: 'Kontrollera din telefon',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Verifieringskod',
-      resendButton: 'Fick du ingen kod? Skicka igen',
-      subtitle: 'För att fortsätta, vänligen ange verifieringskoden som skickats till din telefon',
-      title: 'Kontrollera din telefon',
-    },
-    totpMfa: {
-      formTitle: 'Verifieringskod',
-      subtitle: 'För att fortsätta, vänligen ange verifieringskoden som genererats av din autentiseringsapp',
-      title: 'Tvåstegsverifiering',
-    },
-  },
   backButton: 'Tillbaka',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
@@ -327,6 +271,62 @@ export const svSE: LocalizationResource = {
   paginationButton__previous: 'Föregående',
   paginationRowText__displaying: 'Visar',
   paginationRowText__of: 'av',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Få hjälp',
+      actionText: 'Har du inget av dessa?',
+      blockButton__backupCode: 'Använd en reservkod',
+      blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__password: 'Fortsätt med ditt lösenord',
+      blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
+      blockButton__totp: 'Använd din autentiseringsapp',
+      getHelp: {
+        blockButton__emailSupport: 'E-posta support',
+        content:
+          'Om du har problem med att verifiera ditt konto, maila oss så hjälper vi dig att återställa åtkomsten så snart som möjligt.',
+        title: 'Få hjälp',
+      },
+      subtitle: 'Har du problem? Du kan använda någon av dessa metoder för verifiering.',
+      title: 'Använd en annan metod',
+    },
+    backupCodeMfa: {
+      subtitle: 'Din reservkod är den du fick när du ställde in tvåstegsverifiering.',
+      title: 'Ange en reservkod',
+    },
+    emailCode: {
+      formTitle: 'Verifieringskod',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
+    },
+    noAvailableMethods: {
+      message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
+      subtitle: 'Ett fel inträffade',
+      title: 'Kan inte verifiera ditt konto',
+    },
+    password: {
+      actionLink: 'Använd en annan metod',
+      subtitle: 'Ange lösenordet som är kopplat till ditt konto',
+      title: 'Ange ditt lösenord',
+    },
+    phoneCode: {
+      formTitle: 'Verifieringskod',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din telefon',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Verifieringskod',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'För att fortsätta, vänligen ange verifieringskoden som skickats till din telefon',
+      title: 'Kontrollera din telefon',
+    },
+    totpMfa: {
+      formTitle: 'Verifieringskod',
+      subtitle: 'För att fortsätta, vänligen ange verifieringskoden som genererats av din autentiseringsapp',
+      title: 'Tvåstegsverifiering',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Lägg till konto',
@@ -580,6 +580,7 @@ export const svSE: LocalizationResource = {
     not_allowed_access: 'Åtkomst nekad.',
     organization_domain_blocked: 'Domänen är blockerad.',
     organization_domain_common: 'Domänen är vanlig.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Medlemskapet är fullt.',
     organization_minimum_permissions_needed: 'Du måste ha tillräckligt med behörigheter.',
     passkey_already_exists: 'Passnyckeln finns redan.',

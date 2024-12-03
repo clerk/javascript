@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -48,7 +48,7 @@ export const ActiveDevicesSection = () => {
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
-  const [revokeSession] = useReverification(session.revoke);
+  const [revokeSession] = useReverification(session.revoke.bind(session));
 
   const revoke = async () => {
     if (isCurrent || !session) {

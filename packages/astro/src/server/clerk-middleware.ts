@@ -61,6 +61,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [handler, options] = parseHandlerAndOptions(args);
 
   const astroMiddleware: AstroMiddleware = async (context, next) => {
+    // if the current page is prerendered, do nothing
+    if (isPrerenderedPage(context)) {
+      return next();
+    }
+
     const clerkRequest = createClerkRequest(context.request);
 
     clerkClient(context).telemetry.record(
@@ -122,6 +127,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   };
 
   return astroMiddleware;
+};
+
+const isPrerenderedPage = (context: APIContext) => {
+  return (
+    // for Astro v5
+    ('isPrerendered' in context && context.isPrerendered) ||
+    // for Astro v4
+    ('_isPrerendered' in context && context._isPrerendered)
+  );
 };
 
 // TODO-SHARED: Duplicate from '@clerk/nextjs'

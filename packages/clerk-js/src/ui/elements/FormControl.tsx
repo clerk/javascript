@@ -71,13 +71,14 @@ export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'succes
 type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: boolean };
 
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+  errorMessageId?: string;
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
   center?: boolean;
   sx?: ThemableCssProp;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false } = props;
+  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false, errorMessageId } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -142,6 +143,10 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
+      // We only want the id applied when the feedback type is an error
+      // to avoid having multiple elements in the dom with the same id attribute.
+      // We also only have aria-describedby applied to the input when it is an error.
+      id: type === 'error' ? errorMessageId : undefined,
     };
   };
 

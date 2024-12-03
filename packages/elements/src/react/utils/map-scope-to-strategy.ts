@@ -13,6 +13,9 @@ export function mapScopeToStrategy<T extends `provider:${Strategy}`>(scope: T): 
   if (scope === 'provider:coinbase_wallet') {
     return 'web3_coinbase_wallet_signature';
   }
+  if (scope === 'provider:okx_wallet') {
+    return 'web3_okx_wallet_signature';
+  }
 
   if (scope === 'provider:saml') {
     return 'saml';

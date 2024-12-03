@@ -17,6 +17,7 @@ export const templates = {
   'tanstack-start': resolve(__dirname, './tanstack-start'),
   'tanstack-router': resolve(__dirname, './tanstack-router'),
   'vue-vite': resolve(__dirname, './vue-vite'),
+  'nuxt-node': resolve(__dirname, './nuxt-node'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

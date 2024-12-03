@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Πίσω',
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
@@ -271,7 +216,7 @@ export const elGR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Μέλη',
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Ενημέρωση προφίλ',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -326,6 +271,61 @@ export const elGR: LocalizationResource = {
   paginationButton__previous: 'Προηγούμενο',
   paginationRowText__displaying: 'Εμφάνιση',
   paginationRowText__of: 'από',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -335,7 +335,7 @@ export const elGR: LocalizationResource = {
     },
     alternativeMethods: {
       actionLink: 'Λήψη βοήθειας',
-      actionText: 'Don’t have any of these?',
+      actionText: 'Δεν έχετε κανένα από αυτά;',
       blockButton__backupCode: 'Χρήση ενός εφεδρικού κωδικού',
       blockButton__emailCode: 'Αποστολή κωδικού με email στο {{identifier}}',
       blockButton__emailLink: 'Αποστολή συνδέσμου στο {{identifier}}',
@@ -349,7 +349,8 @@ export const elGR: LocalizationResource = {
           'Εάν αντιμετωπίζετε δυσκολία στη σύνδεση στον λογαριασμό σας, στείλτε μας email και θα επικοινωνήσουμε μαζί σας για να αποκαταστήσουμε την πρόσβαση το συντομότερο δυνατόν.',
         title: 'Λήψη βοήθειας',
       },
-      subtitle: 'Facing issues? You can use any of these methods to sign in.',
+      subtitle:
+        'Αντιμετωπίζετε δυσκολίες; Μπορείτε να χρησιμοποιήσετε οποιαδήποτε από αυτές τις μεθόδους για να συνδεθείτε.',
       title: 'Χρήση μιας άλλης μεθόδου',
     },
     backupCodeMfa: {
@@ -400,10 +401,10 @@ export const elGR: LocalizationResource = {
     forgotPassword: {
       formTitle: 'Επαναφορά κωδικού πρόσβασης',
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
-      subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
-      subtitle_phone: 'First, enter the code sent to your phone',
-      title: 'Reset password',
+      subtitle: 'για να επαναφέρετε τον κωδικό σας',
+      subtitle_email: 'Πρώτα, εισάγετε τον κωδικό που στάλθηκε στη διεύθυνση email σας',
+      subtitle_phone: 'Πρώτα, εισάγετε τον κωδικό που στάλθηκε στο τηλέφωνό σας',
+      title: 'Επαναφορά κωδικού πρόσβασης',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Επαναφορά κωδικού πρόσβασης',
@@ -579,6 +580,7 @@ export const elGR: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -707,11 +709,11 @@ export const elGR: LocalizationResource = {
       title: 'Προσθήκη διεύθυνσης email',
       verifyTitle: 'Verify email address',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Προσθήκη',
     formButtonPrimary__continue: 'Συνέχεια',
     formButtonPrimary__finish: 'Ολοκλήρωση',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Αφαίρεση',
+    formButtonPrimary__save: 'Αποθήκευση',
     formButtonReset: 'Ακύρωση',
     mfaPage: {
       formHint: 'Επιλέξτε μια μέθοδο για προσθήκη.',
@@ -882,7 +884,7 @@ export const elGR: LocalizationResource = {
         title: 'Αριθμοί τηλεφώνου',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Ενημέρωση προφίλ',
         title: 'Προφίλ',
       },
       usernameSection: {

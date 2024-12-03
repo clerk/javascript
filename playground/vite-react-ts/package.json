@@ -8,8 +8,8 @@
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "dev:yalc": "npm run yalc && vite",
-    "yalc": "yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
+    "dev:yalc": "pnpm yalc:add && vite",
+    "yalc:add": "pnpm yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
   },
   "dependencies": {
     "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",

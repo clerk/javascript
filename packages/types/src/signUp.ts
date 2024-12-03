@@ -14,6 +14,7 @@ import type { ClerkResource } from './resource';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
+  EnterpriseSSOStrategy,
   GoogleOneTapStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
@@ -98,6 +99,7 @@ export interface SignUpResource extends ClerkResource {
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -150,7 +152,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
-export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy;
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
 
 // TODO: Replace with discriminated union type
 export type SignUpCreateParams = Partial<
@@ -158,7 +160,7 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | SamlStrategy | TicketStrategy | GoogleOneTapStrategy;
+    strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy | TicketStrategy | GoogleOneTapStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;

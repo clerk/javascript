@@ -1,0 +1,142 @@
+name: Setup Action (Blacksmith)
+description: Checkout, setup node and dependencies for Blacksmith
+inputs:
+  node-version:
+    description: 'The node version to use'
+    required: false
+    default: '22'
+  playwright-enabled:
+    description: 'Enable Playwright?'
+    required: false
+    default: 'false'
+  turbo-summarize:
+    description: 'The token to use for Turbo task summaries'
+    required: false
+    default: 'false'
+  turbo-enabled:
+    description: 'Enable Turbo?'
+    required: false
+    default: 'true'
+  turbo-cache-dir:
+    description: 'The cache dir to use for Turbo'
+    required: false
+    default: './.turbo-cache'
+  turbo-signature:
+    description: 'The signature to use for Turbo'
+    required: false
+  turbo-remote-only:
+    description: 'Only use remote cache?'
+    required: false
+    default: 'true'
+  turbo-team:
+    description: 'The team to use for Turbo remote auth'
+    required: true
+  turbo-token:
+    description: 'The token to use for Turbo remote auth'
+    required: true
+  registry-url:
+    description: 'The registry the packages will be published to'
+    required: false
+    default: ''
+  verbose:
+    description: 'Enable verbose output'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure Turborepo
+      id: turbo
+      uses: actions/github-script@v7
+      env:
+        # envs are required to pass inputs to the script
+        ENABLED: ${{ inputs.turbo-enabled }}
+        CACHE_DIR: ${{ inputs.turbo-cache-dir }}
+        REMOTE_ONLY: ${{ inputs.turbo-remote-only }}
+        SIGNATURE: ${{ inputs.turbo-signature }}
+        SUMMARIZE: ${{ inputs.turbo-summarize }}
+        TEAM: ${{ inputs.turbo-team }}
+        TOKEN: ${{ inputs.turbo-token }}
+        VERBOSE: ${{ inputs.verbose }}
+      with:
+        script: |
+          const os = require('os')
+          const cpus =
+            typeof os.availableParallelism === "function"
+              ? os.availableParallelism()
+              : os.cpus().length;
+
+          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
+
+          const ARGS = [
+            `--cache-dir=${CACHE_DIR}`,
+            `--concurrency=${cpus}`,
+            `--summarize=${SUMMARIZE}`,
+          ]
+
+          if (VERBOSE === 'true') {
+            ARGS.push('--verbosity=2')
+            ARGS.push('--log-order=stream')
+            ARGS.push('--output-logs=full')
+          } else {
+            ARGS.push('--output-logs=new-only')
+          }
+
+          core.exportVariable('TURBO_ARGS',
+            ARGS.join(' ')
+          )
+
+          if (ENABLED === 'true') {
+            core.exportVariable('TURBO_TEAM', TEAM)
+            core.exportVariable('TURBO_TOKEN', TOKEN)
+            core.exportVariable('TURBO_REMOTE_ONLY', REMOTE_ONLY)
+          }
+
+          if (SIGNATURE && SIGNATURE !== '') {
+            core.exportVariable('TURBO_REMOTE_CACHE_SIGNATURE_KEY', SIGNATURE)
+          }
+
+          core.exportVariable('FORCE_COLOR', '1')
+
+    - name: Turborepo CLI Args
+      shell: bash
+      run: echo $TURBO_ARGS
+
+    - name: Install PNPM
+      uses: pnpm/action-setup@v4
+
+    - name: Setup NodeJS ${{ inputs.node-version }}
+      uses: useblacksmith/setup-node@v5
+      with:
+        cache: pnpm
+        node-version: ${{ inputs.node-version }}
+        registry-url: ${{ inputs.registry-url }}
+
+    - name: Install PNPM Dependencies
+      env:
+        CYPRESS_INSTALL_BINARY: 0
+      run: pnpm install
+      shell: bash
+
+    - name: Get Playwright Version
+      if: inputs.playwright-enabled == 'true'
+      shell: bash
+      id: playwright-version
+      run: |
+        VERSION=$(node -p "require('@playwright/test/package.json').version")
+        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+        
+    - name: Cache Playwright Binaries
+      if: inputs.playwright-enabled == 'true'
+      uses: useblacksmith/cache@v5
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}-v2
+
+    - name: Install Playwright Browsers
+      if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        pnpm playwright install chromium

@@ -35,7 +35,7 @@ import type {
 } from './redirects';
 import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
-import type { __experimental_SessionVerificationLevel } from './sessionVerification';
+import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { Web3Strategy } from './strategies';
@@ -165,16 +165,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserVerification component in a modal.
-   * @experimantal This API is still under active development and may change at any moment.
    * @param props Optional user verification configuration parameters.
    */
-  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
+  __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
-   * @experimantal This API is still under active development and may change at any moment.
    */
-  __experimental_closeUserVerification: () => void;
+  __internal_closeReverification: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -562,6 +560,11 @@ export interface Clerk {
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their OKX Wallet browser extension
+   */
+  authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -708,9 +711,13 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     signUpUrl?: string;
     /**
-     * Optional array of domains used to validate against the query param of an auth redirect. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning passed to the console.
+     * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectOrigins?: Array<string | RegExp>;
+    /**
+     * An optional array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     */
+    allowedRedirectProtocols?: Array<string>;
     /**
      * This option defines that the application is a satellite application.
      */
@@ -744,6 +751,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
       },
       Record<string, any>
     >;
+
+    __internal_claimAccountlessKeysUrl?: string;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
@@ -917,10 +926,7 @@ interface TransferableOption {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-/**
- * @experimantal
- */
-export type __experimental_UserVerificationProps = RoutingOptions & {
+export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -936,7 +942,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
    * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
    * @default `'secondFactor'`
    */
-  level?: __experimental_SessionVerificationLevel;
+  level?: SessionVerificationLevel;
 
   /**
    * Customisation options to fully match the Clerk components to your own brand.
@@ -946,7 +952,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
   appearance?: UserVerificationTheme;
 };
 
-export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
+export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
@@ -1381,6 +1387,14 @@ export interface AuthenticateWithMetamaskParams {
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithOKXWalletParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;

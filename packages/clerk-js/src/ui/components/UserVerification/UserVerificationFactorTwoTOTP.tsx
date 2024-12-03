@@ -11,9 +11,9 @@ export function UserVerificationFactorTwoTOTP(props: UVFactorTwoTOTPCardProps): 
     <Flow.Part part='totp2Fa'>
       <UVFactorTwoCodeForm
         {...props}
-        cardTitle={localizationKeys('__experimental_userVerification.totpMfa.title')}
-        cardSubtitle={localizationKeys('__experimental_userVerification.totpMfa.subtitle')}
-        inputLabel={localizationKeys('__experimental_userVerification.totpMfa.formTitle')}
+        cardTitle={localizationKeys('reverification.totpMfa.title')}
+        cardSubtitle={localizationKeys('reverification.totpMfa.subtitle')}
+        inputLabel={localizationKeys('reverification.totpMfa.formTitle')}
       />
     </Flow.Part>
   );

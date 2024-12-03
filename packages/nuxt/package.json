@@ -1,0 +1,71 @@
+{
+  "name": "@clerk/nuxt",
+  "version": "0.0.7",
+  "description": "Clerk SDK for Nuxt",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "vue",
+    "nuxt",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/nuxt"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js"
+    },
+    "./server": {
+      "types": "./dist/runtime/server/index.d.ts",
+      "import": "./dist/runtime/server/index.js"
+    }
+  },
+  "main": "./dist/module.js",
+  "types": "./dist/module.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
+    "@clerk/vue": "workspace:*",
+    "@nuxt/kit": "^3.14.159",
+    "@nuxt/schema": "^3.14.159",
+    "h3": "^1.13.0"
+  },
+  "devDependencies": {
+    "nuxt": "^3.14.159",
+    "typescript": "catalog:repo"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

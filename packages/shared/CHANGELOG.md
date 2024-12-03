@@ -1,5 +1,97 @@
 # Change Log
 
+## 2.18.0
+
+### Minor Changes
+
+- Replace `session_step_up_verification_required` with `session_reverification_required` as the Clerk API error code used for reverification. ([#4699](https://github.com/clerk/javascript/pull/4699)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47)]:
+  - @clerk/types@4.36.0
+
+## 2.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+
+## 2.17.0
+
+### Minor Changes
+
+- Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `__experimental_useReverification` -> `useReverification`
+    Also replaces the following APIs:
+  - `__experimental_reverificationError` -> `reverificationError`
+  - `__experimental_reverificationErrorResponse` -> `reverificationErrorResponse`
+  - `__experimental_isReverificationHint` -> `isReverificationHint`
+
+### Patch Changes
+
+- Gracefully handle missing reverification error metadata ([#4636](https://github.com/clerk/javascript/pull/4636)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/types@4.35.0
+
+## 2.16.1
+
+### Patch Changes
+
+- Updated dependencies [[`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/types@4.34.2
+
+## 2.16.0
+
+### Minor Changes
+
+- Change `useReverification` to handle error in a callback, but still allow an error to be thrown via options. ([#4564](https://github.com/clerk/javascript/pull/4564)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Share hook return types ([#4583](https://github.com/clerk/javascript/pull/4583)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745)]:
+  - @clerk/types@4.34.1
+
+## 2.15.0
+
+### Minor Changes
+
+- Rename `reverificationMismatch` to `reverificationError`. ([#4582](https://github.com/clerk/javascript/pull/4582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Improve formatting of ClerkRuntimeError message to include error code. ([#4574](https://github.com/clerk/javascript/pull/4574)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.14.0
+
+### Minor Changes
+
+- Update reverification config values to snake_case. ([#4556](https://github.com/clerk/javascript/pull/4556)) by [@panteliselef](https://github.com/panteliselef)
+
+  For `__experimental_ReverificationConfig`
+
+  - `strictMfa` changes to `strict_mfa`
+
+  For `__experimental_SessionVerificationLevel`
+
+  - `firstFactor` changes to `first_factor`
+  - - `secondFactor` changes to `second_factor`
+  - - `multiFactor` changes to `multi_factor`
+
+### Patch Changes
+
+- Protect /tokens requests by requiring a valid captcha token if the request fails with 401 ([#4559](https://github.com/clerk/javascript/pull/4559)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`46faeb6f59b19c963fb137c858347525b1cd9e19`](https://github.com/clerk/javascript/commit/46faeb6f59b19c963fb137c858347525b1cd9e19)]:
+  - @clerk/types@4.34.0
+
 ## 2.13.0
 
 ### Minor Changes

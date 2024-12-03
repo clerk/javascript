@@ -31,12 +31,12 @@ Please note we have a [code of conduct](https://github.com/clerk/javascript/blob
 
 The current monorepo setup is based on:
 
-- [npm workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces), used for managing all Clerk packages from within a single repository.
+- [pnpm workspaces](https://pnpm.io/workspaces), used for managing all Clerk packages from within a single repository.
 - [Turborepo](https://turbo.build/repo/docs), used for task running and task output caching.
 - [Changesets](https://github.com/changesets/changesets), used for package versioning, publishing and changelog generation.
 - [GitHub Actions](https://docs.github.com/en/actions), used for quality checks and automated release orchestration.
 - [Yalc](https://github.com/wclr/yalc), used for to publish packages locally and test them in other local projects.
-- [Jest](https://jestjs.io/), used for running unit tests.
+- [Jest](https://jestjs.io/) or [Vitest](https://vitest.dev/), used for running unit tests.
 - [Playwright](https://playwright.dev/), used for running the [integration](../integration/) test suite.
 
 All packages of the monorepo are inside [packages](../packages). For package specific details on installation, architecture and usage, you can refer to the package's README file.
@@ -59,26 +59,35 @@ To set up your development environment, please follow these steps:
 
 1. Clone the repo
 
-   ```sh
-   git clone https://github.com/clerk/javascript
-   ```
+```sh
+git clone https://github.com/clerk/javascript
+```
 
-1. Install the dependencies. We're using npm workspaces, so you **should always run `npm install` from the root of the monorepo**, as it will install dependencies for all the packages:
+1. Enable `pnpm` package manager.
 
-   ```sh
-   cd javascript
-   npm install
-   ```
+```sh
+corepack enable
+```
+
+1. Install the dependencies. We're using pnpm workspaces, so you **should always run `pnpm install` from the root of the monorepo**, as it will install dependencies for all the packages:
+
+```sh
+cd javascript
+pnpm install
+```
 
 1. Build all the packages in the monorepo by running:
 
-   ```sh
-   npm run build
-   ```
+```sh
+pnpm build
+```
 
-   This ensures that all internal TypeScript types are generated and any dependencies between packages are resolving.
+> [!IMPORTANT]
+> Ensure you are using the latest or LTS version of Node.
 
-Once you're ready to make changes, run `npm run dev` from the monorepo root.
+This ensures that all internal TypeScript types are generated and any dependencies between packages are resolving.
+
+Once you're ready to make changes, run `pnpm dev` from the monorepo root.
 
 If you want to run the `dev` script of an individual package, navigate to the folder and run the script from there. This way you can also individually run the `build` script.
 
@@ -107,7 +116,7 @@ If your change can't only be tested by unit tests, you should add/edit an integr
 1. Fork the project
 1. Create your feature branch (`git checkout -b feat/amazing_feature`)
 1. It's highly recommended to [write tests](#writing-tests) to ensure your change works and will continue to work in the future
-1. If required, create a `changeset` that describes your changes (`npm run changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`npm run changeset:empty`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
+1. If required, create a `changeset` that describes your changes (`pnpm changeset`). In cases where a changeset is not required, an empty changeset can be created instead (`pnpm changeset:empty`) - an empty changeset will not generate a changelog entry for the change, so please use it as an escape hatch or for internal refactors only.
 1. Commit your changes (`git commit -m 'feat: Add amazing_feature'`)
 1. Push to the branch (`git push origin feat/amazing_feature`)
 1. [Open a Pull Request](https://github.com/clerk/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.

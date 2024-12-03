@@ -1,18 +1,11 @@
 import {
-  CreateOrganization as BaseCreateOrganization,
   OrganizationProfile as BaseOrganizationProfile,
   SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
 import { useRoutingProps } from '@clerk/clerk-react/internal';
-import type {
-  CreateOrganizationProps,
-  OrganizationProfileProps,
-  SignInProps,
-  SignUpProps,
-  UserProfileProps,
-} from '@clerk/types';
+import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { usePathnameWithoutSplatRouteParams } from './usePathnameWithoutSplatRouteParams';
@@ -28,11 +21,6 @@ export const UserProfile: typeof BaseUserProfile = Object.assign(
   },
   { ...BaseUserProfile },
 );
-
-export const CreateOrganization = (props: CreateOrganizationProps) => {
-  const path = usePathnameWithoutSplatRouteParams();
-  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props, { path })} />;
-};
 
 // The assignment of OrganizationProfile with BaseOrganizationProfile props is used
 // to support the CustomPage functionality (eg OrganizationProfile.Page)

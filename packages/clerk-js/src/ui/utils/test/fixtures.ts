@@ -179,6 +179,7 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     actions: { delete_self: false, create_organization: false },
     social: { ...socialConfig },
     saml: { enabled: false },
+    enterprise_sso: { enabled: false },
     sign_in: {
       second_factor: {
         required: false,

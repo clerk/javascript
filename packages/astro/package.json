@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "1.4.11",
+  "version": "1.5.2",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -71,26 +71,26 @@
     "types.ts"
   ],
   "scripts": {
-    "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
+    "build": "tsup --onSuccess \"pnpm build:dts\" && pnpm copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
-    "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
+    "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
-    "lint:publint": "npm run copy:components && publint",
-    "publish:local": "npx yalc push --replace --sig"
+    "lint:publint": "pnpm copy:components && publint",
+    "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.16.3",
-    "@clerk/shared": "2.13.0",
-    "@clerk/types": "4.33.0",
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/types": "workspace:*",
     "nanoid": "5.0.7",
     "nanostores": "0.11.3"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "react": "*",
-    "typescript": "*"
+    "@clerk/eslint-config-custom": "workspace:*",
+    "react": "catalog:react",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
     "astro": "^3.2.0 || ^4.0.0"

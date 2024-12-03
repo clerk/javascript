@@ -48,7 +48,7 @@ describe('Clerk singleton', () => {
   const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
   const mockNavigate = jest.fn((to: string) => Promise.resolve(to));
-  const mockedLoadOptions = { routerPush: mockNavigate, routerReplace: mockNavigate };
+  const mockedLoadOptions = { routerDebug: true, routerPush: mockNavigate, routerReplace: mockNavigate };
 
   const mockDisplayConfig = {
     signInUrl: 'http://test.host/sign-in',
@@ -696,7 +696,6 @@ describe('Clerk singleton', () => {
       const toUrl = 'https://www.origindifferent.com/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
-      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
@@ -706,7 +705,6 @@ describe('Clerk singleton', () => {
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
       expect(mockNavigate.mock.calls[0][0]).toBe('/path#hash');
-      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('logs navigation external navigation when routerDebug is enabled', async () => {
@@ -729,6 +727,25 @@ describe('Clerk singleton', () => {
 
       expect(logSpy).toHaveBeenCalledTimes(1);
       expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
+    });
+
+    it('validates the protocol of the provided URL', async () => {
+      await sut.load({ ...mockedLoadOptions, allowedRedirectProtocols: ['gg:'] });
+      // allowed protocol
+      const toUrl = 'gg://some/deeply/nested/path';
+      await sut.navigate(toUrl);
+      expect(mockNavigate.mock.calls[0][0]).toBe(toUrl);
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
+
+      mockNavigate.mockReset();
+      logSpy.mockReset();
+
+      // disallowed protocol
+      const badUrl = 'evil://some/deeply/nested/path';
+      await sut.navigate(badUrl);
+      expect(mockNavigate.mock.calls[0][0]).toBe('/');
+      expect(logSpy).toHaveBeenCalledTimes(1);
     });
   });
 
