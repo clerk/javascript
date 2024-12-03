@@ -411,7 +411,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
       // rule for the line.
 
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
