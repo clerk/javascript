@@ -82,6 +82,9 @@ pnpm install
 pnpm build
 ```
 
+> [!IMPORTANT]
+> Ensure you are using the latest or LTS version of Node.
+
 This ensures that all internal TypeScript types are generated and any dependencies between packages are resolving.
 
 Once you're ready to make changes, run `pnpm dev` from the monorepo root.

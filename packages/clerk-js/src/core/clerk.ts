@@ -1382,7 +1382,8 @@ export class Clerk implements ClerkInterface {
       return navigateToSignIn();
     }
 
-    const userHasUnverifiedEmail = si.status === 'needs_first_factor';
+    const userHasUnverifiedEmail =
+      si.status === 'needs_first_factor' && !signIn.supportedFirstFactors?.every(f => f.strategy === 'enterprise_sso');
 
     if (userHasUnverifiedEmail) {
       return navigateToFactorOne();
@@ -1876,7 +1877,9 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    this.#handleAccountlessPrompt();
+    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
+      this.#handleAccountlessPrompt();
+    }
     return true;
   };
 
@@ -2007,13 +2010,15 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleAccountlessPrompt = () => {
-    void this.#componentControls?.ensureMounted().then(controls => {
-      if (this.#options.__internal_claimAccountlessKeysUrl) {
-        controls.updateProps({
-          options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
-        });
-      }
-    });
+    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
+      void this.#componentControls?.ensureMounted().then(controls => {
+        if (this.#options.__internal_claimAccountlessKeysUrl) {
+          controls.updateProps({
+            options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+          });
+        }
+      });
+    }
   };
 
   #buildUrl = (

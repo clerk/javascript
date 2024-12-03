@@ -245,31 +245,34 @@ export function _SignInStart(): JSX.Element {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
 
     /**
-     * FAPI will return an error when password is submitted but the user's email matches requires SAML authentication.
+     * FAPI will return an error when password is submitted but the user's email matches requires enterprise sso authentication.
      * We need to strip password from the create request, and reconstruct it later.
      */
-    if (!hasPassword || userSettings.saml.enabled) {
+    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
       fields = fields.filter(f => f.name !== 'password');
     }
     return {
       ...buildRequest(fields),
-      ...(hasPassword && !userSettings.saml.enabled && { strategy: 'password' }),
+      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' }),
     } as SignInCreateParams;
   };
 
-  const safePasswordSignInForSamlInstance = (
+  const safePasswordSignInForEnterpriseSSOInstance = (
     signInCreatePromise: Promise<SignInResource>,
     fields: Array<FormControlState<string>>,
   ) => {
     return signInCreatePromise.then(signInResource => {
-      if (!userSettings.saml.enabled) {
+      if (!userSettings.enterpriseSSO.enabled) {
         return signInResource;
       }
       /**
-       * For SAML enabled instances, perform sign in with password only when it is allowed for the identified user.
+       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
+      if (
+        !passwordField ||
+        signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')
+      ) {
         return signInResource;
       }
       return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
@@ -278,16 +281,20 @@ export function _SignInStart(): JSX.Element {
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     try {
-      const res = await safePasswordSignInForSamlInstance(signIn.create(buildSignInParams(fields)), fields);
+      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
       switch (res.status) {
         case 'needs_identifier':
-          // Check if we need to initiate a saml flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
-            await authenticateWithSaml();
+          // Check if we need to initiate an enterprise sso flow
+          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')) {
+            await authenticateWithEnterpriseSSO();
           }
           break;
         case 'needs_first_factor':
+          if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+            await authenticateWithEnterpriseSSO();
+            break;
+          }
           return navigate('factor-one');
         case 'needs_second_factor':
           return navigate('factor-two');
@@ -306,12 +313,12 @@ export function _SignInStart(): JSX.Element {
     }
   };
 
-  const authenticateWithSaml = async () => {
+  const authenticateWithEnterpriseSSO = async () => {
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
-      strategy: 'saml',
+      strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
     });

@@ -44,6 +44,7 @@ const common = ({ mode, disableRHC = false }) => {
       new rspack.DefinePlugin({
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         __DEV__: isDevelopment(mode),
+        __BUILD_FLAG_ACCOUNTLESS_UI__: isDevelopment(mode),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
         BUILD_ENABLE_NEW_COMPONENTS: JSON.stringify(process.env.BUILD_ENABLE_NEW_COMPONENTS),
@@ -322,7 +323,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkBrowser),
     isSandbox
       ? {
-          entry: { sandbox: './sandbox/app.js' },
+          entry: { sandbox: './sandbox/app.ts' },
           plugins: [
             new rspack.HtmlRspackPlugin({
               minify: false,
@@ -529,7 +530,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      isSandbox ? { entry: { sandbox: './sandbox/app.js' } } : {},
+      isSandbox ? { entry: { sandbox: './sandbox/app.ts' } } : {},
       common({ mode }),
       commonForDev(),
     ),

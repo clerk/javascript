@@ -1,5 +1,20 @@
 # @clerk/astro
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d), [`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/backend@1.18.1
+  - @clerk/shared@2.17.1
+
+## 1.5.0
+
+### Minor Changes
+
+- Introduce `<Waitlist />` component for Astro ([#4650](https://github.com/clerk/javascript/pull/4650)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 1.4.17
 
 ### Patch Changes

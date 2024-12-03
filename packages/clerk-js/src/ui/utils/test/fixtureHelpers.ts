@@ -466,8 +466,9 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withSaml = () => {
+  const withEnterpriseSso = () => {
     us.saml = { enabled: true };
+    us.enterprise_sso = { enabled: true };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {
@@ -524,7 +525,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withPassword,
     withPasswordComplexity,
     withSocialProvider,
-    withSaml,
+    withEnterpriseSso,
     withBackupCode,
     withAuthenticatorApp,
     withPasskey,

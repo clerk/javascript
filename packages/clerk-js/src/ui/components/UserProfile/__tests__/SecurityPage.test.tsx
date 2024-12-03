@@ -113,6 +113,7 @@ describe('SecurityPage', () => {
             isMobile: false,
           },
           actor: null,
+          revoke: jest.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
         {
           pathRoot: '/me/sessions',
@@ -131,6 +132,7 @@ describe('SecurityPage', () => {
             isMobile: false,
           },
           actor: null,
+          revoke: jest.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
       ]),
     );

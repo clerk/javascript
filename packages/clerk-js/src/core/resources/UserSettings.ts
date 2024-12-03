@@ -1,5 +1,6 @@
 import type {
   Attributes,
+  EnterpriseSSOSettings,
   OAuthProviders,
   OAuthStrategy,
   PasskeySettingsData,
@@ -30,6 +31,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   social!: OAuthProviders;
 
   saml!: SamlSettings;
+  enterpriseSSO!: EnterpriseSSOSettings;
 
   attributes!: Attributes;
   actions!: Actions;
@@ -67,6 +69,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
     this.social = data.social;
     this.saml = data.saml;
+    this.enterpriseSSO = data.enterprise_sso;
     this.attributes = Object.fromEntries(
       Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
     ) as Attributes;
