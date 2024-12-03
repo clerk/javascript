@@ -100,7 +100,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       if (!response.verification.externalVerificationRedirectURL) {
         throw Error('Unexpected: External verification redirect URL is missing');
       }
-      window.open(response.verification.externalVerificationRedirectURL, '_blank');
+      window.open(response.verification.externalVerificationRedirectURL, '_blank', 'noopener');
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()
