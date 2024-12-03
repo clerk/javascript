@@ -66,13 +66,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.waitForPopover();
 
     // Check if custom menu items are visible
-    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i]);
+    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom page/i, /Custom action/i]);
 
     // Click custom action
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
     await expect(u.page.getByText('Is action clicked: true')).toBeVisible();
 
-    // Trigger the popover again
+    // Click custom action and check for custom page availbility
+    await u.page.getByRole('menuitem', { name: /Custom page/i }).click();
+    await u.po.userProfile.waitForUserProfileModal();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Close the modal and trigger the popover again
+    await u.page.locator('.cl-modalCloseButton').click();
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
