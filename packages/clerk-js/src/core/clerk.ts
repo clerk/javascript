@@ -972,7 +972,8 @@ export class Clerk implements ClerkInterface {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
+    if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
