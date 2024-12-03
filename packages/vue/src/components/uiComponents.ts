@@ -9,10 +9,20 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
+  Without,
 } from '@clerk/types';
-import { computed, defineComponent, h, onScopeDispose, ref, watchEffect } from 'vue';
+import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, watchEffect } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
+import { errorThrower } from '../errors/errorThrower';
+import {
+  userButtonMenuActionRenderedError,
+  userButtonMenuItemsRenderedError,
+  userButtonMenuLinkRenderedError,
+} from '../errors/messages';
+import { UserButtonInjectionKey, UserButtonMenuItemsInjectionKey } from '../keys';
+import type { CustomPortalsRendererProps, UserButtonActionProps, UserButtonLinkProps } from '../types';
+import { useUserButtonCustomMenuItems } from '../utils/useCustomMenuItems';
 import { ClerkLoaded } from './controlComponents';
 
 type AnyObject = Record<string, any>;
@@ -23,6 +33,10 @@ interface MountProps {
   updateProps?: (props: { node: HTMLDivElement; props: AnyObject | undefined }) => void;
   props?: AnyObject;
 }
+
+const CustomPortalsRenderer = defineComponent((props: CustomPortalsRendererProps) => {
+  return () => [...(props?.customPagesPortals ?? []), ...(props?.customMenuItemsPortals ?? [])];
+});
 
 /**
  * A utility component that handles mounting and unmounting of Clerk UI components.
@@ -69,16 +83,90 @@ export const UserProfile = defineComponent((props: UserProfileProps) => {
     });
 });
 
-export const UserButton = defineComponent((props: UserButtonProps) => {
+type UserButtonPropsWithoutCustomMenuItems = Without<UserButtonProps, 'customMenuItems'>;
+
+const _UserButton = defineComponent((props: UserButtonPropsWithoutCustomMenuItems, { slots }) => {
   const clerk = useClerk();
 
-  return () =>
+  const { customMenuItems, customMenuItemsPortals, addCustomMenuItem } = useUserButtonCustomMenuItems();
+
+  const finalProps = computed<UserButtonProps>(() => ({
+    ...props,
+    customMenuItems: customMenuItems.value,
+    // TODO: Add custom pages
+  }));
+
+  provide(UserButtonInjectionKey, {
+    addCustomMenuItem,
+  });
+
+  return () => [
     h(Portal, {
       mount: clerk.value?.mountUserButton,
       unmount: clerk.value?.unmountUserButton,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
+      props: finalProps.value,
+    }),
+    h(CustomPortalsRenderer, {
+      // TODO: Add custom pages portals
+      customMenuItemsPortals: customMenuItemsPortals.value,
+    }),
+    slots.default?.(),
+  ];
+});
+
+const MenuItems = defineComponent((_, { slots }) => {
+  const ctx = inject(UserButtonInjectionKey);
+
+  if (!ctx) {
+    return errorThrower.throw(userButtonMenuItemsRenderedError);
+  }
+
+  provide(UserButtonMenuItemsInjectionKey, ctx);
+  return () => slots.default?.();
+});
+
+export const MenuAction = defineComponent(
+  (props: UserButtonActionProps, { slots }) => {
+    const ctx = inject(UserButtonMenuItemsInjectionKey);
+    if (!ctx) {
+      return errorThrower.throw(userButtonMenuActionRenderedError);
+    }
+
+    ctx.addCustomMenuItem({
       props,
+      slots,
+      component: MenuAction,
     });
+
+    return () => null;
+  },
+  { name: 'MenuAction' },
+);
+
+export const MenuLink = defineComponent(
+  (props: UserButtonLinkProps, { slots }) => {
+    const ctx = inject(UserButtonMenuItemsInjectionKey);
+    if (!ctx) {
+      return errorThrower.throw(userButtonMenuLinkRenderedError);
+    }
+
+    ctx.addCustomMenuItem({
+      props,
+      slots,
+      component: MenuLink,
+    });
+
+    return () => null;
+  },
+  { name: 'MenuLink' },
+);
+
+export const UserButton = Object.assign(_UserButton, {
+  MenuItems,
+  Action: MenuAction,
+  Link: MenuLink,
+  // TODO: Add custom pages
 });
 
 export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
