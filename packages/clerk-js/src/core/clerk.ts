@@ -960,7 +960,7 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
         `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
       );
@@ -974,7 +974,8 @@ export class Clerk implements ClerkInterface {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
+    if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
@@ -2111,4 +2112,14 @@ export class Clerk implements ClerkInterface {
       // ignore
     }
   };
+
+  get #allowedRedirectProtocols() {
+    let allowedProtocols = ALLOWED_PROTOCOLS;
+
+    if (this.#options.allowedRedirectProtocols) {
+      allowedProtocols = allowedProtocols.concat(this.#options.allowedRedirectProtocols);
+    }
+
+    return allowedProtocols;
+  }
 }
