@@ -697,6 +697,12 @@ export const mnMN: LocalizationResource = {
         resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} энэ бүртгэлээс хасагдана.',
         messageLine2: 'Та цаашид энэ имэйл хаягийг ашиглан нэвтрэх боломжгүй болно.',

@@ -698,6 +698,12 @@ export const trTR: LocalizationResource = {
         resendButton: 'Yeniden gönder',
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} adresi hesabınızdan kaldırılacaktır.',
         messageLine2: 'Artık bu e-posta adresini kullanarak oturum açmanız mümkün olmayacaktır.',

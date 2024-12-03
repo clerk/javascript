@@ -694,6 +694,12 @@ export const jaJP: LocalizationResource = {
         resendButton: 'リンクを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
         messageLine2: 'このメールアドレスを使用してのサインインはできなくなります。',

@@ -45,7 +45,7 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   return (
     <>
       <VerificationLink
-        resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
+        resendButton={localizationKeys('userProfile.emailAddressPage.enterpriseSsoLink.resendButton')}
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>

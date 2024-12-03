@@ -696,6 +696,12 @@ export const nlNL: LocalizationResource = {
         resendButton: 'Verstuur link opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} zal verwijderd worden uit dit account.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit e-mailadres.',

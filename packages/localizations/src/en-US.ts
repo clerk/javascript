@@ -691,6 +691,12 @@ export const enUS: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      enterpriseSsoLink: {
+        formHint: 'The sign-in screen will open in a new tab. Complete the process there.',
+        formSubtitle: 'Complete the sign-in with {{identifier}} in the new tab that has opened.',
+        resendButton: 'Retry sign-in',
+        successMessage: 'The email {{identifier}} has been added to your account.',
+      },
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',

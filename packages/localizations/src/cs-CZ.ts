@@ -691,6 +691,12 @@ export const csCZ: LocalizationResource = {
         resendButton: 'Znovu odeslat odkaz',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} bude odstraněna z tohoto účtu.',
         messageLine2: 'Nebudete se moci přihlásit pomocí této e-mailové adresy.',

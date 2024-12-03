@@ -700,6 +700,12 @@ export const isIS: LocalizationResource = {
         resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
         messageLine2: 'Þú munt ekki lengur geta skráð þig inn með þessu netfangi.',

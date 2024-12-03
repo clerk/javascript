@@ -700,6 +700,12 @@ export const roRO: LocalizationResource = {
         resendButton: 'Nu ați primit un link? Trimiteți din nou',
         successMessage: 'E-mailul {{identifier}} a fost adăugat în contul dvs.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} va fi eliminat din acest cont.',
         messageLine2: 'Nu veți mai putea să vă conectați folosind această adresă de e-mail.',

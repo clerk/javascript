@@ -20,7 +20,6 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
-  const preferEmailLinks = emailLinksEnabledForInstance(environment);
 
   const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
 
@@ -53,15 +52,13 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
       .catch(e => handleError(e, [emailField], card.setError));
   };
 
+  const translationKey = getTranslationKeyByStrategy(strategy);
+
   return (
     <Wizard {...wizard.props}>
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
-        headerSubtitle={
-          preferEmailLinks
-            ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
-            : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
-        }
+        headerSubtitle={localizationKeys(`${translationKey}.formHint`)}
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
@@ -80,15 +77,9 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
-        headerSubtitle={
-          strategy === 'enterprise_sso' || preferEmailLinks
-            ? localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
-                identifier: emailAddressRef.current?.emailAddress,
-              })
-            : localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
-                identifier: emailAddressRef.current?.emailAddress,
-              })
-        }
+        headerSubtitle={localizationKeys(`${translationKey}.formSubtitle`, {
+          identifier: emailAddressRef.current?.emailAddress,
+        })}
       >
         {strategy === 'email_link' && (
           <VerifyWithLink
@@ -117,6 +108,19 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     </Wizard>
   );
 });
+
+const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationParams['strategy']) => {
+  switch (strategy) {
+    case 'email_code':
+      return 'userProfile.emailAddressPage.emailLink';
+    case 'enterprise_sso':
+      return 'userProfile.emailAddressPage.enterpriseSsoLink';
+    case 'email_link':
+      return 'userProfile.emailAddressPage.emailLink';
+    default:
+      throw new Error(`Unsupported strategy for email verification: ${strategy}`);
+  }
+};
 
 function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;

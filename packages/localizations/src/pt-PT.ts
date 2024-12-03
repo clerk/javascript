@@ -696,6 +696,12 @@ export const ptPT: LocalizationResource = {
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',

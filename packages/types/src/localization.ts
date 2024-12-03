@@ -494,6 +494,12 @@ type _LocalizationResource = {
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
       };
+      enterpriseSsoLink: {
+        formHint: LocalizationValue;
+        formSubtitle: LocalizationValue;
+        resendButton: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;

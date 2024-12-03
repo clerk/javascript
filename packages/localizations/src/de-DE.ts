@@ -706,6 +706,12 @@ export const deDE: LocalizationResource = {
         resendButton: 'Link erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',
