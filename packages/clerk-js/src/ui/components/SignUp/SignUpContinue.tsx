@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useMemo } from 'react';
 
+import { buildSSOCallbackURL } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
@@ -37,6 +38,7 @@ function _SignUpContinue() {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const ctx = useSignUpContext();
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
@@ -150,6 +152,9 @@ function _SignUpContinue() {
     card.setLoading();
     card.setError(undefined);
 
+    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+    const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
     return signUp
       .update(buildRequest(fieldsToSubmit))
       .then(res =>
@@ -159,6 +164,8 @@ function _SignUpContinue() {
           verifyPhonePath: './verify-phone-number',
           handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
+          redirectUrl,
+          redirectUrlComplete,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
