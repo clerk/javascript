@@ -72,6 +72,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
     await expect(u.page.getByText('Is action clicked: true')).toBeVisible();
 
+    // Trigger the popover again
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
     // Click custom action and check for custom page availbility
     await u.page.getByRole('menuitem', { name: /Custom page/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
