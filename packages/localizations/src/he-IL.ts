@@ -684,6 +684,12 @@ export const heIL: LocalizationResource = {
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
+      enterpriseSsoLink: {
+        formHint: undefined,
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות כתובת אימייל זו.',

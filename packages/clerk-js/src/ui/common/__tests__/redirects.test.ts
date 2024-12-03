@@ -1,21 +1,23 @@
-import { buildEmailLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
+import { buildSSOCallbackURL, buildVerificationRedirectUrl } from '../redirects';
 
-describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
+describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
   it('defaults to hash based routing strategy on empty routing', function () {
-    expect(buildEmailLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
+    expect(buildVerificationRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe(
+      'http://localhost/#/verify',
+    );
   });
 
   it('returns the magic link redirect url for components using path based routing ', function () {
-    expect(buildEmailLinkRedirectUrl({ routing: 'path', authQueryString: '' } as any, '')).toBe(
+    expect(buildVerificationRedirectUrl({ routing: 'path', authQueryString: '' } as any, '')).toBe(
       'http://localhost/verify',
     );
 
-    expect(buildEmailLinkRedirectUrl({ routing: 'path', path: '/sign-in', authQueryString: '' } as any, '')).toBe(
+    expect(buildVerificationRedirectUrl({ routing: 'path', path: '/sign-in', authQueryString: '' } as any, '')).toBe(
       'http://localhost/sign-in/verify',
     );
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'path',
           path: '',
@@ -26,7 +28,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
@@ -37,7 +39,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
@@ -50,7 +52,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
 
   it('returns the magic link redirect url for components using hash based routing ', function () {
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'hash',
           authQueryString: '',
@@ -60,7 +62,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -71,7 +73,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'hash',
           path: '',
@@ -82,7 +84,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -93,7 +95,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
@@ -106,7 +108,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
 
   it('returns the magic link redirect url for components using virtual routing ', function () {
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'virtual',
           authQueryString: 'redirectUrl=https://clerk.com',
@@ -116,7 +118,7 @@ describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
     ).toBe('https://accounts.clerk.com/sign-in#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl(
+      buildVerificationRedirectUrl(
         {
           routing: 'virtual',
         } as any,
