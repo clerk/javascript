@@ -2,4 +2,4 @@
 "@clerk/vue": patch
 ---
 
-Add custom menu items support to `<UserButton />`
+Add support for custom menu items to `<UserButton />`
