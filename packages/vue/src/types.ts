@@ -5,6 +5,7 @@ import type {
   ClerkOptions,
   ClientResource,
   CustomMenuItem,
+  CustomPage,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
@@ -55,6 +56,32 @@ export type AddCustomMenuItemParams = {
     labelIcon?: Slot;
   };
   component: Component;
+};
+
+export type AddCustomPagesParams = {
+  props: CustomItemOrPageWithoutHandler<CustomPage>;
+  slots: {
+    default?: Slot;
+    labelIcon?: Slot;
+  };
+  component: Component;
+};
+
+type PageProps<T extends string> =
+  | {
+      label: string;
+      url: string;
+    }
+  | {
+      label: T;
+      url?: never;
+    };
+
+export type UserProfilePageProps = PageProps<'account' | 'security'>;
+
+export type UserProfileLinkProps = {
+  url: string;
+  label: string;
 };
 
 type ButtonActionProps<T extends string> =
