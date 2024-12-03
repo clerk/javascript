@@ -34,25 +34,28 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
           right: `var(${rightProperty}, ${defaultRight}px)`,
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
-          width: '18.5625rem',
-          padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
+          minWidth: '18.5625rem',
+          maxWidth: 'fit-content',
+          padding: `${t.space.$1x5} 6.49rem ${t.space.$1x5} ${t.space.$3}`,
           borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
-
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 200ms cubic-bezier(0.34, 1.2, 0.64, 1)',
+          transition: 'all 190ms cubic-bezier(0.34, 1, 0.64, 0.9)',
 
           ...(isExpanded && {
             flexDirection: 'column',
-            height: '8.75rem',
-            width: '16.125rem',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            height: 'fit-content',
+            width: 'fit-content',
+            minWidth: '16.125rem',
             gap: `${t.space.$1}`,
-            padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
+            padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 200ms cubic-bezier(0.6, 0.6, 0, 1)',
+            transition: 'all 150ms cubic-bezier(0.34, 1, 0.64, 1)',
           }),
         })}
       >
@@ -76,7 +79,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                 width: 1.5rem;
                 height: 1.5rem;
                 transform-style: preserve-3d;
-                animation: ${isExpanded ? 'coinFlipAnimation 5.5s infinite linear' : 'none'};
+                animation: ${isExpanded ? 'coinFlipAnimation 6s infinite linear' : ' none'};
 
                 @keyframes coinFlipAnimation {
                   0%,
@@ -135,6 +138,8 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                 font-weight: 400;
                 position: relative;
                 isolation: isolate;
+                white-space: nowrap;
+                animation: show-title 180ms ease-out forwards;
 
                 &::after {
                   content: attr(data-text);
@@ -152,10 +157,12 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                     transparent 60%,
                     transparent 100%
                   );
-                  background-size: 200% 100%;
+                  background-size: 180% 100%;
                   background-clip: text;
                   filter: blur(1.2px);
-                  animation: text-shimmer 3.6s infinite linear;
+                  animation: ${isExpanded
+                    ? 'text-shimmer-expanded 3s infinite ease-out forwards'
+                    : 'text-shimmer 3s infinite ease-out forwards'};
                 }
 
                 &::before {
@@ -165,7 +172,6 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                   left: 0;
                   top: 0;
                   color: transparent;
-
                   background: linear-gradient(
                     -100deg,
                     transparent 0%,
@@ -177,13 +183,35 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                     transparent 65%,
                     transparent 100%
                   );
-
-                  background-size: 200% 100%;
+                  background-size: 180% 100%;
                   background-clip: text;
-                  animation: text-shimmer 3.6s infinite linear;
+                  animation: ${isExpanded
+                    ? 'text-shimmer-expanded 3s infinite ease-out forwards'
+                    : 'text-shimmer 3s infinite ease-out forwards'};
+                }
+
+                @keyframes show-title {
+                  from {
+                    transform: translateY(1px);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: translateY(0);
+                    opacity: 1;
+                  }
                 }
 
                 @keyframes text-shimmer {
+                  0% {
+                    background-position: 120% center;
+                  }
+                  30%,
+                  100% {
+                    background-position: -60% center;
+                  }
+                }
+
+                @keyframes text-shimmer-expanded {
                   0% {
                     background-position: 120% center;
                   }
@@ -205,9 +233,9 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             css={css`
               display: none;
               cursor: pointer;
+              margin-left: 0.75rem;
               ${isExpanded &&
-              `
-			  display: block;
+              `display: block;
 			  color: #8C8C8C;
               transition: color 150ms ease-out;
               :hover {
@@ -241,15 +269,13 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             font-size: 0.75rem;
             font-weight: 400;
             line-height: 1rem;
+            max-width: 14.625rem;
 
-            ${isExpanded && `display:block`};
-
-            animation: show-description 100ms ease-out forwards;
-            transition: all ease-out;
-
+            ${isExpanded && `display: block;`};
+            animation: ${isExpanded ? 'show-description 250ms ease-out forwards' : 'none'};
             @keyframes show-description {
               from {
-                transform: translateY(0.5px);
+                transform: translateY(1px);
                 opacity: 0;
               }
               to {
@@ -294,8 +320,6 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             white-space: nowrap;
             cursor: pointer;
             user-select: none;
-            transition: all 200ms cubic-bezier(0.6, 0.6, 0, 1);
-
             background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #636363;
             box-shadow:
               0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -304,37 +328,20 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            animation: small-btn-glow 3.6s infinite;
-            animation-play-state: running !important;
+            transition: all 200ms cubic-bezier(0.6, 0.6, 0, 0.98);
+            animation: small-btn-glow 3s infinite 500ms;
 
             ${isExpanded &&
             ` right: 0.75rem;
               bottom: 0.75rem;
-              width: 14.625rem;
+              width: calc(100% - 1.5rem);
               color: #FDE047;
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-              animation: expanded-btn-glow 2s infinite;
-              box-shadow:
-                0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
-                0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+              animation: none;
+              transition: box-shadow 280ms cubic-bezier(0.6, 0.6, 0, 1);
 
-            `}
-
-            @keyframes expanded-btn-glow {
-              0%,
-              100% {
-                box-shadow:
-                  0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              }
-              50% {
+			  &:hover {
                 box-shadow:
                   0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -342,12 +349,19 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                   0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
               }
-            }
+
+              box-shadow:
+                0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
+                0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+            `}
 
             @keyframes small-btn-glow {
               0%,
               5%,
-              70% {
+              95% {
                 box-shadow:
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -356,7 +370,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
               }
 
-              30% {
+              22% {
                 box-shadow:
                   0px 0px 6px 0px #fde047 inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
