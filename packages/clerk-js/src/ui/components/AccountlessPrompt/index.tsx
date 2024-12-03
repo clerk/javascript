@@ -15,8 +15,8 @@ type AccountlessPromptProps = {
 export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const bottomProperty = '--cl-impersonation-fab-bottom';
-  const rightProperty = '--cl-impersonation-fab-right';
+  const bottomProperty = '--cl-keyless-bottom';
+  const rightProperty = '--cl-keyless-right';
   const defaultBottom = 50;
   const defaultRight = 50;
 
@@ -28,6 +28,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
         elementDescriptor={descriptors.impersonationFab}
         align='center'
         onMouseEnter={() => setIsExpanded(true)}
+        data-expanded={isExpanded}
         sx={t => ({
           position: 'fixed',
           bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
@@ -45,7 +46,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
 
           transition: 'all 190ms cubic-bezier(0.34, 1, 0.64, 0.9)',
 
-          ...(isExpanded && {
+          '&[data-expanded="true"]': {
             flexDirection: 'column',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
@@ -56,7 +57,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
             transition: 'all 150ms cubic-bezier(0.34, 1, 0.64, 1)',
-          }),
+          },
         })}
       >
         <Flex
@@ -230,18 +231,20 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             type='button'
             aria-label='Close'
             onClick={() => setIsExpanded(false)}
+            data-expanded={isExpanded}
             css={css`
               display: none;
               cursor: pointer;
               margin-left: 0.75rem;
-              ${isExpanded &&
-              `display: block;
-			  color: #8C8C8C;
-              transition: color 150ms ease-out;
-              :hover {
-                color: #eeeeee;
+
+              &[data-expanded='true'] {
+                display: block;
+                color: #8c8c8c;
+                transition: color 150ms ease-out;
+                :hover {
+                  color: #eeeeee;
+                }
               }
-              `}
             `}
           >
             <svg
@@ -263,6 +266,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
         </Flex>
 
         <p
+          data-expanded={isExpanded}
           css={css`
             display: none;
             color: #b4b4b4;
@@ -271,8 +275,11 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             line-height: 1rem;
             max-width: 14.625rem;
 
-            ${isExpanded && `display: block;`};
-            animation: ${isExpanded ? 'show-description 250ms ease-out forwards' : 'none'};
+            &[data-expanded='true'] {
+              display: block;
+              animation: show-description 250ms ease-out forwards;
+            }
+
             @keyframes show-description {
               from {
                 transform: translateY(1px);
@@ -304,6 +311,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
         <button
           type='button'
           onFocus={handleFocus}
+          data-expanded={isExpanded}
           css={css`
             position: absolute;
             right: 0.375rem;
@@ -331,17 +339,17 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             transition: all 200ms cubic-bezier(0.6, 0.6, 0, 0.98);
             animation: small-btn-glow 3s infinite 500ms;
 
-            ${isExpanded &&
-            ` right: 0.75rem;
+            &[data-expanded='true'] {
+              right: 0.75rem;
               bottom: 0.75rem;
               width: calc(100% - 1.5rem);
-              color: #FDE047;
+              color: #fde047;
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
               animation: none;
               transition: box-shadow 280ms cubic-bezier(0.6, 0.6, 0, 1);
 
-			  &:hover {
+              &:hover {
                 box-shadow:
                   0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                   0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -356,7 +364,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
                 0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                 0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                 0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-            `}
+            }
 
             @keyframes small-btn-glow {
               0%,
