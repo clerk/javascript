@@ -72,11 +72,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
     await expect(u.page.getByText('Is action clicked: true')).toBeVisible();
 
-    // Close the modal and trigger the popover again
-    await u.page.locator('.cl-modalCloseButton').click();
-    await u.po.userButton.toggleTrigger();
-    await u.po.userButton.waitForPopover();
-
     // Trigger the popover again
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
