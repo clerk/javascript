@@ -3,7 +3,12 @@ import type { CustomPage } from '@clerk/types';
 import type { Component } from 'vue';
 import { ref } from 'vue';
 
-import { UserProfileLink, UserProfilePage } from '../components/uiComponents';
+import {
+  OrganizationProfileLink,
+  OrganizationProfilePage,
+  UserProfileLink,
+  UserProfilePage,
+} from '../components/uiComponents';
 import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
 import type { AddCustomPagesParams } from '../types';
 import { isThatComponent } from './componentValidation';
@@ -31,8 +36,8 @@ export const useUserProfileCustomPages = () => {
 export const useOrganizationProfileCustomPages = () => {
   const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
     reorderItemsLabels: ['general', 'members'],
-    PageComponent: UserProfilePage,
-    LinkComponent: UserProfileLink,
+    PageComponent: OrganizationProfilePage,
+    LinkComponent: OrganizationProfileLink,
     componentName: 'OrganizationProfile',
   });
 
