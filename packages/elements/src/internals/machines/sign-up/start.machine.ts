@@ -44,6 +44,9 @@ export const SignUpStartMachine = setup({
         if (strategy === 'web3_coinbase_wallet_signature') {
           return parent.getSnapshot().context.clerk.client.signUp.authenticateWithCoinbaseWallet();
         }
+        if (strategy === 'web3_okx_wallet_signature') {
+          return parent.getSnapshot().context.clerk.client.signUp.authenticateWithOKXWallet();
+        }
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),

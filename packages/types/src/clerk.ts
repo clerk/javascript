@@ -560,6 +560,11 @@ export interface Clerk {
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their OKX Wallet browser extension
+   */
+  authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -1378,6 +1383,14 @@ export interface AuthenticateWithMetamaskParams {
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithOKXWalletParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
