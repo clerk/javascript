@@ -677,22 +677,20 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
     },
     emailAddressPage: {
+      formHint: 'This email address will be verified using your primary authentication method.',
       emailCode: {
-        formHint: 'An email containing a verification code will be sent to this email address.',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
         formTitle: 'Verification code',
         resendButton: "Didn't receive a code? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       emailLink: {
-        formHint: 'An email containing a verification link will be sent to this email address.',
         formSubtitle: 'Click on the verification link in the email sent to {{identifier}}',
         formTitle: 'Verification link',
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       enterpriseSsoLink: {
-        formHint: 'The sign-in screen will open in a new tab. Complete the process there.',
         formSubtitle: 'Complete the sign-in with {{identifier}} in the new tab that has opened.',
         resendButton: 'Retry sign-in',
         successMessage: 'The email {{identifier}} has been added to your account.',

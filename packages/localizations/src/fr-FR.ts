@@ -703,7 +703,6 @@ export const frFR: LocalizationResource = {
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

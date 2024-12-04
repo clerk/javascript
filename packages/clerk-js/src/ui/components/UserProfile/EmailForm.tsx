@@ -58,7 +58,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     <Wizard {...wizard.props}>
       <FormContainer
         headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
-        headerSubtitle={localizationKeys(`${translationKey}.formHint`)}
+        headerSubtitle={localizationKeys('userProfile.emailAddressPage.formHint')}
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>

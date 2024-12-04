@@ -693,7 +693,6 @@ export const skSK: LocalizationResource = {
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

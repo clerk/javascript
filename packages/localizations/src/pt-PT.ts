@@ -697,7 +697,6 @@ export const ptPT: LocalizationResource = {
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

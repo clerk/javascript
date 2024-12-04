@@ -697,7 +697,6 @@ export const nbNO: LocalizationResource = {
         successMessage: 'E-posten {{identifier}} har blitt lagt til kontoen din.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,
