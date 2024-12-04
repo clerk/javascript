@@ -1,5 +1,17 @@
 # @clerk/vue
 
+## 0.0.12
+
+### Patch Changes
+
+- Add support for custom pages and links ([#4708](https://github.com/clerk/javascript/pull/4708)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add support for custom menu items to `<UserButton />` ([#4693](https://github.com/clerk/javascript/pull/4693)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/shared@2.18.1
+
 ## 0.0.11
 
 ### Patch Changes

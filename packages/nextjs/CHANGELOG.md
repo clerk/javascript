@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.7.0
+
+### Minor Changes
+
+- Remove usage of `ezheaders` ([#4706](https://github.com/clerk/javascript/pull/4706)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/backend@1.19.1
+  - @clerk/clerk-react@5.18.1
+  - @clerk/shared@2.18.1
+
 ## 6.6.0
 
 ### Minor Changes

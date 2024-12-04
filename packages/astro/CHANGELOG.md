@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 1.5.3
+
+### Patch Changes
+
+- Using LICENSE file name that is consistent with other @clerk/\* modules ([#4712](https://github.com/clerk/javascript/pull/4712)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/backend@1.19.1
+  - @clerk/shared@2.18.1
+
 ## 1.5.2
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.4.0
+
+### Minor Changes
+
+- Introduce `<Waitlist />` component for Expo Web ([#4701](https://github.com/clerk/javascript/pull/4701)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b), [`5150fa1fd254b8cf9e95df9b2d51251576c86223`](https://github.com/clerk/javascript/commit/5150fa1fd254b8cf9e95df9b2d51251576c86223), [`5800a1f94a94ca8a5334195a70c5fb4d1516ef2c`](https://github.com/clerk/javascript/commit/5800a1f94a94ca8a5334195a70c5fb4d1516ef2c)]:
+  - @clerk/clerk-js@5.38.0
+  - @clerk/types@4.37.0
+  - @clerk/clerk-react@5.18.1
+  - @clerk/shared@2.18.1
+
 ## 2.3.13
 
 ### Patch Changes
