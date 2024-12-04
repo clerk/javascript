@@ -27,24 +27,24 @@
 
 ## Getting Started
 
-[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_react-router) is the easiest way to add authentication and user management to your Remix application. Add sign up, sign in, and profile management to your application in minutes.
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_react-router) is the easiest way to add authentication and user management to your React Router application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
-- React Router `^7.0.0` or later
+- React Router `^7.0.2` or later
 - React 18 or later
 - Node.js `>=20.0.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_react-router).
 
 ### Installation
 
-The fastest way to get started with Clerk is by following the [Remix Quickstart](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_react-router).
+The fastest way to get started with Clerk is by following the [React Router Quickstart](https://clerk.com/docs/quickstarts/react-router?utm_source=github&utm_medium=clerk_react-router).
 
 You'll learn how to install `@clerk/react-router`, set up your environment keys, configure `rootAuthLoader` & `ClerkApp`, and protect your pages.
 
 ## Usage
 
-For further information, guides, and examples visit the [Remix reference documentation](https://clerk.com/docs/references/remix/clerk-app?utm_source=github&utm_medium=clerk_react-router).
+For further information, guides, and examples visit the [React Router reference documentation](https://clerk.com/docs/references/react-router/overview?utm_source=github&utm_medium=clerk_react-router).
 
 ## Support
 
