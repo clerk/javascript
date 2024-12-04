@@ -121,6 +121,61 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
   });
 
+  test('render user profile with custom pages and links', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom/user-profile');
+    await u.po.userProfile.waitForMounted();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. Security tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'Security' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
+  test('render organization profile with custom pages and links', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom/organization-profile');
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. General tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/profile');
