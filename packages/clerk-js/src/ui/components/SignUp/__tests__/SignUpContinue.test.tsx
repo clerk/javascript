@@ -18,6 +18,15 @@ describe('SignUpContinue', () => {
     screen.getByText(/missing/i);
   });
 
+  it('does not render the form if there is not a persisted sign up', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withPassword({ required: true });
+    });
+    render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/missing/i)).toBeNull();
+  });
+
   it('navigates to the sign up page if there is not a persisted sign up', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
