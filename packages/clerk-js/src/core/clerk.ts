@@ -1666,9 +1666,12 @@ export class Clerk implements ClerkInterface {
 
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
+
+      // Note: this might set this.session to null
       this.#setAccessors(session);
 
-      eventBus.dispatch(events.TokenUpdate, { token: this.session.lastActiveToken });
+      // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();
@@ -1866,13 +1869,6 @@ export class Clerk implements ClerkInterface {
         // because authService#setEnvironment depends on clerk.session that is being
         // set in updateClient
         this.updateEnvironment(environment);
-
-        this.#authService.setActiveOrganizationInStorage();
-
-        // Ensure session cookie is updated with the session's last active token
-        if (this.session) {
-          eventBus.dispatch(events.TokenUpdate, { token: this.session.lastActiveToken });
-        }
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
