@@ -78,10 +78,12 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
           label,
           url,
           mountIcon(el) {
+            unmount(el);
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,
           mount(el) {
+            unmount(el);
             mount(el, slots.default!);
           },
           unmount,
@@ -99,6 +101,7 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
           label,
           url,
           mountIcon(el) {
+            unmount(el);
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,
