@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useMemo } from 'react';
 
-import { useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -34,7 +34,8 @@ function _SignUpContinue() {
   const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
   const signUp = useCoreSignUp();
   const options = useOptions();
-  const isCombinedFlow = options.experimental?.combinedFlow || false;
+  const isWithinSignInContext = !!React.useContext(SignInContext);
+  const isCombinedFlow = (options.experimental?.combinedFlow && !!isWithinSignInContext) || false;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
