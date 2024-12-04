@@ -14,7 +14,7 @@ export default defineConfig(overrideOptions => {
       './src/**/*.{ts,tsx,js,jsx}',
       '!./src/**/*.test.{ts,tsx}',
       '!./src/**/server-actions.ts',
-      '!./src/**/accountless-actions.ts',
+      '!./src/**/keyless-actions.ts',
     ],
     // We want to preserve original file structure
     // so that the "use client" directives are not lost
@@ -45,13 +45,13 @@ export default defineConfig(overrideOptions => {
 
   const serverActionsEsm: Options = {
     ...esm,
-    entry: ['./src/**/server-actions.ts', './src/**/accountless-actions.ts'],
+    entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
     sourcemap: false,
   };
 
   const serverActionsCjs: Options = {
     ...cjs,
-    entry: ['./src/**/server-actions.ts', './src/**/accountless-actions.ts'],
+    entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
     sourcemap: false,
   };
 
@@ -61,8 +61,8 @@ export default defineConfig(overrideOptions => {
   // Happy to improve this if there is a better way
   const moveServerActions = (format: 'esm' | 'cjs') =>
     `mv ./dist/${format}/server-actions.js ./dist/${format}/app-router`;
-  const moveAccountlessActions = (format: 'esm' | 'cjs') =>
-    `mv ./dist/${format}/accountless-actions.js ./dist/${format}/app-router`;
+  const moveKeylessActions = (format: 'esm' | 'cjs') =>
+    `mv ./dist/${format}/keyless-actions.js ./dist/${format}/app-router`;
 
   return runAfterLast([
     'pnpm build:declarations',
@@ -70,8 +70,8 @@ export default defineConfig(overrideOptions => {
     copyPackageJson('cjs'),
     moveServerActions('esm'),
     moveServerActions('cjs'),
-    moveAccountlessActions('esm'),
-    moveAccountlessActions('cjs'),
+    moveKeylessActions('esm'),
+    moveKeylessActions('cjs'),
     shouldPublish && 'pnpm publish:local',
   ])(esm, cjs, serverActionsEsm, serverActionsCjs);
 });

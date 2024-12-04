@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
-import { createKeylessApplicationAction } from '../accountless-actions';
+import { createOrReadKeylessAction } from '../keyless-actions';
 
-export const CreateKeylessApplication = (props: NextClerkProviderProps) => {
+export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
   const { children } = props;
-  const [state, fetchKeys] = React.useActionState(createKeylessApplicationAction, null);
+  const [state, fetchKeys] = React.useActionState(createOrReadKeylessAction, null);
   useEffect(() => {
     React.startTransition(() => {
       fetchKeys();

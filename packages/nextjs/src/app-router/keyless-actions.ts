@@ -3,7 +3,7 @@ import type { AccountlessApplication } from '@clerk/backend';
 import { getCookies } from 'ezheaders';
 import { redirect, RedirectType } from 'next/navigation';
 
-import { getKeylessCookieName } from '../server/accountless';
+import { getKeylessCookieName } from '../server/keyless';
 import { canUseKeyless__server } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
@@ -13,16 +13,16 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
     httpOnly: true,
   });
 
-  // TODO-ACCOUNTLESS: Do we even need this ? I think setting the cookie will reset the router cache.
+  // Sync cookies with middleware
   redirect(`/clerk-sync-keyless?returnUrl=${returnUrl}`, RedirectType.replace);
 }
 
-export async function createKeylessApplicationAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
+export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
   if (!canUseKeyless__server) {
     return null;
   }
 
-  const result = await import('../server/accountless-node.js').then(m => m.createOrReadKeyless());
+  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless());
 
   if (!result) {
     return null;

@@ -9,7 +9,7 @@ import { canUseKeyless__client } from '../../utils/feature-flags';
 export function KeylessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   useEffect(() => {
     if (canUseKeyless__client) {
-      void import('../accountless-actions.js').then(m =>
+      void import('../keyless-actions.js').then(m =>
         m.syncKeylessConfigAction({
           ...props,
           // Preserve the current url and return back, once keys are synced in the middleware

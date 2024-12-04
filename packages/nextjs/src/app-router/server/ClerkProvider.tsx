@@ -78,11 +78,11 @@ export async function ClerkProvider(
     const dynamicConfig = await getDynamicConfig();
 
     const newOrReadKeys = dynamicConfig.keylessMode
-      ? await import('../../server/accountless-node.js').then(mod => mod.createOrReadKeyless())
+      ? await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless())
       : undefined;
 
     if (newOrReadKeys) {
-      const KeylessCookieSync = await import('../client/accountless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
+      const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
       output = (
         <KeylessCookieSync {...newOrReadKeys}>
           <ClientClerkProvider
