@@ -112,7 +112,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationParams['strategy']) => {
   switch (strategy) {
     case 'email_code':
-      return 'userProfile.emailAddressPage.emailLink';
+      return 'userProfile.emailAddressPage.emailCode';
     case 'enterprise_sso':
       return 'userProfile.emailAddressPage.enterpriseSsoLink';
     case 'email_link':
