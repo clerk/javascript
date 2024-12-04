@@ -14,12 +14,6 @@ type AccountlessPromptProps = {
 
 export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
-  const bottomProperty = '--cl-keyless-bottom';
-  const rightProperty = '--cl-keyless-right';
-  const defaultBottom = 50;
-  const defaultRight = 50;
-
   const handleFocus = () => setIsExpanded(true);
 
   return (
@@ -31,8 +25,8 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
         data-expanded={isExpanded}
         sx={t => ({
           position: 'fixed',
-          bottom: `var(${bottomProperty}, ${defaultBottom}px)`,
-          right: `var(${rightProperty}, ${defaultRight}px)`,
+          bottom: '3.125rem',
+          right: '3.125rem',
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
           minWidth: '18.5625rem',
@@ -319,6 +313,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             bottom: 0.375rem;
             height: 1.75rem;
             width: 5.125rem;
+            max-width: 14.625rem;
             padding: 0.25rem 0.625rem;
             border-radius: 1rem;
             font-size: 0.75rem;
