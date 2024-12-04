@@ -685,7 +685,6 @@ export const heIL: LocalizationResource = {
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,
