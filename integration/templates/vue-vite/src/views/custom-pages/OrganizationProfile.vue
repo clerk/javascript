@@ -20,7 +20,7 @@ import { OrganizationProfile } from '@clerk/vue';
       label="Homepage"
       url="/"
     >
-      <<template #labelIcon>
+      <template #labelIcon>
         <div>Icon</div>
       </template>
     </OrganizationProfile.Link>
