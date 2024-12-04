@@ -1,5 +1,5 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
-import type { Clerk } from '@clerk/clerk-js/headless';
+import { type Clerk, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 import type {
   ClientJSON,
@@ -92,7 +92,20 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         };
 
         if (createResourceCache) {
-          // let needsSyncFromFAPI = false;
+          const retryInitilizeResourcesFromFAPI = async () => {
+            const isClerkNetworkError = (err: unknown) => isClerkRuntimeError(err) && err.code === 'network_error';
+            const isClerkAPI5xxError = (err: unknown) => isClerkAPIResponseError(err) && err.status >= 500;
+            try {
+              // @ts-expect-error - This is an internal API
+              await __internal_clerk.__internal_reloadInitialResources();
+            } catch (err) {
+              // Retry after 3 seconds if the error is a network error or a 5xx error
+              if (isClerkNetworkError(err) || isClerkAPI5xxError(err)) {
+                setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
+              }
+            }
+          };
+
           EnvironmentResourceCache.init({ publishableKey, storage: createResourceCache });
           ClientResourceCache.init({ publishableKey, storage: createResourceCache });
 
@@ -115,9 +128,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             let environment = await EnvironmentResourceCache.load();
             let client = await ClientResourceCache.load();
             if (!environment || !client) {
-              // needsSyncFromFAPI = true;
               environment = DUMMY_CLERK_ENVIRONMENT_RESOURCE;
               client = DUMMY_CLERK_CLIENT_RESOURCE;
+              setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
             }
             return { client, environment };
           };

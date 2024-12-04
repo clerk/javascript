@@ -1941,6 +1941,19 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 
+  // This is used by @clerk/clerk-expo
+  __internal_reloadInitialResources = async (): Promise<void> => {
+    const [environment, client] = await Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
+      Client.getInstance().fetch({ fetchMaxTries: 1 }),
+    ]);
+
+    this.updateClient(client);
+    this.updateEnvironment(environment);
+
+    this.#emit();
+  };
+
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
     if (client.lastActiveSessionId) {
       const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
