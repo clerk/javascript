@@ -665,14 +665,12 @@ export const zhCN: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: '一封含有验证码的邮件将会被发送到这个电子邮件地址。',
         formSubtitle: '输入发送到 {{identifier}} 的验证码',
         formTitle: '验证码',
         resendButton: '重发验证码',
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
       emailLink: {
-        formHint: '一封含有验证链接的邮件将会被发送到这个电子邮件地址。',
         formSubtitle: '点击发送到 {{identifier}} 的邮件中的验证链接',
         formTitle: '验证链接',
         resendButton: '重发链接',
@@ -683,6 +681,7 @@ export const zhCN: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电子邮件地址登录。',

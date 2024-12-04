@@ -672,14 +672,12 @@ export const zhTW: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: '一封含有驗證碼的郵件將會被發送到這個電子郵件地址。',
         formSubtitle: '輸入發送到 {{identifier}} 的驗證碼',
         formTitle: '驗證碼',
         resendButton: '重發驗證碼',
         successMessage: '電子郵件 {{identifier}} 已被添加到您的帳戶。',
       },
       emailLink: {
-        formHint: '一封含有驗證連結的郵件將會被發送到這個電子郵件地址。',
         formSubtitle: '點擊發送到 {{identifier}} 的郵件中的驗證連結',
         formTitle: '驗證連結',
         resendButton: '重發連結',
@@ -690,6 +688,7 @@ export const zhTW: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
         messageLine2: '您將無法使用這個電子郵件地址登錄。',
