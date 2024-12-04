@@ -53,7 +53,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
 
-  if (authContext.sessionId === void 0 && authContext.userId === void 0) {
+  if (authContext.sessionId === undefined && authContext.userId === undefined) {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
