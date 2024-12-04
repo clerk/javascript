@@ -707,7 +707,6 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

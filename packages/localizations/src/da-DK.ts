@@ -695,7 +695,6 @@ export const daDK: LocalizationResource = {
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

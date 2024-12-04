@@ -701,7 +701,6 @@ export const roRO: LocalizationResource = {
         successMessage: 'E-mailul {{identifier}} a fost adăugat în contul dvs.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

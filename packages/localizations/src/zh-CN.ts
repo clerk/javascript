@@ -679,7 +679,6 @@ export const zhCN: LocalizationResource = {
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

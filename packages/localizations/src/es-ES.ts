@@ -667,7 +667,6 @@ export const esES: LocalizationResource = {
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

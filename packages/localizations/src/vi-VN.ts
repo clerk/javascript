@@ -695,7 +695,6 @@ export const viVN: LocalizationResource = {
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
       enterpriseSsoLink: {
-        formHint: undefined,
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,
