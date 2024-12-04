@@ -363,7 +363,7 @@ const _OrganizationProfile = defineComponent((props: OrganizationProfileProps, {
     customPages: customPages.value,
   }));
 
-  provide(UserProfileInjectionKey, {
+  provide(OrganizationProfileInjectionKey, {
     addCustomPage,
   });
 
