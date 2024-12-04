@@ -130,11 +130,12 @@ export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderPr
   let clerkState;
   const isSpaMode = inSpaMode();
 
-  // Don't use `loaderData` to fetch the clerk state if we're in SPA mode
+  // Don't use `loaderData` to fetch the clerk state if we're in SPA mode or if React Router is used as a library
   if (!isSpaMode) {
     clerkState = loaderData.clerkState;
   }
 
+  // In SPA mode the publishable key is required on the ClerkProvider
   if (isSpaMode) {
     assertPublishableKeyInSpaMode(opts.publishableKey);
   }

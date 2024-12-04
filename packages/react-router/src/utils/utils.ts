@@ -77,9 +77,17 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
   return '';
 };
 
+/**
+ * When React Router is used as a framework, the __reactRouterContext object is populated on window.
+ * The isSpaMode will then be set to true if you use https://reactrouter.com/how-to/spa
+ *
+ * When React Router is used as a library the __reactRouterContext object is not populated on window at all.
+ *
+ * Therefore, if the __reactRouterContext object is not present on window, we can assume that React Router is being used as a library.
+ */
 export const inSpaMode = (): boolean => {
   if (typeof window !== 'undefined' && typeof window.__reactRouterContext?.isSpaMode !== 'undefined') {
     return window.__reactRouterContext.isSpaMode;
   }
-  return false;
+  return true;
 };
