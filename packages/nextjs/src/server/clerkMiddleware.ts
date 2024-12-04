@@ -191,31 +191,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      function sanitizePublicData() {
-        const { publishableKey, proxyUrl, signUpUrl, signInUrl, isSatellite, domain, afterSignInUrl, afterSignUpUrl } =
-          options;
-
-        return {
-          publishableKey,
-          proxyUrl,
-          signUpUrl,
-          signInUrl,
-          isSatellite,
-          domain,
-          afterSignInUrl,
-          afterSignUpUrl,
-          claimKeylessApplicationUrl: keyless?.publishableKey === publishableKey ? keyless?.claimUrl : undefined,
-          keylessMode: keyless?.publishableKey === publishableKey,
-        };
-      }
-
-      decorateRequest(
-        clerkRequest,
-        handlerResult,
-        requestState,
-        { ...resolvedParams, ...options },
-        sanitizePublicData(),
-      );
+      decorateRequest(clerkRequest, handlerResult, requestState, { ...resolvedParams, ...options });
 
       return handlerResult;
     });

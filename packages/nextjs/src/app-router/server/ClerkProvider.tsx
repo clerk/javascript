@@ -5,7 +5,6 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
-import { getHeader } from '../../server/utils';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless__server } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -18,16 +17,6 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   const data = getDynamicAuthData(request);
 
   return data;
-});
-
-const getDynamicConfig = React.cache(async function getDynamicClerkState() {
-  const request = await buildRequestLike();
-  const encoded = getHeader(request, 'x-clerk-public-request-config');
-
-  if (encoded) {
-    return JSON.parse(encoded);
-  }
-  return {};
 });
 
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
@@ -72,14 +61,8 @@ export async function ClerkProvider(
   const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless__server;
 
   if (shouldRunAsKeyless) {
-    /**
-     * Attention: Moving this call outside the conditional will cause the ClerkProvider to opt-in all routes into dynamic rendering.
-     */
-    const dynamicConfig = await getDynamicConfig();
-
-    const newOrReadKeys = dynamicConfig.keylessMode
-      ? await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless())
-      : undefined;
+    // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
+    const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
 
     if (newOrReadKeys) {
       const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);

@@ -98,18 +98,6 @@ export function decorateRequest(
   res: Response,
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
-  publicRequestData: Pick<
-    AuthenticateRequestOptions,
-    | 'publishableKey'
-    | 'domain'
-    | 'isSatellite'
-    | 'proxyUrl'
-    | 'signInUrl'
-    | 'signUpUrl'
-    | 'afterSignInUrl'
-    | 'afterSignUpUrl'
-    | 'organizationSyncOptions'
-  >,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -154,7 +142,6 @@ export function decorateRequest(
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
       ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
-      ...(publicRequestData ? { ['x-clerk-public-request-config']: JSON.stringify(publicRequestData) } : {}),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
