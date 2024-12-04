@@ -196,38 +196,34 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       return handlerResult;
     });
 
-    const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (!canUseKeyless__server) {
-        return baseNextMiddleware(request, event);
-      }
-
-      const isSyncKeyless = request.nextUrl.pathname === '/clerk-sync-keyless';
-      if (isSyncKeyless) {
-        const returnUrl = request.nextUrl.searchParams.get('returnUrl');
-        const url = new URL(request.url);
-        url.pathname = '';
-
-        const response = new NextResponse(null, {
-          status: 307,
-          headers: { location: returnUrl || url.toString() },
-        });
-        return response;
+    const keylessMiddleware: NextMiddleware = async (request, event) => {
+      /**
+       * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
+       */
+      if (isKeylessSyncRequest(request)) {
+        return returnBackFromKeylessSync(request);
       }
 
       const resolvedParams = typeof params === 'function' ? params(request) : params;
-
       const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
-
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
-
+      /**
+       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
+       */
       if (isMissingPublishableKey) {
         const res = NextResponse.next();
-
         setRequestHeadersOnNextResponse(res, request, {
           [constants.Headers.AuthStatus]: 'signed-out',
         });
-
         return res;
+      }
+
+      return baseNextMiddleware(request, event);
+    };
+
+    const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (canUseKeyless__server) {
+        return keylessMiddleware(request, event);
       }
 
       return baseNextMiddleware(request, event);
@@ -257,6 +253,17 @@ const parseHandlerAndOptions = (args: unknown[]) => {
     typeof args[0] === 'function' ? args[0] : undefined,
     (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback];
+};
+
+const isKeylessSyncRequest = (request: NextMiddlewareRequestParam) =>
+  request.nextUrl.pathname === '/clerk-sync-keyless';
+
+const returnBackFromKeylessSync = (request: NextMiddlewareRequestParam) => {
+  const returnUrl = request.nextUrl.searchParams.get('returnUrl');
+  const url = new URL(request.url);
+  url.pathname = '';
+
+  return NextResponse.redirect(returnUrl || url.toString());
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
