@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.19.0
+
+### Minor Changes
+
+- Allow creating organizations without an initial owner to facilitate B2B onboarding flows ([#4670](https://github.com/clerk/javascript/pull/4670)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
+  - @clerk/types@4.36.0
+  - @clerk/shared@2.18.0
+
 ## 1.18.1
 
 ### Patch Changes

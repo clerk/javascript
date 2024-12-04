@@ -4,13 +4,14 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  CustomMenuItem,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
   UserResource,
   Without,
 } from '@clerk/types';
-import type { ComputedRef, ShallowRef } from 'vue';
+import type { Component, ComputedRef, ShallowRef, Slot, VNode } from 'vue';
 
 export interface VueClerkInjectionKeyType {
   clerk: ShallowRef<Clerk | null>;
@@ -40,6 +41,45 @@ export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
 }
+
+export interface CustomPortalsRendererProps {
+  customPagesPortals?: VNode[];
+  customMenuItemsPortals?: VNode[];
+}
+
+export type CustomItemOrPageWithoutHandler<T> = Without<T, 'mount' | 'unmount' | 'mountIcon' | 'unmountIcon'>;
+
+export type AddCustomMenuItemParams = {
+  props: CustomItemOrPageWithoutHandler<CustomMenuItem>;
+  slots: {
+    labelIcon?: Slot;
+  };
+  component: Component;
+};
+
+type ButtonActionProps<T extends string> =
+  | {
+      label: string;
+      onClick: () => void;
+      open?: never;
+    }
+  | {
+      label: T;
+      onClick?: never;
+      open?: never;
+    }
+  | {
+      label: string;
+      onClick?: never;
+      open: string;
+    };
+
+export type UserButtonActionProps = ButtonActionProps<'manageAccount' | 'signOut'>;
+
+export type UserButtonLinkProps = {
+  href: string;
+  label: string;
+};
 
 declare global {
   interface Window {
