@@ -9,7 +9,12 @@ import type {
 } from '@clerk/types';
 import { Platform } from 'react-native';
 
-import { ClientResourceCache, EnvironmentResourceCache } from '../../cache';
+import {
+  ClientResourceCache,
+  DUMMY_CLERK_CLIENT_RESOURCE,
+  DUMMY_CLERK_ENVIRONMENT_RESOURCE,
+  EnvironmentResourceCache,
+} from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
 import { isNative } from '../../utils';
@@ -87,6 +92,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         };
 
         if (createResourceCache) {
+          // let needsSyncFromFAPI = false;
           EnvironmentResourceCache.init({ publishableKey, storage: createResourceCache });
           ClientResourceCache.init({ publishableKey, storage: createResourceCache });
 
@@ -106,8 +112,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             client: ClientJSON | null;
             environment: EnvironmentJSON | null;
           }> => {
-            const environment = await EnvironmentResourceCache.load();
-            const client = await ClientResourceCache.load();
+            let environment = await EnvironmentResourceCache.load();
+            let client = await ClientResourceCache.load();
+            if (!environment || !client) {
+              // needsSyncFromFAPI = true;
+              environment = DUMMY_CLERK_ENVIRONMENT_RESOURCE;
+              client = DUMMY_CLERK_CLIENT_RESOURCE;
+            }
             return { client, environment };
           };
         }
