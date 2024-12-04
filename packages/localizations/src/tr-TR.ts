@@ -685,14 +685,12 @@ export const trTR: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Doğrulama kodunu içeren bir e-posta belirttiğiniz adrese gönderilecektir.',
         formSubtitle: '{{identifier}} adresine gönderilen doğrulama kodunu giriniz',
         formTitle: 'Doğrulama kodu',
         resendButton: 'Yeniden gönder',
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
       emailLink: {
-        formHint: 'Doğrulama bağlantısını içeren bir e-posta belirttiğiniz adrese gönderilecektir.',
         formSubtitle: '{{identifier}} adresine gönderilen doğrulama bağlantısını tıklayınız',
         formTitle: 'Doğrulama bağlantısı',
         resendButton: 'Yeniden gönder',
@@ -703,6 +701,7 @@ export const trTR: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} adresi hesabınızdan kaldırılacaktır.',
         messageLine2: 'Artık bu e-posta adresini kullanarak oturum açmanız mümkün olmayacaktır.',

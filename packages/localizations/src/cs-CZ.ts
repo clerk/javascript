@@ -678,14 +678,12 @@ export const csCZ: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Na tuto e-mailovou adresu bude odeslán ověřovací kód.',
         formSubtitle: 'Zadejte ověřovací kód zaslaný na adresu {{identifier}}',
         formTitle: 'Ověřovací kód',
         resendButton: 'Znovu odeslat kód',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
       emailLink: {
-        formHint: 'Na tuto e-mailovou adresu bude odeslán ověřovací odkaz.',
         formSubtitle: 'Klikněte na ověřovací odkaz v e-mailu zaslaném na adresu {{identifier}}',
         formTitle: 'Ověřovací odkaz',
         resendButton: 'Znovu odeslat odkaz',
@@ -696,6 +694,7 @@ export const csCZ: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstraněna z tohoto účtu.',
         messageLine2: 'Nebudete se moci přihlásit pomocí této e-mailové adresy.',

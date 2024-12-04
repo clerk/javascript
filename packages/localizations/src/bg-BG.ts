@@ -672,14 +672,12 @@ export const bgBG: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'На този имейл адрес ще бъде изпратен имейл с код за потвърждение.',
         formSubtitle: 'Въведете кода за потвърждение, изпратен на {{identifier}}',
         formTitle: 'Код за потвърждение',
         resendButton: 'Не сте получили код? Изпрати отново',
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       emailLink: {
-        formHint: 'На този имейл адрес ще бъде изпратен имейл с линк за потвърждение.',
         formSubtitle: 'Кликнете върху линка за потвърждение в имейла, изпратен на {{identifier}}',
         formTitle: 'Линк за потвърждение',
         resendButton: 'Не сте получили линк? Изпрати отново',
@@ -690,6 +688,7 @@ export const bgBG: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} ще бъде премахнат от този профил.',
         messageLine2: 'Няма да можете да влезете в профила си, използвайки този имейл адрес.',

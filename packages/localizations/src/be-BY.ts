@@ -688,14 +688,12 @@ export const beBY: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'На гэты адрас электроннай пошты будзе адпраўлена ліста з верификацыйным кодам.',
         formSubtitle: 'Увядзіце верификацыйны код, адпраўлены на {{identifier}}',
         formTitle: 'Верификацыйны код',
         resendButton: 'Адправіць код паўторна',
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
       emailLink: {
-        formHint: 'На гэты адрас электроннай пошты будзе адпраўлена верифікацыйная спасылка.',
         formSubtitle: 'Націсніце на верифікацыйную спасылку ў лісьце, адпраўленым на {{identifier}}',
         formTitle: 'Верифікацыйная спасылка',
         resendButton: 'Адправіць спасылку паўторна',
@@ -706,6 +704,7 @@ export const beBY: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будзе выдалены з гэтага ўліковага запісу.',
         messageLine2: 'Вы больш не зможаце ўваходзіць, выкарыстоўваючы гэты адрас электроннай пошты.',
