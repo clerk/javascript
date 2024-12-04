@@ -19,29 +19,21 @@ type Metadata = {
  * The store uses a queue to manage multiple save requests and two slots (A and B) to store the key-value pairs.
  * The function alternates between the two slots to save the key-value pairs and splits the value into chunks to save them.
  * The two slots are used to handle corrupted data or incomplete saves.
- * The keys used are the following: key-latest, key-{A/B}-metadata, key-{A/B}-chunk-{i}, key-{A/B}-complete.
+ *
+ * The keys used are the following:
+ * - key-latest -> 'A'/'B'
+ * - key-{A/B}-metadata -> Metadata
+ * - key-{A/B}-chunk-{i} -> data chunk
+ * - key-{A/B}-complete -> 'true'/'false'
  *
  **/
 export const createSecureStore = (): IStorage => {
   let queue: KeyValuePair[] = [];
   let isProcessing = false;
 
-  const setItem = async (key: string, value: string): Promise<void> => {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (error) {
-      console.log(`Clerk: Error setting value on ${key} in SecureStore:`, error);
-    }
-  };
-
-  const getItem = async (key: string): Promise<string | null> => {
-    try {
-      return await SecureStore.getItemAsync(key);
-    } catch (error) {
-      console.log(`Clerk: Error getting value from ${key} in SecureStore:`, error);
-      return null;
-    }
-  };
+  const setItem = SecureStore.setItemAsync;
+  const getItem = SecureStore.getItemAsync;
+  const deleteItem = SecureStore.deleteItemAsync;
 
   const set = (key: string, value: string): Promise<void> => {
     queue.push({ key, value });
@@ -68,10 +60,11 @@ export const createSecureStore = (): IStorage => {
 
       await performSet(item.key, item.value, targetSlot);
       await setItem(latestKey, targetSlot);
-    } catch (err) {
-      console.error('Clerk: Save failed:', err);
-    } finally {
       isProcessing = false;
+    } catch (err) {
+      isProcessing = false;
+      throw err;
+    } finally {
       void processQueue();
     }
   };
@@ -81,13 +74,30 @@ export const createSecureStore = (): IStorage => {
     const chunks = splitIntoChunks(value);
     const metadataKey = `${slotKey}-metadata`;
 
+    // before saving new chunks, mark the slot as incomplete
+    await setItem(`${slotKey}-complete`, 'false');
+
+    // save the chunks
     for (let i = 0; i < chunks.length; i++) {
       const chunkKey = `${slotKey}-chunk-${i}`;
       await setItem(chunkKey, chunks[i]);
     }
 
+    // delete any extra chunks from previous saved value
+    const oldMetadataString = await getItem(metadataKey);
+    if (oldMetadataString) {
+      const oldMetadata: Metadata = JSON.parse(oldMetadataString);
+      for (let i = chunks.length; i < oldMetadata.totalChunks; i++) {
+        const chunkKey = `${slotKey}-chunk-${i}`;
+        await deleteItem(chunkKey);
+      }
+    }
+
+    // save metadata
     const metadata: Metadata = { totalChunks: chunks.length };
     await setItem(metadataKey, JSON.stringify(metadata));
+
+    // mark the slot as complete
     await setItem(`${slotKey}-complete`, 'true');
   };
 
@@ -107,7 +117,7 @@ export const createSecureStore = (): IStorage => {
   const getSlot = async (slotKey: string): Promise<string | null> => {
     const metadataKey = `${slotKey}-metadata`;
     const isComplete = await getItem(`${slotKey}-complete`);
-    if (!isComplete) {
+    if (isComplete !== 'true') {
       return null;
     }
 
