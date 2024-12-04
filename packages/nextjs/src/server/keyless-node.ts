@@ -21,6 +21,10 @@ const CLERK_HIDDEN = '.clerk';
  */
 const CLERK_LOCK = 'clerk.lock';
 
+/**
+ * The `.clerk/` is NOT safe to be commited as it may include sensitive information about a Clerk instance.
+ * It may include an instance's secret key and the secret token for claiming that instance.
+ */
 function updateGitignore() {
   if (!nodeRuntime.fs) {
     throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
@@ -47,6 +51,13 @@ const getKeylessConfigurationPath = () => {
     throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
   return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'keyless.json');
+};
+
+const getKeylessReadMePath = () => {
+  if (!nodeRuntime.path) {
+    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
+  }
+  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'README.md');
 };
 
 let isCreatingFile = false;
@@ -103,8 +114,10 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   );
 
   const CONFIG_PATH = getKeylessConfigurationPath();
+  const README_PATH = getKeylessReadMePath();
 
   mkdirSync(nodeRuntime.path ? nodeRuntime.path.dirname(CONFIG_PATH) : '', { recursive: true });
+  mkdirSync(nodeRuntime.path ? nodeRuntime.path.dirname(README_PATH) : '', { recursive: true });
   updateGitignore();
 
   /**
@@ -135,6 +148,18 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   logger.logOnce(createMessage(accountlessApplication));
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
+    encoding: 'utf8',
+    mode: '0777',
+    flag: 'w',
+  });
+
+  // TODO-KEYLESS: Add link to official documentation.
+  const README_NOTIFICATION = `
+## DO NOT COMMIT
+This file is auto-generated from \`@clerk/nextjs\` because you are running on Keyless mode. Avoid commiting the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
+  `;
+
+  writeFileSync(README_PATH, README_NOTIFICATION, {
     encoding: 'utf8',
     mode: '0777',
     flag: 'w',
