@@ -15,7 +15,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     treeshake: true,
     format: 'esm',
     outDir: './dist',

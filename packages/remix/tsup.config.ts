@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     bundle: false,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
