@@ -681,14 +681,12 @@ export const daDK: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'En e-mail indeholdende en bekræftelseskode vil blive sendt til denne e-mailadresse.',
         formSubtitle: 'Indtast bekræftelseskoden sendt til {{identifier}}',
         formTitle: 'Bekræftelseskode',
         resendButton: 'Send kode igen',
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
       emailLink: {
-        formHint: 'En e-mail indeholdende et bekræftelseslink vil blive sendt til denne e-mailadresse.',
         formSubtitle: 'Klik på bekræftelseslinket i e-mailen sendt til {{identifier}}',
         formTitle: 'Bekræftelseslink',
         resendButton: 'Send link igen',
@@ -699,6 +697,7 @@ export const daDK: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med denne e-mailadresse.',

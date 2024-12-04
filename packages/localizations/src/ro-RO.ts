@@ -687,14 +687,12 @@ export const roRO: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Un e-mail conținând un cod de verificare va fi trimis la această adresă de e-mail.',
         formSubtitle: 'Introduceți codul de verificare trimis la {{identifier}}',
         formTitle: 'Cod de verificare',
         resendButton: 'Nu ați primit un cod? Trimiteți din nou',
         successMessage: 'E-mailul {{identifier}} a fost adăugat în contul dvs.',
       },
       emailLink: {
-        formHint: 'La această adresă de e-mail va fi trimis un e-mail conținând un link de verificare.',
         formSubtitle: 'Faceți clic pe link-ul de verificare din e-mailul trimis către {{identifier}}',
         formTitle: 'Link de verificare',
         resendButton: 'Nu ați primit un link? Trimiteți din nou',
@@ -705,6 +703,7 @@ export const roRO: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} va fi eliminat din acest cont.',
         messageLine2: 'Nu veți mai putea să vă conectați folosind această adresă de e-mail.',

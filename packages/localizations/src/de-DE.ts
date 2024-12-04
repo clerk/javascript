@@ -693,14 +693,12 @@ export const deDE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungscode gesendet.',
         formSubtitle: 'Geben Sie den Bestätigungscode ein, der an {{identifier}} gesendet wird',
         formTitle: 'Verifizierungs-Schlüssel',
         resendButton: 'Code erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       emailLink: {
-        formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungslink gesendet.',
         formSubtitle: 'Klicken Sie auf den Bestätigungslink in der an {{identifier}} gesendeten E-Mail',
         formTitle: 'Bestätigungslink',
         resendButton: 'Link erneut senden',
@@ -711,6 +709,7 @@ export const deDE: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',

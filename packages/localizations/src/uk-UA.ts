@@ -680,14 +680,12 @@ export const ukUA: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'На цю адресу електронної пошти буде надіслано лист із верифікаційним кодом.',
         formSubtitle: 'Введіть верифікаційний код, відправлений на {{identifier}}',
         formTitle: 'Верифікаційний код',
         resendButton: 'Надіслати код повторно',
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
       emailLink: {
-        formHint: 'На цю адресу електронної пошти буде надіслано верифікаційне посилання.',
         formSubtitle: 'Натисніть на верифікаційне посилання в листі, відправленому на {{identifier}}',
         formTitle: 'Верифікаційне посилання',
         resendButton: 'Надіслати посилання повторно',
@@ -698,6 +696,7 @@ export const ukUA: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} буде видалено з цього акаунта.',
         messageLine2: 'Ви більше не зможете увійти з використанням цієї адреси електронної пошти.',

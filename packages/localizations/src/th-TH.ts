@@ -678,14 +678,12 @@ export const thTH: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'อีเมลที่มีรหัสยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'ป้อนรหัสยืนยันที่ถูกส่งไปยัง {{identifier}}',
         formTitle: 'รหัสยืนยัน',
         resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
       emailLink: {
-        formHint: 'อีเมลที่มีลิงก์ยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'คลิกที่ลิงก์ยืนยันในอีเมลที่ถูกส่งไปยัง {{identifier}}',
         formTitle: 'ลิงก์ยืนยัน',
         resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
@@ -696,6 +694,7 @@ export const thTH: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} จะถูกนำออกจากบัญชีนี้',
         messageLine2: 'คุณจะไม่สามารถเข้าสู่ระบบโดยใช้อีเมลที่อยู่นี้ได้อีกต่อไป',

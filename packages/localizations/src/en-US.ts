@@ -677,7 +677,6 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
     },
     emailAddressPage: {
-      formHint: 'This email address will be verified using your primary authentication method.',
       emailCode: {
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
         formTitle: 'Verification code',
@@ -695,6 +694,7 @@ export const enUS: LocalizationResource = {
         resendButton: 'Retry sign-in',
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      formHint: 'This email address will be verified using your primary authentication method.',
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',

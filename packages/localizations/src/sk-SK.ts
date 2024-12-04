@@ -679,14 +679,12 @@ export const skSK: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Na túto e-mailovú adresu bude odoslaný overovací kód.',
         formSubtitle: 'Zadajte overovací kód zaslaný na adresu {{identifier}}',
         formTitle: 'Overovací kód',
         resendButton: 'Znovu odoslať kód',
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
       emailLink: {
-        formHint: 'Na túto e-mailovú adresu bude odoslaný overovací odkaz.',
         formSubtitle: 'Kliknite na overovací odkaz v e-maile zaslanom na adresu {{identifier}}',
         formTitle: 'Overovací odkaz',
         resendButton: 'Znovu odoslať odkaz',
@@ -697,6 +695,7 @@ export const skSK: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstránená z tohto účtu.',
         messageLine2: 'Nebudete sa môcť prihlásiť pomocou tejto e-mailovej adresy.',

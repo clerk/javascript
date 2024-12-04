@@ -697,14 +697,12 @@ export const ruRU: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'На этот адрес электронной почты будет отправлено письмо с верификационным кодом.',
         formSubtitle: 'Введите верификационный код, отправленный на {{identifier}}',
         formTitle: 'Верификационный код',
         resendButton: 'Не получили код? Отправить повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
       emailLink: {
-        formHint: 'На этот адрес электронной почты будет отправлена верификационная ссылка.',
         formSubtitle: 'Нажмите на верификационную ссылку в письме, отправленном на {{identifier}}',
         formTitle: 'Верификационная ссылка',
         resendButton: 'Отправить ссылку повторно',
@@ -715,6 +713,7 @@ export const ruRU: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти с использованием этого адреса электронной почты.',

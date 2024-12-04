@@ -648,6 +648,7 @@ export const itIT: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',

@@ -689,14 +689,12 @@ export const frFR: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Un e-mail contenant un code de vérification sera envoyé à cette adresse e-mail.',
         formSubtitle: 'Saisissez le code de vérification envoyé à {{identifier}}',
         formTitle: 'Le code de vérification',
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
       emailLink: {
-        formHint: 'Un e-mail contenant un lien de vérification sera envoyé à cette adresse e-mail.',
         formSubtitle: "Cliquez sur le lien de vérification dans l'e-mail envoyé à {{identifier}}",
         formTitle: 'lien de vérification',
         resendButton: 'Renvoyer le lien',
@@ -707,6 +705,7 @@ export const frFR: LocalizationResource = {
         resendButton: undefined,
         successMessage: undefined,
       },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec cette adresse e-mail.',
