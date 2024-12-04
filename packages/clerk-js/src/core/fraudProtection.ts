@@ -27,7 +27,11 @@ export class FraudProtection {
 
       return await cb();
     } catch (e) {
-      if (!isClerkAPIResponseError(e) || e.errors[0].code !== 'requires_captcha') {
+      if (!isClerkAPIResponseError(e)) {
+        throw e;
+      }
+
+      if (e.errors[0]?.code !== 'requires_captcha') {
         throw e;
       }
 
@@ -53,8 +57,6 @@ export class FraudProtection {
         this.inflightException = null;
       }
 
-      // @ts-ignore
-      window.nahestei = false;
       return await cb();
     }
   }

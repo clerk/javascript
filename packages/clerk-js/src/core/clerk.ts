@@ -1637,7 +1637,6 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
-    this.#authService?.setEnvironment(environment);
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -1808,7 +1807,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = await AuthCookieService.create(this, this.#fapiClient);
+    this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
      * 1. Multi-domain SSO handling
@@ -1862,24 +1861,42 @@ export class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: shouldTouchEnv }),
-          Client.getInstance().fetch(),
-        ]);
+        const initEnvironmentPromise = Environment.getInstance()
+          .fetch({ touch: shouldTouchEnv })
+          .then(res => {
+            this.updateEnvironment(res);
+          });
 
-        this.updateClient(client);
-        // updateEnvironment should be called after updateClient
-        // because authService#setEnvironment depends on clerk.session that is being
-        // set in updateClient
-        this.updateEnvironment(environment);
+        const initClient = () => {
+          return Client.getInstance()
+            .fetch()
+            .then(res => this.updateClient(res));
+        };
+
+        const initComponents = () => {
+          if (Clerk.mountComponentRenderer && !this.#componentControls) {
+            this.#componentControls = Clerk.mountComponentRenderer(
+              this,
+              this.environment as Environment,
+              this.#options,
+            );
+          }
+        };
+
+        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
+          // limit the changes for this specific error for now
+          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+            await initEnvironmentPromise;
+            initComponents();
+            await initClient();
+          }
+        });
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
 
-        if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment as Environment, this.#options);
-        }
+        initComponents();
 
         break;
       } catch (err) {

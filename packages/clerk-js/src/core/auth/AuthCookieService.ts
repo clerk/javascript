@@ -1,6 +1,6 @@
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import type { Clerk, EnvironmentResource } from '@clerk/types';
+import type { Clerk, InstanceType } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
@@ -31,24 +31,23 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - isSignedOut(): check if the current user is signed-out using cookies
  *   - decorateUrlWithDevBrowserToken(): decorates url with auth related info (eg dev browser jwt)
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
- *   - setEnvironment(): update cookies (eg client_uat) related to environment
  */
 export class AuthCookieService {
-  private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
   private clientUat: ClientUatCookieHandler;
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
 
-  public static async create(clerk: Clerk, fapiClient: FapiClient) {
+  public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
-    return new AuthCookieService(clerk, fapiClient, cookieSuffix);
+    return new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType);
   }
 
   private constructor(
     private clerk: Clerk,
     fapiClient: FapiClient,
     cookieSuffix: string,
+    private instanceType: InstanceType,
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
@@ -66,11 +65,6 @@ export class AuthCookieService {
       fapiClient,
       cookieSuffix,
     });
-  }
-
-  // TODO(@dimkl): Replace this method call with an event listener to decouple Clerk with setEnvironment
-  public setEnvironment(environment: EnvironmentResource) {
-    this.environment = environment;
     this.setClientUatCookieForDevelopmentInstances();
   }
 
@@ -155,7 +149,7 @@ export class AuthCookieService {
   }
 
   private setClientUatCookieForDevelopmentInstances() {
-    if (this.environment?.isDevelopmentOrStaging() && this.inCustomDevelopmentDomain()) {
+    if (this.instanceType !== 'production' && this.inCustomDevelopmentDomain()) {
       this.clientUat.set(this.clerk.client);
     }
   }
