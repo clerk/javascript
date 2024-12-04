@@ -24,6 +24,6 @@ import { OrganizationProfile } from '@clerk/vue';
         <div>Icon</div>
       </template>
     </OrganizationProfile.Link>
-    <OrganizationProfile.Page label="security" />
+    <OrganizationProfile.Page label="general" />
   </OrganizationProfile>
 </template>
