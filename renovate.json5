@@ -636,6 +636,65 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "expo-passkeys-dev-minor",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "expo-passkeys-dev-major",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "expo-passkeys-prod-minor",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "expo-passkeys-prod-major",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "express-dev-minor",
       "matchFileNames": [
         "packages/express/package.json"
