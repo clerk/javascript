@@ -3,7 +3,13 @@ import React, { useEffect, useMemo } from 'react';
 
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { Card, Header, SocialButtonsReversibleContainerWithDivider, withCardStateProvider } from '../../elements';
+import {
+  Card,
+  Header,
+  LoadingCard,
+  SocialButtonsReversibleContainerWithDivider,
+  withCardStateProvider,
+} from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
@@ -85,6 +91,10 @@ function _SignUpContinue() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!signUp.id) {
+    return <LoadingCard />;
+  }
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
