@@ -1,6 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import type { InitialState, Without } from '@clerk/types';
-import { header } from 'ezheaders';
+import { headers } from 'next/headers';
 import nextPkg from 'next/package.json';
 import React from 'react';
 
@@ -21,7 +21,7 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
 });
 
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
-  return getScriptNonceFromHeader((await header('Content-Security-Policy')) || '') || '';
+  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
 });
 
 export async function ClerkProvider(
