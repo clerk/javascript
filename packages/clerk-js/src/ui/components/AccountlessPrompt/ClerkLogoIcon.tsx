@@ -7,6 +7,7 @@ export function ClerkLogoIcon() {
       height='1.25rem'
       viewBox='0 0 16 20'
       fill='none'
+      aria-hidden
       xmlns='http://www.w3.org/2000/svg'
     >
       <g filter='url(#filter0_i_438_501)'>
