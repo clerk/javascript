@@ -7,6 +7,7 @@ export function KeySlashIcon() {
       height='1rem'
       viewBox='0 0 16 16'
       fill='none'
+      aria-hidden
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
