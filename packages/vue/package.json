@@ -51,8 +51,8 @@
     "test:ci": "vitest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*"
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
