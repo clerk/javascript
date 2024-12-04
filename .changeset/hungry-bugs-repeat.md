@@ -2,4 +2,4 @@
 '@clerk/nextjs': minor
 ---
 
-no ezheaders
+Remove usage of `ezheaders` 
