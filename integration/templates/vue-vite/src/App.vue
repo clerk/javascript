@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { SignedIn, SignedOut, UserButton, OrganizationSwitcher, ClerkLoaded, ClerkLoading } from '@clerk/vue';
+import { SignedIn, SignedOut, OrganizationSwitcher, ClerkLoaded, ClerkLoading } from '@clerk/vue';
+import CustomUserButton from './components/CustomUserButton.vue';
 </script>
 
 <template>
@@ -9,7 +10,7 @@ import { SignedIn, SignedOut, UserButton, OrganizationSwitcher, ClerkLoaded, Cle
         <p class="title">Vue Clerk Integration test</p>
       </div>
       <SignedIn>
-        <UserButton />
+        <CustomUserButton />
         <OrganizationSwitcher />
       </SignedIn>
       <SignedOut>
