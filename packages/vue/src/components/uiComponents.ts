@@ -16,6 +16,8 @@ import { computed, defineComponent, h, inject, onScopeDispose, provide, ref, wat
 import { useClerk } from '../composables/useClerk';
 import { errorThrower } from '../errors/errorThrower';
 import {
+  organizationProfileLinkRenderedError,
+  organizationProfilePageRenderedError,
   userButtonMenuActionRenderedError,
   userButtonMenuItemsRenderedError,
   userButtonMenuLinkRenderedError,
@@ -30,13 +32,15 @@ import {
 } from '../keys';
 import type {
   CustomPortalsRendererProps,
+  OrganizationLinkProps,
+  OrganizationProfilePageProps,
   UserButtonActionProps,
   UserButtonLinkProps,
   UserProfileLinkProps,
   UserProfilePageProps,
 } from '../types';
 import { useUserButtonCustomMenuItems } from '../utils/useCustomMenuItems';
-import { useUserProfileCustomPages } from '../utils/useCustomPages';
+import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../utils/useCustomPages';
 import { ClerkLoaded } from './controlComponents';
 
 type AnyObject = Record<string, any>;
@@ -315,10 +319,10 @@ export const OrganizationList = defineComponent((props: OrganizationListProps) =
 });
 
 export const OrganizationProfilePage = defineComponent(
-  (props: UserProfilePageProps, { slots }) => {
+  (props: OrganizationProfilePageProps, { slots }) => {
     const ctx = inject(OrganizationProfileInjectionKey);
     if (!ctx) {
-      return errorThrower.throw(userProfilePageRenderedError);
+      return errorThrower.throw(organizationProfilePageRenderedError);
     }
 
     ctx.addCustomPage({
@@ -333,10 +337,10 @@ export const OrganizationProfilePage = defineComponent(
 );
 
 export const OrganizationProfileLink = defineComponent(
-  (props: UserProfileLinkProps, { slots }) => {
+  (props: OrganizationLinkProps, { slots }) => {
     const ctx = inject(OrganizationProfileInjectionKey);
     if (!ctx) {
-      return errorThrower.throw(userProfileLinkRenderedError);
+      return errorThrower.throw(organizationProfileLinkRenderedError);
     }
 
     ctx.addCustomPage({
@@ -350,16 +354,29 @@ export const OrganizationProfileLink = defineComponent(
   { name: 'OrganizationProfileLink' },
 );
 
-const _OrganizationProfile = defineComponent((props: OrganizationProfileProps) => {
+const _OrganizationProfile = defineComponent((props: OrganizationProfileProps, { slots }) => {
   const clerk = useClerk();
+  const { customPages, customPagesPortals, addCustomPage } = useOrganizationProfileCustomPages();
 
-  return () =>
+  const finalProps = computed(() => ({
+    ...props,
+    customPages: customPages.value,
+  }));
+
+  provide(UserProfileInjectionKey, {
+    addCustomPage,
+  });
+
+  return () => [
     h(Portal, {
       mount: clerk.value?.mountOrganizationProfile,
       unmount: clerk.value?.unmountOrganizationProfile,
       updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
-    });
+      props: finalProps.value,
+    }),
+    h(CustomPortalsRenderer, { customPagesPortals: customPagesPortals.value }),
+    slots.default?.(),
+  ];
 });
 
 export const OrganizationProfile = Object.assign(_OrganizationProfile, {

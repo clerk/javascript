@@ -84,6 +84,13 @@ export type UserProfileLinkProps = {
   label: string;
 };
 
+export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+
+export type OrganizationLinkProps = {
+  url: string;
+  label: string;
+};
+
 type ButtonActionProps<T extends string> =
   | {
       label: string;
