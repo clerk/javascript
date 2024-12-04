@@ -34,7 +34,7 @@ const routes = [
   {
     name: 'CustomOrganizationProfile',
     path: '/custom-pages/organization-profile',
-    component: () => import('./views/custom-pages/CustomOrganizationProfile.vue'),
+    component: () => import('./views/custom-pages/OrganizationProfile.vue'),
   },
 ];
 
