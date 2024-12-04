@@ -44,7 +44,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 180ms cubic-bezier(0.6, 0.5, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -56,7 +56,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             gap: `${t.space.$1}`,
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 200ms cubic-bezier(0.4, 1, 0.20, 0.9)',
+            transition: 'all 210ms cubic-bezier(0.4, 1, 0.20, 0.9)',
           },
         })}
       >
@@ -336,7 +336,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 90ms cubic-bezier(0.6, 0.6, 0, 0.7);
+            transition: all 100ms cubic-bezier(0.6, 0.5, 0, 0.9);
             animation: small-btn-glow 3s infinite 500ms;
 
             &[data-expanded='true'] {
@@ -346,6 +346,8 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               color: #fde047;
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+
+              transition: all 175ms cubic-bezier(0.6, 0.5, 0.1, 1);
               animation: none;
 
               &:hover {
