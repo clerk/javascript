@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.36.0
 
 ### Minor Changes

@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.38.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fixes an issue in `UserProfile` where email and username forms could retain stale values from the previous render, leading to incorrect data being sent to FAPI ([#4713](https://github.com/clerk/javascript/pull/4713)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove side-effect from `Session` resource initialization that triggered a session cookie update. This cookie update is now explicitly part of the `Clerk.load()` flow. ([#4555](https://github.com/clerk/javascript/pull/4555)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/localizations@3.7.3
+  - @clerk/shared@2.18.1
+
 ## 5.37.0
 
 ### Minor Changes
