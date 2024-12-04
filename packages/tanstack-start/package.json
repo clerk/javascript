@@ -63,7 +63,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@tanstack/react-router": "^1.81.9",
-    "@tanstack/start": "^1.81.9",
+    "@tanstack/start": "^1.85.7",
     "@types/node": "^18.19.43",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
