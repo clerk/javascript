@@ -45,8 +45,7 @@ export type ReactRouterClerkProviderProps = Without<ClerkProviderProps, 'publish
 
 declare global {
   interface Window {
-    // TODO: Update this for RR
-    __remixContext: {
+    __reactRouterContext: {
       isSpaMode?: boolean;
     };
   }

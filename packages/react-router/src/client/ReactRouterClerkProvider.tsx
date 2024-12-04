@@ -123,7 +123,7 @@ type ClerkReactRouterOptions = Partial<
 
 // TODO: Remove "any" on loaderData type
 type ClerkProviderProps = ClerkReactRouterOptions & {
-  loaderData: ReactRouterComponentProps['loaderData'];
+  loaderData?: ReactRouterComponentProps['loaderData'];
 };
 
 export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {

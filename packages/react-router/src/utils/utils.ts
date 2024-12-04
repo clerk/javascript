@@ -32,7 +32,6 @@ export function assertPublishableKeyInSpaMode(key: any): asserts key is string {
 
 type CloudflareEnv = { env: Record<string, string> };
 
-// https://remix.run/blog/remix-vite-stable#cloudflare-pages-support
 const hasCloudflareProxyContext = (context: any): context is { cloudflare: CloudflareEnv } => {
   return !!context?.cloudflare?.env;
 };
@@ -54,8 +53,6 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
     return process.env[name];
   }
 
-  // Remix + Cloudflare pages
-  // if (typeof (context?.cloudflare as CloudflareEnv)?.env !== 'undefined') {
   if (hasCloudflareProxyContext(context)) {
     return context.cloudflare.env[name] || '';
   }
@@ -81,8 +78,8 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
 };
 
 export const inSpaMode = (): boolean => {
-  if (typeof window !== 'undefined' && typeof window.__remixContext?.isSpaMode !== 'undefined') {
-    return window.__remixContext.isSpaMode;
+  if (typeof window !== 'undefined' && typeof window.__reactRouterContext?.isSpaMode !== 'undefined') {
+    return window.__reactRouterContext.isSpaMode;
   }
   return false;
 };
