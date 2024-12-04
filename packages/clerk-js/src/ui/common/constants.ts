@@ -96,6 +96,10 @@ export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
     id: 'coinbase_wallet',
     name: 'Coinbase Wallet',
   },
+  okx_wallet: {
+    id: 'okx_wallet',
+    name: 'OKX Wallet',
+  },
 });
 
 export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {

@@ -48,7 +48,7 @@ describe('Clerk singleton', () => {
   const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
   const mockNavigate = jest.fn((to: string) => Promise.resolve(to));
-  const mockedLoadOptions = { routerPush: mockNavigate, routerReplace: mockNavigate };
+  const mockedLoadOptions = { routerDebug: true, routerPush: mockNavigate, routerReplace: mockNavigate };
 
   const mockDisplayConfig = {
     signInUrl: 'http://test.host/sign-in',
@@ -461,6 +461,7 @@ describe('Clerk singleton', () => {
       status: 'active',
       user: {},
       getToken: jest.fn(),
+      lastActiveToken: { getRawString: () => mockJwt },
     };
 
     afterEach(() => {
@@ -489,6 +490,15 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('updates auth cookie on load from fetched session', async () => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+
+      expect(document.cookie).toContain(mockJwt);
+    });
+
     it('updates auth cookie on token:update event', async () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
@@ -497,11 +507,11 @@ describe('Clerk singleton', () => {
 
       const token = {
         jwt: {},
-        getRawString: () => mockJwt,
+        getRawString: () => 'updated-jwt',
       } as TokenResource;
       eventBus.dispatch(events.TokenUpdate, { token });
 
-      expect(document.cookie).toContain(mockJwt);
+      expect(document.cookie).toContain('updated-jwt');
     });
   });
 
@@ -686,7 +696,6 @@ describe('Clerk singleton', () => {
       const toUrl = 'https://www.origindifferent.com/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
-      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
@@ -696,7 +705,6 @@ describe('Clerk singleton', () => {
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
       expect(mockNavigate.mock.calls[0][0]).toBe('/path#hash');
-      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('logs navigation external navigation when routerDebug is enabled', async () => {
@@ -719,6 +727,25 @@ describe('Clerk singleton', () => {
 
       expect(logSpy).toHaveBeenCalledTimes(1);
       expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
+    });
+
+    it('validates the protocol of the provided URL', async () => {
+      await sut.load({ ...mockedLoadOptions, allowedRedirectProtocols: ['gg:'] });
+      // allowed protocol
+      const toUrl = 'gg://some/deeply/nested/path';
+      await sut.navigate(toUrl);
+      expect(mockNavigate.mock.calls[0][0]).toBe(toUrl);
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
+
+      mockNavigate.mockReset();
+      logSpy.mockReset();
+
+      // disallowed protocol
+      const badUrl = 'evil://some/deeply/nested/path';
+      await sut.navigate(badUrl);
+      expect(mockNavigate.mock.calls[0][0]).toBe('/');
+      expect(logSpy).toHaveBeenCalledTimes(1);
     });
   });
 

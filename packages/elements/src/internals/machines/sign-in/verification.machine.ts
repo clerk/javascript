@@ -411,7 +411,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
       // rule for the line.
 
-      const { params, parent, resendable } = input as PrepareFirstFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
@@ -495,6 +495,17 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
           break;
         }
+        case 'web3_okx_wallet_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature, 'Web3 OKX Wallet signature');
+
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
+
+          break;
+        }
         default:
           throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
       }
@@ -514,7 +525,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input as PrepareSecondFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send

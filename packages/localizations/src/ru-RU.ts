@@ -278,6 +278,62 @@ export const ruRU: LocalizationResource = {
   paginationButton__previous: 'Назад',
   paginationRowText__displaying: 'Отображение',
   paginationRowText__of: 'из',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Получить помощь',
+      actionText: 'У вас нет ничего из этого?',
+      blockButton__backupCode: 'Использовать резервный код',
+      blockButton__emailCode: 'Отправить код на {{identifier}}',
+      blockButton__password: 'Продолжить с вашим паролем',
+      blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
+      blockButton__totp: 'Использовать приложение аутентификации',
+      getHelp: {
+        blockButton__emailSupport: 'Написать в поддержку',
+        content:
+          'Если у вас возникли проблемы с проверкой учетной записи, напишите нам, и мы вместе с вами восстановим доступ как можно скорее.',
+        title: 'Получить помощь',
+      },
+      subtitle: 'Столкнулись с проблемами? Вы можете использовать любой из этих методов для верификации',
+      title: 'Использовать другой метод',
+    },
+    backupCodeMfa: {
+      subtitle: 'Ваш резервный код - это код, который вы получили при настройке двухфакторной аутентификации.',
+      title: 'Введите резервный код',
+    },
+    emailCode: {
+      formTitle: 'Верификационный код',
+      resendButton: 'Не получили код? Отправить повторно',
+      subtitle: 'для продолжения {{applicationName}}',
+      title: 'Проверьте вашу почту',
+    },
+    noAvailableMethods: {
+      message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',
+      subtitle: 'Произошла ошибка',
+      title: 'Невозможно подтвердить учетную запись',
+    },
+    password: {
+      actionLink: 'Используйте другой метод',
+      subtitle: 'Введите пароль, связанный с вашей учетной записью',
+      title: 'Введите ваш пароль',
+    },
+    phoneCode: {
+      formTitle: 'Верификационный код',
+      resendButton: 'Не получили код? Отправить повторно',
+      subtitle: 'для продолжения {{applicationName}}',
+      title: 'Проверьте ваш телефон',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Верификационный код',
+      resendButton: 'Не получили код? Отправить повторно',
+      subtitle: 'Для продолжения, введите верификационный код, отправленный на ваш телефон',
+      title: 'Проверьте ваш телефон',
+    },
+    totpMfa: {
+      formTitle: 'Верификационный код',
+      subtitle: 'Чтобы продолжить, введите верификационный код, сгенерированный вашим приложением-аутентификатором',
+      title: 'Двухфакторная верификация',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Добавить учетную запись',
@@ -535,6 +591,7 @@ export const ruRU: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Вы достигли предела количества участий в организациях, включая ожидающие приглашения.',
     organization_minimum_permissions_needed:
@@ -868,62 +925,6 @@ export const ruRU: LocalizationResource = {
       successMessage: 'Кошелек был добавлен к вашей учетной записи.',
       title: 'Добавить web3 кошелек',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Получить помощь',
-      actionText: 'У вас нет ничего из этого?',
-      blockButton__backupCode: 'Использовать резервный код',
-      blockButton__emailCode: 'Отправить код на {{identifier}}',
-      blockButton__password: 'Продолжить с вашим паролем',
-      blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
-      blockButton__totp: 'Использовать приложение аутентификации',
-      getHelp: {
-        blockButton__emailSupport: 'Написать в поддержку',
-        content:
-          'Если у вас возникли проблемы с проверкой учетной записи, напишите нам, и мы вместе с вами восстановим доступ как можно скорее.',
-        title: 'Получить помощь',
-      },
-      subtitle: 'Столкнулись с проблемами? Вы можете использовать любой из этих методов для верификации',
-      title: 'Использовать другой метод',
-    },
-    backupCodeMfa: {
-      subtitle: 'Ваш резервный код - это код, который вы получили при настройке двухфакторной аутентификации.',
-      title: 'Введите резервный код',
-    },
-    emailCode: {
-      formTitle: 'Верификационный код',
-      resendButton: 'Не получили код? Отправить повторно',
-      subtitle: 'для продолжения {{applicationName}}',
-      title: 'Проверьте вашу почту',
-    },
-    noAvailableMethods: {
-      message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',
-      subtitle: 'Произошла ошибка',
-      title: 'Невозможно подтвердить учетную запись',
-    },
-    password: {
-      actionLink: 'Используйте другой метод',
-      subtitle: 'Введите пароль, связанный с вашей учетной записью',
-      title: 'Введите ваш пароль',
-    },
-    phoneCode: {
-      formTitle: 'Верификационный код',
-      resendButton: 'Не получили код? Отправить повторно',
-      subtitle: 'для продолжения {{applicationName}}',
-      title: 'Проверьте ваш телефон',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Верификационный код',
-      resendButton: 'Не получили код? Отправить повторно',
-      subtitle: 'Для продолжения, введите верификационный код, отправленный на ваш телефон',
-      title: 'Проверьте ваш телефон',
-    },
-    totpMfa: {
-      formTitle: 'Верификационный код',
-      subtitle: 'Чтобы продолжить, введите верификационный код, сгенерированный вашим приложением-аутентификатором',
-      title: 'Двухфакторная верификация',
     },
   },
   waitlist: {
