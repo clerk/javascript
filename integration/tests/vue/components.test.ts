@@ -128,7 +128,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/custom/user-profile');
+    await u.page.goToRelative('/custom-pages/user-profile');
     await u.po.userProfile.waitForMounted();
 
     // Check if custom pages and links are visible
@@ -155,7 +155,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/custom/organization-profile');
+    await u.page.goToRelative('/custom-pages/organization-profile');
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
