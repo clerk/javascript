@@ -1,6 +1,7 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
-import { type Clerk, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/clerk-js/headless';
+import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import { is4xxError } from '@clerk/shared/error';
 import type {
   ClientJSON,
   EnvironmentJSON,
@@ -94,13 +95,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (createResourceCache) {
           const retryInitilizeResourcesFromFAPI = async () => {
             const isClerkNetworkError = (err: unknown) => isClerkRuntimeError(err) && err.code === 'network_error';
-            const isClerkAPI5xxError = (err: unknown) => isClerkAPIResponseError(err) && err.status >= 500;
             try {
               // @ts-expect-error - This is an internal API
               await __internal_clerk.__internal_reloadInitialResources();
             } catch (err) {
               // Retry after 3 seconds if the error is a network error or a 5xx error
-              if (isClerkNetworkError(err) || isClerkAPI5xxError(err)) {
+              if (isClerkNetworkError(err) || !is4xxError(err)) {
                 setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
               }
             }
