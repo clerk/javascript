@@ -50,6 +50,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
+  formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
@@ -539,7 +540,7 @@ export const enUS: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
-    form_code_incorrect: 'The verification code is incorrect. Please try again.',
+    form_code_incorrect: undefined,
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
