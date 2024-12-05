@@ -283,6 +283,7 @@ export const ptBR: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Entrar em contato com o suporte',
         content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.',
+        
       },
       subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.',
       title: 'Métodos alternativos de verificação',
@@ -914,63 +915,6 @@ export const ptBR: LocalizationResource = {
       successMessage: 'A carteira foi adicionada à sua conta.',
       title: 'Adicionar carteira Web3',
       web3WalletButtonsBlockButton: 'Conectar carteira Web3',
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Encontre ajuda',
-      actionText: 'Não tem nenhum destes?',
-      blockButton__backupCode: 'Use um código de recuperação',
-      blockButton__emailCode: 'Enviar código por e-mail para {{identifier}}',
-      blockButton__password: 'Continuar com sua senha',
-      blockButton__phoneCode: 'Enviar código por SMS para {{identifier}}',
-      blockButton__totp: 'Use seu aplicativo autenticador',
-      getHelp: {
-        blockButton__emailSupport: 'Suporte por e-mail',
-        content:
-          'Se você está tendo problemas para acessar sua conta, nos envie um e-mail e nós te ajudaremos a recuperar o acesso o mais rápido possível.',
-        title: 'Encontre ajuda',
-      },
-      subtitle: 'Encontrando dificuldades? Você pode utilizar qualquer um destes métodos para acessar.',
-      title: 'Utilize outro método',
-    },
-    backupCodeMfa: {
-      subtitle:
-        'Use o código de recuperação que lhe foi fornecido durante a configuração da autenticação de dois fatores',
-      title: 'Use um código de recuperação',
-    },
-    emailCode: {
-      formTitle: 'Código de verificação',
-      resendButton: 'Não recebeu um código? Reenviar',
-      subtitle: 'Use o código de verificação enviado ao seu e-mail para continuar',
-      title: 'Verificação obrigatória',
-    },
-    noAvailableMethods: {
-      message: 'Não é possível proceder com a verificação. Não há métodos de autenticação disponíveis.',
-      subtitle: 'Ocorreu um erro',
-      title: 'Não é possível verificar sua conta',
-    },
-    password: {
-      actionLink: 'Use outro método',
-      subtitle: 'Use sua senha para continuar',
-      title: 'Verificação obrigatória',
-    },
-    phoneCode: {
-      formTitle: 'Código de verificação',
-      resendButton: 'Não recebeu um código? Reenviar',
-      subtitle: 'Use o código de verificação enviado ao seu telefone para continuar',
-      title: 'Verificação obrigatória',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Código de verificação',
-      resendButton: 'Não recebeu um código? Reenviar',
-      subtitle: 'Use o código de verificação enviado ao seu telefone para continuar',
-      title: 'Verificação obrigatória',
-    },
-    totpMfa: {
-      formTitle: 'Código de verificação',
-      subtitle: 'Use o código gerado pelo seu aplicativo autenticador para continuar',
-      title: 'Verificação obrigatória',
     },
   },
   waitlist: {
