@@ -71,13 +71,13 @@ function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void))
     }
 
     throw new Error(
-      `Error: ${displayNameOrFn} can only be used within the <ClerkProvider /> component.
+      `${displayNameOrFn} can only be used within the <ClerkProvider /> component.
 
-Possible causes:
+Possible fixes:
 1. Ensure that the <ClerkProvider /> is correctly wrapping your application where this component is used.
-2. Check for multiple versions of the \`@clerk/shared\` package in your project, which could cause context mismatches. You can use a tool like \`npm ls @clerk/shared\` or \`pnpm list @clerk/shared\` to identify duplicates.
+2. Check for multiple versions of the \`@clerk/shared\` package in your project. Use a tool like \`npm ls @clerk/shared\` to identify multiple versions, and update your dependencies to only rely on one.
 
-For more details on setting up the <ClerkProvider />, visit: https://clerk.com/docs/components/clerk-provider`.trim(),
+Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
     );
   }
 }
