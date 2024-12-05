@@ -66,6 +66,8 @@ export interface SignUpResource extends ClerkResource {
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
+  upsert: (params: SignUpCreateParams | SignUpUpdateParams) => Promise<SignUpResource>;
+
   prepareVerification: (params: PrepareVerificationParams) => Promise<SignUpResource>;
 
   attemptVerification: (params: AttemptVerificationParams) => Promise<SignUpResource>;

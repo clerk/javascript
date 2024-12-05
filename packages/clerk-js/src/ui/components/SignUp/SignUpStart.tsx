@@ -216,7 +216,14 @@ function _SignUpStart(): JSX.Element {
     if (fields.ticket) {
       const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'ticket',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -236,7 +243,7 @@ function _SignUpStart(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     return signUp
-      .create(buildRequest(fieldsToSubmit))
+      .upsert(buildRequest(fieldsToSubmit))
       .then(res =>
         completeSignUpFlow({
           signUp: res,
