@@ -46,19 +46,16 @@ function updateGitignore() {
   }
 }
 
-const getKeylessConfigurationPath = () => {
+const generatePath = (...slugs: string[]) => {
   if (!nodeRuntime.path) {
     throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
-  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'keyless.json');
+  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
 };
 
-const getKeylessReadMePath = () => {
-  if (!nodeRuntime.path) {
-    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
-  }
-  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, '.tmp', 'README.md');
-};
+const _TEMP_DIR_NAME = '.tmp';
+const getKeylessConfigurationPath = () => generatePath(_TEMP_DIR_NAME, 'keyless.json');
+const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
 
 let isCreatingFile = false;
 
@@ -116,8 +113,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   const CONFIG_PATH = getKeylessConfigurationPath();
   const README_PATH = getKeylessReadMePath();
 
-  mkdirSync(nodeRuntime.path ? nodeRuntime.path.dirname(CONFIG_PATH) : '', { recursive: true });
-  mkdirSync(nodeRuntime.path ? nodeRuntime.path.dirname(README_PATH) : '', { recursive: true });
+  mkdirSync(generatePath(_TEMP_DIR_NAME), { recursive: true });
   updateGitignore();
 
   /**
@@ -156,7 +152,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   // TODO-KEYLESS: Add link to official documentation.
   const README_NOTIFICATION = `
 ## DO NOT COMMIT
-This file is auto-generated from \`@clerk/nextjs\` because you are running on Keyless mode. Avoid commiting the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
+This directory is auto-generated from \`@clerk/nextjs\` because you are running on Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
   `;
 
   writeFileSync(README_PATH, README_NOTIFICATION, {
