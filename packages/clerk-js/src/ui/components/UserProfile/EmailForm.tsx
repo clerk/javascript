@@ -132,7 +132,7 @@ const getEmailAddressVerificationStrategy = (
   emailAddress: EmailAddressResource | undefined,
   env: EnvironmentResource,
 ): PrepareEmailAddressVerificationParams['strategy'] => {
-  if (emailAddress?.hasEnterpriseSso) {
+  if (emailAddress?.matchesSsoConnection) {
     return 'enterprise_sso';
   }
 
