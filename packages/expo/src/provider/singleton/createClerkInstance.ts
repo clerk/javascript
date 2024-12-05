@@ -15,6 +15,7 @@ import {
   DUMMY_CLERK_CLIENT_RESOURCE,
   DUMMY_CLERK_ENVIRONMENT_RESOURCE,
   EnvironmentResourceCache,
+  SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import { errorThrower } from '../../errorThrower';
@@ -111,15 +112,26 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           EnvironmentResourceCache.init({ publishableKey, storage: createResourceCache });
           ClientResourceCache.init({ publishableKey, storage: createResourceCache });
+          SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
           __internal_clerk.addListener(({ client }) => {
-            if (client) {
-              void ClientResourceCache.save(client.toJSON());
-            }
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.toJSON());
+            }
+
+            if (client) {
+              void ClientResourceCache.save(client.toJSON());
+              if (client.lastActiveSessionId) {
+                const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
+                const token = lastActiveSession?.lastActiveToken?.getRawString();
+                if (token) {
+                  void SessionJWTCache.save(token);
+                }
+              } else {
+                void SessionJWTCache.remove();
+              }
             }
           });
 

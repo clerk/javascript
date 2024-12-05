@@ -18,6 +18,10 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
     storage = opts.storage();
   };
 
+  const checkInit = (): boolean => {
+    return !!storage && !!itemKey;
+  };
+
   const assertInitiliazed = () => {
     if (!storage || !itemKey) {
       throw new Error(`Clerk: ResourceCache for ${key} not initialized!`);
@@ -44,8 +48,18 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
     }
   };
 
-  return { init, load, save };
+  const remove = async (): Promise<void> => {
+    assertInitiliazed();
+    try {
+      return await storage!.set(itemKey!, '');
+    } catch (error) {
+      console.log(`Clerk: Error deleting value on ${key} from storage:`, error);
+    }
+  };
+
+  return { checkInit, init, load, save, remove };
 }
 
 export const EnvironmentResourceCache = createResourceCache<EnvironmentJSON>('__clerk_cache_environment');
 export const ClientResourceCache = createResourceCache<ClientJSON>('__clerk_cache_client');
+export const SessionJWTCache = createResourceCache<string>('__clerk_cache_session_jwt');

@@ -8,8 +8,10 @@ export interface TokenCache {
 
 export interface ResourceCache<T> {
   init: (opts: ResourceCacheInitOptions) => void;
+  checkInit: () => boolean;
   load: () => Promise<T | null>;
   save: (value: T) => Promise<void>;
+  remove: () => Promise<void>;
 }
 
 export type ResourceCacheInitOptions = {
