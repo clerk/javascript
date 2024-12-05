@@ -1,7 +1,7 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
+import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
-// TODO: This import shouldn't be part of @clerk/types
-import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types';
 
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { fromEntries } from '../utils';
