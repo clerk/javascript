@@ -7,6 +7,10 @@ interface RawPortal {
   slot: Slot;
 }
 
+function generateElementIdentifier() {
+  return Math.random().toString(36).substring(2, 7);
+}
+
 export const useCustomElementPortal = () => {
   const rawPortals = ref<RawPortal[]>([]);
   const portals = computed(() => {
@@ -16,16 +20,19 @@ export const useCustomElementPortal = () => {
   });
 
   const mount = (el: HTMLDivElement, slot: Slot) => {
+    const id = generateElementIdentifier();
+    el.setAttribute('data-clerk-mount-id', id);
     rawPortals.value.push({
-      id: el.id,
+      id,
       el,
       slot,
     });
   };
 
   const unmount = (el: HTMLDivElement | undefined) => {
-    if (el) {
-      const index = rawPortals.value.findIndex(portal => portal.id === el.id);
+    const id = el?.getAttribute('data-clerk-mount-id');
+    if (id) {
+      const index = rawPortals.value.findIndex(portal => portal.id === id);
       if (index !== -1) {
         rawPortals.value.splice(index, 1);
       }
