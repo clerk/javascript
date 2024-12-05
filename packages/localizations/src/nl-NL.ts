@@ -461,6 +461,7 @@ export const nlNL: LocalizationResource = {
       actionText__join_waitlist: 'Nog geen account? Meld je aan voor de wachtlijst.',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',
