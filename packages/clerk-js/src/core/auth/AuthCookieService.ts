@@ -40,7 +40,9 @@ export class AuthCookieService {
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
-    return new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType);
+    const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType);
+    await service.setup();
+    return service;
   }
 
   private constructor(
@@ -65,7 +67,14 @@ export class AuthCookieService {
       fapiClient,
       cookieSuffix,
     });
-    this.setClientUatCookieForDevelopmentInstances();
+  }
+
+  public async setup() {
+    if (this.instanceType === 'production') {
+      return this.setupProduction();
+    } else {
+      return this.setupDevelopment();
+    }
   }
 
   public isSignedOut() {
@@ -73,14 +82,6 @@ export class AuthCookieService {
       return this.clientUat.get() <= 0;
     }
     return !!this.clerk.user;
-  }
-
-  public async setupDevelopment() {
-    await this.devBrowser.setup();
-  }
-
-  public setupProduction() {
-    this.devBrowser.clear();
   }
 
   public async handleUnauthenticatedDevBrowser() {
@@ -95,6 +96,14 @@ export class AuthCookieService {
     }
 
     return setDevBrowserJWTInURL(url, devBrowserJwt);
+  }
+
+  private async setupDevelopment() {
+    await this.devBrowser.setup();
+  }
+
+  private setupProduction() {
+    this.devBrowser.clear();
   }
 
   private startPollingForToken() {
@@ -148,7 +157,7 @@ export class AuthCookieService {
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
 
-  private setClientUatCookieForDevelopmentInstances() {
+  public setClientUatCookieForDevelopmentInstances() {
     if (this.instanceType !== 'production' && this.inCustomDevelopmentDomain()) {
       this.clientUat.set(this.clerk.client);
     }

@@ -1807,6 +1807,12 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
+    /**
+     * 0. Init auth service and setup dev browser
+     * This is not needed for production instances hence the .clear()
+     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     */
     this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
@@ -1819,18 +1825,6 @@ export class Clerk implements ClerkInterface {
       await this.#syncWithPrimary();
       // ClerkJS is not considered loaded during the sync/link process with the primary domain
       return false;
-    }
-
-    /**
-     * 2. Setup dev browser.
-     * This is not needed for production instances hence the .clear()
-     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
-     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
-     */
-    if (this.#instanceType === 'production') {
-      this.#authService?.setupProduction();
-    } else {
-      await this.#authService?.setupDevelopment();
     }
 
     /**
@@ -1891,6 +1885,8 @@ export class Clerk implements ClerkInterface {
             await initClient();
           }
         });
+
+        this.#authService?.setClientUatCookieForDevelopmentInstances();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
