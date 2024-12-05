@@ -17,6 +17,7 @@ import {
   Token,
   User,
 } from '.';
+import { AccountlessApplication } from './AccountlessApplication';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
 
@@ -65,6 +66,8 @@ function jsonToObject(item: any): any {
   }
 
   switch (item.object) {
+    case ObjectType.AccountlessApplication:
+      return AccountlessApplication.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.Client:

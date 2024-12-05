@@ -227,7 +227,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (!inBrowser() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
+    if (
+      !inBrowser() ||
+      !this.#instance ||
+      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
+      // Allow hot swapping PKs on the client
+      this.#instance.publishableKey !== options.publishableKey
+    ) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
@@ -278,7 +284,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
 
-    void this.loadClerkJS();
+    if (this.#publishableKey) {
+      void this.loadClerkJS();
+    }
   }
 
   get sdkMetadata(): SDKMetadata | undefined {
