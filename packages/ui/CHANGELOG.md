@@ -1,5 +1,19 @@
 # @clerk/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- Replace usage of `OAUTH_PROVIDERS` and `WEB3_PROVIDERS` from `@clerk/types` to `@clerk/shared`. ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/elements@0.21.0
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/localizations@3.7.4
+
 ## 0.1.28
 
 ### Patch Changes
