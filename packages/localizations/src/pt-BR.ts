@@ -283,7 +283,6 @@ export const ptBR: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Entrar em contato com o suporte',
         content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.',
-        
       },
       subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.',
       title: 'Métodos alternativos de verificação',
