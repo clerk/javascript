@@ -458,6 +458,7 @@ export const bgBG: LocalizationResource = {
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
       title: 'Влезте в {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код за потвърждение',

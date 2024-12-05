@@ -459,6 +459,7 @@ export const skSK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Prihlásiť sa',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',
