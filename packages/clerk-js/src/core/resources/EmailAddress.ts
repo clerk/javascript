@@ -19,7 +19,7 @@ import { BaseResource, IdentificationLink, Verification } from './internal';
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
   emailAddress = '';
-  hasEnterpriseSso = false;
+  matchesSsoConnection = false;
   linkedTo: IdentificationLinkResource[] = [];
   verification!: VerificationResource;
 
@@ -132,7 +132,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.verification = new Verification(data.verification);
-    this.hasEnterpriseSso = data.has_enterprise_sso;
+    this.matchesSsoConnection = data.matches_sso_connection;
     this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }

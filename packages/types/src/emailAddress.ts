@@ -32,7 +32,7 @@ export interface EmailAddressResource extends ClerkResource {
   id: string;
   emailAddress: string;
   verification: VerificationResource;
-  hasEnterpriseSso: boolean;
+  matchesSsoConnection: boolean;
   linkedTo: IdentificationLinkResource[];
   toString: () => string;
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
