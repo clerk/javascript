@@ -5,7 +5,7 @@ export const usePathnameWithoutSplatRouteParams = () => {
   const { pathname } = useLocation();
 
   // Get the splat route params
-  // Remix store splat route params in an object with a key of '*'
+  // React Router stores splat route params in an object with a key of '*'
   // If there are no splat route params, we fallback to an empty string
   const splatRouteParam = params['*'] || '';
 

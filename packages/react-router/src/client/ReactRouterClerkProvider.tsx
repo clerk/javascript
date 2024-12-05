@@ -14,15 +14,8 @@ const SDK_METADATA = {
 };
 
 /**
- * Remix hydration errors should not stop Clerk navigation from working, as the components mount only after
- * hydration is done (in the case of a hydration error, the components will simply mount after client-side hydration)
- * In the case of a hydration error, the first `navigate` function we get from the `useNavigate` hook will not work
- * because the RemixClerkProvider (which is part of the host app) will unmount before the following useEffect within `navigate` fires:
- * https://github.com/remix-run/react-router/blob/main/packages/react-router/lib/hooks.tsx#L175
- * so isomorphicClerk will initialize with a `navigate` function that will never have `activeRef.current` set to true.
- * This variable is just an object ref/cache outside the React rendering cycle that holds a reference to the
- * latest `navigate` function. After a hydration error occurs, RemixClerkProvider will *remount* and this variable
- * will finally get a `navigate` function that has a `activeRef.current` to true so navigation will function as it should.
+ * React Router hydration errors should not stop Clerk navigation from working, as the components mount only after
+ * hydration is done (in the case of a hydration error, the components will simply mount after client-side hydration).
  */
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 

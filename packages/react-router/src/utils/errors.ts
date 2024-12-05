@@ -7,23 +7,23 @@ or come say hi in our discord server: https://clerk.com/discord
 `;
 };
 
-const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, wrap the App component with ClerkApp and make it the default export.
+const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, add <ClerkProvider> to your app.
 Example:
 
-import { ClerkApp } from '@clerk/react-router';
-import { rootAuthLoader } from '@clerk/react-router/ssr.server';
+import { rootAuthLoader } from '@clerk/react-router/ssr.server'
+import { ClerkProvider } from '@clerk/react-router'
 
-export const loader: LoaderFunction = args => rootAuthLoader(args)
-
-function App() {
-  return (
-    <html lang='en'>
-      ...
-    </html>
-  );
+export async function loader(args: Route.LoaderArgs) {
+  return rootAuthLoader(args)
 }
 
-export default ClerkApp(App, { publishableKey: '...' });
+export default function App({ loaderData }: Route.ComponentProps) {
+  return (
+    <ClerkProvider loaderData={loaderData}>
+      <Outlet />
+    </ClerkProvider>
+  )
+}
 `;
 
 export const invalidClerkStatePropError = createErrorMessage(`
@@ -42,31 +42,35 @@ export const noLoaderArgsPassedInGetAuth = createErrorMessage(`
 You're calling 'getAuth()' from a loader, without providing the loader args object.
 Example:
 
-export const loader: LoaderFunction = async (args) => {
-  const { sessionId } = await getAuth(args);
-  ...
-};
+export async function loader(args: Route.LoaderArgs) {
+  const { userId } = await getAuth(args)
+
+  // Your code here
+}
 `);
 
 export const invalidRootLoaderCallbackReturn = createErrorMessage(`
-You're returning an invalid response from the 'rootAuthLoader' called from the loader in root.tsx.
-You can only return plain objects, responses created using the Remix 'json()' and 'redirect()' helpers,
-custom redirect 'Response' instances (status codes in the range of 300 to 400),
-or custom json 'Response' instances (containing a body that is a valid json string).
+You're returning an invalid response from the 'rootAuthLoader' inside root.tsx.
+You can only return plain objects, Responses created using the React Router 'data()'helper or
+custom redirect 'Response' instances (status codes in the range of 300 to 400).
 If you want to return a primitive value or an array, you can always wrap the response with an object.
 
 Example:
 
-export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) => {
+export async function loader(args: Route.LoaderArgs) {
+  return rootAuthLoader(args, async ({ auth }) => {
     const { userId } = auth;
-    const posts: Post[] = database.getPostsByUserId(userId);
+    const posts = await database.getPostsByUserId(userId);
 
-    return json({ data: posts })
-    // or
-    return new Response(JSON.stringify({ data: posts }), { headers: { 'Content-Type': 'application/json' } });
-    // or
-    return { data: posts };
-})
+    return { data: posts }
+    // Or
+    return data(posts, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  })
+}
 `);
 
 export const noSecretKeyError = createErrorMessage(`
@@ -84,12 +88,10 @@ Invalid signInUrl. A satellite application requires a signInUrl for development 
 Check if signInUrl is missing from your configuration or if it is not an absolute URL.`);
 
 export const publishableKeyMissingErrorInSpaMode = createErrorMessage(`
-You're trying to use Clerk in Remix SPA Mode without providing a Publishable Key.
-Please provide the publishableKey option on the ClerkApp component.
+You're trying to use Clerk in React Router SPA Mode without providing a Publishable Key.
+Please provide the publishableKey prop on the <ClerkProvider> component.
 
 Example:
 
-export default ClerkApp(App, {
-  publishableKey: 'pk_test_XXX'
-});
+<ClerkProvider publishableKey={PUBLISHABLE_KEY}>
 `);
