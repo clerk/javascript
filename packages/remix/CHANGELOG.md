@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/backend@1.19.2
+  - @clerk/clerk-react@5.18.2
+
+## 4.3.1
+
+### Patch Changes
+
+- Automatically use dynamic path for OrganizationProfiler and UserProfile. ([#4698](https://github.com/clerk/javascript/pull/4698)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/backend@1.19.1
+  - @clerk/clerk-react@5.18.1
+  - @clerk/shared@2.18.1
+
 ## 4.3.0
 
 ### Minor Changes
