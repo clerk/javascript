@@ -112,7 +112,9 @@
     "utils",
     "workerTimers",
     "devBrowser",
-    "object"
+    "object",
+    "oauth",
+    "web3"
   ],
   "scripts": {
     "build": "tsup",
