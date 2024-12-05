@@ -62,7 +62,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: 'Digite o domínio da organização',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'Digite o e-mail associado ao domínio da organização',
   formFieldInputPlaceholder__organizationName: 'Digite o nome da organização',
-  formFieldInputPlaceholder__organizationSlug: 'Digite o identificador da organização (slug)',
+  formFieldInputPlaceholder__organizationSlug: 'minha-org',
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
@@ -507,12 +507,13 @@ export const ptBR: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: 'Eu concordo com a Política de Privacidade',
-        label__onlyTermsOfService: 'Eu concordo com os Termos de Serviço',
-        label__termsOfServiceAndPrivacyPolicy: 'Eu concordo com os Termos de Serviço e a Política de Privacidade',
+        label__onlyPrivacyPolicy: 'Eu concordo com a {{privacyPolicyLink || link("Política de Privacidade")}}',
+        label__onlyTermsOfService: 'Eu concordo com os {{termsOfServiceLink || link("Termos de Uso")}}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Eu concordo com os {{termsOfServiceLink || link("Termos de Uso")}} e com a {{ privacyPolicyLink || link("Política de Privacidade") }}',
       },
       continue: {
-        subtitle: 'Por favor, leia e aceite os termos para continuar',
+        subtitle: 'Por favor leia e aceite os termos para continuar',
         title: 'Continuar',
       },
     },
@@ -525,19 +526,21 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu telefone',
     },
     restrictedAccess: {
-      actionLink: 'Entrar em contato com o suporte',
-      actionText: 'Precisa de ajuda?',
-      blockButton__emailSupport: 'Entre em contato por e-mail',
-      blockButton__joinWaitlist: 'Entrar na lista de espera',
-      subtitle: 'Você não tem acesso a esta área no momento.',
-      subtitleWaitlist: 'Aguardando acesso, você será notificado quando estiver disponível.',
+      actionLink: 'Entrar',
+      actionText: 'Já possui uma conta?',
+      blockButton__emailSupport: 'Suporte por e-mail',
+      blockButton__joinWaitlist: 'Entre na lista de espera',
+      subtitle:
+        'Cadastros estão desabilitados no momento. Se você deveria ter acesso, por favor entre em contato com o suporte.',
+      subtitleWaitlist:
+        'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançaremos, entre na lista de espera.',
       title: 'Acesso restrito',
     },
 
     start: {
       actionLink: 'Entrar',
-      actionLink__use_email: 'Usar e-mail',
-      actionLink__use_phone: 'Usar telefone',
+      actionLink__use_email: 'Ou use e-mail',
+      actionLink__use_phone: 'Ou use telefone',
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
@@ -820,7 +823,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: 'Sua conta foi desconectada. Por favor, conecte novamente para continuar.',
+        subtitle__disconnected: 'Esta conta foi descontectada',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
@@ -915,16 +918,16 @@ export const ptBR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Clique aqui para saber mais',
-      actionText: 'Entre na lista de espera',
-      formButton: 'Enviar solicitação',
-      subtitle: 'Inscreva-se para garantir sua vaga na lista de espera.',
-      title: 'Junte-se à nossa lista de espera',
+      actionLink: 'Entrar',
+      actionText: 'Já possui acesso?',
+      formButton: 'Entrar na lista de espera',
+      subtitle: 'Entre com seu e-mail e entraremos em contato quando seu lugar estiver disponível',
+      title: 'Entre na lista de espera',
     },
     success: {
-      message: 'Você foi adicionado com sucesso à lista de espera!',
-      subtitle: 'Agradecemos pelo interesse. Entraremos em contato em breve.',
-      title: 'Inscrição bem-sucedida',
+      message: 'Te redireceionando em breve...',
+      subtitle: 'Entraremos em contato quando seu lugar estiver disponível',
+      title: 'Obrigado por entrar na lista de espera!',
     },
   },
 } as const;
