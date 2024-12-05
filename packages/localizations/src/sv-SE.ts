@@ -463,6 +463,7 @@ export const svSE: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Logga in',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifieringskod',

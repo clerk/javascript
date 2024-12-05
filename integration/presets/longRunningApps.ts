@@ -32,6 +32,7 @@ export const createLongRunningApps = () => {
     },
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'next.appRouter.withReverification', config: next.appRouter, env: envs.withReverification },
+    { id: 'next.appRouter.withCombinedFlow', config: next.appRouter, env: envs.withCombinedFlow },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
