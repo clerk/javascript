@@ -175,7 +175,7 @@ export const ruRU: LocalizationResource = {
     navbar: {
       description: 'Управлять вашей организацией.',
       general: 'Общее',
-      members: 'Участници',
+      members: 'Участники',
       title: 'Организация',
     },
     profilePage: {
@@ -268,10 +268,10 @@ export const ruRU: LocalizationResource = {
   organizationSwitcher: {
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
-    action__manageOrganization: 'Управление организацией',
+    action__manageOrganization: 'Настройки',
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
-    personalWorkspace: 'Личное рабочее пространство',
+    personalWorkspace: 'Личный профиль',
     suggestionsAcceptedLabel: 'Ожидает одобрения',
   },
   paginationButton__next: 'Вперед',
