@@ -6,9 +6,6 @@
       "default": "./components.client.js"
     },
     "#safe-node-apis": {
-      "edge-light": "./runtime/browser/safe-node-apis.js",
-      "worker": "./runtime/browser/safe-node-apis.js",
-      "browser": "./runtime/browser/safe-node-apis.js",
       "node": "./runtime/node/safe-node-apis.js",
       "default": "./runtime/browser/safe-node-apis.js"
     }
