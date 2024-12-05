@@ -82,6 +82,7 @@ export interface MountProps {
   mount: (node: HTMLDivElement, props: any) => void;
   unmount: (node: HTMLDivElement) => void;
   updateProps: (props: any) => void;
+  fallback?: React.ReactNode;
   props?: any;
 }
 

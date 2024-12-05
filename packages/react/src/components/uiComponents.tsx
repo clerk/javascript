@@ -46,6 +46,50 @@ import {
 } from '../utils';
 import { withClerk } from './withClerk';
 
+/**
+ * Used to detect when a Clerk component has been added to the DOM.
+ */
+function waitForElementChildren(options: { root: HTMLElement | null; timeout?: number }) {
+  const { root = document, timeout = 0 } = options;
+
+  return new Promise<void>((resolve, reject) => {
+    if (!root) {
+      reject(new Error('No root element provided'));
+      return;
+    }
+
+    // Check if the element already has child nodes
+    const isElementAlreadyPresent = root?.childElementCount && root.childElementCount > 0;
+    if (isElementAlreadyPresent) {
+      resolve();
+      return;
+    }
+
+    // Set up a MutationObserver to detect when the element has children
+    const observer = new MutationObserver(mutationsList => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          if (root?.childElementCount && root.childElementCount > 0) {
+            observer.disconnect();
+            resolve();
+            return;
+          }
+        }
+      }
+    });
+
+    observer.observe(root, { childList: true });
+
+    // Set up an optional timeout to reject the promise if the element never gets child nodes
+    if (timeout > 0) {
+      setTimeout(() => {
+        observer.disconnect();
+        reject(new Error(`Timeout waiting for element children`));
+      }, timeout);
+    }
+  });
+}
+
 type UserProfileExportType = typeof _UserProfile & {
   Page: typeof UserProfilePage;
   Link: typeof UserProfileLink;
@@ -117,7 +161,7 @@ const isOpenProps = (props: any): props is OpenProps => {
   return 'open' in props;
 };
 
-// README: <Portal/> should be a class pure component in order for mount and unmount
+// README: <ClerkHostRenderer/> should be a class pure component in order for mount and unmount
 // lifecycle props to be invoked correctly. Replacing the class component with a
 // functional component wrapped with a React.memo is not identical to the original
 // class implementation due to React intricacies such as the useEffect’s cleanup
@@ -146,10 +190,18 @@ const isOpenProps = (props: any): props is OpenProps => {
 
 // Portal.displayName = 'ClerkPortal';
 
-class Portal extends React.PureComponent<
-  PropsWithChildren<(MountProps | OpenProps) & { hideRootHtmlElement?: boolean }>
+/**
+ * Used to orchestrate mounting of Clerk components in a host React application.
+ * Components are rendered into a specific DOM node using mount/unmount methods provided by the Clerk class.
+ */
+class ClerkHostRenderer extends React.PureComponent<
+  PropsWithChildren<(MountProps | OpenProps) & { component?: string; hideRootHtmlElement?: boolean }>
 > {
-  private portalRef = React.createRef<HTMLDivElement>();
+  private rootRef = React.createRef<HTMLDivElement>();
+
+  state = {
+    rendering: true,
+  };
 
   componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
     if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
@@ -166,28 +218,39 @@ class Portal extends React.PureComponent<
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
 
     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
-      if (this.portalRef.current) {
-        this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+      if (this.rootRef.current) {
+        this.props.updateProps({ node: this.rootRef.current, props: this.props.props });
       }
     }
   }
 
   componentDidMount() {
-    if (this.portalRef.current) {
+    if (this.rootRef.current) {
       if (isMountProps(this.props)) {
-        this.props.mount(this.portalRef.current, this.props.props);
+        this.props.mount(this.rootRef.current, this.props.props);
       }
 
       if (isOpenProps(this.props)) {
         this.props.open(this.props.props);
       }
     }
+
+    // Watch for the element to be added to the DOM so we can render a fallback.
+    if (this.props.component) {
+      waitForElementChildren({ root: this.rootRef.current })
+        .then(() => {
+          this.setState({ rendering: false });
+        })
+        .catch(() => {
+          this.setState({ rendering: false });
+        });
+    }
   }
 
   componentWillUnmount() {
-    if (this.portalRef.current) {
+    if (this.rootRef.current) {
       if (isMountProps(this.props)) {
-        this.props.unmount(this.portalRef.current);
+        this.props.unmount(this.rootRef.current);
       }
       if (isOpenProps(this.props)) {
         this.props.close();
@@ -197,9 +260,16 @@ class Portal extends React.PureComponent<
 
   render() {
     const { hideRootHtmlElement = false } = this.props;
+    const rootAttributes = {
+      ref: this.rootRef,
+      ...(this.props.component ? { 'data-clerk-component': this.props.component } : {}),
+      ...(this.state.rendering && 'fallback' in this.props ? { style: { display: 'none' } } : {}),
+    };
+
     return (
       <>
-        {!hideRootHtmlElement && <div ref={this.portalRef} />}
+        {!hideRootHtmlElement && <div {...rootAttributes} />}
+        {this.state.rendering && 'fallback' in this.props && this.props.fallback}
         {this.props.children}
       </>
     );
@@ -215,20 +285,23 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   );
 };
 
-export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+// @ts-expect-error -- FIXME
+export const SignIn = withClerk(({ clerk, fallback, ...props }: WithClerkProp<SignInProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
+      component='SignIn'
       mount={clerk.mountSignIn}
       unmount={clerk.unmountSignIn}
       updateProps={(clerk as any).__unstable__updateProps}
       props={props}
+      fallback={fallback}
     />
   );
 }, 'SignIn');
 
 export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
       mount={clerk.mountSignUp}
       unmount={clerk.unmountSignUp}
       updateProps={(clerk as any).__unstable__updateProps}
@@ -251,14 +324,14 @@ const _UserProfile = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<UserProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     return (
-      <Portal
+      <ClerkHostRenderer
         mount={clerk.mountUserProfile}
         unmount={clerk.unmountUserProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
       >
         <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-      </Portal>
+      </ClerkHostRenderer>
     );
   },
   'UserProfile',
@@ -297,14 +370,14 @@ const _UserButton = withClerk(
 
     return (
       <UserButtonContext.Provider value={passableProps}>
-        <Portal
+        <ClerkHostRenderer
           {...passableProps}
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {/*This mimics the previous behaviour before asProvider existed*/}
           {props.__experimental_asProvider ? sanitizedChildren : null}
           <CustomPortalsRenderer {...portalProps} />
-        </Portal>
+        </ClerkHostRenderer>
       </UserButtonContext.Provider>
     );
   },
@@ -337,7 +410,7 @@ export function UserButtonOutlet(outletProps: Without<UserButtonProps, 'userProf
     },
   } satisfies MountProps;
 
-  return <Portal {...portalProps} />;
+  return <ClerkHostRenderer {...portalProps} />;
 }
 
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
@@ -363,14 +436,14 @@ const _OrganizationProfile = withClerk(
   ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<OrganizationProfileProps, 'customPages'>>>) => {
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
     return (
-      <Portal
+      <ClerkHostRenderer
         mount={clerk.mountOrganizationProfile}
         unmount={clerk.unmountOrganizationProfile}
         updateProps={(clerk as any).__unstable__updateProps}
         props={{ ...props, customPages }}
       >
         <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-      </Portal>
+      </ClerkHostRenderer>
     );
   },
   'OrganizationProfile',
@@ -383,7 +456,7 @@ export const OrganizationProfile: OrganizationProfileExportType = Object.assign(
 
 export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<CreateOrganizationProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
       mount={clerk.mountCreateOrganization}
       unmount={clerk.unmountCreateOrganization}
       updateProps={(clerk as any).__unstable__updateProps}
@@ -420,14 +493,14 @@ const _OrganizationSwitcher = withClerk(
 
     return (
       <OrganizationSwitcherContext.Provider value={passableProps}>
-        <Portal
+        <ClerkHostRenderer
           {...passableProps}
           hideRootHtmlElement={!!props.__experimental_asProvider}
         >
           {/*This mimics the previous behaviour before asProvider existed*/}
           {props.__experimental_asProvider ? sanitizedChildren : null}
           <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-        </Portal>
+        </ClerkHostRenderer>
       </OrganizationSwitcherContext.Provider>
     );
   },
@@ -447,7 +520,7 @@ export function OrganizationSwitcherOutlet(
     },
   } satisfies MountProps;
 
-  return <Portal {...portalProps} />;
+  return <ClerkHostRenderer {...portalProps} />;
 }
 
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
@@ -458,7 +531,7 @@ export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assig
 
 export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
       mount={clerk.mountOrganizationList}
       unmount={clerk.unmountOrganizationList}
       updateProps={(clerk as any).__unstable__updateProps}
@@ -469,7 +542,7 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
 
 export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<GoogleOneTapProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
       open={clerk.openGoogleOneTap}
       close={clerk.closeGoogleOneTap}
       props={props}
@@ -479,7 +552,7 @@ export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<Google
 
 export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistProps>) => {
   return (
-    <Portal
+    <ClerkHostRenderer
       mount={clerk.mountWaitlist}
       unmount={clerk.unmountWaitlist}
       updateProps={(clerk as any).__unstable__updateProps}
