@@ -42,7 +42,7 @@ function _SignUpStart(): JSX.Element {
   const options = useOptions();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
-  const isCombinedFlow = (options.experimental?.combinedFlow && !!isWithinSignInContext) || false;
+  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
