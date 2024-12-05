@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
@@ -84,9 +84,15 @@ function _SignUpContinue() {
     [signUp.missingFields],
   );
 
-  // Redirect to sign-up if there is no persisted sign-up
+  useEffect(() => {
+    // Redirect to sign-up if there is no persisted sign-up
+    if (!signUp.id) {
+      void navigate(displayConfig.signUpUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!signUp.id) {
-    void navigate(displayConfig.signUpUrl);
     return <LoadingCard />;
   }
 
