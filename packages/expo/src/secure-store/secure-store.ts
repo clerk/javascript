@@ -150,9 +150,12 @@ export const createSecureStore = (): IStorage => {
 };
 
 const splitIntoChunks = (value: string, chunkSize = CLERK_DEFAULT_CHUNK_SIZE): string[] => {
-  const chunks = [];
-  for (let i = 0; i < value.length; i += chunkSize) {
-    chunks.push(value.substring(i, i + chunkSize));
+  // Array.from is used to handle unicode characters correctly
+  const characters = Array.from(value);
+
+  const chunks: string[] = [];
+  for (let i = 0; i < characters.length; i += chunkSize) {
+    chunks.push(characters.slice(i, i + chunkSize).join(''));
   }
   return chunks;
 };
