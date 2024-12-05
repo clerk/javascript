@@ -1,6 +1,7 @@
 export { arSA } from './ar-SA';
 export { beBY } from './be-BY';
 export { enUS } from './en-US';
+export { enGB } from './en-GB';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
 export { deDE } from './de-DE';
