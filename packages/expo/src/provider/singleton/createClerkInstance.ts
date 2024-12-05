@@ -101,7 +101,10 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             } catch (err) {
               // Retry after 3 seconds if the error is a network error or a 5xx error
               if (isClerkNetworkError(err) || !is4xxError(err)) {
-                setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
+                // Retry after 2 seconds if the error is a network error
+                // Retry after 10 seconds if the error is a 5xx FAPI error
+                const timeout = isClerkNetworkError(err) ? 2000 : 10000;
+                setTimeout(() => void retryInitilizeResourcesFromFAPI(), timeout);
               }
             }
           };
