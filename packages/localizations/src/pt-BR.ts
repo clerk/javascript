@@ -52,20 +52,20 @@ export const ptBR: LocalizationResource = {
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug:
     'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
-  formFieldInputPlaceholder__backupCode: undefined,
+  formFieldInputPlaceholder__backupCode: 'Insira o código de backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
-  formFieldInputPlaceholder__emailAddress: undefined,
-  formFieldInputPlaceholder__emailAddress_username: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Digite o endereço de e-mail',
+  formFieldInputPlaceholder__emailAddress_username: 'Digite seu e-mail ou nome de usuário',
   formFieldInputPlaceholder__emailAddresses: 'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
-  formFieldInputPlaceholder__organizationDomain: undefined,
-  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
-  formFieldInputPlaceholder__organizationName: undefined,
+  formFieldInputPlaceholder__firstName: 'Digite seu primeiro nome',
+  formFieldInputPlaceholder__lastName: 'Digite seu sobrenome',
+  formFieldInputPlaceholder__organizationDomain: 'Digite o domínio da organização',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: 'Digite o e-mail associado ao domínio da organização',
+  formFieldInputPlaceholder__organizationName: 'Digite o nome da organização',
   formFieldInputPlaceholder__organizationSlug: 'minha-org',
-  formFieldInputPlaceholder__password: undefined,
-  formFieldInputPlaceholder__phoneNumber: undefined,
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__password: 'Digite sua senha',
+  formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
+  formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -131,7 +131,7 @@ export const ptBR: LocalizationResource = {
       action__invite: 'Convidar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
-        tableHeader__actions: undefined,
+        tableHeader__actions: 'Ações',
         tableHeader__joined: 'Entrou',
         tableHeader__role: 'Função',
         tableHeader__user: 'Usuário',
@@ -271,6 +271,60 @@ export const ptBR: LocalizationResource = {
   paginationButton__previous: 'Anterior',
   paginationRowText__displaying: 'Exibindo',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Solicitar ajuda',
+      actionText: 'Não tem nenhum dos métodos? Tente outra forma.',
+      blockButton__backupCode: 'Usar código de backup',
+      blockButton__emailCode: 'Enviar código para {{identifier}}',
+      blockButton__password: 'Usar senha',
+      blockButton__phoneCode: 'Enviar código de telefone',
+      blockButton__totp: 'Usar autenticação TOTP',
+      getHelp: {
+        blockButton__emailSupport: 'Entrar em contato com o suporte',
+        content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.',
+      },
+      subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.',
+      title: 'Métodos alternativos de verificação',
+    },
+    backupCodeMfa: {
+      subtitle: 'Digite seu código de backup para continuar.',
+      title: 'Verificação com código de backup',
+    },
+    emailCode: {
+      formTitle: 'Código enviado para seu e-mail',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu e-mail e insira o código para continuar.',
+      title: 'Verifique seu e-mail',
+    },
+    noAvailableMethods: {
+      message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.',
+      subtitle: 'Não há métodos de verificação disponíveis no momento.',
+      title: 'Métodos de verificação indisponíveis',
+    },
+    password: {
+      actionLink: 'Usar outro método',
+      subtitle: 'Digite sua senha para continuar.',
+      title: 'Digite sua senha',
+    },
+    phoneCode: {
+      formTitle: 'Código de verificação',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu celular para o código de verificação.',
+      title: 'Verifique seu celular',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Código de verificação',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu celular para o código de verificação.',
+      title: 'Verifique seu celular',
+    },
+    totpMfa: {
+      formTitle: 'Código de verificação TOTP',
+      subtitle: 'Digite o código de verificação gerado pelo seu aplicativo de autenticação.',
+      title: 'Autenticação TOTP',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Adicionar conta',
@@ -403,7 +457,7 @@ export const ptBR: LocalizationResource = {
       actionLink__use_phone: 'Usar telefone',
       actionLink__use_username: 'Usar nome de usuário',
       actionText: 'Não possui uma conta?',
-      actionText__join_waitlist: 'Quer ser um dos primeiros a acessar?',
+      actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
     },
@@ -460,9 +514,10 @@ export const ptBR: LocalizationResource = {
       },
       continue: {
         subtitle: 'Por favor leia e aceite os termos para continuar',
-        title: 'Consentimento legal',
+        title: 'Continuar',
       },
     },
+
     phoneCode: {
       formSubtitle: 'Insira o código enviado para seu telefone',
       formTitle: 'Código de verificação',
@@ -479,8 +534,9 @@ export const ptBR: LocalizationResource = {
         'Cadastros estão desabilitados no momento. Se você deveria ter acesso, por favor entre em contato com o suporte.',
       subtitleWaitlist:
         'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançaremos, entre na lista de espera.',
-      title: 'Acess restrito',
+      title: 'Acesso restrito',
     },
+
     start: {
       actionLink: 'Entrar',
       actionLink__use_email: 'Ou use e-mail',
@@ -767,7 +823,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: 'Esta conta foi descontectada,',
+        subtitle__disconnected: 'Esta conta foi descontectada',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
@@ -857,7 +913,7 @@ export const ptBR: LocalizationResource = {
       subtitle__unavailableWallets: 'Não há carteiras Web3 disponíveis.',
       successMessage: 'A carteira foi adicionada à sua conta.',
       title: 'Adicionar carteira Web3',
-      web3WalletButtonsBlockButton: undefined,
+      web3WalletButtonsBlockButton: 'Conectar carteira Web3',
     },
   },
   reverification: {

@@ -27,8 +27,10 @@ import type {
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
+  getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
 import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
@@ -291,6 +293,26 @@ export class SignUp extends BaseResource implements SignUpResource {
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  public authenticateWithOKXWallet = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return this;
+    }
+
+    const identifier = await getOKXWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithOKXWallet,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
     });
   };

@@ -14,6 +14,7 @@ import type {
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithOKXWalletParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -77,6 +78,7 @@ import {
   errorThrower,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
@@ -958,7 +960,7 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
         `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
       );
@@ -972,7 +974,8 @@ export class Clerk implements ClerkInterface {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
+    if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
@@ -1542,6 +1545,18 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_okx_wallet_signature',
+    });
+  };
+
   public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
@@ -1561,7 +1576,11 @@ export class Clerk implements ClerkInterface {
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
-      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
+      provider === 'metamask'
+        ? generateSignatureWithMetamask
+        : provider === 'coinbase_wallet'
+          ? generateSignatureWithCoinbaseWallet
+          : generateSignatureWithOKXWallet;
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
@@ -1647,7 +1666,12 @@ export class Clerk implements ClerkInterface {
 
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
+
+      // Note: this might set this.session to null
       this.#setAccessors(session);
+
+      // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();
@@ -1846,8 +1870,6 @@ export class Clerk implements ClerkInterface {
         // set in updateClient
         this.updateEnvironment(environment);
 
-        this.#authService.setActiveOrganizationInStorage();
-
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
@@ -1877,8 +1899,8 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
-      this.#handleAccountlessPrompt();
+    if (__BUILD_FLAG_KEYLESS_UI__) {
+      this.#handleKeylessPrompt();
     }
     return true;
   };
@@ -2009,12 +2031,12 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #handleAccountlessPrompt = () => {
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
+  #handleKeylessPrompt = () => {
+    if (__BUILD_FLAG_KEYLESS_UI__) {
       void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimAccountlessKeysUrl) {
+        if (this.#options.__internal_claimKeylessApplicationUrl) {
           controls.updateProps({
-            options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
           });
         }
       });
@@ -2093,4 +2115,14 @@ export class Clerk implements ClerkInterface {
       // ignore
     }
   };
+
+  get #allowedRedirectProtocols() {
+    let allowedProtocols = ALLOWED_PROTOCOLS;
+
+    if (this.#options.allowedRedirectProtocols) {
+      allowedProtocols = allowedProtocols.concat(this.#options.allowedRedirectProtocols);
+    }
+
+    return allowedProtocols;
+  }
 }

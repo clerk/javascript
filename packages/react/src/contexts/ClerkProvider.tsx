@@ -8,10 +8,10 @@ import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
-  const { initialState, children, ...restIsomorphicClerkOptions } = props;
+  const { initialState, children, __internal_bypassMissingPublishableKey, ...restIsomorphicClerkOptions } = props;
   const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
 
-  if (!userInitialisedClerk) {
+  if (!userInitialisedClerk && !__internal_bypassMissingPublishableKey) {
     if (!publishableKey) {
       errorThrower.throwMissingPublishableKeyError();
     } else if (publishableKey && !isPublishableKey(publishableKey)) {

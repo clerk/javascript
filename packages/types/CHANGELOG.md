@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.38.0
+
+### Minor Changes
+
+- Deprecate the following constants and functions: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OAUTH_PROVIDERS`
+  - `getOAuthProviderData()`
+  - `sortedOAuthProviders()`
+  - `WEB3_PROVIDERS`
+  - `getWeb3ProviderData()`
+
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.36.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.35.1
+
+### Patch Changes
+
+- Add support for the new `enterprise_sso` strategy. ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise Single Sign On regardless of the underlying protocol used to authenticate the user.
+  For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+  - Add a new user setting `enterpriseSSO`, this gets enabled when there is an active enterprise connection for an instance.
+  - Add support for signing in / signing up with the new `enterprise_sso` strategy.
+  - Deprecated `userSettings.saml` in favor of `enterprise_sso`.
+  - Deprecated `saml` sign in strategy in favor of `enterprise_sso`.
+
 ## 4.35.0
 
 ### Minor Changes
