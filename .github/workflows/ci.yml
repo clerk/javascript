@@ -2,13 +2,9 @@ name: CI
 
 on:
   workflow_dispatch:
-    inputs:
-      run_integration_tests:
-        description: 'Run integration tests'
-        type: boolean
-        default: false
   merge_group:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize]
     branches:
       - main
       - release/v4
@@ -18,7 +14,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # We must first check whether it is a external contribution, before processing to checkout the code and running jobs with access to secrets
+  check-permissions:
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
   formatting-linting:
+    needs: [check-permissions]
     name: Formatting, linting & changeset checks
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -32,6 +49,7 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
@@ -85,6 +103,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
+    needs: [check-permissions]
     name: Unit Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -102,6 +121,7 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
@@ -136,6 +156,7 @@ jobs:
           retention-days: 5
 
   integration-tests:
+    needs: [check-permissions]
     name: Integration Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
@@ -157,29 +178,11 @@ jobs:
             next-version: '15'
 
     steps:
-      # Skip integration tests from fork PRs to prevent secret exfiltration
-      - name: Get User Permission
-        id: checkAccess
-        uses: actions-cool/check-user-permission@v2
-        with:
-          require: write
-          username: ${{ github.triggering_actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check User Permission
-        if: steps.checkAccess.outputs.require-result == 'false'
-        run: |
-          echo "${{ github.triggering_actor }} does not have permissions on this repo."
-          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
-          echo "Job originally triggered by ${{ github.actor }}"
-          exit 1
-
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
-          # We must first verify the user permissions before checking out PR code
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
