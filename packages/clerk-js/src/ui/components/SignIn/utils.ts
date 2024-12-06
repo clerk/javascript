@@ -1,6 +1,7 @@
 import { titleize } from '@clerk/shared/underscore';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
+import type { FormControlState } from 'ui/utils';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
@@ -108,3 +109,16 @@ export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
+
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
+  if (identifier.type === 'tel') {
+    return 'phoneNumber';
+  }
+
+  if (isEmail(identifier.value)) {
+    return 'emailAddress';
+  }
+
+  return 'username';
+}

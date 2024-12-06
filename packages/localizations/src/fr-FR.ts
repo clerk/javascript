@@ -465,6 +465,7 @@ export const frFR: LocalizationResource = {
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
       title: "S'identifier",
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Le code de vérification',

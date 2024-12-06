@@ -460,6 +460,7 @@ export const itIT: LocalizationResource = {
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Accedi',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Codice di verifica',

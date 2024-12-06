@@ -1,7 +1,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
-export const enUS: LocalizationResource = {
-  locale: 'en-US',
+export const enGB: LocalizationResource = {
+  locale: 'en-GB',
   backButton: 'Back',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
@@ -12,19 +12,19 @@ export const enUS: LocalizationResource = {
   badge__userDevice: 'User device',
   badge__you: 'You',
   createOrganization: {
-    formButtonSubmit: 'Create organization',
+    formButtonSubmit: 'Create organisation',
     invitePage: {
       formButtonReset: 'Skip',
     },
-    title: 'Create organization',
+    title: 'Create organisation',
   },
   dates: {
-    lastDay: "Yesterday at {{ date | timeString('en-US') }}",
-    next6Days: "{{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
-    nextDay: "Tomorrow at {{ date | timeString('en-US') }}",
-    numeric: "{{ date | numeric('en-US') }}",
-    previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
-    sameDay: "Today at {{ date | timeString('en-US') }}",
+    lastDay: "Yesterday at {{ date | timeString('en-GB') }}",
+    next6Days: "{{ date | weekday('en-GB','long') }} at {{ date | timeString('en-GB') }}",
+    nextDay: "Tomorrow at {{ date | timeString('en-GB') }}",
+    numeric: "{{ date | numeric('en-GB') }}",
+    previous6Days: "Last {{ date | weekday('en-GB','long') }} at {{ date | timeString('en-GB') }}",
+    sameDay: "Today at {{ date | timeString('en-GB') }}",
   },
   dividerText: 'or',
   footerActionLink__useAnotherMethod: 'Use another method',
@@ -40,7 +40,7 @@ export const enUS: LocalizationResource = {
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Confirm account deletion',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
   formFieldInputPlaceholder__emailAddress_username: 'Enter email or username',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -48,7 +48,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__lastName: 'Last name',
   formFieldInputPlaceholder__organizationDomain: 'example.com',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
-  formFieldInputPlaceholder__organizationName: 'Organization name',
+  formFieldInputPlaceholder__organizationName: 'Organisation name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Enter your password',
@@ -87,15 +87,15 @@ export const enUS: LocalizationResource = {
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
   organizationList: {
-    action__createOrganization: 'Create organization',
+    action__createOrganization: 'Create organisation',
     action__invitationAccept: 'Join',
     action__suggestionsAccept: 'Request to join',
-    createOrganization: 'Create Organization',
+    createOrganization: 'Create Organisation',
     invitationAcceptedLabel: 'Joined',
     subtitle: 'to continue to {{applicationName}}',
     suggestionsAcceptedLabel: 'Pending approval',
     title: 'Choose an account',
-    titleWithoutPersonal: 'Choose an organization',
+    titleWithoutPersonal: 'Choose an organisation',
   },
   organizationProfile: {
     badge__automaticInvitation: 'Automatic invitations',
@@ -104,7 +104,7 @@ export const enUS: LocalizationResource = {
     badge__unverified: 'Unverified',
     createDomainPage: {
       subtitle:
-        'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
+        'Add the domain to verify. Users with email addresses at this domain can join the organisation automatically or request to join.',
       title: 'Add domain',
     },
     invitePage: {
@@ -129,7 +129,7 @@ export const enUS: LocalizationResource = {
       invitationsTab: {
         autoInvitations: {
           headerSubtitle:
-            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
+            'Invite users by connecting an email domain with your organisation. Anyone who signs up with a matching email domain will be able to join the organisation anytime.',
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
@@ -142,7 +142,7 @@ export const enUS: LocalizationResource = {
       requestsTab: {
         autoSuggestions: {
           headerSubtitle:
-            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
+            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organisation.',
           headerTitle: 'Automatic suggestions',
           primaryButton: 'Manage verified domains',
         },
@@ -158,27 +158,27 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
-      description: 'Manage your organization.',
+      description: 'Manage your organisation.',
       general: 'General',
       members: 'Members',
-      title: 'Organization',
+      title: 'Organisation',
     },
     profilePage: {
       dangerSection: {
         deleteOrganization: {
           actionDescription: 'Type "{{organizationName}}" below to continue.',
-          messageLine1: 'Are you sure you want to delete this organization?',
+          messageLine1: 'Are you sure you want to delete this organisation?',
           messageLine2: 'This action is permanent and irreversible.',
-          successMessage: 'You have deleted the organization.',
-          title: 'Delete organization',
+          successMessage: 'You have deleted the organisation.',
+          title: 'Delete organisation',
         },
         leaveOrganization: {
           actionDescription: 'Type "{{organizationName}}" below to continue.',
           messageLine1:
-            'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
+            'Are you sure you want to leave this organisation? You will lose access to this organisation and its applications.',
           messageLine2: 'This action is permanent and irreversible.',
-          successMessage: 'You have left the organization.',
-          title: 'Leave organization',
+          successMessage: 'You have left the organisation.',
+          title: 'Leave organisation',
         },
         title: 'Danger',
       },
@@ -188,15 +188,15 @@ export const enUS: LocalizationResource = {
         menuAction__verify: 'Verify',
         primaryButton: 'Add domain',
         subtitle:
-          'Allow users to join the organization automatically or request to join based on a verified email domain.',
+          'Allow users to join the organisation automatically or request to join based on a verified email domain.',
         title: 'Verified domains',
       },
-      successMessage: 'The organization has been updated.',
+      successMessage: 'The organisation has been updated.',
       title: 'Update profile',
     },
     removeDomainPage: {
       messageLine1: 'The email domain {{domain}} will be removed.',
-      messageLine2: 'Users won’t be able to join the organization automatically after this.',
+      messageLine2: 'Users won’t be able to join the organisation automatically after this.',
       successMessage: '{{domain}} has been removed.',
       title: 'Remove domain',
     },
@@ -205,7 +205,7 @@ export const enUS: LocalizationResource = {
       headerTitle__members: 'Members',
       profileSection: {
         primaryButton: 'Update profile',
-        title: 'Organization Profile',
+        title: 'Organisation Profile',
         uploadAction__title: 'Logo',
       },
     },
@@ -218,17 +218,17 @@ export const enUS: LocalizationResource = {
       },
       enrollmentTab: {
         automaticInvitationOption__description:
-          'Users are automatically invited to join the organization when they sign-up and can join anytime.',
+          'Users are automatically invited to join the organisation when they sign-up and can join anytime.',
         automaticInvitationOption__label: 'Automatic invitations',
         automaticSuggestionOption__description:
-          'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organization.',
+          'Users receive a suggestion to request to join, but must be approved by an admin before they are able to join the organisation.',
         automaticSuggestionOption__label: 'Automatic suggestions',
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        manualInvitationOption__description: 'Users can only be invited manually to the organization.',
+        manualInvitationOption__description: 'Users can only be invited manually to the organisation.',
         manualInvitationOption__label: 'No automatic enrollment',
-        subtitle: 'Choose how users from this domain can join the organization.',
+        subtitle: 'Choose how users from this domain can join the organisation.',
       },
       start: {
         headerTitle__danger: 'Danger',
@@ -247,11 +247,11 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
-    action__createOrganization: 'Create organization',
+    action__createOrganization: 'Create organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
     action__suggestionsAccept: 'Request to join',
-    notSelected: 'No organization selected',
+    notSelected: 'No organisation selected',
     personalWorkspace: 'Personal account',
     suggestionsAcceptedLabel: 'Pending approval',
   },
@@ -450,7 +450,6 @@ export const enUS: LocalizationResource = {
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
-      __experimental_titleCombined: 'Continue to {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -536,7 +535,7 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    already_a_member_in_organization: '{{email}} is already a member of the organisation.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -572,11 +571,11 @@ export const enUS: LocalizationResource = {
       'You do not have permission to access this page. Please contact support if you believe this is an error.',
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
-    organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organization’s SSO',
+    organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organisation’s SSO',
     organization_membership_quota_exceeded:
-      'You have reached your limit of organization memberships, including outstanding invitations.',
+      'You have reached your limit of organisation memberships, including outstanding invitations.',
     organization_minimum_permissions_needed:
-      'There has to be at least one organization member with the minimum required permissions.',
+      'There has to be at least one organisation member with the minimum required permissions.',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
@@ -809,12 +808,12 @@ export const enUS: LocalizationResource = {
       },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Reconnect',
-        actionLabel__reauthorize: 'Authorize now',
+        actionLabel__reauthorize: 'Authorise now',
         destructiveActionTitle: 'Remove',
         primaryButton: 'Connect account',
         subtitle__disconnected: 'This account has been disconnected.',
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorise this application to avoid any issues',
         title: 'Connected accounts',
       },
       dangerSection: {

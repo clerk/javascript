@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import type { FakeUser } from '../testUtils';
-import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { createTestUtils, type FakeUser, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in flow @generic @nextjs', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withCombinedFlow] })('combined sign in flow @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
@@ -21,6 +20,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   test.afterAll(async () => {
     await fakeUser.deleteIfExists();
     await app.teardown();
+  });
+
+  test('flows are combined', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+
+    await expect(u.page.getByText(`Don’t have an account?`)).toBeHidden();
   });
 
   test('sign in with email and password', async ({ page, context }) => {
