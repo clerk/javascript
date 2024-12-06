@@ -10,7 +10,7 @@ import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp }
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
-const mockEnvironmentFetch = jest.fn();
+const mockEnvironmentFetch = jest.fn(() => Promise.resolve({}));
 
 jest.mock('../resources/Client');
 jest.mock('../resources/Environment');
@@ -1735,7 +1735,16 @@ describe('Clerk singleton', () => {
   describe('.handleEmailLinkVerification()', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
-      mockEnvironmentFetch.mockReset();
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
     });
 
     it('completes the sign in flow if a session was created on this client', async () => {
@@ -1982,6 +1991,20 @@ describe('Clerk singleton', () => {
    * 3) Write test the mimic sync/link in prod
    */
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
+    beforeEach(() => {
+      mockClientFetch.mockReset();
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+    });
+
     it('domain is string, isSatellite is true', async () => {
       const sut = new Clerk(productionPublishableKey, {
         domain: 'example.com',

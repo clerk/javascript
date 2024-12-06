@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { is4xxError } from '@clerk/shared/error';
 import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type {
   ActJWTClaim,
@@ -25,7 +25,6 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
-import { fraudProtection } from '../fraudProtection';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -269,20 +268,9 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    // this handles all getToken invocations with skipCache: true
-    await fraudProtection.blockUntilReady();
-
-    const tokenResolver = Token.create(path, params).catch(e => {
-      if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-        return fraudProtection.execute(async () => {
-          const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
-          return Token.create(path, { ...params, ...captchaParams });
-        });
-      }
-      throw e;
-    });
-
+    const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
+
     return tokenResolver.then(token => {
       if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token });
