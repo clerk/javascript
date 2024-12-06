@@ -20,7 +20,7 @@ How to use it:
 1. Install the `expo-secure-store` package in your project by running:
 
     ```bash
-    npm i expo-secure-store`
+    npm i expo-secure-store
     ```
 
 2. Use `import { secureStore } from "@clerk/clerk-expo/secure-store"` to import our implementation of the `SecureStore` API.
