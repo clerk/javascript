@@ -9,7 +9,6 @@ import type {
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
-  AuthenticateWithOKXWalletParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
@@ -129,7 +128,6 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align Promise unknown
   authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
   authenticateWithCoinbaseWallet: (params: AuthenticateWithCoinbaseWalletParams) => Promise<void>;
-  authenticateWithOKXWallet: (params: AuthenticateWithOKXWalletParams) => Promise<void>;
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<void>;
   authenticateWithGoogleOneTap: (
     params: AuthenticateWithGoogleOneTapParams,
@@ -227,13 +225,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (
-      !inBrowser() ||
-      !this.#instance ||
-      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
-      // Allow hot swapping PKs on the client
-      this.#instance.publishableKey !== options.publishableKey
-    ) {
+    if (!inBrowser() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
@@ -284,9 +276,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
 
-    if (this.#publishableKey) {
-      void this.loadClerkJS();
-    }
+    void this.loadClerkJS();
   }
 
   get sdkMetadata(): SDKMetadata | undefined {
@@ -1146,15 +1136,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
-    }
-  };
-
-  authenticateWithOKXWallet = async (params: AuthenticateWithOKXWalletParams): Promise<void> => {
-    const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
     }
   };
 

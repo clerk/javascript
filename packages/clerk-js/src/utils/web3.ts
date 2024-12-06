@@ -48,10 +48,6 @@ export async function getCoinbaseWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'coinbase_wallet' });
 }
 
-export async function getOKXWalletIdentifier(): Promise<string> {
-  return await getWeb3Identifier({ provider: 'okx_wallet' });
-}
-
 type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
@@ -63,10 +59,6 @@ export async function generateSignatureWithMetamask(params: GenerateSignaturePar
 
 export async function generateSignatureWithCoinbaseWallet(params: GenerateSignatureParams): Promise<string> {
   return await generateWeb3Signature({ ...params, provider: 'coinbase_wallet' });
-}
-
-export async function generateSignatureWithOKXWallet(params: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ ...params, provider: 'okx_wallet' });
 }
 
 async function getEthereumProvider(provider: Web3Provider) {

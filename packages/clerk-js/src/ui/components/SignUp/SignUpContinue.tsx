@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
-import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -33,9 +33,6 @@ function _SignUpContinue() {
   const { attributes } = userSettings;
   const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
   const signUp = useCoreSignUp();
-  const options = useOptions();
-  const isWithinSignInContext = !!React.useContext(SignInContext);
-  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -87,15 +84,9 @@ function _SignUpContinue() {
     [signUp.missingFields],
   );
 
-  useEffect(() => {
-    // Redirect to sign-up if there is no persisted sign-up
-    if (!signUp.id) {
-      void navigate(displayConfig.signUpUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // Redirect to sign-up if there is no persisted sign-up
   if (!signUp.id) {
+    void navigate(displayConfig.signUpUrl);
     return <LoadingCard />;
   }
 
@@ -221,15 +212,13 @@ function _SignUpContinue() {
         </Card.Content>
 
         <Card.Footer>
-          {!isCombinedFlow ? (
-            <Card.Action elementId='signUp'>
-              <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
-              <Card.ActionLink
-                localizationKey={localizationKeys('signUp.continue.actionLink')}
-                to={isCombinedFlow ? '../../' : clerk.buildUrlWithAuth(signInUrl)}
-              />
-            </Card.Action>
-          ) : null}
+          <Card.Action elementId='signUp'>
+            <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signUp.continue.actionLink')}
+              to={clerk.buildUrlWithAuth(signInUrl)}
+            />
+          </Card.Action>
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

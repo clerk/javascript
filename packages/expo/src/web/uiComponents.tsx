@@ -12,7 +12,6 @@ import {
   SignUpButton as BaseSignUpButton,
   UserButton as BaseUserButton,
   UserProfile as BaseUserProfile,
-  Waitlist as BaseWaitlist,
 } from '@clerk/clerk-react';
 import { Platform } from 'react-native';
 
@@ -50,4 +49,3 @@ export const SignOutButton: typeof BaseSignOutButton = WrapComponent(BaseSignOut
 export const SignInWithMetamaskButton: typeof BaseSignInWithMetamaskButton =
   WrapComponent(BaseSignInWithMetamaskButton);
 export const GoogleOneTap: typeof BaseGoogleOneTap = WrapComponent(BaseGoogleOneTap);
-export const Waitlist: typeof BaseWaitlist = WrapComponent(BaseWaitlist);

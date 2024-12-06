@@ -600,7 +600,7 @@ export const frFR: LocalizationResource = {
       requireUppercase: 'une lettre majuscule',
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
-    phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",

@@ -51,26 +51,13 @@ type BuildRequestOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
-  /**
-   * Allow requests without specifying a secret key. In most cases this should be set to `false`.
-   * Defaults to `true`.
-   */
-  requireSecretKey?: boolean;
 };
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const {
-      secretKey,
-      requireSecretKey = true,
-      apiUrl = API_URL,
-      apiVersion = API_VERSION,
-      userAgent = USER_AGENT,
-    } = options;
+    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
-    if (requireSecretKey) {
-      assertValidSecretKey(secretKey);
-    }
+    assertValidSecretKey(secretKey);
 
     const url = joinPaths(apiUrl, apiVersion, path);
 

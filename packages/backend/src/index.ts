@@ -53,7 +53,6 @@ export type { VerifyTokenOptions } from './tokens/verify';
  * JSON types
  */
 export type {
-  AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
   AllowlistIdentifierJSON,
@@ -88,7 +87,6 @@ export type {
  * Resources
  */
 export type {
-  AccountlessApplication,
   AllowlistIdentifier,
   Client,
   EmailAddress,

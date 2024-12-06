@@ -41,10 +41,8 @@ import type {
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
-  getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
 import {
@@ -123,9 +121,6 @@ export class SignIn extends BaseResource implements SignInResource {
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
       case 'web3_coinbase_wallet_signature':
-        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
-        break;
-      case 'web3_okx_wallet_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
@@ -325,20 +320,6 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
-    });
-  };
-
-  public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
-    if (__BUILD_DISABLE_RHC__) {
-      clerkUnsupportedEnvironmentWarning('OKX Wallet');
-      return this;
-    }
-
-    const identifier = await getOKXWalletIdentifier();
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithOKXWallet,
-      strategy: 'web3_okx_wallet_signature',
     });
   };
 

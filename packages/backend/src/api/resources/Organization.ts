@@ -7,6 +7,7 @@ export class Organization {
     readonly slug: string | null,
     readonly imageUrl: string,
     readonly hasImage: boolean,
+    readonly createdBy: string,
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly publicMetadata: OrganizationPublicMetadata | null = {},
@@ -14,7 +15,6 @@ export class Organization {
     readonly maxAllowedMemberships: number,
     readonly adminDeleteEnabled: boolean,
     readonly membersCount?: number,
-    readonly createdBy?: string,
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
@@ -24,6 +24,7 @@ export class Organization {
       data.slug,
       data.image_url || '',
       data.has_image,
+      data.created_by,
       data.created_at,
       data.updated_at,
       data.public_metadata,
@@ -31,7 +32,6 @@ export class Organization {
       data.max_allowed_memberships,
       data.admin_delete_enabled,
       data.members_count,
-      data.created_by,
     );
   }
 }

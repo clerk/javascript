@@ -1,18 +1,24 @@
 'use client';
 
 import {
+  CreateOrganization as BaseCreateOrganization,
   OrganizationProfile as BaseOrganizationProfile,
   SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
-import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/types';
+import type {
+  CreateOrganizationProps,
+  OrganizationProfileProps,
+  SignInProps,
+  SignUpProps,
+  UserProfileProps,
+} from '@clerk/types';
 import React from 'react';
 
 import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
 
 export {
-  CreateOrganization,
   OrganizationList,
   OrganizationSwitcher,
   SignInButton,
@@ -34,6 +40,10 @@ export const UserProfile: typeof BaseUserProfile = Object.assign(
   },
   { ...BaseUserProfile },
 );
+
+export const CreateOrganization = (props: CreateOrganizationProps) => {
+  return <BaseCreateOrganization {...useEnforceCorrectRoutingProps('CreateOrganization', props)} />;
+};
 
 // The assignment of OrganizationProfile with BaseOrganizationProfile props is used
 // to support the CustomPage functionality (eg OrganizationProfile.Page)

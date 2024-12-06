@@ -4,10 +4,6 @@
     "#components": {
       "react-server": "./components.server.js",
       "default": "./components.client.js"
-    },
-    "#safe-node-apis": {
-      "node": "./runtime/node/safe-node-apis.js",
-      "default": "./runtime/browser/safe-node-apis.js"
     }
   }
 }

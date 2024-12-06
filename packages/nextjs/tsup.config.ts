@@ -10,19 +10,13 @@ export default defineConfig(overrideOptions => {
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
-    entry: [
-      './src/**/*.{ts,tsx,js,jsx}',
-      '!./src/**/*.test.{ts,tsx}',
-      '!./src/**/server-actions.ts',
-      '!./src/**/keyless-actions.ts',
-    ],
+    entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}', '!./src/**/server-actions.ts'],
     // We want to preserve original file structure
     // so that the "use client" directives are not lost
     // and make debugging easier via node_modules easier
     bundle: false,
     clean: true,
     minify: false,
-    external: ['#safe-node-apis'],
     sourcemap: true,
     legacyOutput: true,
     define: {
@@ -45,13 +39,13 @@ export default defineConfig(overrideOptions => {
 
   const serverActionsEsm: Options = {
     ...esm,
-    entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
+    entry: ['./src/**/server-actions.ts'],
     sourcemap: false,
   };
 
   const serverActionsCjs: Options = {
     ...cjs,
-    entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
+    entry: ['./src/**/server-actions.ts'],
     sourcemap: false,
   };
 
@@ -61,8 +55,6 @@ export default defineConfig(overrideOptions => {
   // Happy to improve this if there is a better way
   const moveServerActions = (format: 'esm' | 'cjs') =>
     `mv ./dist/${format}/server-actions.js ./dist/${format}/app-router`;
-  const moveKeylessActions = (format: 'esm' | 'cjs') =>
-    `mv ./dist/${format}/keyless-actions.js ./dist/${format}/app-router`;
 
   return runAfterLast([
     'pnpm build:declarations',
@@ -70,8 +62,6 @@ export default defineConfig(overrideOptions => {
     copyPackageJson('cjs'),
     moveServerActions('esm'),
     moveServerActions('cjs'),
-    moveKeylessActions('esm'),
-    moveKeylessActions('cjs'),
     shouldPublish && 'pnpm publish:local',
   ])(esm, cjs, serverActionsEsm, serverActionsCjs);
 });

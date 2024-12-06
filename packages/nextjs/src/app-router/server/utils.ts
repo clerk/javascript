@@ -22,10 +22,9 @@ export const isPrerenderingBailout = (e: unknown) => {
 export async function buildRequestLike() {
   try {
     // Dynamically import next/headers, otherwise Next12 apps will break
-    // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
-    const { headers } = await import('next/headers');
-    const resolvedHeaders = await headers();
-    return new NextRequest('https://placeholder.com', { headers: resolvedHeaders });
+    // @ts-ignore: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
+    const { getHeaders } = await import('ezheaders');
+    return new NextRequest('https://placeholder.com', { headers: await getHeaders() });
   } catch (e: any) {
     // rethrow the error when react throws a prerendering bailout
     // https://nextjs.org/docs/messages/ppr-caught-error

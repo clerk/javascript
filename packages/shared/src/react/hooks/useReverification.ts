@@ -8,8 +8,6 @@ import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
-const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
-
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
@@ -19,7 +17,7 @@ async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<
     return r;
   } catch (e) {
     // Treat fapi assurance as an assurance hint
-    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code === CLERK_API_REVERIFICATION_ERROR_CODE)) {
+    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
       return reverificationError();
     }
 

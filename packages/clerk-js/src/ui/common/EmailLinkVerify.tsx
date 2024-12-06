@@ -15,12 +15,11 @@ export type EmailLinkVerifyProps = {
   redirectUrl?: string;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
-  continuePath?: string;
   texts: Record<VerificationStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
-  const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath, continuePath } = props;
+  const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath } = props;
   const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
@@ -37,7 +36,6 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         signUp,
         verifyEmailPath,
         verifyPhonePath,
-        continuePath,
         navigate,
       });
     } catch (err) {

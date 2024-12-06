@@ -106,7 +106,6 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   React.useEffect(() => {
     return () => {
       IsomorphicClerk.clearInstance();
-      setLoaded(false);
     };
   }, []);
 
