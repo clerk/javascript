@@ -1,57 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`OrganizationMembership has the same initial properties 1`] = `
-OrganizationMembership {
-  "createdAt": 1970-01-01T00:00:12.345Z,
-  "destroy": [Function],
+{
+  "created_at": 12345,
   "id": "test_id",
-  "organization": Organization {
-    "addMember": [Function],
-    "adminDeleteEnabled": true,
-    "createDomain": [Function],
-    "createdAt": 1970-01-01T00:00:12.345Z,
-    "destroy": [Function],
-    "getDomain": [Function],
-    "getDomains": [Function],
-    "getInvitations": [Function],
-    "getMembershipRequests": [Function],
-    "getMemberships": [Function],
-    "getRoles": [Function],
-    "hasImage": true,
+  "object": "organization_membership",
+  "organization": {
+    "admin_delete_enabled": true,
+    "created_at": 12345,
+    "has_image": true,
     "id": "test_org_id",
-    "imageUrl": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160",
-    "inviteMember": [Function],
-    "inviteMembers": [Function],
-    "maxAllowedMemberships": 3,
-    "membersCount": 1,
+    "image_url": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160",
+    "max_allowed_memberships": 3,
+    "members_count": 1,
     "name": "test_name",
-    "pathRoot": "/organizations",
-    "pendingInvitationsCount": 10,
-    "publicMetadata": {
+    "object": "organization",
+    "pending_invitations_count": 10,
+    "public_metadata": {
       "public": "metadata",
     },
-    "removeMember": [Function],
-    "setLogo": [Function],
     "slug": "test_slug",
-    "update": [Function],
-    "updateMember": [Function],
-    "updatedAt": 1970-01-01T00:01:07.890Z,
+    "updated_at": 67890,
   },
-  "pathRoot": "",
   "permissions": [],
-  "publicMetadata": {
+  "public_metadata": {
     "foo": "bar",
   },
-  "publicUserData": PublicUserData {
-    "firstName": "test_first_name",
-    "hasImage": true,
+  "public_user_data": {
+    "first_name": "test_first_name",
+    "has_image": true,
+    "id": "",
     "identifier": "test@identifier.gr",
-    "imageUrl": " https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLTmR2TUtFQzN5cUVpMVFjV0UzQjExbF9WUEVOWW5manlLMlVQd0tCSWw9czEwMDAtYyIsInMiOiJkRkowS3dTSkRINndiODE5cXJTUUxxaWF1ZS9QcHdndC84L0lUUlpYNHpnIn0?width=160",
-    "lastName": "test_last_name",
-    "userId": undefined,
+    "image_url": " https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLTmR2TUtFQzN5cUVpMVFjV0UzQjExbF9WUEVOWW5manlLMlVQd0tCSWw9czEwMDAtYyIsInMiOiJkRkowS3dTSkRINndiODE5cXJTUUxxaWF1ZS9QcHdndC84L0lUUlpYNHpnIn0?width=160",
+    "last_name": "test_last_name",
+    "object": "public_user_data",
+    "user_id": undefined,
   },
   "role": "admin",
-  "update": [Function],
-  "updatedAt": 1970-01-01T00:00:05.678Z,
+  "updated_at": 5678,
 }
 `;
