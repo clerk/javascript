@@ -18,7 +18,8 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
     const clerk = useIsomorphicClerkContext();
 
     if (!clerk.loaded) {
-      return null;
+      // @ts-expect-error -- FIXME
+      return props.fallback || null;
     }
 
     return (
