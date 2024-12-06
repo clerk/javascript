@@ -364,6 +364,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  #isCombinedFlow(): boolean {
+    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -966,7 +970,7 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
         `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
       );
@@ -980,7 +984,8 @@ export class Clerk implements ClerkInterface {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
+    if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
@@ -1057,14 +1062,13 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
   }
 
-  public buildWaitlistUrl(): string {
+  public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
     if (!this.environment || !this.environment.displayConfig) {
       return '';
     }
-
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
-
-    return buildURL({ base: waitlistUrl }, { stringify: true });
+    const initValues = new URLSearchParams(options?.initialValues || {});
+    return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1671,7 +1675,12 @@ export class Clerk implements ClerkInterface {
 
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
+
+      // Note: this might set this.session to null
       this.#setAccessors(session);
+
+      // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();
@@ -1870,8 +1879,6 @@ export class Clerk implements ClerkInterface {
         // set in updateClient
         this.updateEnvironment(environment);
 
-        this.#authService.setActiveOrganizationInStorage();
-
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
@@ -1901,8 +1908,8 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
-      this.#handleAccountlessPrompt();
+    if (__BUILD_FLAG_KEYLESS_UI__) {
+      this.#handleKeylessPrompt();
     }
     return true;
   };
@@ -2062,12 +2069,12 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #handleAccountlessPrompt = () => {
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
+  #handleKeylessPrompt = () => {
+    if (__BUILD_FLAG_KEYLESS_UI__) {
       void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimAccountlessKeysUrl) {
+        if (this.#options.__internal_claimKeylessApplicationUrl) {
           controls.updateProps({
-            options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
           });
         }
       });
@@ -2082,10 +2089,18 @@ export class Clerk implements ClerkInterface {
     if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
-    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    const url = buildURL(
+      {
+        base: signInOrUpUrl,
+        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashSearchParams: [initValues, redirectUrls],
+      },
+      { stringify: true },
+    );
     return this.buildUrlWithAuth(url);
   };
 
@@ -2146,4 +2161,14 @@ export class Clerk implements ClerkInterface {
       // ignore
     }
   };
+
+  get #allowedRedirectProtocols() {
+    let allowedProtocols = ALLOWED_PROTOCOLS;
+
+    if (this.#options.allowedRedirectProtocols) {
+      allowedProtocols = allowedProtocols.concat(this.#options.allowedRedirectProtocols);
+    }
+
+    return allowedProtocols;
+  }
 }

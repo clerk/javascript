@@ -70,6 +70,10 @@ export type OAuthProvider =
   | HuggingfaceOAuthProvider
   | CustomOauthProvider;
 
+/**
+ * @deprecated This utility will be dropped in the next major release.
+ * You can import it from `@clerk/shared/oauth`.
+ */
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
     provider: 'google',
@@ -246,6 +250,9 @@ interface getOAuthProviderDataProps {
   strategy?: OAuthStrategy;
 }
 
+/**
+ * @deprecated This utility will be dropped in the next major release.
+ */
 export function getOAuthProviderData({
   provider,
   strategy,
@@ -257,6 +264,9 @@ export function getOAuthProviderData({
   return OAUTH_PROVIDERS.find(oauth_provider => oauth_provider.strategy == strategy);
 }
 
+/**
+ * @deprecated This utility will be dropped in the next major release.
+ */
 export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
   return OAUTH_PROVIDERS.slice().sort((a, b) => {
     let aPos = sortingArray.indexOf(a.strategy);

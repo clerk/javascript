@@ -456,6 +456,7 @@ export const koKR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       title: '{{applicationName}}에 로그인',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '인증 코드',
