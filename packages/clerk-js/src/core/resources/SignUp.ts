@@ -367,6 +367,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  upsert = (params: SignUpCreateParams | SignUpUpdateParams): Promise<SignUpResource> => {
+    return this.id ? this.update(params) : this.create(params);
+  };
+
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
