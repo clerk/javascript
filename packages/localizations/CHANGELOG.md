@@ -1,5 +1,26 @@
 # Change Log
 
+## 3.8.0
+
+### Minor Changes
+
+- Added support for en-GB localization ([#4313](https://github.com/clerk/javascript/pull/4313)) by [@ijxy](https://github.com/ijxy)
+
+- Updated translations for multiple languages: be-BY, bg-BG, ca-ES, cs-CZ, da-DK, de-DE, en-US, es-ES, fr-FR, it-IT, nl-NL, pt-BR, pt-PT, tr-TR ([#4700](https://github.com/clerk/javascript/pull/4700)) by [@NavidJalilian](https://github.com/NavidJalilian)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `pt-BR` localizations for disconnected accounts, waitlist, mfa, consent ([#4673](https://github.com/clerk/javascript/pull/4673)) by [@GustavoOS](https://github.com/GustavoOS)
+
+- Adds `id-ID` localization ([#4686](https://github.com/clerk/javascript/pull/4686)) by [@ShawnCone](https://github.com/ShawnCone)
+
+- Fix localizations and typos in ru-RU.ts ([#4695](https://github.com/clerk/javascript/pull/4695)) by [@pipisasa](https://github.com/pipisasa)
+
+- Updated dependencies [[`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/types@4.39.0
+
 ## 3.7.4
 
 ### Patch Changes

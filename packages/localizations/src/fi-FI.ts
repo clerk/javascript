@@ -462,6 +462,7 @@ export const fiFI: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Kirjaudu sisään',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',

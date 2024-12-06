@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -39,7 +39,10 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
+  const options = useOptions();
+  const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -315,7 +318,7 @@ function _SignUpStart(): JSX.Element {
             <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Card.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
+              to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>
         </Card.Footer>
