@@ -685,19 +685,23 @@ export const svSE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Ett e-postmeddelande med en verifieringskod kommer att skickas till denna e-postadress.',
         formSubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
         formTitle: 'Verifieringskod',
         resendButton: 'Skicka kod igen',
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
       emailLink: {
-        formHint: 'Ett e-postmeddelande med en verifieringslänk kommer att skickas till denna e-postadress.',
         formSubtitle: 'Klicka på verifieringslänken i e-postmeddelandet som skickats till {{identifier}}',
         formTitle: 'Verifieringslänk',
         resendButton: 'Skicka länken igen',
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
+      enterpriseSsoLink: {
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2: 'Du kommer inte längre att kunna logga in med denna e-postadress.',

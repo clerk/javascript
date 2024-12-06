@@ -1,25 +1,24 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
-import { EmailLinkStatusCard } from '../../common';
 import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
-import { useEmailLink } from '../../hooks';
+import { useEnterpriseSsoLink } from '../../hooks';
 import { handleError } from '../../utils';
 
-type VerifyWithLinkProps = {
+type VerifyWithEnterpriseConnectionProps = {
   email: EmailAddressResource;
   onReset: () => void;
   nextStep: () => void;
 };
 
-export const VerifyWithLink = (props: VerifyWithLinkProps) => {
+export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnectionProps) => {
   const { email, nextStep, onReset } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
-  const { startEmailLinkFlow } = useEmailLink(email);
+  const { startEnterpriseSsoLinkFlow } = useEnterpriseSsoLink(email);
   const { displayConfig } = useEnvironment();
 
   React.useEffect(() => {
@@ -36,9 +35,8 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
      */
     const { routing } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
-
     const redirectUrl = buildVerificationRedirectUrl(profileContext, baseUrl);
-    startEmailLinkFlow({ redirectUrl })
+    startEnterpriseSsoLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
   }
@@ -46,7 +44,7 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   return (
     <>
       <VerificationLink
-        resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
+        resendButton={localizationKeys('userProfile.emailAddressPage.enterpriseSsoLink.resendButton')}
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>
@@ -58,15 +56,5 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
         />
       </FormButtonContainer>
     </>
-  );
-};
-
-export const VerificationSuccessPage = () => {
-  return (
-    <EmailLinkStatusCard
-      title={localizationKeys('signUp.emailLink.verifiedSwitchTab.title')}
-      subtitle={localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitle')}
-      status='verified'
-    />
   );
 };

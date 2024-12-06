@@ -630,19 +630,23 @@ export const itIT: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Una email contenente un codice di verifica é stata inviata a questo indirizzo email.',
         formSubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
         formTitle: 'Codice di verifica',
         resendButton: 'Rinvia codice',
         successMessage: "L'indirizzo email {{identifier}} é stato aggiunto al tuo account.",
       },
       emailLink: {
-        formHint: 'Una email contenente un link di verifica sará inviata a questo indirizzo email.',
         formSubtitle: 'Clicca sul link di verifica nella email inviata a {{identifier}}',
         formTitle: 'Link di verifica',
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} é stato aggiunto al tuo account.",
       },
+      enterpriseSsoLink: {
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sará rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',

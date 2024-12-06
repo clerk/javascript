@@ -41,3 +41,12 @@ export type CreateEmailLinkFlowReturn<Params, Resource> = {
   startEmailLinkFlow: (params: Params) => Promise<Resource>;
   cancelEmailLinkFlow: () => void;
 };
+
+export interface StartEnterpriseSsoLinkFlowParams {
+  redirectUrl: string;
+}
+
+export type CreateEnterpriseSsoLinkFlowReturn<Params, Resource> = {
+  startEnterpriseSsoLinkFlow: (params: Params) => Promise<Resource>;
+  cancelEnterpriseSsoLinkFlow: () => void;
+};
