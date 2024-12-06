@@ -164,7 +164,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
           <ImageOrInitial />
           <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Flex
-              gap={2}
+              gap={1}
               center
             >
               <Text sx={t => ({ color: t.colors.$colorText })}>{`${
