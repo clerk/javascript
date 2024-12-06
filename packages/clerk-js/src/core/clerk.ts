@@ -911,7 +911,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl) {
+    if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 

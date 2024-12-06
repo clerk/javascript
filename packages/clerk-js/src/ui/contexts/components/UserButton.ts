@@ -44,7 +44,6 @@ export const useUserButtonContext = () => {
   const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
-  const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   const userProfileMode = !!ctx.userProfileUrl && !ctx.userProfileMode ? 'navigation' : ctx.userProfileMode;
 
@@ -57,7 +56,6 @@ export const useUserButtonContext = () => {
     componentName,
     navigateAfterMultiSessionSingleSignOut,
     navigateAfterSignOut,
-    navigateAfterSwitchSession,
     signInUrl,
     userProfileUrl,
     afterMultiSessionSingleSignOutUrl,
