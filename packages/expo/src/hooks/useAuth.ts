@@ -4,13 +4,17 @@ import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/types';
 
 import { SessionJWTCache } from '../cache';
 
+/*
+ * This hook extends the useAuth hook to add experimental JWT caching.
+ * The caching is used only when no options are passed to getToken.
+ */
 export const useAuth = (initialAuthState?: any): UseAuthReturn => {
   const { getToken: getTokenBase, ...rest } = useAuthBase(initialAuthState);
 
   const getToken: GetToken = (opts?: GetTokenOptions): Promise<string | null> =>
     getTokenBase(opts)
       .then(token => {
-        if (SessionJWTCache.checkInit()) {
+        if (!opts && SessionJWTCache.checkInit()) {
           if (token) {
             void SessionJWTCache.save(token);
           } else {
@@ -20,7 +24,7 @@ export const useAuth = (initialAuthState?: any): UseAuthReturn => {
         return token;
       })
       .catch(error => {
-        if (SessionJWTCache.checkInit() && !is4xxError(error)) {
+        if (!opts && SessionJWTCache.checkInit() && !is4xxError(error)) {
           return SessionJWTCache.load();
         }
         throw error;
