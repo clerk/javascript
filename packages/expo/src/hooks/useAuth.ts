@@ -1,5 +1,5 @@
 import { useAuth as useAuthBase } from '@clerk/clerk-react';
-import { is4xxError } from '@clerk/shared/error';
+import { isNetworkError } from '@clerk/shared/error';
 import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/types';
 
 import { SessionJWTCache } from '../cache';
@@ -24,7 +24,7 @@ export const useAuth = (initialAuthState?: any): UseAuthReturn => {
         return token;
       })
       .catch(error => {
-        if (!opts && SessionJWTCache.checkInit() && !is4xxError(error)) {
+        if (!opts && SessionJWTCache.checkInit() && isNetworkError(error)) {
           return SessionJWTCache.load();
         }
         throw error;
