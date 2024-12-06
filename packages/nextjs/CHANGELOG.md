@@ -1,5 +1,26 @@
 # Change Log
 
+## 6.8.0
+
+### Minor Changes
+
+- A new **experimental** feature is available: "Keyless mode" ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+  Normally, in order to start a Clerk + Next.js application you need to provide a publishable key and secret key. With "Keyless mode" activated you no longer need to provide these two keys to start your Clerk application. These keys will be automatically generated and the application can be claimed with your account either through a UI prompt or with a URL in your terminal.
+
+  **Requirements**:
+
+  - You need to use Next.js `14.2.0` or later
+  - You need to set the environment variable `NEXT_PUBLIC_CLERK_ENABLE_KEYLESS=true`
+
+### Patch Changes
+
+- Updated dependencies [[`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/backend@1.20.0
+  - @clerk/clerk-react@5.19.0
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
 ## 6.7.1
 
 ### Patch Changes
