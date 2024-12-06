@@ -1,5 +1,35 @@
 # Change Log
 
+## 5.39.0
+
+### Minor Changes
+
+- Replace usage of `OAUTH_PROVIDERS` and `WEB3_PROVIDERS` from `@clerk/types` to `@clerk/shared`. ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/localizations@3.7.4
+
+## 5.38.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fixes an issue in `UserProfile` where email and username forms could retain stale values from the previous render, leading to incorrect data being sent to FAPI ([#4713](https://github.com/clerk/javascript/pull/4713)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove side-effect from `Session` resource initialization that triggered a session cookie update. This cookie update is now explicitly part of the `Clerk.load()` flow. ([#4555](https://github.com/clerk/javascript/pull/4555)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/localizations@3.7.3
+  - @clerk/shared@2.18.1
+
 ## 5.37.0
 
 ### Minor Changes

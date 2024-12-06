@@ -13,8 +13,10 @@ const _Waitlist = () => {
   const ctx = useWaitlistContext();
   const { signInUrl } = ctx;
 
+  const initialValues = ctx.initialValues || {};
+
   const formState = {
-    emailAddress: useFormControl('emailAddress', '', {
+    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
