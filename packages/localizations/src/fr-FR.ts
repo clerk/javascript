@@ -274,6 +274,62 @@ export const frFR: LocalizationResource = {
   paginationButton__previous: 'Précédent',
   paginationRowText__displaying: 'Affichage',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Utiliser une autre méthode',
+      actionText: 'Vous ne pouvez pas accéder à votre compte ?',
+      blockButton__backupCode: 'Utiliser un code de récupération',
+      blockButton__emailCode: 'Recevoir un code par e-mail',
+      blockButton__password: 'Utiliser le mot de passe',
+      blockButton__phoneCode: 'Recevoir un code par téléphone',
+      blockButton__totp: 'Utiliser un code d’application d’authentification',
+      getHelp: {
+        blockButton__emailSupport: 'Contacter le support par e-mail',
+        content:
+          "Si vous ne pouvez pas accéder à votre compte, contactez notre équipe de support pour obtenir de l'aide.",
+        title: "Obtenir de l'aide",
+      },
+      subtitle: 'Choisissez une méthode alternative pour vérifier votre identité.',
+      title: 'Vérification alternative',
+    },
+    backupCodeMfa: {
+      subtitle: "Entrez l'un de vos codes de récupération pour vérifier votre compte.",
+      title: 'Vérification par code de récupération',
+    },
+    emailCode: {
+      formTitle: 'Entrez le code de vérification',
+      resendButton: 'Renvoyer le code',
+      subtitle: 'Un code a été envoyé à votre adresse e-mail.',
+      title: 'Vérification par e-mail',
+    },
+    noAvailableMethods: {
+      message: "Aucune méthode de vérification n'est disponible.",
+      subtitle: 'Impossible de procéder à la vérification.',
+      title: 'Aucune méthode disponible',
+    },
+    password: {
+      actionLink: 'Réinitialiser le mot de passe',
+      subtitle: 'Entrez votre mot de passe pour continuer.',
+      title: 'Vérification par mot de passe',
+    },
+    phoneCode: {
+      formTitle: 'Entrez le code de vérification',
+      resendButton: 'Renvoyer le code',
+      subtitle: 'Un code a été envoyé à votre téléphone.',
+      title: 'Vérification par téléphone',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Entrez le code de vérification',
+      resendButton: 'Renvoyer le code',
+      subtitle: 'Un code a été envoyé à votre téléphone pour vérification.',
+      title: 'Vérification par téléphone',
+    },
+    totpMfa: {
+      formTitle: 'Entrez le code de vérification',
+      subtitle: "Entrez le code généré par votre application d'authentification.",
+      title: 'Vérification par application d’authentification',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Ajouter un compte',
@@ -409,6 +465,7 @@ export const frFR: LocalizationResource = {
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
       title: "S'identifier",
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Le code de vérification',
@@ -534,7 +591,6 @@ export const frFR: LocalizationResource = {
     passkey_pa_not_supported: 'Les clés de sécurité ne sont pas prises en charge dans cet environnement.',
     passkey_registration_cancelled: 'Enregistrement de la clé de sécurité annulé.',
     passkey_retrieval_cancelled: 'Récupération de la clé de sécurité annulée.',
-    phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',
@@ -862,62 +918,7 @@ export const frFR: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Utiliser un portefeuille Web3',
     },
   },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Utiliser une autre méthode',
-      actionText: 'Vous ne pouvez pas accéder à votre compte ?',
-      blockButton__backupCode: 'Utiliser un code de récupération',
-      blockButton__emailCode: 'Recevoir un code par e-mail',
-      blockButton__password: 'Utiliser le mot de passe',
-      blockButton__phoneCode: 'Recevoir un code par téléphone',
-      blockButton__totp: 'Utiliser un code d’application d’authentification',
-      getHelp: {
-        blockButton__emailSupport: 'Contacter le support par e-mail',
-        content:
-          "Si vous ne pouvez pas accéder à votre compte, contactez notre équipe de support pour obtenir de l'aide.",
-        title: "Obtenir de l'aide",
-      },
-      subtitle: 'Choisissez une méthode alternative pour vérifier votre identité.',
-      title: 'Vérification alternative',
-    },
-    backupCodeMfa: {
-      subtitle: "Entrez l'un de vos codes de récupération pour vérifier votre compte.",
-      title: 'Vérification par code de récupération',
-    },
-    emailCode: {
-      formTitle: 'Entrez le code de vérification',
-      resendButton: 'Renvoyer le code',
-      subtitle: 'Un code a été envoyé à votre adresse e-mail.',
-      title: 'Vérification par e-mail',
-    },
-    noAvailableMethods: {
-      message: "Aucune méthode de vérification n'est disponible.",
-      subtitle: 'Impossible de procéder à la vérification.',
-      title: 'Aucune méthode disponible',
-    },
-    password: {
-      actionLink: 'Réinitialiser le mot de passe',
-      subtitle: 'Entrez votre mot de passe pour continuer.',
-      title: 'Vérification par mot de passe',
-    },
-    phoneCode: {
-      formTitle: 'Entrez le code de vérification',
-      resendButton: 'Renvoyer le code',
-      subtitle: 'Un code a été envoyé à votre téléphone.',
-      title: 'Vérification par téléphone',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Entrez le code de vérification',
-      resendButton: 'Renvoyer le code',
-      subtitle: 'Un code a été envoyé à votre téléphone pour vérification.',
-      title: 'Vérification par téléphone',
-    },
-    totpMfa: {
-      formTitle: 'Entrez le code de vérification',
-      subtitle: "Entrez le code généré par votre application d'authentification.",
-      title: 'Vérification par application d’authentification',
-    },
-  },
+
   waitlist: {
     start: {
       actionLink: "Rejoindre la liste d'attente",

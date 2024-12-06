@@ -450,6 +450,7 @@ export const zhCN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
       title: '登录',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '验证码',
@@ -563,6 +564,7 @@ export const zhCN: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,

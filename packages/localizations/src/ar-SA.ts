@@ -460,6 +460,7 @@ export const arSA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',
@@ -576,6 +577,7 @@ export const arSA: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'تم تسجيل مفتاح المرور مسبقاً مع هذا الجهاز',

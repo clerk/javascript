@@ -459,6 +459,7 @@ export const ukUA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Увійти',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верифікаційний код',
@@ -575,6 +576,7 @@ export const ukUA: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,

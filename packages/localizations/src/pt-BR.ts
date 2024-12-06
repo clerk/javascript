@@ -62,7 +62,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: 'Digite o domínio da organização',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'Digite o e-mail associado ao domínio da organização',
   formFieldInputPlaceholder__organizationName: 'Digite o nome da organização',
-  formFieldInputPlaceholder__organizationSlug: 'Digite o identificador da organização (slug)',
+  formFieldInputPlaceholder__organizationSlug: 'minha-org',
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
@@ -271,6 +271,60 @@ export const ptBR: LocalizationResource = {
   paginationButton__previous: 'Anterior',
   paginationRowText__displaying: 'Exibindo',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Solicitar ajuda',
+      actionText: 'Não tem nenhum dos métodos? Tente outra forma.',
+      blockButton__backupCode: 'Usar código de backup',
+      blockButton__emailCode: 'Enviar código para {{identifier}}',
+      blockButton__password: 'Usar senha',
+      blockButton__phoneCode: 'Enviar código de telefone',
+      blockButton__totp: 'Usar autenticação TOTP',
+      getHelp: {
+        blockButton__emailSupport: 'Entrar em contato com o suporte',
+        content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.',
+      },
+      subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.',
+      title: 'Métodos alternativos de verificação',
+    },
+    backupCodeMfa: {
+      subtitle: 'Digite seu código de backup para continuar.',
+      title: 'Verificação com código de backup',
+    },
+    emailCode: {
+      formTitle: 'Código enviado para seu e-mail',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu e-mail e insira o código para continuar.',
+      title: 'Verifique seu e-mail',
+    },
+    noAvailableMethods: {
+      message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.',
+      subtitle: 'Não há métodos de verificação disponíveis no momento.',
+      title: 'Métodos de verificação indisponíveis',
+    },
+    password: {
+      actionLink: 'Usar outro método',
+      subtitle: 'Digite sua senha para continuar.',
+      title: 'Digite sua senha',
+    },
+    phoneCode: {
+      formTitle: 'Código de verificação',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu celular para o código de verificação.',
+      title: 'Verifique seu celular',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Código de verificação',
+      resendButton: 'Reenviar código',
+      subtitle: 'Verifique seu celular para o código de verificação.',
+      title: 'Verifique seu celular',
+    },
+    totpMfa: {
+      formTitle: 'Código de verificação TOTP',
+      subtitle: 'Digite o código de verificação gerado pelo seu aplicativo de autenticação.',
+      title: 'Autenticação TOTP',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Adicionar conta',
@@ -406,6 +460,7 @@ export const ptBR: LocalizationResource = {
       actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',
@@ -453,12 +508,13 @@ export const ptBR: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: 'Eu concordo com a Política de Privacidade',
-        label__onlyTermsOfService: 'Eu concordo com os Termos de Serviço',
-        label__termsOfServiceAndPrivacyPolicy: 'Eu concordo com os Termos de Serviço e a Política de Privacidade',
+        label__onlyPrivacyPolicy: 'Eu concordo com a {{privacyPolicyLink || link("Política de Privacidade")}}',
+        label__onlyTermsOfService: 'Eu concordo com os {{termsOfServiceLink || link("Termos de Uso")}}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Eu concordo com os {{termsOfServiceLink || link("Termos de Uso")}} e com a {{ privacyPolicyLink || link("Política de Privacidade") }}',
       },
       continue: {
-        subtitle: 'Por favor, leia e aceite os termos para continuar',
+        subtitle: 'Por favor leia e aceite os termos para continuar',
         title: 'Continuar',
       },
     },
@@ -471,19 +527,21 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu telefone',
     },
     restrictedAccess: {
-      actionLink: 'Entrar em contato com o suporte',
-      actionText: 'Precisa de ajuda?',
-      blockButton__emailSupport: 'Entre em contato por e-mail',
-      blockButton__joinWaitlist: 'Entrar na lista de espera',
-      subtitle: 'Você não tem acesso a esta área no momento.',
-      subtitleWaitlist: 'Aguardando acesso, você será notificado quando estiver disponível.',
+      actionLink: 'Entrar',
+      actionText: 'Já possui uma conta?',
+      blockButton__emailSupport: 'Suporte por e-mail',
+      blockButton__joinWaitlist: 'Entre na lista de espera',
+      subtitle:
+        'Cadastros estão desabilitados no momento. Se você deveria ter acesso, por favor entre em contato com o suporte.',
+      subtitleWaitlist:
+        'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançaremos, entre na lista de espera.',
       title: 'Acesso restrito',
     },
 
     start: {
       actionLink: 'Entrar',
-      actionLink__use_email: 'Usar e-mail',
-      actionLink__use_phone: 'Usar telefone',
+      actionLink__use_email: 'Ou use e-mail',
+      actionLink__use_phone: 'Ou use telefone',
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
@@ -766,7 +824,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: 'Sua conta foi desconectada. Por favor, conecte novamente para continuar.',
+        subtitle__disconnected: 'Esta conta foi descontectada',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
@@ -859,59 +917,18 @@ export const ptBR: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Conectar carteira Web3',
     },
   },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Solicitar ajuda', // Action link for requesting help
-      actionText: 'Não tem nenhum dos métodos? Tente outra forma.', // Alternative methods text
-      blockButton__backupCode: 'Usar código de backup', // Use backup code button
-      blockButton__emailCode: 'Enviar código para {{identifier}}', // Send email code button
-      blockButton__password: 'Usar senha', // Use password button
-      blockButton__phoneCode: 'Enviar código de telefone', // Send phone code button
-      blockButton__totp: 'Usar autenticação TOTP', // Use TOTP button
-      getHelp: {
-        blockButton__emailSupport: 'Entrar em contato com o suporte', // Email support button
-        content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.', // Help content text
-        title: 'Ajuda', // Help title
-      },
-      subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.', // Subtitle for alternative methods
-      title: 'Métodos alternativos de verificação', // Title for alternative methods
+  waitlist: {
+    start: {
+      actionLink: 'Entrar',
+      actionText: 'Já possui acesso?',
+      formButton: 'Entrar na lista de espera',
+      subtitle: 'Entre com seu e-mail e entraremos em contato quando seu lugar estiver disponível',
+      title: 'Entre na lista de espera',
     },
-    backupCodeMfa: {
-      subtitle: 'Digite seu código de backup para continuar.', // Subtitle for backup code MFA
-      title: 'Verificação com código de backup', // Title for backup code MFA
-    },
-    emailCode: {
-      formTitle: 'Código enviado para seu e-mail', // Form title for email code
-      resendButton: 'Reenviar código', // Resend code button
-      subtitle: 'Verifique seu e-mail e insira o código para continuar.', // Subtitle for email code form
-      title: 'Verifique seu e-mail', // Title for email code form
-    },
-    noAvailableMethods: {
-      message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.', // Message for no available methods
-      subtitle: 'Não há métodos de verificação disponíveis no momento.', // Subtitle for no available methods
-      title: 'Métodos de verificação indisponíveis', // Title for no available methods
-    },
-    password: {
-      actionLink: 'Usar outro método', // Action link for using another method
-      subtitle: 'Digite sua senha para continuar.', // Subtitle for password form
-      title: 'Digite sua senha', // Title for password form
-    },
-    phoneCode: {
-      formTitle: 'Código de verificação', // Form title for phone code
-      resendButton: 'Reenviar código', // Resend code button
-      subtitle: 'Verifique seu celular para o código de verificação.', // Subtitle for phone code form
-      title: 'Verifique seu celular', // Title for phone code form
-    },
-    phoneCodeMfa: {
-      formTitle: 'Código de verificação', // Form title for phone code MFA
-      resendButton: 'Reenviar código', // Resend code button
-      subtitle: 'Verifique seu celular para o código de verificação.', // Subtitle for phone code MFA
-      title: 'Verifique seu celular', // Title for phone code MFA
-    },
-    totpMfa: {
-      formTitle: 'Código de verificação TOTP', // Form title for TOTP MFA
-      subtitle: 'Digite o código de verificação gerado pelo seu aplicativo de autenticação.', // Subtitle for TOTP MFA
-      title: 'Autenticação TOTP', // Title for TOTP MFA
+    success: {
+      message: 'Te redireceionando em breve...',
+      subtitle: 'Entraremos em contato quando seu lugar estiver disponível',
+      title: 'Obrigado por entrar na lista de espera!',
     },
   },
 } as const;

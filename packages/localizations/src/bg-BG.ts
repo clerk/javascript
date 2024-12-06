@@ -270,6 +270,61 @@ export const bgBG: LocalizationResource = {
   paginationButton__previous: 'Предишен',
   paginationRowText__displaying: 'Показване на',
   paginationRowText__of: 'от',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Get help',
+      actionText: "Don't have one of these?",
+      blockButton__backupCode: 'Use backup code',
+      blockButton__emailCode: 'Send code to email',
+      blockButton__password: 'Login with password',
+      blockButton__phoneCode: 'Send code to phone',
+      blockButton__totp: 'Use authenticator app',
+      getHelp: {
+        blockButton__emailSupport: 'Contact support via email',
+        content: 'If you need assistance, please contact support.',
+        title: 'Need help?',
+      },
+      subtitle: 'Choose an alternative method to verify your identity.',
+      title: 'Alternative methods',
+    },
+    backupCodeMfa: {
+      subtitle: 'Enter the backup code sent to your email.',
+      title: 'Backup code verification',
+    },
+    emailCode: {
+      formTitle: 'Enter the verification code sent to your email address.',
+      resendButton: "Didn't receive the code? Send it again.",
+      subtitle: "We've sent a code to your email.",
+      title: 'Email verification',
+    },
+    noAvailableMethods: {
+      message: 'Unable to proceed. No available authentication methods.',
+      subtitle: 'Something went wrong.',
+      title: 'Authentication failed',
+    },
+    password: {
+      actionLink: 'Use another method',
+      subtitle: 'Enter your password to continue using "{{applicationName}}"',
+      title: 'Enter your password',
+    },
+    phoneCode: {
+      formTitle: 'Enter the verification code sent to your phone number.',
+      resendButton: "Didn't receive the code? Resend it.",
+      subtitle: "We've sent a code to your phone.",
+      title: 'Phone verification',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Enter the verification code sent to your phone number.',
+      resendButton: "Didn't receive the code? Resend it.",
+      subtitle: 'Verify using the code sent to your phone.',
+      title: 'Phone number MFA',
+    },
+    totpMfa: {
+      formTitle: 'Enter the verification code from your authenticator app.',
+      subtitle: 'Use your authenticator app to get the code.',
+      title: 'Authenticator App MFA',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -403,6 +458,7 @@ export const bgBG: LocalizationResource = {
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
       title: 'Влезте в {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код за потвърждение',
@@ -844,61 +900,7 @@ export const bgBG: LocalizationResource = {
       web3WalletButtonsBlockButton: undefined,
     },
   },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Get help',
-      actionText: "Don't have one of these?",
-      blockButton__backupCode: 'Use backup code',
-      blockButton__emailCode: 'Send code to email',
-      blockButton__password: 'Login with password',
-      blockButton__phoneCode: 'Send code to phone',
-      blockButton__totp: 'Use authenticator app',
-      getHelp: {
-        blockButton__emailSupport: 'Contact support via email',
-        content: 'If you need assistance, please contact support.',
-        title: 'Need help?',
-      },
-      subtitle: 'Choose an alternative method to verify your identity.',
-      title: 'Alternative methods',
-    },
-    backupCodeMfa: {
-      subtitle: 'Enter the backup code sent to your email.',
-      title: 'Backup code verification',
-    },
-    emailCode: {
-      formTitle: 'Enter the verification code sent to your email address.',
-      resendButton: "Didn't receive the code? Send it again.",
-      subtitle: "We've sent a code to your email.",
-      title: 'Email verification',
-    },
-    noAvailableMethods: {
-      message: 'Unable to proceed. No available authentication methods.',
-      subtitle: 'Something went wrong.',
-      title: 'Authentication failed',
-    },
-    password: {
-      actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue using "{{applicationName}}"',
-      title: 'Enter your password',
-    },
-    phoneCode: {
-      formTitle: 'Enter the verification code sent to your phone number.',
-      resendButton: "Didn't receive the code? Resend it.",
-      subtitle: "We've sent a code to your phone.",
-      title: 'Phone verification',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Enter the verification code sent to your phone number.',
-      resendButton: "Didn't receive the code? Resend it.",
-      subtitle: 'Verify using the code sent to your phone.',
-      title: 'Phone number MFA',
-    },
-    totpMfa: {
-      formTitle: 'Enter the verification code from your authenticator app.',
-      subtitle: 'Use your authenticator app to get the code.',
-      title: 'Authenticator App MFA',
-    },
-  },
+
   waitlist: {
     start: {
       actionLink: 'Sign up',

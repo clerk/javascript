@@ -271,6 +271,61 @@ export const trTR: LocalizationResource = {
   paginationButton__previous: 'Geri',
   paginationRowText__displaying: 'Sayfa bilgisi:',
   paginationRowText__of: '-',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Yardım almak için buraya tıklayın',
+      actionText: 'Alternatif doğrulama yöntemlerini mi kullanmak istersiniz?',
+      blockButton__backupCode: 'Yedek kodu kullan',
+      blockButton__emailCode: 'E-posta kodu gönder',
+      blockButton__password: 'Şifreyi gir',
+      blockButton__phoneCode: 'Telefon kodu gönder',
+      blockButton__totp: 'TOTP kodu kullan',
+      getHelp: {
+        blockButton__emailSupport: 'E-posta ile destek alın',
+        content: 'Hala yardıma ihtiyacınız varsa, destek ekibimizle iletişime geçin.',
+        title: 'Yardım Al',
+      },
+      subtitle: 'Doğrulama işlemi için alternatif yöntemler.',
+      title: 'Alternatif Doğrulama Yöntemleri',
+    },
+    backupCodeMfa: {
+      subtitle: 'Yedek kodu girerek doğrulamanızı tamamlayabilirsiniz.',
+      title: 'Yedek Kod ile Doğrulama',
+    },
+    emailCode: {
+      formTitle: 'E-posta ile Doğrulama',
+      resendButton: 'Tekrar gönder',
+      subtitle: 'E-posta adresinize gönderilen doğrulama kodunu girin.',
+      title: 'E-posta Kodunu Girin',
+    },
+    noAvailableMethods: {
+      message: 'Alternatif doğrulama yöntemleri mevcut değil.',
+      subtitle: 'Lütfen farklı bir doğrulama yöntemi deneyin.',
+      title: 'Doğrulama Yöntemleri Yok',
+    },
+    password: {
+      actionLink: 'Şifremi unuttum',
+      subtitle: 'Şifrenizi girerek devam edebilirsiniz.',
+      title: 'Şifre ile Giriş Yapın',
+    },
+    phoneCode: {
+      formTitle: 'Telefon Kodu ile Doğrulama',
+      resendButton: 'Telefon kodunu tekrar gönder',
+      subtitle: 'Telefonunuza gönderilen doğrulama kodunu girin.',
+      title: 'Telefon Kodu Girin',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Telefon Koduyla MFA Doğrulaması',
+      resendButton: 'Telefon kodunu tekrar gönder',
+      subtitle: 'Telefonunuza gönderilen doğrulama kodunu girin.',
+      title: 'Telefon Koduyla Doğrulama',
+    },
+    totpMfa: {
+      formTitle: 'TOTP ile MFA Doğrulaması',
+      subtitle: 'Mobil uygulamanızdan TOTP kodunu girin.',
+      title: 'TOTP Kodunu Girin',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Hesap ekle',
@@ -408,6 +463,7 @@ export const trTR: LocalizationResource = {
 
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Giriş yap',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Doğrulama kodu',
@@ -855,61 +911,7 @@ export const trTR: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Web3 cüzdanınızı bağlamak için tıklayın',
     },
   },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Yardım almak için buraya tıklayın',
-      actionText: 'Alternatif doğrulama yöntemlerini mi kullanmak istersiniz?',
-      blockButton__backupCode: 'Yedek kodu kullan',
-      blockButton__emailCode: 'E-posta kodu gönder',
-      blockButton__password: 'Şifreyi gir',
-      blockButton__phoneCode: 'Telefon kodu gönder',
-      blockButton__totp: 'TOTP kodu kullan',
-      getHelp: {
-        blockButton__emailSupport: 'E-posta ile destek alın',
-        content: 'Hala yardıma ihtiyacınız varsa, destek ekibimizle iletişime geçin.',
-        title: 'Yardım Al',
-      },
-      subtitle: 'Doğrulama işlemi için alternatif yöntemler.',
-      title: 'Alternatif Doğrulama Yöntemleri',
-    },
-    backupCodeMfa: {
-      subtitle: 'Yedek kodu girerek doğrulamanızı tamamlayabilirsiniz.',
-      title: 'Yedek Kod ile Doğrulama',
-    },
-    emailCode: {
-      formTitle: 'E-posta ile Doğrulama',
-      resendButton: 'Tekrar gönder',
-      subtitle: 'E-posta adresinize gönderilen doğrulama kodunu girin.',
-      title: 'E-posta Kodunu Girin',
-    },
-    noAvailableMethods: {
-      message: 'Alternatif doğrulama yöntemleri mevcut değil.',
-      subtitle: 'Lütfen farklı bir doğrulama yöntemi deneyin.',
-      title: 'Doğrulama Yöntemleri Yok',
-    },
-    password: {
-      actionLink: 'Şifremi unuttum',
-      subtitle: 'Şifrenizi girerek devam edebilirsiniz.',
-      title: 'Şifre ile Giriş Yapın',
-    },
-    phoneCode: {
-      formTitle: 'Telefon Kodu ile Doğrulama',
-      resendButton: 'Telefon kodunu tekrar gönder',
-      subtitle: 'Telefonunuza gönderilen doğrulama kodunu girin.',
-      title: 'Telefon Kodu Girin',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Telefon Koduyla MFA Doğrulaması',
-      resendButton: 'Telefon kodunu tekrar gönder',
-      subtitle: 'Telefonunuza gönderilen doğrulama kodunu girin.',
-      title: 'Telefon Koduyla Doğrulama',
-    },
-    totpMfa: {
-      formTitle: 'TOTP ile MFA Doğrulaması',
-      subtitle: 'Mobil uygulamanızdan TOTP kodunu girin.',
-      title: 'TOTP Kodunu Girin',
-    },
-  },
+
   waitlist: {
     start: {
       actionLink: 'Bekleme listesine katıl',

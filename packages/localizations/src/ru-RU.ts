@@ -175,7 +175,7 @@ export const ruRU: LocalizationResource = {
     navbar: {
       description: 'Управлять вашей организацией.',
       general: 'Общее',
-      members: 'Участници',
+      members: 'Участники',
       title: 'Организация',
     },
     profilePage: {
@@ -268,10 +268,10 @@ export const ruRU: LocalizationResource = {
   organizationSwitcher: {
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
-    action__manageOrganization: 'Управление организацией',
+    action__manageOrganization: 'Настройки',
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
-    personalWorkspace: 'Личное рабочее пространство',
+    personalWorkspace: 'Личный профиль',
     suggestionsAcceptedLabel: 'Ожидает одобрения',
   },
   paginationButton__next: 'Вперед',
@@ -470,6 +470,7 @@ export const ruRU: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Войти',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верификационный код',
@@ -590,6 +591,7 @@ export const ruRU: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Вы достигли предела количества участий в организациях, включая ожидающие приглашения.',
     organization_minimum_permissions_needed:

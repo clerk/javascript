@@ -271,6 +271,61 @@ export const itIT: LocalizationResource = {
   paginationButton__previous: 'Precedente',
   paginationRowText__displaying: 'Visualizzando',
   paginationRowText__of: 'di',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Clicca qui per utilizzare un metodo alternativo',
+      actionText: 'Usa un metodo di verifica alternativo',
+      blockButton__backupCode: 'Verifica con il codice di backup',
+      blockButton__emailCode: 'Verifica con il codice via email',
+      blockButton__password: 'Verifica con la password',
+      blockButton__phoneCode: 'Verifica con il codice SMS',
+      blockButton__totp: 'Verifica con il TOTP',
+      getHelp: {
+        blockButton__emailSupport: 'Contatta il supporto via email',
+        content: 'Se hai bisogno di assistenza, contatta il nostro supporto.',
+        title: 'Ottieni aiuto',
+      },
+      subtitle: 'Scegli un metodo per verificarti',
+      title: 'Verifica necessaria',
+    },
+    backupCodeMfa: {
+      subtitle: 'Usa il codice di backup che ti è stato fornito al momento della registrazione.',
+      title: 'Verifica con il codice di backup',
+    },
+    emailCode: {
+      formTitle: 'Inserisci il codice che ti è stato inviato via email.',
+      resendButton: 'Invia di nuovo il codice',
+      subtitle: 'Controlla la tua email per il codice di verifica.',
+      title: 'Verifica con il codice email',
+    },
+    noAvailableMethods: {
+      message: 'Non sono disponibili metodi di verifica.',
+      subtitle: 'Contatta il supporto per assistenza.',
+      title: 'Nessun metodo disponibile',
+    },
+    password: {
+      actionLink: 'Reimposta la password',
+      subtitle: 'Inserisci la tua password per continuare.',
+      title: 'Verifica con la password',
+    },
+    phoneCode: {
+      formTitle: 'Inserisci il codice che ti è stato inviato via SMS.',
+      resendButton: 'Invia di nuovo il codice',
+      subtitle: 'Controlla il tuo SMS per il codice di verifica.',
+      title: 'Verifica con il codice SMS',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Inserisci il codice che ti abbiamo inviato via SMS.',
+      resendButton: 'Invia di nuovo il codice',
+      subtitle: 'Controlla il tuo SMS per il codice di verifica.',
+      title: 'Verifica SMS (MFA)',
+    },
+    totpMfa: {
+      formTitle: 'Inserisci il codice dalla tua app di autenticazione.',
+      subtitle: 'Usa l’app di autenticazione che hai configurato.',
+      title: 'Verifica TOTP (MFA)',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Aggiungi account',
@@ -405,6 +460,7 @@ export const itIT: LocalizationResource = {
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Accedi',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Codice di verifica',
@@ -803,61 +859,6 @@ export const itIT: LocalizationResource = {
       successMessage: 'Il wallet é stato aggiunto al tuo account.',
       title: 'Aggiungi web3 wallet',
       web3WalletButtonsBlockButton: 'Continua con il tuo portafoglio Web3',
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Richiedi aiuto',
-      actionText: 'Non hai accesso a nessun metodo?',
-      blockButton__backupCode: 'Usa codice di backup',
-      blockButton__emailCode: 'Invia codice via email',
-      blockButton__password: 'Usa la tua password',
-      blockButton__phoneCode: 'Invia codice via telefono',
-      blockButton__totp: 'Usa il codice TOTP',
-      getHelp: {
-        blockButton__emailSupport: 'Contatta il supporto via email',
-        content: 'Se hai bisogno di assistenza, non esitare a contattarci.',
-        title: 'Hai bisogno di aiuto?',
-      },
-      subtitle: 'Scegli uno dei metodi per verificare la tua identità',
-      title: 'Verifica la tua identità',
-    },
-    backupCodeMfa: {
-      subtitle: 'Usa il codice di backup che hai ricevuto in precedenza.',
-      title: 'Codice di Backup MFA',
-    },
-    emailCode: {
-      formTitle: 'Inserisci il codice inviato via email',
-      resendButton: 'Rinvia il codice',
-      subtitle: 'Verifica il codice inviato alla tua email.',
-      title: 'Codice via Email',
-    },
-    noAvailableMethods: {
-      message: 'Non hai metodi disponibili per la verifica. Contatta il supporto per assistenza.',
-      subtitle: 'Non possiamo procedere con la verifica, scegli un altro metodo.',
-      title: 'Nessun metodo disponibile',
-    },
-    password: {
-      actionLink: 'Usa un altro metodo',
-      subtitle: 'Inserisci la tua password per continuare.',
-      title: 'Inserisci la tua password',
-    },
-    phoneCode: {
-      formTitle: 'Inserisci il codice di verifica inviato al tuo telefono',
-      resendButton: 'Rinvia il codice',
-      subtitle: 'Controlla il tuo telefono per il codice.',
-      title: 'Codice via Telefono',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Inserisci il codice di verifica inviato al tuo telefono',
-      resendButton: 'Rinvia il codice',
-      subtitle: 'Controlla il tuo telefono per il codice.',
-      title: 'Codice via Telefono (MFA)',
-    },
-    totpMfa: {
-      formTitle: 'Inserisci il codice TOTP',
-      subtitle: 'Apri la tua app di autenticazione e inserisci il codice TOTP.',
-      title: 'Verifica in due passaggi',
     },
   },
   waitlist: {

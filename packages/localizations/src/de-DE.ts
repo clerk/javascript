@@ -271,6 +271,61 @@ export const deDE: LocalizationResource = {
   paginationButton__previous: 'Vorherige',
   paginationRowText__displaying: 'Anzeigen',
   paginationRowText__of: 'von',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Klicken Sie hier, um eine alternative Methode zu verwenden',
+      actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
+      blockButton__backupCode: 'Mit Backup-Code verifizieren',
+      blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
+      blockButton__password: 'Mit Passwort verifizieren',
+      blockButton__phoneCode: 'Mit SMS-Code verifizieren',
+      blockButton__totp: 'Mit TOTP verifizieren',
+      getHelp: {
+        blockButton__emailSupport: 'E-Mail-Support kontaktieren',
+        content: 'Wenn Sie Hilfe benötigen, wenden Sie sich bitte an unseren Support.',
+        title: 'Hilfe erhalten',
+      },
+      subtitle: 'Wählen Sie eine Methode, um sich zu verifizieren',
+      title: 'Verifizierung erforderlich',
+    },
+    backupCodeMfa: {
+      subtitle: 'Verwenden Sie den Backup-Code, der Ihnen bei der Registrierung zur Verfügung gestellt wurde.',
+      title: 'Backup-Code Verifizierung',
+    },
+    emailCode: {
+      formTitle: 'Geben Sie den Code ein, den wir an Ihre E-Mail-Adresse gesendet haben.',
+      resendButton: 'Code erneut senden',
+      subtitle: 'Überprüfen Sie Ihre E-Mail auf den Verifizierungscode.',
+      title: 'E-Mail-Code Verifizierung',
+    },
+    noAvailableMethods: {
+      message: 'Es sind keine Verifizierungsmethoden mehr verfügbar.',
+      subtitle: 'Bitte kontaktieren Sie den Support, um Hilfe zu erhalten.',
+      title: 'Keine verfügbaren Methoden',
+    },
+    password: {
+      actionLink: 'Passwort zurücksetzen',
+      subtitle: 'Geben Sie Ihr Passwort ein, um fortzufahren.',
+      title: 'Passwort-Verifizierung',
+    },
+    phoneCode: {
+      formTitle: 'Geben Sie den Code ein, den wir an Ihre Telefonnummer gesendet haben.',
+      resendButton: 'Code erneut senden',
+      subtitle: 'Überprüfen Sie Ihre SMS-Nachricht auf den Verifizierungscode.',
+      title: 'SMS-Code Verifizierung',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Geben Sie den Code ein, den wir Ihnen per SMS gesendet haben.',
+      resendButton: 'Code erneut senden',
+      subtitle: 'Überprüfen Sie Ihre SMS auf den Verifizierungscode.',
+      title: 'SMS-Code (MFA) Verifizierung',
+    },
+    totpMfa: {
+      formTitle: 'Geben Sie den Code aus Ihrer Authentifikator-App ein.',
+      subtitle: 'Verwenden Sie die Authentifikator-App, die Sie eingerichtet haben.',
+      title: 'TOTP-Verifizierung (MFA)',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Konto hinzufügen',
@@ -407,6 +462,7 @@ export const deDE: LocalizationResource = {
       actionText__join_waitlist: 'Warteliste beitreten',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Einloggen',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
@@ -527,13 +583,12 @@ export const deDE: LocalizationResource = {
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
-    not_allowed_access: 'Sie haben keine Berechtigung, auf diese Ressource zuzugreifen.',
-    organization_domain_blocked: 'Die angegebene Domain für die Organisation ist blockiert.',
-    organization_domain_common:
-      'Die angegebene Domain gehört zu einer bekannten öffentlichen Organisation. Bitte verwenden Sie eine andere.',
-    organization_membership_quota_exceeded: 'Die Mitgliedschaftskontingent der Organisation wurde überschritten.',
-    organization_minimum_permissions_needed:
-      'Für diese Aktion sind zusätzliche Berechtigungen erforderlich. Bitte wenden Sie sich an einen Administrator.',
+    not_allowed_access: undefined,
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:
@@ -865,61 +920,6 @@ export const deDE: LocalizationResource = {
       successMessage: 'Die Brieftasche wurde Ihrem Konto hinzugefügt.',
       title: 'Web3-Wallet hinzufügen',
       web3WalletButtonsBlockButton: undefined,
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Andere Methode versuchen',
-      actionText: 'Methode ändern?',
-      blockButton__backupCode: 'Mit Backup-Code fortfahren',
-      blockButton__emailCode: 'Mit E-Mail-Code fortfahren',
-      blockButton__password: 'Mit Passwort fortfahren',
-      blockButton__phoneCode: 'Mit Telefon-Code fortfahren',
-      blockButton__totp: 'Mit TOTP fortfahren',
-      getHelp: {
-        blockButton__emailSupport: 'E-Mail-Support kontaktieren',
-        content: 'Falls Sie Probleme haben, können Sie unseren Support kontaktieren.',
-        title: 'Hilfe benötigen?',
-      },
-      subtitle: 'Wählen Sie eine der alternativen Methoden zur Verifizierung aus.',
-      title: 'Verifizierung erforderlich',
-    },
-    backupCodeMfa: {
-      subtitle: 'Verwenden Sie Ihren Backup-Code, um sich zu verifizieren.',
-      title: 'Backup-Code eingeben',
-    },
-    emailCode: {
-      formTitle: 'Geben Sie den Code ein, den wir Ihnen per E-Mail gesendet haben.',
-      resendButton: 'Code erneut senden',
-      subtitle: 'Überprüfen Sie Ihre E-Mail und geben Sie den Code hier ein.',
-      title: 'E-Mail-Code eingeben',
-    },
-    noAvailableMethods: {
-      message: 'Es sind keine Verifizierungsmethoden verfügbar. Bitte versuchen Sie es später erneut.',
-      subtitle: 'Es tut uns leid, aber wir konnten keine Verifizierungsmethoden finden.',
-      title: 'Verifizierungsmethoden fehlen',
-    },
-    password: {
-      actionLink: 'Passwort zurücksetzen',
-      subtitle: 'Geben Sie Ihr Passwort ein, um fortzufahren.',
-      title: 'Passwort eingeben',
-    },
-    phoneCode: {
-      formTitle: 'Geben Sie den Code ein, den wir Ihnen per SMS gesendet haben.',
-      resendButton: 'Code erneut senden',
-      subtitle: 'Überprüfen Sie Ihre SMS und geben Sie den Code hier ein.',
-      title: 'Telefon-Code eingeben',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Geben Sie den SMS-Code ein, um Ihre Identität zu bestätigen.',
-      resendButton: 'Code erneut senden',
-      subtitle: 'Überprüfen Sie Ihre SMS und geben Sie den Code hier ein.',
-      title: 'SMS-Code eingeben',
-    },
-    totpMfa: {
-      formTitle: 'Geben Sie den Code aus Ihrer Authentifizierungs-App ein.',
-      subtitle: 'Verwenden Sie Ihre App, um den aktuellen TOTP-Code einzugeben.',
-      title: 'TOTP-Code eingeben',
     },
   },
   waitlist: {

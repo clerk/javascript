@@ -273,6 +273,62 @@ export const esES: LocalizationResource = {
   paginationButton__previous: 'Previo',
   paginationRowText__displaying: 'Mostrando',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Probar otro método',
+      actionText: '¿No tienes acceso a este método? Prueba otra opción.',
+      blockButton__backupCode: 'Usar código de respaldo',
+      blockButton__emailCode: 'Usar código de correo electrónico',
+      blockButton__password: 'Usar contraseña',
+      blockButton__phoneCode: 'Usar código de teléfono',
+      blockButton__totp: 'Usar verificación TOTP',
+      getHelp: {
+        blockButton__emailSupport: 'Contactar soporte por correo electrónico',
+        content:
+          'Si no puedes verificar tu identidad con los métodos anteriores, comunícate con nuestro equipo de soporte.',
+        title: 'Necesitas ayuda con la verificación?',
+      },
+      subtitle: 'Selecciona uno de los métodos disponibles para verificar tu identidad.',
+      title: 'Reverificación de identidad',
+    },
+    backupCodeMfa: {
+      subtitle: 'Introduce tu código de respaldo para continuar con el acceso.',
+      title: 'Verificación por código de respaldo',
+    },
+    emailCode: {
+      formTitle: 'Ingresa el código que hemos enviado a tu correo electrónico.',
+      resendButton: 'Reenviar código',
+      subtitle: 'Revisa tu bandeja de entrada para el código de verificación.',
+      title: 'Verificación por correo electrónico',
+    },
+    noAvailableMethods: {
+      message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',
+      subtitle: 'No se encontraron métodos alternativos disponibles.',
+      title: 'Métodos de verificación no disponibles',
+    },
+    password: {
+      actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
+      subtitle: 'Usa tu contraseña para verificar tu identidad.',
+      title: 'Verificación por contraseña',
+    },
+    phoneCode: {
+      formTitle: 'Introduce el código enviado a tu teléfono.',
+      resendButton: 'Reenviar código',
+      subtitle: 'Recibirás un código SMS para verificar tu identidad.',
+      title: 'Verificación por teléfono',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Código de verificación de 2 pasos',
+      resendButton: 'Reenviar código',
+      subtitle: 'Introduce el código de verificación de dos factores enviado a tu teléfono.',
+      title: 'Verificación por teléfono (2FA)',
+    },
+    totpMfa: {
+      formTitle: 'Código TOTP',
+      subtitle: 'Introduce el código de autenticación TOTP para completar la verificación.',
+      title: 'Verificación por TOTP (2FA)',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Añadir cuenta',
@@ -409,6 +465,7 @@ export const esES: LocalizationResource = {
 
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Entrar',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -528,6 +585,7 @@ export const esES: LocalizationResource = {
     not_allowed_access: 'Acceso no permitido.',
     organization_domain_blocked: 'Este es un dominio bloqueado, por favor usa otro.',
     organization_domain_common: 'Este es un dominio común, por favor usa otro.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Has alcanzado tu límite de miembros de la organización, incluyendo invitaciones pendientes.',
     organization_minimum_permissions_needed:
@@ -822,62 +880,6 @@ export const esES: LocalizationResource = {
       successMessage: 'La billetera ha sido agregada a su cuenta.',
       title: 'Añadir billetera Web3',
       web3WalletButtonsBlockButton: 'Conectar billetera',
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Probar otro método',
-      actionText: '¿No tienes acceso a este método? Prueba otra opción.',
-      blockButton__backupCode: 'Usar código de respaldo',
-      blockButton__emailCode: 'Usar código de correo electrónico',
-      blockButton__password: 'Usar contraseña',
-      blockButton__phoneCode: 'Usar código de teléfono',
-      blockButton__totp: 'Usar verificación TOTP',
-      getHelp: {
-        blockButton__emailSupport: 'Contactar soporte por correo electrónico',
-        content:
-          'Si no puedes verificar tu identidad con los métodos anteriores, comunícate con nuestro equipo de soporte.',
-        title: 'Necesitas ayuda con la verificación?',
-      },
-      subtitle: 'Selecciona uno de los métodos disponibles para verificar tu identidad.',
-      title: 'Reverificación de identidad',
-    },
-    backupCodeMfa: {
-      subtitle: 'Introduce tu código de respaldo para continuar con el acceso.',
-      title: 'Verificación por código de respaldo',
-    },
-    emailCode: {
-      formTitle: 'Ingresa el código que hemos enviado a tu correo electrónico.',
-      resendButton: 'Reenviar código',
-      subtitle: 'Revisa tu bandeja de entrada para el código de verificación.',
-      title: 'Verificación por correo electrónico',
-    },
-    noAvailableMethods: {
-      message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',
-      subtitle: 'No se encontraron métodos alternativos disponibles.',
-      title: 'Métodos de verificación no disponibles',
-    },
-    password: {
-      actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
-      subtitle: 'Usa tu contraseña para verificar tu identidad.',
-      title: 'Verificación por contraseña',
-    },
-    phoneCode: {
-      formTitle: 'Introduce el código enviado a tu teléfono.',
-      resendButton: 'Reenviar código',
-      subtitle: 'Recibirás un código SMS para verificar tu identidad.',
-      title: 'Verificación por teléfono',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Código de verificación de 2 pasos',
-      resendButton: 'Reenviar código',
-      subtitle: 'Introduce el código de verificación de dos factores enviado a tu teléfono.',
-      title: 'Verificación por teléfono (2FA)',
-    },
-    totpMfa: {
-      formTitle: 'Código TOTP',
-      subtitle: 'Introduce el código de autenticación TOTP para completar la verificación.',
-      title: 'Verificación por TOTP (2FA)',
     },
   },
 
