@@ -26,3 +26,4 @@ export * from './Tr';
 export * from './Th';
 export * from './Td';
 export * from './NotificationBadge';
+export * from './Span';

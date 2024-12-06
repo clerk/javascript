@@ -15,10 +15,10 @@ describe('UserProfile', () => {
       });
 
       render(<UserProfile />, { wrapper });
-      const profileElements = screen.getAllByText(/Profile/i);
-      expect(profileElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
-      const securityElements = screen.getAllByText(/Security/i);
-      expect(securityElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
+      const profileElements = screen.getAllByRole('button', { name: /Profile/i });
+      expect(profileElements.length).toBeGreaterThan(0);
+      const securityElements = screen.getAllByRole('button', { name: /Security/i });
+      expect(securityElements.length).toBeGreaterThan(0);
     });
 
     it('includes custom nav items', async () => {
@@ -45,14 +45,14 @@ describe('UserProfile', () => {
 
       props.setProps({ customPages });
       render(<UserProfile />, { wrapper });
-      const profileElements = screen.getAllByText(/Profile/i);
-      expect(profileElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
-      const securityElements = screen.getAllByText(/Security/i);
-      expect(securityElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
-      const customElements = screen.getAllByText(/Custom1/i);
-      expect(customElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
-      const externalElements = screen.getAllByText(/ExternalLink/i);
-      expect(externalElements.some(el => el.tagName.toUpperCase() === 'BUTTON')).toBe(true);
+      const profileElements = screen.getAllByRole('button', { name: /Profile/i });
+      expect(profileElements.length).toBeGreaterThan(0);
+      const securityElements = screen.getAllByRole('button', { name: /Security/i });
+      expect(securityElements.length).toBeGreaterThan(0);
+      const customElements = screen.getAllByRole('button', { name: /Custom1/i });
+      expect(customElements.length).toBeGreaterThan(0);
+      const externalElements = screen.getAllByRole('button', { name: /ExternalLink/i });
+      expect(externalElements.length).toBeGreaterThan(0);
     });
   });
 });
