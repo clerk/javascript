@@ -166,6 +166,7 @@ export type ElementsConfig = {
   footerPages: WithOptions;
   footerPagesLink: WithOptions<'help' | 'terms' | 'privacy'>;
 
+  socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
