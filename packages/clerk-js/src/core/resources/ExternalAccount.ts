@@ -67,6 +67,25 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return this;
   }
 
+  public toJSON(): ExternalAccountJSON {
+    return {
+      object: 'external_account',
+      id: this.id,
+      identification_id: this.identificationId,
+      provider: this.provider,
+      provider_user_id: this.providerUserId,
+      email_address: this.emailAddress,
+      approved_scopes: this.approvedScopes,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      image_url: this.imageUrl,
+      username: this.username,
+      public_metadata: this.publicMetadata,
+      label: this.label,
+      verification: this.verification?.toJSON() || null,
+    };
+  }
+
   providerSlug(): OAuthProvider {
     return this.provider;
   }

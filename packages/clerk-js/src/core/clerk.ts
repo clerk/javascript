@@ -19,6 +19,7 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClientJSON,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -122,6 +123,7 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
+  isClerkRuntimeError,
   Organization,
   Waitlist,
 } from './resources/internal';
@@ -194,6 +196,10 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+
+  public __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSON | null; environment: EnvironmentJSON | null }>)
+    | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -1908,11 +1914,27 @@ export class Clerk implements ClerkInterface {
     return true;
   };
 
+  private shouldFallbackToCachedResources = (): boolean => {
+    return !!this.__internal_getCachedResources;
+  };
+
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false }),
-      Client.getInstance().fetch(),
-    ]);
+    let environment, client;
+    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    try {
+      [environment, client] = await Promise.all([
+        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
+        Client.getInstance().fetch({ fetchMaxTries }),
+      ]);
+    } catch (err) {
+      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+        const cachedResources = await this.__internal_getCachedResources?.();
+        environment = new Environment(cachedResources?.environment);
+        client = new Client(cachedResources?.client);
+      } else {
+        throw err;
+      }
+    }
 
     this.updateClient(client);
     this.updateEnvironment(environment);
@@ -1924,6 +1946,19 @@ export class Clerk implements ClerkInterface {
     }
 
     return true;
+  };
+
+  // This is used by @clerk/clerk-expo
+  __internal_reloadInitialResources = async (): Promise<void> => {
+    const [environment, client] = await Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
+      Client.getInstance().fetch({ fetchMaxTries: 1 }),
+    ]);
+
+    this.updateClient(client);
+    this.updateEnvironment(environment);
+
+    this.#emit();
   };
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {

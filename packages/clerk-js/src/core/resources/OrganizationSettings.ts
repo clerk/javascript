@@ -31,4 +31,19 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     };
     return this;
   }
+
+  public toJSON(): OrganizationSettingsJSON {
+    return {
+      enabled: this.enabled,
+      max_allowed_memberships: this.maxAllowedMemberships,
+      actions: {
+        admin_delete: this.actions.adminDelete,
+      },
+      domains: {
+        enabled: this.domains.enabled,
+        enrollment_modes: this.domains.enrollmentModes,
+        default_role: this.domains.defaultRole,
+      },
+    } as any as OrganizationSettingsJSON;
+  }
 }

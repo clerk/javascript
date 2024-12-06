@@ -14,4 +14,12 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     this.singleSessionMode = data ? data.single_session_mode : true;
     return this;
   }
+
+  public toJSON(): AuthConfigJSON {
+    return {
+      object: 'auth_config',
+      id: this.id || '',
+      single_session_mode: this.singleSessionMode,
+    };
+  }
 }

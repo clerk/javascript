@@ -33,11 +33,11 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.fromJSON(data);
   }
 
-  fetch({ touch }: { touch: boolean } = { touch: false }): Promise<Environment> {
+  fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
     if (touch) {
       return this._basePatch({});
     }
-    return this._baseGet();
+    return this._baseGet({ fetchMaxTries });
   }
 
   isSingleSession = (): boolean => {
@@ -65,5 +65,17 @@ export class Environment extends BaseResource implements EnvironmentResource {
       this.maintenanceMode = data.maintenance_mode;
     }
     return this;
+  }
+
+  public toJSON(): EnvironmentJSON {
+    return {
+      object: 'environment',
+      id: this.id || '',
+      auth_config: this.authConfig.toJSON(),
+      display_config: this.displayConfig.toJSON(),
+      user_settings: this.userSettings.toJSON(),
+      organization_settings: this.organizationSettings.toJSON(),
+      maintenance_mode: this.maintenanceMode,
+    };
   }
 }

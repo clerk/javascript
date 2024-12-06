@@ -24,4 +24,17 @@ export class PublicUserData implements IPublicUserData {
 
     return this;
   }
+
+  public toJSON(): PublicUserDataJSON {
+    return {
+      object: 'public_user_data',
+      id: this.userId || '',
+      first_name: this.firstName,
+      last_name: this.lastName,
+      image_url: this.imageUrl,
+      has_image: this.hasImage,
+      identifier: this.identifier,
+      user_id: this.userId,
+    };
+  }
 }

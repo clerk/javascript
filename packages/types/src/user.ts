@@ -124,6 +124,8 @@ export interface UserResource extends ClerkResource {
   get hasVerifiedEmailAddress(): boolean;
 
   get hasVerifiedPhoneNumber(): boolean;
+
+  toJSON: () => UserJSON;
 }
 
 export type CreateEmailAddressParams = { email: string };

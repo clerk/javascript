@@ -1,3 +1,5 @@
+import type { OrganizationJSON } from 'json';
+
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -56,6 +58,7 @@ export interface OrganizationResource extends ClerkResource {
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
+  toJSON: () => OrganizationJSON;
 }
 
 export type GetRolesParams = ClerkPaginationParams;
