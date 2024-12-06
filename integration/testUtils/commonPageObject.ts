@@ -16,6 +16,7 @@ export const common = ({ page }: TestArgs) => {
     },
     enterOtpCode: async (code: string) => {
       await page.getByRole('textbox', { name: /digit 1/i }).click();
+      // We've got a delay here to ensure the prepare call is triggered before the OTP is auto-submitted.
       await page.keyboard.type(code, { delay: 100 });
     },
     enterTestOtpCode: async () => {
