@@ -9,6 +9,7 @@ type CreatePhoneNumberParams = {
   phoneNumber: string;
   verified?: boolean;
   primary?: boolean;
+  reserved_for_second_factor?: boolean;
 };
 
 type UpdatePhoneNumberParams = {
