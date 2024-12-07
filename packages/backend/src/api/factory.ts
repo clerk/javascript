@@ -32,7 +32,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),
     invitations: new InvitationAPI(request),
-    machineTokens: new MachineTokensAPI(request),
+    __internal_machineTokens: new MachineTokensAPI(request),
     organizations: new OrganizationAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
