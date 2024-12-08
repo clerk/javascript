@@ -58,7 +58,7 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses:
     'Ingrese o pegue una o más direcciones de correo electrónico, separadas por espacios o comas',
   formFieldInputPlaceholder__firstName: 'Ingrese su nombre',
-  formFieldInputPlaceholder__lastName: 'Ingrese sus apellidos',
+  formFieldInputPlaceholder__lastName: 'Ingrese su apellido',
   formFieldInputPlaceholder__organizationDomain: 'Ingrese el dominio de la organización',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'Ingrese un correo electrónico del dominio',
   formFieldInputPlaceholder__organizationName: 'Ingrese el nombre de la organización',
@@ -76,7 +76,7 @@ export const esES: LocalizationResource = {
   formFieldLabel__emailAddress_username: 'Correo electrónico o nombre de usuario',
   formFieldLabel__emailAddresses: 'Direcciones de correo',
   formFieldLabel__firstName: 'Nombre',
-  formFieldLabel__lastName: 'Apellidos',
+  formFieldLabel__lastName: 'Apellido',
   formFieldLabel__newPassword: 'Nueva contraseña',
   formFieldLabel__organizationDomain: 'Dominio',
   formFieldLabel__organizationDomainDeletePending: 'Borrar invitaciones y sugerencias pendientes',
