@@ -187,7 +187,7 @@ export const itIT: LocalizationResource = {
           actionDescription: 'Scrivi "{{organizationName}}" qui sotto per continuare.',
           messageLine1:
             'Sei sicuro di voler lasciare questa organizzazione? Perderai accesso a questa organizzazione e le sue applicazioni.',
-          messageLine2: 'Questa azione é permanente ed irreversibile.',
+          messageLine2: 'Questa azione è permanente ed irreversibile.',
           successMessage: "Hai lasciato l'organizzazione.",
           title: 'Lascia organizzazione',
         },
@@ -202,7 +202,7 @@ export const itIT: LocalizationResource = {
           "Consenti agli utenti di unirsi automaticamente all'organizzazione oppure di richiedere di unirsi in base a un dominio email verificato.",
         title: 'Domini verificati',
       },
-      successMessage: "L'organizzazione é stata aggiornata.",
+      successMessage: "L'organizzazione è stata aggiornata.",
       title: "Profilo dell'organizzazione",
     },
     removeDomainPage: {
@@ -215,14 +215,14 @@ export const itIT: LocalizationResource = {
       headerTitle__general: 'Generale',
       headerTitle__members: 'Membri',
       profileSection: {
-        primaryButton: 'Salva modifiche',
+        primaryButton: 'Modifica profilo',
         title: "Profilo dell'organizzazione",
         uploadAction__title: 'Logo',
       },
     },
     verifiedDomainPage: {
       dangerTab: {
-        calloutInfoLabel: 'Rimuovere questo dominio influirá sugli utenti invitati.',
+        calloutInfoLabel: 'Rimuovere questo dominio influirà sugli utenti invitati.',
         removeDomainActionLabel__remove: 'Rimuovi dominio',
         removeDomainSubtitle: 'Rimuovi questo dominio dai tuoi domini verificati',
         removeDomainTitle: 'Rimuovi dominio',
@@ -346,7 +346,7 @@ export const itIT: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Supporto email',
         content:
-          'Se stai incontrando delle difficoltá ad accedere al tuo account, inviaci una email e ti aiuteremo a ripristinare il tuo account il prima possibile.',
+          'Se stai incontrando delle difficoltà ad accedere al tuo account, inviaci una email e ti aiuteremo a ripristinare il tuo account il prima possibile.',
         title: 'Richiedi aiuto',
       },
       subtitle: 'Problemi di accesso? Puoi usare uno di questi metodi per accedere.',
@@ -430,7 +430,7 @@ export const itIT: LocalizationResource = {
     phoneCode: {
       formTitle: 'Codice di verifica',
       resendButton: 'Rinvia il codice',
-      subtitle: 'per accedera a {{applicationName}}',
+      subtitle: 'per accedere a {{applicationName}}',
       title: 'Controlla il tuo telefono',
     },
     phoneCodeMfa: {
@@ -537,7 +537,7 @@ export const itIT: LocalizationResource = {
       actionLink: 'Accedi',
       actionLink__use_email: 'Usa email',
       actionLink__use_phone: 'Usa telefono',
-      actionText: 'Hai giá un account?',
+      actionText: 'Hai già un account?',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
     },
@@ -601,7 +601,7 @@ export const itIT: LocalizationResource = {
         'Tieni segreti i codici di backup e salvali in maniera sicura. Potrai generare altri codici di backup se pensi che possano essere compromessi.',
       subtitle__codelist: 'Salvali in maniera sicura e tienili segreti.',
       successMessage:
-        'I codici di backup sono ora abilitati. Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione. Ogni codice potrá essere utilizzato una sola volta.',
+        'I codici di backup sono ora abilitati. Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione. Ogni codice potrà essere utilizzato una sola volta.',
       successSubtitle:
         'Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione.',
       title: 'Aggiungi verifica codici backup',
@@ -611,14 +611,14 @@ export const itIT: LocalizationResource = {
       formHint: 'Seleziona un provider per collegare il tuo account.',
       formHint__noAccounts: 'Non ci sono provider esterni disponibili.',
       removeResource: {
-        messageLine1: '{{identifier}} sará rimosso dal tuo account.',
+        messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2:
-          'Non sarai piú in grado di accedere utilizzando questo account e le funzionalitá collegate smetteranno di funzionare.',
-        successMessage: '{{connectedAccount}} é stato rimosso dal tuo account.',
+          'Non sarai piú in grado di accedere utilizzando questo account e le funzionalità collegate smetteranno di funzionare.',
+        successMessage: '{{connectedAccount}} è stato rimosso dal tuo account.',
         title: 'Rimuovi account collegato',
       },
       socialButtonsBlockButton: 'Collega {{provider|titleize}} account',
-      successMessage: 'Il provider é stato aggiunto al tuo account',
+      successMessage: 'Il provider è stato aggiunto al tuo account',
       title: 'Aggiungi account collegato',
     },
     deletePage: {
@@ -630,23 +630,23 @@ export const itIT: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Una email contenente un codice di verifica é stata inviata a questo indirizzo email.',
+        formHint: 'Una email contenente un codice di verifica è stata inviata a questo indirizzo email.',
         formSubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
         formTitle: 'Codice di verifica',
         resendButton: 'Rinvia codice',
-        successMessage: "L'indirizzo email {{identifier}} é stato aggiunto al tuo account.",
+        successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
       emailLink: {
-        formHint: 'Una email contenente un link di verifica sará inviata a questo indirizzo email.',
+        formHint: 'Una email contenente un link di verifica sarà inviata a questo indirizzo email.',
         formSubtitle: 'Clicca sul link di verifica nella email inviata a {{identifier}}',
         formTitle: 'Link di verifica',
         resendButton: 'Rinvia link',
-        successMessage: "L'indirizzo email {{identifier}} é stato aggiunto al tuo account.",
+        successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
       removeResource: {
-        messageLine1: '{{identifier}} sará rimosso dal tuo account.',
+        messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',
-        successMessage: '{{emailAddress}} é stato rimosso dal tuo account.',
+        successMessage: '{{emailAddress}} è stato rimosso dal tuo account.',
         title: 'Rimuovi indirizzo email',
       },
       title: 'Aggiungi un indirizzo email',
@@ -666,10 +666,10 @@ export const itIT: LocalizationResource = {
       backButton: 'Usa numero esistente',
       primaryButton__addPhoneNumber: 'Aggiungi un numero di telefono',
       removeResource: {
-        messageLine1: "{{identifier}} non riceverá piú i codici di verifica all'accesso.",
+        messageLine1: "{{identifier}} non riceverà piú i codici di verifica all'accesso.",
         messageLine2: 'Il tuo account potrebbe essere non sicuro. Sei sicuro di voler continuare?',
-        successMessage: 'La verifica in 2 passaggi tramite SMS é stata rimossa per {{mfaPhoneCode}}',
-        title: 'Rimuovi verifica in 2 passsaggi',
+        successMessage: 'La verifica in 2 passaggi tramite SMS è stata rimossa per {{mfaPhoneCode}}',
+        title: 'Rimuovi verifica in 2 passaggi',
       },
       subtitle__availablePhoneNumbers:
         'Seleziona un numero di telefono da registrare per la verifica in 2 passaggi tramite SMS.',
@@ -685,7 +685,7 @@ export const itIT: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'Scansiona il codice QR',
-        buttonUnableToScan__nonPrimary: 'Non é possibile scansionare il codice QR?',
+        buttonUnableToScan__nonPrimary: 'Non è possibile scansionare il codice QR?',
         infoText__ableToScan:
           'Aggiungi un nuovo metodo di accesso nella tua app di autenticazione e scansione il seguente codice QR per associarla a questo account.',
         infoText__unableToScan:
@@ -698,11 +698,11 @@ export const itIT: LocalizationResource = {
       removeResource: {
         messageLine1: "I codici di verifica di questo autenticatore non saranno piú richiesti all'accesso.",
         messageLine2: 'Il tuo account potrebbe essere non sicuro. Sei sicuro di voler continuare?',
-        successMessage: 'La verifica in 2 passaggi tramite autenticatore é stata rimossa.',
+        successMessage: 'La verifica in 2 passaggi tramite autenticatore è stata rimossa.',
         title: 'Rimuovi verifica in 2 passaggi',
       },
       successMessage:
-        "Verifica in 2 passaggi attivata. All'accesso sará richiesto di inserire un codice di verifica generato dall'app di autenticazione come ulteriore passaggio.",
+        "Verifica in 2 passaggi attivata. All'accesso sarà richiesto di inserire un codice di verifica generato dall'app di autenticazione come ulteriore passaggio.",
       title: 'Aggiungi app di autenticazione',
       verifySubtitle: 'Inserisci il codice di verifica generato dalla tua app di autenticazione',
       verifyTitle: 'Codice di verifica',
@@ -728,21 +728,21 @@ export const itIT: LocalizationResource = {
         'È consigliabile disconnettersi da tutti gli altri dispositivi che potrebbero aver utilizzato la tua vecchia password.',
       readonly:
         'La tua password corrente non può essere modificata perché puoi accedere solo tramite la connessione aziendale.',
-      successMessage__set: 'La tua password é stata impostata.',
+      successMessage__set: 'La tua password è stata impostata.',
       successMessage__signOutOfOtherSessions: 'Tutti gli altri dispositivi sono stati disconnessi.',
       successMessage__update: 'La tua password è stata aggiornata.',
       title__set: 'Imposta password',
       title__update: 'Cambia password',
     },
     phoneNumberPage: {
-      infoText: 'Un SMS contenente un link di verifica é stato inviato a questo numero di telefono.',
+      infoText: 'Un SMS contenente un link di verifica è stato inviato a questo numero di telefono.',
       removeResource: {
-        messageLine1: '{{identifier}} sará rimosso dal tuo account.',
+        messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo numero di telefono.',
-        successMessage: '{{phoneNumber}} é stato rimosso dal tuo account.',
+        successMessage: '{{phoneNumber}} è stato rimosso dal tuo account.',
         title: 'Rimuovi numero di telefono',
       },
-      successMessage: '{{identifier}} é stato aggiunto al tuo account.',
+      successMessage: '{{identifier}} è stato aggiunto al tuo account.',
       title: 'Aggiungi numero di telefono',
       verifySubtitle: 'Inserisci il codice di verifica inviato a {{identifier}}',
       verifyTitle: 'Verifica numero di telefono',
@@ -754,7 +754,7 @@ export const itIT: LocalizationResource = {
       imageFormTitle: 'Immagine di profilo',
       readonly:
         'Le informazioni del tuo profilo sono state fornite dalla connessione aziendale e non possono essere modificate.',
-      successMessage: 'Il tuo profile é stato aggiornato.',
+      successMessage: 'Il tuo profile è stato aggiornato.',
       title: 'Aggiorna profilo',
     },
     start: {
@@ -787,7 +787,7 @@ export const itIT: LocalizationResource = {
       enterpriseAccountsSection: {
         title: 'Account aziendali',
       },
-      headerTitle__account: 'Account',
+      headerTitle__account: 'Dettagli profilo',
       headerTitle__security: 'Sicurezza',
       mfaSection: {
         backupCodes: {
@@ -843,20 +843,20 @@ export const itIT: LocalizationResource = {
       },
     },
     usernamePage: {
-      successMessage: 'Il tuo username é stato aggiornato.',
+      successMessage: 'Il tuo username è stato aggiornato.',
       title__set: 'Aggiorna username',
       title__update: 'Aggiorna username',
     },
     web3WalletPage: {
       removeResource: {
-        messageLine1: '{{identifier}} sará rimosso dal tuo account.',
+        messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo web3 wallet.',
-        successMessage: '{{web3Wallet}} é stato rimosso dal tuo account.',
+        successMessage: '{{web3Wallet}} è stato rimosso dal tuo account.',
         title: 'Rimuovi web3 wallet',
       },
       subtitle__availableWallets: 'Seleziona un web3 wallet da collegare al tuo account.',
       subtitle__unavailableWallets: 'Non ci sono web3 wallets disponibili.',
-      successMessage: 'Il wallet é stato aggiunto al tuo account.',
+      successMessage: 'Il wallet è stato aggiunto al tuo account.',
       title: 'Aggiungi web3 wallet',
       web3WalletButtonsBlockButton: 'Continua con il tuo portafoglio Web3',
     },
