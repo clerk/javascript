@@ -11,11 +11,11 @@ const _SignInAccountSwitcher = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath } = useSignInContext();
-  const { navigateAfterSignOut } = useSignOutContext();
+  const { afterSignOutUrl } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
     useMultisessionActions({
-      navigateAfterSignOut,
-      afterSwitchSession: afterSignInUrl,
+      afterSignOutUrl,
+      afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
       signInUrl: signInPath,
       user: undefined,
