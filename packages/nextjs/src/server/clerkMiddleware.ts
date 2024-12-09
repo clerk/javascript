@@ -2,6 +2,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -17,7 +18,6 @@ import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
-  nextjsNotFound,
   nextjsRedirectError,
   redirectToSignInError,
 } from './nextErrors';
