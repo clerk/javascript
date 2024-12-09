@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
-import { createOrReadKeylessAction } from '../keyless-actions';
+import { copyKeysInsideEnvFileAction, createOrReadKeylessAction } from '../keyless-actions';
 
 export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
   const { children } = props;
@@ -21,5 +21,6 @@ export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
     publishableKey: state?.publishableKey,
     __internal_claimKeylessApplicationUrl: state?.claimUrl,
     __internal_bypassMissingPublishableKey: true,
+    __internal_keylessCopyToEnvFile: copyKeysInsideEnvFileAction,
   } as any);
 };

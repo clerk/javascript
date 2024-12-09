@@ -520,7 +520,10 @@ const Components = (props: ComponentsProps) => {
         {__BUILD_FLAG_KEYLESS_UI__
           ? state.options?.__internal_claimKeylessApplicationUrl && (
               <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-                <KeylessPrompt url={state.options.__internal_claimKeylessApplicationUrl} />
+                <KeylessPrompt
+                  url={state.options.__internal_claimKeylessApplicationUrl}
+                  onClaimed={state.options?.__internal_keylessCopyToEnvFile}
+                />
               </LazyImpersonationFabProvider>
             )
           : null}

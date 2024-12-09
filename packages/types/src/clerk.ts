@@ -754,6 +754,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     >;
 
     __internal_claimKeylessApplicationUrl?: string;
+    __internal_keylessCopyToEnvFile?: () => Promise<void>;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.

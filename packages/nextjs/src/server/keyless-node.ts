@@ -46,7 +46,7 @@ function updateGitignore() {
   }
 }
 
-const generatePath = (...slugs: string[]) => {
+const generateHiddenPath = (...slugs: string[]) => {
   if (!nodeRuntime.path) {
     throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
   }
@@ -54,8 +54,8 @@ const generatePath = (...slugs: string[]) => {
 };
 
 const _TEMP_DIR_NAME = '.tmp';
-const getKeylessConfigurationPath = () => generatePath(_TEMP_DIR_NAME, 'keyless.json');
-const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
+const getKeylessConfigurationPath = () => generateHiddenPath(_TEMP_DIR_NAME, 'keyless.json');
+const getKeylessReadMePath = () => generateHiddenPath(_TEMP_DIR_NAME, 'README.md');
 
 let isCreatingFile = false;
 
@@ -113,7 +113,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   const CONFIG_PATH = getKeylessConfigurationPath();
   const README_PATH = getKeylessReadMePath();
 
-  mkdirSync(generatePath(_TEMP_DIR_NAME), { recursive: true });
+  mkdirSync(generateHiddenPath(_TEMP_DIR_NAME), { recursive: true });
   updateGitignore();
 
   /**
@@ -170,4 +170,48 @@ This directory is auto-generated from \`@clerk/nextjs\` because you are running 
   return accountlessApplication;
 }
 
-export { createOrReadKeyless };
+const dotenvFiles = [`.env.development.local`, `.env.local`];
+
+/**
+ * Copy the keys from the hidden directory inside a local environment file.
+ * We cannot completely remove the hidden directory yet, since there is no guarantee that the newly set
+ * environment variables will be loaded on time to prevent another accountable application from being removed.
+ */
+function copyKeysInsideEnvFile() {
+  if (!nodeRuntime.fs) {
+    // This should never happen.
+    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+  }
+
+  let existingEnvFile: string | undefined;
+  const { existsSync, writeFileSync } = nodeRuntime.fs;
+
+  for (const file of dotenvFiles) {
+    const envPath = nodeRuntime.path.join(process.cwd(), file);
+    if (existsSync(envPath)) {
+      existingEnvFile = envPath;
+      break;
+    }
+  }
+
+  const keys = safeParseClerkFile();
+
+  if (!keys) {
+    return;
+  }
+
+  writeFileSync(
+    existingEnvFile || nodeRuntime.path.join(process.cwd(), '.env.local'),
+    `
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${keys.publishableKey}
+CLERK_SECRET_KEY=${keys.secretKey}
+`,
+    {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'a',
+    },
+  );
+}
+
+export { createOrReadKeyless, copyKeysInsideEnvFile };

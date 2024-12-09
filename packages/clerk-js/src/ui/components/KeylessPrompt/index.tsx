@@ -8,11 +8,17 @@ import { InternalThemeProvider, mqu } from '../../styledSystem';
 
 type KeylessPromptProps = {
   url?: string;
+  onClaimed?: () => Promise<void>;
 };
 
-type FabContentProps = { title?: LocalizationKey | string; signOutText: LocalizationKey | string; url: string };
+type FabContentProps = {
+  title?: LocalizationKey | string;
+  signOutText: LocalizationKey | string;
+  url: string;
+  onClaimed: (() => Promise<void>) | undefined;
+};
 
-const FabContent = ({ title, signOutText, url }: FabContentProps) => {
+const FabContent = ({ title, signOutText, url, onClaimed }: FabContentProps) => {
   return (
     <Col
       sx={t => ({
@@ -46,6 +52,27 @@ const FabContent = ({ title, signOutText, url }: FabContentProps) => {
           // handleSignOutSessionClicked(session!)
         }
       />
+      {onClaimed && (
+        <Link
+          variant='buttonLarge'
+          elementDescriptor={descriptors.impersonationFabActionLink}
+          sx={t => ({
+            alignSelf: 'flex-start',
+            color: t.colors.$primary500,
+            ':hover': {
+              cursor: 'pointer',
+            },
+          })}
+          localizationKey={'Copy keys'}
+          onClick={
+            () => {
+              onClaimed().catch();
+            }
+            // clerk-js has been loaded at this point so we can safely access session
+            // handleSignOutSessionClicked(session!)
+          }
+        />
+      )}
     </Col>
   );
 };
@@ -162,6 +189,7 @@ const _KeylessPrompt = (props: KeylessPromptProps) => {
           <FabContent
             url={props.url}
             signOutText={'Claim your keys'}
+            onClaimed={props.onClaimed}
           />
         </Flex>
       </Flex>

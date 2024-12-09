@@ -2052,7 +2052,10 @@ export class Clerk implements ClerkInterface {
       void this.#componentControls?.ensureMounted().then(controls => {
         if (this.#options.__internal_claimKeylessApplicationUrl) {
           controls.updateProps({
-            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
+            options: {
+              __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
+              __internal_keylessCopyToEnvFile: this.#options.__internal_keylessCopyToEnvFile,
+            },
           });
         }
       });

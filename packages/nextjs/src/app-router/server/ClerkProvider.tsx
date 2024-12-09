@@ -66,6 +66,9 @@ export async function ClerkProvider(
 
     if (newOrReadKeys) {
       const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
+      const copyKeysInsideEnvFileAction = await import('../keyless-actions.js').then(
+        mod => mod.copyKeysInsideEnvFileAction,
+      );
       output = (
         <KeylessCookieSync {...newOrReadKeys}>
           <ClientClerkProvider
@@ -73,6 +76,7 @@ export async function ClerkProvider(
               ...rest,
               publishableKey: newOrReadKeys.publishableKey,
               __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
+              __internal_keylessCopyToEnvFile: copyKeysInsideEnvFileAction,
             })}
             nonce={await nonce}
             initialState={await statePromise}

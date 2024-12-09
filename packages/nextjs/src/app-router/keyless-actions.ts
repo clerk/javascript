@@ -42,3 +42,14 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     publishableKey,
   };
 }
+
+export async function copyKeysInsideEnvFileAction(): Promise<void> {
+  if (!canUseKeyless__server) {
+    return;
+  }
+
+  const copyKeysInsideEnvFile = await import('../server/keyless-node.js').then(m => m.copyKeysInsideEnvFile);
+  copyKeysInsideEnvFile();
+
+  void (await cookies()).delete(getKeylessCookieName());
+}
