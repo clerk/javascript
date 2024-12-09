@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.19.2
+
+### Patch Changes
+
+- Improving error messaging from `useAssertWrappedByClerkProvider` to point out potential failure scenarios. ([#4719](https://github.com/clerk/javascript/pull/4719)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 2.19.1
 
 ### Patch Changes
