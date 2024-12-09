@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Add localization key for `navbarButtonText`.
+Introduce the `navbarButtonText` element descriptor.
