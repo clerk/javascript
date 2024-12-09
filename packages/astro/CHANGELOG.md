@@ -1,5 +1,22 @@
 # @clerk/astro
 
+## 2.0.0
+
+### Major Changes
+
+- Recently Astro released its v5. Read their [migration guide](https://docs.astro.build/en/guides/upgrade-to/v5/) to learn more. ([#4721](https://github.com/clerk/javascript/pull/4721)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  `@clerk/astro@2.0.0` supports Astro v4.15.0 and above, including v5. If you're using Astro v3, you'll need to upgrade your Astro version as v3 support has been removed. If you need to stay on Astro v3, stick with your current version.
+
+  The `@clerk/astro@2.0.0` upgrade itself doesn't have any required code changes as only internal dependencies and requirements were updated.
+
+### Patch Changes
+
+- Updated dependencies [[`fe75ced8a7d8b8a28839430444588ee173b5230a`](https://github.com/clerk/javascript/commit/fe75ced8a7d8b8a28839430444588ee173b5230a), [`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/backend@1.20.2
+  - @clerk/types@4.39.1
+  - @clerk/shared@2.19.3
+
 ## 1.5.6
 
 ### Patch Changes
