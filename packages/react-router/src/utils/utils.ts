@@ -85,7 +85,7 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
  *
  * Therefore, if the __reactRouterContext object is not present on window, we can assume that React Router is being used as a library.
  */
-export const inSpaMode = (): boolean => {
+export const isSpaMode = (): boolean => {
   if (typeof window !== 'undefined' && typeof window.__reactRouterContext?.isSpaMode !== 'undefined') {
     return window.__reactRouterContext.isSpaMode;
   }
