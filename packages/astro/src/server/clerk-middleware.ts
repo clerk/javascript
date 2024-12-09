@@ -81,13 +81,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       createAuthenticateRequestOptions(clerkRequest, options, context),
     );
 
+    console.log('requestState', requestState);
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      if (!locationHeader.includes('client/handshake') && !locationHeader.includes('__clerk_handshake')) {
-        const url = new URL(locationHeader);
-        url.searchParams.append('__netlify_clerk_cache_bust', Date.now().toString());
-        requestState.headers.set('Location', url.toString());
-      }
+      handleNetlifyCacheInDevInstance(locationHeader, requestState);
 
       const res = new Response(null, { status: 307, headers: requestState.headers });
       return decorateResponseWithObservabilityHeaders(res, requestState);
@@ -239,6 +236,16 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 2) With environment variables e.g.
    PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    PUBLIC_CLERK_IS_SATELLITE='true'`;
+
+function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
+  const isHandshakeUrl = locationHeader.includes('/v1/client/handshake');
+  const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+  if (!isHandshakeUrl && !hasHandshakeQueryParam) {
+    const url = new URL(locationHeader);
+    url.searchParams.append('__netlify_clerk_cache_bust', Date.now().toString());
+    requestState.headers.set('Location', url.toString());
+  }
+}
 
 function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;
