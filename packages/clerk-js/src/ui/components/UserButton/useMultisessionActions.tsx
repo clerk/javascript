@@ -10,8 +10,8 @@ import { sleep } from '../../utils';
 type UseMultisessionActionsParams = {
   user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
-  navigateAfterSignOut?: () => any;
-  navigateAfterMultiSessionSingleSignOut?: () => any;
+  afterSignOutUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
   afterSwitchSessionUrl?: string;
   userProfileUrl?: string;
   signInUrl?: string;
@@ -25,9 +25,11 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut(opts.navigateAfterSignOut);
+      return signOut({
+        redirectUrl: opts.afterSignOutUrl,
+      });
     }
-    return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(() =>
+    return signOut({ sessionId: session.id, redirectUrl: opts.afterMultiSessionSingleSignOutUrl }).finally(() =>
       card.setIdle(),
     );
   };
@@ -63,7 +65,9 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleSignOutAllClicked = () => {
-    return signOut(opts.navigateAfterSignOut);
+    return signOut({
+      redirectUrl: opts.afterSignOutUrl,
+    });
   };
 
   const handleSessionClicked = (session: ActiveSessionResource) => async () => {
