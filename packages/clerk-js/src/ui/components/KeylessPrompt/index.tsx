@@ -1,6 +1,7 @@
 import type { PointerEventHandler } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
+import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Link, Text } from '../../customizables';
 import { Portal } from '../../elements/Portal';
@@ -19,6 +20,7 @@ type FabContentProps = {
 };
 
 const FabContent = ({ title, signOutText, url, onClaimed }: FabContentProps) => {
+  const claimed = useEnvironment().authConfig.claimedAt;
   return (
     <Col
       sx={t => ({
@@ -35,24 +37,22 @@ const FabContent = ({ title, signOutText, url, onClaimed }: FabContentProps) => 
         truncate
         localizationKey={title}
       />
-      <Link
-        variant='buttonLarge'
-        elementDescriptor={descriptors.impersonationFabActionLink}
-        sx={t => ({
-          alignSelf: 'flex-start',
-          color: t.colors.$primary500,
-          ':hover': {
-            cursor: 'pointer',
-          },
-        })}
-        localizationKey={signOutText}
-        onClick={
-          () => (window.location.href = url)
-          // clerk-js has been loaded at this point so we can safely access session
-          // handleSignOutSessionClicked(session!)
-        }
-      />
-      {onClaimed && (
+      {!claimed ? (
+        <Link
+          variant='buttonLarge'
+          elementDescriptor={descriptors.impersonationFabActionLink}
+          sx={t => ({
+            alignSelf: 'flex-start',
+            color: t.colors.$primary500,
+            ':hover': {
+              cursor: 'pointer',
+            },
+          })}
+          localizationKey={signOutText}
+          onClick={() => (window.location.href = url)}
+        />
+      ) : null}
+      {claimed && onClaimed ? (
         <Link
           variant='buttonLarge'
           elementDescriptor={descriptors.impersonationFabActionLink}
@@ -64,15 +64,14 @@ const FabContent = ({ title, signOutText, url, onClaimed }: FabContentProps) => 
             },
           })}
           localizationKey={'Copy keys'}
-          onClick={
-            () => {
-              onClaimed().catch();
-            }
-            // clerk-js has been loaded at this point so we can safely access session
-            // handleSignOutSessionClicked(session!)
-          }
+          onClick={async () => {
+            await onClaimed().catch();
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }}
         />
-      )}
+      ) : null}
     </Col>
   );
 };
