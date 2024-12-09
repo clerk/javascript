@@ -2,11 +2,10 @@ import { createClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
-import { isTruthy } from '@clerk/shared/underscore';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
+import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
-import { getEnvVariable } from '../utils/utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { patchRequest } from './utils';
 
@@ -20,21 +19,19 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
   // 3. Then try from globalThis (Cloudflare Workers).
   // 4. Then from loader context (Cloudflare Pages).
   const secretKey = overrides.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
-  const publishableKey = overrides.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
+  const publishableKey = overrides.publishableKey || getPublicEnvVariables(context).publishableKey;
   const jwtKey = overrides.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
   const apiUrl = getEnvVariable('CLERK_API_URL', context) || apiUrlFromPublishableKey(publishableKey);
-  const domain =
-    handleValueOrFn(overrides.domain, new URL(request.url)) || getEnvVariable('CLERK_DOMAIN', context) || '';
+  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || getPublicEnvVariables(context).domain;
   const isSatellite =
-    handleValueOrFn(overrides.isSatellite, new URL(request.url)) ||
-    isTruthy(getEnvVariable('CLERK_IS_SATELLITE', context));
+    handleValueOrFn(overrides.isSatellite, new URL(request.url)) || getPublicEnvVariables(context).isSatellite;
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     overrides?.proxyUrl,
     clerkRequest.clerkUrl,
-    getEnvVariable('CLERK_PROXY_URL', context),
+    getPublicEnvVariables(context).proxyUrl,
   );
-  const signInUrl = overrides.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context) || '';
-  const signUpUrl = overrides.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context) || '';
+  const signInUrl = overrides.signInUrl || getPublicEnvVariables(context).signInUrl;
+  const signUpUrl = overrides.signUpUrl || getPublicEnvVariables(context).signUpUrl;
   const signInForceRedirectUrl =
     overrides.signInForceRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL', context) || '';
   const signUpForceRedirectUrl =
@@ -43,8 +40,8 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     overrides.signInFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL', context) || '';
   const signUpFallbackRedirectUrl =
     overrides.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context) || '';
-  const afterSignInUrl = overrides.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
-  const afterSignUpUrl = overrides.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
+  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables(context).afterSignInUrl;
+  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables(context).afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {

@@ -1,9 +1,8 @@
 import { constants, debugRequestState } from '@clerk/backend/internal';
-import { isTruthy } from '@clerk/shared/underscore';
 import cookie from 'cookie';
 import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
 
-import * as utils from '../utils/utils';
+import { getPublicEnvVariables } from '../utils/env';
 import type { RequestStateWithRedirectUrls } from './types';
 
 export function isResponse(value: any): value is Response {
@@ -82,10 +81,10 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
-    __clerkJSUrl: utils.getEnvVariable('CLERK_JS', context),
-    __clerkJSVersion: utils.getEnvVariable('CLERK_JS_VERSION', context),
-    __telemetryDisabled: isTruthy(utils.getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
-    __telemetryDebug: isTruthy(utils.getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
+    __clerkJSUrl: getPublicEnvVariables(context).clerkJsUrl,
+    __clerkJSVersion: getPublicEnvVariables(context).clerkJsVersion,
+    __telemetryDisabled: getPublicEnvVariables(context).telemetryDisabled,
+    __telemetryDebug: getPublicEnvVariables(context).telemetryDebug,
   });
 
   return {
