@@ -671,19 +671,23 @@ export const heIL: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'אימייל שמכיל קוד אימות ישלח לכתובת זו.',
         formSubtitle: 'הכנס את קוד האימות שנשלח ל-{{identifier}}',
         formTitle: 'קוד אימות',
         resendButton: 'שלח קוד מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
       emailLink: {
-        formHint: 'אימייל שמכיל קישור לאימות ישלח לכתובת זו.',
         formSubtitle: 'לחץ על קישור האימות באימייל שנשלח ל-{{identifier}}',
         formTitle: 'קישור לאימות',
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
+      enterpriseSsoLink: {
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות כתובת אימייל זו.',

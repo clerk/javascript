@@ -684,19 +684,23 @@ export const huHU: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Egy visszaigazoló kódot tartalmazó emailt fogunk küldeni erre az email címre.',
         formSubtitle: 'Írd be a visszaigazoló kódot, amit a(z) {{identifier}} címre küldtünk.',
         formTitle: 'Visszaigazoló kód',
         resendButton: 'Nem kaptad meg a kódot? Újraküldés',
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
       emailLink: {
-        formHint: 'Egy visszaigazoló linket tartalmazó emailt fogunk küldeni erre az email címre.',
         formSubtitle: 'Kattints a visszaigazoló linkre az emailben, amit ide küldtünk: {{identifier}}',
         formTitle: 'Visszaigazoló link',
         resendButton: 'Nem kaptad meg a linket? Újraküldés',
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
+      enterpriseSsoLink: {
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} el lesz távolítva ebből a fiókból.',
         messageLine2: 'Nem fogsz tudni többet bejelentkezni ezzel az email címmel.',

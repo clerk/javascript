@@ -52,7 +52,7 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
       <EnterpriseAccountProviderIcon account={account} />
       <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
         <Flex
-          gap={2}
+          gap={1}
           center
         >
           <Text

@@ -2,11 +2,13 @@ import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
+  CreateEnterpriseSsoLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
   StartEmailLinkFlowParams,
+  StartEnterpriseSsoLinkFlowParams,
   VerificationResource,
 } from '@clerk/types';
 
@@ -16,6 +18,7 @@ import { BaseResource, IdentificationLink, Verification } from './internal';
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;
   emailAddress = '';
+  matchesSsoConnection = false;
   linkedTo: IdentificationLinkResource[] = [];
   verification!: VerificationResource;
 
@@ -77,6 +80,45 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
+  createEnterpriseSsoLinkFlow = (): CreateEnterpriseSsoLinkFlowReturn<
+    StartEnterpriseSsoLinkFlowParams,
+    EmailAddressResource
+  > => {
+    const { run, stop } = Poller();
+
+    const startEnterpriseSsoLinkFlow = async ({
+      redirectUrl,
+    }: StartEnterpriseSsoLinkFlowParams): Promise<EmailAddressResource> => {
+      if (!this.id) {
+        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+      }
+      const response = await this.prepareVerification({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+      });
+      if (!response.verification.externalVerificationRedirectURL) {
+        throw Error('Unexpected: External verification redirect URL is missing');
+      }
+      window.open(response.verification.externalVerificationRedirectURL, '_blank', 'noopener');
+      return new Promise((resolve, reject) => {
+        void run(() => {
+          return this.reload()
+            .then(res => {
+              if (res.verification.status === 'verified') {
+                stop();
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              stop();
+              reject(err);
+            });
+        });
+      });
+    };
+    return { startEnterpriseSsoLinkFlow, cancelEnterpriseSsoLinkFlow: stop };
+  };
+
   destroy = (): Promise<void> => this._baseDelete();
 
   toString = (): string => this.emailAddress;
@@ -89,6 +131,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.verification = new Verification(data.verification);
+    this.matchesSsoConnection = data.matches_sso_connection;
     this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }
