@@ -6,7 +6,7 @@ import { Col, descriptors, Flex, Link, Text } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider, mqu } from '../../styledSystem';
 
-type AccountlessPromptProps = {
+type KeylessPromptProps = {
   url?: string;
 };
 
@@ -50,7 +50,7 @@ const FabContent = ({ title, signOutText, url }: FabContentProps) => {
   );
 };
 
-export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
+const _KeylessPrompt = (props: KeylessPromptProps) => {
   // const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +150,7 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
           },
         })}
       >
-        🔓Accountless Mode
+        🔓Keyless Mode
         <Flex
           id='cl-impersonationText'
           sx={t => ({
@@ -169,8 +169,8 @@ export const _AccountlessPrompt = (props: AccountlessPromptProps) => {
   );
 };
 
-export const AccountlessPrompt = (props: AccountlessPromptProps) => (
+export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
-    <_AccountlessPrompt {...props} />
+    <_KeylessPrompt {...props} />
   </InternalThemeProvider>
 );

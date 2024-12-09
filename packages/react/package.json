@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.18.0",
+  "version": "5.19.1",
   "description": "Clerk React library",
   "keywords": [
     "clerk",

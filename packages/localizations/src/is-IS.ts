@@ -463,6 +463,7 @@ export const isIS: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
       title: 'Skrá inn í {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Staðfestingarkóði',

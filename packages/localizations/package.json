@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.7.2",
+  "version": "3.8.0",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -59,11 +59,13 @@
     "da-DK",
     "de-DE",
     "el-GR",
+    "en-GB",
     "en-US",
     "es-ES",
     "fi-FI",
     "fr-FR",
     "he-IL",
+    "id-ID",
     "is-IS",
     "it-IT",
     "ja-JP",

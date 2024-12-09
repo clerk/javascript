@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.39.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.38.0
+
+### Minor Changes
+
+- Deprecate the following constants and functions: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OAUTH_PROVIDERS`
+  - `getOAuthProviderData()`
+  - `sortedOAuthProviders()`
+  - `WEB3_PROVIDERS`
+  - `getWeb3ProviderData()`
+
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.36.0
 
 ### Minor Changes

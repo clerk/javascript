@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.6.0",
+  "version": "6.8.1",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -70,7 +70,6 @@
     "@clerk/shared": "workspace:*",
     "@clerk/types": "workspace:*",
     "crypto-js": "4.2.0",
-    "ezheaders": "0.1.0",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"
   },

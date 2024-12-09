@@ -1,5 +1,47 @@
 # @clerk/ui
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+  - @clerk/elements@0.21.2
+
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`6fdffaf41f6b79c56dc017e058a670ddbaaf9f42`](https://github.com/clerk/javascript/commit/6fdffaf41f6b79c56dc017e058a670ddbaaf9f42), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`9393a90eeecd7a8e441a85682a7defa5cc5aa4f2`](https://github.com/clerk/javascript/commit/9393a90eeecd7a8e441a85682a7defa5cc5aa4f2), [`965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7`](https://github.com/clerk/javascript/commit/965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`b9a5bea404cb09d7e328d48b41bd2669feb4e518`](https://github.com/clerk/javascript/commit/b9a5bea404cb09d7e328d48b41bd2669feb4e518), [`e7abe51a9e8baa378c6ad588b4766a60bc2c4433`](https://github.com/clerk/javascript/commit/e7abe51a9e8baa378c6ad588b4766a60bc2c4433)]:
+  - @clerk/localizations@3.8.0
+  - @clerk/types@4.39.0
+  - @clerk/elements@0.21.1
+  - @clerk/shared@2.19.1
+
+## 0.2.0
+
+### Minor Changes
+
+- Replace usage of `OAUTH_PROVIDERS` and `WEB3_PROVIDERS` from `@clerk/types` to `@clerk/shared`. ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/elements@0.21.0
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/localizations@3.7.4
+
+## 0.1.28
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/elements@0.20.1
+  - @clerk/localizations@3.7.3
+  - @clerk/shared@2.18.1
+
 ## 0.1.27
 
 ### Patch Changes

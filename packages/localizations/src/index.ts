@@ -1,6 +1,7 @@
 export { arSA } from './ar-SA';
 export { beBY } from './be-BY';
 export { enUS } from './en-US';
+export { enGB } from './en-GB';
 export { frFR } from './fr-FR';
 export { daDK } from './da-DK';
 export { deDE } from './de-DE';
@@ -34,3 +35,4 @@ export { caES } from './ca-ES';
 export { huHU } from './hu-HU';
 export { isIS } from './is-IS';
 export { hrHR } from './hr-HR';
+export { idID } from './id-ID';
