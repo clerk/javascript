@@ -111,6 +111,16 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { runInjectionScript, swapDocument } from "${buildImportPath}";
 
+            function removeTemporaryNetlifyClerkQueryParam(param) {
+              const url = new URL(window.location.href);
+              if (url.searchParams.has(param)) {
+                url.searchParams.delete(param);
+                window.history.replaceState(window.history.state, '', url);
+              }
+            }
+
+            removeTemporaryNetlifyClerkQueryParam('__netlify_clerk_cache_bust');
+
             // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
             // Importing it directly from astro:transitions/client breaks custom client-side routing
             // even when View Transitions is disabled.

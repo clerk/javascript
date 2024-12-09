@@ -83,6 +83,12 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
+      if (!locationHeader.includes('client/handshake') && !locationHeader.includes('__clerk_handshake')) {
+        const url = new URL(locationHeader);
+        url.searchParams.append('__netlify_clerk_cache_bust', Date.now().toString());
+        requestState.headers.set('Location', url.toString());
+      }
+
       const res = new Response(null, { status: 307, headers: requestState.headers });
       return decorateResponseWithObservabilityHeaders(res, requestState);
     } else if (requestState.status === AuthStatus.Handshake) {
