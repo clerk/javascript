@@ -7,7 +7,7 @@ import type { ClerkProviderProps } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 
-function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
+function ClerkProviderBase(props: ClerkProviderProps) {
   const { initialState, children, __internal_bypassMissingPublishableKey, ...restIsomorphicClerkOptions } = props;
   const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
 
