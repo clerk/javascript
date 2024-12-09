@@ -10,12 +10,15 @@ const CONTROL_FLOW_ERROR = {
  * In-house implementation of `notFound()`
  * https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/not-found.ts
  */
-const LEGACY_NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND';
+const LEGACY_NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND' as const;
 
 type LegacyNotFoundError = Error & {
   digest: typeof LEGACY_NOT_FOUND_ERROR_CODE;
 };
 
+/**
+ * Checks for the error thrown from `notFound()` for versions <= next@15.0.4
+ */
 function isLegacyNextjsNotFoundError(error: unknown): error is LegacyNotFoundError {
   if (typeof error !== 'object' || error === null || !('digest' in error)) {
     return false;
@@ -24,15 +27,15 @@ function isLegacyNextjsNotFoundError(error: unknown): error is LegacyNotFoundErr
   return error.digest === LEGACY_NOT_FOUND_ERROR_CODE;
 }
 
-const HTTPAccessErrorStatus = {
+const HTTPAccessErrorStatusCodes = {
   NOT_FOUND: 404,
   FORBIDDEN: 403,
   UNAUTHORIZED: 401,
 };
 
-const ALLOWED_CODES = new Set(Object.values(HTTPAccessErrorStatus));
+const ALLOWED_CODES = new Set(Object.values(HTTPAccessErrorStatusCodes));
 
-export const HTTP_ERROR_FALLBACK_ERROR_CODE = 'NEXT_HTTP_ERROR_FALLBACK';
+export const HTTP_ERROR_FALLBACK_ERROR_CODE = 'NEXT_HTTP_ERROR_FALLBACK' as const;
 
 export type HTTPAccessFallbackError = Error & {
   digest: `${typeof HTTP_ERROR_FALLBACK_ERROR_CODE};${string}`;
@@ -57,7 +60,11 @@ export function whichHTTPAccessFallbackError(error: unknown): number | undefined
 }
 
 function isNextjsNotFoundError(error: unknown): error is LegacyNotFoundError | HTTPAccessFallbackError {
-  return isLegacyNextjsNotFoundError(error) || whichHTTPAccessFallbackError(error) === 404;
+  return (
+    isLegacyNextjsNotFoundError(error) ||
+    // Checks for the error thrown from `notFound()` for canary versions of next@15
+    whichHTTPAccessFallbackError(error) === HTTPAccessErrorStatusCodes.NOT_FOUND
+  );
 }
 
 /**
