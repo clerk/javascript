@@ -176,9 +176,9 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     });
   }
 
-  async function request<T>(requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>> {
-    // eslint-disable-next-line prefer-const
-    let { method = 'GET', body } = requestInit;
+  async function request<T>(_requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>> {
+    const requestInit = { ..._requestInit };
+    const { method = 'GET', body } = requestInit;
 
     requestInit.url = buildUrl({
       ...requestInit,

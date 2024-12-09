@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.8.1
+
+### Patch Changes
+
+- Fix translations and typos in `es-ES` and `es-MX` localizations. ([#4731](https://github.com/clerk/javascript/pull/4731)) by [@paratustra](https://github.com/paratustra)
+
+- Fix accents on it-IT localization values. ([#4733](https://github.com/clerk/javascript/pull/4733)) by [@Onnwen](https://github.com/Onnwen)
+
+- Updated dependencies [[`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/types@4.39.1
+
 ## 3.8.0
 
 ### Minor Changes

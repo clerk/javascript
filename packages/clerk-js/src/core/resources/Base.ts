@@ -2,8 +2,10 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
+import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
+import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
@@ -52,7 +54,25 @@ export abstract class BaseResource {
     return BaseResource.clerk.getFapiClient();
   }
 
+  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
+    const { rotatingTokenNonce } = params || {};
+    return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
+  }
+
+  public isNew(): boolean {
+    return !this.id;
+  }
+
   protected static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
+    requestInit: FapiRequestInit,
+    opts: BaseFetchOptions = {},
+  ): Promise<FapiResponseJSON<J> | null> {
+    return FraudProtection.getInstance(Client, CaptchaChallenge).execute(this.clerk, () =>
+      this._baseFetch<J>(requestInit, opts),
+    );
+  }
+
+  protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
@@ -132,10 +152,6 @@ export abstract class BaseResource {
     }
   }
 
-  isNew(): boolean {
-    return !this.id;
-  }
-
   protected path(action?: string): string {
     const base = this.pathRoot;
 
@@ -166,17 +182,15 @@ export abstract class BaseResource {
     return this.fromJSON((json?.response || json) as J);
   }
 
-  protected async _baseMutate<J extends ClerkResourceJSON | null>({
-    action,
-    body,
-    method = 'POST',
-    path,
-  }: BaseMutateParams): Promise<this> {
-    const json = await BaseResource._fetch<J>({
-      method,
-      path: path || this.path(action),
-      body,
-    });
+  protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
+    const { action, body, method, path } = params;
+    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    return this.fromJSON((json?.response || json) as J);
+  }
+
+  protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
+    const { action, body, method, path } = params;
+    const json = await BaseResource._baseFetch<J>({ method, path: path || this.path(action), body });
     return this.fromJSON((json?.response || json) as J);
   }
 
@@ -192,13 +206,12 @@ export abstract class BaseResource {
     return this._baseMutate<J>({ ...params, method: 'PATCH' });
   }
 
-  protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
-    await this._baseMutate<J>({ ...params, method: 'DELETE' });
+  protected async _basePatchBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
+    return this._baseMutateBypass<J>({ ...params, method: 'PATCH' });
   }
 
-  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
-    const { rotatingTokenNonce } = params || {};
-    return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
+  protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
+    await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
 
   private static shouldRethrowOfflineNetworkErrors(): boolean {
