@@ -38,7 +38,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 180ms cubic-bezier(0.6, 0.5, 0.1, 1)',
+          transition: 'all 210ms cubic-bezier(0.3, 0.5, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -335,7 +335,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 80ms cubic-bezier(0.6, 0.5, 0, 0.9);
+            transition: all 60ms ease;
             animation: small-btn-glow 3s infinite 500ms;
 
             &[data-expanded='true'] {
