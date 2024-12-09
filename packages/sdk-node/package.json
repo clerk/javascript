@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-sdk-node",
-  "version": "5.0.75",
+  "version": "5.0.76",
   "description": "Clerk server SDK for usage with node",
   "keywords": [
     "clerk",
