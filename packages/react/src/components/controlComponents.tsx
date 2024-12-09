@@ -15,7 +15,7 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedIn');
 
   const { userId } = useAuthContext();
@@ -25,7 +25,7 @@ export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.El
   return null;
 };
 
-export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedOut');
 
   const { userId } = useAuthContext();
@@ -35,7 +35,7 @@ export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.E
   return null;
 };
 
-export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
   const isomorphicClerk = useIsomorphicClerkContext();
@@ -45,7 +45,7 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX
   return <>{children}</>;
 };
 
-export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
@@ -212,7 +212,7 @@ export const AuthenticateWithRedirectCallback = withClerk(
   'AuthenticateWithRedirectCallback',
 );
 
-export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {
+export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('MultisessionAppSupport');
 
   const session = useSessionContext();
