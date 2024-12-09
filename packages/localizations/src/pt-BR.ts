@@ -460,6 +460,7 @@ export const ptBR: LocalizationResource = {
       actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',

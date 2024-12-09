@@ -40,7 +40,7 @@ export const enUS: LocalizationResource = {
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Confirm account deletion',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
   formFieldInputPlaceholder__emailAddress_username: 'Enter email or username',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -450,6 +450,7 @@ export const enUS: LocalizationResource = {
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
+      __experimental_titleCombined: 'Continue to {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Verification code',

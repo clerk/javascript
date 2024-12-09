@@ -465,6 +465,7 @@ export const beBY: LocalizationResource = {
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увайсці',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код верыфікацыі',

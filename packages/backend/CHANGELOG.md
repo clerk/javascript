@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.20.0
+
+### Minor Changes
+
+- New **experimental** API: `AccountlessApplicationAPI` ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+  Inside `clerkClient` you can activate this new API through `__experimental_accountlessApplications`. It allows you to generate an "accountless" application and the API returns the publishable key, secret key, and an URL as a response. The URL allows a user to claim this application with their account. Hence the name "accountless" because in its initial state the application is not attached to any account yet.
+
+### Patch Changes
+
+- Updated dependencies [[`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
 ## 1.19.2
 
 ### Patch Changes
