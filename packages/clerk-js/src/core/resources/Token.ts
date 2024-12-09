@@ -42,4 +42,12 @@ export class Token extends BaseResource implements TokenResource {
     this.jwt = decode(data.jwt);
     return this;
   }
+
+  public toJSON(): TokenJSON {
+    return {
+      object: 'token',
+      id: this.id || '',
+      jwt: this.getRawString(),
+    };
+  }
 }

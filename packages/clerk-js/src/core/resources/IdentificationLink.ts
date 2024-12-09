@@ -20,4 +20,12 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
     this.type = data.type;
     return this;
   }
+
+  public toJSON(): IdentificationLinkJSON {
+    return {
+      object: 'identification_link',
+      id: this.id,
+      type: this.type,
+    };
+  }
 }

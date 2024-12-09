@@ -55,6 +55,23 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
 
     return this;
   }
+
+  public toJSON(): EnterpriseAccountJSON {
+    return {
+      object: 'enterprise_account',
+      id: this.id,
+      provider: this.provider,
+      protocol: this.protocol,
+      provider_user_id: this.providerUserId,
+      active: this.active,
+      email_address: this.emailAddress,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      public_metadata: this.publicMetadata,
+      verification: this.verification?.toJSON() || null,
+      enterprise_connection: this.enterpriseConnection?.toJSON() || null,
+    };
+  }
 }
 
 export class EnterpriseAccountConnection extends BaseResource implements EnterpriseAccountConnectionResource {
@@ -94,5 +111,24 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
     }
 
     return this;
+  }
+
+  public toJSON(): EnterpriseAccountConnectionJSON {
+    return {
+      object: 'enterprise_account_connection',
+      id: this.id,
+      name: this.name,
+      domain: this.domain,
+      active: this.active,
+      protocol: this.protocol,
+      provider: this.provider,
+      logo_public_url: this.logoPublicUrl,
+      sync_user_attributes: this.syncUserAttributes,
+      allow_subdomains: this.allowSubdomains,
+      allow_idp_initiated: this.allowIdpInitiated,
+      disable_additional_identifications: this.disableAdditionalIdentifications,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

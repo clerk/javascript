@@ -8,6 +8,11 @@ import type {
 
 import type { TokenCache } from '../../cache/types';
 
+export interface IStorage {
+  set: (key: string, value: string) => Promise<void>;
+  get: (key: string) => Promise<string | null>;
+}
+
 export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
@@ -29,4 +34,5 @@ export type BuildClerkOptions = {
     isSupported: () => boolean;
     isAutoFillSupported: () => Promise<boolean>;
   };
+  __experimental_resourceCache?: () => IStorage;
 };
