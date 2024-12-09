@@ -31,7 +31,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
           height: `${t.sizes.$10}`,
           minWidth: '18.5625rem',
           maxWidth: 'fit-content',
-          padding: `${t.space.$1x5} 6.49rem ${t.space.$1x5} ${t.space.$3}`,
+          padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
           borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -71,8 +71,8 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               css={css`
                 perspective: 1000px;
                 position: relative;
-                width: 1.5rem;
-                height: 1.5rem;
+                width: 1rem;
+                height: 1rem;
                 transform-style: preserve-3d;
                 animation: ${isExpanded ? 'coinFlipAnimation 6s infinite linear' : ' none'};
 
@@ -187,7 +187,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
 
                 @keyframes show-title {
                   from {
-                    transform: translateY(1px);
+                    transform: translateY(-1.5px);
                     opacity: 0;
                   }
                   to {
@@ -221,88 +221,91 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
             </p>
           </Flex>
 
-          <button
-            type='button'
-            aria-label='Close'
-            onClick={() => setIsExpanded(false)}
-            data-expanded={isExpanded}
-            css={css`
-              display: none;
-              cursor: pointer;
-              margin-left: 0.75rem;
-
-              &[data-expanded='true'] {
-                display: block;
+          {isExpanded && (
+            <button
+              onClick={() => setIsExpanded(false)}
+              aria-label='Close'
+              type='button'
+              css={css`
+                cursor: pointer;
+                margin-left: 0.75rem;
                 color: #8c8c8c;
-                transition: color 150ms ease-out;
+                transition: color 130ms ease-out;
                 :hover {
                   color: #eeeeee;
+                }
+                animation: show-button 200ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
+
+                @keyframes show-button {
+                  from {
+                    transform: scaleX(0.9);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: scaleX(1);
+                    opacity: 1;
+                  }
+                }
+              `}
+            >
+              <svg
+                width='1rem'
+                height='1rem'
+                viewBox='0 0 16 16'
+                fill='none'
+                aria-hidden
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M3.75 8H12.25'
+                  stroke='currentColor'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </button>
+          )}
+        </Flex>
+
+        {isExpanded && (
+          <p
+            css={css`
+              color: #b4b4b4;
+              font-size: 0.75rem;
+              font-weight: 400;
+              line-height: 1rem;
+              max-width: 14.625rem;
+              animation: show-description 260ms ease-out forwards;
+
+              @keyframes show-description {
+                from {
+                  transform: translateY(-1.8px);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateY(0);
+                  opacity: 1;
                 }
               }
             `}
           >
-            <svg
-              width='1rem'
-              height='1rem'
-              viewBox='0 0 16 16'
-              fill='none'
-              aria-hidden
-              xmlns='http://www.w3.org/2000/svg'
+            We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
+            <Link
+              href='/'
+              sx={t => ({
+                color: t.colors.$whiteAlpha600,
+                textDecoration: 'underline solid',
+                transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                ':hover': {
+                  color: t.colors.$whiteAlpha800,
+                },
+              })}
             >
-              <path
-                d='M3.75 8H12.25'
-                stroke='currentColor'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
-          </button>
-        </Flex>
-
-        <p
-          data-expanded={isExpanded}
-          css={css`
-            display: none;
-            color: #b4b4b4;
-            font-size: 0.75rem;
-            font-weight: 400;
-            line-height: 1rem;
-            max-width: 14.625rem;
-
-            &[data-expanded='true'] {
-              display: block;
-              animation: show-description 250ms ease-out forwards;
-            }
-
-            @keyframes show-description {
-              from {
-                transform: translateY(1px);
-                opacity: 0;
-              }
-              to {
-                transform: translateY(0);
-                opacity: 1;
-              }
-            }
-          `}
-        >
-          We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
-          <Link
-            href='/'
-            sx={t => ({
-              color: t.colors.$whiteAlpha600,
-              textDecoration: 'underline solid',
-              transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-              ':hover': {
-                color: t.colors.$whiteAlpha800,
-              },
-            })}
-          >
-            Learn more
-          </Link>
-        </p>
-
+              Learn more
+            </Link>
+          </p>
+        )}
         <button
           type='button'
           onFocus={handleFocus}
@@ -332,7 +335,7 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 100ms cubic-bezier(0.6, 0.5, 0, 0.9);
+            transition: all 80ms cubic-bezier(0.6, 0.5, 0, 0.9);
             animation: small-btn-glow 3s infinite 500ms;
 
             &[data-expanded='true'] {
