@@ -49,23 +49,5 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
 
       await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
     });
-
-    /*
-    test('clerk handler has ran', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-      await u.po.signIn.goTo();
-
-      await u.po.signIn.setIdentifier(fakeUser.email);
-      await u.po.signIn.setPassword(fakeUser.password);
-      await u.po.signIn.continue();
-      await u.po.expect.toBeSignedIn();
-
-      await u.page.waitForAppUrl('/');
-
-      const clerkInitialState = await u.page.waitForFunction(() => window.__clerk_init_state);
-
-      expect(clerkInitialState !== undefined).toBeTruthy();
-    });
-    */
   },
 );
