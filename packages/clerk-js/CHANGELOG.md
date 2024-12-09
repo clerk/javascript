@@ -1,5 +1,42 @@
 # Change Log
 
+## 5.40.2
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6ea3d39510297b005cde3cd561f56b2e0ea7c61b`](https://github.com/clerk/javascript/commit/6ea3d39510297b005cde3cd561f56b2e0ea7c61b), [`08b3e4042370937b79d4b4167155d6aad1fa9356`](https://github.com/clerk/javascript/commit/08b3e4042370937b79d4b4167155d6aad1fa9356), [`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/localizations@3.8.1
+  - @clerk/types@4.39.1
+  - @clerk/shared@2.19.3
+
+## 5.40.1
+
+### Patch Changes
+
+- Apply fraud protection logic to all requests ([#4709](https://github.com/clerk/javascript/pull/4709)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+
+## 5.40.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue during sign-up flow where a user lands on the continue step, and proceeds successfully through the sign-up process and gets redirected to AP sign-up due to signUp.id being undefined. ([#4711](https://github.com/clerk/javascript/pull/4711)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6fdffaf41f6b79c56dc017e058a670ddbaaf9f42`](https://github.com/clerk/javascript/commit/6fdffaf41f6b79c56dc017e058a670ddbaaf9f42), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`9393a90eeecd7a8e441a85682a7defa5cc5aa4f2`](https://github.com/clerk/javascript/commit/9393a90eeecd7a8e441a85682a7defa5cc5aa4f2), [`965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7`](https://github.com/clerk/javascript/commit/965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`b9a5bea404cb09d7e328d48b41bd2669feb4e518`](https://github.com/clerk/javascript/commit/b9a5bea404cb09d7e328d48b41bd2669feb4e518), [`e7abe51a9e8baa378c6ad588b4766a60bc2c4433`](https://github.com/clerk/javascript/commit/e7abe51a9e8baa378c6ad588b4766a60bc2c4433)]:
+  - @clerk/localizations@3.8.0
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
 ## 5.39.0
 
 ### Minor Changes

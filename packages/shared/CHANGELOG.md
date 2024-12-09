@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/types@4.39.1
+
+## 2.19.2
+
+### Patch Changes
+
+- Improving error messaging from `useAssertWrappedByClerkProvider` to point out potential failure scenarios. ([#4719](https://github.com/clerk/javascript/pull/4719)) by [@jacekradko](https://github.com/jacekradko)
+
+## 2.19.1
+
+### Patch Changes
+
+- Updated dependencies [[`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/types@4.39.0
+
 ## 2.19.0
 
 ### Minor Changes

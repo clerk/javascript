@@ -47,6 +47,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'backRow',
   'backLink',
 
+  'socialButtonsRoot',
   'socialButtons',
   'socialButtonsIconButton',
   'socialButtonsBlockButton',
@@ -249,6 +250,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'navbarButtons',
   'navbarButton',
   'navbarButtonIcon',
+  'navbarButtonText',
   'navbarMobileMenuRow',
   'navbarMobileMenuButton',
   'navbarMobileMenuButtonIcon',

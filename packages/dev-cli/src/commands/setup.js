@@ -114,6 +114,49 @@ async function mergeEnvFiles(filename, config) {
 }
 
 /**
+ * Checks if the current working directory contains a lockfile that can be imported with `pnpm import`
+ * @returns {boolean}
+ */
+function hasSupportedLockfile() {
+  const SUPPORTED_LOCKFILES = ['package-lock.json', 'yarn.lock'];
+  for (const lockfile of SUPPORTED_LOCKFILES) {
+    if (existsSync(join(process.cwd(), lockfile))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Imports a compatible lockfile with `pnpm import` if present.
+ * @returns {Promise<void>}
+ */
+async function importPackageLock() {
+  return new Promise((resolve, reject) => {
+    if (!hasSupportedLockfile()) {
+      resolve();
+    }
+    console.log('Supported non-pnpm lockfile detected, importing with `pnpm import`...');
+
+    const child = spawn('pnpm', ['import'], {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+      },
+    });
+
+    child.on('close', code => {
+      if (code !== 0) {
+        reject();
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+/**
  * Installs the monorepo versions of the Clerk dependencies listed in the `package.json` file of the cwd.
  * @returns {Promise<void>}
  */
@@ -128,15 +171,13 @@ async function linkDependencies() {
     .filter(dep => dep in clerkPackages)
     .map(clerkDep => clerkPackages[clerkDep]);
 
-  const args = ['install', '--no-audit', '--no-fund', ...dependenciesToBeInstalled];
+  const args = ['add', ...dependenciesToBeInstalled];
 
   return new Promise((resolve, reject) => {
-    const child = spawn('npm', args, {
+    const child = spawn('pnpm', args, {
       stdio: 'inherit',
       env: {
         ...process.env,
-        ADBLOCK: '1',
-        DISABLE_OPENCOLLECTIVE: '1',
       },
     });
 
@@ -160,6 +201,7 @@ async function linkDependencies() {
 export async function setup({ js = true, skipInstall = false }) {
   if (!skipInstall) {
     console.log('Installing monorepo versions of Clerk packages from package.json...');
+    await importPackageLock();
     await linkDependencies();
   }
 
