@@ -203,8 +203,10 @@ function copyKeysInsideEnvFile() {
   writeFileSync(
     existingEnvFile || nodeRuntime.path.join(process.cwd(), '.env.local'),
     `
+# Your Clerk instance keys:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${keys.publishableKey}
 CLERK_SECRET_KEY=${keys.secretKey}
+# NOTE: You can safely remove the \`.clerk/\` directory if you like.
 `,
     {
       encoding: 'utf8',
