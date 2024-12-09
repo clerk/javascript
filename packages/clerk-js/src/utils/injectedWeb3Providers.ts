@@ -53,13 +53,15 @@ class InjectedWeb3Providers {
   }
 
   get = (provider: InjectedWeb3Provider) => {
-    // In case there is a single injected provider, use that directly.
-    // This is needed in order to support other compatible Web3 Wallets (e.g. Rabby Wallet)
-    // and maintain the previous behavior
-    if (this.#providers.length === 1) {
-      return this.#providers[0].provider;
+    const ethProvider = this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
+    if (ethProvider !== undefined) {
+      return ethProvider;
     }
-    return this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
+
+    // In case we weren't able to find the requested provider, fallback to the
+    // global injected provider instead, if any, to allow the user to continue
+    // the flow rather than be a no-op
+    return window.ethereum;
   };
 
   #onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
