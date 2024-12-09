@@ -9,4 +9,7 @@ export default defineConfig({
       projects: ['./tsconfig.json'],
     }),
   ],
+  server: {
+    port: Number(process.env.PORT),
+  },
 });

@@ -4,12 +4,6 @@ import { appConfigs } from '../../presets';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-declare global {
-  interface Window {
-    __clerk_init_state?: any;
-  }
-}
-
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern: ['react-router.node'] })(
   'basic tests for @react-router',
   ({ app }) => {
