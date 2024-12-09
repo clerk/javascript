@@ -227,6 +227,17 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "//#test:integration:react-router": {
+      "dependsOn": [
+        "@clerk/clerk-js#build",
+        "@clerk/react-router#build",
+        "@clerk/backend#build",
+        "@clerk/clerk-react#build"
+      ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
     }
   }
 }

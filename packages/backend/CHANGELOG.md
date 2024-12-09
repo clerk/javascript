@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.20.2
+
+### Patch Changes
+
+- Add missing `reservedForSecondFactor` property to `CreatePhoneNumberParams` and `UpdatePhoneNumberParams` types. ([#4730](https://github.com/clerk/javascript/pull/4730)) by [@tmoran-stenoa](https://github.com/tmoran-stenoa)
+
+- Updated dependencies [[`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/types@4.39.1
+  - @clerk/shared@2.19.3
+
 ## 1.20.1
 
 ### Patch Changes

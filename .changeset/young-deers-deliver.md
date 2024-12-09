@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Add `socialButtonsRoot` descriptor.
+Introduce the `navbarButtonText` element descriptor.
