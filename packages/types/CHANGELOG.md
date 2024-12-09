@@ -1,5 +1,105 @@
 # Change Log
 
+## 4.39.1
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.39.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.38.0
+
+### Minor Changes
+
+- Deprecate the following constants and functions: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OAUTH_PROVIDERS`
+  - `getOAuthProviderData()`
+  - `sortedOAuthProviders()`
+  - `WEB3_PROVIDERS`
+  - `getWeb3ProviderData()`
+
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.36.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.35.1
+
+### Patch Changes
+
+- Add support for the new `enterprise_sso` strategy. ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise Single Sign On regardless of the underlying protocol used to authenticate the user.
+  For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+  - Add a new user setting `enterpriseSSO`, this gets enabled when there is an active enterprise connection for an instance.
+  - Add support for signing in / signing up with the new `enterprise_sso` strategy.
+  - Deprecated `userSettings.saml` in favor of `enterprise_sso`.
+  - Deprecated `saml` sign in strategy in favor of `enterprise_sso`.
+
+## 4.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+  Renaming
+
+  - `__experimental_SessionVerificationResource` -> `SessionVerificationResource`
+  - `__experimental_SessionVerificationStatus` -> `SessionVerificationStatus`
+  - `__experimental_SessionVerificationLevel` -> `SessionVerificationLevel`
+  - `__experimental_ReverificationConfig` -> `ReverificationConfig`
+
+  `CheckAuthorizationParamsWithCustomPermissions` and `CheckAuthorizationParams` now include `reverification?: ReverificationConfig;`
+
+  Properties of `IntialState`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+
+  Localization types:
+  All properties of `__experimental_userVerification` are moved to `reverification`
+
+### Patch Changes
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.34.2
 
 ### Patch Changes

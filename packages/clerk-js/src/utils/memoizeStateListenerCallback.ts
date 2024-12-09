@@ -32,7 +32,8 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
     prev.id !== next.id ||
     prev.updatedAt.getTime() < next.updatedAt.getTime() ||
     sessionFVAChanged(prev, next) ||
-    sessionUserMembershipPermissionsChanged(prev, next)
+    sessionUserMembershipPermissionsChanged(prev, next) ||
+    sessionUserChanged(prev, next)
   );
 }
 
@@ -57,6 +58,13 @@ function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolea
     return prevFVA[0] !== nextFVA[0] || prevFVA[1] !== nextFVA[1];
   }
   return prevFVA !== nextFVA;
+}
+
+function sessionUserChanged(prev: SessionResource, next: SessionResource): boolean {
+  if (!!prev.user !== !!next.user) {
+    return true;
+  }
+  return !!prev.user && !!next.user && userChanged(prev.user, next.user);
 }
 
 function sessionUserMembershipPermissionsChanged(prev: SessionResource, next: SessionResource): boolean {

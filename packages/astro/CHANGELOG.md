@@ -1,5 +1,100 @@
 # @clerk/astro
 
+## 2.0.0
+
+### Major Changes
+
+- Recently Astro released its v5. Read their [migration guide](https://docs.astro.build/en/guides/upgrade-to/v5/) to learn more. ([#4721](https://github.com/clerk/javascript/pull/4721)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  `@clerk/astro@2.0.0` supports Astro v4.15.0 and above, including v5. If you're using Astro v3, you'll need to upgrade your Astro version as v3 support has been removed. If you need to stay on Astro v3, stick with your current version.
+
+  The `@clerk/astro@2.0.0` upgrade itself doesn't have any required code changes as only internal dependencies and requirements were updated.
+
+### Patch Changes
+
+- Updated dependencies [[`fe75ced8a7d8b8a28839430444588ee173b5230a`](https://github.com/clerk/javascript/commit/fe75ced8a7d8b8a28839430444588ee173b5230a), [`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/backend@1.20.2
+  - @clerk/types@4.39.1
+  - @clerk/shared@2.19.3
+
+## 1.5.6
+
+### Patch Changes
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+  - @clerk/backend@1.20.1
+
+## 1.5.5
+
+### Patch Changes
+
+- Updated dependencies [[`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/backend@1.20.0
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
+## 1.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/backend@1.19.2
+
+## 1.5.3
+
+### Patch Changes
+
+- Using LICENSE file name that is consistent with other @clerk/\* modules ([#4712](https://github.com/clerk/javascript/pull/4712)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/backend@1.19.1
+  - @clerk/shared@2.18.1
+
+## 1.5.2
+
+### Patch Changes
+
+- Add backwards compatibility for ignoring prerendered routes in Astro ([#4694](https://github.com/clerk/javascript/pull/4694)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`b6aa589f75be62a89a3853d496176ed2f2c0e2c5`](https://github.com/clerk/javascript/commit/b6aa589f75be62a89a3853d496176ed2f2c0e2c5), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
+  - @clerk/types@4.36.0
+  - @clerk/backend@1.19.0
+  - @clerk/shared@2.18.0
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d), [`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/backend@1.18.1
+  - @clerk/shared@2.17.1
+
+## 1.5.0
+
+### Minor Changes
+
+- Introduce `<Waitlist />` component for Astro ([#4650](https://github.com/clerk/javascript/pull/4650)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 1.4.17
+
+### Patch Changes
+
+- Ignore pre-rendered files in Clerk Middleware ([#4640](https://github.com/clerk/javascript/pull/4640)) by [@jlengstorf](https://github.com/jlengstorf)
+
+## 1.4.16
+
+### Patch Changes
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/shared@2.17.0
+  - @clerk/types@4.35.0
+  - @clerk/backend@1.18.0
+
 ## 1.4.15
 
 ### Patch Changes

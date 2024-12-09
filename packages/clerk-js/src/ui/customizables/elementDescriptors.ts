@@ -47,6 +47,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'backRow',
   'backLink',
 
+  'socialButtonsRoot',
   'socialButtons',
   'socialButtonsIconButton',
   'socialButtonsBlockButton',

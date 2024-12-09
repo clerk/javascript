@@ -7,6 +7,7 @@ import type {
 } from './Enums';
 
 export const ObjectType = {
+  AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
   Client: 'client',
   Email: 'email',
@@ -46,6 +47,13 @@ export interface ClerkResourceJSON {
 export interface TokenJSON {
   object: typeof ObjectType.Token;
   jwt: string;
+}
+
+export interface AccountlessApplicationJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.AccountlessApplication;
+  publishable_key: string;
+  secret_key: string;
+  claim_url: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
@@ -157,7 +165,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   public_metadata: OrganizationPublicMetadata | null;
   private_metadata?: OrganizationPrivateMetadata;
-  created_by: string;
+  created_by?: string;
   created_at: number;
   updated_at: number;
 }

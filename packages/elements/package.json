@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.19.6",
+  "version": "0.21.3",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -88,10 +88,10 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "concurrently": "^8.2.2",
-    "next": "^14.2.10",
+    "next": "^14.2.18",
     "tslib": "catalog:repo",
     "tsup": "catalog:repo",
-    "type-fest": "^4.9.0",
+    "type-fest": "^4.29.0",
     "typescript": "catalog:repo"
   },
   "peerDependencies": {

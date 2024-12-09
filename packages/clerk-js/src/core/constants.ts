@@ -32,6 +32,7 @@ export const ERROR_CODES = {
   ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'enterprise_sso_email_address_domain_mismatch',
   ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH: 'enterprise_sso_hosted_domain_mismatch',
   SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
+  INVITATION_ACCOUNT_NOT_EXISTS: 'invitation_account_not_exists',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
@@ -46,4 +47,4 @@ export const SIGN_UP_MODES: Record<string, SignUpModes> = {
 };
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2021-02-05';
+export const SUPPORTED_FAPI_VERSION = '2024-10-01';

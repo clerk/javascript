@@ -133,7 +133,7 @@
           viewBox="0 0 62 18"
           fill="none"
           aria-hidden="true"
-          class="h-[1.125rem] text-gray-950 dark:text-white"
+          class="h-[1.125rem] text-gray-950"
         >
           <ellipse
             cx="8.99999"
@@ -159,7 +159,7 @@
           ></path>
         </svg>
         <div
-          class="bg-gray-25 mt-0.5 rounded-full px-2 py-1 text-[0.625rem]/3 font-medium text-gray-600 ring-1 ring-inset ring-gray-100 dark:bg-gray-900 dark:text-gray-400 dark:ring-gray-700"
+          class="bg-gray-25 mt-0.5 rounded-full px-2 py-1 text-[0.625rem]/3 font-medium text-gray-600 ring-1 ring-inset ring-gray-100"
         >
           Sandbox
         </div>
@@ -244,12 +244,31 @@
               Accountless
             </a>
           </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/open-sign-in"
+            >
+              Open sign in
+            </a>
+          </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/open-sign-up"
+            >
+              Open sign up
+            </a>
+          </li>
         </ul>
       </nav>
     </div>
 
     <main class="bg-gray-25 flex h-full flex-1 items-center justify-center overflow-y-auto overflow-x-hidden pl-72">
-      <div id="app"></div>
+      <div
+        id="app"
+        class="max-w-full px-8 py-12"
+      ></div>
     </main>
 
     <!-- This app is in the Team SDK organization. -->

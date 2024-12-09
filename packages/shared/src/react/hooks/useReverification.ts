@@ -8,6 +8,8 @@ import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
+const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
+
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
@@ -17,7 +19,7 @@ async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<
     return r;
   } catch (e) {
     // Treat fapi assurance as an assurance hint
-    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code == 'session_step_up_verification_required')) {
+    if (isClerkAPIResponseError(e) && e.errors.find(({ code }) => code === CLERK_API_REVERIFICATION_ERROR_CODE)) {
       return reverificationError();
     }
 
@@ -34,7 +36,7 @@ type UseReverificationOptions = {
 };
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
-  openUIComponent: Clerk['__internal_openUserVerification'];
+  openUIComponent: Clerk['__internal_openReverification'];
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -52,7 +54,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
          */
         const resolvers = createDeferredPromise();
 
-        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata.reverification);
+        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
         /**
          * On success resolve the pending promise
@@ -129,17 +131,17 @@ function useReverification<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
-  const { __internal_openUserVerification } = useClerk();
+  const { __internal_openReverification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      openUIComponent: __internal_openUserVerification,
+      openUIComponent: __internal_openReverification,
       ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
-  }, [__internal_openUserVerification, fetcherRef.current, optionsRef.current]);
+  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {

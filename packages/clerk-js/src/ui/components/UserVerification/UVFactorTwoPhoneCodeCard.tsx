@@ -19,10 +19,10 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
     <Flow.Part part='phoneCode2Fa'>
       <UVFactorTwoCodeForm
         {...props}
-        cardTitle={localizationKeys('userVerification.phoneCodeMfa.title')}
-        cardSubtitle={localizationKeys('userVerification.phoneCodeMfa.subtitle')}
-        inputLabel={localizationKeys('userVerification.phoneCodeMfa.formTitle')}
-        resendButton={localizationKeys('userVerification.phoneCodeMfa.resendButton')}
+        cardTitle={localizationKeys('reverification.phoneCodeMfa.title')}
+        cardSubtitle={localizationKeys('reverification.phoneCodeMfa.subtitle')}
+        inputLabel={localizationKeys('reverification.phoneCodeMfa.formTitle')}
+        resendButton={localizationKeys('reverification.phoneCodeMfa.resendButton')}
         prepare={prepare}
       />
     </Flow.Part>

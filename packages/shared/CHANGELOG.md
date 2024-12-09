@@ -1,5 +1,85 @@
 # Change Log
 
+## 2.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/types@4.39.1
+
+## 2.19.2
+
+### Patch Changes
+
+- Improving error messaging from `useAssertWrappedByClerkProvider` to point out potential failure scenarios. ([#4719](https://github.com/clerk/javascript/pull/4719)) by [@jacekradko](https://github.com/jacekradko)
+
+## 2.19.1
+
+### Patch Changes
+
+- Updated dependencies [[`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/types@4.39.0
+
+## 2.19.0
+
+### Minor Changes
+
+- Introduce new submodules: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Export `OAUTH_PROVIDERS` from `@clerk/shared/oauth`
+  - Export `WEB3_PROVIDERS` from `@clerk/shared/web3`
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/types@4.38.0
+
+## 2.18.1
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+
+## 2.18.0
+
+### Minor Changes
+
+- Replace `session_step_up_verification_required` with `session_reverification_required` as the Clerk API error code used for reverification. ([#4699](https://github.com/clerk/javascript/pull/4699)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47)]:
+  - @clerk/types@4.36.0
+
+## 2.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+
+## 2.17.0
+
+### Minor Changes
+
+- Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `__experimental_useReverification` -> `useReverification`
+    Also replaces the following APIs:
+  - `__experimental_reverificationError` -> `reverificationError`
+  - `__experimental_reverificationErrorResponse` -> `reverificationErrorResponse`
+  - `__experimental_isReverificationHint` -> `isReverificationHint`
+
+### Patch Changes
+
+- Gracefully handle missing reverification error metadata ([#4636](https://github.com/clerk/javascript/pull/4636)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/types@4.35.0
+
 ## 2.16.1
 
 ### Patch Changes

@@ -91,7 +91,7 @@ describe('AccountPage', () => {
 
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             enterprise_accounts: [
@@ -157,6 +157,7 @@ describe('AccountPage', () => {
 
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             enterprise_accounts: [
@@ -268,7 +269,7 @@ describe('AccountPage', () => {
           f.withEmailAddress();
           f.withPhoneNumber();
           f.withSocialProvider({ provider: 'google' });
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             enterprise_accounts: [enterpriseAccount],
@@ -291,7 +292,7 @@ describe('AccountPage', () => {
           f.withEmailAddress();
           f.withPhoneNumber();
           f.withSocialProvider({ provider: 'google' });
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
             phone_numbers: [phoneNumber],
