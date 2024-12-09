@@ -375,6 +375,7 @@ export type ElementsConfig = {
   navbarButtons: WithOptions<never, ActiveState>;
   navbarButton: WithOptions<string, ActiveState>;
   navbarButtonIcon: WithOptions<string, ActiveState>;
+  navbarButtonText: WithOptions<string, ActiveState>;
   navbarMobileMenuRow: WithOptions;
   navbarMobileMenuButton: WithOptions;
   navbarMobileMenuButtonIcon: WithOptions;
