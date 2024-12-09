@@ -5,7 +5,7 @@ import { templates } from '../templates/index.js';
 const reactRouterNode = applicationConfig()
   .setName('react-router-node')
   .useTemplate(templates['react-router-node'])
-  .setEnvFormatter('public', key => `${key}`)
+  .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
