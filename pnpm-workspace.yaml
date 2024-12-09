@@ -1,5 +1,6 @@
 packages:
   - 'packages/*'
+  - 'integration/templates/*'
 
 catalogs:
   # Can be referenced through "catalog:react"

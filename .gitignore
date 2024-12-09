@@ -58,6 +58,7 @@ Thumbs.db
 
 lerna-debug.log
 .next
+.nuxt
 .dev.vars
 .env.local
 .yalc
