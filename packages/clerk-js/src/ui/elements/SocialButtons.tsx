@@ -88,6 +88,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     <Flex
       direction='col'
       gap={2}
+      elementDescriptor={descriptors.socialButtonsRoot}
     >
       {strategyRows.map((row, rowIndex) => (
         <Grid

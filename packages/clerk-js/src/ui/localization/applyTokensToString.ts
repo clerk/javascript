@@ -32,11 +32,12 @@ export const applyTokensToString = (s: string | undefined, tokens: Tokens): stri
 export const useGlobalTokens = (): GlobalTokens => {
   const { applicationName } = useEnvironment().displayConfig;
   const { client, user } = useClerk();
-  const { signIn } = client;
+  // TODO: @nikos decouple captcha from component loading
+  const { signIn } = client || {};
 
   return {
     applicationName,
-    'signIn.identifier': signIn.identifier || '',
+    'signIn.identifier': signIn?.identifier || '',
     'user.username': user?.username || '',
     'user.firstName': user?.firstName || '',
     'user.lastName': user?.lastName || '',
