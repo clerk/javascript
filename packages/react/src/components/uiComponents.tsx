@@ -1,5 +1,3 @@
-import { without } from '@clerk/shared/object';
-import { isDeeplyEqual } from '@clerk/shared/react';
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   CreateOrganizationProps,
@@ -14,7 +12,7 @@ import type {
   WaitlistProps,
   Without,
 } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactElement } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
 import {
@@ -29,7 +27,6 @@ import {
 import type {
   CustomPortalsRendererProps,
   MountProps,
-  OpenProps,
   OrganizationProfileLinkProps,
   OrganizationProfilePageProps,
   UserButtonActionProps,
@@ -44,51 +41,16 @@ import {
   useUserButtonCustomMenuItems,
   useUserProfileCustomPages,
 } from '../utils';
+import { useWaitForComponentMount } from '../utils/useWaitForComponentMount';
+import { ClerkHostRenderer } from './ClerkHostRenderer';
 import { withClerk } from './withClerk';
 
-/**
- * Used to detect when a Clerk component has been added to the DOM.
- */
-function waitForElementChildren(options: { root: HTMLElement | null; timeout?: number }) {
-  const { root = document, timeout = 0 } = options;
-
-  return new Promise<void>((resolve, reject) => {
-    if (!root) {
-      reject(new Error('No root element provided'));
-      return;
-    }
-
-    // Check if the element already has child nodes
-    const isElementAlreadyPresent = root?.childElementCount && root.childElementCount > 0;
-    if (isElementAlreadyPresent) {
-      resolve();
-      return;
-    }
-
-    // Set up a MutationObserver to detect when the element has children
-    const observer = new MutationObserver(mutationsList => {
-      for (const mutation of mutationsList) {
-        if (mutation.type === 'childList') {
-          if (root?.childElementCount && root.childElementCount > 0) {
-            observer.disconnect();
-            resolve();
-            return;
-          }
-        }
-      }
-    });
-
-    observer.observe(root, { childList: true });
-
-    // Set up an optional timeout to reject the promise if the element never gets child nodes
-    if (timeout > 0) {
-      setTimeout(() => {
-        observer.disconnect();
-        reject(new Error(`Timeout waiting for element children`));
-      }, timeout);
-    }
-  });
-}
+type FallbackProp = {
+  /**
+   * An optional element to render while the component is mounting.
+   */
+  fallback?: ReactElement;
+};
 
 type UserProfileExportType = typeof _UserProfile & {
   Page: typeof UserProfilePage;
@@ -153,129 +115,6 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   __experimental_asProvider?: boolean;
 };
 
-const isMountProps = (props: any): props is MountProps => {
-  return 'mount' in props;
-};
-
-const isOpenProps = (props: any): props is OpenProps => {
-  return 'open' in props;
-};
-
-// README: <ClerkHostRenderer/> should be a class pure component in order for mount and unmount
-// lifecycle props to be invoked correctly. Replacing the class component with a
-// functional component wrapped with a React.memo is not identical to the original
-// class implementation due to React intricacies such as the useEffect’s cleanup
-// seems to run AFTER unmount, while componentWillUnmount runs BEFORE.
-
-// More information can be found at https://clerk.slack.com/archives/C015S0BGH8R/p1624891993016300
-
-// The function Portal implementation is commented out for future reference.
-
-// const Portal = React.memo(({ props, mount, unmount }: MountProps) => {
-//   const portalRef = React.createRef<HTMLDivElement>();
-
-//   useEffect(() => {
-//     if (portalRef.current) {
-//       mount(portalRef.current, props);
-//     }
-//     return () => {
-//       if (portalRef.current) {
-//         unmount(portalRef.current);
-//       }
-//     };
-//   }, []);
-
-//   return <div ref={portalRef} />;
-// });
-
-// Portal.displayName = 'ClerkPortal';
-
-/**
- * Used to orchestrate mounting of Clerk components in a host React application.
- * Components are rendered into a specific DOM node using mount/unmount methods provided by the Clerk class.
- */
-class ClerkHostRenderer extends React.PureComponent<
-  PropsWithChildren<(MountProps | OpenProps) & { component?: string; hideRootHtmlElement?: boolean }>
-> {
-  private rootRef = React.createRef<HTMLDivElement>();
-
-  state = {
-    rendering: true,
-  };
-
-  componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
-    if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
-      return;
-    }
-
-    // Remove children and customPages from props before comparing
-    // children might hold circular references which deepEqual can't handle
-    // and the implementation of customPages or customMenuItems relies on props getting new references
-    const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
-    const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
-    // instead, we simply use the length of customPages to determine if it changed or not
-    const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
-    const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
-
-    if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
-      if (this.rootRef.current) {
-        this.props.updateProps({ node: this.rootRef.current, props: this.props.props });
-      }
-    }
-  }
-
-  componentDidMount() {
-    if (this.rootRef.current) {
-      if (isMountProps(this.props)) {
-        this.props.mount(this.rootRef.current, this.props.props);
-      }
-
-      if (isOpenProps(this.props)) {
-        this.props.open(this.props.props);
-      }
-    }
-
-    // Watch for the element to be added to the DOM so we can render a fallback.
-    if (this.props.component) {
-      waitForElementChildren({ root: this.rootRef.current })
-        .then(() => {
-          this.setState({ rendering: false });
-        })
-        .catch(() => {
-          this.setState({ rendering: false });
-        });
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.rootRef.current) {
-      if (isMountProps(this.props)) {
-        this.props.unmount(this.rootRef.current);
-      }
-      if (isOpenProps(this.props)) {
-        this.props.close();
-      }
-    }
-  }
-
-  render() {
-    const { hideRootHtmlElement = false } = this.props;
-    const rootAttributes = {
-      ref: this.rootRef,
-      ...(this.props.component ? { 'data-clerk-component': this.props.component } : {}),
-      ...(this.state.rendering && 'fallback' in this.props ? { style: { display: 'none' } } : {}),
-    };
-
-    return (
-      <>
-        {!hideRootHtmlElement && <div {...rootAttributes} />}
-        {this.state.rendering && 'fallback' in this.props && this.props.fallback}
-        {this.props.children}
-      </>
-    );
-  }
-}
-
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
@@ -285,30 +124,61 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   );
 };
 
-// @ts-expect-error -- FIXME
-export const SignIn = withClerk(({ clerk, fallback, ...props }: WithClerkProp<SignInProps>) => {
-  return (
-    <ClerkHostRenderer
-      component='SignIn'
-      mount={clerk.mountSignIn}
-      unmount={clerk.unmountSignIn}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-      fallback={fallback}
-    />
-  );
-}, 'SignIn');
+export const SignIn = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<SignInProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
-export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
-  return (
-    <ClerkHostRenderer
-      mount={clerk.mountSignUp}
-      unmount={clerk.unmountSignUp}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'SignUp');
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountSignIn}
+            unmount={clerk.unmountSignIn}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'SignIn', renderWhileLoading: true },
+);
+
+export const SignUp = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<SignUpProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountSignUp}
+            unmount={clerk.unmountSignUp}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'SignUp', renderWhileLoading: true },
+);
 
 export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
   logErrorInDevMode(userProfilePageRenderedError);

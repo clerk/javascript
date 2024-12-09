@@ -8,18 +8,22 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 
 export const withClerk = <P extends { clerk: LoadedClerk }>(
   Component: React.ComponentType<P>,
-  displayName?: string,
+  displayNameOrOptions?: string | { component: string; renderWhileLoading?: boolean },
 ) => {
-  displayName = displayName || Component.displayName || Component.name || 'Component';
+  const passedDisplayedName =
+    typeof displayNameOrOptions === 'string' ? displayNameOrOptions : displayNameOrOptions?.component;
+  const displayName = passedDisplayedName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
+
+  const options = typeof displayNameOrOptions === 'string' ? undefined : displayNameOrOptions;
+
   const HOC = (props: Without<P, 'clerk'>) => {
     useAssertWrappedByClerkProvider(displayName || 'withClerk');
 
     const clerk = useIsomorphicClerkContext();
 
-    if (!clerk.loaded) {
-      // @ts-expect-error -- FIXME
-      return props.fallback || null;
+    if (!clerk.loaded && !options?.renderWhileLoading) {
+      return null;
     }
 
     return (
