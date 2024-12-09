@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.3.35",
+  "version": "1.3.36",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",

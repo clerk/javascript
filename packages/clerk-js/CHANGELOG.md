@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.40.1
+
+### Patch Changes
+
+- Apply fraud protection logic to all requests ([#4709](https://github.com/clerk/javascript/pull/4709)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+
 ## 5.40.0
 
 ### Minor Changes
