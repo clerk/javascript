@@ -14,3 +14,4 @@ export { runInjectionScript };
 
 export { generateSafeId } from './utils/generateSafeId';
 export { swapDocument } from './swap-document';
+export { NETLIFY_CACHE_BUST_PARAM, removeNetlifyCacheBustParam } from './remove-query-param';
