@@ -31,6 +31,7 @@ export type SignInStartInput = {
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  ticket?: string | undefined;
 };
 
 // ---------------------------------- Context ---------------------------------- //
