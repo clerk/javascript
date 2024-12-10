@@ -6,7 +6,7 @@ import { errorThrower } from '../errors/errorThrower';
 import { hocChildrenNotAFunctionError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 
-export const withClerk = <P extends { clerk: LoadedClerk }>(
+export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
   Component: React.ComponentType<P>,
   displayNameOrOptions?: string | { component: string; renderWhileLoading?: boolean },
 ) => {
@@ -29,6 +29,7 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
     return (
       <Component
         {...(props as P)}
+        component={displayName}
         clerk={clerk}
       />
     );
