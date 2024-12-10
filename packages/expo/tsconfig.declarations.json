@@ -8,5 +8,6 @@
     "declarationMap": true,
     "sourceMap": false,
     "declarationDir": "./dist"
-  }
+  },
+  "exclude": ["**/__tests__/**/*"]
 }

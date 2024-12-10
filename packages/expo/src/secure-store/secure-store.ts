@@ -37,7 +37,8 @@ export const createSecureStore = (): IStorage => {
 
   const set = (key: string, value: string): Promise<void> => {
     queue.push({ key, value });
-    return processQueue();
+    void processQueue();
+    return Promise.resolve();
   };
 
   const processQueue = async (): Promise<void> => {
