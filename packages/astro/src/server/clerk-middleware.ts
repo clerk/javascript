@@ -243,6 +243,12 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
  * doesn't serve a cached response during the authentication flow.
  */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
+  // Only run on Netlify environment
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  if (!process.env.NETLIFY) {
+    return;
+  }
+
   const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
   // If location header is the original URL before the handshake redirects, add cache bust param
   if (!hasHandshakeQueryParam) {
