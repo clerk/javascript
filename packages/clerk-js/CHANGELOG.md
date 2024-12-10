@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.40.3
+
+### Patch Changes
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/localizations@3.8.2
+  - @clerk/shared@2.19.4
+
 ## 5.40.2
 
 ### Patch Changes
