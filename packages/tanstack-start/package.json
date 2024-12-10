@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -34,12 +34,17 @@
       "types": "./dist/server/index.d.ts",
       "default": "./dist/server/index.js"
     },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "errors",
     "server"
   ],
   "scripts": {

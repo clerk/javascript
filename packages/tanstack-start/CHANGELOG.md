@@ -1,5 +1,25 @@
 # @clerk/tanstack-start
 
+## 0.7.0
+
+### Minor Changes
+
+- Re-export missing error helpers functions from `@clerk/tanstack-start/errors` ([#4741](https://github.com/clerk/javascript/pull/4741)) by [@octoper](https://github.com/octoper)
+
+  - `isClerkAPIResponseError`
+  - `isEmailLinkError`
+  - `isKnownError`
+  - `isMetamaskError`
+  - `EmailLinkErrorCode`
+
+### Patch Changes
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/backend@1.20.3
+  - @clerk/clerk-react@5.19.3
+  - @clerk/shared@2.19.4
+
 ## 0.6.5
 
 ### Patch Changes
