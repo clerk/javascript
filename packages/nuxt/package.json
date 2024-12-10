@@ -33,6 +33,14 @@
     "./server": {
       "types": "./dist/runtime/server/index.d.ts",
       "import": "./dist/runtime/server/index.js"
+    },
+    "./components": {
+      "types": "./dist/runtime/components.d.ts",
+      "import": "./dist/runtime/components.js"
+    },
+    "./composables": {
+      "types": "./dist/runtime/composables.d.ts",
+      "import": "./dist/runtime/composables.js"
     }
   },
   "main": "./dist/module.js",

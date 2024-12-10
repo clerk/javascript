@@ -1,7 +1,7 @@
 import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
 import {
-  addComponent,
-  addImports,
+  addComponentsDir,
+  addImportsDir,
   addPlugin,
   addServerHandler,
   createResolver,
@@ -91,62 +91,9 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    type VueClerkImports = Array<keyof typeof import('@clerk/vue')>;
-
-    // Add auto-imports for Clerk components and composables
-    // More info https://nuxt.com/docs/guide/concepts/auto-imports
-    const components: VueClerkImports = [
-      // Authentication Components
-      'SignIn',
-      'SignUp',
-      // Unstyled Components
-      'SignInButton',
-      'SignOutButton',
-      'SignUpButton',
-      'SignInWithMetamaskButton',
-      // User Components
-      'UserButton',
-      'UserProfile',
-      // Organization Components
-      'CreateOrganization',
-      'OrganizationProfile',
-      'OrganizationSwitcher',
-      'OrganizationList',
-      // Control Components
-      'ClerkLoaded',
-      'ClerkLoading',
-      'Protect',
-      'RedirectToSignIn',
-      'RedirectToSignUp',
-      'RedirectToUserProfile',
-      'RedirectToOrganizationProfile',
-      'RedirectToCreateOrganization',
-      'SignedIn',
-      'SignedOut',
-    ];
-    const composables: VueClerkImports = [
-      'useAuth',
-      'useClerk',
-      'useSession',
-      'useSessionList',
-      'useSignIn',
-      'useSignUp',
-      'useUser',
-      'useOrganization',
-    ];
-    addImports(
-      composables.map(composable => ({
-        name: composable,
-        from: '@clerk/vue',
-      })),
-    );
-    components.forEach(component => {
-      void addComponent({
-        name: component,
-        export: component,
-        filePath: '@clerk/vue',
-      });
+    addImportsDir(resolver.resolve('./runtime/composables'));
+    void addComponentsDir({
+      path: resolver.resolve('./runtime/components'),
     });
   },
 });
