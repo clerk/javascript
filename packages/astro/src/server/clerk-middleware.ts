@@ -82,7 +82,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       createAuthenticateRequestOptions(clerkRequest, options, context),
     );
 
-    console.log('requestState', requestState);
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
       handleNetlifyCacheInDevInstance(locationHeader, requestState);
@@ -244,6 +243,7 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
  */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
   const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+  // If location header is the original URL before the handshake redirects, add cache bust param
   if (!hasHandshakeQueryParam) {
     const url = new URL(locationHeader);
     url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
