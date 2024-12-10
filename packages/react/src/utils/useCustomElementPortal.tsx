@@ -7,7 +7,7 @@ export type UseCustomElementPortalParams = {
 };
 
 export type UseCustomElementPortalReturn = {
-  portal: () => JSX.Element;
+  portal: () => React.JSX.Element;
   mount: (node: Element) => void;
   unmount: () => void;
   id: number;
