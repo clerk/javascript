@@ -92,8 +92,8 @@
     "test:cloudflare-miniflare": "vitest --environment miniflare"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "cookie": "0.7.0",
     "snakecase-keys": "5.4.4",
     "tslib": "catalog:repo"

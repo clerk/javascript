@@ -31,8 +31,8 @@
     "publish:local": "pnpm yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "expo-modules-core": "1.12.26"
   },
   "devDependencies": {},
