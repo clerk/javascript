@@ -10,13 +10,12 @@ import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 const _SignInAccountSwitcher = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
-  const { navigateAfterSignIn, afterSignInUrl, path: signInPath } = useSignInContext();
-  const { navigateAfterSignOut } = useSignOutContext();
+  const { afterSignInUrl, path: signInPath } = useSignInContext();
+  const { afterSignOutUrl } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
     useMultisessionActions({
-      navigateAfterSignOut,
-      navigateAfterSwitchSession: navigateAfterSignIn,
-      afterSignInUrl,
+      afterSignOutUrl,
+      afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
       signInUrl: signInPath,
       user: undefined,

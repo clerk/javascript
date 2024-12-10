@@ -72,13 +72,11 @@ describe('UserButton', () => {
       });
     });
 
-    fixtures.clerk.signOut.mockImplementationOnce(callback => callback());
-
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
     await userEvent.click(getByRole('button', { name: 'Open user button' }));
     await userEvent.click(getByText('Sign out'));
 
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+    expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.objectContaining({ redirectUrl: '/' }));
   });
 
   it('redirects to afterSignOutUrl when "Sign out" is clicked and afterSignOutUrl prop is passed', async () => {
@@ -91,14 +89,13 @@ describe('UserButton', () => {
       });
     });
 
-    fixtures.clerk.signOut.mockImplementation(callback => callback());
     props.setProps({ afterSignOutUrl: '/after-sign-out' });
 
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
     await userEvent.click(getByRole('button', { name: 'Open user button' }));
     await userEvent.click(getByText('Sign out'));
 
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/after-sign-out');
+    expect(fixtures.clerk.signOut).toHaveBeenCalledWith({ redirectUrl: '/after-sign-out' });
   });
 
   it.todo('navigates to sign in url when "Add account" is clicked');
@@ -151,29 +148,22 @@ describe('UserButton', () => {
 
     it('signs out of the currently active session when clicking "Sign out"', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.signOut.mockImplementationOnce(callback => {
-        return Promise.resolve(callback());
-      });
+      fixtures.clerk.signOut.mockResolvedValue({});
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user button' }));
       await userEvent.click(getByText('Sign out'));
       await waitFor(() => {
-        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function), { sessionId: '0' });
-        expect(fixtures.clerk.redirectWithAuth).toHaveBeenCalledWith('https://accounts.clerk.com/sign-in/choose');
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith({ sessionId: '0', redirectUrl: expect.any(String) });
       });
     });
 
     it('signs out of all currently active session when clicking "Sign out of all accounts"', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.signOut.mockImplementationOnce(callback => {
-        return Promise.resolve(callback());
-      });
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user button' }));
       await userEvent.click(getByText('Sign out of all accounts'));
       await waitFor(() => {
-        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
-        expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith({ redirectUrl: expect.any(String) });
       });
     });
   });
