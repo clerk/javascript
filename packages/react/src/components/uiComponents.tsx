@@ -204,16 +204,19 @@ const _UserProfile = withClerk(
 
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     return (
-      <ClerkHostRenderer
-        component={component}
-        mount={clerk.mountUserProfile}
-        unmount={clerk.unmountUserProfile}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, customPages }}
-        rootProps={rendererRootProps}
-      >
-        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-      </ClerkHostRenderer>
+      <>
+        {shouldShowFallback && fallback}
+        <ClerkHostRenderer
+          component={component}
+          mount={clerk.mountUserProfile}
+          unmount={clerk.unmountUserProfile}
+          updateProps={(clerk as any).__unstable__updateProps}
+          props={{ ...props, customPages }}
+          rootProps={rendererRootProps}
+        >
+          <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+        </ClerkHostRenderer>
+      </>
     );
   },
   { component: 'UserProfile', renderWhileLoading: true },
