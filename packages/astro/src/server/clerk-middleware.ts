@@ -238,8 +238,9 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
    PUBLIC_CLERK_IS_SATELLITE='true'`;
 
 /**
- * Adds a cache bust parameter to non-handshake redirects to prevent infinite redirects
- * in Netlify and Clerk's dev instance.
+ * Prevents infinite redirects in Netlify's functions
+ * by adding a cache bust parameter to the original redirect URL. This ensures Netlify
+ * doesn't serve a cached response during the authentication flow.
  */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
   const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
