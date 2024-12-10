@@ -28,4 +28,5 @@ export interface OrganizationSettingsResource extends ClerkResource {
     enrollmentModes: OrganizationEnrollmentMode[];
     defaultRole: string | null;
   };
+  toJSON: () => OrganizationSettingsJSON;
 }

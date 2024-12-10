@@ -141,4 +141,5 @@ export interface UserSettingsResource extends ClerkResource {
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;
+  toJSON: () => UserSettingsJSON;
 }
