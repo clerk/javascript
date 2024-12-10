@@ -58,7 +58,7 @@
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
     "typescript": "catalog:repo",
-    "vue": "3.5.12"
+    "vue": "3.5.13"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
