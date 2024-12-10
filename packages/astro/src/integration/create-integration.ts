@@ -111,7 +111,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { removeNetlifyCacheBustParam, runInjectionScript, swapDocument } from "${buildImportPath}";
 
-            // Fix an issue with infinite reload in Netlify and Clerk dev instance
+            // Fix an issue with infinite redirect in Netlify and Clerk dev instance
             removeNetlifyCacheBustParam();
 
             // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.

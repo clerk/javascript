@@ -243,9 +243,8 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
  * in Netlify and Clerk's dev instance.
  */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
-  const isHandshakeUrl = locationHeader.includes('/v1/client/handshake');
   const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
-  if (!isHandshakeUrl && !hasHandshakeQueryParam) {
+  if (!hasHandshakeQueryParam) {
     const url = new URL(locationHeader);
     url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
     requestState.headers.set('Location', url.toString());
