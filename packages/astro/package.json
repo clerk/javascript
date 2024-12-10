@@ -84,7 +84,7 @@
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "nanoid": "5.0.7",
+    "nanoid": "5.0.9",
     "nanostores": "0.11.3"
   },
   "devDependencies": {
