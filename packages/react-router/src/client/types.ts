@@ -36,8 +36,9 @@ export type WithClerkState<U = any> = {
 
 export type ReactRouterClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
   /**
-   * Used to override the default CLERK_PUBLISHABLE_KEY env variable if needed.
-   * This is optional for React Router as the ClerkProvider will automatically use the CLERK_PUBLISHABLE_KEY env variable if it exists.
+   * Used to override the default VITE_CLERK_PUBLISHABLE_KEY env variable if needed.
+   * This is optional for React Router (in SSR mode) as the ClerkProvider will automatically use the VITE_CLERK_PUBLISHABLE_KEY env variable if it exists.
+   * If you use React Router in SPA mode or as a library, you have to pass the publishableKey prop.
    */
   publishableKey?: string;
   children: React.ReactNode;
