@@ -1,5 +1,18 @@
 # @clerk/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`383cd2967ea111efcb95fc20cec186aa29070d1a`](https://github.com/clerk/javascript/commit/383cd2967ea111efcb95fc20cec186aa29070d1a), [`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630)]:
+  - @clerk/elements@0.22.0
+  - @clerk/localizations@3.9.0
+  - @clerk/shared@2.20.0
+
 ## 0.2.4
 
 ### Patch Changes
