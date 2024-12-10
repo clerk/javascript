@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -59,10 +59,10 @@
     "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {

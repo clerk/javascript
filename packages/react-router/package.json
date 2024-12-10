@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -71,10 +71,10 @@
     "publish:local": "pnpm dlx yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "cookie": "0.7.0",
     "tslib": "catalog:repo"
   },
