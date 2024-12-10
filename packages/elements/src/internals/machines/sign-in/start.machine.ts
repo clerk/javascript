@@ -1,5 +1,5 @@
 import type { SignInResource, Web3Strategy } from '@clerk/types';
-import { assertEvent, fromPromise, not, sendTo, setup } from 'xstate';
+import { assertEvent, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
@@ -9,6 +9,8 @@ import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignInStartSchema } from './start.types';
+
+const DISABLEABLE_FIELDS = ['emailAddress', 'phoneNumber'] as const;
 
 export type TSignInStartMachine = typeof SignInStartMachine;
 
@@ -49,10 +51,6 @@ export const SignInStartMachine = setup({
       const password = fields.get('password');
       const identifier = fields.get('identifier');
 
-      const commonStrategyParams = {
-        identifier: (identifier?.value as string) || '',
-      };
-
       const passwordParams = password?.value
         ? {
             password: password.value,
@@ -61,9 +59,12 @@ export const SignInStartMachine = setup({
         : {};
 
       return clerk.client.signIn.create({
-        ...commonStrategyParams,
         ...passwordParams,
-        ...params,
+        ...(params?.ticket
+          ? params
+          : {
+              identifier: (identifier?.value as string) ?? '',
+            }),
       });
     }),
   },
@@ -73,6 +74,19 @@ export const SignInStartMachine = setup({
       return context.parent.send({ type: 'NEXT', resource: event?.output });
     },
     sendToLoading,
+    setFormDisabledTicketFields: enqueueActions(({ context, enqueue }) => {
+      if (!context.ticket) {
+        return;
+      }
+
+      const currentFields = context.formRef.getSnapshot().context.fields;
+
+      for (const name of DISABLEABLE_FIELDS) {
+        if (currentFields.has(name)) {
+          enqueue.sendTo(context.formRef, { type: 'FIELD.DISABLE', field: { name } });
+        }
+      }
+    }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -162,10 +176,10 @@ export const SignInStartMachine = setup({
           return { ...defaultParams, params };
         },
         onDone: {
-          actions: ['sendToNext', 'sendToLoading'],
+          actions: ['setFormDisabledTicketFields', 'sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: ['setFormErrors', 'sendToLoading'],
+          actions: ['setFormDisabledTicketFields', 'setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },
