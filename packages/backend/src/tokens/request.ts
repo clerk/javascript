@@ -10,9 +10,23 @@ import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
-import type { SignedInAuthObject } from './authObjects';
-import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
-import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
+import { type SignedInAuthObject } from './authObjects';
+import type {
+  HandshakeState,
+  MachineAuthenticatedState,
+  MachineUnauthenticatedState,
+  RequestState,
+  SignedInState,
+  SignedOutState,
+} from './authStatus';
+import {
+  AuthErrorReason,
+  handshake,
+  machineAuthenticated,
+  machineUnauthenticated,
+  signedIn,
+  signedOut,
+} from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
@@ -90,10 +104,26 @@ function isRequestEligibleForRefresh(
   );
 }
 
+// export async function authenticateRequest<T extends 'user' | 'machine' | undefined>(
+//   request: Request,
+//   options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: T },
+// ): Promise<
+//   T extends 'user'
+//     ? SignedInState | SignedOutState | HandshakeState
+//     : T extends 'machine'
+//       ? MachineUnauthenticatedState | MachineAuthenticatedState
+//       : SignedInState | SignedOutState | HandshakeState
+// > {
 export async function authenticateRequest(
   request: Request,
-  options: AuthenticateRequestOptions,
-): Promise<RequestState> {
+  options: AuthenticateRequestOptions & { entity: 'machine' },
+): Promise<MachineUnauthenticatedState | MachineAuthenticatedState>;
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions & { entity: 'user' },
+): Promise<RequestState>;
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -623,8 +653,11 @@ ${error.getFullMessage()}`,
   async function handleError(
     err: unknown,
     tokenCarrier: TokenCarrier,
-  ): Promise<SignedInState | SignedOutState | HandshakeState> {
+  ): Promise<SignedInState | SignedOutState | HandshakeState | MachineUnauthenticatedState> {
     if (!(err instanceof TokenVerificationError)) {
+      if (options.entity === 'machine') {
+        return machineUnauthenticated(authenticateContext, 'unexpected error', 'unexpected error');
+      }
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
@@ -661,7 +694,7 @@ ${error.getFullMessage()}`,
       TokenVerificationErrorReason.TokenIatInTheFuture,
     ].includes(err.reason);
 
-    if (reasonToHandshake) {
+    if (reasonToHandshake && options.entity !== 'machine') {
       return handleMaybeHandshakeStatus(
         authenticateContext,
         convertTokenVerificationErrorReasonToAuthErrorReason({ tokenError: err.reason, refreshError }),
@@ -669,14 +702,47 @@ ${error.getFullMessage()}`,
       );
     }
 
+    if (options.entity === 'machine') {
+      return machineUnauthenticated(authenticateContext, err.reason, err.getFullMessage());
+    }
+
     return signedOut(authenticateContext, err.reason, err.getFullMessage());
   }
 
-  if (authenticateContext.sessionTokenInHeader) {
-    return authenticateRequestWithTokenInHeader();
+  async function authenticateMachineRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
+    try {
+      const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      console.log(errors);
+      if (errors) {
+        throw errors[0];
+      }
+      if (data.sub.startsWith('user_')) {
+        return machineUnauthenticated(
+          authenticateContext,
+          'Expected a machine token but received a user token. Please verify the token type and ensure you are passing a machine token to the machine authentication function',
+        );
+      }
+      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader!, data);
+    } catch (err) {
+      return handleError(err, 'header');
+    }
   }
 
-  return authenticateRequestWithTokenInCookie();
+  if (authenticateContext.sessionTokenInHeader) {
+    if (options.entity === 'machine') {
+      return authenticateMachineRequestWithTokenInHeader();
+    } else {
+      return authenticateRequestWithTokenInHeader();
+    }
+  }
+
+  if (options.entity === 'machine') {
+    return machineUnauthenticated(authenticateContext, 'no machine token in header');
+  } else {
+    return authenticateRequestWithTokenInCookie();
+  }
 }
 
 /**

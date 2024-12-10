@@ -1,5 +1,6 @@
 import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
+import type { MachineAuthenticatedState, MachineUnauthenticatedState, RequestState } from './authStatus';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 import type { AuthenticateRequestOptions } from './types';
 
@@ -46,9 +47,23 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
-  const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
+  // These overloads should match the function signature from request.ts
+  function authenticateRequest(
+    request: Request,
+    options: AuthenticateRequestOptions & { entity: 'machine' },
+  ): Promise<MachineUnauthenticatedState | MachineAuthenticatedState>;
+  function authenticateRequest(
+    request: Request,
+    options: AuthenticateRequestOptions & { entity: 'user' },
+  ): Promise<RequestState>;
+  function authenticateRequest(request: Request, options?: AuthenticateRequestOptions): Promise<RequestState>;
+  function authenticateRequest(
+    request: Request,
+    options: RunTimeOptions = {},
+  ): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState> {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
+
     return authenticateRequestOriginal(request, {
       ...options,
       ...runTimeOptions,
@@ -58,7 +73,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       apiClient,
     });
-  };
+  }
 
   return {
     authenticateRequest,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { handshake, signedIn, signedOut } from '../authStatus';
+import { handshake, machineAuthenticated, machineUnauthenticated, signedIn, signedOut } from '../authStatus';
 
 describe('signed-in', () => {
   it('does not include debug headers', () => {
@@ -41,6 +41,44 @@ describe('signed-out', () => {
   });
 });
 
+describe('machine-unauthenticated', () => {
+  it('includes debug headers', () => {
+    const headers = new Headers({ 'custom-header': 'value' });
+    const authObject = machineUnauthenticated({} as any, 'auth-reason', 'auth-message', headers);
+
+    expect(authObject.headers.get('custom-header')).toBe('value');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBe('machine-unauthenticated');
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBe('auth-reason');
+    expect(authObject.headers.get('x-clerk-auth-message')).toBe('auth-message');
+  });
+
+  it('handles debug headers containing invalid unicode characters without throwing', () => {
+    const headers = new Headers({ 'custom-header': 'value' });
+    const authObject = machineUnauthenticated({} as any, 'auth-reason+RR�56', 'auth-message+RR�56', headers);
+
+    expect(authObject.headers.get('custom-header')).toBe('value');
+    expect(authObject.headers.get('x-clerk-auth-status')).toBe('machine-unauthenticated');
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-message')).toBeNull();
+  });
+});
+
+describe('machine-authenticated', () => {
+  it('does not include debug headers', () => {
+    const authObject = machineAuthenticated({} as any, undefined, 'token', {} as any);
+
+    expect(authObject.headers.get('x-clerk-auth-status')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
+    expect(authObject.headers.get('x-clerk-auth-message')).toBeNull();
+  });
+
+  it('authObject returned by toAuth() returns the token passed', async () => {
+    const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
+    const token = await signedInAuthObject.getToken();
+
+    expect(token).toBe('token');
+  });
+});
 describe('handshake', () => {
   it('includes debug headers', () => {
     const headers = new Headers({ location: '/' });

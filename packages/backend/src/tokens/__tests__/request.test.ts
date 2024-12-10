@@ -4,11 +4,16 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { TokenVerificationErrorReason } from '../../errors';
 import {
   mockExpiredJwt,
+  mockExpiredMachineJwt,
   mockInvalidSignatureJwt,
   mockJwks,
   mockJwt,
   mockJwtPayload,
+  mockMachineJwks,
+  mockMachineJwt,
+  mockMachineJwtPayload,
   mockMalformedJwt,
+  mockUserTokenForMachineTesting,
 } from '../../fixtures';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
@@ -31,6 +36,10 @@ interface CustomMatchers<R = unknown> {
   toMatchHandshake: (expected: unknown) => R;
   toBeSignedIn: (expected?: unknown) => R;
   toBeSignedInToAuth: () => R;
+  toBeMachineAuthenticated: (expected?: unknown) => R;
+  toBeMachineAuthenticatedToAuth: () => R;
+  toBeMachineUnAuthenticated: (expected: unknown) => R;
+  toBeMachineUnAuthenticatedToAuth: () => R;
 }
 
 declare module 'vitest' {
@@ -216,6 +225,115 @@ expect.extend({
       };
     }
   },
+  toBeMachineAuthenticated(
+    received,
+    expected: {
+      domain?: string;
+      isSatellite?: boolean;
+      signInUrl?: string;
+    },
+  ) {
+    const pass =
+      received.afterSignInUrl === '' &&
+      received.afterSignUpUrl === '' &&
+      received.domain === (expected?.domain ?? '') &&
+      received.isSatellite === (expected?.isSatellite ?? false) &&
+      received.isSignedIn === false &&
+      received.proxyUrl === '' &&
+      received.signInUrl === (expected?.signInUrl ?? '') &&
+      received.signUpUrl === '' &&
+      received.isMachineAuthenticated === true &&
+      received.status === AuthStatus.MachineAuthenticated;
+
+    if (pass) {
+      return {
+        message: () => `expected to be machine authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected not to be machine authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineAuthenticatedToAuth(received) {
+    const pass =
+      !received.orgId &&
+      !received.orgRole &&
+      !received.orgSlug &&
+      !received.sessionClaims &&
+      !received.sessionId &&
+      !received.userId;
+
+    if (pass) {
+      return {
+        message: () => `expected machine to be authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected machine not to be authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineUnAuthenticated(
+    received,
+    expected: {
+      domain?: string;
+      isSatellite?: boolean;
+      reason: AuthReason;
+      signInUrl?: string;
+    },
+  ) {
+    const pass =
+      received.afterSignInUrl === '' &&
+      received.afterSignUpUrl === '' &&
+      received.domain === (expected?.domain ?? '') &&
+      received.isSatellite === (expected?.isSatellite ?? false) &&
+      received.isSignedIn === false &&
+      received.proxyUrl === '' &&
+      received.signInUrl === (expected?.signInUrl ?? '') &&
+      received.signUpUrl === '' &&
+      received.reason === expected.reason &&
+      received.isMachineAuthenticated === false &&
+      received.status === AuthStatus.MachineUnauthenticated;
+
+    if (pass) {
+      return {
+        message: () => `expected to be machine authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected not to be machine authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineUnAuthenticatedToAuth(received) {
+    const pass =
+      !received.orgId &&
+      !received.orgRole &&
+      !received.orgSlug &&
+      !received.sessionClaims &&
+      !received.sessionId &&
+      !received.userId &&
+      !received.machineId;
+
+    if (pass) {
+      return {
+        message: () => `expected machine not to be authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected machine to be authenticated`,
+        pass: false,
+      };
+    }
+  },
 });
 
 const defaultHeaders: Record<string, string> = {
@@ -243,6 +361,7 @@ const mockOptions = (options?) => {
     afterSignInUrl: '',
     afterSignUpUrl: '',
     domain: '',
+    entity: '',
     ...options,
   } satisfies AuthenticateRequestOptions;
 };
@@ -568,6 +687,81 @@ describe('tokens.authenticateRequest(options)', () => {
         'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)',
     });
     expect(requestState).toBeSignedOutToAuth();
+  });
+
+  test('headerToken: returns machine authenticated state when a valid token [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({
+        authorization: mockMachineJwt,
+      }),
+      mockOptions({
+        entity: 'machine',
+      }),
+    );
+
+    expect(requestState).toBeMachineAuthenticated();
+    expect(requestState.toAuth()).toBeMachineAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing an expired token [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockExpiredMachineJwt }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.TokenExpired,
+      message: 'JWT is expired',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing a user token [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockUserTokenForMachineTesting }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason:
+        'Expected a machine token but received a user token. Please verify the token type and ensure you are passing a machine token to the machine authentication function',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing a no token [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: '' }),
+      mockOptions({ entity: 'machine' }),
+    );
+    console.log(requestState);
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: 'no machine token in header',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
   });
 
   test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async () => {
