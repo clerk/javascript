@@ -131,7 +131,7 @@ export const daDK: LocalizationResource = {
       action__invite: 'Inviter',
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
-        tableHeader__actions: undefined,
+        tableHeader__actions: 'Handlinger',
         tableHeader__joined: 'Deltaget',
         tableHeader__role: 'Rolle',
         tableHeader__user: 'Bruger',
@@ -460,6 +460,7 @@ export const daDK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Log ind',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',

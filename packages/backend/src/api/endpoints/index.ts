@@ -1,3 +1,4 @@
+export * from './AccountlessApplicationsAPI';
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
 export * from './ClientApi';

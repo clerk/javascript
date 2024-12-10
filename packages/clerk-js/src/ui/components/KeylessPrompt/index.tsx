@@ -8,11 +8,11 @@ import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
 
-type AccountlessPromptProps = {
+type KeylessPromptProps = {
   url?: string;
 };
 
-export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
+const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const handleFocus = () => setIsExpanded(true);
 
@@ -396,8 +396,8 @@ export const _AccountlessPrompt = (_props: AccountlessPromptProps) => {
   );
 };
 
-export const AccountlessPrompt = (props: AccountlessPromptProps) => (
+export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
-    <_AccountlessPrompt {...props} />
+    <_KeylessPrompt {...props} />
   </InternalThemeProvider>
 );

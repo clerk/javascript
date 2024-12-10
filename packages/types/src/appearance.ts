@@ -166,6 +166,7 @@ export type ElementsConfig = {
   footerPages: WithOptions;
   footerPagesLink: WithOptions<'help' | 'terms' | 'privacy'>;
 
+  socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
@@ -374,6 +375,7 @@ export type ElementsConfig = {
   navbarButtons: WithOptions<never, ActiveState>;
   navbarButton: WithOptions<string, ActiveState>;
   navbarButtonIcon: WithOptions<string, ActiveState>;
+  navbarButtonText: WithOptions<string, ActiveState>;
   navbarMobileMenuRow: WithOptions;
   navbarMobileMenuButton: WithOptions;
   navbarMobileMenuButtonIcon: WithOptions;

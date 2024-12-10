@@ -358,6 +358,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  #isCombinedFlow(): boolean {
+    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -1052,14 +1056,13 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
   }
 
-  public buildWaitlistUrl(): string {
+  public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
     if (!this.environment || !this.environment.displayConfig) {
       return '';
     }
-
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
-
-    return buildURL({ base: waitlistUrl }, { stringify: true });
+    const initValues = new URLSearchParams(options?.initialValues || {});
+    return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1634,7 +1637,6 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
-    this.#authService?.setEnvironment(environment);
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -1805,7 +1807,13 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = await AuthCookieService.create(this, this.#fapiClient);
+    /**
+     * 0. Init auth service and setup dev browser
+     * This is not needed for production instances hence the .clear()
+     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     */
+    this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
      * 1. Multi-domain SSO handling
@@ -1817,18 +1825,6 @@ export class Clerk implements ClerkInterface {
       await this.#syncWithPrimary();
       // ClerkJS is not considered loaded during the sync/link process with the primary domain
       return false;
-    }
-
-    /**
-     * 2. Setup dev browser.
-     * This is not needed for production instances hence the .clear()
-     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
-     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
-     */
-    if (this.#instanceType === 'production') {
-      this.#authService?.setupProduction();
-    } else {
-      await this.#authService?.setupDevelopment();
     }
 
     /**
@@ -1859,24 +1855,44 @@ export class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: shouldTouchEnv }),
-          Client.getInstance().fetch(),
-        ]);
+        const initEnvironmentPromise = Environment.getInstance()
+          .fetch({ touch: shouldTouchEnv })
+          .then(res => {
+            this.updateEnvironment(res);
+          });
 
-        this.updateClient(client);
-        // updateEnvironment should be called after updateClient
-        // because authService#setEnvironment depends on clerk.session that is being
-        // set in updateClient
-        this.updateEnvironment(environment);
+        const initClient = () => {
+          return Client.getInstance()
+            .fetch()
+            .then(res => this.updateClient(res));
+        };
+
+        const initComponents = () => {
+          if (Clerk.mountComponentRenderer && !this.#componentControls) {
+            this.#componentControls = Clerk.mountComponentRenderer(
+              this,
+              this.environment as Environment,
+              this.#options,
+            );
+          }
+        };
+
+        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
+          // limit the changes for this specific error for now
+          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+            await initEnvironmentPromise;
+            initComponents();
+            await initClient();
+          }
+        });
+
+        this.#authService?.setClientUatCookieForDevelopmentInstances();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
 
-        if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment as Environment, this.#options);
-        }
+        initComponents();
 
         break;
       } catch (err) {
@@ -1899,8 +1915,8 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
-      this.#handleAccountlessPrompt();
+    if (__BUILD_FLAG_KEYLESS_UI__) {
+      this.#handleKeylessPrompt();
     }
     return true;
   };
@@ -2031,12 +2047,12 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #handleAccountlessPrompt = () => {
-    if (__BUILD_FLAG_ACCOUNTLESS_UI__) {
+  #handleKeylessPrompt = () => {
+    if (__BUILD_FLAG_KEYLESS_UI__) {
       void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimAccountlessKeysUrl) {
+        if (this.#options.__internal_claimKeylessApplicationUrl) {
           controls.updateProps({
-            options: { __internal_claimAccountlessKeysUrl: this.#options.__internal_claimAccountlessKeysUrl },
+            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
           });
         }
       });
@@ -2051,10 +2067,18 @@ export class Clerk implements ClerkInterface {
     if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
-    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    const url = buildURL(
+      {
+        base: signInOrUpUrl,
+        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashSearchParams: [initValues, redirectUrls],
+      },
+      { stringify: true },
+    );
     return this.buildUrlWithAuth(url);
   };
 

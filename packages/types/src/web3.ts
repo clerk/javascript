@@ -12,6 +12,10 @@ export type OKXWalletWeb3Provider = 'okx_wallet';
 
 export type Web3Provider = MetamaskWeb3Provider | CoinbaseWalletWeb3Provider | OKXWalletWeb3Provider;
 
+/**
+ * @deprecated This constant will be dropped in the next major release.
+ * You can import it from `@clerk/shared/web3`.
+ */
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
     provider: 'metamask',
@@ -35,6 +39,9 @@ interface getWeb3ProviderDataProps {
   strategy?: Web3Strategy;
 }
 
+/**
+ * @deprecated This utility will be dropped in the next major release.
+ */
 export function getWeb3ProviderData({
   provider,
   strategy,
