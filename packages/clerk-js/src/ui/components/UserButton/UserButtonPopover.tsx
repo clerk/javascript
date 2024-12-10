@@ -15,7 +15,8 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const { close: unsafeClose, ...rest } = props;
   const close = () => unsafeClose?.(false);
   const { session } = useSession() as { session: ActiveSessionResource };
-  const { __experimental_asStandalone } = useUserButtonContext();
+  const userButtonContext = useUserButtonContext();
+  const { __experimental_asStandalone } = userButtonContext;
   const { authConfig } = useEnvironment();
   const { user } = useUser();
   const {
@@ -26,7 +27,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSignOutSessionClicked,
     handleUserProfileActionClicked,
     otherSessions,
-  } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
+  } = useMultisessionActions({ ...userButtonContext, actionCompleteCallback: close, user });
 
   return (
     <RootBox elementDescriptor={descriptors.userButtonPopoverRootBox}>
