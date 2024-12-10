@@ -463,6 +463,7 @@ export const roRO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Conectați-vă',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Cod de verificare',

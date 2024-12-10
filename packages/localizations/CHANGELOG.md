@@ -1,5 +1,51 @@
 # Change Log
 
+## 3.8.1
+
+### Patch Changes
+
+- Fix translations and typos in `es-ES` and `es-MX` localizations. ([#4731](https://github.com/clerk/javascript/pull/4731)) by [@paratustra](https://github.com/paratustra)
+
+- Fix accents on it-IT localization values. ([#4733](https://github.com/clerk/javascript/pull/4733)) by [@Onnwen](https://github.com/Onnwen)
+
+- Updated dependencies [[`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/types@4.39.1
+
+## 3.8.0
+
+### Minor Changes
+
+- Added support for en-GB localization ([#4313](https://github.com/clerk/javascript/pull/4313)) by [@ijxy](https://github.com/ijxy)
+
+- Updated translations for multiple languages: be-BY, bg-BG, ca-ES, cs-CZ, da-DK, de-DE, en-US, es-ES, fr-FR, it-IT, nl-NL, pt-BR, pt-PT, tr-TR ([#4700](https://github.com/clerk/javascript/pull/4700)) by [@NavidJalilian](https://github.com/NavidJalilian)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `pt-BR` localizations for disconnected accounts, waitlist, mfa, consent ([#4673](https://github.com/clerk/javascript/pull/4673)) by [@GustavoOS](https://github.com/GustavoOS)
+
+- Adds `id-ID` localization ([#4686](https://github.com/clerk/javascript/pull/4686)) by [@ShawnCone](https://github.com/ShawnCone)
+
+- Fix localizations and typos in ru-RU.ts ([#4695](https://github.com/clerk/javascript/pull/4695)) by [@pipisasa](https://github.com/pipisasa)
+
+- Updated dependencies [[`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/types@4.39.0
+
+## 3.7.4
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/types@4.38.0
+
+## 3.7.3
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+
 ## 3.7.2
 
 ### Patch Changes

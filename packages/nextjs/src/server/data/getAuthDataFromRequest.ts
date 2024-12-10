@@ -3,7 +3,7 @@ import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
-import { API_URL, API_VERSION, SECRET_KEY } from '../constants';
+import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import type { RequestLike } from '../types';
 import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../utils';
 
@@ -28,6 +28,7 @@ export function getAuthDataFromRequest(
 
   const options = {
     secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
+    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,

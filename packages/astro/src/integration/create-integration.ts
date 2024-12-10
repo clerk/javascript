@@ -144,6 +144,12 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             }`,
           );
         },
+        'astro:config:done': ({ injectTypes }) => {
+          injectTypes({
+            filename: 'types.d.ts',
+            content: `/// <reference types="@clerk/astro/env" />`,
+          });
+        },
       },
     };
   };

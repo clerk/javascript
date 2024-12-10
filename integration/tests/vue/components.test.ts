@@ -66,13 +66,23 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.waitForPopover();
 
     // Check if custom menu items are visible
-    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i]);
+    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom page/i, /Custom action/i]);
 
     // Click custom action
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
     await expect(u.page.getByText('Is action clicked: true')).toBeVisible();
 
     // Trigger the popover again
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // Click custom action and check for custom page availbility
+    await u.page.getByRole('menuitem', { name: /Custom page/i }).click();
+    await u.po.userProfile.waitForUserProfileModal();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Close the modal and trigger the popover again
+    await u.page.locator('.cl-modalCloseButton').click();
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
@@ -109,6 +119,61 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.goToRelative('/profile');
     await u.po.userProfile.waitForMounted();
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
+  });
+
+  test('render user profile with custom pages and links', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages/user-profile');
+    await u.po.userProfile.waitForMounted();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. Security tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'Security' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
+  test('render organization profile with custom pages and links', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages/organization-profile');
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. General tab is now the last item.
+    await u.page.locator('.cl-navbarButton').last().click();
+    await expect(u.page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
   });
 
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {

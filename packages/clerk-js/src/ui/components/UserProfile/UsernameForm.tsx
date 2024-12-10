@@ -12,7 +12,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   const { onSuccess, onReset } = props;
   const { user } = useUser();
 
-  const [updateUsername] = useReverification(() => user?.update({ username: usernameField.value }));
+  const [updateUsername] = useReverification((username: string) => user?.update({ username }));
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
@@ -33,7 +33,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
 
   const submitUpdate = async () => {
     try {
-      await updateUsername();
+      await updateUsername(usernameField.value);
       onSuccess();
     } catch (e) {
       handleError(e, [usernameField], card.setError);
