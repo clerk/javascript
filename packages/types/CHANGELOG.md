@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.39.1
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.39.0
 
 ### Minor Changes
