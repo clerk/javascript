@@ -3,6 +3,7 @@
 '@clerk/tanstack-start': minor
 '@clerk/expo-passkeys': minor
 '@clerk/localizations': minor
+'@clerk/react-router': minor
 '@clerk/clerk-js': minor
 '@clerk/elements': minor
 '@clerk/clerk-sdk-node': minor
