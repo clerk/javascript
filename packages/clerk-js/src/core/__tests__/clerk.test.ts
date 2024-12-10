@@ -564,7 +564,6 @@ describe('Clerk singleton', () => {
         expect(mockClientRemoveSessions).toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          // beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -590,7 +589,6 @@ describe('Clerk singleton', () => {
         expect(mockSession1.remove).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          // beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -614,7 +612,6 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).not.toHaveBeenCalledWith({
           session: null,
-          // beforeEmit: expect.any(Function),
         });
       });
     });
@@ -637,7 +634,6 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          // beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -653,8 +649,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn(async ({ beforeEmit }) => void (beforeEmit && beforeEmit()));
-      sut.navigate = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });
       await waitFor(() => {
@@ -662,10 +657,8 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          // beforeEmit: expect.any(Function),
           redirectUrl: '/after-sign-out',
         });
-        // expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
   });

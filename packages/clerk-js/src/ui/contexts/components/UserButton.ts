@@ -3,6 +3,7 @@ import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import { useEnvironment, useOptions } from '../../contexts';
+import { useRouter } from '../../router';
 import type { UserButtonCtx } from '../../types';
 import { createUserButtonCustomMenuItems } from '../../utils';
 
@@ -11,6 +12,7 @@ export const UserButtonContext = createContext<UserButtonCtx | null>(null);
 export const useUserButtonContext = () => {
   const context = useContext(UserButtonContext);
   const clerk = useClerk();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
 
@@ -28,6 +30,7 @@ export const useUserButtonContext = () => {
   }
 
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
+  const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
   if (ctx.afterSignOutUrl) {
     deprecatedObjectProperty(
@@ -38,6 +41,7 @@ export const useUserButtonContext = () => {
   }
   const afterMultiSessionSingleSignOutUrl =
     ctx.afterMultiSessionSingleSignOutUrl || clerk.buildAfterMultiSessionSingleSignOutUrl();
+  const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
 
@@ -50,6 +54,8 @@ export const useUserButtonContext = () => {
   return {
     ...ctx,
     componentName,
+    navigateAfterMultiSessionSingleSignOut,
+    navigateAfterSignOut,
     signInUrl,
     userProfileUrl,
     afterMultiSessionSingleSignOutUrl,

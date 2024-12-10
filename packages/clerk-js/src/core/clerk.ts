@@ -373,7 +373,6 @@ export class Clerk implements ClerkInterface {
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
       if (signOutCallback) {
-        deprecated('Clerk.signOut(callback)', 'Use `Clerk.signOut({redirectUrl})` instead');
         return this.setActive({
           session: null,
           beforeEmit: ignoreEventValue(signOutCallback),
