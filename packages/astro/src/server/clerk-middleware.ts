@@ -245,16 +245,14 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
   // Only run on Netlify environment and Clerk development instance
   // eslint-disable-next-line turbo/no-undeclared-env-vars
-  if (!process.env.NETLIFY || !isDevelopmentFromPublishableKey(requestState.publishableKey)) {
-    return;
-  }
-
-  const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
-  // If location header is the original URL before the handshake redirects, add cache bust param
-  if (!hasHandshakeQueryParam) {
-    const url = new URL(locationHeader);
-    url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
-    requestState.headers.set('Location', url.toString());
+  if (import.meta.env.NETLIFY && isDevelopmentFromPublishableKey(requestState.publishableKey)) {
+    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+    // If location header is the original URL before the handshake redirects, add cache bust param
+    if (!hasHandshakeQueryParam) {
+      const url = new URL(locationHeader);
+      url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
+      requestState.headers.set('Location', url.toString());
+    }
   }
 }
 
