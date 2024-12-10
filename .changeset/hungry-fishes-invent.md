@@ -2,4 +2,4 @@
 "@clerk/astro": patch
 ---
 
-Fix handshake redirect loop with Netlify adapter
+Fix handshake redirect loop in Netlify deployments
