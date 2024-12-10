@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.1.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630)]:
+  - @clerk/backend@1.21.0
+  - @clerk/shared@2.20.0
+
 ## 5.0.77
 
 ### Patch Changes
