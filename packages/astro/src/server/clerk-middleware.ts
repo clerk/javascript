@@ -10,6 +10,7 @@ import type { APIContext } from 'astro';
 // @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
+import { NETLIFY_CACHE_BUST_PARAM } from '../internal';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
@@ -237,12 +238,16 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
    PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    PUBLIC_CLERK_IS_SATELLITE='true'`;
 
+/**
+ * Adds a cache bust parameter to non-handshake redirects to prevent infinite redirects
+ * in Netlify and Clerk's dev instance.
+ */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
   const isHandshakeUrl = locationHeader.includes('/v1/client/handshake');
   const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
   if (!isHandshakeUrl && !hasHandshakeQueryParam) {
     const url = new URL(locationHeader);
-    url.searchParams.append('__netlify_clerk_cache_bust', Date.now().toString());
+    url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
     requestState.headers.set('Location', url.toString());
   }
 }
