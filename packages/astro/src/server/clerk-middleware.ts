@@ -1,7 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { isDevelopmentFromPublishableKey, isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -243,9 +243,9 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
  * doesn't serve a cached response during the authentication flow.
  */
 function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
-  // Only run on Netlify environment
+  // Only run on Netlify environment and Clerk development instance
   // eslint-disable-next-line turbo/no-undeclared-env-vars
-  if (!process.env.NETLIFY) {
+  if (!process.env.NETLIFY || !isDevelopmentFromPublishableKey(requestState.publishableKey)) {
     return;
   }
 
