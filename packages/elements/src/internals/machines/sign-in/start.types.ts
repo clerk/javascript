@@ -42,6 +42,7 @@ export interface SignInStartContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
   loadingStep: 'start';
+  ticket?: string | undefined;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

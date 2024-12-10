@@ -14,6 +14,8 @@ export type TSignInStartMachine = typeof SignInStartMachine;
 
 export const SignInStartMachineId = 'SignInStart';
 
+type AttemptParams = { strategy: 'ticket'; ticket: string } | { strategy?: never; ticket?: never };
+
 export const SignInStartMachine = setup({
   actors: {
     attemptPasskey: fromPromise<
@@ -38,26 +40,32 @@ export const SignInStartMachine = setup({
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),
-    attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
-      ({ input: { fields, parent } }) => {
-        const clerk = parent.getSnapshot().context.clerk;
+    attempt: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; fields: FormFields; params?: AttemptParams }
+    >(({ input: { fields, parent, params } }) => {
+      const clerk = parent.getSnapshot().context.clerk;
 
-        const password = fields.get('password');
-        const identifier = fields.get('identifier');
+      const password = fields.get('password');
+      const identifier = fields.get('identifier');
 
-        const passwordParams = password?.value
-          ? {
-              password: password.value,
-              strategy: 'password',
-            }
-          : {};
+      const commonStrategyParams = {
+        identifier: (identifier?.value as string) || '',
+      };
 
-        return clerk.client.signIn.create({
-          identifier: (identifier?.value as string) || '',
-          ...passwordParams,
-        });
-      },
-    ),
+      const passwordParams = password?.value
+        ? {
+            password: password.value,
+            strategy: 'password',
+          }
+        : {};
+
+      return clerk.client.signIn.create({
+        ...commonStrategyParams,
+        ...passwordParams,
+        ...params,
+      });
+    }),
   },
   actions: {
     sendToNext: ({ context, event }) => {
@@ -77,6 +85,7 @@ export const SignInStartMachine = setup({
     ),
   },
   guards: {
+    hasTicket: ({ context }) => Boolean(context.ticket),
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
   },
   types: {} as SignInStartSchema,
@@ -87,9 +96,22 @@ export const SignInStartMachine = setup({
     parent: input.parent,
     formRef: input.formRef,
     loadingStep: 'start',
+    ticket: input.ticket,
   }),
-  initial: 'Pending',
+  initial: 'Init',
   states: {
+    Init: {
+      description: 'Handle ticket, if present; Else, default to Pending state.',
+      always: [
+        {
+          guard: 'hasTicket',
+          target: 'Attempting',
+        },
+        {
+          target: 'Pending',
+        },
+      ],
+    },
     Pending: {
       tags: ['state:pending'],
       description: 'Waiting for user input',
@@ -122,10 +144,23 @@ export const SignInStartMachine = setup({
       invoke: {
         id: 'attempt',
         src: 'attempt',
-        input: ({ context }) => ({
-          parent: context.parent,
-          fields: context.formRef.getSnapshot().context.fields,
-        }),
+        input: ({ context }) => {
+          // Standard fields
+          const defaultParams = {
+            fields: context.formRef.getSnapshot().context.fields,
+            parent: context.parent,
+          };
+
+          // Handle ticket-specific flows
+          const params: AttemptParams = context.ticket
+            ? {
+                strategy: 'ticket',
+                ticket: context.ticket,
+              }
+            : {};
+
+          return { ...defaultParams, params };
+        },
         onDone: {
           actions: ['sendToNext', 'sendToLoading'],
         },
