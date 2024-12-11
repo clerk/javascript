@@ -89,8 +89,8 @@
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "react": "^18 || ^19.0.0-0",
-    "react-dom": "^18 || ^19.0.0-0"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"
