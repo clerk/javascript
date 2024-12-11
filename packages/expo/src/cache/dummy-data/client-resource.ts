@@ -127,4 +127,4 @@ export const DUMMY_CLERK_CLIENT_RESOURCE = {
   cookie_expires_at: null,
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
-} as any as ClientJSON;
+} as unknown as ClientJSON;

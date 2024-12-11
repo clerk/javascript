@@ -225,4 +225,4 @@ export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
     domains: { enabled: false, enrollment_modes: [], default_role: null },
   },
   maintenance_mode: false,
-} as any as EnvironmentJSON;
+} as unknown as EnvironmentJSON;

@@ -44,6 +44,6 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
         enrollment_modes: this.domains.enrollmentModes,
         default_role: this.domains.defaultRole,
       },
-    } as any as OrganizationSettingsJSON;
+    } as unknown as OrganizationSettingsJSON;
   }
 }

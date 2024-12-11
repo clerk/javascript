@@ -229,8 +229,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
-        let maxTries = isBrowserOnline() ? 4 : 11;
-        maxTries = options?.fetchMaxTries ?? maxTries;
+        const maxTries = options?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'

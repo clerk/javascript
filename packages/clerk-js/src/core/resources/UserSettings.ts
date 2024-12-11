@@ -103,7 +103,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       sign_up: this.signUp,
       password_settings: this.passwordSettings,
       passkey_settings: this.passkeySettings,
-    } as any as UserSettingsJSON;
+    } as unknown as UserSettingsJSON;
   }
 
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {
