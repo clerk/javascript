@@ -17,6 +17,11 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
   const [isClaimed, setIsClaimed] = useState(false);
   const handleFocus = () => setIsExpanded(true);
 
+  const handleClaim = () => {
+    setIsClaimed(!isClaimed);
+    setIsExpanded(true);
+  };
+
   return (
     <Portal>
       <Flex
@@ -444,7 +449,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
           right: 5rem;
         `}
       >
-        <Button onClick={() => setIsClaimed(!isClaimed)}>Toggle</Button>
+        <Button onClick={handleClaim}>Toggle</Button>
       </div>
     </Portal>
   );
