@@ -766,7 +766,15 @@ export type ClerkOptions = ClerkOptionsNavigation &
       Record<string, any>
     >;
 
+    /**
+     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     */
     __internal_claimKeylessApplicationUrl?: string;
+
+    /**
+     * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     */
+    __internal_copyInstanceKeysUrl?: string;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
