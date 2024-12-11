@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import { useState } from 'react';
@@ -9,13 +10,15 @@ import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
 
 type KeylessPromptProps = {
-  url?: string;
+  claimUrl: string;
+  copyKeysUrl: string;
 };
 
 const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isClaimed, setIsClaimed] = useState(false);
   const handleFocus = () => setIsExpanded(true);
+  const clerk = useClerk();
 
   //   const claimed = Boolean(useEnvironment().authConfig.claimedAt)
 
@@ -356,6 +359,9 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
           type='button'
           onFocus={handleFocus}
           data-expanded={isExpanded}
+          onClick={() => {
+            void clerk.navigate(_props.claimUrl);
+          }}
           css={css`
             position: absolute;
             right: 0.375rem;
