@@ -53,8 +53,12 @@ export const useSignUpContext = (): SignUpContextType => {
     queryParams,
   );
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
-  const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
+  const getRedirectUrl = (url: string) => {
+    return ctx.routing === 'virtual' && url === '/' ? window.location.href : clerk.buildUrlWithAuth(url);
+  };
+
+  const afterSignInUrl = getRedirectUrl(redirectUrls.getAfterSignInUrl());
+  const afterSignUpUrl = getRedirectUrl(redirectUrls.getAfterSignUpUrl());
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
