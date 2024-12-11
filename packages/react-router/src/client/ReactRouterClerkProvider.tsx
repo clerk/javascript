@@ -1,5 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
+import { useLoaderData } from 'react-router';
 
 import {
   assertPublishableKeyInSpaMode,
@@ -8,7 +9,7 @@ import {
   warnForSsr,
 } from '../utils/assert';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
-import type { ClerkState, ReactRouterClerkProviderProps, ReactRouterComponentProps } from './types';
+import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
@@ -115,18 +116,12 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
   );
 }
 
-type ClerkReactRouterOptions = Partial<
-  Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>
->;
+type ClerkProviderProps = Partial<Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>>;
 
-// TODO: Remove "any" on loaderData type
-type ClerkProviderProps = ClerkReactRouterOptions & {
-  loaderData?: ReactRouterComponentProps['loaderData'];
-};
-
-export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {
+export const ClerkProvider = ({ children, ...opts }: ClerkProviderProps) => {
   let clerkState;
   const isSpaMode = _isSpaMode();
+  const loaderData: { clerkState?: ClerkState } = useLoaderData();
 
   // Don't use `loaderData` to fetch the clerk state if we're in SPA mode or if React Router is used as a library
   if (!isSpaMode && loaderData?.clerkState) {

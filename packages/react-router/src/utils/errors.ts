@@ -16,9 +16,9 @@ export async function loader(args: Route.LoaderArgs) {
   return rootAuthLoader(args)
 }
 
-export default function App({ loaderData }: Route.ComponentProps) {
+export default function App() {
   return (
-    <ClerkProvider loaderData={loaderData}>
+    <ClerkProvider>
       <Outlet />
     </ClerkProvider>
   )
