@@ -324,11 +324,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           >
             {claimed ? (
               <>
-                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the Clerk Dashboard.
+                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
+                Clerk Dashboard.
               </>
             ) : (
               <>
-                API keys were missing so we generated them for you. Link this instance to your Clerk account to make configuration changes.{' '}
+                API keys were missing so we generated them for you. Link this instance to your Clerk account to make
+                configuration changes.{' '}
                 <Link
                   href='https://clerk.com/docs/keyless'
                   sx={t => ({
