@@ -354,7 +354,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           data-expanded={isExpanded}
           onClick={() => {
             setIsLoading(true);
-            void clerk.navigate(_props.claimUrl);
+            void clerk.navigate(claimed ? _props.copyKeysUrl : _props.claimUrl);
           }}
           css={css`
             display: flex;
