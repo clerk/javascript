@@ -79,8 +79,8 @@
   "peerDependencies": {
     "@tanstack/react-router": ">=1.81.9",
     "@tanstack/start": ">=1.81.9",
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"
