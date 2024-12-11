@@ -20,6 +20,7 @@ export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
     key: state?.publishableKey,
     publishableKey: state?.publishableKey,
     __internal_claimKeylessApplicationUrl: state?.claimUrl,
+    __internal_copyInstanceKeysUrl: state?.apiKeysUrl,
     __internal_bypassMissingPublishableKey: true,
   } as any);
 };
