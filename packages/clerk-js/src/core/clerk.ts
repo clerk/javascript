@@ -1915,9 +1915,7 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__BUILD_FLAG_KEYLESS_UI__) {
-      this.#handleKeylessPrompt();
-    }
+    this.#handleKeylessPrompt();
     return true;
   };
 
@@ -2048,18 +2046,16 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleKeylessPrompt = () => {
-    if (__BUILD_FLAG_KEYLESS_UI__) {
-      void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimKeylessApplicationUrl) {
-          controls.updateProps({
-            options: {
-              __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
-              __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
-            },
-          });
-        }
-      });
-    }
+    void this.#componentControls?.ensureMounted().then(controls => {
+      if (this.#options.__internal_claimKeylessApplicationUrl) {
+        controls.updateProps({
+          options: {
+            __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
+            __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+          },
+        });
+      }
+    });
   };
 
   #buildUrl = (

@@ -35,7 +35,6 @@ if (typeof window !== 'undefined') {
 
   global.__PKG_NAME__ = '';
   global.__PKG_VERSION__ = '';
-  global.__BUILD_FLAG_KEYLESS_UI__ = '';
   global.BUILD_ENABLE_NEW_COMPONENTS = '';
 
   //@ts-expect-error
