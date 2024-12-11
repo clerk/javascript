@@ -73,6 +73,7 @@ export async function ClerkProvider(
               ...rest,
               publishableKey: newOrReadKeys.publishableKey,
               __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
+              __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             })}
             nonce={await nonce}
             initialState={await statePromise}
