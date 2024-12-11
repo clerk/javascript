@@ -3,7 +3,7 @@ import type { EnvironmentJSON } from '@clerk/types';
 export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
   object: 'environment',
   id: '',
-  auth_config: { object: 'auth_config', id: '', single_session_mode: true },
+  auth_config: { object: 'auth_config', id: '', single_session_mode: true, claimed_at: null },
   display_config: {
     object: 'display_config',
     id: 'display_config_DUMMY_ID',

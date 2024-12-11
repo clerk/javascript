@@ -23,6 +23,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
       object: 'auth_config',
       id: this.id || '',
       single_session_mode: this.singleSessionMode,
+      claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
     };
   }
 }
