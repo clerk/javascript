@@ -8,7 +8,7 @@ import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
-import { getInitialValuesFromQueryParams, getRedirectUrlFromMode } from '../utils';
+import { determineRedirectUrlFromMode, getInitialValuesFromQueryParams } from '../utils';
 
 export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
@@ -53,8 +53,8 @@ export const useSignUpContext = (): SignUpContextType => {
     queryParams,
   );
 
-  const afterSignInUrl = getRedirectUrlFromMode({ mode, url: redirectUrls.getAfterSignInUrl(), clerk });
-  const afterSignUpUrl = getRedirectUrlFromMode({ mode, url: redirectUrls.getAfterSignUpUrl(), clerk });
+  const afterSignInUrl = determineRedirectUrlFromMode({ mode, url: redirectUrls.getAfterSignInUrl(), clerk });
+  const afterSignUpUrl = determineRedirectUrlFromMode({ mode, url: redirectUrls.getAfterSignUpUrl(), clerk });
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 

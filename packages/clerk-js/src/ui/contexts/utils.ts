@@ -31,6 +31,6 @@ export function getInitialValuesFromQueryParams(queryString: string, params: str
 export const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
 type Mode = 'modal' | 'mounted' | undefined;
-export const getRedirectUrlFromMode = ({ mode, url, clerk }: { mode: Mode; url: string; clerk: Clerk }) => {
+export const determineRedirectUrlFromMode = ({ mode, url, clerk }: { mode: Mode; url: string; clerk: Clerk }) => {
   return mode === 'modal' && url === '/' ? window.location.href : clerk.buildUrlWithAuth(url);
 };
