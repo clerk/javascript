@@ -1,6 +1,6 @@
 import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
 import {
-  addComponentsDir,
+  addComponent,
   addImportsDir,
   addPlugin,
   addServerHandler,
@@ -93,8 +93,43 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add auto-imports for Clerk components and composables
     addImportsDir(resolver.resolve('./runtime/composables'));
-    void addComponentsDir({
-      path: resolver.resolve('./runtime/components'),
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const components: Array<keyof typeof import('@clerk/vue')> = [
+      // Authentication Components
+      'SignIn',
+      'SignUp',
+      // Unstyled Components
+      'SignInButton',
+      'SignOutButton',
+      'SignUpButton',
+      'SignInWithMetamaskButton',
+      // User Components
+      'UserButton',
+      'UserProfile',
+      // Organization Components
+      'CreateOrganization',
+      'OrganizationProfile',
+      'OrganizationSwitcher',
+      'OrganizationList',
+      // Control Components
+      'ClerkLoaded',
+      'ClerkLoading',
+      'Protect',
+      'RedirectToSignIn',
+      'RedirectToSignUp',
+      'RedirectToUserProfile',
+      'RedirectToOrganizationProfile',
+      'RedirectToCreateOrganization',
+      'SignedIn',
+      'SignedOut',
+    ];
+    components.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: '@clerk/vue',
+      });
     });
   },
 });
