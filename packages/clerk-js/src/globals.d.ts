@@ -5,7 +5,6 @@ declare global {
   /**
    * Build time feature flags.
    */
-  const __BUILD_FLAG_KEYLESS_UI__: boolean;
   const __BUILD_DISABLE_RHC__: string;
 
   interface Window {

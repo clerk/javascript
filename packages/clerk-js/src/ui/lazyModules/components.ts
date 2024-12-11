@@ -16,9 +16,7 @@ const componentImportPaths = {
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
-  KeylessPrompt: __BUILD_FLAG_KEYLESS_UI__
-    ? () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt')
-    : () => null,
+  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -86,10 +84,9 @@ export const BlankCaptchaModal = lazy(() =>
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
-export const KeylessPrompt = __BUILD_FLAG_KEYLESS_UI__
-  ? // @ts-expect-error Types are broken due to __BUILD_FLAG_KEYLESS_UI__
-    lazy(() => componentImportPaths.KeylessPrompt().then(module => ({ default: module.KeylessPrompt })))
-  : () => null;
+export const KeylessPrompt = lazy(() =>
+  componentImportPaths.KeylessPrompt().then(module => ({ default: module.KeylessPrompt })),
+);
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
