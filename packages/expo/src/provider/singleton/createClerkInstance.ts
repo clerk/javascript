@@ -97,8 +97,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           const retryInitilizeResourcesFromFAPI = async () => {
             const isClerkNetworkError = (err: unknown) => isClerkRuntimeError(err) && err.code === 'network_error';
             try {
-              // @ts-expect-error - This is an internal API
-              await __internal_clerk.__internal_reloadInitialResources();
+              await __internal_clerk?.__internal_reloadInitialResources();
             } catch (err) {
               // Retry after 3 seconds if the error is a network error or a 5xx error
               if (isClerkNetworkError(err) || !is4xxError(err)) {
@@ -135,7 +134,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             }
           });
 
-          // @ts-expect-error - This is an internal API
           __internal_clerk.__internal_getCachedResources = async (): Promise<{
             client: ClientJSON | null;
             environment: EnvironmentJSON | null;

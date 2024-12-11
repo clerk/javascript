@@ -17,7 +17,7 @@ import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
-import type { DisplayThemeJSON } from './json';
+import type { ClientJSON, DisplayThemeJSON, EnvironmentJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
@@ -592,6 +592,19 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * This is an optional function.
+   * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   */
+  __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSON | null; environment: EnvironmentJSON | null }>)
+    | undefined;
+
+  /**
+   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+   **/
+  __internal_reloadInitialResources: () => Promise<void>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
