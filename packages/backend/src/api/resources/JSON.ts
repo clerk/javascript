@@ -54,6 +54,7 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
   publishable_key: string;
   secret_key: string;
   claim_url: string;
+  api_keys_url: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
