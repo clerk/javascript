@@ -32,7 +32,7 @@ type ClerkProviderPropsWithState = ReactRouterClerkProviderProps & {
   clerkState?: ClerkState;
 };
 
-function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
+function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
   const awaitableNavigate = useAwaitableNavigate();
   const isSpaMode = _isSpaMode();
 

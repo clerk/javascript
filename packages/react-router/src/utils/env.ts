@@ -75,6 +75,18 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     telemetryDebug:
       isTruthy(getEnvVariable('VITE_CLERK_TELEMETRY_DEBUG', context)) ||
       isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
+    signInForceRedirectUrl:
+      getEnvVariable('VITE_CLERK_SIGN_IN_FORCE_REDIRECT_URL', context) ||
+      getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL', context),
+    signUpForceRedirectUrl:
+      getEnvVariable('VITE_CLERK_SIGN_UP_FORCE_REDIRECT_URL', context) ||
+      getEnvVariable('CLERK_SIGN_UP_FORCE_REDIRECT_URL', context),
+    signInFallbackRedirectUrl:
+      getEnvVariable('VITE_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL', context) ||
+      getEnvVariable('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL', context),
+    signUpFallbackRedirectUrl:
+      getEnvVariable('VITE_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context) ||
+      getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context),
     afterSignInUrl:
       getEnvVariable('VITE_CLERK_AFTER_SIGN_IN_URL', context) || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context),
     afterSignUpUrl:

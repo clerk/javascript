@@ -8,6 +8,7 @@ import {
   CHOOSE_SESSION_PATH_ROUTE,
   ERROR_CODES,
   ROUTING,
+  SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
@@ -151,6 +152,7 @@ export const SignInRouterMachine = setup({
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
     hasOAuthError: ({ context }) => Boolean(context.clerk?.client?.signIn?.firstFactorVerification?.error),
     hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
+    hasTicket: ({ context }) => Boolean(context.ticket),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
     isActivePathRoot: isCurrentPath('/'),
@@ -253,16 +255,21 @@ export const SignInRouterMachine = setup({
       },
       on: {
         INIT: {
-          actions: assign(({ event }) => ({
-            clerk: event.clerk,
-            exampleMode: event.exampleMode || false,
-            formRef: event.formRef,
-            loading: {
-              isLoading: false,
-            },
-            router: event.router,
-            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
-          })),
+          actions: assign(({ event }) => {
+            const searchParams = event.router?.searchParams();
+
+            return {
+              clerk: event.clerk,
+              exampleMode: event.exampleMode || false,
+              formRef: event.formRef,
+              loading: {
+                isLoading: false,
+              },
+              router: event.router,
+              signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
+              ticket: searchParams?.get(SEARCH_PARAMS.ticket) || undefined,
+            };
+          }),
           target: 'Init',
         },
       },
@@ -331,6 +338,11 @@ export const SignInRouterMachine = setup({
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
+        {
+          guard: 'hasTicket',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
+          target: 'Start',
+        },
       ],
     },
     Start: {
@@ -343,6 +355,7 @@ export const SignInRouterMachine = setup({
           basePath: context.router?.basePath,
           formRef: context.formRef,
           parent: self,
+          ticket: context.ticket,
         }),
         onDone: {
           actions: 'raiseNext',

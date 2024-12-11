@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -50,10 +50,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
-    "@clerk/vue": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^3.14.159",
     "@nuxt/schema": "^3.14.159",
     "h3": "^1.13.0"

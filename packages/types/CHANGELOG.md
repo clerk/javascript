@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.39.2
+
+### Patch Changes
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.39.1
 
 ### Patch Changes

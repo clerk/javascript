@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.41.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630)]:
+  - @clerk/localizations@3.9.0
+  - @clerk/shared@2.20.0
+
+## 5.40.3
+
+### Patch Changes
+
+- Bug fix: When the requested Web3 provider cannot be found, use any other available injected Web3 Wallet provider, instead of blocking the sign-in/sign-up flow. ([#4734](https://github.com/clerk/javascript/pull/4734)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/localizations@3.8.2
+  - @clerk/shared@2.19.4
+
 ## 5.40.2
 
 ### Patch Changes
