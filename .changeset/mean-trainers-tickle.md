@@ -1,8 +1,5 @@
 ---
-'@clerk/clerk-js': minor
 '@clerk/clerk-expo': minor
-'@clerk/shared': minor
-'@clerk/types': minor
 ---
 
 Introduce improved offline support for Expo.
