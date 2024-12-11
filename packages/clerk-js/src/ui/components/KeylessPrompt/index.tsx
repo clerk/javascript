@@ -324,8 +324,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           >
             {claimed ? (
               <>
-                You claimed your application, but haven&apos;t added the keys to .env file. Get your keys from the API
-                Keys page in the dashboard
+                You claimed your application, but haven&apos;t added the keys to the .env file. Get your keys from API
+                Keys page in dashboard
               </>
             ) : (
               <>
