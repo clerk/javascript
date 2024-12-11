@@ -459,8 +459,8 @@ export const elGR: LocalizationResource = {
       actionLink__use_username: 'Χρήση ονόματος χρήστη',
       actionText: 'Δεν έχετε λογαριασμό;',
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
-      subtitle: 'Καλώς ήρθατε πίσω! Παρακαλώ συνδεθείτε για να συνεχίσετε',
-      title: 'Σύνδεση στο {{applicationName}}',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Σύνδεση',
       __experimental_titleCombined: 'Συνέχεια στο {{applicationName}}',
     },
     totpMfa: {
