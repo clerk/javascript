@@ -756,7 +756,6 @@ describe('tokens.authenticateRequest(options)', () => {
       mockRequestWithHeaderAuth({ authorization: '' }),
       mockOptions({ entity: 'machine' }),
     );
-    console.log(requestState);
 
     expect(requestState).toBeMachineUnAuthenticated({
       reason: 'no machine token in header',
