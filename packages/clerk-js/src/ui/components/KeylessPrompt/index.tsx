@@ -3,7 +3,8 @@ import { useClerk } from '@clerk/shared/react';
 import { css } from '@emotion/react';
 import { useState } from 'react';
 
-import { descriptors, Flex, Link } from '../../customizables';
+import { useEnvironment } from '../../contexts';
+import { descriptors, Flex, Link, Spinner } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -16,7 +17,10 @@ type KeylessPromptProps = {
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const handleFocus = () => setIsExpanded(true);
+
+  const claimed = Boolean(useEnvironment().authConfig.claimedAt);
   const clerk = useClerk();
 
   return (
@@ -50,7 +54,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             height: 'fit-content',
             width: 'fit-content',
             minWidth: '16.125rem',
-            gap: `${t.space.$1}`,
+            gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
             transition: 'all 210ms cubic-bezier(0.4, 1, 0.20, 0.9)',
@@ -70,63 +74,82 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               gap: t.space.$2,
             })}
           >
-            <div
-              css={css`
-                perspective: 1000px;
-                position: relative;
-                width: 1rem;
-                height: 1rem;
-                transform-style: preserve-3d;
-                animation: ${isExpanded ? 'coinFlipAnimation 6s infinite linear' : ' none'};
+            {claimed ? (
+              <svg
+                width='1rem'
+                height='1rem'
+                viewBox='0 0 16 16'
+                aria-hidden
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M8 5.75V7.25M8 10.2502V10.2602M13.25 8C13.25 10.8995 10.8995 13.25 8 13.25C5.10051 13.25 2.75 10.8995 2.75 8C2.75 5.10051 5.10051 2.75 8 2.75C10.8995 2.75 13.25 5.10051 13.25 8Z'
+                  stroke='#F36B16'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            ) : (
+              <div
+                css={css`
+                  perspective: 1000px;
+                  position: relative;
+                  width: 1rem;
+                  height: 1rem;
+                  transform-style: preserve-3d;
+                  animation: ${isExpanded ? 'coinFlipAnimation 6s infinite linear' : ' none'};
 
-                @keyframes coinFlipAnimation {
-                  0%,
-                  40% {
-                    transform: rotateY(0);
+                  @keyframes coinFlipAnimation {
+                    0%,
+                    40% {
+                      transform: rotateY(0);
+                    }
+                    50%,
+                    90% {
+                      transform: rotateY(180deg);
+                    }
+                    100% {
+                      transform: rotateY(0);
+                    }
                   }
-                  50%,
-                  90% {
+                `}
+              >
+                <span
+                  className='coin-flip-front'
+                  aria-hidden='true'
+                  css={css`
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    backface-visibility: hidden;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  `}
+                >
+                  <ClerkLogoIcon />
+                </span>
+
+                <span
+                  className='coin-flip-back'
+                  aria-hidden='true'
+                  css={css`
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    backface-visibility: hidden;
                     transform: rotateY(180deg);
-                  }
-                  100% {
-                    transform: rotateY(0);
-                  }
-                }
-              `}
-            >
-              <span
-                className='coin-flip-front'
-                aria-hidden='true'
-                css={css`
-                  position: absolute;
-                  width: 100%;
-                  height: 100%;
-                  backface-visibility: hidden;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                `}
-              >
-                <ClerkLogoIcon />
-              </span>
-
-              <span
-                className='coin-flip-back'
-                aria-hidden='true'
-                css={css`
-                  position: absolute;
-                  width: 100%;
-                  height: 100%;
-                  backface-visibility: hidden;
-                  transform: rotateY(180deg);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                `}
-              >
-                <KeySlashIcon />
-              </span>
-            </div>
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  `}
+                >
+                  <KeySlashIcon />
+                </span>
+              </div>
+            )}
 
             <p
               data-text='Clerk is in keyless mode'
@@ -139,7 +162,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 white-space: nowrap;
                 animation: show-title 180ms ease-out forwards;
 
-                &::after {
+                ${!claimed &&
+                `&::after {
                   content: attr(data-text);
                   z-index: 1;
                   position: absolute;
@@ -158,9 +182,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   background-size: 180% 100%;
                   background-clip: text;
                   filter: blur(1.2px);
-                  animation: ${isExpanded
-                    ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                    : 'text-shimmer 3s infinite ease-out forwards'};
+                  animation: ${
+                    isExpanded
+                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
+                      : 'text-shimmer 3s infinite ease-out forwards'
+                  };
                 }
 
                 &::before {
@@ -183,20 +209,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   );
                   background-size: 180% 100%;
                   background-clip: text;
-                  animation: ${isExpanded
-                    ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                    : 'text-shimmer 3s infinite ease-out forwards'};
-                }
-
-                @keyframes show-title {
-                  from {
-                    transform: translateY(-1.5px);
-                    opacity: 0;
-                  }
-                  to {
-                    transform: translateY(0);
-                    opacity: 1;
-                  }
+                  animation: ${
+                    isExpanded
+                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
+                      : 'text-shimmer 3s infinite ease-out forwards'
+                  };
                 }
 
                 @keyframes text-shimmer {
@@ -219,12 +236,23 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   }
                 }
               `}
+                @keyframes show-title {
+                  from {
+                    transform: translateY(-1.5px);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: translateY(0);
+                    opacity: 1;
+                  }
+                }
+              `}
             >
-              Clerk is in keyless mode
+              {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
 
-          {isExpanded && (
+          {isExpanded && !claimed && (
             <button
               onClick={() => setIsExpanded(false)}
               aria-label='Close'
@@ -279,6 +307,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               font-weight: 400;
               line-height: 1rem;
               max-width: 14.625rem;
+              min-height: 2rem;
               animation: show-description 260ms ease-out forwards;
 
               @keyframes show-description {
@@ -293,30 +322,45 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               }
             `}
           >
-            We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
-            <Link
-              href='/'
-              sx={t => ({
-                color: t.colors.$whiteAlpha600,
-                textDecoration: 'underline solid',
-                transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                ':hover': {
-                  color: t.colors.$whiteAlpha800,
-                },
-              })}
-            >
-              Learn more
-            </Link>
+            {claimed ? (
+              <>
+                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
+                Clerk Dashboard.
+              </>
+            ) : (
+              <>
+                API keys were missing so we generated them for you. Link this instance to your Clerk account to make
+                configuration changes.{' '}
+                <Link
+                  href='https://clerk.com/docs/keyless'
+                  sx={t => ({
+                    color: t.colors.$whiteAlpha600,
+                    textDecoration: 'underline solid',
+                    transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                    ':hover': {
+                      color: t.colors.$whiteAlpha800,
+                    },
+                  })}
+                >
+                  Learn more
+                </Link>
+              </>
+            )}
           </p>
         )}
+
         <button
           type='button'
           onFocus={handleFocus}
           data-expanded={isExpanded}
           onClick={() => {
-            void clerk.navigate(_props.claimUrl);
+            setIsLoading(true);
+            void clerk.navigate(claimed ? _props.copyKeysUrl : _props.claimUrl);
           }}
           css={css`
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: absolute;
             right: 0.375rem;
             bottom: 0.375rem;
@@ -348,7 +392,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               right: 0.75rem;
               bottom: 0.75rem;
               width: calc(100% - 1.5rem);
-              color: #fde047;
+              color: ${claimed ? 'white' : '#fde047'};
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
 
@@ -356,12 +400,17 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               animation: none;
 
               &:hover {
-                box-shadow:
-                  0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+                ${claimed
+                  ? `
+                  background: #4B4B4B;
+                  transition: all 120ms ease-in-out;`
+                  : `
+                  box-shadow:
+                    0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
+                    0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                    0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                    0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
               }
 
               box-shadow:
@@ -395,7 +444,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             }
           `}
         >
-          Claim keys
+          {isLoading ? <Spinner size={'sm'} /> : <> {claimed ? 'Get API keys' : 'Claim keys'}</>}
         </button>
       </Flex>
     </Portal>
