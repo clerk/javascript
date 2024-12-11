@@ -17,6 +17,8 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
   const [isClaimed, setIsClaimed] = useState(false);
   const handleFocus = () => setIsExpanded(true);
 
+  //   const claimed = Boolean(useEnvironment().authConfig.claimedAt)
+
   const handleClaim = () => {
     setIsClaimed(!isClaimed);
     setIsExpanded(true);
