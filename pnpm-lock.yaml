@@ -5,6 +5,13 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
+  peer-react:
+    react:
+      specifier: ^18.0.0 || ^19.0.0
+      version: 18.3.1
+    react-dom:
+      specifier: ^18.0.0 || ^19.0.0
+      version: 18.3.1
   react:
     '@types/react':
       specifier: 18.3.12
@@ -306,10 +313,10 @@ importers:
         specifier: workspace:^
         version: link:../shared
       react:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       webextension-polyfill:
         specifier: ^0.10.0
@@ -400,10 +407,10 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(react@18.3.1)
       react:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       regenerator-runtime:
         specifier: 0.13.11
@@ -516,10 +523,10 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1
       react:
-        specifier: ^18.0.0 || ^19.0.0-beta
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: ^18.0.0 || ^19.0.0-beta
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       xstate:
         specifier: ^5.15.0
@@ -785,10 +792,10 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       react:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       server-only:
         specifier: 0.0.1
@@ -853,10 +860,10 @@ importers:
         specifier: workspace:^
         version: link:../types
       react:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       tslib:
         specifier: catalog:repo
@@ -899,10 +906,10 @@ importers:
         specifier: 0.7.0
         version: 0.7.0
       react:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       tslib:
         specifier: catalog:repo
@@ -951,10 +958,10 @@ importers:
         specifier: 0.7.0
         version: 0.7.0
       react:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: '>=18'
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: ^6.0.0
@@ -1040,10 +1047,10 @@ importers:
         specifier: 3.0.5
         version: 3.0.5
       react:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: ^18 || ^19.0.0-0
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       std-env:
         specifier: ^3.7.0
@@ -1116,10 +1123,10 @@ importers:
         specifier: workspace:^
         version: link:../types
       react:
-        specifier: '>=18 || >=19.0.0-beta'
+        specifier: catalog:peer-react
         version: 18.3.1
       react-dom:
-        specifier: '>=18 || >=19.0.0-beta'
+        specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       tslib:
         specifier: catalog:repo
@@ -3028,7 +3035,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}

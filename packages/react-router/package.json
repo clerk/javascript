@@ -89,8 +89,8 @@
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react",
     "react-router": "^7.0.2"
   },
   "engines": {
