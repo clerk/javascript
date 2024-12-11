@@ -153,8 +153,8 @@ packages:
     resolution: {integrity: sha512-Ha7Cjiffk3GT0+lJgrtJfeTC9P1kIdmErjQc0t6+lcx12qZwnO1fsf5fp6GND6+P+VtjbgGOPrQmPoJoEcI3cA==}
     engines: {node: '>=18.17.0'}
     peerDependencies:
-      react: ^18 || ^19.0.0-0
-      react-dom: ^18 || ^19.0.0-0
+      react: ^18 || ^19.0.0
+      react-dom: ^18 || ^19.0.0
 
   '@clerk/localizations@3.6.2':
     resolution: {integrity: sha512-CAP0jAgWP4hjco6hm+KoDan376Co/5ZUyJjAEgh+bs0JoHLIBkK+bML62XHPQgzHUdHHoNUn5pydXvsvaPFNvA==}
@@ -164,8 +164,8 @@ packages:
     resolution: {integrity: sha512-ezX/BXnMJ1rH7vX4H3nXpZ3WW8m1lbyri5dHOoDlREUOe/zr9lawUgVx+75aTxrVPtK7u8XwzMj/rT2cMfMmqw==}
     engines: {node: '>=18.17.0'}
     peerDependencies:
-      react: ^18 || ^19.0.0-0
-      react-dom: ^18 || ^19.0.0-0
+      react: ^18 || ^19.0.0
+      react-dom: ^18 || ^19.0.0
     peerDependenciesMeta:
       react:
         optional: true
