@@ -2,7 +2,7 @@
 '@clerk/react-router': minor
 ---
 
-Remove need to pass `loaderData` to `<ClerkProvider>`.
+Remove the need to pass `loaderData` to `<ClerkProvider>`.
 
 Before:
 
