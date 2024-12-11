@@ -398,8 +398,8 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               &:hover {
                 ${isClaimed
                   ? `
-                  background: #4e4e4e;
-                  transition: all 175ms ease-in-out;`
+                  background: #4B4B4B;
+                  transition: all 120ms ease-in-out;`
                   : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
@@ -444,15 +444,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
         </button>
       </Flex>
 
-      <div
-        css={css`
-          position: absolute;
-          bottom: 20rem;
-          right: 5rem;
-        `}
-      >
-        <Button onClick={handleClaim}>Toggle</Button>
-      </div>
+      <Button onClick={handleClaim}>Toggle</Button>
     </Portal>
   );
 };
