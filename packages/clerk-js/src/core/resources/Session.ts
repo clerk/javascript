@@ -101,6 +101,17 @@ export class Session extends BaseResource implements SessionResource {
     })(params);
   };
 
+  activate = async (): Promise<SessionResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/client/sessions/${this.id}/activate`,
+      })
+    )?.response as unknown as SessionJSON;
+
+    return new Session(json);
+  };
+
   #hydrateCache = (token: TokenResource | null) => {
     if (token) {
       SessionTokenCache.set({

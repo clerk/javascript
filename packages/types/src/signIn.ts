@@ -50,6 +50,7 @@ import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
+import type { SessionResource } from './session';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -83,6 +84,7 @@ export interface SignInResource extends ClerkResource {
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
+  createdSession: SessionResource | null;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 

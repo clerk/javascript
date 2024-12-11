@@ -37,5 +37,9 @@ export const useSession: UseSession = () => {
     return { isLoaded: true, isSignedIn: false, session: null };
   }
 
+  if (session.status === 'pending') {
+    return { isLoaded: true, isSignedIn: false, session };
+  }
+
   return { isLoaded: true, isSignedIn: true, session };
 };

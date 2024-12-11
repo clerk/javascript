@@ -4,6 +4,7 @@ import type {
   ClientResource,
   InitialState,
   OrganizationResource,
+  PendingSessionResource,
   UserResource,
 } from '@clerk/types';
 import { atom, map } from 'nanostores';
@@ -12,7 +13,7 @@ export const $csrState = map<{
   isLoaded: boolean;
   client: ClientResource | undefined | null;
   user: UserResource | undefined | null;
-  session: ActiveSessionResource | undefined | null;
+  session: ActiveSessionResource | PendingSessionResource | undefined | null;
   organization: OrganizationResource | undefined | null;
 }>({
   isLoaded: false,
