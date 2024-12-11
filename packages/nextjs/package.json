@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.8.2",
+  "version": "6.9.0",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -65,10 +65,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "crypto-js": "4.2.0",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"

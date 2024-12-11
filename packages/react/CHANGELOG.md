@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.20.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Return components as `React.JSX.Element` instead of `JSX.Element` ([#4740](https://github.com/clerk/javascript/pull/4740)) by [@dstaley](https://github.com/dstaley)
+
+- `useAuth` now uses derived auth state instead of locally stored state ([#4715](https://github.com/clerk/javascript/pull/4715)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630)]:
+  - @clerk/shared@2.20.0
+
+## 5.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/shared@2.19.4
+
 ## 5.19.2
 
 ### Patch Changes

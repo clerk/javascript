@@ -1,6 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -50,24 +50,14 @@ type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 export const useAuth: UseAuth = (initialAuthState = {}) => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const authContext = useAuthContext();
+  const authContextFromHook = useAuthContext();
+  let authContext = authContextFromHook;
 
-  const [authState, setAuthState] = useState(() => {
-    // This indicates the authContext is not available, and so we fallback to the provided initialState
-    if (authContext.sessionId === undefined && authContext.userId === undefined) {
-      return initialAuthState ?? {};
-    }
-    return authContext;
-  });
+  if (authContext.sessionId === undefined && authContext.userId === undefined) {
+    authContext = initialAuthState != null ? initialAuthState : {};
+  }
 
-  useEffect(() => {
-    if (authContext.sessionId === undefined && authContext.userId === undefined) {
-      return;
-    }
-    setAuthState(authContext);
-  }, [authContext]);
-
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authState;
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);

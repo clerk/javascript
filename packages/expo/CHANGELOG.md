@@ -1,5 +1,28 @@
 # Change Log
 
+## 2.5.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`9d656c16bc78ac31b59b5edbd25118dfc33c4469`](https://github.com/clerk/javascript/commit/9d656c16bc78ac31b59b5edbd25118dfc33c4469), [`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630), [`0266f6a73fc34748a86603bc89b6125d6bbb679b`](https://github.com/clerk/javascript/commit/0266f6a73fc34748a86603bc89b6125d6bbb679b)]:
+  - @clerk/clerk-react@5.20.0
+  - @clerk/clerk-js@5.41.0
+  - @clerk/shared@2.20.0
+
+## 2.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`80f2402be5b630a7061dcf44ff8c408d6da46a46`](https://github.com/clerk/javascript/commit/80f2402be5b630a7061dcf44ff8c408d6da46a46), [`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/clerk-js@5.40.3
+  - @clerk/types@4.39.2
+  - @clerk/clerk-react@5.19.3
+  - @clerk/shared@2.19.4
+
 ## 2.4.4
 
 ### Patch Changes
