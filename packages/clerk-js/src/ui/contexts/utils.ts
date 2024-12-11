@@ -31,6 +31,9 @@ export function getInitialValuesFromQueryParams(queryString: string, params: str
 export const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
 type Mode = 'modal' | 'mounted' | undefined;
+/**
+ * When we're in modal mode and no redirect_url is provided, we want to redirect to the current page after sign-in or sign-up.
+ */
 export const determineRedirectUrlFromMode = ({ mode, url, clerk }: { mode: Mode; url: string; clerk: Clerk }) => {
   return mode === 'modal' && url === '/' ? window.location.href : clerk.buildUrlWithAuth(url);
 };
