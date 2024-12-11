@@ -91,6 +91,7 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
+    // Add auto-imports for Clerk components and composables
     addImportsDir(resolver.resolve('./runtime/composables'));
     void addComponentsDir({
       path: resolver.resolve('./runtime/components'),
