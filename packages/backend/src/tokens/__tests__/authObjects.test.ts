@@ -2,7 +2,12 @@ import type { JwtPayload } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
 import type { AuthenticateContext } from '../authenticateContext';
-import { makeAuthObjectSerializable, signedInAuthObject, signedOutAuthObject } from '../authObjects';
+import {
+  authenticatedMachineObject,
+  makeAuthObjectSerializable,
+  signedInAuthObject,
+  signedOutAuthObject,
+} from '../authObjects';
 
 describe('makeAuthObjectSerializable', () => {
   it('removes non-serializable props', () => {
@@ -29,6 +34,23 @@ describe('signedInAuthObject', () => {
     } as unknown as JwtPayload);
 
     const token = await authObject.getToken();
+    expect(token).toBe('token');
+  });
+});
+
+describe('authenticatedMachineObject', () => {
+  it('getToken returns the token passed in', async () => {
+    const authObject = authenticatedMachineObject('token', {
+      act: null,
+      sid: null,
+      org_id: null,
+      org_role: null,
+      org_slug: null,
+      org_permissions: null,
+      sub: 'mch_id',
+    } as unknown as JwtPayload);
+
+    const token = authObject.getToken();
     expect(token).toBe('token');
   });
 });

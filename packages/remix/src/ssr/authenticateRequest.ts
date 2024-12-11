@@ -1,5 +1,11 @@
 import { createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  MachineAuthenticatedState,
+  MachineUnauthenticatedState,
+  SignedInState,
+  SignedOutState,
+} from '@clerk/backend/internal';
 import { AuthStatus } from '@clerk/backend/internal';
 
 import type { LoaderFunctionArgs } from './types';
@@ -8,7 +14,7 @@ import { patchRequest } from './utils';
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
   opts: AuthenticateRequestOptions,
-): Promise<SignedInState | SignedOutState> {
+): Promise<SignedInState | SignedOutState | MachineAuthenticatedState | MachineUnauthenticatedState> {
   const { request } = args;
   const { audience, authorizedParties } = opts;
 
