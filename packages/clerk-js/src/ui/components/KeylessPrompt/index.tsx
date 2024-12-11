@@ -3,7 +3,8 @@ import { useClerk } from '@clerk/shared/react';
 import { css } from '@emotion/react';
 import { useState } from 'react';
 
-import { Button, descriptors, Flex, Link } from '../../customizables';
+import { useEnvironment } from '../../contexts';
+import { descriptors, Flex, Link, Spinner } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -14,18 +15,13 @@ type KeylessPromptProps = {
   copyKeysUrl: string;
 };
 
-const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
+const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isClaimed, setIsClaimed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const handleFocus = () => setIsExpanded(true);
+
+  const claimed = Boolean(useEnvironment().authConfig.claimedAt);
   const clerk = useClerk();
-
-  //   const claimed = Boolean(useEnvironment().authConfig.claimedAt)
-
-  const handleClaim = () => {
-    setIsClaimed(!isClaimed);
-    setIsExpanded(true);
-  };
 
   return (
     <Portal>
@@ -78,7 +74,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               gap: t.space.$2,
             })}
           >
-            {isClaimed ? (
+            {claimed ? (
               <svg
                 width='1rem'
                 height='1rem'
@@ -166,9 +162,8 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
                 white-space: nowrap;
                 animation: show-title 180ms ease-out forwards;
 
-                ${!isClaimed &&
-                `
-                &::after {
+                ${!claimed &&
+                `&::after {
                   content: attr(data-text);
                   z-index: 1;
                   position: absolute;
@@ -221,17 +216,6 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
                   };
                 }
 
-                @keyframes show-title {
-                  from {
-                    transform: translateY(-1.5px);
-                    opacity: 0;
-                  }
-                  to {
-                    transform: translateY(0);
-                    opacity: 1;
-                  }
-                }
-
                 @keyframes text-shimmer {
                   0% {
                     background-position: 120% center;
@@ -252,13 +236,23 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
                   }
                 }
               `}
+                @keyframes show-title {
+                  from {
+                    transform: translateY(-1.5px);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: translateY(0);
+                    opacity: 1;
+                  }
+                }
               `}
             >
-              {isClaimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
 
-          {isExpanded && !isClaimed && (
+          {isExpanded && !claimed && (
             <button
               onClick={() => setIsExpanded(false)}
               aria-label='Close'
@@ -328,7 +322,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               }
             `}
           >
-            {isClaimed ? (
+            {claimed ? (
               <>
                 You claimed your application, but haven&apos;t added the keys to .env file. Get your keys from the API
                 Keys page in the dashboard
@@ -337,8 +331,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               <>
                 We noticed your app was running without API Keys. Claim this instance by linking a Clerk account.{' '}
                 <Link
-                  // TODO: add url
-                  href='/'
+                  href='https://clerk.com/docs/keyless'
                   sx={t => ({
                     color: t.colors.$whiteAlpha600,
                     textDecoration: 'underline solid',
@@ -360,9 +353,13 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
           onFocus={handleFocus}
           data-expanded={isExpanded}
           onClick={() => {
+            setIsLoading(true);
             void clerk.navigate(_props.claimUrl);
           }}
           css={css`
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: absolute;
             right: 0.375rem;
             bottom: 0.375rem;
@@ -394,7 +391,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               right: 0.75rem;
               bottom: 0.75rem;
               width: calc(100% - 1.5rem);
-              color: ${isClaimed ? 'white' : '#fde047'};
+              color: ${claimed ? 'white' : '#fde047'};
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
 
@@ -402,7 +399,7 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
               animation: none;
 
               &:hover {
-                ${isClaimed
+                ${claimed
                   ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
@@ -446,11 +443,9 @@ const _KeylessPrompt = (_prompts: KeylessPromptProps) => {
             }
           `}
         >
-          {isClaimed ? 'Get API keys' : 'Claim keys'}
+          {isLoading ? <Spinner size={'sm'} /> : <> {claimed ? 'Get API keys' : 'Claim keys'}</>}
         </button>
       </Flex>
-
-      <Button onClick={handleClaim}>Toggle</Button>
     </Portal>
   );
 };

@@ -160,7 +160,12 @@ function addCurrentRouteIndicator(currentRoute: string) {
       Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
     },
     '/accountless': () => {
-      Clerk.__unstable__updateProps({ options: { __internal_claimKeylessApplicationUrl: '/test-url' } });
+      Clerk.__unstable__updateProps({
+        options: {
+          __internal_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
+          __internal_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
+        },
+      });
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
