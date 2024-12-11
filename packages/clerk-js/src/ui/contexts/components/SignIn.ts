@@ -37,7 +37,7 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, ..._ctx } = context;
+  const { componentName, mode, ..._ctx } = context;
   const ctx = _ctx.__experimental?.combinedProps || _ctx;
 
   const initialValuesFromQueryParams = useMemo(
@@ -56,7 +56,7 @@ export const useSignInContext = (): SignInContextType => {
   );
 
   const getRedirectUrl = (url: string) => {
-    return ctx.routing === 'virtual' && url === '/' ? window.location.href : clerk.buildUrlWithAuth(url);
+    return mode === 'modal' && url === '/' ? window.location.href : clerk.buildUrlWithAuth(url);
   };
 
   const afterSignInUrl = getRedirectUrl(redirectUrls.getAfterSignInUrl());
