@@ -110,6 +110,11 @@ export interface ActiveSessionResource extends SessionResource {
   user: UserResource;
 }
 
+export interface PendingSessionResource extends SessionResource {
+  status: 'pending';
+  user: UserResource;
+}
+
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
   status: string;
@@ -133,7 +138,15 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
+export type SessionStatus =
+  | 'abandoned'
+  | 'active'
+  | 'ended'
+  | 'expired'
+  | 'removed'
+  | 'replaced'
+  | 'revoked'
+  | 'pending';
 
 export interface PublicUserData {
   firstName: string | null;

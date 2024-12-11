@@ -3,6 +3,7 @@ import type {
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
+  PendingSessionResource,
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
@@ -54,6 +55,10 @@ export class Client extends BaseResource implements ClientResource {
 
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
+  }
+
+  get pendingSessions(): PendingSessionResource[] {
+    return this.sessions.filter(s => s.status === 'pending') as PendingSessionResource[];
   }
 
   create(): Promise<this> {

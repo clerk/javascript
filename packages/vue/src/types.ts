@@ -9,6 +9,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
+  PendingSessionResource,
   UserResource,
   Without,
 } from '@clerk/types';
@@ -26,7 +27,7 @@ export interface VueClerkInjectionKeyType {
     orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
   }>;
   clientCtx: ComputedRef<ClientResource | null | undefined>;
-  sessionCtx: ComputedRef<ActiveSessionResource | null | undefined>;
+  sessionCtx: ComputedRef<ActiveSessionResource | PendingSessionResource | null | undefined>;
   userCtx: ComputedRef<UserResource | null | undefined>;
   organizationCtx: ComputedRef<OrganizationResource | null | undefined>;
 }

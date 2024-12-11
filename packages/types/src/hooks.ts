@@ -7,6 +7,7 @@ import type {
   ActiveSessionResource,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  PendingSessionResource,
   SessionResource,
 } from './session';
 import type { SignUpResource } from './signUp';
@@ -96,6 +97,7 @@ export type UseSignUpReturn =
 export type UseSessionReturn =
   | { isLoaded: false; isSignedIn: undefined; session: undefined }
   | { isLoaded: true; isSignedIn: false; session: null }
+  | { isLoaded: true; isSignedIn: false; session: PendingSessionResource }
   | { isLoaded: true; isSignedIn: true; session: ActiveSessionResource };
 
 export type UseSessionListReturn =

@@ -6,6 +6,7 @@ import type {
   ClientResource,
   LoadedClerk,
   OrganizationResource,
+  PendingSessionResource,
   UserResource,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
@@ -17,9 +18,9 @@ import { createContextAndHook } from './hooks/createContextAndHook';
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
 const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
-const [SessionContext, useSessionContext] = createContextAndHook<ActiveSessionResource | null | undefined>(
-  'SessionContext',
-);
+const [SessionContext, useSessionContext] = createContextAndHook<
+  ActiveSessionResource | PendingSessionResource | null | undefined
+>('SessionContext');
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 

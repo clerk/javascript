@@ -13,6 +13,7 @@ import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SessionResource } from './session';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -63,6 +64,7 @@ export interface SignUpResource extends ClerkResource {
   createdUserId: string | null;
   abandonAt: number | null;
   legalAcceptedAt: number | null;
+  createdSession: SessionResource | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 

@@ -35,7 +35,7 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ClerkHostRouter } from './router';
-import type { ActiveSessionResource } from './session';
+import type { ActiveSessionResource, PendingSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -65,7 +65,9 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (
+  session?: ActiveSessionResource | PendingSessionResource | null,
+) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -133,7 +135,7 @@ export interface Clerk {
   client: ClientResource | undefined;
 
   /** Active Session. */
-  session: ActiveSessionResource | null | undefined;
+  session: ActiveSessionResource | PendingSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
@@ -790,7 +792,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: ActiveSessionResource | null;
+  session?: ActiveSessionResource | PendingSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -866,7 +868,7 @@ export type SetActiveParams = {
    * The session resource or session id (string version) to be set as active.
    * If `null`, the current session is deleted.
    */
-  session?: ActiveSessionResource | string | null;
+  session?: ActiveSessionResource | PendingSessionResource | string | null;
 
   /**
    * The organization resource or organization ID/slug (string version) to be set as active in the current session.
