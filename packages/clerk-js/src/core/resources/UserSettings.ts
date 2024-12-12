@@ -88,7 +88,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     };
     this.usernameSettings = {
       ...data.username_settings,
-      min_length: Math.max(data?.username_settings?.min_length, 3),
+      min_length: Math.max(data?.username_settings?.min_length, 4),
       max_length: Math.min(data?.username_settings?.max_length, 64),
     };
     this.passkeySettings = data.passkey_settings;
