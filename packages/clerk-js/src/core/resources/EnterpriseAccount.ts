@@ -1,7 +1,9 @@
 import type {
   EnterpriseAccountConnectionJSON,
+  EnterpriseAccountConnectionJSONSnapshot,
   EnterpriseAccountConnectionResource,
   EnterpriseAccountJSON,
+  EnterpriseAccountJSONSnapshot,
   EnterpriseAccountResource,
   VerificationResource,
 } from '@clerk/types';
@@ -23,14 +25,14 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
   verification: VerificationResource | null = null;
   enterpriseConnection: EnterpriseAccountConnectionResource | null = null;
 
-  public constructor(data: Partial<EnterpriseAccountJSON>, pathRoot: string);
-  public constructor(data: EnterpriseAccountJSON, pathRoot: string) {
+  public constructor(data: Partial<EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot>, pathRoot: string);
+  public constructor(data: EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: EnterpriseAccountJSON | null): this {
+  protected fromJSON(data: EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -55,6 +57,23 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
 
     return this;
   }
+
+  public toJSON(): EnterpriseAccountJSONSnapshot {
+    return {
+      object: 'enterprise_account',
+      id: this.id,
+      provider: this.provider,
+      protocol: this.protocol,
+      provider_user_id: this.providerUserId,
+      active: this.active,
+      email_address: this.emailAddress,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      public_metadata: this.publicMetadata,
+      verification: this.verification?.toJSON() || null,
+      enterprise_connection: this.enterpriseConnection?.toJSON() || null,
+    };
+  }
 }
 
 export class EnterpriseAccountConnection extends BaseResource implements EnterpriseAccountConnectionResource {
@@ -72,12 +91,12 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: EnterpriseAccountConnectionJSON | null) {
+  constructor(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: EnterpriseAccountConnectionJSON | null): this {
+  protected fromJSON(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.name = data.name;
@@ -94,5 +113,24 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
     }
 
     return this;
+  }
+
+  public toJSON(): EnterpriseAccountConnectionJSONSnapshot {
+    return {
+      object: 'enterprise_account_connection',
+      id: this.id,
+      name: this.name,
+      domain: this.domain,
+      active: this.active,
+      protocol: this.protocol,
+      provider: this.provider,
+      logo_public_url: this.logoPublicUrl,
+      sync_user_attributes: this.syncUserAttributes,
+      allow_subdomains: this.allowSubdomains,
+      allow_idp_initiated: this.allowIdpInitiated,
+      disable_additional_identifications: this.disableAdditionalIdentifications,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

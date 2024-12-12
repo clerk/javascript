@@ -9,7 +9,10 @@ import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
-export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
+export type BaseFetchOptions = ClerkResourceReloadParams & {
+  forceUpdateClient?: boolean;
+  fetchMaxTries?: number;
+};
 
 export type BaseMutateParams = {
   action?: string;
@@ -78,9 +81,10 @@ export abstract class BaseResource {
     }
 
     let fapiResponse: FapiResponse<J>;
+    const { fetchMaxTries } = opts;
 
     try {
-      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
+      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
@@ -144,7 +148,7 @@ export abstract class BaseResource {
     const client = responseJSON.client || responseJSON.meta?.client;
 
     if (client && BaseResource.clerk) {
-      BaseResource.clerk.updateClient(Client.getInstance().fromJSON(client));
+      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client));
     }
   }
 

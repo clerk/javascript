@@ -1,3 +1,5 @@
+import type { SessionJSONSnapshot } from 'snapshots';
+
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -100,6 +102,7 @@ export interface SessionResource extends ClerkResource {
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  toJSON: () => SessionJSONSnapshot;
 }
 
 export interface ActiveSessionResource extends SessionResource {
