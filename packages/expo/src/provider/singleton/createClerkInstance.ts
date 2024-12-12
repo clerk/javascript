@@ -3,8 +3,8 @@ import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 import { is4xxError } from '@clerk/shared/error';
 import type {
-  ClientJSON,
-  EnvironmentJSON,
+  ClientJSONSnapshot,
+  EnvironmentJSONSnapshot,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
 } from '@clerk/types';
@@ -135,8 +135,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           });
 
           __internal_clerk.__internal_getCachedResources = async (): Promise<{
-            client: ClientJSON | null;
-            environment: EnvironmentJSON | null;
+            client: ClientJSONSnapshot | null;
+            environment: EnvironmentJSONSnapshot | null;
           }> => {
             let environment = await EnvironmentResourceCache.load();
             let client = await ClientResourceCache.load();

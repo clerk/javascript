@@ -1,4 +1,4 @@
-import type { ClientJSON } from '@clerk/types';
+import type { ClientJSONSnapshot } from '@clerk/types';
 
 export const DUMMY_CLERK_CLIENT_RESOURCE = {
   object: 'client',
@@ -127,4 +127,4 @@ export const DUMMY_CLERK_CLIENT_RESOURCE = {
   cookie_expires_at: null,
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
-} as unknown as ClientJSON;
+} as unknown as ClientJSONSnapshot;

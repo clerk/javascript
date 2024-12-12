@@ -1,4 +1,4 @@
-import type { EnvironmentJSON } from '@clerk/types';
+import type { EnvironmentJSONSnapshot } from '@clerk/types';
 
 export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
   object: 'environment',
@@ -225,4 +225,4 @@ export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
     domains: { enabled: false, enrollment_modes: [], default_role: null },
   },
   maintenance_mode: false,
-} as unknown as EnvironmentJSON;
+} as unknown as EnvironmentJSONSnapshot;

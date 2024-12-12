@@ -1,4 +1,4 @@
-import type { ClientJSON, EnvironmentJSON } from '@clerk/types';
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from '@clerk/types';
 
 import type { IStorage } from '../provider/singleton/types';
 import type { ResourceCache, ResourceCacheInitOptions } from './types';
@@ -60,6 +60,6 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
   return { checkInit, init, load, save, remove };
 }
 
-export const EnvironmentResourceCache = createResourceCache<EnvironmentJSON>('__clerk_cache_environment');
-export const ClientResourceCache = createResourceCache<ClientJSON>('__clerk_cache_client');
+export const EnvironmentResourceCache = createResourceCache<EnvironmentJSONSnapshot>('__clerk_cache_environment');
+export const ClientResourceCache = createResourceCache<ClientJSONSnapshot>('__clerk_cache_client');
 export const SessionJWTCache = createResourceCache<string>('__clerk_cache_session_jwt');
