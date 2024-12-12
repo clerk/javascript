@@ -50,9 +50,9 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
-  formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -439,6 +439,7 @@ export const enUS: LocalizationResource = {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     start: {
+      __experimental_titleCombined: 'Continue to {{applicationName}}',
       actionLink: 'Sign up',
       actionLink__join_waitlist: 'Join waitlist',
       actionLink__use_email: 'Use email',
@@ -450,7 +451,6 @@ export const enUS: LocalizationResource = {
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
-      __experimental_titleCombined: 'Continue to {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -566,7 +566,7 @@ export const enUS: LocalizationResource = {
     form_password_validation_failed: 'Incorrect Password',
     form_username_invalid_character:
       'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
-    form_username_invalid_length: 'Your username must be between 3 and 20 characters long.',
+    form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       'You do not have permission to access this page. Please contact support if you believe this is an error.',
