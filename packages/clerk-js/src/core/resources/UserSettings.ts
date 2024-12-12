@@ -8,6 +8,7 @@ import type {
   SamlSettings,
   SignInData,
   SignUpData,
+  UsernameSettingsData,
   UserSettingsJSON,
   UserSettingsJSONSnapshot,
   UserSettingsResource,
@@ -18,6 +19,9 @@ import { BaseResource } from './internal';
 
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
+
+const defaultMinUsernameLength = 4;
+const defaultMaxUsernameLength = 64;
 
 export type Actions = {
   create_organization: boolean;
@@ -40,6 +44,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   signUp!: SignUpData;
   passwordSettings!: PasswordSettingsData;
   passkeySettings!: PasskeySettingsData;
+  usernameSettings!: UsernameSettingsData;
 
   socialProviderStrategies: OAuthStrategy[] = [];
   authenticatableSocialStrategies: OAuthStrategy[] = [];
@@ -84,6 +89,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
         data?.password_settings?.max_length === 0
           ? defaultMaxPasswordLength
           : Math.min(data?.password_settings?.max_length, defaultMaxPasswordLength),
+    };
+    this.usernameSettings = {
+      ...data.username_settings,
+      min_length: Math.max(data?.username_settings?.min_length, defaultMinUsernameLength),
+      max_length: Math.min(data?.username_settings?.max_length, defaultMaxUsernameLength),
     };
     this.passkeySettings = data.passkey_settings;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
