@@ -237,7 +237,14 @@ export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
   keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
 ) {
-  if ((!requestData || !Object.values(requestData).length) && (!keylessMode || !Object.values(keylessMode).length)) {
+  const isEmpty = (obj: Record<string, any> | undefined) => {
+    if (!obj) {
+      return true;
+    }
+    return !Object.values(obj).some(v => v !== undefined);
+  };
+
+  if (isEmpty(requestData) && isEmpty(keylessMode)) {
     return;
   }
 
