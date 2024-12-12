@@ -98,6 +98,7 @@ export function decorateRequest(
   res: Response,
   requestState: RequestState,
   requestData: AuthenticateRequestOptions,
+  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -132,12 +133,14 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData);
+    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
-      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, requestData?.secretKey ?? SECRET_KEY) : '',
+      [constants.Headers.AuthSignature]: token
+        ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || keylessMode.secretKey || '')
+        : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
@@ -230,12 +233,15 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
-  if (!requestData || !Object.values(requestData).length) {
+export function encryptClerkRequestData(
+  requestData: Partial<AuthenticateRequestOptions>,
+  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+) {
+  if ((!requestData || !Object.values(requestData).length) && (!keylessMode || !Object.values(keylessMode).length)) {
     return;
   }
 
-  if (requestData.secretKey && !ENCRYPTION_KEY && isProductionEnvironment()) {
+  if (requestData.secretKey && !ENCRYPTION_KEY) {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
@@ -248,7 +254,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
-  return AES.encrypt(JSON.stringify(requestData), maybeKeylessEncryptionKey).toString();
+  return AES.encrypt(JSON.stringify({ ...keylessMode, ...requestData }), maybeKeylessEncryptionKey).toString();
 }
 
 /**
