@@ -191,7 +191,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, { ...resolvedParams, ...options });
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
+        publishableKey: keyless?.publishableKey,
+        secretKey: keyless?.secretKey,
+      });
 
       return handlerResult;
     });
