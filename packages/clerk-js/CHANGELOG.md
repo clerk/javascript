@@ -1,5 +1,37 @@
 # Change Log
 
+## 5.42.0
+
+### Minor Changes
+
+- Display a UI prompt while Clerk is running in Keyless mode. ([#4761](https://github.com/clerk/javascript/pull/4761)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add additional toast UI for the claim/keyless flow ([#4756](https://github.com/clerk/javascript/pull/4756)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Using the same peerDependencies semver for react and react-dom ([#4758](https://github.com/clerk/javascript/pull/4758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Use `afterSwitchSessionUrl` instead of using`afterSignInUrl`when switching sessions within`<UserButton/>`. ([#4726](https://github.com/clerk/javascript/pull/4726)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `claimedAt` proprty inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
+
+- Handle organization membership quote exceeded error during enterprise SSO ([#4763](https://github.com/clerk/javascript/pull/4763)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
+
+  This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
+
+  - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+
+- Updated dependencies [[`66ad299e4b6496ea4a93799de0f1ecfad920ddad`](https://github.com/clerk/javascript/commit/66ad299e4b6496ea4a93799de0f1ecfad920ddad), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`7f7edcaa8228c26d19e9081979100ada7e982095`](https://github.com/clerk/javascript/commit/7f7edcaa8228c26d19e9081979100ada7e982095), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d)]:
+  - @clerk/shared@2.20.1
+  - @clerk/types@4.39.3
+  - @clerk/localizations@3.9.1
+
 ## 5.41.0
 
 ### Minor Changes
