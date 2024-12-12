@@ -34,6 +34,16 @@ const TestComponent = () => {
 };
 
 describe('useAuth', () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
+  beforeAll(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    consoleErrorSpy.mockRestore();
+  });
+
   test('throws an error if not wrapped in <ClerkProvider>', () => {
     expect(() => {
       render(<TestComponent />);
