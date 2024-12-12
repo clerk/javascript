@@ -65,10 +65,14 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     e.preventDefault();
     return signIn
       .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
-      .then(res => {
+      .then(async res => {
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
+            await setActive({
+              session: res.createdSessionId,
+              redirectUrl: res.createdSession?.status === 'active' ? afterSignInUrl : undefined,
+            });
+            return navigate('../select-org');
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:
