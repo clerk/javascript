@@ -1,10 +1,10 @@
-import type { OrganizationDomainVerificationJSON } from '@clerk/types';
+import type { OrganizationDomainVerificationJSON, VerificationStatus } from '@clerk/types';
 
 import type { VerificationJSON } from './JSON';
 
 export class Verification {
   constructor(
-    readonly status: string,
+    readonly status: VerificationStatus,
     readonly strategy: string,
     readonly externalVerificationRedirectURL: URL | null = null,
     readonly attempts: number | null = null,
