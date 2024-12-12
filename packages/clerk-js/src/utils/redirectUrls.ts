@@ -22,12 +22,14 @@ export class RedirectUrls {
   private readonly fromOptions: RedirectOptions;
   private readonly fromProps: RedirectOptions;
   private readonly fromSearchParams: RedirectOptions & { redirectUrl?: string | null };
+  private readonly mode?: 'modal' | 'mounted' | undefined;
 
-  constructor(options: ClerkOptions, props: RedirectOptions = {}, searchParams: any = {}) {
+  constructor(options: ClerkOptions, props: RedirectOptions = {}, searchParams: any = {}, mode?: undefined) {
     this.options = options;
     this.fromOptions = this.#parse(options || {});
     this.fromProps = this.#parse(props || {});
     this.fromSearchParams = this.#parseSearchParams(searchParams || {});
+    this.mode = mode;
   }
 
   getAfterSignInUrl() {
@@ -135,6 +137,10 @@ export class RedirectUrls {
 
     warnForNewPropShadowingLegacyProp(newKeyInUse, result, legacyPropKey, legacyValue);
     result ||= legacyValue;
+
+    if (!result && this.mode === 'modal') {
+      return window.location.href;
+    }
 
     return result || '/';
   }
