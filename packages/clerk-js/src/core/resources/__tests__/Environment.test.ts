@@ -1,4 +1,4 @@
-import type { EnvironmentJSON } from '@clerk/types';
+import type { EnvironmentJSONSnapshot } from '@clerk/types';
 
 import { Environment } from '../internal';
 
@@ -229,7 +229,7 @@ describe('Environment', () => {
         domains: { enabled: false, enrollment_modes: [], default_role: null },
       },
       maintenance_mode: false,
-    } as unknown as EnvironmentJSON;
+    } as unknown as EnvironmentJSONSnapshot;
 
     const environment = new Environment(environmentJSON);
 

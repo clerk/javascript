@@ -1,4 +1,4 @@
-import type { ClientJSON } from '@clerk/types';
+import type { ClientJSON, ClientJSONSnapshot } from '@clerk/types';
 
 import { createSession, createSignIn, createSignUp, createUser } from '../../test/fixtures';
 import { BaseResource, Client } from '../internal';
@@ -48,7 +48,7 @@ describe('Client Singleton', () => {
       }),
     );
 
-    const client = Client.getInstance().fromJSON(clientObjectJSON);
+    const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
     expect(client.sessions.length).toBe(1);
     expect(client.createdAt).not.toBeNull();
     expect(client.updatedAt).not.toBeNull();
@@ -200,8 +200,9 @@ describe('Client Singleton', () => {
       cookie_expires_at: null,
       created_at: 1733924546843,
       updated_at: 1733924546843,
-    } as unknown as ClientJSON;
+    } as unknown as ClientJSONSnapshot;
 
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(clientJSON);
 
     expect(client).toMatchSnapshot();

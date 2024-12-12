@@ -148,7 +148,7 @@ export abstract class BaseResource {
     const client = responseJSON.client || responseJSON.meta?.client;
 
     if (client && BaseResource.clerk) {
-      BaseResource.clerk.updateClient(Client.getInstance().fromJSON(client));
+      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client));
     }
   }
 

@@ -1495,7 +1495,7 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const newClient = await Client.getInstance().fetch();
+    const newClient = await Client.getOrCreateInstance().fetch();
     this.updateClient(newClient);
     if (this.session) {
       return;
@@ -1869,7 +1869,7 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = () => {
-          return Client.getInstance()
+          return Client.getOrCreateInstance()
             .fetch()
             .then(res => this.updateClient(res));
         };
@@ -1931,18 +1931,19 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
-    let environment, client;
+    let environment: Environment, client: Client;
     const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
     try {
       [environment, client] = await Promise.all([
         Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
-        Client.getInstance().fetch({ fetchMaxTries }),
+        Client.getOrCreateInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
       if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
-        client = new Client(cachedResources?.client);
+        Client.clearInstance();
+        client = Client.getOrCreateInstance(cachedResources?.client);
       } else {
         throw err;
       }
@@ -1964,7 +1965,7 @@ export class Clerk implements ClerkInterface {
   __internal_reloadInitialResources = async (): Promise<void> => {
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
-      Client.getInstance().fetch({ fetchMaxTries: 1 }),
+      Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
     ]);
 
     this.updateClient(client);

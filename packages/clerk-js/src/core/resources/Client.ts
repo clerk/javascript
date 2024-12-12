@@ -12,7 +12,7 @@ import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export class Client extends BaseResource implements ClientResource {
-  private static instance: Client;
+  private static instance: Client | null | undefined;
 
   pathRoot = '/client';
 
@@ -24,18 +24,22 @@ export class Client extends BaseResource implements ClientResource {
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 
-  public static getInstance(): Client {
+  public static getOrCreateInstance(data: ClientJSON | ClientJSONSnapshot | null = null): Client {
     if (!Client.instance) {
-      Client.instance = new Client();
+      Client.instance = new Client(data);
     }
     return Client.instance;
+  }
+
+  static clearInstance() {
+    Client.instance = null;
   }
 
   static isClientResource(resource: unknown): resource is Client {
     return !!resource && resource instanceof Client;
   }
 
-  constructor(data: ClientJSON | ClientJSONSnapshot | null = null) {
+  private constructor(data: ClientJSON | ClientJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }

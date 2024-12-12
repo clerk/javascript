@@ -67,8 +67,8 @@ exports[`Client Singleton has the same initial properties 1`] = `
     "supported_second_factors": null,
     "user_data": {
       "first_name": undefined,
-      "has_image": undefined,
-      "image_url": undefined,
+      "has_image": null,
+      "image_url": null,
       "last_name": undefined,
     },
   },

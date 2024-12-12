@@ -57,8 +57,9 @@ const unboundCreateFixtures = (
     const environmentMock = new Environment(baseEnvironment);
     Environment.getInstance().fetch = jest.fn(() => Promise.resolve(environmentMock));
 
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const clientMock = new Client(baseClient);
-    Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
+    Client.getOrCreateInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
 
     // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
     const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
