@@ -19,6 +19,9 @@ import { BaseResource } from './internal';
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
 
+const defaultMinUsernameLength = 4;
+const defaultMaxUsernameLength = 64;
+
 export type Actions = {
   create_organization: boolean;
   delete_self: boolean;
@@ -88,8 +91,8 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     };
     this.usernameSettings = {
       ...data.username_settings,
-      min_length: Math.max(data?.username_settings?.min_length, 4),
-      max_length: Math.min(data?.username_settings?.max_length, 64),
+      min_length: Math.max(data?.username_settings?.min_length, defaultMinUsernameLength),
+      max_length: Math.min(data?.username_settings?.max_length, defaultMaxUsernameLength),
     };
     this.passkeySettings = data.passkey_settings;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
