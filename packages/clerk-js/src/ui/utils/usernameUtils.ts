@@ -11,6 +11,10 @@ type LocalizationConfigProps = {
 export const createUsernameError = (errors: ClerkAPIError[], localizationConfig: LocalizationConfigProps) => {
   const { t, usernameSettings } = localizationConfig;
 
+  if (!localizationConfig) {
+    return errors[0].longMessage;
+  }
+
   const msg = t(
     localizationKeys('unstable__errors.form_username_invalid_length', {
       min_length: usernameSettings.min_length,
@@ -18,9 +22,5 @@ export const createUsernameError = (errors: ClerkAPIError[], localizationConfig:
     }),
   );
 
-  console.log(msg);
-
   return msg;
-
-  return errors[0].longMessage;
 };
