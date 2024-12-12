@@ -1,3 +1,5 @@
+import type { SamlAccountJSONSnapshot } from 'snapshots';
+
 import type { ClerkResource } from './resource';
 import type { SamlIdpSlug } from './saml';
 import type { SamlAccountConnectionResource } from './samlConnection';
@@ -12,4 +14,5 @@ export interface SamlAccountResource extends ClerkResource {
   lastName: string;
   verification: VerificationResource | null;
   samlConnection: SamlAccountConnectionResource | null;
+  toJSON: () => SamlAccountJSONSnapshot;
 }

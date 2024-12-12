@@ -34,6 +34,10 @@ export type DeepRequired<T> = Required<{
   [P in keyof T]: T[P] extends object | undefined ? DeepRequired<Required<T[P]>> : T[P];
 }>;
 
+export type Nullable<T, K extends keyof T> = {
+  [P in keyof T]: P extends K ? T[P] | null : T[P];
+};
+
 /**
  * Internal type used by RecordToPath
  */

@@ -1,3 +1,5 @@
+import type { DisplayConfigJSONSnapshot } from 'snapshots';
+
 import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy } from './strategies';
@@ -90,4 +92,5 @@ export interface DisplayConfigResource extends ClerkResource {
   privacyPolicyUrl: string;
   waitlistUrl: string;
   afterJoinWaitlistUrl: string;
+  toJSON: () => DisplayConfigJSONSnapshot;
 }
