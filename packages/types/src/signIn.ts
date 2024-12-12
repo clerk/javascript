@@ -1,3 +1,5 @@
+import type { SignInJSONSnapshot } from 'snapshots';
+
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -110,6 +112,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  toJSON: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =

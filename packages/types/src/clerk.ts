@@ -1,3 +1,4 @@
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
 import type { TelemetryCollector } from 'telemetry';
 
 import type {
@@ -592,6 +593,19 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * This is an optional function.
+   * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   */
+  __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
+    | undefined;
+
+  /**
+   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+   **/
+  __internal_reloadInitialResources: () => Promise<void>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

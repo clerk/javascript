@@ -1,3 +1,5 @@
+import type { UserSettingsJSONSnapshot } from 'snapshots';
+
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
@@ -141,4 +143,5 @@ export interface UserSettingsResource extends ClerkResource {
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;
+  toJSON: () => UserSettingsJSONSnapshot;
 }

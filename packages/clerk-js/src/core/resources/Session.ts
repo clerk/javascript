@@ -9,6 +9,7 @@ import type {
   GetTokenOptions,
   PhoneCodeConfig,
   SessionJSON,
+  SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
   SessionVerificationJSON,
@@ -50,7 +51,7 @@ export class Session extends BaseResource implements SessionResource {
     return !!resource && resource instanceof Session;
   }
 
-  constructor(data: SessionJSON) {
+  constructor(data: SessionJSON | SessionJSONSnapshot) {
     super();
 
     this.fromJSON(data);
@@ -207,7 +208,7 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  protected fromJSON(data: SessionJSON | null): this {
+  protected fromJSON(data: SessionJSON | SessionJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -217,7 +218,7 @@ export class Session extends BaseResource implements SessionResource {
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.factorVerificationAge = data.factor_verification_age;
-    this.lastActiveAt = unixEpochToDate(data.last_active_at);
+    this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
     this.createdAt = unixEpochToDate(data.created_at);
@@ -231,6 +232,25 @@ export class Session extends BaseResource implements SessionResource {
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
 
     return this;
+  }
+
+  public toJSON(): SessionJSONSnapshot {
+    return {
+      object: 'session',
+      id: this.id,
+      status: this.status,
+      expire_at: this.expireAt.getTime(),
+      abandon_at: this.abandonAt.getTime(),
+      factor_verification_age: this.factorVerificationAge,
+      last_active_at: this.lastActiveAt.getTime(),
+      last_active_organization_id: this.lastActiveOrganizationId,
+      actor: this.actor,
+      user: this.user?.toJSON() || null,
+      public_user_data: this.publicUserData.toJSON(),
+      last_active_token: this.lastActiveToken?.toJSON() || null,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 
   private async _getToken(options?: GetTokenOptions): Promise<string | null> {

@@ -1,7 +1,9 @@
 import type {
   SamlAccountConnectionJSON,
+  SamlAccountConnectionJSONSnapshot,
   SamlAccountConnectionResource,
   SamlAccountJSON,
+  SamlAccountJSONSnapshot,
   SamlAccountResource,
   SamlIdpSlug,
   VerificationResource,
@@ -22,14 +24,14 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
   verification: VerificationResource | null = null;
   samlConnection: SamlAccountConnectionResource | null = null;
 
-  public constructor(data: Partial<SamlAccountJSON>, pathRoot: string);
-  public constructor(data: SamlAccountJSON, pathRoot: string) {
+  public constructor(data: Partial<SamlAccountJSON | SamlAccountJSONSnapshot>, pathRoot: string);
+  public constructor(data: SamlAccountJSON | SamlAccountJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: SamlAccountJSON | null): this {
+  protected fromJSON(data: SamlAccountJSON | SamlAccountJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -52,6 +54,21 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
 
     return this;
   }
+
+  public toJSON(): SamlAccountJSONSnapshot {
+    return {
+      object: 'saml_account',
+      id: this.id,
+      provider: this.provider,
+      provider_user_id: this.providerUserId,
+      active: this.active,
+      email_address: this.emailAddress,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      verification: this.verification?.toJSON() || null,
+      saml_connection: this.samlConnection?.toJSON(),
+    };
+  }
 }
 
 export class SamlAccountConnection extends BaseResource implements SamlAccountConnectionResource {
@@ -67,11 +84,11 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: SamlAccountConnectionJSON | null) {
+  constructor(data: SamlAccountConnectionJSON | SamlAccountConnectionJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
-  protected fromJSON(data: SamlAccountConnectionJSON | null): this {
+  protected fromJSON(data: SamlAccountConnectionJSON | SamlAccountConnectionJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.name = data.name;
@@ -87,5 +104,22 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
     }
 
     return this;
+  }
+
+  public toJSON(): SamlAccountConnectionJSONSnapshot {
+    return {
+      object: 'saml_account_connection',
+      id: this.id,
+      name: this.name,
+      domain: this.domain,
+      active: this.active,
+      provider: this.provider,
+      sync_user_attributes: this.syncUserAttributes,
+      allow_subdomains: this.allowSubdomains,
+      allow_idp_initiated: this.allowIdpInitiated,
+      disable_additional_identifications: this.disableAdditionalIdentifications,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

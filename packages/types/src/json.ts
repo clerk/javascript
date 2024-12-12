@@ -75,6 +75,29 @@ export interface ClientJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+// export type ClientJSON = ClerkResourceJSON & {
+//   object: 'client';
+//   id: string;
+//   status: any;
+//   sessions: SessionJSON[];
+//   sign_up: SignUpJSON | null;
+//   sign_in: SignInJSON | null;
+//   last_active_session_id: string | null;
+//   cookie_expires_at: number | null;
+//   created_at: number;
+//   updated_at: number;
+// } | {
+//   object: 'client';
+//   id: null;
+//   status: null;
+//   sessions: null
+//   sign_up: null
+//   sign_in: null
+//   last_active_session_id: null
+//   cookie_expires_at: null
+//   created_at: null;
+//   updated_at: null;
+// }
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: 'sign_up';
@@ -287,7 +310,6 @@ export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
 
 export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
-  url_based_session_syncing: boolean;
   claimed_at: number | null;
 }
 
