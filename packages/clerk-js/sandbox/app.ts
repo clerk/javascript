@@ -102,7 +102,7 @@ function mountOpenSignInButton(element: HTMLDivElement, props) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign In';
   button.onclick = () => {
-    Clerk?.openSignUp(props);
+    Clerk?.openSignIn(props);
   };
   element.appendChild(button);
 }
