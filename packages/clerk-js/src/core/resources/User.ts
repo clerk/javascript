@@ -26,6 +26,7 @@ import type {
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
+  UserJSONSnapshot,
   UserResource,
   VerifyTOTPParams,
   Web3WalletResource,
@@ -100,7 +101,7 @@ export class User extends BaseResource implements UserResource {
     return !!resource && resource instanceof User;
   }
 
-  constructor(data: UserJSON) {
+  constructor(data: UserJSON | UserJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
@@ -305,7 +306,7 @@ export class User extends BaseResource implements UserResource {
     return this.phoneNumbers.filter(phone => phone.verification.status === 'verified').length > 0;
   }
 
-  protected fromJSON(data: UserJSON | null): this {
+  protected fromJSON(data: UserJSON | UserJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -377,7 +378,7 @@ export class User extends BaseResource implements UserResource {
     return this;
   }
 
-  public toJSON(): UserJSON {
+  public toJSON(): UserJSONSnapshot {
     return {
       object: 'user',
       id: this.id,

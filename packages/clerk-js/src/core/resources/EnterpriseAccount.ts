@@ -1,7 +1,9 @@
 import type {
   EnterpriseAccountConnectionJSON,
+  EnterpriseAccountConnectionJSONSnapshot,
   EnterpriseAccountConnectionResource,
   EnterpriseAccountJSON,
+  EnterpriseAccountJSONSnapshot,
   EnterpriseAccountResource,
   VerificationResource,
 } from '@clerk/types';
@@ -23,14 +25,14 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
   verification: VerificationResource | null = null;
   enterpriseConnection: EnterpriseAccountConnectionResource | null = null;
 
-  public constructor(data: Partial<EnterpriseAccountJSON>, pathRoot: string);
-  public constructor(data: EnterpriseAccountJSON, pathRoot: string) {
+  public constructor(data: Partial<EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot>, pathRoot: string);
+  public constructor(data: EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: EnterpriseAccountJSON | null): this {
+  protected fromJSON(data: EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -56,7 +58,7 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
     return this;
   }
 
-  public toJSON(): EnterpriseAccountJSON {
+  public toJSON(): EnterpriseAccountJSONSnapshot {
     return {
       object: 'enterprise_account',
       id: this.id,
@@ -89,12 +91,12 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: EnterpriseAccountConnectionJSON | null) {
+  constructor(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: EnterpriseAccountConnectionJSON | null): this {
+  protected fromJSON(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.name = data.name;
@@ -113,7 +115,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
     return this;
   }
 
-  public toJSON(): EnterpriseAccountConnectionJSON {
+  public toJSON(): EnterpriseAccountConnectionJSONSnapshot {
     return {
       object: 'enterprise_account_connection',
       id: this.id,

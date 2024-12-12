@@ -2,6 +2,7 @@ import type {
   AuthConfigResource,
   DisplayConfigResource,
   EnvironmentJSON,
+  EnvironmentJSONSnapshot,
   EnvironmentResource,
   OrganizationSettingsResource,
   UserSettingsResource,
@@ -28,7 +29,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return Environment.instance;
   }
 
-  constructor(data: EnvironmentJSON | null = null) {
+  constructor(data: EnvironmentJSON | EnvironmentJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -56,7 +57,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this.displayConfig.backendHost === window.location.host;
   };
 
-  protected fromJSON(data: EnvironmentJSON | null): this {
+  protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
       this.displayConfig = new DisplayConfig(data.display_config);
@@ -67,7 +68,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this;
   }
 
-  public toJSON(): EnvironmentJSON {
+  public toJSON(): EnvironmentJSONSnapshot {
     return {
       object: 'environment',
       id: this.id || '',

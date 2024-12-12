@@ -2,6 +2,7 @@ import type {
   AttemptPhoneNumberVerificationParams,
   IdentificationLinkResource,
   PhoneNumberJSON,
+  PhoneNumberJSONSnapshot,
   PhoneNumberResource,
   SetReservedForSecondFactorParams,
   VerificationResource,
@@ -18,8 +19,8 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   verification!: VerificationResource;
   backupCodes?: string[];
 
-  public constructor(data: Partial<PhoneNumberJSON>, pathRoot: string);
-  public constructor(data: PhoneNumberJSON, pathRoot: string) {
+  public constructor(data: Partial<PhoneNumberJSON | PhoneNumberJSONSnapshot>, pathRoot: string);
+  public constructor(data: PhoneNumberJSON | PhoneNumberJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -70,7 +71,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     return this.phoneNumber;
   };
 
-  protected fromJSON(data: PhoneNumberJSON | null): this {
+  protected fromJSON(data: PhoneNumberJSON | PhoneNumberJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -85,7 +86,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     return this;
   }
 
-  public toJSON(): PhoneNumberJSON {
+  public toJSON(): PhoneNumberJSONSnapshot {
     return {
       object: 'phone_number',
       id: this.id || '',

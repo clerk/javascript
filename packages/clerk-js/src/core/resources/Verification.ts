@@ -5,10 +5,13 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
+  SignUpVerificationJSONSnapshot,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
+  SignUpVerificationsJSONSnapshot,
   SignUpVerificationsResource,
   VerificationJSON,
+  VerificationJSONSnapshot,
   VerificationResource,
   VerificationStatus,
 } from '@clerk/types';
@@ -30,7 +33,7 @@ export class Verification extends BaseResource implements VerificationResource {
   error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
 
-  constructor(data: VerificationJSON | null) {
+  constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
@@ -39,7 +42,7 @@ export class Verification extends BaseResource implements VerificationResource {
     return this.verifiedAtClient === BaseResource.clerk?.client?.id;
   };
 
-  protected fromJSON(data: VerificationJSON | null): this {
+  protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     if (data) {
       this.status = data.status;
       this.verifiedAtClient = data.verified_at_client;
@@ -58,7 +61,7 @@ export class Verification extends BaseResource implements VerificationResource {
     return this;
   }
 
-  public toJSON(): VerificationJSON {
+  public toJSON(): VerificationJSONSnapshot {
     return {
       object: 'verification',
       id: this.id || '',
@@ -78,7 +81,7 @@ export class Verification extends BaseResource implements VerificationResource {
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
   publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
 
-  constructor(data: VerificationJSON | null) {
+  constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super(data);
     this.fromJSON(data);
   }
@@ -86,7 +89,7 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
   /**
    * Transform base64url encoded strings to ArrayBuffer
    */
-  protected fromJSON(data: VerificationJSON | null): this {
+  protected fromJSON(data: VerificationJSON | VerificationJSONSnapshot | null): this {
     super.fromJSON(data);
     if (data?.nonce) {
       this.publicKey = convertJSONToPublicKeyCreateOptions(
@@ -103,7 +106,7 @@ export class SignUpVerifications implements SignUpVerificationsResource {
   web3Wallet: SignUpVerificationResource;
   externalAccount: VerificationResource;
 
-  constructor(data: SignUpVerificationsJSON | null) {
+  constructor(data: SignUpVerificationsJSON | SignUpVerificationsJSONSnapshot | null) {
     if (data) {
       this.emailAddress = new SignUpVerification(data.email_address);
       this.phoneNumber = new SignUpVerification(data.phone_number);
@@ -117,7 +120,7 @@ export class SignUpVerifications implements SignUpVerificationsResource {
     }
   }
 
-  public toJSON(): SignUpVerificationsJSON {
+  public toJSON(): SignUpVerificationsJSONSnapshot {
     return {
       email_address: this.emailAddress.toJSON(),
       phone_number: this.phoneNumber.toJSON(),
@@ -131,7 +134,7 @@ export class SignUpVerification extends Verification {
   nextAction: string;
   supportedStrategies: string[];
 
-  constructor(data: SignUpVerificationJSON | null) {
+  constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
     if (data) {
       this.nextAction = data.next_action;
@@ -142,7 +145,7 @@ export class SignUpVerification extends Verification {
     }
   }
 
-  public toJSON(): SignUpVerificationJSON {
+  public toJSON(): SignUpVerificationJSONSnapshot {
     return {
       ...super.toJSON(),
       next_action: this.nextAction,

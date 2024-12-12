@@ -7,6 +7,7 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
+  PasskeyJSONSnapshot,
   PasskeyResource,
   PasskeyVerificationResource,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
@@ -30,7 +31,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   createdAt!: Date;
   updatedAt!: Date;
 
-  public constructor(data: PasskeyJSON) {
+  public constructor(data: PasskeyJSON | PasskeyJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -128,7 +129,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     return new DeletedObject(json);
   };
 
-  protected fromJSON(data: PasskeyJSON | null): this {
+  protected fromJSON(data: PasskeyJSON | PasskeyJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -145,7 +146,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     return this;
   }
 
-  public toJSON(): PasskeyJSON {
+  public toJSON(): PasskeyJSONSnapshot {
     return {
       object: 'passkey',
       id: this.id,

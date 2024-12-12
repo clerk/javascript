@@ -3,6 +3,7 @@ import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
   EmailAddressJSON,
+  EmailAddressJSONSnapshot,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
@@ -19,8 +20,8 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   linkedTo: IdentificationLinkResource[] = [];
   verification!: VerificationResource;
 
-  public constructor(data: Partial<EmailAddressJSON>, pathRoot: string);
-  public constructor(data: EmailAddressJSON, pathRoot: string) {
+  public constructor(data: Partial<EmailAddressJSON | EmailAddressJSONSnapshot>, pathRoot: string);
+  public constructor(data: EmailAddressJSON | EmailAddressJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -81,7 +82,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
   toString = (): string => this.emailAddress;
 
-  protected fromJSON(data: EmailAddressJSON | null): this {
+  protected fromJSON(data: EmailAddressJSON | EmailAddressJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -93,7 +94,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return this;
   }
 
-  public toJSON(): EmailAddressJSON {
+  public toJSON(): EmailAddressJSONSnapshot {
     return {
       object: 'email_address',
       id: this.id,

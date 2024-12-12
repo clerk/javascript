@@ -19,13 +19,14 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
-  ClientJSON,
+  ClientJSONSnapshot,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
   DomainOrProxyUrl,
   EnvironmentJSON,
+  EnvironmentJSONSnapshot,
   EnvironmentResource,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
@@ -198,7 +199,7 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
 
   public __internal_getCachedResources:
-    | (() => Promise<{ client: ClientJSON | null; environment: EnvironmentJSON | null }>)
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
 
   public __internal_createPublicCredentials:

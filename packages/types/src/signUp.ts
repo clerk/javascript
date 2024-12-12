@@ -1,4 +1,4 @@
-import type { SignUpJSON, SignUpVerificationJSON, SignUpVerificationsJSON } from 'json';
+import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from 'snapshots';
 
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
@@ -102,7 +102,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
-  toJSON: () => SignUpJSON;
+  toJSON: () => SignUpJSONSnapshot;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -190,11 +190,11 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
-  toJSON: () => SignUpVerificationsJSON;
+  toJSON: () => SignUpVerificationsJSONSnapshot;
 }
 
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
-  toJSON: () => SignUpVerificationJSON;
+  toJSON: () => SignUpVerificationJSONSnapshot;
 }

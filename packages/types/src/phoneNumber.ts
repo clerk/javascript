@@ -1,4 +1,4 @@
-import type { PhoneNumberJSON } from 'json';
+import type { PhoneNumberJSONSnapshot } from 'snapshots';
 
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
@@ -34,5 +34,5 @@ export interface PhoneNumberResource extends ClerkResource {
   setReservedForSecondFactor: (params: SetReservedForSecondFactorParams) => Promise<PhoneNumberResource>;
   destroy: () => Promise<void>;
   create: () => Promise<PhoneNumberResource>;
-  toJSON: () => PhoneNumberJSON;
+  toJSON: () => PhoneNumberJSONSnapshot;
 }

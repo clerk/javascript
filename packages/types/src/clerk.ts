@@ -1,3 +1,4 @@
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
 import type { TelemetryCollector } from 'telemetry';
 
 import type {
@@ -17,7 +18,7 @@ import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
-import type { ClientJSON, DisplayThemeJSON, EnvironmentJSON } from './json';
+import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
@@ -598,7 +599,7 @@ export interface Clerk {
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
    */
   __internal_getCachedResources:
-    | (() => Promise<{ client: ClientJSON | null; environment: EnvironmentJSON | null }>)
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
 
   /**

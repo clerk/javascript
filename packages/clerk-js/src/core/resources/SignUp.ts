@@ -17,6 +17,7 @@ import type {
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
+  SignUpJSONSnapshot,
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
@@ -75,7 +76,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
 
-  constructor(data: SignUpJSON | null = null) {
+  constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -376,7 +377,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
   };
 
-  protected fromJSON(data: SignUpJSON | null): this {
+  protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -401,7 +402,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
-  public toJSON(): SignUpJSON {
+  public toJSON(): SignUpJSONSnapshot {
     return {
       object: 'sign_up',
       id: this.id || '',

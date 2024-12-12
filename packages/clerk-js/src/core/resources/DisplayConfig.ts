@@ -2,6 +2,7 @@ import type {
   CaptchaProvider,
   CaptchaWidgetType,
   DisplayConfigJSON,
+  DisplayConfigJSONSnapshot,
   DisplayConfigResource,
   DisplayThemeJSON,
   OAuthStrategy,
@@ -51,12 +52,12 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   waitlistUrl!: string;
   afterJoinWaitlistUrl!: string;
 
-  public constructor(data: DisplayConfigJSON) {
+  public constructor(data: DisplayConfigJSON | DisplayConfigJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: DisplayConfigJSON | null): this {
+  protected fromJSON(data: DisplayConfigJSON | DisplayConfigJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -102,7 +103,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     return this;
   }
 
-  public toJSON(): DisplayConfigJSON {
+  public toJSON(): DisplayConfigJSONSnapshot {
     return {
       object: 'display_config',
       id: this.id,

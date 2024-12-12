@@ -1,4 +1,4 @@
-import type { PublicUserData as IPublicUserData, PublicUserDataJSON } from '@clerk/types';
+import type { PublicUserData as IPublicUserData, PublicUserDataJSON, PublicUserDataJSONSnapshot } from '@clerk/types';
 
 export class PublicUserData implements IPublicUserData {
   firstName!: string | null;
@@ -8,11 +8,11 @@ export class PublicUserData implements IPublicUserData {
   identifier!: string;
   userId?: string;
 
-  constructor(data: PublicUserDataJSON) {
+  constructor(data: PublicUserDataJSON | PublicUserDataJSONSnapshot) {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: PublicUserDataJSON | null): this {
+  protected fromJSON(data: PublicUserDataJSON | PublicUserDataJSONSnapshot | null): this {
     if (data) {
       this.firstName = data.first_name;
       this.lastName = data.last_name;
@@ -25,7 +25,7 @@ export class PublicUserData implements IPublicUserData {
     return this;
   }
 
-  public toJSON(): PublicUserDataJSON {
+  public toJSON(): PublicUserDataJSONSnapshot {
     return {
       object: 'public_user_data',
       id: this.userId || '',

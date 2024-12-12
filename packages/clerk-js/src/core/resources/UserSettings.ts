@@ -9,6 +9,7 @@ import type {
   SignInData,
   SignUpData,
   UserSettingsJSON,
+  UserSettingsJSONSnapshot,
   UserSettingsResource,
   Web3Strategy,
 } from '@clerk/types';
@@ -45,7 +46,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   web3FirstFactors: Web3Strategy[] = [];
   enabledFirstFactorIdentifiers: Array<keyof UserSettingsResource['attributes']> = [];
 
-  public constructor(data: UserSettingsJSON) {
+  public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -62,7 +63,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     );
   }
 
-  protected fromJSON(data: UserSettingsJSON | null): this {
+  protected fromJSON(data: UserSettingsJSON | UserSettingsJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -93,7 +94,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return this;
   }
 
-  public toJSON(): UserSettingsJSON {
+  public toJSON(): UserSettingsJSONSnapshot {
     return {
       social: this.social,
       saml: this.saml,
@@ -103,7 +104,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       sign_up: this.signUp,
       password_settings: this.passwordSettings,
       passkey_settings: this.passkeySettings,
-    } as unknown as UserSettingsJSON;
+    } as unknown as UserSettingsJSONSnapshot;
   }
 
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {

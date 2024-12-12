@@ -1,3 +1,5 @@
+import type { OrganizationSettingsJSONSnapshot } from 'snapshots';
+
 import type { ClerkResourceJSON } from './json';
 import type { OrganizationEnrollmentMode } from './organizationDomain';
 import type { ClerkResource } from './resource';
@@ -28,5 +30,5 @@ export interface OrganizationSettingsResource extends ClerkResource {
     enrollmentModes: OrganizationEnrollmentMode[];
     defaultRole: string | null;
   };
-  toJSON: () => OrganizationSettingsJSON;
+  toJSON: () => OrganizationSettingsJSONSnapshot;
 }

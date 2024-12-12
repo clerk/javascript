@@ -1,3 +1,5 @@
+import type { SignInJSONSnapshot } from 'snapshots';
+
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -110,7 +112,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
-  toJSON: () => SignInJSON;
+  toJSON: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =
@@ -248,15 +250,15 @@ export type SignInStrategy =
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
   id: string;
-  status: SignInStatus | null;
+  status: SignInStatus;
   /**
    * @deprecated This attribute will be removed in the next major version
    */
   supported_identifiers: SignInIdentifier[];
-  identifier: string | null;
+  identifier: string;
   user_data: UserDataJSON;
-  supported_first_factors: SignInFirstFactorJSON[] | null;
-  supported_second_factors: SignInSecondFactorJSON[] | null;
+  supported_first_factors: SignInFirstFactorJSON[];
+  supported_second_factors: SignInSecondFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;

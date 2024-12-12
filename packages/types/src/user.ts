@@ -1,3 +1,5 @@
+import type { UserJSONSnapshot } from 'snapshots';
+
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
@@ -125,7 +127,7 @@ export interface UserResource extends ClerkResource {
 
   get hasVerifiedPhoneNumber(): boolean;
 
-  toJSON: () => UserJSON;
+  toJSON: () => UserJSONSnapshot;
 }
 
 export type CreateEmailAddressParams = { email: string };

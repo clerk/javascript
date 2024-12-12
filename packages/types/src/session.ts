@@ -1,4 +1,4 @@
-import type { SessionJSON } from 'json';
+import type { SessionJSONSnapshot } from 'snapshots';
 
 import type {
   BackupCodeAttempt,
@@ -102,7 +102,7 @@ export interface SessionResource extends ClerkResource {
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
-  toJSON: () => SessionJSON;
+  toJSON: () => SessionJSONSnapshot;
 }
 
 export interface ActiveSessionResource extends SessionResource {

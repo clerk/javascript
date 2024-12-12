@@ -1,4 +1,4 @@
-import type { AuthConfigJSON } from 'json';
+import type { AuthConfigJSONSnapshot } from 'snapshots';
 
 import type { ClerkResource } from './resource';
 
@@ -12,5 +12,5 @@ export interface AuthConfigResource extends ClerkResource {
    * Defaults to `null`.
    */
   claimedAt: Date | null;
-  toJSON: () => AuthConfigJSON;
+  toJSON: () => AuthConfigJSONSnapshot;
 }

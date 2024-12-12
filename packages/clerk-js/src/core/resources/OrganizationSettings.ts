@@ -1,4 +1,9 @@
-import type { OrganizationEnrollmentMode, OrganizationSettingsJSON, OrganizationSettingsResource } from '@clerk/types';
+import type {
+  OrganizationEnrollmentMode,
+  OrganizationSettingsJSON,
+  OrganizationSettingsJSONSnapshot,
+  OrganizationSettingsResource,
+} from '@clerk/types';
 
 import { BaseResource } from './internal';
 
@@ -14,12 +19,12 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     defaultRole: string | null;
   };
 
-  public constructor(data: OrganizationSettingsJSON) {
+  public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: OrganizationSettingsJSON | null): this {
+  protected fromJSON(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null): this {
     const { enabled = false, max_allowed_memberships = 0, actions, domains } = data || {};
     this.enabled = enabled;
     this.maxAllowedMemberships = max_allowed_memberships;
@@ -32,7 +37,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     return this;
   }
 
-  public toJSON(): OrganizationSettingsJSON {
+  public toJSON(): OrganizationSettingsJSONSnapshot {
     return {
       enabled: this.enabled,
       max_allowed_memberships: this.maxAllowedMemberships,
@@ -44,6 +49,6 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
         enrollment_modes: this.domains.enrollmentModes,
         default_role: this.domains.defaultRole,
       },
-    } as unknown as OrganizationSettingsJSON;
+    } as unknown as OrganizationSettingsJSONSnapshot;
   }
 }

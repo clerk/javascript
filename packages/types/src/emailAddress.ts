@@ -1,4 +1,4 @@
-import type { EmailAddressJSON } from 'json';
+import type { EmailAddressJSONSnapshot } from 'snapshots';
 
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
@@ -29,5 +29,5 @@ export interface EmailAddressResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
   destroy: () => Promise<void>;
   create: () => Promise<EmailAddressResource>;
-  toJSON: () => EmailAddressJSON;
+  toJSON: () => EmailAddressJSONSnapshot;
 }

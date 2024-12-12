@@ -64,3 +64,4 @@ export * from './passkey';
 export * from './customMenuItems';
 export * from './samlConnection';
 export * from './waitlist';
+export * from './snapshots';

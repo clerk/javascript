@@ -3,6 +3,7 @@ import type {
   PrepareWeb3WalletVerificationParams,
   VerificationResource,
   Web3WalletJSON,
+  Web3WalletJSONSnapshot,
   Web3WalletResource,
 } from '@clerk/types';
 
@@ -13,8 +14,8 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
   web3Wallet = '';
   verification!: VerificationResource;
 
-  public constructor(data: Partial<Web3WalletJSON>, pathRoot: string);
-  public constructor(data: Web3WalletJSON, pathRoot: string) {
+  public constructor(data: Partial<Web3WalletJSON | Web3WalletJSONSnapshot>, pathRoot: string);
+  public constructor(data: Web3WalletJSON | Web3WalletJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -49,7 +50,7 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
     return this.web3Wallet;
   }
 
-  protected fromJSON(data: Web3WalletJSON | null): this {
+  protected fromJSON(data: Web3WalletJSON | Web3WalletJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -60,7 +61,7 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
     return this;
   }
 
-  public toJSON(): Web3WalletJSON {
+  public toJSON(): Web3WalletJSONSnapshot {
     return {
       object: 'web3_wallet',
       id: this.id,

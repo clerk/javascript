@@ -9,6 +9,7 @@ import type {
   GetTokenOptions,
   PhoneCodeConfig,
   SessionJSON,
+  SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
   SessionVerificationJSON,
@@ -50,7 +51,7 @@ export class Session extends BaseResource implements SessionResource {
     return !!resource && resource instanceof Session;
   }
 
-  constructor(data: SessionJSON) {
+  constructor(data: SessionJSON | SessionJSONSnapshot) {
     super();
 
     this.fromJSON(data);
@@ -207,7 +208,7 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  protected fromJSON(data: SessionJSON | null): this {
+  protected fromJSON(data: SessionJSON | SessionJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -222,7 +223,7 @@ export class Session extends BaseResource implements SessionResource {
     this.actor = data.actor;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
-    this.user = new User(data.user!);
+    this.user = new User(data.user);
 
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
@@ -233,7 +234,7 @@ export class Session extends BaseResource implements SessionResource {
     return this;
   }
 
-  public toJSON(): SessionJSON {
+  public toJSON(): SessionJSONSnapshot {
     return {
       object: 'session',
       id: this.id,

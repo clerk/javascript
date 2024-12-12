@@ -1,6 +1,7 @@
 import { titleize } from '@clerk/shared/underscore';
 import type {
   ExternalAccountJSON,
+  ExternalAccountJSONSnapshot,
   ExternalAccountResource,
   OAuthProvider,
   ReauthorizeExternalAccountParams,
@@ -25,8 +26,8 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   label = '';
   verification: VerificationResource | null = null;
 
-  public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
-  public constructor(data: ExternalAccountJSON, pathRoot: string) {
+  public constructor(data: Partial<ExternalAccountJSON | ExternalAccountJSONSnapshot>, pathRoot: string);
+  public constructor(data: ExternalAccountJSON | ExternalAccountJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -42,7 +43,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   };
   destroy = (): Promise<void> => this._baseDelete();
 
-  protected fromJSON(data: ExternalAccountJSON | null): this {
+  protected fromJSON(data: ExternalAccountJSON | ExternalAccountJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -67,7 +68,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return this;
   }
 
-  public toJSON(): ExternalAccountJSON {
+  public toJSON(): ExternalAccountJSONSnapshot {
     return {
       object: 'external_account',
       id: this.id,

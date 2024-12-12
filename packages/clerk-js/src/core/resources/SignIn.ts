@@ -28,6 +28,7 @@ import type {
   SignInFirstFactor,
   SignInIdentifier,
   SignInJSON,
+  SignInJSONSnapshot,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -79,7 +80,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
-  constructor(data: SignInJSON | null = null) {
+  constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -420,7 +421,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  protected fromJSON(data: SignInJSON | null): this {
+  protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -436,7 +437,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this;
   }
 
-  public toJSON(): SignInJSON {
+  public toJSON(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
       id: this.id || '',

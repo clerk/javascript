@@ -15,6 +15,7 @@ import type {
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationJSON,
+  OrganizationJSONSnapshot,
   OrganizationMembershipJSON,
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
@@ -48,7 +49,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
 
-  constructor(data: OrganizationJSON) {
+  constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -260,7 +261,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  protected fromJSON(data: OrganizationJSON | null): this {
+  protected fromJSON(data: OrganizationJSON | OrganizationJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -280,7 +281,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this;
   }
 
-  public toJSON(): OrganizationJSON {
+  public toJSON(): OrganizationJSONSnapshot {
     return {
       object: 'organization',
       id: this.id,

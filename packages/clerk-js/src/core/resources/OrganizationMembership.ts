@@ -4,6 +4,7 @@ import type {
   GetUserOrganizationMembershipParams,
   OrganizationCustomRoleKey,
   OrganizationMembershipJSON,
+  OrganizationMembershipJSONSnapshot,
   OrganizationMembershipResource,
   OrganizationPermissionKey,
 } from '@clerk/types';
@@ -23,7 +24,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: OrganizationMembershipJSON) {
+  constructor(data: OrganizationMembershipJSON | OrganizationMembershipJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -61,7 +62,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     });
   };
 
-  protected fromJSON(data: OrganizationMembershipJSON | null): this {
+  protected fromJSON(data: OrganizationMembershipJSON | OrganizationMembershipJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -79,7 +80,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     return this;
   }
 
-  public toJSON(): OrganizationMembershipJSON {
+  public toJSON(): OrganizationMembershipJSONSnapshot {
     return {
       object: 'organization_membership',
       id: this.id,

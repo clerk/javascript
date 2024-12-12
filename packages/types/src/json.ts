@@ -72,13 +72,36 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_in: SignInJSON | null;
   last_active_session_id: string | null;
   cookie_expires_at: number | null;
-  created_at: number | null;
-  updated_at: number | null;
+  created_at: number;
+  updated_at: number;
 }
+// export type ClientJSON = ClerkResourceJSON & {
+//   object: 'client';
+//   id: string;
+//   status: any;
+//   sessions: SessionJSON[];
+//   sign_up: SignUpJSON | null;
+//   sign_in: SignInJSON | null;
+//   last_active_session_id: string | null;
+//   cookie_expires_at: number | null;
+//   created_at: number;
+//   updated_at: number;
+// } | {
+//   object: 'client';
+//   id: null;
+//   status: null;
+//   sessions: null
+//   sign_up: null
+//   sign_in: null
+//   last_active_session_id: null
+//   cookie_expires_at: null
+//   created_at: null;
+//   updated_at: null;
+// }
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: 'sign_up';
-  status: SignUpStatus | null;
+  status: SignUpStatus;
   required_fields: SignUpField[];
   optional_fields: SignUpField[];
   missing_fields: SignUpField[];
@@ -113,11 +136,11 @@ export interface SessionJSON extends ClerkResourceJSON {
   factor_verification_age: [number, number] | null;
   expire_at: number;
   abandon_at: number;
-  last_active_at: number | null;
-  last_active_token: TokenJSON | null;
+  last_active_at: number;
+  last_active_token: TokenJSON;
   last_active_organization_id: string | null;
   actor: ActJWTClaim | null;
-  user: UserJSON | null;
+  user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;
   updated_at: number;
@@ -187,7 +210,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   username: string;
   public_metadata: Record<string, unknown>;
   label: string;
-  verification: VerificationJSON | null;
+  verification?: VerificationJSON;
 }
 
 export interface EnterpriseAccountJSON extends ClerkResourceJSON {
@@ -234,13 +257,13 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
-  external_id: string | null;
-  primary_email_address_id: string | null;
-  primary_phone_number_id: string | null;
-  primary_web3_wallet_id: string | null;
+  external_id: string;
+  primary_email_address_id: string;
+  primary_phone_number_id: string;
+  primary_web3_wallet_id: string;
   image_url: string;
   has_image: boolean;
-  username: string | null;
+  username: string;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
@@ -255,8 +278,8 @@ export interface UserJSON extends ClerkResourceJSON {
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   profile_image_id: string;
-  first_name: string | null;
-  last_name: string | null;
+  first_name: string;
+  last_name: string;
   totp_enabled: boolean;
   backup_code_enabled: boolean;
   two_factor_enabled: boolean;
@@ -267,8 +290,8 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
-  updated_at: number | null;
-  created_at: number | null;
+  updated_at: number;
+  created_at: number;
 }
 
 export interface PublicUserDataJSON extends ClerkResourceJSON {
@@ -291,14 +314,14 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  status: VerificationStatus | null;
-  verified_at_client: string | null;
-  strategy: string | null;
-  nonce?: string | null;
-  message?: string | null;
-  external_verification_redirect_url?: string | null;
-  attempts: number | null;
-  expire_at: number | null;
+  status: VerificationStatus;
+  verified_at_client: string;
+  strategy: string;
+  nonce?: string;
+  message?: string;
+  external_verification_redirect_url?: string;
+  attempts: number;
+  expire_at: number;
   error: ClerkAPIErrorJSON;
 }
 
@@ -473,8 +496,8 @@ export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
 export interface UserDataJSON {
   first_name?: string;
   last_name?: string;
-  image_url?: string;
-  has_image?: boolean;
+  image_url: string;
+  has_image: boolean;
 }
 
 export interface TOTPJSON extends ClerkResourceJSON {

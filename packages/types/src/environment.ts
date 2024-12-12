@@ -1,4 +1,4 @@
-import type { EnvironmentJSON } from 'json';
+import type { EnvironmentJSONSnapshot } from 'snapshots';
 
 import type { AuthConfigResource } from './authConfig';
 import type { DisplayConfigResource } from './displayConfig';
@@ -16,5 +16,5 @@ export interface EnvironmentResource extends ClerkResource {
   isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
-  toJSON: () => EnvironmentJSON;
+  toJSON: () => EnvironmentJSONSnapshot;
 }

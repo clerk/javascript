@@ -1,4 +1,4 @@
-import type { OrganizationMembershipJSON } from 'json';
+import type { OrganizationMembershipJSONSnapshot } from 'snapshots';
 
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
@@ -50,7 +50,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
-  toJSON: () => OrganizationMembershipJSON;
+  toJSON: () => OrganizationMembershipJSONSnapshot;
 }
 
 export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder

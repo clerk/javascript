@@ -1,4 +1,4 @@
-import type { ExternalAccountJSON } from 'json';
+import type { ExternalAccountJSONSnapshot } from 'snapshots';
 
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { ClerkResource } from './resource';
@@ -28,5 +28,5 @@ export interface ExternalAccountResource extends ClerkResource {
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
   accountIdentifier: () => string;
-  toJSON: () => ExternalAccountJSON;
+  toJSON: () => ExternalAccountJSONSnapshot;
 }

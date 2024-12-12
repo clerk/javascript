@@ -1,4 +1,4 @@
-import type { IdentificationLinkJSON, IdentificationLinkResource } from '@clerk/types';
+import type { IdentificationLinkJSON, IdentificationLinkJSONSnapshot, IdentificationLinkResource } from '@clerk/types';
 
 import { BaseResource } from './Base';
 
@@ -6,12 +6,12 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
   id!: string;
   type!: string;
 
-  constructor(data: IdentificationLinkJSON) {
+  constructor(data: IdentificationLinkJSON | IdentificationLinkJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: IdentificationLinkJSON | null): this {
+  protected fromJSON(data: IdentificationLinkJSON | IdentificationLinkJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -21,7 +21,7 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
     return this;
   }
 
-  public toJSON(): IdentificationLinkJSON {
+  public toJSON(): IdentificationLinkJSONSnapshot {
     return {
       object: 'identification_link',
       id: this.id,

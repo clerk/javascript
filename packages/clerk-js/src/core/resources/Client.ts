@@ -1,4 +1,11 @@
-import type { ActiveSessionResource, ClientJSON, ClientResource, SignInResource, SignUpResource } from '@clerk/types';
+import type {
+  ActiveSessionResource,
+  ClientJSON,
+  ClientJSONSnapshot,
+  ClientResource,
+  SignInResource,
+  SignUpResource,
+} from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
@@ -28,7 +35,7 @@ export class Client extends BaseResource implements ClientResource {
     return !!resource && resource instanceof Client;
   }
 
-  constructor(data: ClientJSON | null = null) {
+  constructor(data: ClientJSON | ClientJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -98,7 +105,7 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePatchBypass({ body: params });
   }
 
-  fromJSON(data: ClientJSON | null): this {
+  fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.sessions = (data.sessions || []).map(s => new Session(s));
@@ -113,7 +120,7 @@ export class Client extends BaseResource implements ClientResource {
     return this;
   }
 
-  public toJSON(): ClientJSON {
+  public toJSON(): ClientJSONSnapshot {
     return {
       object: 'client',
       status: null,
