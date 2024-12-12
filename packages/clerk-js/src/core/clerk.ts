@@ -907,9 +907,11 @@ export class Clerk implements ClerkInterface {
     }
 
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    const token = await newSession?.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+    if (newSession?.status === 'active') {
+      const token = await newSession?.getToken();
+      if (!token) {
+        eventBus.dispatch(events.TokenUpdate, { token: null });
+      }
     }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
@@ -1988,12 +1990,14 @@ export class Clerk implements ClerkInterface {
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
+      const lastActiveSession =
+        client.activeSessions.find(s => s.id === client.lastActiveSessionId) ||
+        client.activeSessions.find(s => s.id === client.lastActiveSessionId);
       if (lastActiveSession) {
         return lastActiveSession;
       }
     }
-    const session = client.activeSessions[0];
+    const session = client.activeSessions[0] || client.pendingSessions[0];
     return session || null;
   };
 
@@ -2077,8 +2081,12 @@ export class Clerk implements ClerkInterface {
     this.#aliasUser();
   };
 
-  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
-    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
+  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | PendingSessionResource | null => {
+    return (
+      this.client?.activeSessions.find(x => x.id === sessionId) ||
+      this.client?.pendingSessions.find(x => x.id === sessionId) ||
+      null
+    );
   };
 
   #aliasUser = () => {
