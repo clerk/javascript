@@ -32,14 +32,16 @@ import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
 import type { Nullable } from './utils';
 
-export type SignInJSONSnapshot = Omit<
+type Override<T, U> = Omit<T, keyof U> & U;
+
+export type SignInJSONSnapshot = Override<
   Nullable<SignInJSON, 'status' | 'identifier' | 'supported_first_factors' | 'supported_second_factors'>,
-  'first_factor_verification' | 'second_factor_verification' | 'user_data'
-> & {
-  first_factor_verification: VerificationJSONSnapshot;
-  second_factor_verification: VerificationJSONSnapshot;
-  user_data: UserDataJSONSnapshot;
-};
+  {
+    first_factor_verification: VerificationJSONSnapshot;
+    second_factor_verification: VerificationJSONSnapshot;
+    user_data: UserDataJSONSnapshot;
+  }
+>;
 
 export type VerificationJSONSnapshot = Nullable<
   VerificationJSON,
@@ -55,7 +57,7 @@ export type VerificationJSONSnapshot = Nullable<
 
 export type UserDataJSONSnapshot = Nullable<UserDataJSON, 'image_url' | 'has_image'>;
 
-export type UserJSONSnapshot = Omit<
+export type UserJSONSnapshot = Override<
   Nullable<
     UserJSON,
     | 'external_id'
@@ -68,43 +70,46 @@ export type UserJSONSnapshot = Omit<
     | 'updated_at'
     | 'created_at'
   >,
-  | 'external_accounts'
-  | 'email_addresses'
-  | 'passkeys'
-  | 'enterprise_accounts'
-  | 'phone_numbers'
-  | 'saml_accounts'
-  | 'web3_wallets'
-> & {
-  external_accounts: ExternalAccountJSONSnapshot[];
-  email_addresses: EmailAddressJSONSnapshot[];
-  passkeys: PasskeyJSONSnapshot[];
-  enterprise_accounts: EnterpriseAccountJSONSnapshot[];
-  phone_numbers: PhoneNumberJSONSnapshot[];
-  saml_accounts: SamlAccountJSONSnapshot[];
-  web3_wallets: Web3WalletJSONSnapshot[];
-};
+  {
+    external_accounts: ExternalAccountJSONSnapshot[];
+    email_addresses: EmailAddressJSONSnapshot[];
+    passkeys: PasskeyJSONSnapshot[];
+    enterprise_accounts: EnterpriseAccountJSONSnapshot[];
+    phone_numbers: PhoneNumberJSONSnapshot[];
+    saml_accounts: SamlAccountJSONSnapshot[];
+    web3_wallets: Web3WalletJSONSnapshot[];
+  }
+>;
 
-export type ExternalAccountJSONSnapshot = Omit<ExternalAccountJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot | null;
-};
+export type ExternalAccountJSONSnapshot = Override<
+  ExternalAccountJSON,
+  {
+    verification: VerificationJSONSnapshot | null;
+  }
+>;
 
-export type SessionJSONSnapshot = Omit<Nullable<SessionJSON, 'last_active_at' | 'last_active_token'>, 'user'> & {
-  user: UserJSONSnapshot | null;
-};
+export type SessionJSONSnapshot = Override<
+  Nullable<SessionJSON, 'last_active_at' | 'last_active_token'>,
+  {
+    user: UserJSONSnapshot | null;
+  }
+>;
 
-export type SignUpJSONSnapshot = Omit<Nullable<SignUpJSON, 'status'>, 'verifications'> & {
-  verifications: SignUpVerificationsJSONSnapshot;
-};
+export type SignUpJSONSnapshot = Override<
+  Nullable<SignUpJSON, 'status'>,
+  {
+    verifications: SignUpVerificationsJSONSnapshot;
+  }
+>;
 
-export type ClientJSONSnapshot = Omit<
+export type ClientJSONSnapshot = Override<
   Nullable<ClientJSON, 'created_at' | 'updated_at'>,
-  'sign_up' | 'sign_in' | 'sessions'
-> & {
-  sign_up: SignUpJSONSnapshot;
-  sign_in: SignInJSONSnapshot;
-  sessions: SessionJSONSnapshot[];
-};
+  {
+    sign_up: SignUpJSONSnapshot;
+    sign_in: SignInJSONSnapshot;
+    sessions: SessionJSONSnapshot[];
+  }
+>;
 
 export type AuthConfigJSONSnapshot = AuthConfigJSON;
 
@@ -112,13 +117,19 @@ export type EnvironmentJSONSnapshot = EnvironmentJSON;
 
 export type DisplayConfigJSONSnapshot = DisplayConfigJSON;
 
-export type EmailAddressJSONSnapshot = Omit<EmailAddressJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot | null;
-};
+export type EmailAddressJSONSnapshot = Override<
+  EmailAddressJSON,
+  {
+    verification: VerificationJSONSnapshot | null;
+  }
+>;
 
-export type EnterpriseAccountJSONSnapshot = Omit<EnterpriseAccountJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot | null;
-};
+export type EnterpriseAccountJSONSnapshot = Override<
+  EnterpriseAccountJSON,
+  {
+    verification: VerificationJSONSnapshot | null;
+  }
+>;
 
 export type EnterpriseAccountConnectionJSONSnapshot = EnterpriseAccountConnectionJSON;
 
@@ -130,27 +141,33 @@ export type OrganizationMembershipJSONSnapshot = OrganizationMembershipJSON;
 
 export type OrganizationSettingsJSONSnapshot = OrganizationSettingsJSON;
 
-export type PasskeyJSONSnapshot = Omit<PasskeyJSON, 'verification'> & { verification: VerificationJSONSnapshot | null };
+export type PasskeyJSONSnapshot = Override<PasskeyJSON, { verification: VerificationJSONSnapshot | null }>;
 
-export type PhoneNumberJSONSnapshot = Omit<PhoneNumberJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot;
-};
+export type PhoneNumberJSONSnapshot = Override<
+  PhoneNumberJSON,
+  {
+    verification: VerificationJSONSnapshot;
+  }
+>;
 
-export type SamlAccountJSONSnapshot = Omit<SamlAccountJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot | null;
-};
+export type SamlAccountJSONSnapshot = Override<
+  SamlAccountJSON,
+  {
+    verification: VerificationJSONSnapshot | null;
+  }
+>;
 
 export type SamlAccountConnectionJSONSnapshot = SamlAccountConnectionJSON;
 
-export type SignUpVerificationsJSONSnapshot = Omit<
+export type SignUpVerificationsJSONSnapshot = Override<
   SignUpVerificationsJSON,
-  'external_account' | 'email_address' | 'phone_number' | 'web3_wallet'
-> & {
-  external_account: VerificationJSONSnapshot;
-  web3_wallet: SignUpVerificationJSONSnapshot;
-  email_address: SignUpVerificationJSONSnapshot;
-  phone_number: SignUpVerificationJSONSnapshot;
-};
+  {
+    external_account: VerificationJSONSnapshot;
+    web3_wallet: SignUpVerificationJSONSnapshot;
+    email_address: SignUpVerificationJSONSnapshot;
+    phone_number: SignUpVerificationJSONSnapshot;
+  }
+>;
 
 export type SignUpVerificationJSONSnapshot = Pick<SignUpVerificationJSON, 'next_action' | 'supported_strategies'> &
   VerificationJSONSnapshot;
@@ -159,8 +176,11 @@ export type TokenJSONSnapshot = TokenJSON;
 
 export type UserSettingsJSONSnapshot = UserSettingsJSON;
 
-export type Web3WalletJSONSnapshot = Omit<Web3WalletJSON, 'verification'> & {
-  verification: VerificationJSONSnapshot | null;
-};
+export type Web3WalletJSONSnapshot = Override<
+  Web3WalletJSON,
+  {
+    verification: VerificationJSONSnapshot | null;
+  }
+>;
 
 export type PublicUserDataJSONSnapshot = PublicUserDataJSON;
