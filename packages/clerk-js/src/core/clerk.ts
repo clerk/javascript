@@ -369,8 +369,21 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
-    const defaultCb = () => this.navigate(redirectUrl);
-    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
+
+    const handleSetActive = () => {
+      const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+      if (signOutCallback) {
+        return this.setActive({
+          session: null,
+          beforeEmit: ignoreEventValue(signOutCallback),
+        });
+      }
+
+      return this.setActive({
+        session: null,
+        redirectUrl,
+      });
+    };
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
@@ -379,22 +392,14 @@ export class Clerk implements ClerkInterface {
         await this.client.destroy();
       }
 
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
   };
 
@@ -906,12 +911,15 @@ export class Clerk implements ClerkInterface {
     if (beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
-      deprecated('beforeEmit', 'Use the `redirectUrl` property instead.');
+      deprecated(
+        'Clerk.setActive({beforeEmit})',
+        'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
+      );
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl) {
+    if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
