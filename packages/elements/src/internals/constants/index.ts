@@ -57,6 +57,7 @@ export const ERROR_CODES = {
   ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'enterprise_sso_email_address_domain_mismatch',
   ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH: 'enterprise_sso_hosted_domain_mismatch',
   SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
+  ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO: 'organization_membership_quota_exceeded_for_sso',
 };
 
 export const ROUTING = {
