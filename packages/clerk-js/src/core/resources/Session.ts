@@ -108,6 +108,7 @@ export class Session extends BaseResource implements SessionResource {
         path: `/client/sessions/${this.id}/activate`,
       })
     )?.response as unknown as SessionJSON;
+    console.log(json);
 
     return new Session(json);
   };
@@ -265,10 +266,12 @@ export class Session extends BaseResource implements SessionResource {
   }
 
   private async _getToken(options?: GetTokenOptions): Promise<string | null> {
-    if (!this.user) {
+    console.trace('get token ran');
+    if (!this.user || this.status !== 'active') {
       return null;
     }
 
+    console.trace('get token sucessfully');
     const { leewayInSeconds, template, skipCache = false } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory

@@ -131,7 +131,7 @@ export class AuthCookieService {
   }: {
     updateCookieImmediately?: boolean;
   } = {}): Promise<void> {
-    if (!this.clerk.session) {
+    if (!this.clerk.session || this.clerk.session?.status !== 'active') {
       return;
     }
 

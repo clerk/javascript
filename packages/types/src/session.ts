@@ -114,6 +114,8 @@ export interface SessionResource extends ClerkResource {
   createdAt: Date;
   updatedAt: Date;
 
+  activate: () => Promise<SessionResource>;
+
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   prepareFirstFactorVerification: (
     factor: SessionVerifyPrepareFirstFactorParams,

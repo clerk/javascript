@@ -72,7 +72,11 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               session: res.createdSessionId,
               redirectUrl: res.createdSession?.status === 'active' ? afterSignInUrl : undefined,
             });
-            return navigate('../select-org');
+
+            if (res.createdSession?.status === 'pending') {
+              return navigate('../select-organization');
+            }
+            return;
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:

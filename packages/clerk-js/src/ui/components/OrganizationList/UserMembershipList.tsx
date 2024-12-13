@@ -1,4 +1,4 @@
-import { useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganizationList, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/types';
 
 import { useOrganizationListContext } from '../../contexts';
@@ -10,6 +10,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
+  const { session } = useSession();
 
   if (!isLoaded) {
     return null;
@@ -19,6 +20,9 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
       await setActive({
         organization,
       });
+
+      await session?.activate();
+
       await navigateAfterSelectOrganization(organization);
     });
   };
