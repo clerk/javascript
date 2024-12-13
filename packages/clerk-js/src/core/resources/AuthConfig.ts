@@ -18,7 +18,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     return this;
   }
 
-  public toSnapshot(): AuthConfigJSONSnapshot {
+  public __internal_toSnapshot(): AuthConfigJSONSnapshot {
     return {
       object: 'auth_config',
       id: this.id || '',

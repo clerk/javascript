@@ -104,7 +104,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return this;
   }
 
-  public toSnapshot(): UserSettingsJSONSnapshot {
+  public __internal_toSnapshot(): UserSettingsJSONSnapshot {
     return {
       social: this.social,
       saml: this.saml,

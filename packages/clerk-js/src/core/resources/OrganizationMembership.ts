@@ -80,13 +80,13 @@ export class OrganizationMembership extends BaseResource implements Organization
     return this;
   }
 
-  public toSnapshot(): OrganizationMembershipJSONSnapshot {
+  public __internal_toSnapshot(): OrganizationMembershipJSONSnapshot {
     return {
       object: 'organization_membership',
       id: this.id,
-      organization: this.organization.toSnapshot(),
+      organization: this.organization.__internal_toSnapshot(),
       public_metadata: this.publicMetadata,
-      public_user_data: this.publicUserData.toSnapshot(),
+      public_user_data: this.publicUserData.__internal_toSnapshot(),
       permissions: this.permissions,
       role: this.role,
       created_at: this.createdAt.getTime(),

@@ -14,5 +14,5 @@ export interface SamlAccountResource extends ClerkResource {
   lastName: string;
   verification: VerificationResource | null;
   samlConnection: SamlAccountConnectionResource | null;
-  toSnapshot: () => SamlAccountJSONSnapshot;
+  __internal_toSnapshot: () => SamlAccountJSONSnapshot;
 }

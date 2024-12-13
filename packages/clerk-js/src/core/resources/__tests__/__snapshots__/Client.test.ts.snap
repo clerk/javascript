@@ -232,7 +232,7 @@ Client {
 }
 `;
 
-exports[`Client Singleton toSnapshot() 1`] = `
+exports[`Client Singleton __internal_toSnapshot() 1`] = `
 {
   "cookie_expires_at": null,
   "created_at": 1733924546843,

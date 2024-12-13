@@ -437,7 +437,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this;
   }
 
-  public toSnapshot(): SignInJSONSnapshot {
+  public __internal_toSnapshot(): SignInJSONSnapshot {
     return {
       object: 'sign_in',
       id: this.id || '',
@@ -445,11 +445,11 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
-      first_factor_verification: this.firstFactorVerification.toSnapshot(),
-      second_factor_verification: this.secondFactorVerification.toSnapshot(),
+      first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
+      second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
       created_session_id: this.createdSessionId,
-      user_data: this.userData.toSnapshot(),
+      user_data: this.userData.__internal_toSnapshot(),
     };
   }
 }

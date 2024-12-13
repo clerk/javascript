@@ -6,5 +6,5 @@ import type { ClerkResource } from './resource';
 export interface TokenResource extends ClerkResource {
   jwt?: JWT;
   getRawString: () => string;
-  toSnapshot: () => TokenJSONSnapshot;
+  __internal_toSnapshot: () => TokenJSONSnapshot;
 }

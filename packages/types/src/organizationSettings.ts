@@ -30,5 +30,5 @@ export interface OrganizationSettingsResource extends ClerkResource {
     enrollmentModes: OrganizationEnrollmentMode[];
     defaultRole: string | null;
   };
-  toSnapshot: () => OrganizationSettingsJSONSnapshot;
+  __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;
 }

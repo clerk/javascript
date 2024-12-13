@@ -208,7 +208,7 @@ describe('Client Singleton', () => {
     expect(client).toMatchSnapshot();
   });
 
-  it('toSnapshot()', () => {
+  it('__internal_toSnapshot()', () => {
     const clientJSON = {
       object: 'client',
       status: null,
@@ -341,6 +341,6 @@ describe('Client Singleton', () => {
     // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(clientJSON);
 
-    expect(client.toSnapshot()).toMatchSnapshot();
+    expect(client.__internal_toSnapshot()).toMatchSnapshot();
   });
 });

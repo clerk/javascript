@@ -1,4 +1,4 @@
-// this file contains the types returned by the toSnapshot method of the resources
+// this file contains the types returned by the __internal_toSnapshot method of the resources
 
 import type { DisplayConfigJSON } from './displayConfig';
 import type {

@@ -112,7 +112,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
-  toSnapshot: () => SignInJSONSnapshot;
+  __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =

@@ -23,7 +23,7 @@ export interface Web3WalletResource extends ClerkResource {
   attemptVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<Web3WalletResource>;
   destroy: () => Promise<void>;
   create: () => Promise<Web3WalletResource>;
-  toSnapshot: () => Web3WalletJSONSnapshot;
+  __internal_toSnapshot: () => Web3WalletJSONSnapshot;
 }
 
 export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<string>;

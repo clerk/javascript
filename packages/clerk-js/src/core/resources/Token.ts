@@ -43,7 +43,7 @@ export class Token extends BaseResource implements TokenResource {
     return this;
   }
 
-  public toSnapshot(): TokenJSONSnapshot {
+  public __internal_toSnapshot(): TokenJSONSnapshot {
     return {
       object: 'token',
       id: this.id || '',

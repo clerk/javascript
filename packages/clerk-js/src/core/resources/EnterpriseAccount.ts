@@ -58,7 +58,7 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
     return this;
   }
 
-  public toSnapshot(): EnterpriseAccountJSONSnapshot {
+  public __internal_toSnapshot(): EnterpriseAccountJSONSnapshot {
     return {
       object: 'enterprise_account',
       id: this.id,
@@ -70,8 +70,8 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
       first_name: this.firstName,
       last_name: this.lastName,
       public_metadata: this.publicMetadata,
-      verification: this.verification?.toSnapshot() || null,
-      enterprise_connection: this.enterpriseConnection?.toSnapshot() || null,
+      verification: this.verification?.__internal_toSnapshot() || null,
+      enterprise_connection: this.enterpriseConnection?.__internal_toSnapshot() || null,
     };
   }
 }
@@ -115,7 +115,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
     return this;
   }
 
-  public toSnapshot(): EnterpriseAccountConnectionJSONSnapshot {
+  public __internal_toSnapshot(): EnterpriseAccountConnectionJSONSnapshot {
     return {
       object: 'enterprise_account_connection',
       id: this.id,

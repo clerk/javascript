@@ -102,7 +102,7 @@ export interface SessionResource extends ClerkResource {
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
-  toSnapshot: () => SessionJSONSnapshot;
+  __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 
 export interface ActiveSessionResource extends SessionResource {

@@ -28,5 +28,5 @@ export interface ExternalAccountResource extends ClerkResource {
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
   accountIdentifier: () => string;
-  toSnapshot: () => ExternalAccountJSONSnapshot;
+  __internal_toSnapshot: () => ExternalAccountJSONSnapshot;
 }

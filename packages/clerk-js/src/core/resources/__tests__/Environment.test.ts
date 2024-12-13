@@ -236,7 +236,7 @@ describe('Environment', () => {
     expect(environment).toMatchSnapshot();
   });
 
-  it('toSnapshot()', () => {
+  it('__internal_toSnapshot()', () => {
     const environmentJSON = {
       object: 'environment',
       id: '',
@@ -466,6 +466,6 @@ describe('Environment', () => {
 
     const environment = new Environment(environmentJSON);
 
-    expect(environment.toSnapshot()).toMatchSnapshot();
+    expect(environment.__internal_toSnapshot()).toMatchSnapshot();
   });
 });

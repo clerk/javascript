@@ -55,7 +55,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
     return this;
   }
 
-  public toSnapshot(): SamlAccountJSONSnapshot {
+  public __internal_toSnapshot(): SamlAccountJSONSnapshot {
     return {
       object: 'saml_account',
       id: this.id,
@@ -65,8 +65,8 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
       email_address: this.emailAddress,
       first_name: this.firstName,
       last_name: this.lastName,
-      verification: this.verification?.toSnapshot() || null,
-      saml_connection: this.samlConnection?.toSnapshot(),
+      verification: this.verification?.__internal_toSnapshot() || null,
+      saml_connection: this.samlConnection?.__internal_toSnapshot(),
     };
   }
 }
@@ -106,7 +106,7 @@ export class SamlAccountConnection extends BaseResource implements SamlAccountCo
     return this;
   }
 
-  public toSnapshot(): SamlAccountConnectionJSONSnapshot {
+  public __internal_toSnapshot(): SamlAccountConnectionJSONSnapshot {
     return {
       object: 'saml_account_connection',
       id: this.id,

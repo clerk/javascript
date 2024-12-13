@@ -284,7 +284,7 @@ Environment {
 }
 `;
 
-exports[`Environment toSnapshot() 1`] = `
+exports[`Environment __internal_toSnapshot() 1`] = `
 {
   "auth_config": {
     "claimed_at": null,
