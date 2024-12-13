@@ -50,7 +50,7 @@ export class FraudProtection {
       const captchaParams = await this.managedChallenge(clerk);
 
       try {
-        await this.client.getInstance().sendCaptchaToken(captchaParams);
+        await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
       } finally {
         // Resolve the exception placeholder promise so that other exceptions can be handled
         resolve();

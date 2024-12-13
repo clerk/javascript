@@ -26,7 +26,7 @@ jest.mock('../auth/devBrowser', () => ({
   }),
 }));
 
-Client.getInstance = jest.fn().mockImplementation(() => {
+Client.getOrCreateInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
 });
 Environment.getInstance = jest.fn().mockImplementation(() => {
