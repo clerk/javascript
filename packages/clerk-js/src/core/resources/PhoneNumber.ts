@@ -86,15 +86,15 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     return this;
   }
 
-  public toJSON(): PhoneNumberJSONSnapshot {
+  public toSnapshot(): PhoneNumberJSONSnapshot {
     return {
       object: 'phone_number',
       id: this.id || '',
       phone_number: this.phoneNumber,
       reserved_for_second_factor: this.reservedForSecondFactor,
       default_second_factor: this.defaultSecondFactor,
-      verification: this.verification.toJSON(),
-      linked_to: this.linkedTo.map(link => link.toJSON()),
+      verification: this.verification.toSnapshot(),
+      linked_to: this.linkedTo.map(link => link.toSnapshot()),
       backup_codes: this.backupCodes,
     };
   }

@@ -61,12 +61,12 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
     return this;
   }
 
-  public toJSON(): Web3WalletJSONSnapshot {
+  public toSnapshot(): Web3WalletJSONSnapshot {
     return {
       object: 'web3_wallet',
       id: this.id,
       web3_wallet: this.web3Wallet,
-      verification: this.verification.toJSON(),
+      verification: this.verification.toSnapshot(),
     };
   }
 }

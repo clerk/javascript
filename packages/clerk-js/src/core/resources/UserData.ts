@@ -21,7 +21,7 @@ export class UserData implements IUserData {
     return this;
   }
 
-  public toJSON(): UserDataJSONSnapshot {
+  public toSnapshot(): UserDataJSONSnapshot {
     return {
       first_name: this.firstName,
       last_name: this.lastName,

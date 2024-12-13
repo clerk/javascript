@@ -68,14 +68,14 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this;
   }
 
-  public toJSON(): EnvironmentJSONSnapshot {
+  public toSnapshot(): EnvironmentJSONSnapshot {
     return {
       object: 'environment',
       id: this.id || '',
-      auth_config: this.authConfig.toJSON(),
-      display_config: this.displayConfig.toJSON(),
-      user_settings: this.userSettings.toJSON(),
-      organization_settings: this.organizationSettings.toJSON(),
+      auth_config: this.authConfig.toSnapshot(),
+      display_config: this.displayConfig.toSnapshot(),
+      user_settings: this.userSettings.toSnapshot(),
+      organization_settings: this.organizationSettings.toSnapshot(),
       maintenance_mode: this.maintenanceMode,
     };
   }

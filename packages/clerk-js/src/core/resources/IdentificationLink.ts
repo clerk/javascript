@@ -21,7 +21,7 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
     return this;
   }
 
-  public toJSON(): IdentificationLinkJSONSnapshot {
+  public toSnapshot(): IdentificationLinkJSONSnapshot {
     return {
       object: 'identification_link',
       id: this.id,

@@ -61,7 +61,7 @@ export class Verification extends BaseResource implements VerificationResource {
     return this;
   }
 
-  public toJSON(): VerificationJSONSnapshot {
+  public toSnapshot(): VerificationJSONSnapshot {
     return {
       object: 'verification',
       id: this.id || '',
@@ -120,12 +120,12 @@ export class SignUpVerifications implements SignUpVerificationsResource {
     }
   }
 
-  public toJSON(): SignUpVerificationsJSONSnapshot {
+  public toSnapshot(): SignUpVerificationsJSONSnapshot {
     return {
-      email_address: this.emailAddress.toJSON(),
-      phone_number: this.phoneNumber.toJSON(),
-      web3_wallet: this.web3Wallet.toJSON(),
-      external_account: this.externalAccount.toJSON(),
+      email_address: this.emailAddress.toSnapshot(),
+      phone_number: this.phoneNumber.toSnapshot(),
+      web3_wallet: this.web3Wallet.toSnapshot(),
+      external_account: this.externalAccount.toSnapshot(),
     };
   }
 }
@@ -145,9 +145,9 @@ export class SignUpVerification extends Verification {
     }
   }
 
-  public toJSON(): SignUpVerificationJSONSnapshot {
+  public toSnapshot(): SignUpVerificationJSONSnapshot {
     return {
-      ...super.toJSON(),
+      ...super.toSnapshot(),
       next_action: this.nextAction,
       supported_strategies: this.supportedStrategies,
     };

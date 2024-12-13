@@ -102,7 +102,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
-  toJSON: () => SignUpJSONSnapshot;
+  toSnapshot: () => SignUpJSONSnapshot;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -190,11 +190,11 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
-  toJSON: () => SignUpVerificationsJSONSnapshot;
+  toSnapshot: () => SignUpVerificationsJSONSnapshot;
 }
 
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
-  toJSON: () => SignUpVerificationJSONSnapshot;
+  toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

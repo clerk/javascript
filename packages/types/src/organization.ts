@@ -58,7 +58,7 @@ export interface OrganizationResource extends ClerkResource {
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
-  toJSON: () => OrganizationJSONSnapshot;
+  toSnapshot: () => OrganizationJSONSnapshot;
 }
 
 export type GetRolesParams = ClerkPaginationParams;

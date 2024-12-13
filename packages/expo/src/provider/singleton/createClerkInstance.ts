@@ -117,11 +117,11 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
             if (environment) {
-              void EnvironmentResourceCache.save(environment.toJSON());
+              void EnvironmentResourceCache.save(environment.toSnapshot());
             }
 
             if (client) {
-              void ClientResourceCache.save(client.toJSON());
+              void ClientResourceCache.save(client.toSnapshot());
               if (client.lastActiveSessionId) {
                 const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
                 const token = lastActiveSession?.lastActiveToken?.getRawString();

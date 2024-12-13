@@ -20,7 +20,7 @@ export interface PasskeyResource extends ClerkResource {
 
   update: (params: UpdatePasskeyParams) => Promise<PasskeyResource>;
   delete: () => Promise<DeletedObjectResource>;
-  toJSON: () => PasskeyJSONSnapshot;
+  toSnapshot: () => PasskeyJSONSnapshot;
 }
 
 export type PublicKeyCredentialCreationOptionsWithoutExtensions = Omit<

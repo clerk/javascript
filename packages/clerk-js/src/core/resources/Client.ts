@@ -124,14 +124,14 @@ export class Client extends BaseResource implements ClientResource {
     return this;
   }
 
-  public toJSON(): ClientJSONSnapshot {
+  public toSnapshot(): ClientJSONSnapshot {
     return {
       object: 'client',
       status: null,
       id: this.id || '',
-      sessions: this.sessions.map(s => s.toJSON()),
-      sign_up: this.signUp.toJSON(),
-      sign_in: this.signIn.toJSON(),
+      sessions: this.sessions.map(s => s.toSnapshot()),
+      sign_up: this.signUp.toSnapshot(),
+      sign_in: this.signIn.toSnapshot(),
       last_active_session_id: this.lastActiveSessionId,
       cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
       created_at: this.createdAt?.getTime() ?? null,

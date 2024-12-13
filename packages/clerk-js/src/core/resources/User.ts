@@ -378,7 +378,7 @@ export class User extends BaseResource implements UserResource {
     return this;
   }
 
-  public toJSON(): UserJSONSnapshot {
+  public toSnapshot(): UserJSONSnapshot {
     return {
       object: 'user',
       id: this.id,
@@ -390,14 +390,14 @@ export class User extends BaseResource implements UserResource {
       unsafe_metadata: this.unsafeMetadata,
       image_url: this.imageUrl,
       has_image: this.hasImage,
-      email_addresses: this.emailAddresses.map(ea => ea.toJSON()),
-      phone_numbers: this.phoneNumbers.map(ph => ph.toJSON()),
-      web3_wallets: this.web3Wallets.map(ph => ph.toJSON()),
-      external_accounts: this.externalAccounts.map(ea => ea.toJSON()),
-      passkeys: this.passkeys.map(passkey => passkey.toJSON()),
-      organization_memberships: this.organizationMemberships.map(om => om.toJSON()),
-      saml_accounts: this.samlAccounts.map(sa => sa.toJSON()),
-      enterprise_accounts: this.enterpriseAccounts.map(ea => ea.toJSON()),
+      email_addresses: this.emailAddresses.map(ea => ea.toSnapshot()),
+      phone_numbers: this.phoneNumbers.map(ph => ph.toSnapshot()),
+      web3_wallets: this.web3Wallets.map(ph => ph.toSnapshot()),
+      external_accounts: this.externalAccounts.map(ea => ea.toSnapshot()),
+      passkeys: this.passkeys.map(passkey => passkey.toSnapshot()),
+      organization_memberships: this.organizationMemberships.map(om => om.toSnapshot()),
+      saml_accounts: this.samlAccounts.map(sa => sa.toSnapshot()),
+      enterprise_accounts: this.enterpriseAccounts.map(ea => ea.toSnapshot()),
       totp_enabled: this.totpEnabled,
       backup_code_enabled: this.backupCodeEnabled,
       two_factor_enabled: this.twoFactorEnabled,

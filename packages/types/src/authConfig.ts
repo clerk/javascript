@@ -12,5 +12,5 @@ export interface AuthConfigResource extends ClerkResource {
    * Defaults to `null`.
    */
   claimedAt: Date | null;
-  toJSON: () => AuthConfigJSONSnapshot;
+  toSnapshot: () => AuthConfigJSONSnapshot;
 }

@@ -68,7 +68,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     return this;
   }
 
-  public toJSON(): ExternalAccountJSONSnapshot {
+  public toSnapshot(): ExternalAccountJSONSnapshot {
     return {
       object: 'external_account',
       id: this.id,
@@ -83,7 +83,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
       username: this.username,
       public_metadata: this.publicMetadata,
       label: this.label,
-      verification: this.verification?.toJSON() || null,
+      verification: this.verification?.toSnapshot() || null,
     };
   }
 

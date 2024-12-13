@@ -37,7 +37,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     return this;
   }
 
-  public toJSON(): OrganizationSettingsJSONSnapshot {
+  public toSnapshot(): OrganizationSettingsJSONSnapshot {
     return {
       enabled: this.enabled,
       max_allowed_memberships: this.maxAllowedMemberships,

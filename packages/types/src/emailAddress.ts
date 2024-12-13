@@ -29,5 +29,5 @@ export interface EmailAddressResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
   destroy: () => Promise<void>;
   create: () => Promise<EmailAddressResource>;
-  toJSON: () => EmailAddressJSONSnapshot;
+  toSnapshot: () => EmailAddressJSONSnapshot;
 }
