@@ -205,6 +205,6 @@ describe('Client Singleton', () => {
     // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const client = new Client(clientJSON);
 
-    expect(client).toMatchSnapshot();
+    expect(client.toSnapshot()).toMatchSnapshot();
   });
 });

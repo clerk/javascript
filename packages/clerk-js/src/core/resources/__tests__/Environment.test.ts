@@ -233,6 +233,6 @@ describe('Environment', () => {
 
     const environment = new Environment(environmentJSON);
 
-    expect(environment).toMatchSnapshot();
+    expect(environment.toSnapshot()).toMatchSnapshot();
   });
 });
