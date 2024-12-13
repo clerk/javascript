@@ -252,9 +252,12 @@ describe('redirectUrls', () => {
     });
 
     it('returns current window location when in modal mode and no redirect_url is found', () => {
+      const aboutPageUrl = 'https://www.clerk.com/about';
+      mockWindowLocation = new URL(aboutPageUrl) as any as Window['location'];
+      Object.defineProperty(global.window, 'location', { value: mockWindowLocation });
       const redirectUrls = new RedirectUrls({}, {}, {}, 'modal');
-      expect(redirectUrls.getAfterSignInUrl()).toBe(mockWindowLocation.href);
-      expect(redirectUrls.getAfterSignUpUrl()).toBe(mockWindowLocation.href);
+      expect(redirectUrls.getAfterSignInUrl()).toBe(aboutPageUrl);
+      expect(redirectUrls.getAfterSignUpUrl()).toBe(aboutPageUrl);
     });
   });
 
