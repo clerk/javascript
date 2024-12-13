@@ -98,7 +98,7 @@ describe('useDerivedAuth', () => {
     expect(current.orgRole).toBeNull();
     expect(current.orgSlug).toBeNull();
     expect(current.has).toBeInstanceOf(Function);
-    expect(current.has!({ permission: 'test' })).toBe(false);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
   });
 
   it('returns signed in with org context when sessionId, userId, orgId, and orgRole are present', () => {
@@ -130,8 +130,8 @@ describe('useDerivedAuth', () => {
     expect(current.getToken).toBe(authObject.getToken);
 
     // Check has function behavior
-    (createCheckAuthorization as vi.Mock).mockReturnValueOnce(vi.fn().mockReturnValue('authorized'));
-    expect(current.has!({ permission: 'read' })).toBe('authorized');
+    vi.mocked(createCheckAuthorization).mockReturnValueOnce(vi.fn().mockReturnValue('authorized'));
+    expect(current.has?.({ permission: 'read' })).toBe('authorized');
   });
 
   it('returns signed in without org context when sessionId and userId are present but no orgId', () => {
@@ -159,8 +159,8 @@ describe('useDerivedAuth', () => {
     expect(current.getToken).toBe(authObject.getToken);
 
     // Check derivedHas fallback
-    (createCheckAuthorization as vi.Mock).mockReturnValueOnce(vi.fn().mockReturnValue(false));
-    expect(current.has!({ permission: 'read' })).toBe(false);
+    vi.mocked(createCheckAuthorization).mockReturnValueOnce(vi.fn().mockReturnValue(false));
+    expect(current.has?.({ permission: 'read' })).toBe(false);
   });
 
   it('throws invalid state error if none of the conditions match', () => {
@@ -170,6 +170,7 @@ describe('useDerivedAuth', () => {
     };
     renderHook(() => useDerivedAuth(authObject));
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
 
@@ -184,7 +185,7 @@ describe('useDerivedAuth', () => {
       result: { current },
     } = renderHook(() => useDerivedAuth(authObject));
 
-    expect(current.has!({ permission: 'test' })).toBe('mocked-result');
+    expect(current.has?.({ permission: 'test' })).toBe('mocked-result');
     expect(mockHas).toHaveBeenCalledWith({ permission: 'test' });
   });
 });
