@@ -167,9 +167,7 @@ describe('useDerivedAuth', () => {
       sessionId: true,
       userId: undefined,
     };
-    const {
-      result: { current },
-    } = renderHook(() => useDerivedAuth(authObject));
+    renderHook(() => useDerivedAuth(authObject));
 
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
