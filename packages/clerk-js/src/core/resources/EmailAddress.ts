@@ -94,13 +94,13 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return this;
   }
 
-  public toJSON(): EmailAddressJSONSnapshot {
+  public __internal_toSnapshot(): EmailAddressJSONSnapshot {
     return {
       object: 'email_address',
       id: this.id,
       email_address: this.emailAddress,
-      verification: this.verification.toJSON(),
-      linked_to: this.linkedTo.map(link => link.toJSON()),
+      verification: this.verification.__internal_toSnapshot(),
+      linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
     };
   }
 }
