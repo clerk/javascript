@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -43,7 +43,7 @@ describe('<SignOutButton />', () => {
   it('calls clerk.signOutOne when clicked', async () => {
     render(<SignOutButton />);
     const btn = screen.getByText('Sign out');
-    userEvent.click(btn);
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockSignOut).toHaveBeenCalled();
     });
@@ -52,7 +52,7 @@ describe('<SignOutButton />', () => {
   it('handles redirectUrl prop', async () => {
     render(<SignOutButton redirectUrl={url} />);
     const btn = screen.getByText('Sign out');
-    userEvent.click(btn);
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockSignOut).toHaveBeenCalledWith({ redirectUrl: url });
     });
@@ -61,7 +61,7 @@ describe('<SignOutButton />', () => {
   it('handles signOutOptions prop', async () => {
     render(<SignOutButton signOutOptions={{ redirectUrl: url, sessionId: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe' }} />);
     const btn = screen.getByText('Sign out');
-    userEvent.click(btn);
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockSignOut).toHaveBeenCalledWith({ redirectUrl: url, sessionId: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe' });
     });

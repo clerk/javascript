@@ -2,19 +2,6 @@
 
 exports[`useRoutingProps() > path prop has priority over path option 1`] = `
 <body>
-  <div />
-  <div>
-    <div>
-      {"routing":"hash","prop1":"1","prop2":"2"}
-    </div>
-  </div>
-  <div>
-    <div>
-      {"routing":"virtual","prop1":"1","prop2":"2"}
-    </div>
-  </div>
-  <div />
-  <div />
   <div>
     <div>
       {"path":"/path-prop","prop1":"1","prop2":"2","routing":"path"}
@@ -25,7 +12,6 @@ exports[`useRoutingProps() > path prop has priority over path option 1`] = `
 
 exports[`useRoutingProps() > the path option is ignored when "hash" routing prop 1`] = `
 <body>
-  <div />
   <div>
     <div>
       {"routing":"hash","prop1":"1","prop2":"2"}
@@ -35,42 +21,6 @@ exports[`useRoutingProps() > the path option is ignored when "hash" routing prop
 `;
 
 exports[`useRoutingProps() > the path option is ignored when "virtual" routing prop 1`] = `
-<body>
-  <div />
-  <div>
-    <div>
-      {"routing":"hash","prop1":"1","prop2":"2"}
-    </div>
-  </div>
-  <div>
-    <div>
-      {"routing":"virtual","prop1":"1","prop2":"2"}
-    </div>
-  </div>
-</body>
-`;
-
-exports[`useRoutingProps() path prop has priority over path option 1`] = `
-<body>
-  <div>
-    <div>
-      {"path":"/path-prop","prop1":"1","prop2":"2","routing":"path"}
-    </div>
-  </div>
-</body>
-`;
-
-exports[`useRoutingProps() the path option is ignored when "hash" routing prop 1`] = `
-<body>
-  <div>
-    <div>
-      {"routing":"hash","prop1":"1","prop2":"2"}
-    </div>
-  </div>
-</body>
-`;
-
-exports[`useRoutingProps() the path option is ignored when "virtual" routing prop 1`] = `
 <body>
   <div>
     <div>
