@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SignInWithMetamaskButton } from '../SignInWithMetamaskButton';
 
-const mockAuthenticatewithMetamask = jest.fn();
+const mockAuthenticatewithMetamask = vi.fn();
 const originalError = console.error;
 
 const mockClerk = {
   authenticateWithMetamask: mockAuthenticatewithMetamask,
 } as any;
 
-jest.mock('../withClerk', () => {
+vi.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => (
       <Component
@@ -24,7 +25,7 @@ jest.mock('../withClerk', () => {
 
 describe('<SignInWithMetamaskButton/>', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {

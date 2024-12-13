@@ -3,21 +3,22 @@ import { ClerkInstanceContext } from '@clerk/shared/react';
 import type { LoadedClerk } from '@clerk/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { AuthContext } from '../../contexts/AuthContext';
 import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
 
-jest.mock('@clerk/shared/authorization', () => ({
-  ...jest.requireActual('@clerk/shared/authorization'),
-  createCheckAuthorization: jest.fn().mockReturnValue(jest.fn().mockReturnValue(true)),
+vi.mock('@clerk/shared/authorization', () => ({
+  ...vi.importActual('@clerk/shared/authorization'),
+  createCheckAuthorization: vi.fn().mockReturnValue(vi.fn().mockReturnValue(true)),
 }));
 
-jest.mock('../../errors/errorThrower', () => ({
+vi.mock('../../errors/errorThrower', () => ({
   errorThrower: {
-    throw: jest.fn(),
-    throwMissingClerkProviderError: jest.fn(() => {
+    throw: vi.fn(),
+    throwMissingClerkProviderError: vi.fn(() => {
       throw new Error('missing ClerkProvider error');
     }),
   },
@@ -34,10 +35,10 @@ const TestComponent = () => {
 };
 
 describe('useAuth', () => {
-  let consoleErrorSpy: jest.SpyInstance;
+  let consoleErrorSpy: vi.SpyInstance;
 
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterAll(() => {
@@ -65,7 +66,7 @@ describe('useAuth', () => {
 
 describe('useDerivedAuth', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns not loaded state when sessionId and userId are undefined', () => {
@@ -108,8 +109,8 @@ describe('useDerivedAuth', () => {
       orgId: 'org123',
       orgRole: 'admin',
       orgSlug: 'my-org',
-      signOut: jest.fn(),
-      getToken: jest.fn(),
+      signOut: vi.fn(),
+      getToken: vi.fn(),
     };
 
     const {
@@ -129,7 +130,7 @@ describe('useDerivedAuth', () => {
     expect(current.getToken).toBe(authObject.getToken);
 
     // Check has function behavior
-    (createCheckAuthorization as jest.Mock).mockReturnValueOnce(jest.fn().mockReturnValue('authorized'));
+    (createCheckAuthorization as vi.Mock).mockReturnValueOnce(vi.fn().mockReturnValue('authorized'));
     expect(current.has!({ permission: 'read' })).toBe('authorized');
   });
 
@@ -138,8 +139,8 @@ describe('useDerivedAuth', () => {
       sessionId: 'session123',
       userId: 'user123',
       actor: 'actor123',
-      signOut: jest.fn(),
-      getToken: jest.fn(),
+      signOut: vi.fn(),
+      getToken: vi.fn(),
     };
     const {
       result: { current },
@@ -158,7 +159,7 @@ describe('useDerivedAuth', () => {
     expect(current.getToken).toBe(authObject.getToken);
 
     // Check derivedHas fallback
-    (createCheckAuthorization as jest.Mock).mockReturnValueOnce(jest.fn().mockReturnValue(false));
+    (createCheckAuthorization as vi.Mock).mockReturnValueOnce(vi.fn().mockReturnValue(false));
     expect(current.has!({ permission: 'read' })).toBe(false);
   });
 
@@ -173,7 +174,7 @@ describe('useDerivedAuth', () => {
   });
 
   it('uses provided has function if available', () => {
-    const mockHas = jest.fn().mockReturnValue('mocked-result');
+    const mockHas = vi.fn().mockReturnValue('mocked-result');
     const authObject = {
       sessionId: 'session123',
       userId: 'user123',

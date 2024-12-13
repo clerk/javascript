@@ -71,9 +71,7 @@
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",

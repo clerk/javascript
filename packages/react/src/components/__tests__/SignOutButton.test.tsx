@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SignOutButton } from '../SignOutButton';
 
-const mockSignOut = jest.fn();
+const mockSignOut = vi.fn();
 const originalError = console.error;
 
 const mockClerk = {
   signOut: mockSignOut,
 } as any;
 
-jest.mock('../withClerk', () => {
+vi.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return (
@@ -28,7 +29,7 @@ const url = 'https://www.clerk.com';
 
 describe('<SignOutButton />', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {

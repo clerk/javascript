@@ -17,6 +17,7 @@ import {
 } from '@clerk/localizations';
 import { dark } from '@clerk/themes';
 import { expectTypeOf } from 'expect-type';
+import { describe, it } from 'vitest';
 
 import type { ClerkProvider } from '../ClerkProvider';
 

@@ -1,17 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SignInButton } from '../SignInButton';
 
-const mockRedirectToSignIn = jest.fn();
+const mockRedirectToSignIn = vi.fn();
 const originalError = console.error;
 
 const mockClerk = {
   redirectToSignIn: mockRedirectToSignIn,
 } as any;
 
-jest.mock('../withClerk', () => {
+vi.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return (
@@ -28,7 +29,7 @@ const url = 'https://www.clerk.com';
 
 describe('<SignInButton/>', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {
@@ -68,7 +69,7 @@ describe('<SignInButton/>', () => {
   });
 
   it('renders passed button and calls both click handlers', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     render(
       <SignInButton>
