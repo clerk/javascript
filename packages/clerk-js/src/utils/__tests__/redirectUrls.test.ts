@@ -244,6 +244,16 @@ describe('redirectUrls', () => {
       expect(redirectUrls.getAfterSignInUrl()).toBe(`${mockWindowLocation.href}search-param-redirect-url`);
       expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}search-param-redirect-url`);
     });
+
+    it('returns current window location when in modal mode and no redirect URL is found', () => {
+      Object.defineProperty(global.window, 'location', { value: new URL('https://www.clerk.com/test') });
+
+      const redirectUrls = new RedirectUrls({}, {}, {}, 'modal');
+      const currentLocation = window.location.href;
+
+      expect(redirectUrls.getAfterSignInUrl()).toBe(currentLocation);
+      expect(redirectUrls.getAfterSignUpUrl()).toBe(currentLocation);
+    });
   });
 
   describe('search params', () => {
