@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -43,7 +43,8 @@ describe('<SignUpButton/>', () => {
   it('calls clerk.redirectToSignUp when clicked', async () => {
     render(<SignUpButton />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalled();
     });
@@ -52,7 +53,8 @@ describe('<SignUpButton/>', () => {
   it('handles forceRedirectUrl prop', async () => {
     render(<SignUpButton forceRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({ forceRedirectUrl: url, signUpForceRedirectUrl: url });
     });
@@ -61,7 +63,8 @@ describe('<SignUpButton/>', () => {
   it('handles fallbackRedirectUrl prop', async () => {
     render(<SignUpButton fallbackRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({
         fallbackRedirectUrl: url,
@@ -74,11 +77,17 @@ describe('<SignUpButton/>', () => {
     const handler = vi.fn();
     render(
       <SignUpButton>
-        <button onClick={handler}>custom button</button>
+        <button
+          onClick={handler}
+          type='button'
+        >
+          custom button
+        </button>
       </SignUpButton>,
     );
     const btn = screen.getByText('custom button');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(handler).toHaveBeenCalled();
       expect(mockRedirectToSignUp).toHaveBeenCalled();
@@ -94,8 +103,8 @@ describe('<SignUpButton/>', () => {
     expect(() => {
       render(
         <SignUpButton>
-          <button>1</button>
-          <button>2</button>
+          <button type='button'>1</button>
+          <button type='button'>2</button>
         </SignUpButton>,
       );
     }).toThrow();

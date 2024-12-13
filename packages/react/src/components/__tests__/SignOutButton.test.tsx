@@ -69,15 +69,16 @@ describe('<SignOutButton />', () => {
 
   it('uses text passed as children', async () => {
     render(<SignOutButton>text</SignOutButton>);
-    screen.getByText('text');
+
+    await screen.findByText('text');
   });
 
-  it('throws if multiple children provided', async () => {
+  it('throws if multiple children provided', () => {
     expect(() => {
       render(
         <SignOutButton>
-          <button>1</button>
-          <button>2</button>
+          <button type='button'>1</button>
+          <button type='button'>2</button>
         </SignOutButton>,
       );
     }).toThrow();

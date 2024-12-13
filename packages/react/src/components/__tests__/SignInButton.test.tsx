@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -91,10 +91,11 @@ describe('<SignInButton/>', () => {
 
   it('uses text passed as children', async () => {
     render(<SignInButton>text</SignInButton>);
-    screen.getByText('text');
+
+    await screen.findByText('text');
   });
 
-  it('throws if multiple children provided', async () => {
+  it('throws if multiple children provided', () => {
     expect(() => {
       render(
         <SignInButton>
