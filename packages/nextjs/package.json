@@ -62,7 +62,8 @@
     "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

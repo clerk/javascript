@@ -34,7 +34,8 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "dev": "tsc -p tsconfig.build.json --watch",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",

@@ -130,7 +130,8 @@
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",

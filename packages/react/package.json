@@ -71,7 +71,8 @@
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",

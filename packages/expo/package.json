@@ -63,7 +63,8 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",

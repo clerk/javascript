@@ -70,7 +70,8 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace  --sig"
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

@@ -89,7 +89,8 @@
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "vitest --environment node",
     "test:edge-runtime": "vitest --environment edge-runtime",
-    "test:cloudflare-miniflare": "vitest --environment miniflare"
+    "test:cloudflare-miniflare": "vitest --environment miniflare",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",

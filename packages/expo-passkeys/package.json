@@ -28,7 +28,8 @@
     "lint": "eslint src/",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
-    "publish:local": "pnpm yalc push --replace  --sig"
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
