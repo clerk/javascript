@@ -4,4 +4,4 @@
 '@clerk/clerk-expo': patch
 ---
 
-Rename `toJSON()` resource methods to `toSnapshot()` to avoid issues with serializers.
+Rename `toJSON()` resource methods to `toSnapshot()` to avoid issues with serializing functions.
