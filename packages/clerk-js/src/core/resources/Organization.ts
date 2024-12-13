@@ -281,7 +281,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this;
   }
 
-  public toJSON(): OrganizationJSONSnapshot {
+  public __internal_toSnapshot(): OrganizationJSONSnapshot {
     return {
       object: 'organization',
       id: this.id,

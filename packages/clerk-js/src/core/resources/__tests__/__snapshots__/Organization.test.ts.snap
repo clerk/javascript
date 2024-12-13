@@ -1,21 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Organization has the same initial properties 1`] = `
-{
-  "admin_delete_enabled": true,
-  "created_at": 12345,
-  "has_image": true,
+Organization {
+  "addMember": [Function],
+  "adminDeleteEnabled": true,
+  "createDomain": [Function],
+  "createdAt": 1970-01-01T00:00:12.345Z,
+  "destroy": [Function],
+  "getDomain": [Function],
+  "getDomains": [Function],
+  "getInvitations": [Function],
+  "getMembershipRequests": [Function],
+  "getMemberships": [Function],
+  "getRoles": [Function],
+  "hasImage": true,
   "id": "test_id",
-  "image_url": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160",
-  "max_allowed_memberships": 3,
-  "members_count": 1,
+  "imageUrl": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160",
+  "inviteMember": [Function],
+  "inviteMembers": [Function],
+  "maxAllowedMemberships": 3,
+  "membersCount": 1,
   "name": "test_name",
-  "object": "organization",
-  "pending_invitations_count": 10,
-  "public_metadata": {
+  "pathRoot": "/organizations",
+  "pendingInvitationsCount": 10,
+  "publicMetadata": {
     "public": "metadata",
   },
+  "removeMember": [Function],
+  "setLogo": [Function],
   "slug": "test_slug",
-  "updated_at": 5678,
+  "update": [Function],
+  "updateMember": [Function],
+  "updatedAt": 1970-01-01T00:00:05.678Z,
 }
 `;

@@ -5,5 +5,5 @@ import type { ClerkResource } from './resource';
 export interface IdentificationLinkResource extends ClerkResource {
   id: string;
   type: string;
-  toJSON(): IdentificationLinkJSONSnapshot;
+  __internal_toSnapshot(): IdentificationLinkJSONSnapshot;
 }

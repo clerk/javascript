@@ -234,7 +234,7 @@ export class Session extends BaseResource implements SessionResource {
     return this;
   }
 
-  public toJSON(): SessionJSONSnapshot {
+  public __internal_toSnapshot(): SessionJSONSnapshot {
     return {
       object: 'session',
       id: this.id,
@@ -245,9 +245,9 @@ export class Session extends BaseResource implements SessionResource {
       last_active_at: this.lastActiveAt.getTime(),
       last_active_organization_id: this.lastActiveOrganizationId,
       actor: this.actor,
-      user: this.user?.toJSON() || null,
-      public_user_data: this.publicUserData.toJSON(),
-      last_active_token: this.lastActiveToken?.toJSON() || null,
+      user: this.user?.__internal_toSnapshot() || null,
+      public_user_data: this.publicUserData.__internal_toSnapshot(),
+      last_active_token: this.lastActiveToken?.__internal_toSnapshot() || null,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };

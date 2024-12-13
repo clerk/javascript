@@ -103,7 +103,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     return this;
   }
 
-  public toJSON(): DisplayConfigJSONSnapshot {
+  public __internal_toSnapshot(): DisplayConfigJSONSnapshot {
     return {
       object: 'display_config',
       id: this.id,
