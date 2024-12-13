@@ -1,4 +1,5 @@
 import { expectTypeOf } from 'expect-type';
+import { describe, it } from 'vitest';
 
 import type { useAuth } from '../useAuth';
 

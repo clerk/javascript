@@ -1,14 +1,15 @@
 import type { Resources, UnsubscribeCallback } from '@clerk/types';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
 describe('isomorphicClerk', () => {
   beforeAll(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('instantiates a IsomorphicClerk instance', () => {
@@ -35,10 +36,10 @@ describe('isomorphicClerk', () => {
     void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'green' } });
     expect(propsHistory).toEqual([]);
 
-    jest.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
+    vi.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
     void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'white' } });
-    await jest.runAllTimersAsync();
+    await vi.runAllTimersAsync();
 
     expect(propsHistory).toEqual([
       { appearance: { baseTheme: 'dark' } },
@@ -75,7 +76,7 @@ describe('isomorphicClerk', () => {
     // Unsubscribe one listener before ClerkJS is loaded
     unsubscribe1();
 
-    jest.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
+    vi.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
     const unsubscribe3 = isomorphicClerk.addListener(payload => listenerCallHistory.push(payload));
 

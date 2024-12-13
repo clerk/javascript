@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SignUpButton } from '../SignUpButton';
 
-const mockRedirectToSignUp = jest.fn();
+const mockRedirectToSignUp = vi.fn();
 const originalError = console.error;
 
 const mockClerk = {
   redirectToSignUp: mockRedirectToSignUp,
 } as any;
 
-jest.mock('../withClerk', () => {
+vi.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return (
@@ -28,7 +29,7 @@ const url = 'https://www.clerk.com';
 
 describe('<SignUpButton/>', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {
@@ -42,7 +43,8 @@ describe('<SignUpButton/>', () => {
   it('calls clerk.redirectToSignUp when clicked', async () => {
     render(<SignUpButton />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalled();
     });
@@ -51,7 +53,8 @@ describe('<SignUpButton/>', () => {
   it('handles forceRedirectUrl prop', async () => {
     render(<SignUpButton forceRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({ forceRedirectUrl: url, signUpForceRedirectUrl: url });
     });
@@ -60,7 +63,8 @@ describe('<SignUpButton/>', () => {
   it('handles fallbackRedirectUrl prop', async () => {
     render(<SignUpButton fallbackRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({
         fallbackRedirectUrl: url,
@@ -70,14 +74,20 @@ describe('<SignUpButton/>', () => {
   });
 
   it('renders passed button and calls both click handlers', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     render(
       <SignUpButton>
-        <button onClick={handler}>custom button</button>
+        <button
+          onClick={handler}
+          type='button'
+        >
+          custom button
+        </button>
       </SignUpButton>,
     );
     const btn = screen.getByText('custom button');
-    userEvent.click(btn);
+
+    await userEvent.click(btn);
     await waitFor(() => {
       expect(handler).toHaveBeenCalled();
       expect(mockRedirectToSignUp).toHaveBeenCalled();
@@ -93,8 +103,8 @@ describe('<SignUpButton/>', () => {
     expect(() => {
       render(
         <SignUpButton>
-          <button>1</button>
-          <button>2</button>
+          <button type='button'>1</button>
+          <button type='button'>2</button>
         </SignUpButton>,
       );
     }).toThrow();
