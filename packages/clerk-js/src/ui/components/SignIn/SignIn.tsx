@@ -46,7 +46,7 @@ function SignInRoutes(): JSX.Element {
         <Route path='factor-one'>
           <SignInFactorOne />
         </Route>
-        <Route path='select-org'>
+        <Route path='select-organization'>
           <SignInSelectOrganization />
         </Route>
         <Route path='factor-two'>

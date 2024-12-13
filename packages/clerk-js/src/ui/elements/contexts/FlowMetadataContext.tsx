@@ -14,7 +14,8 @@ type FlowMetadata = {
     | 'organizationList'
     | 'oneTap'
     | 'blankCaptcha'
-    | 'waitlist';
+    | 'waitlist'
+    | 'selectOrganization';
   part?:
     | 'start'
     | 'emailCode'
@@ -34,7 +35,8 @@ type FlowMetadata = {
     | 'ssoCallback'
     | 'popover'
     | 'complete'
-    | 'accountSwitcher';
+    | 'accountSwitcher'
+    | 'selectOrganization';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
