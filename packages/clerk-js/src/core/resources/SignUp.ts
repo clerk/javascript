@@ -402,7 +402,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
-  public toJSON(): SignUpJSONSnapshot {
+  public __internal_toSnapshot(): SignUpJSONSnapshot {
     return {
       object: 'sign_up',
       id: this.id || '',
@@ -411,7 +411,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       optional_fields: this.optionalFields,
       missing_fields: this.missingFields,
       unverified_fields: this.unverifiedFields,
-      verifications: this.verifications.toJSON(),
+      verifications: this.verifications.__internal_toSnapshot(),
       username: this.username,
       first_name: this.firstName,
       last_name: this.lastName,
