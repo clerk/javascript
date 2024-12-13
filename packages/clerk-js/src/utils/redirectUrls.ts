@@ -5,6 +5,8 @@ import type { ClerkOptions, RedirectOptions } from '@clerk/types';
 import { assertNoLegacyProp, warnForNewPropShadowingLegacyProp } from './assertNoLegacyProp';
 import { isAllowedRedirect, relativeToAbsoluteUrl } from './url';
 
+type ComponentMode = 'modal' | 'mounted';
+
 export class RedirectUrls {
   private static keys: (keyof RedirectOptions)[] = [
     'signInForceRedirectUrl',
@@ -22,9 +24,9 @@ export class RedirectUrls {
   private readonly fromOptions: RedirectOptions;
   private readonly fromProps: RedirectOptions;
   private readonly fromSearchParams: RedirectOptions & { redirectUrl?: string | null };
-  private readonly mode?: 'modal' | 'mounted' | undefined;
+  private readonly mode?: ComponentMode;
 
-  constructor(options: ClerkOptions, props: RedirectOptions = {}, searchParams: any = {}, mode?: undefined) {
+  constructor(options: ClerkOptions, props: RedirectOptions = {}, searchParams: any = {}, mode?: ComponentMode) {
     this.options = options;
     this.fromOptions = this.#parse(options || {});
     this.fromProps = this.#parse(props || {});
