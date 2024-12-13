@@ -10,8 +10,8 @@ import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
 
-vi.mock('@clerk/shared/authorization', () => ({
-  ...vi.importActual('@clerk/shared/authorization'),
+vi.mock('@clerk/shared/authorization', async () => ({
+  ...(await vi.importActual('@clerk/shared/authorization')),
   createCheckAuthorization: vi.fn().mockReturnValue(vi.fn().mockReturnValue(true)),
 }));
 
@@ -35,7 +35,7 @@ const TestComponent = () => {
 };
 
 describe('useAuth', () => {
-  let consoleErrorSpy: vi.SpyInstance;
+  let consoleErrorSpy: any;
 
   beforeAll(() => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
