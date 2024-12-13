@@ -21,7 +21,7 @@ import { describe, it } from 'vitest';
 
 import type { ClerkProvider } from '../ClerkProvider';
 
-//@ts-ignore
+// @ts-ignore
 type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
 
 describe('ClerkProvider', () => {
