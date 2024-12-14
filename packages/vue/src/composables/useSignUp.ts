@@ -41,14 +41,14 @@ export const useSignUp: UseSignUp = () => {
   });
 
   const result = computed<UseSignUpReturn>(() => {
-    if (!clientCtx.value) {
+    if (!clerk.value || !clientCtx.value) {
       return { isLoaded: false, signUp: undefined, setActive: undefined };
     }
 
     return {
       isLoaded: true,
       signUp: clientCtx.value.signUp,
-      setActive: clerk.value!.setActive,
+      setActive: clerk.value.setActive,
     };
   });
 
