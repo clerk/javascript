@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.43.0
+
+### Minor Changes
+
+- Redirect to the current page when within modal mode and no redirect URL is provided. ([#4768](https://github.com/clerk/javascript/pull/4768)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- fix: Properly detect and create devBrowser when the suffixed version is missing but an unsuffixed version exists ([#4776](https://github.com/clerk/javascript/pull/4776)) by [@panteliselef](https://github.com/panteliselef)
+
+  If the \_\_clerk_db_jwt referred to a different instance, we’d fetch `/environment` and `/client` with mismatched publishable keys and JWTs, breaking the app.
+
+- Updated dependencies [[`1677fa46862accd25d4837c9abd9a7a70c5b7858`](https://github.com/clerk/javascript/commit/1677fa46862accd25d4837c9abd9a7a70c5b7858), [`dcd2f3973ca90500fda9e52c4f81e631c49e87fc`](https://github.com/clerk/javascript/commit/dcd2f3973ca90500fda9e52c4f81e631c49e87fc)]:
+  - @clerk/localizations@3.9.3
+
 ## 5.42.1
 
 ### Patch Changes
