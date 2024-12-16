@@ -59,7 +59,9 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('throws an error if the publishable key is missing, when fatal: true', () => {
-    expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError('Publishable key is missing.');
+    expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
+      'Publishable key is missing. Ensure that your publishable key is correctly configured. Make sure to double-check your environment configuration (.env file).',
+    );
   });
 
   it('applies the proxyUrl if provided', () => {

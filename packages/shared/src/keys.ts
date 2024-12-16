@@ -40,7 +40,9 @@ export function parsePublishableKey(
 
   if (!key || !isPublishableKey(key)) {
     if (options.fatal && !key) {
-      throw new Error('Publishable key is missing.');
+      throw new Error(
+        'Publishable key is missing. Ensure that your publishable key is correctly configured. Make sure to double-check your environment configuration (.env file).',
+      );
     }
     if (options.fatal && !isPublishableKey(key)) {
       throw new Error('Publishable key not valid.');
