@@ -80,7 +80,8 @@ export const elGR: LocalizationResource = {
   formFieldLabel__organizationDomain: 'Domain',
   formFieldLabel__organizationDomainDeletePending: 'Διαγραφή εκκρεμών προσκλήσεων και προτάσεων',
   formFieldLabel__organizationDomainEmailAddress: 'Διεύθυνση email επαλήθευσης',
-  formFieldLabel__organizationDomainEmailAddressDescription: 'Εισάγετε μια διεύθυνση email σε αυτόν τον τομέα για να λάβετε κωδικό και να επαληθεύσετε τον τομέα.',
+  formFieldLabel__organizationDomainEmailAddressDescription:
+    'Εισάγετε μια διεύθυνση email σε αυτόν τον τομέα για να λάβετε κωδικό και να επαληθεύσετε τον τομέα.',
   formFieldLabel__organizationName: 'Όνομα οργανισμού',
   formFieldLabel__organizationSlug: 'Συντόμευση URL',
   formFieldLabel__passkeyName: undefined,
@@ -106,7 +107,7 @@ export const elGR: LocalizationResource = {
     subtitle: 'για να συνεχίσετε στο {{applicationName}}',
     suggestionsAcceptedLabel: 'Εκκρεμεί έγκριση',
     title: 'Επιλέξτε λογαριασμό',
-    titleWithoutPersonal: 'Επιλέξτε οργανισμό'
+    titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
@@ -115,8 +116,8 @@ export const elGR: LocalizationResource = {
     badge__unverified: 'Μη επαληθευμένο',
     createDomainPage: {
       subtitle:
-       'Προσθέστε τον τομέα για επαλήθευση. Χρήστες με διευθύνσεις email σε αυτόν τον τομέα μπορούν να συμμετάσχουν στον οργανισμό αυτόματα ή να αιτηθούν συμμετοχή.',
-      title: 'Προσθήκη τομέα'
+        'Προσθέστε τον τομέα για επαλήθευση. Χρήστες με διευθύνσεις email σε αυτόν τον τομέα μπορούν να συμμετάσχουν στον οργανισμό αυτόματα ή να αιτηθούν συμμετοχή.',
+      title: 'Προσθήκη τομέα',
     },
     invitePage: {
       detailsTitle__inviteFailed:
@@ -416,8 +417,9 @@ export const elGR: LocalizationResource = {
       title: 'Δεν είναι δυνατή η σύνδεση',
     },
     passkey: {
-      subtitle: 'Η χρήση του passkey σας επιβεβαιώνει την ταυτότητά σας. Η συσκευή σας μπορεί να ζητήσει δακτυλικό αποτύπωμα, αναγνώριση προσώπου ή κλείδωμα οθόνης.',
-      title: 'Χρησιμοποιήστε το passkey σας'
+      subtitle:
+        'Η χρήση του passkey σας επιβεβαιώνει την ταυτότητά σας. Η συσκευή σας μπορεί να ζητήσει δακτυλικό αποτύπωμα, αναγνώριση προσώπου ή κλείδωμα οθόνης.',
+      title: 'Χρησιμοποιήστε το passkey σας',
     },
     password: {
       actionLink: 'Χρήση άλλης μεθόδου',
@@ -425,7 +427,7 @@ export const elGR: LocalizationResource = {
       title: 'Εισαγωγή κωδικού πρόσβασης',
     },
     passwordPwned: {
-      title: 'Παραβιασμένος κωδικός'
+      title: 'Παραβιασμένος κωδικός',
     },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
