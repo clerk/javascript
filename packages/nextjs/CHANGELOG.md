@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.9.3
+
+### Patch Changes
+
+- Improves the error message when changing keys in development causes a subsequent request to fail. ([#4787](https://github.com/clerk/javascript/pull/4787)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.20.2
+
 ## 6.9.2
 
 ### Patch Changes

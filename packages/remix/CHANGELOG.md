@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.4.3
+
+### Patch Changes
+
+- Add note about React Router v7 to the README. If you want to use React Router v7 and Clerk together, please use the [`@clerk/react-router`](https://clerk.com/docs/references/react-router/overview) SDK instead. ([#4783](https://github.com/clerk/javascript/pull/4783)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.20.2
+
 ## 4.4.2
 
 ### Patch Changes
