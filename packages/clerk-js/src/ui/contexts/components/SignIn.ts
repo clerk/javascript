@@ -33,7 +33,7 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = options.signInUrl === options.signUpUrl;
+  const isCombinedFlow = !options.signUpUrl;
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);

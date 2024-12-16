@@ -32,7 +32,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = options.signInUrl === options.signUpUrl;
+  const isCombinedFlow = !options.signUpUrl;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),

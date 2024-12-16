@@ -366,7 +366,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #isCombinedFlow(): boolean {
-    return this.#options.signInUrl === this.#options.signUpUrl;
+    return !this.#options.signUpUrl;
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
