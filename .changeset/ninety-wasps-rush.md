@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-pl-PL localization updates
+Improve `pl-PL` localization.
