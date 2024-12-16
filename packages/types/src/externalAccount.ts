@@ -7,6 +7,8 @@ import type { VerificationResource } from './verification';
 export type ReauthorizeExternalAccountParams = {
   additionalScopes?: OAuthScope[];
   redirectUrl?: string;
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 
 export interface ExternalAccountResource extends ClerkResource {
