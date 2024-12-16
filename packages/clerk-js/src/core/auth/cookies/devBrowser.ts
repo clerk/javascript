@@ -24,7 +24,7 @@ export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHa
 
   const get = (mode?: 'only-suffixed') => {
     if (mode === 'only-suffixed') {
-      suffixedDevBrowserCookie.get();
+      return suffixedDevBrowserCookie.get();
     }
     return suffixedDevBrowserCookie.get() || devBrowserCookie.get();
   };
