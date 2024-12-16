@@ -41,7 +41,7 @@ export const useSignUpContext = (): SignUpContextType => {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const { componentName, ...ctx } = context;
+  const { componentName, mode, ...ctx } = context;
 
   const redirectUrls = new RedirectUrls(
     options,
@@ -51,6 +51,7 @@ export const useSignUpContext = (): SignUpContextType => {
       signUpForceRedirectUrl: ctx.forceRedirectUrl,
     },
     queryParams,
+    mode,
   );
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
