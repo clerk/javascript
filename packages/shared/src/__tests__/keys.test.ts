@@ -58,6 +58,10 @@ describe('parsePublishableKey(key)', () => {
     expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid.');
   });
 
+  it('throws an error if the publishable key is missing, when fatal: true', () => {
+    expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError('Publishable key is missing.');
+  });
+
   it('applies the proxyUrl if provided', () => {
     expect(parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { proxyUrl: 'example.com/__clerk' })).toEqual({
       frontendApi: 'example.com/__clerk',

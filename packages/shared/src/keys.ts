@@ -39,7 +39,10 @@ export function parsePublishableKey(
   key = key || '';
 
   if (!key || !isPublishableKey(key)) {
-    if (options.fatal) {
+    if (options.fatal && !key) {
+      throw new Error('Publishable key is missing.');
+    }
+    if (options.fatal && !isPublishableKey(key)) {
       throw new Error('Publishable key not valid.');
     }
     return null;
