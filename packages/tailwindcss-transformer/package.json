@@ -26,7 +26,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "jest"
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@babel/parser": "^7.24.5",

@@ -138,6 +138,10 @@
     "format:check": {
       "outputs": []
     },
+    "typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
     "//#test:integration:ap-flows": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
