@@ -567,7 +567,7 @@ export const ptBR: LocalizationResource = {
     form_param_max_length_exceeded__first_name: 'O primeiro nome não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__last_name: 'O sobrenome não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__name: 'O nome não deve exceder 256 caracteres.',
-    form_param_nil: undefined,
+    form_param_nil: 'Campo obrigatório',
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Senha incorreta.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
@@ -602,6 +602,9 @@ export const ptBR: LocalizationResource = {
       sentencePrefix: 'Sua senha deve conter',
     },
     phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
+    verification_expired: 'Esta verificação expirou. Você deve criar uma nova.',
+    oauth_access_denied: 'Você não concedeu acesso à sua conta do Google',
+    session_exists: 'Você está atualmente no modo de sessão única. Você só pode entrar em uma conta por vez.',
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',
