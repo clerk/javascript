@@ -20,7 +20,7 @@ export interface EnterpriseAccountResource extends ClerkResource {
   providerUserId: string | null;
   publicMetadata: Record<string, unknown> | null;
   verification: VerificationResource | null;
-  toJSON: () => EnterpriseAccountJSONSnapshot;
+  __internal_toSnapshot: () => EnterpriseAccountJSONSnapshot;
 }
 
 export interface EnterpriseAccountConnectionResource extends ClerkResource {
@@ -34,5 +34,5 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   syncUserAttributes: boolean;
-  toJSON: () => EnterpriseAccountConnectionJSONSnapshot;
+  __internal_toSnapshot: () => EnterpriseAccountConnectionJSONSnapshot;
 }

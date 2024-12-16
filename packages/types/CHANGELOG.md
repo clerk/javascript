@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.39.4
+
+### Patch Changes
+
+- Added min and max length username settings to username field error. ([#4771](https://github.com/clerk/javascript/pull/4771)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename `toJSON()` resource methods to `__internal_toSnapshot()` to avoid issues with serializing functions. ([#4777](https://github.com/clerk/javascript/pull/4777)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.39.3
 
 ### Patch Changes

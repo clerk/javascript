@@ -20,7 +20,7 @@ export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
 
   const { userId } = useAuthContext();
   if (userId) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
@@ -30,7 +30,7 @@ export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
 
   const { userId } = useAuthContext();
   if (userId === null) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
@@ -42,7 +42,7 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   if (!isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => {
@@ -52,7 +52,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   if (isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
@@ -109,9 +109,9 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  const unauthorized = <>{fallback ?? null}</>;
+  const unauthorized = fallback ?? null;
 
-  const authorized = <>{children}</>;
+  const authorized = children;
 
   if (!userId) {
     return unauthorized;

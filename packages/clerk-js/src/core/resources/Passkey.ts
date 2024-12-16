@@ -146,12 +146,12 @@ export class Passkey extends BaseResource implements PasskeyResource {
     return this;
   }
 
-  public toJSON(): PasskeyJSONSnapshot {
+  public __internal_toSnapshot(): PasskeyJSONSnapshot {
     return {
       object: 'passkey',
       id: this.id,
       name: this.name,
-      verification: this.verification?.toJSON() || null,
+      verification: this.verification?.__internal_toSnapshot() || null,
       last_used_at: this.lastUsedAt?.getTime() || null,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
