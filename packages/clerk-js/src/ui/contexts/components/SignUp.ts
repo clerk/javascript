@@ -20,6 +20,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -31,6 +32,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
+  const isCombinedFlow = options.signInUrl === options.signUpUrl;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -87,5 +89,6 @@ export const useSignUpContext = (): SignUpContextType => {
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
+    isCombinedFlow,
   };
 };

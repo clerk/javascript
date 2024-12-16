@@ -9,7 +9,7 @@ export function buildEmailLinkRedirectUrl(
   baseUrl: string | undefined = '',
 ): string {
   const { routing, authQueryString, path } = ctx;
-  const isCombinedFlow = '__experimental' in ctx && ctx.__experimental?.combinedProps;
+  const isCombinedFlow = 'isCombinedFlow' in ctx && ctx.isCombinedFlow;
   return buildRedirectUrl({
     routing,
     baseUrl,
