@@ -121,6 +121,8 @@ type IsomorphicLoadedClerk = Without<
   | 'mountUserProfile'
   | 'mountWaitlist'
   | 'client'
+  | '__internal_getCachedResources'
+  | '__internal_reloadInitialResources'
 > & {
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;

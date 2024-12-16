@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.5.0",
+  "version": "2.6.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -39,6 +39,10 @@
     "./local-credentials": {
       "types": "./dist/local-credentials/index.d.ts",
       "default": "./dist/local-credentials/index.js"
+    },
+    "./secure-store": {
+      "types": "./dist/secure-store/index.d.ts",
+      "default": "./dist/secure-store/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -48,7 +52,8 @@
     "dist",
     "web",
     "local-credentials",
-    "passkeys"
+    "passkeys",
+    "secure-store"
   ],
   "scripts": {
     "build": "tsup",
@@ -57,7 +62,8 @@
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
-    "publish:local": "pnpm yalc push --replace  --sig"
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",

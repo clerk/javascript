@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.22.0",
+  "version": "0.22.2",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -96,8 +96,8 @@
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15",
-    "react": "^18.0.0 || ^19.0.0-beta",
-    "react-dom": "^18.0.0 || ^19.0.0-beta"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
     "next": {

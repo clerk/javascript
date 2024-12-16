@@ -1,5 +1,77 @@
 # Change Log
 
+## 2.6.1
+
+### Patch Changes
+
+- Rename `toJSON()` resource methods to `__internal_toSnapshot()` to avoid issues with serializing functions. ([#4777](https://github.com/clerk/javascript/pull/4777)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`aeafa7c5efd50c893d088ac99199d7eaecc04025`](https://github.com/clerk/javascript/commit/aeafa7c5efd50c893d088ac99199d7eaecc04025), [`acd9326ef2d6942b981b3ee59c4b20ddd303323d`](https://github.com/clerk/javascript/commit/acd9326ef2d6942b981b3ee59c4b20ddd303323d)]:
+  - @clerk/clerk-js@5.42.1
+  - @clerk/types@4.39.4
+  - @clerk/clerk-react@5.20.2
+  - @clerk/shared@2.20.2
+
+## 2.6.0
+
+### Minor Changes
+
+- Introduce improved offline support for Expo. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
+
+  We're introducing an improved offline support for the `@clerk/clerk-expo` package to enhance reliability and user experience. This new improvement allows apps to bootstrap without an internet connection by using cached Clerk resources, ensuring quick initialization.
+
+  It solves issues as the following:
+
+  - Faster resolution of the `isLoaded` property and the `ClerkLoaded` component, with only a single network fetch attempt, and if it fails, it falls back to the cached resources.
+  - The `getToken` function of `useAuth` hook now returns a cached token if network errors occur.
+  - Developers can now catch and handle network errors gracefully in their custom flows, as the errors are no longer muted.
+
+  How to use it:
+
+  1. Install the `expo-secure-store` package in your project by running:
+
+     ```bash
+     npm i expo-secure-store
+     ```
+
+  2. Use `import { secureStore } from "@clerk/clerk-expo/secure-store"` to import our implementation of the `SecureStore` API.
+  3. Pass the `secureStore` in the `__experimental_resourceCache` property of the `ClerkProvider` to enable offline support.
+
+  ```tsx
+  import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
+  import { Slot } from 'expo-router';
+  import { tokenCache } from '../token-cache';
+  import { secureStore } from '@clerk/clerk-expo/secure-store';
+
+  export default function RootLayout() {
+    const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+    if (!publishableKey) {
+      throw new Error('Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env file');
+    }
+
+    return (
+      <ClerkProvider
+        publishableKey={publishableKey}
+        tokenCache={tokenCache}
+        __experimental_resourceCache={secureStore}
+      >
+        <ClerkLoaded>
+          <Slot />
+        </ClerkLoaded>
+      </ClerkProvider>
+    );
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`e80166e08c8e230ce9ee48f2eaef3b27996b7557`](https://github.com/clerk/javascript/commit/e80166e08c8e230ce9ee48f2eaef3b27996b7557), [`66ad299e4b6496ea4a93799de0f1ecfad920ddad`](https://github.com/clerk/javascript/commit/66ad299e4b6496ea4a93799de0f1ecfad920ddad), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`85a36a8ed615c968e9b381be97db797d96f69acc`](https://github.com/clerk/javascript/commit/85a36a8ed615c968e9b381be97db797d96f69acc), [`63b95ad5c0463f4d10db08f18f97e7c94102930d`](https://github.com/clerk/javascript/commit/63b95ad5c0463f4d10db08f18f97e7c94102930d), [`7f7edcaa8228c26d19e9081979100ada7e982095`](https://github.com/clerk/javascript/commit/7f7edcaa8228c26d19e9081979100ada7e982095), [`c7d7f45947c151342cfb2f7ffd67628da4cebdd7`](https://github.com/clerk/javascript/commit/c7d7f45947c151342cfb2f7ffd67628da4cebdd7), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d)]:
+  - @clerk/clerk-js@5.42.0
+  - @clerk/shared@2.20.1
+  - @clerk/clerk-react@5.20.1
+  - @clerk/types@4.39.3
+
 ## 2.5.0
 
 ### Minor Changes

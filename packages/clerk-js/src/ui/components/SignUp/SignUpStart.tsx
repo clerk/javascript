@@ -20,7 +20,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { buildRequest, createPasswordError, handleError, useFormControl } from '../../utils';
+import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
@@ -52,7 +52,7 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
-    userSettings: { passwordSettings },
+    userSettings: { passwordSettings, usernameSettings },
   } = useEnvironment();
 
   const { mode } = userSettings.signUp;
@@ -78,6 +78,7 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
       transformer: value => value.trim(),
+      buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
@@ -176,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:

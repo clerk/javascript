@@ -99,7 +99,7 @@
     "rimraf": "6.0.1",
     "statuses": "^1.4.0",
     "tree-kill": "^1.2.2",
-    "ts-jest": "^29.0.3",
+    "ts-jest": "29.2.5",
     "tsup": "catalog:repo",
     "turbo": "^2.0.14",
     "turbo-ignore": "^2.0.6",

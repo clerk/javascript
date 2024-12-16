@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -64,8 +64,8 @@
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SignInWithMetamaskButton } from '../SignInWithMetamaskButton';
 
-const mockAuthenticatewithMetamask = jest.fn();
+const mockAuthenticatewithMetamask = vi.fn();
 const originalError = console.error;
 
 const mockClerk = {
   authenticateWithMetamask: mockAuthenticatewithMetamask,
 } as any;
 
-jest.mock('../withClerk', () => {
+vi.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => (
       <Component
@@ -24,7 +25,7 @@ jest.mock('../withClerk', () => {
 
 describe('<SignInWithMetamaskButton/>', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {
@@ -38,7 +39,8 @@ describe('<SignInWithMetamaskButton/>', () => {
   it('calls clerk.authenticateWithMetamask when clicked', async () => {
     render(<SignInWithMetamaskButton />);
     const btn = screen.getByText('Sign in with Metamask');
-    userEvent.click(btn);
+    await userEvent.click(btn);
+
     await waitFor(() => {
       expect(mockAuthenticatewithMetamask).toHaveBeenCalled();
     });
@@ -53,8 +55,8 @@ describe('<SignInWithMetamaskButton/>', () => {
     expect(() => {
       render(
         <SignInWithMetamaskButton>
-          <button>1</button>
-          <button>2</button>
+          <button type='button'>1</button>
+          <button type='button'>2</button>
         </SignInWithMetamaskButton>,
       );
     }).toThrow();

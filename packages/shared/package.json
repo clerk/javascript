@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.20.0",
+  "version": "2.20.2",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -151,8 +151,8 @@
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "react": "^18 || ^19.0.0-0",
-    "react-dom": "^18 || ^19.0.0-0"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
     "react": {
