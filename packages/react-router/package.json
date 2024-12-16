@@ -68,7 +68,8 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig"
+    "publish:local": "pnpm dlx yalc push --replace --sig",
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
