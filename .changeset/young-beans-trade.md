@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Improve experience when swapping keys on Keyless mode.
+Improves the error message when changing keys in development causes a subsequent request to fail.
