@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
@@ -33,7 +34,7 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = !options.signUpUrl;
+  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
