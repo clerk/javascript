@@ -37,7 +37,8 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, ...ctx } = context;
+  const { componentName, mode, ..._ctx } = context;
+  const ctx = _ctx.__experimental?.combinedProps || _ctx;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
@@ -52,6 +53,7 @@ export const useSignInContext = (): SignInContextType => {
       signInForceRedirectUrl: ctx.forceRedirectUrl,
     },
     queryParams,
+    mode,
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
@@ -70,6 +72,13 @@ export const useSignInContext = (): SignInContextType => {
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+  if (options.experimental?.combinedFlow) {
+    signUpUrl = buildURL(
+      { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
+      { stringify: true },
+    );
+  }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 

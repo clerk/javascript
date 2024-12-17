@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`useRoutingProps() path prop has priority over path option 1`] = `
+exports[`useRoutingProps() > path prop has priority over path option 1`] = `
 <body>
   <div>
     <div>
@@ -10,7 +10,7 @@ exports[`useRoutingProps() path prop has priority over path option 1`] = `
 </body>
 `;
 
-exports[`useRoutingProps() the path option is ignored when "hash" routing prop 1`] = `
+exports[`useRoutingProps() > the path option is ignored when "hash" routing prop 1`] = `
 <body>
   <div>
     <div>
@@ -20,7 +20,7 @@ exports[`useRoutingProps() the path option is ignored when "hash" routing prop 1
 </body>
 `;
 
-exports[`useRoutingProps() the path option is ignored when "virtual" routing prop 1`] = `
+exports[`useRoutingProps() > the path option is ignored when "virtual" routing prop 1`] = `
 <body>
   <div>
     <div>

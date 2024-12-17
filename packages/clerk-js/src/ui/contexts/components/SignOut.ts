@@ -12,10 +12,8 @@ export type SignOutContextType = {
 export const useSignOutContext = (): SignOutContextType => {
   const { navigate } = useRouter();
   const clerk = useClerk();
-
   const navigateAfterSignOut = () => navigate(clerk.buildAfterSignOutUrl());
   const navigateAfterMultiSessionSingleSignOutUrl = () => navigate(clerk.buildAfterMultiSessionSingleSignOutUrl());
-
   return {
     navigateAfterSignOut,
     navigateAfterMultiSessionSingleSignOutUrl,

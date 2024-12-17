@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -20,7 +20,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { buildRequest, createPasswordError, handleError, useFormControl } from '../../utils';
+import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
@@ -39,7 +39,10 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
+  const options = useOptions();
+  const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -49,7 +52,7 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
-    userSettings: { passwordSettings },
+    userSettings: { passwordSettings, usernameSettings },
   } = useEnvironment();
 
   const { mode } = userSettings.signUp;
@@ -75,6 +78,7 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
       transformer: value => value.trim(),
+      buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
@@ -173,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:
@@ -315,7 +320,7 @@ function _SignUpStart(): JSX.Element {
             <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Card.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
+              to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>
         </Card.Footer>

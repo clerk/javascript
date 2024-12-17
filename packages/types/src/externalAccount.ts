@@ -1,3 +1,5 @@
+import type { ExternalAccountJSONSnapshot } from 'snapshots';
+
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { ClerkResource } from './resource';
 import type { VerificationResource } from './verification';
@@ -26,4 +28,5 @@ export interface ExternalAccountResource extends ClerkResource {
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
   accountIdentifier: () => string;
+  __internal_toSnapshot: () => ExternalAccountJSONSnapshot;
 }

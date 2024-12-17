@@ -8,6 +8,9 @@ export default function Page() {
         path={'/sign-in'}
         signUpUrl={'/sign-up'}
         fallback={<>Loading sign in</>}
+        __experimental={{
+          combinedProps: {},
+        }}
       />
     </div>
   );

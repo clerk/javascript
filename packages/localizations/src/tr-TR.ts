@@ -463,6 +463,7 @@ export const trTR: LocalizationResource = {
 
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Giriş yap',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Doğrulama kodu',

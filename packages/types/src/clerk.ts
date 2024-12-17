@@ -1,3 +1,4 @@
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
 import type { TelemetryCollector } from 'telemetry';
 
 import type {
@@ -463,7 +464,7 @@ export interface Clerk {
   /**
    * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
    */
-  buildWaitlistUrl(): string;
+  buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
    *
@@ -592,6 +593,19 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * This is an optional function.
+   * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   */
+  __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
+    | undefined;
+
+  /**
+   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+   **/
+  __internal_reloadInitialResources: () => Promise<void>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -748,11 +762,20 @@ export type ClerkOptions = ClerkOptionsNavigation &
       {
         persistClient: boolean;
         rethrowOfflineNetworkErrors: boolean;
+        combinedFlow: boolean;
       },
       Record<string, any>
     >;
 
+    /**
+     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     */
     __internal_claimKeylessApplicationUrl?: string;
+
+    /**
+     * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     */
+    __internal_copyInstanceKeysUrl?: string;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
@@ -903,12 +926,65 @@ export type SignInProps = RoutingOptions & {
   /**
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
+  __experimental?: Record<string, any> & { newComponents?: boolean; combinedProps?: SignInCombinedProps };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
+} & TransferableOption &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
+
+export type SignInCombinedProps = RoutingOptions & {
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  forceRedirectUrl?: string | null;
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  fallbackRedirectUrl?: string | null;
+  /**
+   * Full URL or path to for the sign in process.
+   * Used to fill the "Sign in" link in the SignUp component.
+   */
+  signInUrl?: string;
+  /**
+   * Full URL or path to for the sign up process.
+   * Used to fill the "Sign up" link in the SignUp component.
+   */
+  signUpUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: SignInTheme;
+  /**
+   * Initial values that are used to prefill the sign in or up forms.
+   */
+  initialValues?: SignInInitialValues & SignUpInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
   __experimental?: Record<string, any> & { newComponents?: boolean };
   /**
    * Full URL or path to for the waitlist process.
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   * Additional arbitrary metadata to be stored alongside the User object
+   */
+  unsafeMetadata?: SignUpUnsafeMetadata;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &

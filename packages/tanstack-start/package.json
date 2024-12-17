@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.6.2",
+  "version": "0.8.2",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -34,12 +34,17 @@
       "types": "./dist/server/index.d.ts",
       "default": "./dist/server/index.js"
     },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "errors",
     "server"
   ],
   "scripts": {
@@ -54,10 +59,10 @@
     "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
@@ -74,8 +79,8 @@
   "peerDependencies": {
     "@tanstack/react-router": ">=1.81.9",
     "@tanstack/start": ">=1.81.9",
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

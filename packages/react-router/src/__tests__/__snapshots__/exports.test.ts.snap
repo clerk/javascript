@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`root public exports > should not change unexpectedly 1`] = `
+[
+  "AuthenticateWithRedirectCallback",
+  "ClerkLoaded",
+  "ClerkLoading",
+  "ClerkProvider",
+  "CreateOrganization",
+  "GoogleOneTap",
+  "OrganizationList",
+  "OrganizationProfile",
+  "OrganizationSwitcher",
+  "Protect",
+  "RedirectToCreateOrganization",
+  "RedirectToOrganizationProfile",
+  "RedirectToSignIn",
+  "RedirectToSignUp",
+  "RedirectToUserProfile",
+  "SignIn",
+  "SignInButton",
+  "SignInWithMetamaskButton",
+  "SignOutButton",
+  "SignUp",
+  "SignUpButton",
+  "SignedIn",
+  "SignedOut",
+  "UserButton",
+  "UserProfile",
+  "Waitlist",
+  "useAuth",
+  "useClerk",
+  "useEmailLink",
+  "useOrganization",
+  "useOrganizationList",
+  "useReverification",
+  "useSession",
+  "useSessionList",
+  "useSignIn",
+  "useSignUp",
+  "useUser",
+]
+`;
+
+exports[`ssr public exports > should not change unexpectedly 1`] = `
+[
+  "getAuth",
+  "rootAuthLoader",
+]
+`;

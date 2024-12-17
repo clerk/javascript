@@ -2,6 +2,7 @@ import type {
   AttemptPhoneNumberVerificationParams,
   IdentificationLinkResource,
   PhoneNumberJSON,
+  PhoneNumberJSONSnapshot,
   PhoneNumberResource,
   SetReservedForSecondFactorParams,
   VerificationResource,
@@ -18,8 +19,8 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   verification!: VerificationResource;
   backupCodes?: string[];
 
-  public constructor(data: Partial<PhoneNumberJSON>, pathRoot: string);
-  public constructor(data: PhoneNumberJSON, pathRoot: string) {
+  public constructor(data: Partial<PhoneNumberJSON | PhoneNumberJSONSnapshot>, pathRoot: string);
+  public constructor(data: PhoneNumberJSON | PhoneNumberJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -70,7 +71,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     return this.phoneNumber;
   };
 
-  protected fromJSON(data: PhoneNumberJSON | null): this {
+  protected fromJSON(data: PhoneNumberJSON | PhoneNumberJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -83,5 +84,18 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     this.backupCodes = data.backup_codes;
     return this;
+  }
+
+  public __internal_toSnapshot(): PhoneNumberJSONSnapshot {
+    return {
+      object: 'phone_number',
+      id: this.id || '',
+      phone_number: this.phoneNumber,
+      reserved_for_second_factor: this.reservedForSecondFactor,
+      default_second_factor: this.defaultSecondFactor,
+      verification: this.verification.__internal_toSnapshot(),
+      linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
+      backup_codes: this.backupCodes,
+    };
   }
 }

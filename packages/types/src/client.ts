@@ -1,3 +1,5 @@
+import type { ClientJSONSnapshot } from 'snapshots';
+
 import type { ClerkResource } from './resource';
 import type { ActiveSessionResource, SessionResource } from './session';
 import type { SignInResource } from './signIn';
@@ -20,4 +22,5 @@ export interface ClientResource extends ClerkResource {
   cookieExpiresAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  __internal_toSnapshot: () => ClientJSONSnapshot;
 }

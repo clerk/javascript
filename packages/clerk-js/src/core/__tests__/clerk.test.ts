@@ -10,7 +10,7 @@ import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp }
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
-const mockEnvironmentFetch = jest.fn();
+const mockEnvironmentFetch = jest.fn(() => Promise.resolve({}));
 
 jest.mock('../resources/Client');
 jest.mock('../resources/Environment');
@@ -26,7 +26,7 @@ jest.mock('../auth/devBrowser', () => ({
   }),
 }));
 
-Client.getInstance = jest.fn().mockImplementation(() => {
+Client.getOrCreateInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
 });
 Environment.getInstance = jest.fn().mockImplementation(() => {
@@ -564,7 +564,6 @@ describe('Clerk singleton', () => {
         expect(mockClientRemoveSessions).toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -590,7 +589,6 @@ describe('Clerk singleton', () => {
         expect(mockSession1.remove).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -614,7 +612,6 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).not.toHaveBeenCalledWith({
           session: null,
-          beforeEmit: expect.any(Function),
         });
       });
     });
@@ -637,7 +634,6 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          beforeEmit: expect.any(Function),
           redirectUrl: '/',
         });
       });
@@ -653,8 +649,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn(async ({ beforeEmit }) => void (beforeEmit && beforeEmit()));
-      sut.navigate = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });
       await waitFor(() => {
@@ -662,10 +657,8 @@ describe('Clerk singleton', () => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.setActive).toHaveBeenCalledWith({
           session: null,
-          beforeEmit: expect.any(Function),
           redirectUrl: '/after-sign-out',
         });
-        expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
   });
@@ -1735,7 +1728,16 @@ describe('Clerk singleton', () => {
   describe('.handleEmailLinkVerification()', () => {
     beforeEach(() => {
       mockClientFetch.mockReset();
-      mockEnvironmentFetch.mockReset();
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
     });
 
     it('completes the sign in flow if a session was created on this client', async () => {
@@ -1982,6 +1984,20 @@ describe('Clerk singleton', () => {
    * 3) Write test the mimic sync/link in prod
    */
   describe('Clerk().isSatellite and Clerk().domain getters', () => {
+    beforeEach(() => {
+      mockClientFetch.mockReset();
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+    });
+
     it('domain is string, isSatellite is true', async () => {
       const sut = new Clerk(productionPublishableKey, {
         domain: 'example.com',
