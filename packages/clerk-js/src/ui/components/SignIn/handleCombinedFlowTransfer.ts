@@ -45,8 +45,6 @@ export function handleCombinedFlowTransfer({
     return navigate(waitlistUrl);
   }
 
-  console.log(clerk.client.signUp);
-
   clerk.client.signUp[identifierAttribute] = identifierValue;
   const paramsToForward = new URLSearchParams();
   if (organizationTicket) {
@@ -82,7 +80,12 @@ export function handleCombinedFlowTransfer({
 
 function hasOptionalFields(signUp: SignUpResource) {
   const filteredFields = signUp.optionalFields.filter(
-    field => !field.startsWith('oauth_') && !field.startsWith('web3_'),
+    field =>
+      !field.startsWith('oauth_') &&
+      !field.startsWith('web3_') &&
+      field !== 'password' &&
+      field !== 'enterprise_sso' &&
+      field !== 'saml',
   );
   return filteredFields.length > 0;
 }
