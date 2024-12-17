@@ -1,7 +1,7 @@
+import { link } from 'fs';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-
-const isCI = process.env.CI === 'true';
+import { linkPackage } from './utils';
 
 const astroNode = applicationConfig()
   .setName('astro-node')
@@ -11,9 +11,9 @@ const astroNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/astro', isCI ? '*' : 'link:../../packages/astro')
-  .addDependency('@clerk/types', isCI ? '*' : 'link:../../packages/types')
-  .addDependency('@clerk/localizations', isCI ? '*' : 'link:../../packages/localizations');
+  .addDependency('@clerk/astro', linkPackage('astro'))
+  .addDependency('@clerk/types', linkPackage('types'))
+  .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 const astroStatic = astroNode.clone().setName('astro-hybrid').useTemplate(templates['astro-hybrid']);
 

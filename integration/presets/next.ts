@@ -1,8 +1,8 @@
+import { link } from 'fs';
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
-
-const isCI = process.env.CI === 'true';
+import { linkPackage } from './utils';
 
 const appRouter = applicationConfig()
   .setName('next-app-router')
@@ -15,9 +15,9 @@ const appRouter = applicationConfig()
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', isCI ? constants.E2E_CLERK_VERSION || '*' : 'link:../../packages/next')
-  .addDependency('@clerk/shared', isCI ? '*' : 'link:../../packages/shared')
-  .addDependency('@clerk/types', isCI ? '*' : 'link:../../packages/types');
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || linkPackage('nextjs'))
+  .addDependency('@clerk/shared', linkPackage('shared'))
+  .addDependency('@clerk/types', linkPackage('types'));
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 

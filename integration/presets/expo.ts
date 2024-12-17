@@ -1,7 +1,7 @@
+import { link } from 'fs';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-
-const isCI = process.env.CI === 'true';
+import { linkPackage } from './utils';
 
 const expoWeb = applicationConfig()
   .setName('expo-web')
@@ -11,7 +11,7 @@ const expoWeb = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-expo', isCI ? '*' : 'link:../../packages/expo');
+  .addDependency('@clerk/clerk-expo', linkPackage('expo'));
 
 export const expo = {
   expoWeb,
