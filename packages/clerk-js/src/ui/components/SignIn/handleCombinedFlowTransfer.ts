@@ -51,7 +51,7 @@ export function handleCombinedFlowTransfer({
     paramsToForward.set('__clerk_ticket', organizationTicket);
   }
 
-  // Attempt to transfer directly to sign up verification if email or phone was used. The signUp.create() call will
+  // Attempt to transfer directly to sign up verification if email or phone was used and there are no optional fields. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
   if (
     (!hasOptionalFields(clerk.client.signUp) && identifierAttribute === 'emailAddress') ||
