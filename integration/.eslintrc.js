@@ -29,7 +29,7 @@ module.exports = {
     {
       rules: {
         'turbo/no-undeclared-variables': 'off',
-      }
-    }
+      },
+    },
   ],
 };
