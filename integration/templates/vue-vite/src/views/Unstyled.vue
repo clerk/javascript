@@ -3,6 +3,6 @@ import { SignInButton, SignUpButton } from '@clerk/vue';
 </script>
 
 <template>
-  <SignInButton mode="modal" />
-  <SignUpButton mode="modal" />
+  <SignInButton mode="modal" fallbackRedirectUrl="/" />
+  <SignUpButton mode="modal" fallbackRedirectUrl="/" />
 </template>
