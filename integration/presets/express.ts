@@ -1,4 +1,3 @@
-import { link } from 'fs';
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
