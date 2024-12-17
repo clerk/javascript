@@ -2,8 +2,7 @@ name: CI
 
 on:
   merge_group:
-  pull_request_target:
-    types: [opened, synchronize]
+  pull_request:
     branches:
       - main
       - release/v4
@@ -13,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from accessing secrets for malicious purposes
+  # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
@@ -48,7 +47,6 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
@@ -120,7 +118,6 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
@@ -182,7 +179,6 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
