@@ -60,7 +60,7 @@ describe('parsePublishableKey(key)', () => {
 
   it('throws an error if the publishable key is missing, when fatal: true', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
-      'Publishable key is missing. Ensure that your publishable key is correctly configured. Make sure to double-check your environment configuration (.env file).',
+      'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
     );
   });
 
