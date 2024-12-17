@@ -43,20 +43,14 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
 
-  /**
-   * Create a debounced version of the feedback.
-   */
+  // Create a debounced version of the feedback.
   const { debounced } = useFormControlFeedback({ feedback, feedbackType, isFocused });
 
-  /**
-   * Both html attributes (e.g. data-invalid) and css styles depend on hasError being debounced
-   */
+  // Both html attributes (e.g. data-invalid) and css styles depend on hasError being debounced
   const hasError = debounced.feedbackType === 'error';
 
-  /**
-   * Track whether the `FormErrorText` has been rendered.
-   * We use this to append its id the `aria-describedby` of the `input`.
-   */
+  // Track whether the `FormErrorText` has been rendered.
+  // We use this to append its id the `aria-describedby` of the `input`.
   const errorMessageId = hasError ? `error-${propsId}` : '';
   const value = React.useMemo(
     () => ({
