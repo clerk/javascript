@@ -34,11 +34,13 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
+
+  const isCombinedFlow =
+    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) || context.combinedFlow;
 
   const { componentName, mode, ..._ctx } = context;
   const ctx = _ctx.__experimental?.combinedProps || _ctx;
@@ -76,7 +78,7 @@ export const useSignInContext = (): SignInContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
-  if (options.experimental?.combinedFlow) {
+  if (isCombinedFlow) {
     signUpUrl = buildURL(
       { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
       { stringify: true },

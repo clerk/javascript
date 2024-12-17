@@ -13,6 +13,7 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
     signUpForceRedirectUrl,
     mode,
     initialValues,
+    combinedFlow,
     ...rest
   } = props;
   children = normalizeWithDefaultValue(children, 'Sign in');
@@ -25,6 +26,7 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
       signUpFallbackRedirectUrl,
       signUpForceRedirectUrl,
       initialValues,
+      combinedFlow,
     };
 
     if (mode === 'modal') {
