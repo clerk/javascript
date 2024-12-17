@@ -7,7 +7,7 @@ import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
-import { handleValueOrFn, noop } from '@clerk/shared/utils';
+import { createDeferredPromise, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   ActiveSessionResource,
@@ -65,7 +65,9 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
+  Web3Strategy,
 } from '@clerk/types';
+import type CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import { UI } from '../ui/new';
@@ -138,6 +140,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: ClerkInterface['proxyUrl'];
     __clerk_domain?: ClerkInterface['domain'];
+    __clerk_coinbase_sdk: Promise<typeof CoinbaseWalletSDK>;
   }
 }
 
@@ -197,6 +200,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #coinbaseSDKResolvers = createDeferredPromise();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -367,6 +371,20 @@ export class Clerk implements ClerkInterface {
 
   #isCombinedFlow(): boolean {
     return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
+  #isCoinbaseWalletEnabled(): boolean {
+    const attributes = this.environment?.userSettings.attributes;
+    if (!attributes) {
+      return false;
+    }
+
+    const findWeb3Attributes = Object.entries(attributes)
+      .filter(([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'))
+      .map(([, desc]) => desc.first_factors)
+      .flat() as any as Web3Strategy[];
+
+    return findWeb3Attributes.includes('web3_coinbase_wallet_signature');
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -1654,6 +1672,16 @@ export class Clerk implements ClerkInterface {
     this.environment = environment;
   }
 
+  private prefetchDependencies = async (): Promise<void> => {
+    if (this.#isCoinbaseWalletEnabled()) {
+      window.__clerk_coinbase_sdk = this.#coinbaseSDKResolvers.promise as Promise<typeof CoinbaseWalletSDK>;
+
+      await import('@coinbase/wallet-sdk').then(mod => {
+        this.#coinbaseSDKResolvers.resolve(mod.CoinbaseWalletSDK);
+      });
+    }
+  };
+
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
       this.__internal_country = country;
@@ -1906,6 +1934,8 @@ export class Clerk implements ClerkInterface {
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
+
+        void this.prefetchDependencies();
 
         initComponents();
 
