@@ -1,4 +1,4 @@
-import type { LoadedClerk, SignUpModes } from '@clerk/types';
+import type { LoadedClerk, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
 import { completeSignUpFlow } from '../SignUp/util';
@@ -45,6 +45,8 @@ export function handleCombinedFlowTransfer({
     return navigate(waitlistUrl);
   }
 
+  console.log(clerk.client.signUp);
+
   clerk.client.signUp[identifierAttribute] = identifierValue;
   const paramsToForward = new URLSearchParams();
   if (organizationTicket) {
@@ -53,7 +55,10 @@ export function handleCombinedFlowTransfer({
 
   // Attempt to transfer directly to sign up verification if email or phone was used. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
-  if (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber') {
+  if (
+    (!hasOptionalFields(clerk.client.signUp) && identifierAttribute === 'emailAddress') ||
+    identifierAttribute === 'phoneNumber'
+  ) {
     return clerk.client.signUp
       .create({
         [identifierAttribute]: identifierValue,
@@ -73,4 +78,11 @@ export function handleCombinedFlowTransfer({
   }
 
   return navigate(`create?${paramsToForward.toString()}`);
+}
+
+function hasOptionalFields(signUp: SignUpResource) {
+  const filteredFields = signUp.optionalFields.filter(
+    field => !field.startsWith('oauth_') && !field.startsWith('web3_'),
+  );
+  return filteredFields.length > 0;
 }
