@@ -8,7 +8,7 @@ import { getSecureAttribute } from '../getSecureAttribute';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
-  get: (mode?: 'only-suffixed') => string | undefined;
+  get: () => string | undefined;
   remove: () => void;
 };
 
@@ -22,12 +22,7 @@ export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHa
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
   const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
 
-  const get = (mode?: 'only-suffixed') => {
-    if (mode === 'only-suffixed') {
-      return suffixedDevBrowserCookie.get();
-    }
-    return suffixedDevBrowserCookie.get() || devBrowserCookie.get();
-  };
+  const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
