@@ -2,6 +2,8 @@ import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
+const isCI = process.env.CI === 'true';
+
 const cra = applicationConfig()
   .setName('react-cra')
   .useTemplate(templates['react-cra'])
@@ -10,8 +12,8 @@ const cra = applicationConfig()
   .addScript('dev', 'pnpm start')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || '*')
-  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || '*');
+  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || isCI ? '*' : 'link:../../packages/react')
+  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || isCI ? '*' : 'link:../../packages/themes');
 
 const vite = cra
   .clone()

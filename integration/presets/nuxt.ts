@@ -1,6 +1,8 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
+const isCI = process.env.CI === 'true';
+
 const nuxtNode = applicationConfig()
   .setName('nuxt-node')
   .useTemplate(templates['nuxt-node'])
@@ -10,7 +12,7 @@ const nuxtNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/nuxt', '*');
+  .addDependency('@clerk/nuxt', isCI ? '*' : 'link:../../packages/nuxt');
 
 export const nuxt = {
   node: nuxtNode,

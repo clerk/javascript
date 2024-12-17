@@ -1,6 +1,8 @@
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
+const isCI = process.env.CI === 'true';
+
 const router = applicationConfig()
   .setName('tanstack-router')
   .useTemplate(templates['tanstack-router'])
@@ -9,7 +11,7 @@ const router = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', '*');
+  .addDependency('@clerk/tanstack-start', isCI ? '*' : 'link:../../packages/tanstack-start');
 
 const start = applicationConfig()
   .setName('tanstack-start')
@@ -19,7 +21,7 @@ const start = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', '*');
+  .addDependency('@clerk/tanstack-start', isCI ? '*' : 'link:../../packages/tanstack-start');
 
 export const tanstack = {
   start,

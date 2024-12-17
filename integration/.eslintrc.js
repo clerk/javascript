@@ -26,5 +26,10 @@ module.exports = {
         '@typescript-eslint/no-redundant-type-constituents': 'warn', // TODO: Remove when we able to update tests
       },
     },
+    {
+      rules: {
+        'turbo/no-undeclared-variables': 'off',
+      }
+    }
   ],
 };
