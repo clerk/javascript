@@ -1,5 +1,11 @@
 # @clerk/vue
 
+## 0.1.3
+
+### Patch Changes
+
+- Fixed an issue when accessing Clerk properties inside composables before Clerk is available. ([#4779](https://github.com/clerk/javascript/pull/4779)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.1.2
 
 ### Patch Changes
