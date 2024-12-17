@@ -12,7 +12,7 @@ import type {
   WaitlistProps,
   Without,
 } from '@clerk/types';
-import type { PropsWithChildren, ReactElement } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
 import {
@@ -49,7 +49,7 @@ type FallbackProp = {
   /**
    * An optional element to render while the component is mounting.
    */
-  fallback?: ReactElement;
+  fallback?: ReactNode;
 };
 
 type UserProfileExportType = typeof _UserProfile & {
