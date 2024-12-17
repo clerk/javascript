@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.20.3
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
 ## 5.20.2
 
 ### Patch Changes
