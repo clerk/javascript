@@ -1,4 +1,3 @@
-import { link } from 'fs';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
