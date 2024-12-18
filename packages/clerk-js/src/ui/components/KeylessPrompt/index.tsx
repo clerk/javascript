@@ -2,7 +2,7 @@
 import { css } from '@emotion/react';
 import { useState } from 'react';
 
-import { useEnvironment } from '../../contexts';
+// import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
@@ -20,30 +20,35 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
       e.preventDefault();
-      setIsExpanded(prev => !prev);
+      if (!claimed) {
+        setIsExpanded(prev => !prev);
+      }
     }
-    if (e.key === 'Escape' && isExpanded) {
+    if (e.key === 'Escape' && isExpanded && !claimed) {
       setIsExpanded(false);
     }
   };
 
-  const claimed = Boolean(useEnvironment().authConfig.claimedAt);
+  //   const claimed = Boolean(useEnvironment().authConfig.claimedAt);
+  const claimed = false;
   //   const clerk = useClerk();
 
   return (
     <Portal>
       <Flex
-        aria-expanded={isExpanded}
         data-expanded={isExpanded}
-        role='button'
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
         onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
+        onMouseLeave={() => (claimed ? null : setIsExpanded(false))}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
         elementDescriptor={descriptors.impersonationFab}
-        aria-controls='keyless-content'
-        aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode controls'}
         align='center'
+        role='button'
+        aria-expanded={isExpanded}
+        aria-controls='keyless-content'
+        aria-disabled={claimed && isExpanded}
+        id='keyless-prompt'
+        aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode overlay'}
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
@@ -270,54 +275,60 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
         </Flex>
 
         {isExpanded && (
-          <p
-            css={css`
-              color: #b4b4b4;
-              font-size: 0.8125rem;
-              font-weight: 400;
-              line-height: 1rem;
-              max-width: 14.625rem;
-              min-height: 2rem;
-              animation: show-description 260ms ease-out forwards;
-
-              @keyframes show-description {
-                from {
-                  transform: translateY(-1.8px);
-                  opacity: 0;
-                }
-                to {
-                  transform: translateY(0);
-                  opacity: 1;
-                }
-              }
-            `}
+          <div
+            role='region'
+            id='keyless-content'
+            aria-labelledby='keyless-header'
           >
-            {claimed ? (
-              <>
-                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
-                Clerk Dashboard.
-              </>
-            ) : (
-              <>
-                API keys were missing so we generated them for you. Link this instance to your Clerk account to make
-                configuration changes.{' '}
-                <Link
-                  href='https://clerk.com/docs/keyless'
-                  sx={t => ({
-                    color: t.colors.$whiteAlpha600,
-                    textDecoration: 'underline solid',
-                    transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                    ':hover': {
-                      color: t.colors.$whiteAlpha800,
-                    },
-                  })}
-                >
-                  Learn more
-                  <span className='sr-only'> about keyless mode in Clerk</span>
-                </Link>
-              </>
-            )}
-          </p>
+            <p
+              css={css`
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
+                max-width: 14.625rem;
+                min-height: 2rem;
+                animation: show-description 260ms ease-out forwards;
+
+                @keyframes show-description {
+                  from {
+                    transform: translateY(-1.8px);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: translateY(0);
+                    opacity: 1;
+                  }
+                }
+              `}
+            >
+              {claimed ? (
+                <>
+                  You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
+                  Clerk Dashboard.
+                </>
+              ) : (
+                <>
+                  API keys were missing so we generated them for you. Link this instance to your Clerk account to make
+                  configuration changes.{' '}
+                  <Link
+                    aria-label='Learn more about Clerk keyless mode'
+                    href='https://clerk.com/docs/keyless'
+                    sx={t => ({
+                      color: t.colors.$whiteAlpha600,
+                      textDecoration: 'underline solid',
+                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                      ':hover': {
+                        color: t.colors.$whiteAlpha800,
+                      },
+                    })}
+                  >
+                    Learn more
+                  </Link>
+                </>
+              )}
+            </p>
+          </div>
         )}
 
         <a
