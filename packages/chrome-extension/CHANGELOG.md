@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.1.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.43.3
+  - @clerk/clerk-react@5.20.4
+  - @clerk/shared@2.20.4
+
 ## 2.1.5
 
 ### Patch Changes
