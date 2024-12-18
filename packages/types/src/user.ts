@@ -138,6 +138,8 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 export type VerifyTOTPParams = { code: string };
 
