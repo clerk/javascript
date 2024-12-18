@@ -144,6 +144,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       email_address: this.emailAddress,
       verification: this.verification.__internal_toSnapshot(),
       linked_to: this.linkedTo.map(link => link.__internal_toSnapshot()),
+      matches_sso_connection: this.matchesSsoConnection,
     };
   }
 }
