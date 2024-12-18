@@ -17,12 +17,12 @@ type KeylessPromptProps = {
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
+      e.preventDefault();
       setIsExpanded(prev => !prev);
     }
-    if (event.key === 'Escape' && isExpanded) {
+    if (e.key === 'Escape' && isExpanded) {
       setIsExpanded(false);
     }
   };
@@ -43,6 +43,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
         tabIndex={0}
         aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode controls'}
         sx={t => ({
+          role: 'region',
+          ariaLabel: 'Testing',
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
@@ -269,7 +271,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           <p
             css={css`
               color: #b4b4b4;
-              font-size: 0.75rem;
+              font-size: 0.8125rem;
               font-weight: 400;
               line-height: 1rem;
               max-width: 14.625rem;
@@ -309,6 +311,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   })}
                 >
                   Learn more
+                  <span className='sr-only'> about keyless mode in Clerk</span>
                 </Link>
               </>
             )}
@@ -332,7 +335,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             max-width: 14.625rem;
             padding: 0.25rem 0.625rem;
             border-radius: 1rem;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 500;
             letter-spacing: 0.12px;
             color: white;
