@@ -33,18 +33,18 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   return (
     <Portal>
       <Flex
-        align='center'
-        data-expanded={isExpanded}
         aria-expanded={isExpanded}
+        data-expanded={isExpanded}
+        role='button'
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
         elementDescriptor={descriptors.impersonationFab}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
+        aria-controls='keyless-content'
         aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode controls'}
+        align='center'
         sx={t => ({
-          role: 'region',
-          ariaLabel: 'Testing',
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
@@ -63,6 +63,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
+
+            ariaLabel: 'I am expanded',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
             height: 'fit-content',
@@ -335,7 +337,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             max-width: 14.625rem;
             padding: 0.25rem 0.625rem;
             border-radius: 1rem;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 500;
             letter-spacing: 0.12px;
             color: white;
