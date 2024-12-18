@@ -28,5 +28,5 @@ export const SignInWithMetamaskButton = withClerk(
     const childProps = { ...rest, onClick: wrappedChildClickHandler };
     return React.cloneElement(child as React.ReactElement<unknown>, childProps);
   },
-  'SignInWithMetamask',
+  { component: 'SignInWithMetamask', renderWhileLoading: true },
 );

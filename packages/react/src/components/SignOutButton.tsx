@@ -27,5 +27,5 @@ export const SignOutButton = withClerk(
     const childProps = { ...rest, onClick: wrappedChildClickHandler };
     return React.cloneElement(child as React.ReactElement<unknown>, childProps);
   },
-  'SignOutButton',
+  { component: 'SignOutButton', renderWhileLoading: true },
 );
