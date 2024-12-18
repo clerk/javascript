@@ -1,5 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
+import { linkPackage } from './utils';
 
 const expoWeb = applicationConfig()
   .setName('expo-web')
@@ -9,7 +10,7 @@ const expoWeb = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-expo', '*');
+  .addDependency('@clerk/clerk-expo', linkPackage('expo'));
 
 export const expo = {
   expoWeb,
