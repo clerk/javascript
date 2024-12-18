@@ -101,6 +101,8 @@ export type PassKeyConfig = PasskeyFactor;
 export type OAuthConfig = OauthFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 
 export type SamlConfig = SamlFactor & {

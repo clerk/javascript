@@ -71,8 +71,8 @@ export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: Crea
       return;
     }
 
-    // 2. If no JWT is found in the first step, check if a JWT is already available in the suffixed __clerk_db_jwt JS cookie
-    if (devBrowserCookie.get('only-suffixed')) {
+    // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
+    if (devBrowserCookie.get()) {
       return;
     }
 

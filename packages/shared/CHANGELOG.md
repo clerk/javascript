@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.20.3
+
+### Patch Changes
+
+- Improve error message when Publishable Key is missing when trying to parse it. ([#4785](https://github.com/clerk/javascript/pull/4785)) by [@anagstef](https://github.com/anagstef)
+
 ## 2.20.2
 
 ### Patch Changes
