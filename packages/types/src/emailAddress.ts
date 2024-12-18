@@ -3,24 +3,25 @@ import type { ClerkResource } from './resource';
 import type { EmailAddressJSONSnapshot } from './snapshots';
 import type { EmailCodeStrategy, EmailLinkStrategy, EnterpriseSSOStrategy } from './strategies';
 import type {
-  CreateEmailLinkFlowReturn, CreateEnterpriseSsoLinkFlowReturn,
-  StartEmailLinkFlowParams, StartEnterpriseSsoLinkFlowParams,
-  VerificationResource
+  CreateEmailLinkFlowReturn,
+  CreateEnterpriseSsoLinkFlowReturn,
+  StartEmailLinkFlowParams,
+  StartEnterpriseSsoLinkFlowParams,
+  VerificationResource,
 } from './verification';
-
 
 export type PrepareEmailAddressVerificationParams =
   | {
-    strategy: EmailCodeStrategy;
-  }
+      strategy: EmailCodeStrategy;
+    }
   | {
-    strategy: EmailLinkStrategy;
-    redirectUrl: string;
-  }
+      strategy: EmailLinkStrategy;
+      redirectUrl: string;
+    }
   | {
-    strategy: EnterpriseSSOStrategy;
-    redirectUrl: string;
-  };
+      strategy: EnterpriseSSOStrategy;
+      redirectUrl: string;
+    };
 
 export type AttemptEmailAddressVerificationParams = {
   code: string;
