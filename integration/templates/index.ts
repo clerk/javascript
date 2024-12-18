@@ -18,6 +18,7 @@ export const templates = {
   'vue-vite': resolve(__dirname, './vue-vite'),
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
+  'react-router-library': resolve(__dirname, './react-router-library'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {
