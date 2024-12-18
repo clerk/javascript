@@ -1,10 +1,9 @@
-import { useClerk } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import { useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { descriptors, Flex, Link, Spinner } from '../../customizables';
+import { descriptors, Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -17,23 +16,36 @@ type KeylessPromptProps = {
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const handleFocus = () => setIsExpanded(true);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setIsExpanded(prev => !prev);
+    }
+    if (event.key === 'Escape' && isExpanded) {
+      setIsExpanded(false);
+    }
+  };
 
   const claimed = Boolean(useEnvironment().authConfig.claimedAt);
-  const clerk = useClerk();
+  //   const clerk = useClerk();
 
   return (
     <Portal>
       <Flex
-        elementDescriptor={descriptors.impersonationFab}
         align='center'
-        onMouseEnter={() => setIsExpanded(true)}
         data-expanded={isExpanded}
+        aria-expanded={isExpanded}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+        elementDescriptor={descriptors.impersonationFab}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode controls'}
         sx={t => ({
           position: 'fixed',
-          bottom: '3.125rem',
-          right: '3.125rem',
+          bottom: '1.25rem',
+          right: '1.25rem',
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
           minWidth: '18.5625rem',
@@ -45,7 +57,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 200ms cubic-bezier(0.3, 0.5, 0.1, 1)',
+          transition: 'all 310ms cubic-bezier(0.2, 0.95, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -251,52 +263,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
-
-          {isExpanded && !claimed && (
-            <button
-              onClick={() => setIsExpanded(false)}
-              aria-label='Close'
-              type='button'
-              css={css`
-                cursor: pointer;
-                margin-left: 0.75rem;
-                color: #8c8c8c;
-                transition: color 130ms ease-out;
-                :hover {
-                  color: #eeeeee;
-                }
-                animation: show-button 200ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
-
-                @keyframes show-button {
-                  from {
-                    transform: scaleX(0.9);
-                    opacity: 0;
-                  }
-                  to {
-                    transform: scaleX(1);
-                    opacity: 1;
-                  }
-                }
-              `}
-            >
-              <svg
-                width='1rem'
-                height='1rem'
-                viewBox='0 0 16 16'
-                fill='none'
-                aria-hidden
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  d='M3.75 8H12.25'
-                  stroke='currentColor'
-                  strokeWidth='1.5'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </button>
-          )}
         </Flex>
 
         {isExpanded && (
@@ -349,14 +315,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           </p>
         )}
 
-        <button
-          type='button'
-          onFocus={handleFocus}
+        <a
+          href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+          target='_blank'
+          rel='noopener noreferrer'
           data-expanded={isExpanded}
-          onClick={() => {
-            setIsLoading(true);
-            void clerk.navigate(claimed ? _props.copyKeysUrl : _props.claimUrl);
-          }}
           css={css`
             display: flex;
             align-items: center;
@@ -385,7 +348,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 80ms cubic-bezier(0.3, 0.5, 0.1, 1);
+            transition: all 135ms cubic-bezier(0.18, 0.89, 0.1, 1);
             animation: small-btn-glow 3s infinite 500ms;
 
             &[data-expanded='true'] {
@@ -396,7 +359,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               border-radius: 0.375rem;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
 
-              transition: all 175ms cubic-bezier(0.6, 0.5, 0.1, 1);
+              transition: all 200ms cubic-bezier(0.4, 0.8, 0.2, 1);
               animation: none;
 
               &:hover {
@@ -444,8 +407,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             }
           `}
         >
-          {isLoading ? <Spinner size={'sm'} /> : <> {claimed ? 'Get API keys' : 'Claim keys'}</>}
-        </button>
+          {claimed ? 'Get API keys' : 'Claim keys'}
+          <span className='sr-only'>(opens in a new tab)</span>
+        </a>
       </Flex>
     </Portal>
   );
