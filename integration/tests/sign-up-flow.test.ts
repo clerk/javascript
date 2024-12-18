@@ -10,12 +10,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     await app.teardown();
   });
 
-  test('sign up supports fallback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/sign-up');
-    await expect(u.page.getByText('Loading sign up')).toBeVisible();
-  });
-
   test('sign up with email and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({

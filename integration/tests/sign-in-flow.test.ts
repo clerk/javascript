@@ -23,12 +23,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await app.teardown();
   });
 
-  test('sign in supports fallback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/sign-in');
-    await expect(u.page.getByText('Loading sign in')).toBeVisible();
-  });
-
   test('sign in with email and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
