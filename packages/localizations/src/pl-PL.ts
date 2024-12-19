@@ -687,19 +687,23 @@ export const plPL: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'E-mail zawierający kod weryfikacyjny zostanie wysłany na ten adres e-mail.',
         formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na adres {{identifier}}',
         formTitle: 'Kod weryfikacyjny',
         resendButton: 'Wyślij ponownie kod',
         successMessage: 'Adres e-mail {{identifier}} został dodany do twojego konta.',
       },
       emailLink: {
-        formHint: 'E-mail zawierający link weryfikacyjny zostanie wysłany na ten adres e-mail.',
         formSubtitle: 'Kliknij w link weryfikacyjny w e-mailu wysłanym na adres {{identifier}}',
         formTitle: 'Link weryfikacyjny',
         resendButton: 'Wyślij ponownie link',
         successMessage: 'Adres e-mail {{identifier}} został dodany do twojego konta.',
       },
+      enterpriseSsoLink: {
+        formSubtitle: undefined,
+        resendButton: undefined,
+        successMessage: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} zostanie usunięty z tego konta.',
         messageLine2: 'Nie będzie już możliwe zalogowanie się za pomocą tego adresu e-mail.',

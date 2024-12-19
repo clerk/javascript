@@ -2,8 +2,14 @@ import type { EmailAddressJSONSnapshot } from 'snapshots';
 
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
-import type { EmailCodeStrategy, EmailLinkStrategy } from './strategies';
-import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
+import type { EmailCodeStrategy, EmailLinkStrategy, EnterpriseSSOStrategy } from './strategies';
+import type {
+  CreateEmailLinkFlowReturn,
+  CreateEnterpriseSsoLinkFlowReturn,
+  StartEmailLinkFlowParams,
+  StartEnterpriseSsoLinkFlowParams,
+  VerificationResource,
+} from './verification';
 
 export type PrepareEmailAddressVerificationParams =
   | {
@@ -11,6 +17,10 @@ export type PrepareEmailAddressVerificationParams =
     }
   | {
       strategy: EmailLinkStrategy;
+      redirectUrl: string;
+    }
+  | {
+      strategy: EnterpriseSSOStrategy;
       redirectUrl: string;
     };
 
@@ -22,11 +32,16 @@ export interface EmailAddressResource extends ClerkResource {
   id: string;
   emailAddress: string;
   verification: VerificationResource;
+  matchesSsoConnection: boolean;
   linkedTo: IdentificationLinkResource[];
   toString: () => string;
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
+  createEnterpriseSsoLinkFlow: () => CreateEnterpriseSsoLinkFlowReturn<
+    StartEnterpriseSsoLinkFlowParams,
+    EmailAddressResource
+  >;
   destroy: () => Promise<void>;
   create: () => Promise<EmailAddressResource>;
   __internal_toSnapshot: () => EmailAddressJSONSnapshot;
