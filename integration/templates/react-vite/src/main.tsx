@@ -11,6 +11,7 @@ import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
 import UserButtonCustom from './custom-user-button';
 import UserButtonCustomTrigger from './custom-user-button-trigger';
+import UserButton from './user-button';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: '/user/*',
         element: <UserProfile />,
+      },
+      {
+        path: '/user-button',
+        element: <UserButton />,
       },
       {
         path: '/protected',
