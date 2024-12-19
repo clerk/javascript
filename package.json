@@ -109,10 +109,10 @@
     "yalc": "1.0.0-pre.53",
     "zx": "^7.2.3"
   },
-  "packageManager": "pnpm@9.13.0+sha512.beb9e2a803db336c10c9af682b58ad7181ca0fbd0d4119f2b33d5f2582e96d6c0d93c85b23869295b765170fbdaa92890c0da6ada457415039769edf3c959efe",
+  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c",
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=9"
+    "pnpm": ">=9.15.0"
   },
   "pnpm": {
     "overrides": {
