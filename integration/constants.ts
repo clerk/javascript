@@ -59,10 +59,6 @@ export const constants = {
   /**
    * The version of the dependency to use, controlled programmatically.
    */
-  E2E_REMIX_VERSION: process.env.E2E_REMIX_VERSION,
-  /**
-   * The version of the dependency to use, controlled programmatically.
-   */
   E2E_VITE_VERSION: process.env.E2E_VITE_VERSION,
   /**
    * The version of the dependency to use, controlled programmatically.
