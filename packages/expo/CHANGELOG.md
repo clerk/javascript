@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.6.6
+
+### Patch Changes
+
+- Re-export the `isClerkRuntimeError()` utility function from `@clerk/clerk-react`. ([#4815](https://github.com/clerk/javascript/pull/4815)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`99f7536f191eb7b4f2ecff008f5523c500a02816`](https://github.com/clerk/javascript/commit/99f7536f191eb7b4f2ecff008f5523c500a02816), [`05c5de9201ac94ca889d4b65a9aab2946beb2474`](https://github.com/clerk/javascript/commit/05c5de9201ac94ca889d4b65a9aab2946beb2474)]:
+  - @clerk/clerk-js@5.43.4
+
 ## 2.6.5
 
 ### Patch Changes

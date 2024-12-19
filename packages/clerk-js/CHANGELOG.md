@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.43.4
+
+### Patch Changes
+
+- Fix broken enterprise connection icon for custom SAML provider ([#4809](https://github.com/clerk/javascript/pull/4809)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix(clerk-js): Rethrow errors if not requires_captcha during init ([#4812](https://github.com/clerk/javascript/pull/4812)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.43.3
 
 ### Patch Changes
