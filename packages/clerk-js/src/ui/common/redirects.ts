@@ -2,9 +2,9 @@ import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
 const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
-const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
+const VERIFICATION_PATH_ROUTE = '/verify';
 
-export function buildEmailLinkRedirectUrl(
+export function buildVerificationRedirectUrl(
   ctx: SignInContextType | SignUpContextType | UserProfileContextType,
   baseUrl: string | undefined = '',
 ): string {
@@ -15,7 +15,7 @@ export function buildEmailLinkRedirectUrl(
     baseUrl,
     authQueryString,
     path,
-    endpoint: isCombinedFlow ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint: isCombinedFlow ? `/create${VERIFICATION_PATH_ROUTE}` : VERIFICATION_PATH_ROUTE,
   });
 }
 

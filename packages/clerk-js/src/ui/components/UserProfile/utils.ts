@@ -1,10 +1,4 @@
-import type {
-  Attributes,
-  EmailAddressResource,
-  EnvironmentResource,
-  PhoneNumberResource,
-  UserResource,
-} from '@clerk/types';
+import type { Attributes, EmailAddressResource, PhoneNumberResource, UserResource } from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -15,12 +9,6 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
 export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ? -1 : 1);
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
-
-export function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
-  const { userSettings } = env;
-  const { email_address } = userSettings.attributes;
-  return email_address.enabled && email_address.verifications.includes('email_link');
-}
 
 export function getSecondFactors(attributes: Attributes): string[] {
   const secondFactors: string[] = [];
