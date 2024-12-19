@@ -512,25 +512,27 @@ describe('isAllowedRedirect', () => {
 
 describe('createAllowedRedirectOrigins', () => {
   it('contains the default allowed origin values if no value is provided', async () => {
-    const frontendApi = 'https://somename.clerk.accounts.dev';
+    const frontendApi = 'somename.clerk.accounts.dev';
     const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi);
     const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi);
 
     expect(allowedRedirectOriginsValuesUndefined).toEqual([
       'http://localhost',
-      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+      `https://somename.accounts.dev`,
+      `https://*.somename.accounts.dev`,
+      `https://somename.clerk.accounts.dev/oauth/authorize*`,
     ]);
 
     expect(allowedRedirectOriginsValuesEmptyArray).toEqual([
       'http://localhost',
-      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
+      `https://somename.accounts.dev`,
+      `https://*.somename.accounts.dev`,
+      `https://somename.clerk.accounts.dev/oauth/authorize*`,
     ]);
   });
 
   it('contains only the allowedRedirectOrigins options given', async () => {
-    const frontendApi = 'https://somename.clerk.accounts.dev';
+    const frontendApi = 'somename.clerk.accounts.dev';
     const allowedRedirectOriginsValues = createAllowedRedirectOrigins(
       ['https://test.host', 'https://*.test.host'],
       frontendApi,
