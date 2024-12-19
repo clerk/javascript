@@ -3,12 +3,12 @@ import { useClerk } from '@clerk/shared/react';
 import { css } from '@emotion/react';
 import { useState } from 'react';
 
-import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, Spinner } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
+import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
   claimUrl: string;
@@ -20,7 +20,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const handleFocus = () => setIsExpanded(true);
 
-  const claimed = Boolean(useEnvironment().authConfig.claimedAt);
+  const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
   const clerk = useClerk();
 
   return (
