@@ -105,9 +105,7 @@
     "@clerk/types": "workspace:^"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
-    "tsup": "catalog:repo",
-    "typescript": "catalog:repo"
+    "@clerk/eslint-config-custom": "workspace:*"
   },
   "engines": {
     "node": ">=18.17.0"

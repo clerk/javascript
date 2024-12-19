@@ -76,9 +76,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/crypto-js": "4.2.2",
-    "@types/node": "^18.19.33",
-    "next": "^14.2.20",
-    "typescript": "catalog:repo"
+    "next": "^14.2.20"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15.0.0",
