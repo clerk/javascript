@@ -127,6 +127,8 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: SamlStrategy;
@@ -171,6 +173,8 @@ export type SignUpCreateParams = Partial<
     ticket: string;
     token: string;
     legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
