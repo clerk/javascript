@@ -69,10 +69,48 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
+export type AuthenticatedMachineObject = {
+  sessionClaims: null;
+  claims: JwtPayload;
+  machineId: string;
+  sessionId: null;
+  actor: null;
+  userId: null;
+  orgId: null;
+  orgRole: null;
+  orgSlug: null;
+  orgPermissions: null;
+  __experimental_factorVerificationAge: null;
+  has: CheckAuthorizationWithCustomPermissions;
+  getToken: () => string;
+  debug: AuthObjectDebug;
+};
+
+export type UnauthenticatedMachineObject = {
+  sessionClaims: null;
+  claims: null;
+  machineId: null;
+  sessionId: null;
+  actor: null;
+  userId: null;
+  orgId: null;
+  orgRole: null;
+  orgSlug: null;
+  orgPermissions: null;
+  __experimental_factorVerificationAge: null;
+  has: CheckAuthorizationWithCustomPermissions;
+  getToken: ServerGetToken;
+  debug: AuthObjectDebug;
+};
+
 /**
  * @internal
  */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthObject =
+  | SignedInAuthObject
+  | SignedOutAuthObject
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -147,6 +185,51 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   };
 }
 
+export function authenticatedMachineObject(
+  machineToken: string,
+  claims: JwtPayload,
+  debugData?: AuthObjectDebugData,
+): AuthenticatedMachineObject {
+  const { sub: machineId } = claims;
+  const getToken = () => {
+    return machineToken;
+  };
+  return {
+    sessionClaims: null,
+    claims,
+    machineId,
+    sessionId: null,
+    actor: null,
+    userId: null,
+    orgId: null,
+    orgRole: null,
+    orgSlug: null,
+    orgPermissions: null,
+    __experimental_factorVerificationAge: null,
+    getToken,
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+export function unauthenticatedMachineObject(debugData?: AuthObjectDebug): UnauthenticatedMachineObject {
+  return {
+    sessionClaims: null,
+    claims: null,
+    machineId: null,
+    sessionId: null,
+    actor: null,
+    userId: null,
+    orgId: null,
+    orgRole: null,
+    orgSlug: null,
+    orgPermissions: null,
+    __experimental_factorVerificationAge: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
 /**
  * Auth objects moving through the server -> client boundary need to be serializable
  * as we need to ensure that they can be transferred via the network as pure strings.
