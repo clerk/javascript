@@ -40,6 +40,7 @@ describe('FraudProtectionService', () => {
 
     mockClerk = { client: mockClient.getOrCreateInstance() } as any as Clerk;
 
+    // @ts-expect-error The contructor is private and the singleton instance should be accessed through getInstance()
     sut = new FraudProtection(mockClient, MockCaptchaChallenge as any);
   });
 
