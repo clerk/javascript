@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
@@ -21,6 +22,7 @@ export type SignInContextType = SignInCtx & {
   afterSignInUrl: string;
   transferable: boolean;
   waitlistUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -32,6 +34,7 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
+  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
@@ -96,5 +99,6 @@ export const useSignInContext = (): SignInContextType => {
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
+    isCombinedFlow,
   };
 };
