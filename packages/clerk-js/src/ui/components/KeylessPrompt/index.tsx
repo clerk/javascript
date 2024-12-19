@@ -17,35 +17,13 @@ type KeylessPromptProps = {
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
-      e.preventDefault();
-      if (!claimed) {
-        setIsExpanded(prev => !prev);
-      }
-    }
-    if (e.key === 'Escape' && isExpanded && !claimed) {
-      setIsExpanded(false);
-    }
-  };
-
   const claimed = Boolean(useEnvironment().authConfig.claimedAt);
 
   return (
     <Portal>
       <Flex
         data-expanded={isExpanded}
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => (claimed ? null : setIsExpanded(false))}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
         align='center'
-        role='button'
-        aria-expanded={isExpanded}
-        aria-controls='keyless-content'
-        aria-disabled={claimed && isExpanded}
-        id='keyless-prompt'
-        aria-label={claimed ? 'Missing environment keys' : 'Clerk keyless mode overlay'}
         elementDescriptor={descriptors.impersonationFab}
         sx={t => ({
           position: 'fixed',
@@ -62,11 +40,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 300ms cubic-bezier(0.2, 0.98, 0.1, 1)',
+          transition: 'all 310ms cubic-bezier(0.2, 0.98, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
-            ariaLabel: 'I am expanded',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
             height: 'fit-content',
@@ -81,12 +58,18 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           },
         })}
       >
-        <Flex
-          sx={{
-            width: '100%',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
+        <button
+          type='button'
+          aria-expanded={isExpanded}
+          aria-controls='keyless-prompt-content'
+          id='keyless-prompt-button'
+          onClick={() => !claimed && setIsExpanded(prev => !prev)}
+          css={css`
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          `}
         >
           <Flex
             sx={t => ({
@@ -141,7 +124,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               >
                 <span
                   className='coin-flip-front'
-                  aria-hidden='true'
+                  aria-hidden
                   css={css`
                     position: absolute;
                     width: 100%;
@@ -157,7 +140,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
                 <span
                   className='coin-flip-back'
-                  aria-hidden='true'
+                  aria-hidden
                   css={css`
                     position: absolute;
                     width: 100%;
@@ -176,6 +159,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
             <p
               data-text='Clerk is in keyless mode'
+              aria-label={claimed && isExpanded ? 'Missing environment keys' : 'Clerk is in keyless mode'}
               css={css`
                 color: #d9d9d9;
                 font-size: 0.875rem;
@@ -210,6 +194,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
+                  speak: none;
+                  -webkit-user-select: none;
+                  user-select: none;
                 }
 
                 &::before {
@@ -237,6 +224,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
+                  speak: none;
+                  -webkit-user-select: none;
+                  user-select: none;
                 }
 
                 @media (prefers-reduced-motion: reduce) {
@@ -282,12 +272,53 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
-        </Flex>
+
+          <svg
+            width='1rem'
+            height='1rem'
+            viewBox='0 0 16 16'
+            fill='none'
+            aria-hidden={!isExpanded || claimed}
+            aria-label='Minimize keyless overlay'
+            xmlns='http://www.w3.org/2000/svg'
+            css={css`
+              color: #8c8c8c;
+              transition: color 130ms ease-out;
+              visibility: ${isExpanded && !claimed ? 'visible' : 'hidden'};
+              :hover {
+                color: #eeeeee;
+              }
+              animation: show-button 200ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
+
+              @keyframes show-button {
+                from {
+                  transform: scaleX(0.9);
+                  opacity: 0;
+                }
+                to {
+                  transform: scaleX(1);
+                  opacity: 1;
+                }
+              }
+            `}
+          >
+            <path
+              d='M3.75 8H12.25'
+              stroke='currentColor'
+              strokeWidth='1.5'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
+        </button>
 
         {isExpanded && (
           <div
             role='region'
-            id='keyless-content'
+            id='keyless-prompt-content'
+            aria-labelledby='keyless-prompt-button'
+            aria-label='Keyless mode information'
+            hidden={!isExpanded}
           >
             <p
               css={css`
