@@ -10,10 +10,22 @@ export { debugRequestState } from './tokens/request';
 export type { AuthenticateRequestOptions, OrganizationSyncOptions } from './tokens/types';
 
 export type { SignedInAuthObjectOptions, SignedInAuthObject, SignedOutAuthObject } from './tokens/authObjects';
-export { makeAuthObjectSerializable, signedOutAuthObject, signedInAuthObject } from './tokens/authObjects';
+export {
+  makeAuthObjectSerializable,
+  signedOutAuthObject,
+  signedInAuthObject,
+  authenticatedMachineObject,
+  unauthenticatedMachineObject,
+} from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';
-export type { RequestState, SignedInState, SignedOutState } from './tokens/authStatus';
+export type {
+  RequestState,
+  SignedInState,
+  SignedOutState,
+  MachineAuthenticatedState,
+  MachineUnauthenticatedState,
+} from './tokens/authStatus';
 
 export { decorateObjectWithResources, stripPrivateDataFromObject } from './util/decorateObjectWithResources';
 
