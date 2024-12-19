@@ -1,5 +1,416 @@
 # Change Log
 
+## 6.9.5
+
+### Patch Changes
+
+- Updated dependencies [[`b3300c84a42276bd071a37addbd1ca6888ed9d7c`](https://github.com/clerk/javascript/commit/b3300c84a42276bd071a37addbd1ca6888ed9d7c), [`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/backend@1.21.4
+  - @clerk/types@4.40.0
+  - @clerk/clerk-react@5.20.4
+  - @clerk/shared@2.20.4
+
+## 6.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+  - @clerk/backend@1.21.3
+  - @clerk/clerk-react@5.20.3
+
+## 6.9.3
+
+### Patch Changes
+
+- Improves the error message when changing keys in development causes a subsequent request to fail. ([#4787](https://github.com/clerk/javascript/pull/4787)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.20.2
+
+## 6.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`aeafa7c5efd50c893d088ac99199d7eaecc04025`](https://github.com/clerk/javascript/commit/aeafa7c5efd50c893d088ac99199d7eaecc04025), [`acd9326ef2d6942b981b3ee59c4b20ddd303323d`](https://github.com/clerk/javascript/commit/acd9326ef2d6942b981b3ee59c4b20ddd303323d)]:
+  - @clerk/types@4.39.4
+  - @clerk/clerk-react@5.20.2
+  - @clerk/backend@1.21.2
+  - @clerk/shared@2.20.2
+
+## 6.9.1
+
+### Patch Changes
+
+- Using the same peerDependencies semver for react and react-dom ([#4758](https://github.com/clerk/javascript/pull/4758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Hide warning about missing `CLERK_ENCRYPTION_KEY` when the secret key is not explictily provided as option to `clerkMiddleware`. ([#4766](https://github.com/clerk/javascript/pull/4766)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Support `unstable_rethrow` usage inside `clerkMiddleware()` for the canary version of `notFound()`. ([#4727](https://github.com/clerk/javascript/pull/4727)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`66ad299e4b6496ea4a93799de0f1ecfad920ddad`](https://github.com/clerk/javascript/commit/66ad299e4b6496ea4a93799de0f1ecfad920ddad), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`7f7edcaa8228c26d19e9081979100ada7e982095`](https://github.com/clerk/javascript/commit/7f7edcaa8228c26d19e9081979100ada7e982095), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d)]:
+  - @clerk/shared@2.20.1
+  - @clerk/clerk-react@5.20.1
+  - @clerk/types@4.39.3
+  - @clerk/backend@1.21.1
+
+## 6.9.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`9d656c16bc78ac31b59b5edbd25118dfc33c4469`](https://github.com/clerk/javascript/commit/9d656c16bc78ac31b59b5edbd25118dfc33c4469), [`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630), [`0266f6a73fc34748a86603bc89b6125d6bbb679b`](https://github.com/clerk/javascript/commit/0266f6a73fc34748a86603bc89b6125d6bbb679b)]:
+  - @clerk/clerk-react@5.20.0
+  - @clerk/backend@1.21.0
+  - @clerk/shared@2.20.0
+
+## 6.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/backend@1.20.3
+  - @clerk/clerk-react@5.19.3
+  - @clerk/shared@2.19.4
+
+## 6.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`fe75ced8a7d8b8a28839430444588ee173b5230a`](https://github.com/clerk/javascript/commit/fe75ced8a7d8b8a28839430444588ee173b5230a), [`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/backend@1.20.2
+  - @clerk/types@4.39.1
+  - @clerk/clerk-react@5.19.2
+  - @clerk/shared@2.19.3
+
+## 6.8.1
+
+### Patch Changes
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+  - @clerk/backend@1.20.1
+  - @clerk/clerk-react@5.19.1
+
+## 6.8.0
+
+### Minor Changes
+
+- A new **experimental** feature is available: "Keyless mode" ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+  Normally, in order to start a Clerk + Next.js application you need to provide a publishable key and secret key. With "Keyless mode" activated you no longer need to provide these two keys to start your Clerk application. These keys will be automatically generated and the application can be claimed with your account either through a UI prompt or with a URL in your terminal.
+
+  **Requirements**:
+
+  - You need to use Next.js `14.2.0` or later
+  - You need to set the environment variable `NEXT_PUBLIC_CLERK_ENABLE_KEYLESS=true`
+
+### Patch Changes
+
+- Updated dependencies [[`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99)]:
+  - @clerk/backend@1.20.0
+  - @clerk/clerk-react@5.19.0
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
+## 6.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/backend@1.19.2
+  - @clerk/clerk-react@5.18.2
+
+## 6.7.0
+
+### Minor Changes
+
+- Remove usage of `ezheaders` ([#4706](https://github.com/clerk/javascript/pull/4706)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/backend@1.19.1
+  - @clerk/clerk-react@5.18.1
+  - @clerk/shared@2.18.1
+
+## 6.6.0
+
+### Minor Changes
+
+- Drop path routing requirement for `<CreateOrganization/>`. ([#4687](https://github.com/clerk/javascript/pull/4687)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`b6aa589f75be62a89a3853d496176ed2f2c0e2c5`](https://github.com/clerk/javascript/commit/b6aa589f75be62a89a3853d496176ed2f2c0e2c5), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
+  - @clerk/types@4.36.0
+  - @clerk/clerk-react@5.18.0
+  - @clerk/backend@1.19.0
+  - @clerk/shared@2.18.0
+
+## 6.5.2
+
+### Patch Changes
+
+- Warn for deprecated support for `13.x` and `14.0.x` Next.js versions. ([#4657](https://github.com/clerk/javascript/pull/4657)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d), [`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/backend@1.18.1
+  - @clerk/clerk-react@5.17.2
+  - @clerk/shared@2.17.1
+
+## 6.5.1
+
+### Patch Changes
+
+- - Re-export `isClerkRuntimeError` from `@clerk/clerk-react/errors`. ([#4656](https://github.com/clerk/javascript/pull/4656)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Fixes and issue where `isClerkAPIError` would only exist in the client bundle.
+
+- Updated dependencies [[`115fd0c32443c6fc4e692c0ebdd60c092e57057e`](https://github.com/clerk/javascript/commit/115fd0c32443c6fc4e692c0ebdd60c092e57057e), [`0a1807552dcf0501a97f60b4df0280525bca9743`](https://github.com/clerk/javascript/commit/0a1807552dcf0501a97f60b4df0280525bca9743)]:
+  - @clerk/clerk-react@5.17.1
+
+## 6.5.0
+
+### Minor Changes
+
+- Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Replaces `__experimental_useReverification` with `useReverification`
+    Also replaces the following APIs:
+  - `____experimental_reverificationError` -> `__reverificationError`
+  - `__experimental_reverificationErrorResponse` -> `reverificationErrorResponse`
+
+### Patch Changes
+
+- Updated dependencies [[`4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d`](https://github.com/clerk/javascript/commit/4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/clerk-react@5.17.0
+  - @clerk/shared@2.17.0
+  - @clerk/types@4.35.0
+  - @clerk/backend@1.18.0
+
+## 6.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/types@4.34.2
+  - @clerk/backend@1.17.2
+  - @clerk/clerk-react@5.16.2
+  - @clerk/shared@2.16.1
+
+## 6.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/clerk-react@5.16.1
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+  - @clerk/backend@1.17.1
+
+## 6.4.0
+
+### Minor Changes
+
+- Rename `reverificationMismatch` to `reverificationError`. ([#4582](https://github.com/clerk/javascript/pull/4582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `initialValues` option to `<SignUpButton />` component. ([#4567](https://github.com/clerk/javascript/pull/4567)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Removing error in dev when useAuth() is not wrapped in <ClerkProvider dynamic /> ([#4588](https://github.com/clerk/javascript/pull/4588)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b2671affd230eed176ac03af516307898d371757`](https://github.com/clerk/javascript/commit/b2671affd230eed176ac03af516307898d371757), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da), [`6c424e179850f520ae738e816bf0423a55ddf3ef`](https://github.com/clerk/javascript/commit/6c424e179850f520ae738e816bf0423a55ddf3ef)]:
+  - @clerk/backend@1.17.0
+  - @clerk/shared@2.15.0
+  - @clerk/clerk-react@5.16.0
+
+## 6.3.4
+
+### Patch Changes
+
+- Updated dependencies [[`46faeb6f59b19c963fb137c858347525b1cd9e19`](https://github.com/clerk/javascript/commit/46faeb6f59b19c963fb137c858347525b1cd9e19), [`ea6c52dd751abe38b350ee07f148652c24125e22`](https://github.com/clerk/javascript/commit/ea6c52dd751abe38b350ee07f148652c24125e22)]:
+  - @clerk/shared@2.14.0
+  - @clerk/types@4.34.0
+  - @clerk/backend@1.16.4
+  - @clerk/clerk-react@5.15.5
+
+## 6.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`1c0b5001f7f975a2f3f54ad692526ecf7257847e`](https://github.com/clerk/javascript/commit/1c0b5001f7f975a2f3f54ad692526ecf7257847e), [`6217a3f7c94311d49f873214bd406961e0b8d6f7`](https://github.com/clerk/javascript/commit/6217a3f7c94311d49f873214bd406961e0b8d6f7), [`1783025cdb94c447028704c2121fa0b8af785904`](https://github.com/clerk/javascript/commit/1783025cdb94c447028704c2121fa0b8af785904)]:
+  - @clerk/types@4.33.0
+  - @clerk/shared@2.13.0
+  - @clerk/backend@1.16.3
+  - @clerk/clerk-react@5.15.4
+
+## 6.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`ff4ebeba6c2a77c247a946070b56bdb2153d1588`](https://github.com/clerk/javascript/commit/ff4ebeba6c2a77c247a946070b56bdb2153d1588)]:
+  - @clerk/backend@1.16.2
+
+## 6.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`7dbad4c5abd226d7b10941a626ead5d85b1a3f24`](https://github.com/clerk/javascript/commit/7dbad4c5abd226d7b10941a626ead5d85b1a3f24)]:
+  - @clerk/types@4.32.0
+  - @clerk/backend@1.16.1
+  - @clerk/clerk-react@5.15.3
+  - @clerk/shared@2.12.1
+
+## 6.3.0
+
+### Minor Changes
+
+- Introduce experimental verification helpers exported from `@clerk/nextjs/server` ([#4480](https://github.com/clerk/javascript/pull/4480)) by [@panteliselef](https://github.com/panteliselef)
+
+  - \_\_experimental_reverificationMismatch
+  - \_\_experimental_reverificationMismatchResponse
+
+### Patch Changes
+
+- Fixes issues in `ClerkRouter` that were causing inaccurate pathnames within Elements flows. Also fixes a dependency issue where `@clerk/elements` was pulling in the wrong version of `@clerk/shared`. ([#4513](https://github.com/clerk/javascript/pull/4513)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add timestamp to debug logger output. ([#4479](https://github.com/clerk/javascript/pull/4479)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`b185e42e5136de3511a0b37ce9b0030022ba679e`](https://github.com/clerk/javascript/commit/b185e42e5136de3511a0b37ce9b0030022ba679e), [`5a21de1f46df3642828dc27e4862263c9858da2b`](https://github.com/clerk/javascript/commit/5a21de1f46df3642828dc27e4862263c9858da2b), [`f7472e22877f62fc7f3c8d3efe409ff2276fb4a3`](https://github.com/clerk/javascript/commit/f7472e22877f62fc7f3c8d3efe409ff2276fb4a3), [`e10232c56551bf0cffc11246f2ff9aa58ec584d7`](https://github.com/clerk/javascript/commit/e10232c56551bf0cffc11246f2ff9aa58ec584d7), [`e199037b8f484abdeeb9fc24455a1b4b8c31c8dd`](https://github.com/clerk/javascript/commit/e199037b8f484abdeeb9fc24455a1b4b8c31c8dd), [`886e294a8d8c54b39cd5bda88d46b89eace3861e`](https://github.com/clerk/javascript/commit/886e294a8d8c54b39cd5bda88d46b89eace3861e), [`0e443ad7c76643420b50e5b169193e03f6ef79f9`](https://github.com/clerk/javascript/commit/0e443ad7c76643420b50e5b169193e03f6ef79f9), [`cc24c8145f1eea7fb91550f2c3e0bac3993e4320`](https://github.com/clerk/javascript/commit/cc24c8145f1eea7fb91550f2c3e0bac3993e4320)]:
+  - @clerk/backend@1.16.0
+  - @clerk/shared@2.12.0
+  - @clerk/types@4.31.0
+  - @clerk/clerk-react@5.15.2
+
+## 6.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`8a04ae47b8305f994b348301fd8134d5baf02943`](https://github.com/clerk/javascript/commit/8a04ae47b8305f994b348301fd8134d5baf02943)]:
+  - @clerk/clerk-react@5.15.1
+  - @clerk/shared@2.11.5
+  - @clerk/backend@1.15.7
+
+## 6.2.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Fixes an issue where Next.js cache invalidation was incorrectly setting a cookie. ([#4478](https://github.com/clerk/javascript/pull/4478)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix issue within `<ClerkProvider />` where the window object is possibly undefined. ([#4476](https://github.com/clerk/javascript/pull/4476)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/clerk-react@5.15.0
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+  - @clerk/backend@1.15.6
+
+## 6.1.3
+
+### Patch Changes
+
+- Fix static analysis warnings warning during production NextJS builds by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updates broken Clerk documentation references by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/backend@1.15.5
+  - @clerk/clerk-react@5.14.3
+
+## 6.1.0
+
+### Minor Changes
+
+- Bug fix: For next>=14 applications resolve `__unstable__onBeforeSetActive` once `invalidateCacheAction` resolves. ([#4362](https://github.com/clerk/javascript/pull/4362)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a new experimental hook called `useReverification` that makes it easy to handle reverification errors. ([#4362](https://github.com/clerk/javascript/pull/4362)) by [@panteliselef](https://github.com/panteliselef)
+
+  It returns a high order function (HOF) and allows developers to wrap any function that triggers a fetch request which might fail due to a user's session verification status.
+  When such error is returned, the recommended UX is to offer a way to the user to recover by re-verifying their credentials.
+  This helper will automatically handle this flow in the developer's behalf, by displaying a modal the end-user can interact with.
+  Upon completion, the original request that previously failed, will be retried (only once).
+
+  Example with clerk-js methods.
+
+  ```tsx
+  import { __experimental_useReverification as useReverification } from '@clerk/nextjs';
+
+  function DeleteAccount() {
+    const { user } = useUser();
+    const [deleteUserAccount] = useReverification(() => {
+      if (!user) return;
+      return user.delete();
+    });
+
+    return (
+      <>
+        <button
+          onClick={async () => {
+            await deleteUserAccount();
+          }}
+        >
+          Delete account
+        </button>
+      </>
+    );
+  }
+  ```
+
+- Replace `next/headers` with `ezheaders` ([#4392](https://github.com/clerk/javascript/pull/4392)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes a bug where `<ClerkProvider dynamic>` would error when rendered in a Next.js 13 application using the App Router. ([#4421](https://github.com/clerk/javascript/pull/4421)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updating peerDependencies for correct ranges ([#4436](https://github.com/clerk/javascript/pull/4436)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`69c8f4f21`](https://github.com/clerk/javascript/commit/69c8f4f21410b3db95ac11a23a2b3d1277981bcf), [`f875463da`](https://github.com/clerk/javascript/commit/f875463da9692f2d173b6d5388743cf720750ae3), [`41f2ede56`](https://github.com/clerk/javascript/commit/41f2ede56c82c97df509c5a28b7637862121b935), [`5be7ca9fd`](https://github.com/clerk/javascript/commit/5be7ca9fd239c937cc88e20ce8f5bfc9f3b84f22), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`24cd77989`](https://github.com/clerk/javascript/commit/24cd77989adb45a11db12627daa3f31e8d9338e4), [`434b432f8`](https://github.com/clerk/javascript/commit/434b432f8c114825120eef0f2c278b8142ed1563)]:
+  - @clerk/clerk-react@5.14.0
+  - @clerk/types@4.29.0
+  - @clerk/shared@2.11.0
+  - @clerk/backend@1.15.2
+
+## 6.0.2
+
+### Patch Changes
+
+- Bug fix: Include protect types in `auth` ([#4398](https://github.com/clerk/javascript/pull/4398)) by [@panteliselef](https://github.com/panteliselef)
+
+## 6.0.1
+
+### Patch Changes
+
+- Await usage of cookies() and ensure the return value of the server action is valid. ([#4396](https://github.com/clerk/javascript/pull/4396)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`1c7e105a3`](https://github.com/clerk/javascript/commit/1c7e105a32fd492cc175ef9fd1c1fa0428c259dc)]:
+  - @clerk/types@4.28.0
+  - @clerk/backend@1.15.1
+  - @clerk/clerk-react@5.13.1
+  - @clerk/shared@2.10.1
+
 ## 6.0.0
 
 ### Major Changes
@@ -17,7 +428,7 @@
   Previously the `auth()` method from `@clerk/nextjs/server` was synchronous.
 
   ```typescript
-  import { auth } from "@clerk/nextjs/server";
+  import { auth } from '@clerk/nextjs/server';
 
   export function GET() {
     const { userId } = auth();
@@ -661,7 +1072,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -676,11 +1087,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === "complete") {
+      if (signInOrUp.status === 'complete') {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -922,11 +1333,10 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from "@clerk/backend";
-  import { ClerkAPIResponseError } from "@clerk/shared/error";
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
 
-  const { data, errors, clerkTraceId, status, statusText } =
-    await users.getUser("user_deadbeef");
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,
@@ -975,7 +1385,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1012,29 +1422,18 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 - f58a9949b: Changes in exports of `@clerk/backend`:
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import {
-      decodeJwt,
-      hasValidSignature,
-      signJwt,
-      verifyJwt,
-    } from "@clerk/backend/jwt";
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -1051,15 +1450,15 @@
   Remove the named `Clerk` import from `@clerk/nextjs` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/nextjs";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/nextjs';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/nextjs";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/nextjs';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 - 9b02c1aae: Changes in `@clerk/backend` exports:
@@ -1071,20 +1470,14 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    } from '@clerk/backend/errors';
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
     // After
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
     ```
 - e5598cfb1: Drop `user`, `session`, and `organization` resources from the returned value of `auth()`.
 - 6fffd3b54: Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency).
@@ -1235,9 +1628,9 @@
   ### 1. Protect a route that requires authentication
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
+  export default clerkMiddleware(auth => {
     const { userId } = auth().protect();
     // userId is now available for use in your route handler
     // for page requests, calling protect will automatically redirect the user to the sign-in URL if they are not authenticated
@@ -1248,10 +1641,10 @@
   ### 2. Protect a route that requires specific permissions
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
-    const { userId } = auth().protect({ permission: "org:domains:delete" });
+  export default clerkMiddleware(auth => {
+    const { userId } = auth().protect({ permission: 'org:domains:delete' });
     // userId is now available for use in your route handler
     // for page requests, calling protect will automatically throw a notFound error if the user does not have the required permissions
     return NextResponse.next();
@@ -1261,9 +1654,9 @@
   ### 2. Manually redirect to sign-in URL using the redirectToSignIn helper
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
+  export default clerkMiddleware(auth => {
     // If you want more fine-grained control, you can always use the low-level redirectToSignIn helper
     if (!auth().userId) {
       return auth().redirectToSignIn();
@@ -1276,10 +1669,7 @@
   This commit also introduces the experimental `createRouteMatcher` helper, which can be used to create a route matcher that matches a route against the current request. This is useful for creating custom logic based on which routes you want to handle as protected or public.
 
   ```js
-  import {
-    clerkMiddleware,
-    experimental_createRouteMatcher,
-  } from "@clerk/nextjs/server";
+  import { clerkMiddleware, experimental_createRouteMatcher } from '@clerk/nextjs/server';
 
   const isProtectedRoute = experimental_createRouteMatcher([/protected.*/]);
 
@@ -1310,9 +1700,9 @@
 - 529e2e14c: Introduce `createRouteMatcher` which is designed to generate and return a function that evaluates whether a given Request object matches a set of predefined routes. It provides flexibility in defining these routes through various patterns, including glob patterns, regular expressions, and custom functions. This composable helper can be used in combination with the `clerkMiddleware` helper to easily protect specific routes, eg:
 
   ```ts
-  import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-  const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
   export default clerkMiddleware((auth, request) => {
     if (isProtectedRoute(request)) {
@@ -1343,14 +1733,11 @@
 
   ```ts
   // Authorization
-  auth().protect({ role: "org:admin" }, { redirectUrl: "/any-page" });
-  auth().protect(
-    { permission: "org:settings:manage" },
-    { redirectUrl: "/any-page" },
-  );
+  auth().protect({ role: 'org:admin' }, { redirectUrl: '/any-page' });
+  auth().protect({ permission: 'org:settings:manage' }, { redirectUrl: '/any-page' });
 
   // Authentication
-  auth().protect({ redirectUrl: "/any-page" });
+  auth().protect({ redirectUrl: '/any-page' });
   ```
 
 - fb794ce7b: Support older iOS 13.3 and 13.4 mobile devices
@@ -1902,9 +2289,9 @@
 - Introduce `createRouteMatcher` which is designed to generate and return a function that evaluates whether a given Request object matches a set of predefined routes. It provides flexibility in defining these routes through various patterns, including glob patterns, regular expressions, and custom functions. This composable helper can be used in combination with the `clerkMiddleware` helper to easily protect specific routes, eg: ([#2572](https://github.com/clerk/javascript/pull/2572)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   ```ts
-  import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-  const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
   export default clerkMiddleware((auth, request) => {
     if (isProtectedRoute(request)) {
@@ -1969,9 +2356,9 @@
   ### 1. Protect a route that requires authentication
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
+  export default clerkMiddleware(auth => {
     const { userId } = auth().protect();
     // userId is now available for use in your route handler
     // for page requests, calling protect will automatically redirect the user to the sign-in URL if they are not authenticated
@@ -1982,10 +2369,10 @@
   ### 2. Protect a route that requires specific permissions
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
-    const { userId } = auth().protect({ permission: "org:domains:delete" });
+  export default clerkMiddleware(auth => {
+    const { userId } = auth().protect({ permission: 'org:domains:delete' });
     // userId is now available for use in your route handler
     // for page requests, calling protect will automatically throw a notFound error if the user does not have the required permissions
     return NextResponse.next();
@@ -1995,9 +2382,9 @@
   ### 2. Manually redirect to sign-in URL using the redirectToSignIn helper
 
   ```js
-  import { clerkMiddleware } from "@clerk/nextjs/server";
+  import { clerkMiddleware } from '@clerk/nextjs/server';
 
-  export default clerkMiddleware((auth) => {
+  export default clerkMiddleware(auth => {
     // If you want more fine-grained control, you can always use the low-level redirectToSignIn helper
     if (!auth().userId) {
       return auth().redirectToSignIn();
@@ -2010,10 +2397,7 @@
   This commit also introduces the experimental `createRouteMatcher` helper, which can be used to create a route matcher that matches a route against the current request. This is useful for creating custom logic based on which routes you want to handle as protected or public.
 
   ```js
-  import {
-    clerkMiddleware,
-    experimental_createRouteMatcher,
-  } from "@clerk/nextjs/server";
+  import { clerkMiddleware, experimental_createRouteMatcher } from '@clerk/nextjs/server';
 
   const isProtectedRoute = experimental_createRouteMatcher([/protected.*/]);
 
@@ -2110,7 +2494,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from "@clerk/backend/internal";
+    } from '@clerk/backend/internal';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -2149,31 +2533,20 @@
       Token,
       User,
       Verification,
-    } from "@clerk/backend";
+    } from '@clerk/backend';
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type {
-      Organization,
-      Session,
-      User,
-      WebhookEvent,
-      WebhookEventType,
-    } from "@clerk/backend";
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
     ```
 
 - Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
 
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
-    import {
-      decodeJwt,
-      hasValidSignature,
-      signJwt,
-      verifyJwt,
-    } from "@clerk/backend/jwt";
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -2194,20 +2567,14 @@
       TokenVerificationErrorAction,
       TokenVerificationErrorCode,
       TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    } from '@clerk/backend/errors';
     ```
   - Drop errors from top-level export
     ```typescript
     // Before
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
     // After
-    import {
-      TokenVerificationError,
-      TokenVerificationErrorReason,
-    } from "@clerk/backend/errors";
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
     ```
 
 - Use `NEXT_PUBLIC_CLERK_JS_URL` instead of `NEXT_PUBLIC_CLERK_JS` to pin a specific @clerk/clerk-js version. ([#2374](https://github.com/clerk/javascript/pull/2374)) by [@SokratisVidros](https://github.com/SokratisVidros)
@@ -2246,29 +2613,24 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
+    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
     // After
-    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
+    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 
     // Before
+    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from "@clerk/clerk-react";
-    // After
-    import {
-      isClerkAPIResponseError,
-      isEmailLinkError,
-      isKnownError,
-      isMetamaskError,
-    } from "@clerk/clerk-react/errors";
+    } from '@clerk/clerk-react/errors';
 
     // Before
-    import { MultisessionAppSupport } from "@clerk/clerk-react";
+    import { MultisessionAppSupport } from '@clerk/clerk-react';
     // After
-    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
+    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
@@ -2285,15 +2647,15 @@
   Remove the named `Clerk` import from `@clerk/nextjs` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from "@clerk/nextjs";
-  const clerk = Clerk({ secretKey: "..." });
+  import { Clerk } from '@clerk/nextjs';
+  const clerk = Clerk({ secretKey: '...' });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from "@clerk/nextjs";
-  const clerk = createClerkClient({ secretKey: "..." });
+  import { createClerkClient } from '@clerk/nextjs';
+  const clerk = createClerkClient({ secretKey: '...' });
   ```
 
 ### Minor Changes
@@ -2322,14 +2684,11 @@
 
   ```ts
   // Authorization
-  auth().protect({ role: "org:admin" }, { redirectUrl: "/any-page" });
-  auth().protect(
-    { permission: "org:settings:manage" },
-    { redirectUrl: "/any-page" },
-  );
+  auth().protect({ role: 'org:admin' }, { redirectUrl: '/any-page' });
+  auth().protect({ permission: 'org:settings:manage' }, { redirectUrl: '/any-page' });
 
   // Authentication
-  auth().protect({ redirectUrl: "/any-page" });
+  auth().protect({ redirectUrl: '/any-page' });
   ```
 
 - Updated dependencies [[`896cb6104`](https://github.com/clerk/javascript/commit/896cb610409f84c0ff7a4f502f0b4ccee1afc157), [`02976d494`](https://github.com/clerk/javascript/commit/02976d49473958b8c3fea38d4e389dc1bee7e8c4), [`8aea39cd6`](https://github.com/clerk/javascript/commit/8aea39cd6907e3a8ac01091aa6df64ebd6a42ed2), [`86d52fb5c`](https://github.com/clerk/javascript/commit/86d52fb5cf68f1dc7adf617605b922134e21268f), [`ab4eb56a5`](https://github.com/clerk/javascript/commit/ab4eb56a5c34baf496ebb8ac412ad6171b9bd79c), [`46040a2f3`](https://github.com/clerk/javascript/commit/46040a2f34d0991072fca490e031c1994b2e2296), [`75ea300bc`](https://github.com/clerk/javascript/commit/75ea300bce16a0ce401a225263bb267ad2a217b8), [`844847e0b`](https://github.com/clerk/javascript/commit/844847e0becf20243fba3c659b2b77a238dd270a)]:
@@ -2508,11 +2867,10 @@
   Code example to keep the same behavior:
 
   ```typescript
-  import { users } from "@clerk/backend";
-  import { ClerkAPIResponseError } from "@clerk/shared/error";
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
 
-  const { data, errors, clerkTraceId, status, statusText } =
-    await users.getUser("user_deadbeef");
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
   if (errors) {
     throw new ClerkAPIResponseError(statusText, {
       data: errors,

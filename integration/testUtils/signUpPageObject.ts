@@ -8,6 +8,7 @@ type SignUpFormInputs = {
   lastName?: string;
   username?: string;
   phoneNumber?: string;
+  legalAccepted?: boolean;
 };
 
 export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
@@ -20,9 +21,8 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
 
       if (typeof opts?.headlessSelector !== 'undefined') {
         return self.waitForMounted(opts.headlessSelector);
-      } else {
-        return self.waitForMounted();
       }
+      return self.waitForMounted();
     },
     waitForMounted: (selector = '.cl-signUp-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
@@ -54,6 +54,11 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
       if (opts.password) {
         await self.getPasswordInput().fill(opts.password);
       }
+
+      if (opts.legalAccepted) {
+        await self.getLegalAccepted().check();
+      }
+
       await self.continue();
     },
     signUpWithEmailAndPassword: async (opts: Pick<SignUpFormInputs, 'email' | 'password'>) => {

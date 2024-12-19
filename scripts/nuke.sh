@@ -9,5 +9,5 @@ done
 for d in playground/*
 do
     echo $d
-    npx yalc remove --all
+    pnpm yalc remove --all
 done

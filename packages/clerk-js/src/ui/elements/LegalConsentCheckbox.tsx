@@ -1,4 +1,5 @@
 import { useEnvironment } from '../../ui/contexts';
+import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
@@ -16,40 +17,49 @@ import { LinkRenderer } from './LinkRenderer';
 const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: string }) => {
   const { termsUrl, privacyPolicyUrl } = props;
   const { t } = useLocalizations();
+  const formField = useFormField();
+  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
   let localizationKey: LocalizationKey | undefined;
 
   if (termsUrl && privacyPolicyUrl) {
-    localizationKey = localizationKeys(
-      'signUp.__experimental_legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy',
-      {
-        termsOfServiceLink: props.termsUrl,
-        privacyPolicyLink: props.privacyPolicyUrl,
-      },
-    );
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__termsOfServiceAndPrivacyPolicy', {
+      termsOfServiceLink: props.termsUrl,
+      privacyPolicyLink: props.privacyPolicyUrl,
+    });
   } else if (termsUrl) {
-    localizationKey = localizationKeys('signUp.__experimental_legalConsent.checkbox.label__onlyTermsOfService', {
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyTermsOfService', {
       termsOfServiceLink: props.termsUrl,
     });
   } else if (privacyPolicyUrl) {
-    localizationKey = localizationKeys('signUp.__experimental_legalConsent.checkbox.label__onlyPrivacyPolicy', {
+    localizationKey = localizationKeys('signUp.legalConsent.checkbox.label__onlyPrivacyPolicy', {
       privacyPolicyLink: props.privacyPolicyUrl,
     });
   }
 
   return (
-    <Text
-      variant='body'
-      as='span'
+    <FormLabel
+      elementDescriptor={descriptors.formFieldCheckboxLabel}
+      htmlFor={inputProps.id}
+      isDisabled={inputProps.isDisabled}
+      sx={t => ({
+        paddingLeft: t.space.$1x5,
+        textAlign: 'left',
+      })}
     >
-      <LinkRenderer
-        text={t(localizationKey)}
-        isExternal
-        sx={t => ({
-          textDecoration: 'underline',
-          textUnderlineOffset: t.space.$1,
-        })}
-      />
-    </Text>
+      <Text
+        variant='body'
+        as='span'
+      >
+        <LinkRenderer
+          text={t(localizationKey)}
+          isExternal
+          sx={t => ({
+            textDecoration: 'underline',
+            textUnderlineOffset: t.space.$1,
+          })}
+        />
+      </Text>
+    </FormLabel>
   );
 };
 
@@ -68,24 +78,15 @@ export const LegalCheckbox = (
 
   return (
     <Field.Root {...props}>
-      <Flex
-        align='center'
-        justify='center'
-      >
-        <Field.CheckboxIndicator />
-        <FormLabel
-          elementDescriptor={descriptors.formFieldRadioLabel}
-          htmlFor={props.itemID}
-          sx={t => ({
-            paddingLeft: t.space.$1x5,
-            textAlign: 'left',
-          })}
-        >
-          <LegalCheckboxLabel
-            termsUrl={termsLink}
-            privacyPolicyUrl={privacyPolicy}
-          />
-        </FormLabel>
+      <Flex justify='center'>
+        <Field.CheckboxIndicator
+          elementDescriptor={descriptors.formFieldCheckboxInput}
+          elementId={descriptors.formFieldInput.setId('legalAccepted')}
+        />
+        <LegalCheckboxLabel
+          termsUrl={termsLink}
+          privacyPolicyUrl={privacyPolicy}
+        />
       </Flex>
     </Field.Root>
   );

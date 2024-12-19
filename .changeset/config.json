@@ -12,10 +12,9 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": [],
   "snapshot": {
     "useCalculatedVersion": true,
-    "prereleaseTemplate": "{tag}.v{commit}"
+    "prereleaseTemplate": "{tag}.v{datetime}"
   },
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true,

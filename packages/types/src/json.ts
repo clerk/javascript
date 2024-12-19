@@ -3,6 +3,7 @@
  */
 
 import type { DisplayConfigJSON } from './displayConfig';
+import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
@@ -12,10 +13,7 @@ import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
-import type {
-  __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationStatus,
-} from './sessionVerification';
+import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
@@ -73,9 +71,33 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_up: SignUpJSON | null;
   sign_in: SignInJSON | null;
   last_active_session_id: string | null;
+  cookie_expires_at: number | null;
   created_at: number;
   updated_at: number;
 }
+// export type ClientJSON = ClerkResourceJSON & {
+//   object: 'client';
+//   id: string;
+//   status: any;
+//   sessions: SessionJSON[];
+//   sign_up: SignUpJSON | null;
+//   sign_in: SignInJSON | null;
+//   last_active_session_id: string | null;
+//   cookie_expires_at: number | null;
+//   created_at: number;
+//   updated_at: number;
+// } | {
+//   object: 'client';
+//   id: null;
+//   status: null;
+//   sessions: null
+//   sign_up: null
+//   sign_in: null
+//   last_active_session_id: null
+//   cookie_expires_at: null
+//   created_at: null;
+//   updated_at: null;
+// }
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: 'sign_up';
@@ -124,13 +146,13 @@ export interface SessionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface __experimental_SessionVerificationJSON extends ClerkResourceJSON {
+export interface SessionVerificationJSON extends ClerkResourceJSON {
   object: 'session_verification';
-  status: __experimental_SessionVerificationStatus;
+  status: SessionVerificationStatus;
   first_factor_verification: VerificationJSON | null;
   session: SessionJSON;
   second_factor_verification: VerificationJSON | null;
-  level: __experimental_SessionVerificationLevel;
+  level: SessionVerificationLevel;
   supported_first_factors: SignInFirstFactorJSON[] | null;
   supported_second_factors: SignInSecondFactorJSON[] | null;
 }
@@ -191,6 +213,35 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   verification?: VerificationJSON;
 }
 
+export interface EnterpriseAccountJSON extends ClerkResourceJSON {
+  object: 'enterprise_account';
+  active: boolean;
+  email_address: string;
+  enterprise_connection: EnterpriseAccountConnectionJSON | null;
+  first_name: string | null;
+  last_name: string | null;
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
+  provider_user_id: string | null;
+  public_metadata: Record<string, unknown>;
+  verification: VerificationJSON | null;
+}
+
+export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
+  active: boolean;
+  allow_idp_initiated: boolean;
+  allow_subdomains: boolean;
+  disable_additional_identifications: boolean;
+  domain: string;
+  logo_public_url: string | null;
+  name: string;
+  protocol: EnterpriseProtocol;
+  provider: EnterpriseProvider;
+  sync_user_attributes: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: 'saml_account';
   provider: SamlIdpSlug;
@@ -217,7 +268,11 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
+  enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
+  /**
+   * @deprecated use `enterprise_accounts` instead
+   */
   saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];
@@ -255,7 +310,7 @@ export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
 
 export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
-  url_based_session_syncing: boolean;
+  claimed_at: number | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -527,6 +582,13 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface WaitlistJSON extends ClerkResourceJSON {
+  object: 'waitlist';
+  id: string;
   created_at: number;
   updated_at: number;
 }

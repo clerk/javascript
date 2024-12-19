@@ -1,13 +1,17 @@
-import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import {
+  API_URL,
+  API_VERSION,
+  MAX_CACHE_LAST_UPDATED_AT_SECONDS,
+  SUPPORTED_BAPI_VERSION,
+  USER_AGENT,
+} from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
   TokenVerificationErrorCode,
   TokenVerificationErrorReason,
 } from '../errors';
-// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
-// For more information refer to https://sinonjs.org/how-to/stub-dependency/
-import runtime from '../runtime';
+import { runtime } from '../runtime';
 import { joinPaths } from '../util/path';
 import { callWithRetry } from '../util/shared';
 
@@ -167,7 +171,9 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const response = await runtime.fetch(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
+      'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'Content-Type': 'application/json',
+      'User-Agent': USER_AGENT,
     },
   });
 

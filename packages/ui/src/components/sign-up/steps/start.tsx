@@ -8,6 +8,7 @@ import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
+import { LegalAcceptedField } from '~/common/legal-accepted';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { RouterLink } from '~/common/router-link';
@@ -54,6 +55,7 @@ export function SignUpStart() {
   const isDev = useDevModeWarning();
   const { options } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
+  const legalConsentEnabled = userSettings.signUp.legal_consent_enabled;
 
   return (
     <Common.Loading scope='global'>
@@ -144,10 +146,13 @@ export function SignUpStart() {
 
                   {options.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
 
+                  {legalConsentEnabled && hasConnection && !hasIdentifier && <LegalAcceptedField />}
+
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
-                {hasConnection || hasIdentifier ? (
+                {hasIdentifier ? (
                   <Card.Actions>
+                    {legalConsentEnabled && hasIdentifier && <LegalAcceptedField />}
                     <Common.Loading scope='submit'>
                       {isSubmitting => {
                         return (

@@ -1,0 +1,72 @@
+{
+  "name": "@clerk/vue",
+  "version": "0.1.5",
+  "description": "Clerk SDK for Vue",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "vue",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/vue"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest",
+    "test:ci": "vitest --maxWorkers=70%"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^"
+  },
+  "devDependencies": {
+    "@testing-library/vue": "^8.1.0",
+    "@vue.ts/tsx-auto-props": "^0.6.0",
+    "typescript": "catalog:repo",
+    "vue": "3.5.12"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

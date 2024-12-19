@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
-import { ComponentContext, withCoreUserGuard } from '../../contexts';
+import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -58,12 +58,12 @@ export const OrganizationProfileModal = (props: OrganizationProfileModalProps): 
 
   return (
     <Route path='organizationProfile'>
-      <ComponentContext.Provider value={organizationProfileProps}>
+      <OrganizationProfileContext.Provider value={organizationProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
           <OrganizationProfile {...organizationProfileProps} />
         </div>
-      </ComponentContext.Provider>
+      </OrganizationProfileContext.Provider>
     </Route>
   );
 };

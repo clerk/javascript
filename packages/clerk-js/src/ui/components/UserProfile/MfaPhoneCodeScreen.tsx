@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
@@ -15,7 +15,6 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
@@ -77,26 +76,26 @@ type AddMfaProps = FormProps & {
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
 };
 
-const AddMfa = (props: AddMfaProps) => {
-  const { onSuccess, onReset, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
+const EnableMFAButtonForPhone = (
+  props: {
+    phone: PhoneNumberResource;
+  } & Pick<AddMfaProps, 'onUnverifiedPhoneClick' | 'resourceRef' | 'onSuccess'>,
+) => {
+  const { phone, onSuccess, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
-  const { user } = useUser();
-  const { handleAssurance } = useAssurance();
+  const [setReservedForSecondFactor] = useReverification(() => phone.setReservedForSecondFactor({ reserved: true }));
 
-  if (!user) {
-    return null;
-  }
+  const { country } = getCountryFromPhoneString(phone.phoneNumber);
+  const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
 
-  const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
-
-  const enableMfa = async (phone: PhoneNumberResource) => {
+  const enableMfa = async () => {
     if (phone.verification.status !== 'verified') {
       return onUnverifiedPhoneClick(phone);
     }
 
     card.setLoading(phone.id);
     try {
-      await handleAssurance(() => phone.setReservedForSecondFactor({ reserved: true }));
+      await setReservedForSecondFactor();
       resourceRef.current = phone;
       onSuccess();
     } catch (err) {
@@ -105,6 +104,31 @@ const AddMfa = (props: AddMfaProps) => {
       card.setIdle();
     }
   };
+
+  return (
+    <Button
+      key={phone.id}
+      variant='outline'
+      colorScheme='neutral'
+      sx={{ justifyContent: 'start' }}
+      onClick={enableMfa}
+      isLoading={card.loadingMetadata === phone.id}
+      isDisabled={card.isLoading}
+    >
+      {country.iso.toUpperCase()} {formattedPhone}
+    </Button>
+  );
+};
+
+const AddMfa = (props: AddMfaProps) => {
+  const { onSuccess, onReset, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
 
   return (
     <FormContainer
@@ -121,25 +145,12 @@ const AddMfa = (props: AddMfaProps) => {
       />
       {availableMethods.length > 0 && (
         <Col gap={2}>
-          {availableMethods.map(phone => {
-            const { country } = getCountryFromPhoneString(phone.phoneNumber);
-
-            const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
-
-            return (
-              <Button
-                key={phone.id}
-                variant='outline'
-                colorScheme='neutral'
-                sx={{ justifyContent: 'start' }}
-                onClick={() => enableMfa(phone)}
-                isLoading={card.loadingMetadata === phone.id}
-                isDisabled={card.isLoading}
-              >
-                {country.iso.toUpperCase()} {formattedPhone}
-              </Button>
-            );
-          })}
+          {availableMethods.map(phone => (
+            <EnableMFAButtonForPhone
+              key={phone.id}
+              {...{ onSuccess, phone, onUnverifiedPhoneClick, resourceRef }}
+            />
+          ))}
         </Col>
       )}
       <FormButtonContainer sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>

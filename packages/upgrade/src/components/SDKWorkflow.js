@@ -16,18 +16,19 @@ import { UpgradeSDK } from './UpgradeSDK.js';
  *
  * @component
  * @param {Object} props
- * @param {string} props.packageManager - The package manager to use for the upgrade, if needed.
  * @param {string} props.sdk - The SDK to be upgraded.
  *
  * @returns {JSX.Element} The rendered component.
  */
 export function SDKWorkflow(props) {
-  const { packageManager, sdk } = props;
+  const { sdk } = props;
 
   const [done, setDone] = useState(false);
+  const [runCodemod, setRunCodemod] = useState(false);
   const [upgradeComplete, setUpgradeComplete] = useState(false);
 
-  const version = getClerkSdkVersion(sdk);
+  // eslint-disable-next-line no-unused-vars
+  const [version, setVersion] = useState(getClerkSdkVersion(sdk));
 
   if (sdk !== 'nextjs') {
     return (
@@ -41,11 +42,22 @@ export function SDKWorkflow(props) {
   return (
     <>
       <Header />
+      <Text>
+        Clerk SDK used: <Text color='green'>@clerk/{sdk}</Text>
+      </Text>
+      <Text>
+        Migrating from version: <Text color='green'>{version}</Text>
+      </Text>
+      {runCodemod ? (
+        <Text>
+          Executing codemod: <Text color='green'>yes</Text>
+        </Text>
+      ) : null}
+      <Newline />
       {version === 5 && (
         <>
           <UpgradeSDK
             callback={setUpgradeComplete}
-            packageManager={packageManager}
             sdk={sdk}
           />
           {upgradeComplete ? (
@@ -57,32 +69,34 @@ export function SDKWorkflow(props) {
           ) : null}
         </>
       )}
-      {!done && version === 6 && (
+      {version === 6 && (
         <>
-          <Text>
-            Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to run
-            the associated codemod?.
-          </Text>
-          {upgradeComplete ? (
+          {runCodemod ? (
             <Codemod
               sdk={sdk}
               callback={setDone}
               transform='transform-async-request'
             />
           ) : (
-            <Select
-              options={[
-                { label: 'yes', value: 'yes' },
-                { label: 'no', value: 'no' },
-              ]}
-              onChange={value => {
-                if (value === 'yes') {
-                  setUpgradeComplete(true);
-                } else {
-                  setDone(true);
-                }
-              }}
-            />
+            <>
+              <Text>
+                Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to
+                run the associated codemod?
+              </Text>
+              <Select
+                options={[
+                  { label: 'yes', value: 'yes' },
+                  { label: 'no', value: 'no' },
+                ]}
+                onChange={value => {
+                  if (value === 'yes') {
+                    setRunCodemod(true);
+                  } else {
+                    setDone(true);
+                  }
+                }}
+              />
+            </>
           )}
         </>
       )}
@@ -111,8 +125,8 @@ export function SDKWorkflow(props) {
                 <Newline />
                 <Text>
                   You can find more information about this change in the Clerk documentation at{' '}
-                  <Link url='https://clerk.com/docs/nextjs/rendering-modes'>
-                    https://clerk.com/docs/nextjs/rendering-modes
+                  <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
+                    https://clerk.com/docs/references/nextjs/rendering-modes
                   </Link>
                   .
                 </Text>

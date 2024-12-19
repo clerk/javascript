@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: 'The node version to use'
     required: false
-    default: '18'
+    default: '22'
   playwright-enabled:
     description: 'Enable Playwright?'
     required: false
@@ -103,23 +103,29 @@ runs:
       shell: bash
       run: echo $TURBO_ARGS
 
+    - name: Install PNPM
+      uses: pnpm/action-setup@v4
+
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v4
       with:
-        cache: npm
-        cache-dependency-path: '**/package-lock.json'
+        cache: pnpm
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
-    - name: Install NPM Dependencies
-      run: npm ci --audit=false --fund=false --engine-strict=false
+    - name: Install PNPM Dependencies
+      env:
+        CYPRESS_INSTALL_BINARY: 0
+      run: pnpm install
       shell: bash
 
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
       shell: bash
       id: playwright-version
-      run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
+      run: |
+        VERSION=$(node -p "require('@playwright/test/package.json').version")
+        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
     - name: Cache Playwright Binaries
       if: inputs.playwright-enabled == 'true'
@@ -133,4 +139,4 @@ runs:
       if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        npx playwright install chromium
+        pnpm playwright install chromium

@@ -16,7 +16,8 @@ export const common = ({ page }: TestArgs) => {
     },
     enterOtpCode: async (code: string) => {
       await page.getByRole('textbox', { name: /digit 1/i }).click();
-      await page.keyboard.type(code, { delay: 50 });
+      // We've got a delay here to ensure the prepare call is triggered before the OTP is auto-submitted.
+      await page.keyboard.type(code, { delay: 100 });
     },
     enterTestOtpCode: async () => {
       return self.enterOtpCode('424242');
@@ -40,6 +41,9 @@ export const common = ({ page }: TestArgs) => {
     },
     getPasswordInput: () => {
       return page.locator('input[name=password]');
+    },
+    getLegalAccepted: () => {
+      return page.locator('input[name=legalAccepted]');
     },
     getFirstNameInput: () => {
       return page.locator('input[name=firstName]');

@@ -1,8 +1,13 @@
-import { isWebAuthnPlatformAuthenticatorSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
+import {
+  isWebAuthnPlatformAuthenticatorSupported as isWebAuthnPlatformAuthenticatorSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
+  PasskeyJSONSnapshot,
   PasskeyResource,
   PasskeyVerificationResource,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
@@ -10,7 +15,10 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { ClerkWebAuthnError, serializePublicKeyCredential, webAuthnCreateCredential } from '../../utils/passkeys';
+import {
+  serializePublicKeyCredential,
+  webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
+} from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 
@@ -23,7 +31,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   createdAt!: Date;
   updatedAt!: Date;
 
-  public constructor(data: PasskeyJSON) {
+  public constructor(data: PasskeyJSON | PasskeyJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -55,6 +63,13 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
+    const isWebAuthnSupported = Passkey.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnCreateCredential =
+      Passkey.clerk.__internal_createPublicCredentials || webAuthnCreateCredentialOnWindow;
+    const isWebAuthnPlatformAuthenticatorSupported =
+      Passkey.clerk.__internal_isWebAuthnPlatformAuthenticatorSupported ||
+      isWebAuthnPlatformAuthenticatorSupportedOnWindow;
+
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {
         code: 'passkey_not_supported',
@@ -89,7 +104,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
     if (!publicKeyCredential) {
       throw error;
     }
-
     return this.attemptVerification(passkey.id, publicKeyCredential);
   }
 
@@ -115,7 +129,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     return new DeletedObject(json);
   };
 
-  protected fromJSON(data: PasskeyJSON | null): this {
+  protected fromJSON(data: PasskeyJSON | PasskeyJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -130,5 +144,17 @@ export class Passkey extends BaseResource implements PasskeyResource {
       this.verification = new PasskeyVerification(data.verification);
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): PasskeyJSONSnapshot {
+    return {
+      object: 'passkey',
+      id: this.id,
+      name: this.name,
+      verification: this.verification?.__internal_toSnapshot() || null,
+      last_used_at: this.lastUsedAt?.getTime() || null,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 }

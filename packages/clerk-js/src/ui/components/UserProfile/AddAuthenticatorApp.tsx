@@ -1,5 +1,5 @@
-import { isClerkRuntimeError } from '@clerk/shared';
-import { useUser } from '@clerk/shared/react';
+import { isClerkRuntimeError } from '@clerk/shared/error';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
@@ -16,7 +16,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useAssurance } from '../../hooks/useAssurance';
 import { handleError } from '../../utils';
 
 type AddAuthenticatorAppProps = FormProps & {
@@ -29,7 +28,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   const { title, onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
-  const { handleAssurance } = useAssurance();
+  const [createTOTP] = useReverification(() => user?.createTOTP());
   const { close } = useActionContext();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
@@ -41,10 +40,10 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
       return;
     }
 
-    void handleAssurance(user.createTOTP)
-      .then((totp: TOTPResource) => setTOTP(totp))
+    void createTOTP()
+      .then(totp => setTOTP(totp))
       .catch(err => {
-        if (isClerkRuntimeError(err) && err.code === 'assurance_cancelled') {
+        if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
           return close();
         }
         return handleError(err, [], card.setError);

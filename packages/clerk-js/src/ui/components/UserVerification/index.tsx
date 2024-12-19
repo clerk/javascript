@@ -1,7 +1,7 @@
-import type { __experimental_UserVerificationModalProps, __experimental_UserVerificationProps } from '@clerk/types';
+import type { __internal_UserVerificationModalProps, __internal_UserVerificationProps } from '@clerk/types';
 import React, { useEffect } from 'react';
 
-import { ComponentContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { UserVerificationContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
@@ -31,13 +31,13 @@ function UserVerificationRoutes(): JSX.Element {
 
 UserVerificationRoutes.displayName = 'UserVerification';
 
-const UserVerification: React.ComponentType<__experimental_UserVerificationProps> =
+const UserVerification: React.ComponentType<__internal_UserVerificationProps> =
   withCoreSessionSwitchGuard(UserVerificationRoutes);
 
-const UserVerificationModal = (props: __experimental_UserVerificationModalProps): JSX.Element => {
+const UserVerificationModal = (props: __internal_UserVerificationModalProps): JSX.Element => {
   return (
     <Route path='user-verification'>
-      <ComponentContext.Provider
+      <UserVerificationContext.Provider
         value={{
           componentName: 'UserVerification',
           ...props,
@@ -51,7 +51,7 @@ const UserVerificationModal = (props: __experimental_UserVerificationModalProps)
             routing='virtual'
           />
         </div>
-      </ComponentContext.Provider>
+      </UserVerificationContext.Provider>
     </Route>
   );
 };

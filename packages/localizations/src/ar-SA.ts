@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'الرجوع',
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
@@ -324,6 +269,61 @@ export const arSA: LocalizationResource = {
   paginationButton__previous: 'السابق',
   paginationRowText__displaying: 'عرض',
   paginationRowText__of: 'من',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'إضافة حساب',
@@ -450,14 +450,17 @@ export const arSA: LocalizationResource = {
     },
     start: {
       actionLink: 'إنشاء حساب جديد',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'استخدم البريد الإلكتروني',
       actionLink__use_email_username: 'استخدم البريد الإلكتروني أو اسم المستخدم',
       actionLink__use_passkey: 'استخدم مفتاح المرور بدلاً من ذلك',
       actionLink__use_phone: 'استخدم رقم الجوال',
       actionLink__use_username: 'استخدم اسم المستخدم',
       actionText: 'ليس لديك حساب؟',
+      actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',
@@ -502,12 +505,32 @@ export const arSA: LocalizationResource = {
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'أدخل رمز التحقق المرسل إلى هاتفك',
       formTitle: 'رمز التحقق',
       resendButton: 'لم يصلك الرمز؟ حاول مرة أخرى',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تحقق من هاتفك',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'تسجيل الدخول',
@@ -554,6 +577,7 @@ export const arSA: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'تم تسجيل مفتاح المرور مسبقاً مع هذا الجهاز',
@@ -877,6 +901,20 @@ export const arSA: LocalizationResource = {
       successMessage: 'تمت إضافة المحفظة الى حسابك.',
       title: 'إضافة محفظة web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

@@ -55,6 +55,11 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    * Provide an initial state of the Clerk client during server-side rendering (SSR)
    */
   initialState?: InitialState;
+  /**
+   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
+   * Defaults to `false`.
+   */
+  __internal_bypassMissingPublishableKey?: boolean;
 };
 
 export interface BrowserClerkConstructor {
@@ -112,7 +117,11 @@ type ButtonProps = {
 export type SignInButtonProps = ButtonProps &
   Pick<
     SignInProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
   >;
 
 export type SignUpButtonProps = {
@@ -120,7 +129,11 @@ export type SignUpButtonProps = {
 } & ButtonProps &
   Pick<
     SignUpProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
   >;
 
 export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;

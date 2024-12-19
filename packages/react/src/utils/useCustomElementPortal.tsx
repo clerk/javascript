@@ -7,7 +7,7 @@ export type UseCustomElementPortalParams = {
 };
 
 export type UseCustomElementPortalReturn = {
-  portal: () => JSX.Element;
+  portal: () => React.JSX.Element;
   mount: (node: Element) => void;
   unmount: () => void;
   id: number;
@@ -23,6 +23,6 @@ export const useCustomElementPortal = (elements: UseCustomElementPortalParams[])
     id: el.id,
     mount: (node: Element) => setNodes(prevState => prevState.map((n, i) => (i === index ? node : n))),
     unmount: () => setNodes(prevState => prevState.map((n, i) => (i === index ? null : n))),
-    portal: () => <>{nodes[index] ? createPortal(el.component, nodes[index] as Element) : null}</>,
+    portal: () => <>{nodes[index] ? createPortal(el.component, nodes[index]) : null}</>,
   }));
 };

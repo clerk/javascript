@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.0.0",
+  "version": "6.9.5",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -53,41 +53,37 @@
     "errors"
   ],
   "scripts": {
-    "build": "npm run clean && tsup",
+    "build": "pnpm clean && tsup",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "1.15.0",
-    "@clerk/clerk-react": "5.13.0",
-    "@clerk/shared": "2.10.0",
-    "@clerk/types": "4.27.0",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "crypto-js": "4.2.0",
     "server-only": "0.0.1",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/crypto-js": "4.2.2",
     "@types/node": "^18.19.33",
-    "@types/react": "*",
-    "@types/react-dom": "*",
-    "next": "^14.2.10",
-    "typescript": "*"
+    "next": "^14.2.20",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "next": "^13.5.4 || ^14.0.3 || >=15.0.0-rc",
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "next": "^13.5.4 || ^14.0.3 || ^15.0.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

@@ -1,5 +1,10 @@
-import { deepSnakeToCamel, Poller } from '@clerk/shared';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
+import { Poller } from '@clerk/shared/poller';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import {
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -9,6 +14,7 @@ import type {
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  EnterpriseSSOConfig,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -22,6 +28,7 @@ import type {
   SignInFirstFactor,
   SignInIdentifier,
   SignInJSON,
+  SignInJSONSnapshot,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -35,15 +42,16 @@ import type {
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
+  getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
 import {
-  ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
@@ -51,6 +59,7 @@ import {
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkMissingWebAuthnPublicKeyOptions,
+  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -71,7 +80,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
-  constructor(data: SignInJSON | null = null) {
+  constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -117,6 +126,9 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'web3_coinbase_wallet_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
+      case 'web3_okx_wallet_signature':
+        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        break;
       case 'reset_password_phone_code':
         config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
         break;
@@ -128,6 +140,12 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: factor.redirectUrl,
           actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
         } as SamlConfig;
+        break;
+      case 'enterprise_sso':
+        config = {
+          redirectUrl: factor.redirectUrl,
+          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+        } as EnterpriseSSOConfig;
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -210,7 +228,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
 
     const { firstFactorVerification } =
-      strategy === 'saml' && this.id
+      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
         ? await this.prepareFirstFactor({
             strategy,
             redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
@@ -233,6 +251,11 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return this;
+    }
+
     const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -279,6 +302,11 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return this;
+    }
+
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -288,11 +316,30 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return this;
+    }
+
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
+    });
+  };
+
+  public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return this;
+    }
+
+    const identifier = await getOKXWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithOKXWallet,
+      strategy: 'web3_okx_wallet_signature',
     });
   };
 
@@ -303,6 +350,12 @@ export class SignIn extends BaseResource implements SignInResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
+
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal_isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
+
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
@@ -368,7 +421,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  protected fromJSON(data: SignInJSON | null): this {
+  protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -382,5 +435,21 @@ export class SignIn extends BaseResource implements SignInResource {
       this.userData = new UserData(data.user_data);
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): SignInJSONSnapshot {
+    return {
+      object: 'sign_in',
+      id: this.id || '',
+      status: this.status || null,
+      supported_identifiers: this.supportedIdentifiers,
+      supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
+      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
+      second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
+      identifier: this.identifier,
+      created_session_id: this.createdSessionId,
+      user_data: this.userData.__internal_toSnapshot(),
+    };
   }
 }

@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import { isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared';
+import { isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared/keys';
 import dotenv from 'dotenv';
 
 import type { ClerkSetupOptions, ClerkSetupReturn } from './types';

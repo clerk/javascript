@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: '戻る',
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
@@ -326,6 +271,61 @@ export const jaJP: LocalizationResource = {
   paginationButton__previous: '前へ',
   paginationRowText__displaying: '表示中',
   paginationRowText__of: '全',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'アカウントを追加',
@@ -451,14 +451,17 @@ export const jaJP: LocalizationResource = {
     },
     start: {
       actionLink: 'サインアップ',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
+      actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'サインイン',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '検証コード',
@@ -503,12 +506,32 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレスが正常に確認されました',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: '電話番号に送信された確認コードを入力してください',
       formTitle: '確認コード',
       resendButton: 'コードを再送信',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: '電話番号を確認',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'サインイン',
@@ -556,6 +579,7 @@ export const jaJP: LocalizationResource = {
     not_allowed_access: 'アクセスが許可されていません。',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -879,6 +903,20 @@ export const jaJP: LocalizationResource = {
       successMessage: 'ウォレットがアカウントに追加されました。',
       title: 'Web3ウォレットの追加',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

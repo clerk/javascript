@@ -79,9 +79,10 @@ export const SignUpRouterMachine = setup({
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
         ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
-      const beforeEmit = () =>
-        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl());
-      void context.clerk.setActive({ session, beforeEmit });
+      void context.clerk.setActive({
+        session,
+        redirectUrl: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+      });
     },
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     setError: assign({
@@ -108,6 +109,11 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
         case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
         case ERROR_CODES.USER_LOCKED:
+        case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+        case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+        case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+        case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
         default:

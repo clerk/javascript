@@ -1,3 +1,5 @@
+import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from 'snapshots';
+
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
@@ -14,6 +16,7 @@ import type { ClerkResource } from './resource';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
+  EnterpriseSSOStrategy,
   GoogleOneTapStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
@@ -92,12 +95,14 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithWeb3: (
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  __internal_toSnapshot: () => SignUpJSONSnapshot;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -122,6 +127,8 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: SamlStrategy;
@@ -150,7 +157,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
-export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy;
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
 
 // TODO: Replace with discriminated union type
 export type SignUpCreateParams = Partial<
@@ -158,14 +165,16 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | SamlStrategy | TicketStrategy | GoogleOneTapStrategy;
+    strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy | TicketStrategy | GoogleOneTapStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
     token: string;
-    __experimental_legalAccepted: boolean;
+    legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
@@ -185,9 +194,11 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
+  __internal_toSnapshot: () => SignUpVerificationsJSONSnapshot;
 }
 
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
+  __internal_toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

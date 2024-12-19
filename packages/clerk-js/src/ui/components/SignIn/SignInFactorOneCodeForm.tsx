@@ -1,4 +1,4 @@
-import { isUserLockedError } from '@clerk/shared';
+import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
@@ -32,7 +32,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { afterSignInUrl } = useSignInContext();
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
@@ -62,7 +62,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
+            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
           case 'needs_second_factor':
             return navigate('../factor-two');
           case 'needs_new_password':

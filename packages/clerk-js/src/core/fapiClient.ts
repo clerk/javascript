@@ -1,7 +1,10 @@
-import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
+import { isBrowserOnline } from '@clerk/shared/browser';
+import { camelToSnake } from '@clerk/shared/underscore';
+import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
+import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
@@ -20,6 +23,10 @@ type FapiQueryStringParameters = {
   _clerk_session_id?: string;
   _clerk_js_version?: string;
   rotating_token_nonce?: string;
+};
+
+type FapiRequestOptions = {
+  fetchMaxTries?: number;
 };
 
 export type FapiResponse<T> = Response & {
@@ -51,8 +58,11 @@ export interface FapiClient {
 
   onBeforeRequest(callback: FapiRequestCallback<unknown>): void;
 
-  request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
+  request<T>(requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>>;
 }
+
+// List of paths that should not receive the session ID parameter in the URL
+const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
 export function createFapiClient(clerkInstance: Clerk): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
@@ -91,6 +101,9 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
+    // Append supported FAPI version to the query string
+    searchParams.append('__clerk_api_version', SUPPORTED_FAPI_VERSION);
+
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
     }
@@ -110,7 +123,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       searchParams.append('_method', method);
     }
 
-    if (path && !path.startsWith('/client') && sessionId) {
+    if (path && !unauthorizedPathPrefixes.some(p => path.startsWith(p)) && sessionId) {
       searchParams.append('_clerk_session_id', sessionId);
     }
 
@@ -163,9 +176,9 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     });
   }
 
-  async function request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>> {
-    // eslint-disable-next-line prefer-const
-    let { method = 'GET', body } = requestInit;
+  async function request<T>(_requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>> {
+    const requestInit = { ..._requestInit };
+    const { method = 'GET', body } = requestInit;
 
     requestInit.url = buildUrl({
       ...requestInit,
@@ -216,7 +229,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
-        const maxTries = isBrowserOnline() ? 4 : 11;
+        const maxTries = options?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'

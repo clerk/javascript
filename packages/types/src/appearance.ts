@@ -11,6 +11,7 @@ import type {
   SelectId,
   UserPreviewId,
 } from './elementIds';
+import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
@@ -165,6 +166,7 @@ export type ElementsConfig = {
   footerPages: WithOptions;
   footerPagesLink: WithOptions<'help' | 'terms' | 'privacy'>;
 
+  socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
@@ -172,7 +174,10 @@ export type ElementsConfig = {
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
-  enterpriseButtonsProviderIcon: WithOptions<SamlIdpSlug, LoadingState>;
+  enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
+
+  providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
 
   alternativeMethods: WithOptions;
   alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
@@ -210,6 +215,8 @@ export type ElementsConfig = {
   formFieldRadioLabel: WithOptions<FieldId, ControlState>;
   formFieldRadioLabelTitle: WithOptions<FieldId, ControlState>;
   formFieldRadioLabelDescription: WithOptions<FieldId, ControlState>;
+  formFieldCheckboxInput: WithOptions<FieldId, ControlState>;
+  formFieldCheckboxLabel: WithOptions<FieldId, ControlState>;
   formFieldAction: WithOptions<FieldId, ControlState>;
   formFieldInput: WithOptions<FieldId, ControlState>;
   formFieldErrorText: WithOptions<FieldId, ControlState>;
@@ -368,6 +375,7 @@ export type ElementsConfig = {
   navbarButtons: WithOptions<never, ActiveState>;
   navbarButton: WithOptions<string, ActiveState>;
   navbarButtonIcon: WithOptions<string, ActiveState>;
+  navbarButtonText: WithOptions<string, ActiveState>;
   navbarMobileMenuRow: WithOptions;
   navbarMobileMenuButton: WithOptions;
   navbarMobileMenuButtonIcon: WithOptions;
@@ -395,7 +403,6 @@ export type ElementsConfig = {
   badge: WithOptions<'primary' | 'actionRequired'>;
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
-  providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
 };
 
@@ -630,6 +637,7 @@ export type OrganizationListTheme = Theme;
 export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 export type UserVerificationTheme = Theme;
+export type WaitlistTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -672,4 +680,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<CreateOrganization />` component
    */
   oneTap?: T;
+  /**
+   * Theme overrides that only apply to the `<Waitlist />` component
+   */
+  waitlist?: T;
 };

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.28.0",
+  "version": "5.43.3",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -27,18 +27,21 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "headless"
+    "headless",
+    "no-rhc"
   ],
   "scripts": {
-    "build": "npm run build:bundle && npm run build:declarations",
-    "build:analyze": "webpack-bundle-analyzer stats.json dist/",
-    "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
+    "build": "pnpm build:bundle && pnpm build:declarations",
+    "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
+    "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
-    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
+    "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
+    "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
+    "bundlewatch": "pnpm dlx bundlewatch --config bundlewatch.config.json",
     "clean": "rimraf ./dist",
-    "dev": "webpack serve --config webpack.config.js",
-    "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
+    "dev": "rspack serve --config rspack.config.js",
+    "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
+    "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000 --env sandbox=1",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint || true",
@@ -46,19 +49,20 @@
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
-    "watch": "webpack --config webpack.config.js --env production --watch"
+    "watch": "rspack build --config rspack.config.js --env production --watch"
   },
-  "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
+  "browserslist": "last 2 years, Safari > 12, iOS > 12",
   "dependencies": {
-    "@clerk/localizations": "3.3.1",
-    "@clerk/shared": "2.10.0",
-    "@clerk/types": "4.27.0",
-    "@clerk/ui": "0.1.9",
+    "@clerk/localizations": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "@coinbase/wallet-sdk": "4.0.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
+    "@floating-ui/react-dom": "^2.0.2",
     "@formkit/auto-animate": "^0.8.1",
+    "@swc/helpers": "^0.5.13",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "browser-tabs-lock": "1.2.15",
@@ -70,29 +74,27 @@
     "regenerator-runtime": "0.13.11"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
-    "@rsdoctor/webpack-plugin": "^0.4.4",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@clerk/ui": "workspace:*",
+    "@rsdoctor/rspack-plugin": "^0.4.7",
+    "@rspack/cli": "^1.0.14",
+    "@rspack/core": "^1.0.14",
+    "@rspack/plugin-react-refresh": "^1.0.0",
     "@svgr/webpack": "^6.2.1",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
     "@types/webpack-dev-server": "^4.7.2",
     "@types/webpack-env": "^1.16.4",
-    "bundlewatch": "^0.4.0",
     "react-refresh": "^0.14.0",
     "react-refresh-typescript": "^2.0.5",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.3.0",
-    "typescript": "*",
-    "webpack": "^5.94.0",
-    "webpack-bundle-analyzer": "^4.9.0",
-    "webpack-cli": "^5.1.3",
-    "webpack-dev-server": "^4.15.0",
+    "typescript": "catalog:repo",
     "webpack-merge": "^5.9.0"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

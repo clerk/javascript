@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default async function Page() {
   const { userId } = await auth();
   const currentUser_ = await currentUser();
-  const user = userId ? await clerkClient.users.getUser(userId) : null;
+  const user = userId ? await (await clerkClient()).users.getUser(userId) : null;
 
   return (
     <main>
@@ -26,6 +26,7 @@ export default async function Page() {
       <div>
         <h1>Hello, Next.js!</h1>
         {userId ? <h3>Signed in as: {userId}</h3> : <h3>Signed out</h3>}
+        {/* @ts-ignore */}
         <SignedIn>
           <UserButton
             userProfileMode='navigation'
@@ -40,6 +41,7 @@ export default async function Page() {
           <div>{JSON.stringify(user)}</div>
           <div>{JSON.stringify(currentUser_)}</div>
         </SignedIn>
+        {/* @ts-ignore */}
         <SignedOut>
           <SignIn routing='hash' />
         </SignedOut>

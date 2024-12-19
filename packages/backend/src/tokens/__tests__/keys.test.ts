@@ -1,5 +1,5 @@
-import type QUnit from 'qunit';
-import sinon from 'sinon';
+import { http, HttpResponse } from 'msw';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../../errors';
 import {
@@ -11,212 +11,185 @@ import {
   mockRsaJwk,
   mockRsaJwkKid,
 } from '../../fixtures';
-import runtime from '../../runtime';
-import { jsonError, jsonOk } from '../../util/testUtils';
+import { server, validateHeaders } from '../../mock-server';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
 
-export default (QUnit: QUnit) => {
-  const { module, test } = QUnit;
+describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
+  it('throws an error if no key has been provided', () => {
+    expect(() => loadClerkJWKFromLocal()).toThrow(
+      new TokenVerificationError({
+        action: TokenVerificationErrorAction.SetClerkJWTKey,
+        message: 'Missing local JWK.',
+        reason: TokenVerificationErrorReason.LocalJWKMissing,
+      }),
+    );
+  });
 
-  module('tokens.loadClerkJWKFromLocal(localKey)', () => {
-    test('throws an error if no key has been provided', assert => {
-      assert.throws(
-        () => loadClerkJWKFromLocal(),
-        new TokenVerificationError({
-          action: TokenVerificationErrorAction.SetClerkJWTKey,
-          message: 'Missing local JWK.',
-          reason: TokenVerificationErrorReason.LocalJWKMissing,
+  it('loads the local key', () => {
+    const jwk = loadClerkJWKFromLocal(mockPEMKey);
+    expect(jwk).toMatchObject(mockPEMJwk);
+  });
+
+  it('loads the local key in PEM format', () => {
+    const jwk = loadClerkJWKFromLocal(mockPEMJwtKey);
+    expect(jwk).toMatchObject(mockPEMJwk);
+  });
+});
+
+describe('tokens.loadClerkJWKFromRemote(options)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(mockJwtPayload.iat * 1000).getTime());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('loads JWKS from Backend API when secretKey is provided', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
         }),
-      );
+      ),
+    );
+    const jwk = await loadClerkJWKFromRemote({
+      secretKey: 'sk_test_deadbeef',
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
     });
 
-    test('loads the local key', assert => {
-      const jwk = loadClerkJWKFromLocal(mockPEMKey);
-      assert.propContains(jwk, mockPEMJwk);
-    });
-
-    test('loads the local key in PEM format', assert => {
-      const jwk = loadClerkJWKFromLocal(mockPEMJwtKey);
-      assert.propContains(jwk, mockPEMJwk);
-    });
+    expect(jwk).toMatchObject(mockRsaJwk);
   });
 
-  module('tokens.loadClerkJWKFromRemote(options)', hooks => {
-    let fakeClock;
-    let fakeFetch;
-    hooks.beforeEach(() => {
-      fakeClock = sinon.useFakeTimers(new Date(mockJwtPayload.iat * 1000).getTime());
-      fakeFetch = sinon.stub(runtime, 'fetch');
-    });
-    hooks.afterEach(() => {
-      fakeClock.restore();
-      fakeFetch.restore();
-      sinon.restore();
-    });
+  it('loads JWKS from Backend API using the provided apiUrl', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
 
-    test('loads JWKS from Backend API when secretKey is provided', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const jwk = await loadClerkJWKFromRemote({
-        secretKey: 'sk_test_deadbeef',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-
-      fakeFetch.calledOnceWith('https://api.clerk.com/v1/jwks', {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer deadbeef',
-          'Content-Type': 'application/json',
-          'User-Agent': '@clerk/backend@0.0.0-test',
-        },
-      });
-      assert.propEqual(jwk, mockRsaJwk);
+    const jwk = await loadClerkJWKFromRemote({
+      secretKey: 'sk_test_deadbeef',
+      apiUrl: 'https://api.clerk.test',
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
     });
 
-    test('loads JWKS from Backend API using the provided apiUrl', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const jwk = await loadClerkJWKFromRemote({
-        secretKey: 'sk_test_deadbeef',
-        apiUrl: 'https://api.clerk.test',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-
-      fakeFetch.calledOnceWith('https://api.clerk.test/v1/jwks', {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer sk_test_deadbeef',
-          'Content-Type': 'application/json',
-          'User-Agent': '@clerk/backend@0.0.0-test',
-        },
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
-
-    test('caches JWK by kid', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      let jwk = await loadClerkJWKFromRemote({
-        secretKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-      jwk = await loadClerkJWKFromRemote({
-        secretKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
-
-    test('retries five times with exponential back-off policy to fetch JWKS before it fails', async assert => {
-      // Since the stub the clock and the retry mechanism schedules a retry every some seconds,
-      // we need to restore the clock to allow the retries execution
-      fakeClock.restore();
-      fakeFetch.onCall(0).returns(jsonError('something awful happened', 503));
-      fakeFetch.onCall(1).returns(jsonError('server error'));
-      fakeFetch.onCall(2).returns(jsonError('server error'));
-      fakeFetch.onCall(3).returns(jsonError('server error'));
-      fakeFetch.onCall(4).returns(jsonError('Connection to the origin web server failed', 542));
-
-      try {
-        await loadClerkJWKFromRemote({
-          secretKey: 'deadbeef',
-          kid: 'ins_whatever',
-          skipJwksCache: true,
-        });
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.propEqual(err, {
-            reason: 'jwk-remote-failed-to-load',
-            action: 'Contact support@clerk.com',
-          });
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
-      assert.equal(fakeFetch.callCount, 5);
-    });
-
-    test('throws an error when JWKS can not be fetched from Backend or Frontend API', async assert => {
-      try {
-        await loadClerkJWKFromRemote({
-          kid: 'ins_whatever',
-          skipJwksCache: true,
-        });
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.propEqual(err, {
-            reason: 'jwk-remote-failed-to-load',
-            action: 'Contact support@clerk.com',
-          });
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
-    });
-
-    test('throws an error when no JWK matches the provided kid', async assert => {
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      const kid = 'ins_whatever';
-
-      try {
-        await loadClerkJWKFromRemote({
-          secretKey: 'deadbeef',
-          kid,
-        });
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.propEqual(err, {
-            reason: 'jwk-kid-mismatch',
-            action:
-              'Go to your Dashboard and validate your secret and public keys are correct. Contact support@clerk.com if the issue persists.',
-          });
-          assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${mockRsaJwkKid}, local`,
-          });
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
-    });
-
-    test('cache TTLs do not conflict', async assert => {
-      fakeClock.runAll();
-
-      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-      let jwk = await loadClerkJWKFromRemote({
-        secretKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-        skipJwksCache: true,
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-
-      // just less than an hour, the cache TTL
-      fakeClock.tick(60 * 60 * 1000 - 5);
-
-      // re-fetch, 5m cache is expired
-      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
-      jwk = await loadClerkJWKFromRemote({
-        secretKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-
-      // cache should be cleared, but 5m ttl is still valid
-      fakeClock.next();
-
-      // re-fetch, 5m cache is expired
-      jwk = await loadClerkJWKFromRemote({
-        secretKey: 'deadbeef',
-        kid: mockRsaJwkKid,
-      });
-      assert.propEqual(jwk, mockRsaJwk);
-    });
+    expect(jwk).toMatchObject(mockRsaJwk);
   });
-};
+
+  it('caches JWK by kid', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    let jwk = await loadClerkJWKFromRemote({
+      secretKey: 'deadbeef',
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
+    });
+    expect(jwk).toMatchObject(mockRsaJwk);
+    jwk = await loadClerkJWKFromRemote({
+      secretKey: 'deadbeef',
+      kid: mockRsaJwkKid,
+    });
+    expect(jwk).toMatchObject(mockRsaJwk);
+  });
+
+  it('retries five times with exponential back-off policy to fetch JWKS before it fails', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json({}, { status: 503 });
+        }),
+      ),
+    );
+
+    await expect(async () => {
+      const promise = loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: 'ins_whatever',
+        skipJwksCache: true,
+      });
+      vi.advanceTimersByTimeAsync(10000);
+      await promise;
+    }).rejects.toThrowError('Error loading Clerk JWKS from https://api.clerk.com/v1/jwks with code=503');
+  });
+
+  it('throws an error when JWKS can not be fetched from Backend or Frontend API', async () => {
+    await expect(() =>
+      loadClerkJWKFromRemote({
+        kid: 'ins_whatever',
+        skipJwksCache: true,
+      }),
+    ).rejects.toThrowError('Failed to load JWKS from Clerk Backend or Frontend API.');
+  });
+
+  it('throws an error when no JWK matches the provided kid', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const kid = 'ins_whatever';
+
+    await expect(() =>
+      loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid,
+      }),
+    ).rejects.toThrowError(
+      "Unable to find a signing key in JWKS that matches the kid='ins_whatever' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ins_2GIoQhbUpy0hX7B2cVkuTMinXoD",
+    );
+  });
+
+  it('cache TTLs do not conflict', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    let jwk = await loadClerkJWKFromRemote({
+      secretKey: 'deadbeef',
+      kid: mockRsaJwkKid,
+      skipJwksCache: true,
+    });
+    expect(jwk).toMatchObject(mockRsaJwk);
+
+    vi.advanceTimersByTime(60 * 60 * 1000 - 5);
+
+    jwk = await loadClerkJWKFromRemote({
+      secretKey: 'deadbeef',
+      kid: mockRsaJwkKid,
+    });
+    expect(jwk).toMatchObject(mockRsaJwk);
+
+    vi.runAllTicks();
+
+    jwk = await loadClerkJWKFromRemote({
+      secretKey: 'deadbeef',
+      kid: mockRsaJwkKid,
+    });
+    expect(jwk).toMatchObject(mockRsaJwk);
+  });
+});

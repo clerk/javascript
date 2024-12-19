@@ -7,7 +7,7 @@
     "build": "expo export -p web",
     "dev": "RCT_METRO_PORT=$PORT expo start --web --port $PORT",
     "lint": "expo lint",
-    "start": "npx serve dist --single"
+    "start": "pnpm dlx serve dist --single"
   },
   "jest": {
     "preset": "jest-expo"
@@ -24,8 +24,8 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.6",
     "expo-web-browser": "~13.0.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-native": "0.74.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-reanimated": "~3.10.1",
@@ -36,12 +36,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/runtime": "7.26.0",
     "@types/jest": "^29.5.12",
-    "@types/react": "~18.2.45",
+    "@types/react": "18.3.12",
     "@types/react-test-renderer": "^18.0.7",
     "jest": "^29.2.1",
     "jest-expo": "~51.0.3",
     "react-test-renderer": "18.2.0",
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.3"
   }
 }

@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
@@ -9,7 +9,6 @@ import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvide
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useAssurance } from '../../hooks/useAssurance';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
@@ -90,13 +89,27 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { navigate } = useRouter();
   const { user } = useUser();
   const card = useCardState();
-  const { handleAssurance } = useAssurance();
+
+  const isModal = mode === 'modal';
+  const redirectUrl = isModal
+    ? appendModalState({
+        url: window.location.href,
+        componentName,
+      })
+    : window.location.href;
+
+  const [createExternalAccount] = useReverification(() =>
+    user?.createExternalAccount({
+      strategy: account.verification!.strategy as OAuthStrategy,
+      redirectUrl,
+      additionalScopes,
+    }),
+  );
 
   if (!user) {
     return null;
   }
 
-  const isModal = mode === 'modal';
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const label = account.username || account.emailAddress;
   const fallbackErrorMessage = account.verification?.error?.longMessage;
@@ -113,20 +126,16 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
 
     try {
-      let response: ExternalAccountResource;
+      let response: ExternalAccountResource | undefined;
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
-        response = await handleAssurance(() =>
-          user.createExternalAccount({
-            strategy: account.verification!.strategy as OAuthStrategy,
-            redirectUrl,
-            additionalScopes,
-          }),
-        );
+        response = await createExternalAccount();
       }
 
-      await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
+      if (response) {
+        await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
+      }
     } catch (err) {
       handleError(err, [], card.setError);
     }

@@ -1,6 +1,6 @@
 import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/types';
 
-import runtime from '../../runtime';
+import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
   Organization,
@@ -31,7 +31,7 @@ type CreateParams = {
   name: string;
   slug?: string;
   /* The User id for the user creating the organization. The user will become an administrator for the organization. */
-  createdBy: string;
+  createdBy?: string;
   maxAllowedMemberships?: number;
 } & MetadataParams;
 

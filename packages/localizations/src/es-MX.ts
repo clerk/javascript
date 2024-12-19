@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Atrás',
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
@@ -131,7 +76,7 @@ export const esMX: LocalizationResource = {
   formFieldLabel__emailAddress_username: 'Correo electrónico o nombre de usuario',
   formFieldLabel__emailAddresses: 'Direcciones de correo',
   formFieldLabel__firstName: 'Nombre',
-  formFieldLabel__lastName: 'Apellidos',
+  formFieldLabel__lastName: 'Apellido',
   formFieldLabel__newPassword: 'Nueva contraseña',
   formFieldLabel__organizationDomain: 'Domain',
   formFieldLabel__organizationDomainDeletePending: 'Eliminar invitaciones y sugerencias pendientes',
@@ -329,6 +274,61 @@ export const esMX: LocalizationResource = {
   paginationButton__previous: 'Anterior',
   paginationRowText__displaying: 'Mostrando',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Agregar cuenta',
@@ -455,14 +455,17 @@ export const esMX: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrarse',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilizar correo electrónico',
       actionLink__use_email_username: 'Utilizar correo electrónico o nombre de usuario',
       actionLink__use_passkey: 'Usar llave de acceso',
       actionLink__use_phone: 'Utilizar teléfono',
       actionLink__use_username: 'Utilizar nombre de usuario',
       actionText: '¿No tiene cuenta?',
+      actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Iniciar sesión',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -507,12 +510,32 @@ export const esMX: LocalizationResource = {
         title: 'Correo electrónico verificado con éxito',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Introduzca el código de verificación enviado a su número de teléfono.',
       formTitle: 'Código de verificación',
       resendButton: 'Reenviar código',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Verifique su teléfono',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Acceder',
@@ -560,6 +583,7 @@ export const esMX: LocalizationResource = {
     not_allowed_access: 'No tienes permiso para acceder a este recurso.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Ya se ha registrado una llave de acceso en este dispositivo.',
@@ -599,11 +623,11 @@ export const esMX: LocalizationResource = {
       },
       warnings: {
         common: 'Es una contraseña usada comúnmente.',
-        commonNames: 'Nombre y apellidos comunes son fáciles de adivinar.',
+        commonNames: 'Nombres y apellidos comunes son fáciles de adivinar.',
         dates: 'Las fechas son fáciles de adivinar.',
         extendedRepeat: 'Patrones repetidos como "abcabcabc" son fáciles de adivinar.',
         keyPattern: 'Patrones cortos son fáciles de adivinar.',
-        namesByThemselves: 'Nombres o apellidos a solas son fáciles de adivinar.',
+        namesByThemselves: 'Nombres y apellidos a solas son fáciles de adivinar.',
         pwned: 'Su contraseña fue expuesta por una violación de datos en Internet.',
         recentYears: 'Los años recientes son fáciles de adivinar.',
         sequences: 'Patrones comunes como "abc" son fáciles de adivinar',
@@ -890,6 +914,20 @@ export const esMX: LocalizationResource = {
       successMessage: 'La billetera ha sido agregada a su cuenta.',
       title: 'Añadir web3 billetera',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

@@ -2,10 +2,8 @@ import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
-import { API_URL, API_VERSION, constants, USER_AGENT } from '../constants';
-// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
-// For more information refer to https://sinonjs.org/how-to/stub-dependency/
-import runtime from '../runtime';
+import { API_URL, API_VERSION, constants, SUPPORTED_BAPI_VERSION, USER_AGENT } from '../constants';
+import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
@@ -53,13 +51,26 @@ type BuildRequestOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
+  /**
+   * Allow requests without specifying a secret key. In most cases this should be set to `false`.
+   * Defaults to `true`.
+   */
+  requireSecretKey?: boolean;
 };
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
+    const {
+      secretKey,
+      requireSecretKey = true,
+      apiUrl = API_URL,
+      apiVersion = API_VERSION,
+      userAgent = USER_AGENT,
+    } = options;
     const { path, method, queryParams, headerParams, bodyParams, formData } = requestOptions;
 
-    assertValidSecretKey(secretKey);
+    if (requireSecretKey) {
+      assertValidSecretKey(secretKey);
+    }
 
     const url = joinPaths(apiUrl, apiVersion, path);
 
@@ -81,6 +92,7 @@ export function buildRequest(options: BuildRequestOptions) {
     // Build headers
     const headers: Record<string, any> = {
       Authorization: `Bearer ${secretKey}`,
+      'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
     };

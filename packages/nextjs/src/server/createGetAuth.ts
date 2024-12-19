@@ -1,7 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
-import { isTruthy } from '@clerk/shared';
+import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';

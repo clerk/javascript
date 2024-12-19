@@ -4,6 +4,7 @@ import 'client-only';
 export { Field, FieldError, FieldState, GlobalError, Input, Label, Submit } from '~/react/common/form';
 export { Connection, Icon } from '~/react/common/connections';
 export { Loading } from '~/react/common/loading';
+export { Link } from '~/react/common/link';
 
 export type {
   FormFieldErrorProps,

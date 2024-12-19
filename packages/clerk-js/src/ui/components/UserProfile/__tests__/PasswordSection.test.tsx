@@ -106,21 +106,57 @@ describe('PasswordSection', () => {
       });
     });
 
-    describe('with SAML', () => {
+    describe('with Enterprise SSO', () => {
       it('prevents setting a password if user has active enterprise connections', async () => {
         const emailAddress = 'george@jungle.com';
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
-            saml_accounts: [
+            enterprise_accounts: [
               {
-                id: 'samlacc_foo',
-                provider: 'saml_okta',
+                object: 'enterprise_account',
                 active: true,
-                email_address: emailAddress,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: true,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
               },
             ],
           });
@@ -149,15 +185,51 @@ describe('PasswordSection', () => {
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             email_addresses: [emailAddress],
-            saml_accounts: [
+            enterprise_accounts: [
               {
-                id: 'samlacc_foo',
-                provider: 'saml_okta',
+                object: 'enterprise_account',
                 active: false,
-                email_address: emailAddress,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: false,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
               },
             ],
           });
@@ -243,22 +315,58 @@ describe('PasswordSection', () => {
       expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
     });
 
-    describe('with SAML', () => {
+    describe('with Enterprise SSO', () => {
       it('prevents changing a password if user has active enterprise connections', async () => {
         const emailAddress = 'george@jungle.com';
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             password_enabled: true,
             email_addresses: [emailAddress],
-            saml_accounts: [
+            enterprise_accounts: [
               {
-                id: 'samlacc_foo',
-                provider: 'saml_okta',
+                object: 'enterprise_account',
                 active: true,
-                email_address: emailAddress,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: true,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
               },
             ],
           });
@@ -287,16 +395,52 @@ describe('PasswordSection', () => {
 
         const config = createFixtures.config(f => {
           f.withEmailAddress();
-          f.withSaml();
+          f.withEnterpriseSso();
           f.withUser({
             password_enabled: true,
             email_addresses: [emailAddress],
-            saml_accounts: [
+            enterprise_accounts: [
               {
-                id: 'samlacc_foo',
-                provider: 'saml_okta',
+                object: 'enterprise_account',
                 active: false,
-                email_address: emailAddress,
+                first_name: 'Laura',
+                last_name: 'Serafim',
+                protocol: 'saml',
+                provider_user_id: null,
+                public_metadata: {},
+                email_address: 'test@clerk.com',
+                provider: 'saml_okta',
+                enterprise_connection: {
+                  object: 'enterprise_connection',
+                  provider: 'saml_okta',
+                  name: 'Okta Workforce',
+                  id: 'ent_123',
+                  active: false,
+                  allow_idp_initiated: false,
+                  allow_subdomains: false,
+                  disable_additional_identifications: false,
+                  sync_user_attributes: false,
+                  domain: 'foocorp.com',
+                  created_at: 123,
+                  updated_at: 123,
+                  logo_public_url: null,
+                  protocol: 'saml',
+                },
+                verification: {
+                  status: 'verified',
+                  strategy: 'saml',
+                  verified_at_client: 'foo',
+                  attempts: 0,
+                  error: {
+                    code: 'identifier_already_signed_in',
+                    long_message: "You're already signed in",
+                    message: "You're already signed in",
+                  },
+                  expire_at: 123,
+                  id: 'ver_123',
+                  object: 'verification',
+                },
+                id: 'eac_123',
               },
             ],
           });

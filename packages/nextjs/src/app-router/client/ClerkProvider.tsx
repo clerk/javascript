@@ -1,18 +1,30 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import type { ClerkHostRouter } from '@clerk/shared/router';
-import { ClerkHostRouterContext } from '@clerk/shared/router';
+import { inBrowser } from '@clerk/shared/browser';
+import { logger } from '@clerk/shared/logger';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import nextPackage from 'next/package.json';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
+import { canUseKeyless__client } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
+
+/**
+ * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
+ * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
+ */
+const LazyCreateKeylessApplication = dynamic(() =>
+  import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
+);
 
 declare global {
   export interface Window {
@@ -25,39 +37,18 @@ declare global {
   }
 }
 
-// The version that Next added support for the window.history.pushState and replaceState APIs.
-// ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
-const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
+const NextClientClerkProvider = (props: NextClerkProviderProps) => {
+  if (isNextWithUnstableServerActions) {
+    const deprecationWarning = `Clerk:\nYour current Next.js version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to next@14.1.0 or later.`;
+    if (inBrowser()) {
+      logger.warnOnce(deprecationWarning);
+    } else {
+      logger.logOnce(`\n\x1b[43m----------\n${deprecationWarning}\n----------\x1b[0m\n`);
+    }
+  }
 
-/**
- * Clerk router integration with Next.js's router.
- */
-const useNextRouter = (): ClerkHostRouter => {
-  const router = useRouter();
-
-  // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
-  // preserve internal state between steps.
-  const canUseWindowHistoryAPIs =
-    typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
-
-  return {
-    mode: 'path',
-    name: 'NextRouter',
-    push: (path: string) => router.push(path),
-    replace: (path: string) =>
-      canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
-    shallowPush(path: string) {
-      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
-    },
-    pathname: () => window.location.pathname,
-    searchParams: () => new URLSearchParams(window.location.search),
-  };
-};
-
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
-  const clerkRouter = useNextRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
@@ -97,13 +88,15 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
        */
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
-        startTransition(() => {
-          if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
+
+        // NOTE: the following code will allow `useReverification()` to work properly when `handlerReverification` is called inside `startTransition`
+        if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
+          startTransition(() => {
             router.refresh();
-          } else {
-            void invalidateCacheAction();
-          }
-        });
+          });
+        } else {
+          void invalidateCacheAction().then(() => res());
+        }
       });
     };
 
@@ -116,7 +109,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    __experimental_router: clerkRouter,
     routerPush: push,
     routerReplace: replace,
   });
@@ -125,8 +117,23 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <ClerkJSScript router='app' />
-        <ClerkHostRouterContext.Provider value={clerkRouter}>{children}</ClerkHostRouterContext.Provider>
+        {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
+  );
+};
+
+export const ClientClerkProvider = (props: NextClerkProviderProps) => {
+  const { children, ...rest } = props;
+  const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
+
+  if (safePublishableKey || !canUseKeyless__client) {
+    return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
+  }
+
+  return (
+    <LazyCreateKeylessApplication>
+      <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
+    </LazyCreateKeylessApplication>
   );
 };

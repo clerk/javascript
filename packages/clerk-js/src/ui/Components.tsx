@@ -1,7 +1,7 @@
-import { createDeferredPromise } from '@clerk/shared';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationProps,
   Appearance,
   Clerk,
   ClerkOptions,
@@ -12,6 +12,7 @@ import type {
   SignInProps,
   SignUpProps,
   UserProfileProps,
+  WaitlistProps,
 } from '@clerk/types';
 import React, { Suspense } from 'react';
 
@@ -22,14 +23,17 @@ import type { AppearanceCascade } from './customizables/parseAppearance';
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
+  BlankCaptchaModal,
   CreateOrganizationModal,
   ImpersonationFab,
+  KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
   SignInModal,
   SignUpModal,
   UserProfileModal,
   UserVerificationModal,
+  WaitlistModal,
 } from './lazyModules/components';
 import {
   LazyComponentRenderer,
@@ -65,7 +69,9 @@ export type ComponentControls = {
       | 'userProfile'
       | 'organizationProfile'
       | 'createOrganization'
-      | 'userVerification',
+      | 'userVerification'
+      | 'waitlist'
+      | 'blankCaptcha',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -73,8 +79,10 @@ export type ComponentControls = {
       : T extends 'signUp'
         ? SignUpProps
         : T extends 'userVerification'
-          ? __experimental_UserVerificationProps
-          : UserProfileProps,
+          ? __internal_UserVerificationProps
+          : T extends 'waitlist'
+            ? WaitlistProps
+            : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -84,7 +92,9 @@ export type ComponentControls = {
       | 'userProfile'
       | 'organizationProfile'
       | 'createOrganization'
-      | 'userVerification',
+      | 'userVerification'
+      | 'waitlist'
+      | 'blankCaptcha',
     options?: {
       notify?: boolean;
     },
@@ -115,10 +125,12 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
-  userVerificationModal: null | __experimental_UserVerificationProps;
+  userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
+  waitlistModal: null | WaitlistProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -183,6 +195,7 @@ const componentNodes = Object.freeze({
   UserProfile: 'userProfileModal',
   OrganizationProfile: 'organizationProfileModal',
   CreateOrganization: 'createOrganizationModal',
+  Waitlist: 'waitlistModal',
 }) as any;
 
 const Components = (props: ComponentsProps) => {
@@ -197,6 +210,8 @@ const Components = (props: ComponentsProps) => {
     organizationProfileModal: null,
     createOrganizationModal: null,
     organizationSwitcherPrefetch: false,
+    waitlistModal: null,
+    blankCaptchaModal: null,
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -209,6 +224,8 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal,
     organizationProfileModal,
     createOrganizationModal,
+    waitlistModal,
+    blankCaptchaModal,
     nodes,
   } = state;
 
@@ -334,6 +351,7 @@ const Components = (props: ComponentsProps) => {
     >
       <SignInModal {...signInModal} />
       <SignUpModal {...signInModal} />
+      <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
 
@@ -350,6 +368,7 @@ const Components = (props: ComponentsProps) => {
     >
       <SignInModal {...signUpModal} />
       <SignUpModal {...signUpModal} />
+      <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
 
@@ -427,6 +446,40 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedWaitlistModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'waitlist'}
+      componentAppearance={waitlistModal?.appearance}
+      flowName={'waitlist'}
+      onClose={() => componentsControls.closeModal('waitlist')}
+      onExternalNavigate={() => componentsControls.closeModal('waitlist')}
+      startPath={buildVirtualRouterUrl({ base: '/waitlist', path: urlStateParam?.path })}
+      componentName={'WaitlistModal'}
+    >
+      <WaitlistModal {...waitlistModal} />
+      <SignInModal {...waitlistModal} />
+    </LazyModalRenderer>
+  );
+
+  const mountedBlankCaptchaModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'blankCaptcha' as any}
+      componentAppearance={{}}
+      flowName={'blankCaptcha'}
+      onClose={() => componentsControls.closeModal('blankCaptcha')}
+      onExternalNavigate={() => componentsControls.closeModal('blankCaptcha')}
+      startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
+      componentName={'BlankCaptchaModal'}
+      canCloseModal={false}
+      modalId={'cl-modal-captcha-wrapper'}
+      modalStyle={{ visibility: 'hidden', pointerEvents: 'none' }}
+    >
+      <BlankCaptchaModal />
+    </LazyModalRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -455,9 +508,21 @@ const Components = (props: ComponentsProps) => {
         {userVerificationModal && mountedUserVerificationModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
+        {waitlistModal && mountedWaitlistModal}
+        {blankCaptchaModal && mountedBlankCaptchaModal}
+
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+
+        {state.options?.__internal_claimKeylessApplicationUrl && state.options?.__internal_copyInstanceKeysUrl && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <KeylessPrompt
+              claimUrl={state.options.__internal_claimKeylessApplicationUrl}
+              copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
+            />
           </LazyImpersonationFabProvider>
         )}
 

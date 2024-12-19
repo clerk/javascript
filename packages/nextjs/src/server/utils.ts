@@ -1,9 +1,9 @@
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
@@ -11,8 +11,15 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
+import { canUseKeyless__server } from '../utils/feature-flags';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import {
+  authSignatureInvalid,
+  encryptionKeyInvalid,
+  encryptionKeyInvalidDev,
+  missingDomainAndProxy,
+  missingSignInUrlInDev,
+} from './errors';
 import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
@@ -97,7 +104,8 @@ export function decorateRequest(
   req: ClerkRequest,
   res: Response,
   requestState: RequestState,
-  requestData?: AuthenticateRequestOptions,
+  requestData: AuthenticateRequestOptions,
+  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -132,12 +140,14 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData);
+    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
-      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, requestData?.secretKey ?? SECRET_KEY) : '',
+      [constants.Headers.AuthSignature]: token
+        ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || keylessMode.secretKey || '')
+        : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
@@ -195,7 +205,7 @@ export function assertAuthStatus(req: RequestLike, error: string) {
   }
 }
 
-export function assertKey(key: string, onError: () => never): string {
+export function assertKey(key: string | undefined, onError: () => never): string {
   if (!key) {
     onError();
   }
@@ -224,12 +234,24 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 }
 
+const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
+
 /**
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
-  if (!requestData || !Object.values(requestData).length) {
+export function encryptClerkRequestData(
+  requestData: Partial<AuthenticateRequestOptions>,
+  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+) {
+  const isEmpty = (obj: Record<string, any> | undefined) => {
+    if (!obj) {
+      return true;
+    }
+    return !Object.values(obj).some(v => v !== undefined);
+  };
+
+  if (isEmpty(requestData) && isEmpty(keylessMode)) {
     return;
   }
 
@@ -242,10 +264,11 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
     return;
   }
 
-  return AES.encrypt(
-    JSON.stringify(requestData),
-    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
-  ).toString();
+  const maybeKeylessEncryptionKey = isProductionEnvironment()
+    ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
+    : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
+
+  return AES.encrypt(JSON.stringify({ ...keylessMode, ...requestData }), maybeKeylessEncryptionKey).toString();
 }
 
 /**
@@ -259,11 +282,39 @@ export function decryptClerkRequestData(
     return {};
   }
 
+  const maybeKeylessEncryptionKey = isProductionEnvironment()
+    ? ENCRYPTION_KEY || SECRET_KEY
+    : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
+
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
-    const encoded = decryptedBytes.toString(encUtf8);
-    return JSON.parse(encoded);
+    return decryptData(encryptedRequestData, maybeKeylessEncryptionKey);
   } catch (err) {
+    /**
+     * There is a great chance when running on Keyless mode that the above fails,
+     * because the keys hot-swapped and the Next.js dev server has not yet fully rebuilt middleware and routes.
+     *
+     * Attempt one more time with the default dummy value.
+     */
+    if (canUseKeyless__server) {
+      try {
+        return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
+      } catch (e) {
+        throwInvalidEncryptionKey();
+      }
+    }
+    throwInvalidEncryptionKey();
+  }
+}
+
+function throwInvalidEncryptionKey(): never {
+  if (isProductionEnvironment()) {
     throw new Error(encryptionKeyInvalid);
   }
+  throw new Error(encryptionKeyInvalidDev);
+}
+
+function decryptData(data: string, key: string) {
+  const decryptedBytes = AES.decrypt(data, key);
+  const encoded = decryptedBytes.toString(encUtf8);
+  return JSON.parse(encoded);
 }

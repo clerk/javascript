@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'กลับ',
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
@@ -323,6 +268,61 @@ export const thTH: LocalizationResource = {
   paginationButton__previous: 'ก่อนหน้า',
   paginationRowText__displaying: 'แสดง',
   paginationRowText__of: 'จาก',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'เพิ่มบัญชี',
@@ -447,14 +447,17 @@ export const thTH: LocalizationResource = {
     },
     start: {
       actionLink: 'สมัครสมาชิก',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'ใช้อีเมล',
       actionLink__use_email_username: 'ใช้อีเมลหรือชื่อผู้ใช้',
       actionLink__use_passkey: 'ใช้พาสคีย์แทน',
       actionLink__use_phone: 'ใช้โทรศัพท์',
       actionLink__use_username: 'ใช้ชื่อผู้ใช้',
       actionText: 'ไม่มีบัญชีหรือ?',
+      actionText__join_waitlist: undefined,
       subtitle: 'ยินดีต้อนรับกลับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ',
       title: 'เข้าสู่ระบบ {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'รหัสการตรวจสอบ',
@@ -499,12 +502,32 @@ export const thTH: LocalizationResource = {
         title: 'ยืนยันอีเมลสำเร็จ',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'ใส่รหัสยืนยันที่ส่งไปยังหมายเลขโทรศัพท์ของคุณ',
       formTitle: 'รหัสยืนยัน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'ใส่รหัสยืนยันที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ยืนยันโทรศัพท์ของคุณ',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'เข้าสู่ระบบ',
@@ -553,6 +576,7 @@ export const thTH: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'พาสคีย์ถูกลงทะเบียนกับอุปกรณ์นี้แล้ว',
@@ -875,6 +899,20 @@ export const thTH: LocalizationResource = {
       successMessage: 'วอลเล็ตได้ถูกเพิ่มเข้าไปในบัญชีของคุณแล้ว',
       title: 'เพิ่มวอลเล็ต Web3',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

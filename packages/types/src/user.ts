@@ -1,6 +1,9 @@
+import type { UserJSONSnapshot } from 'snapshots';
+
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
+import type { EnterpriseAccountResource } from './enterpriseAccount';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
@@ -68,7 +71,11 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+  enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
+  /**
+   * @deprecated use `enterpriseAccounts` instead
+   */
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];
@@ -119,6 +126,8 @@ export interface UserResource extends ClerkResource {
   get hasVerifiedEmailAddress(): boolean;
 
   get hasVerifiedPhoneNumber(): boolean;
+
+  __internal_toSnapshot: () => UserJSONSnapshot;
 }
 
 export type CreateEmailAddressParams = { email: string };
@@ -129,6 +138,8 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 export type VerifyTOTPParams = { code: string };
 

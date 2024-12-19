@@ -4,16 +4,20 @@ import React from 'react';
 
 import { Clerk as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
-import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
+import {
+  ComponentContextProvider,
+  CoreClerkContextWrapper,
+  EnvironmentProvider,
+  OptionsProvider,
+} from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
+import type { AvailableComponentName, AvailableComponentProps } from '../../types';
 import { createClientFixtureHelpers, createEnvironmentFixtureHelpers } from './fixtureHelpers';
 import { createBaseClientJSON, createBaseEnvironmentJSON } from './fixtures';
 import { mockClerkMethods, mockRouteContextValue } from './mockHelpers';
-
-type UnpackContext<T> = NonNullable<T extends React.Context<infer U> ? U : T>;
 
 const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseClient: ClientJSON) => {
   return {
@@ -34,8 +38,8 @@ export const bindCreateFixtures = (
   return { createFixtures: unboundCreateFixtures(componentName, mockOpts) };
 };
 
-const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(
-  componentName: N,
+const unboundCreateFixtures = (
+  componentName: AvailableComponentName,
   mockOpts?: {
     router?: Parameters<typeof mockRouteContextValue>[0];
   },
@@ -53,9 +57,9 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
     const environmentMock = new Environment(baseEnvironment);
     Environment.getInstance().fetch = jest.fn(() => Promise.resolve(environmentMock));
 
-    // @ts-expect-error
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
     const clientMock = new Client(baseClient);
-    Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
+    Client.getOrCreateInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
 
     // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
     const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -75,7 +79,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
       options: optionsMock,
     };
 
-    let componentContextProps: Partial<UnpackContext<typeof ComponentContext> & { componentName: N }>;
+    let componentContextProps: AvailableComponentProps;
     const props = {
       setProps: (props: typeof componentContextProps) => {
         componentContextProps = props;
@@ -84,6 +88,19 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
+
+      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection'];
+      const contextWrappedChildren = !componentsWithoutContext.includes(componentName) ? (
+        <ComponentContextProvider
+          componentName={componentName}
+          props={componentContextProps}
+        >
+          {children}
+        </ComponentContextProvider>
+      ) : (
+        <>{children}</>
+      );
+
       return (
         <CoreClerkContextWrapper
           clerk={clerkMock}
@@ -95,11 +112,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
               <RouteContext.Provider value={routerMock}>
                 <AppearanceProvider appearanceKey={'signIn'}>
                   <FlowMetadataProvider flow={componentName as any}>
-                    <InternalThemeProvider>
-                      <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
-                        {children}
-                      </ComponentContext.Provider>
-                    </InternalThemeProvider>
+                    <InternalThemeProvider>{contextWrappedChildren}</InternalThemeProvider>
                   </FlowMetadataProvider>
                 </AppearanceProvider>
               </RouteContext.Provider>

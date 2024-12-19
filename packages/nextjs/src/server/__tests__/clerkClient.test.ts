@@ -1,18 +1,24 @@
-global.fetch = jest.fn(() => Promise.resolve(new Response(null)));
+import { createClerkClient } from '@clerk/backend';
+import type { Mock } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 
+vi.mock('@clerk/backend', async importOriginal => {
+  const mod: any = await importOriginal();
+  return {
+    ...mod,
+    // replace some exports
+    createClerkClient: vi.fn().mockReturnValue({ users: { getUser: vi.fn() } }),
+  };
+});
+
 describe('clerkClient', () => {
-  it('should pass version package to userAgent', async () => {
-    const resolvedClerkClient = await clerkClient();
+  it('should pass package-specific userAgent', async () => {
+    await clerkClient();
 
-    await resolvedClerkClient.users.getUser('user_test');
-
-    expect(global.fetch).toBeCalled();
-    expect((global.fetch as any).mock.calls[0][1].headers).toMatchObject({
-      Authorization: 'Bearer TEST_SECRET_KEY',
-      'Content-Type': 'application/json',
-      'User-Agent': '@clerk/nextjs@0.0.0-test',
+    expect((createClerkClient as Mock).mock.lastCall?.[0]).toMatchObject({
+      userAgent: '@clerk/nextjs@0.0.0-test',
     });
   });
 });

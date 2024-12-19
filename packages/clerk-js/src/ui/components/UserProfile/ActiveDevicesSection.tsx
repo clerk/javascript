@@ -1,10 +1,9 @@
-import { useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/types';
 
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
 import { useFetch, useLoadingStatus } from '../../hooks';
-import { useAssurance } from '../../hooks/useAssurance';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
 import { getRelativeToNowDateKey } from '../../utils';
@@ -49,7 +48,7 @@ export const ActiveDevicesSection = () => {
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
-  const { handleAssurance } = useAssurance();
+  const [revokeSession] = useReverification(session.revoke.bind(session));
 
   const revoke = async () => {
     if (isCurrent || !session) {
@@ -57,7 +56,7 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
     }
     status.setLoading();
     return (
-      handleAssurance(() => session.revoke())
+      revokeSession()
         // TODO-STEPUP: Properly handler the response with a setCardError
         .catch(() => {})
         .finally(() => status.setIdle())

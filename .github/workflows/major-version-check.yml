@@ -2,7 +2,7 @@ name: Major Version Check
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types: [opened, edited, synchronize, reopened]
   issue_comment:
     types: [created, edited]
 

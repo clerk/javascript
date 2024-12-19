@@ -12,6 +12,9 @@ const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
 const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
+const StyleCacheProvider = lazy(() =>
+  import('../styledSystem/StyleCacheProvider').then(m => ({ default: m.StyleCacheProvider })),
+);
 const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal })));
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
@@ -26,11 +29,13 @@ type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
-    <CoreClerkContextWrapper clerk={props.clerk}>
-      <EnvironmentProvider value={props.environment}>
-        <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-      </EnvironmentProvider>
-    </CoreClerkContextWrapper>
+    <StyleCacheProvider nonce={props.options.nonce}>
+      <CoreClerkContextWrapper clerk={props.clerk}>
+        <EnvironmentProvider value={props.environment}>
+          <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
+        </EnvironmentProvider>
+      </CoreClerkContextWrapper>
+    </StyleCacheProvider>
   );
 };
 
@@ -78,6 +83,9 @@ type LazyModalRendererProps = React.PropsWithChildren<
     onExternalNavigate?: () => any;
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
+    canCloseModal?: boolean;
+    modalId?: string;
+    modalStyle?: React.CSSProperties;
   } & AppearanceProviderProps
 >;
 
@@ -92,9 +100,12 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
         <FlowMetadataProvider flow={props.flowName || ('' as any)}>
           <InternalThemeProvider>
             <Modal
+              id={props.modalId}
+              style={props.modalStyle}
               handleClose={props.onClose}
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
+              canCloseModal={props.canCloseModal}
             >
               {props.startPath ? (
                 <Suspense>

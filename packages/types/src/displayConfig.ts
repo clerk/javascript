@@ -1,10 +1,12 @@
+import type { DisplayConfigJSONSnapshot } from 'snapshots';
+
 import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy } from './strategies';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 export type CaptchaWidgetType = 'smart' | 'invisible' | null;
-export type CaptchaProvider = 'hcaptcha' | 'turnstile';
+export type CaptchaProvider = 'turnstile';
 
 export interface DisplayConfigJSON {
   object: 'display_config';
@@ -21,6 +23,8 @@ export interface DisplayConfigJSON {
   captcha_public_key_invisible: string | null;
   captcha_provider: CaptchaProvider;
   captcha_oauth_bypass: OAuthStrategy[] | null;
+  captcha_heartbeat?: boolean;
+  captcha_heartbeat_interval_ms?: number;
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
@@ -40,6 +44,8 @@ export interface DisplayConfigJSON {
   show_devmode_warning: boolean;
   terms_url: string;
   privacy_policy_url: string;
+  waitlist_url: string;
+  after_join_waitlist_url: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -62,6 +68,8 @@ export interface DisplayConfigResource extends ClerkResource {
    * This can also be used to bypass the captcha for a specific OAuth provider on a per-instance basis.
    */
   captchaOauthBypass: OAuthStrategy[];
+  captchaHeartbeat: boolean;
+  captchaHeartbeatIntervalMs?: number;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
@@ -82,4 +90,7 @@ export interface DisplayConfigResource extends ClerkResource {
   showDevModeWarning: boolean;
   termsUrl: string;
   privacyPolicyUrl: string;
+  waitlistUrl: string;
+  afterJoinWaitlistUrl: string;
+  __internal_toSnapshot: () => DisplayConfigJSONSnapshot;
 }

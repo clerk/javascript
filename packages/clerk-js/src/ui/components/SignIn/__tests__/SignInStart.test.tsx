@@ -134,6 +134,17 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('Waitlist mode', () => {
+    it('shows the waitlist message', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withWaitlistMode();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText('Join waitlist');
+    });
+  });
+
   describe('Social OAuth', () => {
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
       const { wrapper } = await createFixtures(f => {
@@ -275,7 +286,30 @@ describe('SignInStart', () => {
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
-        strategy: 'saml',
+        strategy: 'enterprise_sso',
+        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrlComplete: '/',
+      });
+    });
+  });
+
+  describe('Enterprise SSO', () => {
+    it('initiates a Enterprise SSO flow if enterprise_sso is listed as the only supported first factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalled();
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+        strategy: 'enterprise_sso',
         redirectUrl: 'http://localhost/#/sso-callback',
         redirectUrlComplete: '/',
       });

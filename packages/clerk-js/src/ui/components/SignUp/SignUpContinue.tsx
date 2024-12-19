@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -31,8 +31,11 @@ function _SignUpContinue() {
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
+  const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
   const signUp = useCoreSignUp();
+  const options = useOptions();
+  const isWithinSignInContext = !!React.useContext(SignInContext);
+  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -71,7 +74,7 @@ function _SignUpContinue() {
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
       validatePassword: true,
     }),
-    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+    legalAccepted: useFormControl('legalAccepted', '', {
       type: 'checkbox',
       label: '',
       defaultChecked: false,
@@ -84,9 +87,15 @@ function _SignUpContinue() {
     [signUp.missingFields],
   );
 
-  // Redirect to sign-up if there is no persisted sign-up
+  useEffect(() => {
+    // Redirect to sign-up if there is no persisted sign-up
+    if (!signUp.id) {
+      void navigate(displayConfig.signUpUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!signUp.id) {
-    void navigate(displayConfig.signUpUrl);
     return <LoadingCard />;
   }
 
@@ -157,7 +166,7 @@ function _SignUpContinue() {
           signUp: res,
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
-          handleComplete: () => clerk.setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
         }),
       )
@@ -171,11 +180,11 @@ function _SignUpContinue() {
 
   const headerTitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.title')
-    : localizationKeys('signUp.__experimental_legalConsent.continue.title');
+    : localizationKeys('signUp.legalConsent.continue.title');
 
   const headerSubtitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.subtitle')
-    : localizationKeys('signUp.__experimental_legalConsent.continue.subtitle');
+    : localizationKeys('signUp.legalConsent.continue.subtitle');
 
   return (
     <Flow.Part part='complete'>
@@ -212,13 +221,15 @@ function _SignUpContinue() {
         </Card.Content>
 
         <Card.Footer>
-          <Card.Action elementId='signUp'>
-            <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signUp.continue.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Card.Action>
+          {!isCombinedFlow ? (
+            <Card.Action elementId='signUp'>
+              <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signUp.continue.actionLink')}
+                to={isCombinedFlow ? '../../' : clerk.buildUrlWithAuth(signInUrl)}
+              />
+            </Card.Action>
+          ) : null}
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

@@ -6,7 +6,9 @@ import React from 'react';
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
+import { canUseKeyless__server } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
@@ -29,11 +31,24 @@ export async function ClerkProvider(
   let nonce = Promise.resolve('');
 
   if (dynamic) {
-    statePromise = getDynamicClerkState();
-    nonce = getNonceFromCSPHeader();
+    if (isNext13) {
+      /**
+       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+       * Without the await here, Next will throw a DynamicServerError during build.
+       */
+      statePromise = Promise.resolve(await getDynamicClerkState());
+      nonce = Promise.resolve(await getNonceFromCSPHeader());
+    } else {
+      statePromise = getDynamicClerkState();
+      nonce = getNonceFromCSPHeader();
+    }
   }
 
-  const output = (
+  const propsWithEnvs = mergeNextClerkPropsWithEnv({
+    ...rest,
+  });
+
+  let output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
       nonce={await nonce}
@@ -42,6 +57,33 @@ export async function ClerkProvider(
       {children}
     </ClientClerkProvider>
   );
+
+  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless__server;
+
+  if (shouldRunAsKeyless) {
+    // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
+    const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
+
+    if (newOrReadKeys) {
+      const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
+      output = (
+        <KeylessCookieSync {...newOrReadKeys}>
+          <ClientClerkProvider
+            {...mergeNextClerkPropsWithEnv({
+              ...rest,
+              publishableKey: newOrReadKeys.publishableKey,
+              __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
+              __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
+            })}
+            nonce={await nonce}
+            initialState={await statePromise}
+          >
+            {children}
+          </ClientClerkProvider>
+        </KeylessCookieSync>
+      );
+    }
+  }
 
   if (dynamic) {
     return (

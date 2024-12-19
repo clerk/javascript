@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: '返回',
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
@@ -323,6 +268,61 @@ export const zhTW: LocalizationResource = {
   paginationButton__previous: '上一頁',
   paginationRowText__displaying: '顯示',
   paginationRowText__of: '的',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -446,14 +446,17 @@ export const zhTW: LocalizationResource = {
     },
     start: {
       actionLink: '註冊',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: '使用電子郵件',
       actionLink__use_email_username: '使用電子郵件或使用者名稱',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '使用電話',
       actionLink__use_username: '使用使用者名稱',
       actionText: '還沒有帳戶？',
+      actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
       title: '登錄',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',
@@ -498,12 +501,32 @@ export const zhTW: LocalizationResource = {
         title: '成功驗證電子郵件',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: '輸入發送到您的電話號碼的驗證碼',
       formTitle: '驗證碼',
       resendButton: '重新發送驗證碼',
       subtitle: '繼續使用 {{applicationName}}',
       title: '驗證您的電話',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: '登錄',
@@ -548,6 +571,7 @@ export const zhTW: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -865,6 +889,20 @@ export const zhTW: LocalizationResource = {
       successMessage: '錢包已被添加到您的帳戶。',
       title: '添加web3錢包',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

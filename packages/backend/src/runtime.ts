@@ -33,11 +33,13 @@ type Runtime = {
 //
 // https://github.com/supabase/supabase/issues/4417
 const globalFetch = fetch.bind(globalThis);
-// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
-// For more information refer to https://sinonjs.org/how-to/stub-dependency/
-const runtime: Runtime = {
+
+export const runtime: Runtime = {
   crypto,
-  fetch: globalFetch,
+  get fetch() {
+    // We need to use the globalFetch for Cloudflare Workers but the fetch for testing
+    return process.env.NODE_ENV === 'test' ? fetch : globalFetch;
+  },
   AbortController: globalThis.AbortController,
   Blob: globalThis.Blob,
   FormData: globalThis.FormData,
@@ -45,5 +47,3 @@ const runtime: Runtime = {
   Request: globalThis.Request,
   Response: globalThis.Response,
 };
-
-export default runtime;

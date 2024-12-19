@@ -10,10 +10,12 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  useReverification,
 } from '@clerk/clerk-react';
 
 export {
   isClerkAPIResponseError,
+  isClerkRuntimeError,
   isEmailLinkError,
   isKnownError,
   isMetamaskError,

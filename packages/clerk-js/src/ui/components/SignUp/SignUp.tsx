@@ -3,7 +3,7 @@ import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
@@ -92,16 +92,18 @@ export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGua
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
+    waitlistUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/waitlist`,
     ...props,
   };
 
   return (
     <Route path='sign-up'>
-      <ComponentContext.Provider
+      <SignUpContext.Provider
         value={{
           componentName: 'SignUp',
           ...signUpProps,
           routing: 'virtual',
+          mode: 'modal',
         }}
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
@@ -111,7 +113,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
             routing='virtual'
           />
         </div>
-      </ComponentContext.Provider>
+      </SignUpContext.Provider>
     </Route>
   );
 };

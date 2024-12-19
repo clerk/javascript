@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  workflow_dispatch:
   merge_group:
   pull_request:
     branches:
@@ -13,9 +12,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
+  check-permissions:
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
   formatting-linting:
+    needs: [check-permissions]
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -30,30 +50,29 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          node-version: 20
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
 
       - name: Lint GitHub Actions Workflows
-        run: npx eslint .github
+        run: pnpm eslint .github
         shell: bash
 
       - name: Check Formatting
-        run: npm run format:check
+        run: pnpm format:check
 
       - name: Build Packages
-        run: npx turbo build $TURBO_ARGS --only
+        run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Check size using bundlewatch
-        run: npx turbo bundlewatch $TURBO_ARGS --only
+        run: pnpm turbo bundlewatch $TURBO_ARGS --only
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
@@ -63,13 +82,13 @@ jobs:
           CI_BRANCH_BASE: refs/heads/main
 
       - name: Lint packages using publint
-        run: npx turbo lint:publint $TURBO_ARGS --only
+        run: pnpm turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --only
+        run: pnpm turbo lint:attw $TURBO_ARGS --only
 
       - name: Run lint
-        run: npx turbo lint $TURBO_ARGS --only -- --quiet
+        run: pnpm turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
@@ -81,9 +100,9 @@ jobs:
           retention-days: 5
 
   unit-tests:
+    needs: [check-permissions]
     name: Unit Tests
-    needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
@@ -91,7 +110,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [18,22]
 
     steps:
       - name: Checkout Repo
@@ -102,7 +121,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
           node-version: ${{ matrix.node-version }}
@@ -115,10 +134,10 @@ jobs:
         run: |
           if [ "${{ matrix.node-version }}" == "18" ]; then
             echo "Running tests on Node 18 only for packages with LTS support."
-            npx turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements"
+            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
           else
-            echo "Running tests for all packages on Node 20."
-            npx turbo test $TURBO_ARGS
+            echo "Running tests for all packages on Node 22."
+            pnpm turbo test $TURBO_ARGS
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -133,14 +152,15 @@ jobs:
           retention-days: 5
 
   integration-tests:
+    needs: [check-permissions]
     name: Integration Tests
-    needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
+      fail-fast: false
       matrix:
-        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router']
+        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue', 'nuxt', 'react-router']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -149,6 +169,9 @@ jobs:
           - test-name: 'nextjs'
             test-project: 'chrome'
             next-version: '14'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '15'
 
     steps:
       - name: Checkout Repo
@@ -159,7 +182,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: ./.github/actions/init-blacksmith
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -176,7 +199,7 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
           AFFECTED=0
-          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          (pnpm turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
@@ -185,21 +208,24 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
-        run: npm init -y && npm install @clerk/backend
+        run: pnpm init && pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
-        run: cd packages/astro && npm run copy:components
+        run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
         if: ${{ steps.task-status.outputs.affected == '1' }}
@@ -227,7 +253,7 @@ jobs:
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
-        run: sudo --preserve-env npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
+        run: sudo npm install -g pnpm && sudo --preserve-env pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'

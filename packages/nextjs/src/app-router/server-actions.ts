@@ -6,6 +6,6 @@ import { cookies } from 'next/headers';
 // These versions required 'use server' files to export async methods only. This check was later relaxed
 // and the async is no longer required in newer next versions.
 // ref: https://github.com/vercel/next.js/pull/62821
-export async function invalidateCacheAction() {
-  return cookies().delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
+export async function invalidateCacheAction(): Promise<void> {
+  void (await cookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
 }

@@ -51,6 +51,13 @@ const withCustomRoles = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk);
 
+const withReverification = base
+  .clone()
+  .setId('withReverification')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-reverification').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-reverification').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
+
 const withEmailCodesQuickstart = withEmailCodes
   .clone()
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
@@ -94,12 +101,34 @@ const withRestrictedMode = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk);
 
+const withLegalConsent = base
+  .clone()
+  .setId('withLegalConsent')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-legal-consent').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-legal-consent').pk);
+
+const withWaitlistdMode = withEmailCodes
+  .clone()
+  .setId('withWaitlistdMode')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
+
+const withCombinedFlow = withEmailCodes
+  .clone()
+  .setId('withCombinedFlow')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
+  .setEnvVariable('public', 'EXPERIMENTAL_COMBINED_FLOW', 'true')
+  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-in');
+
 export const envs = {
   base,
   withEmailCodes,
   withEmailCodes_destroy_client,
   withEmailLinks,
   withCustomRoles,
+  withReverification,
   withEmailCodesQuickstart,
   withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
@@ -107,4 +136,7 @@ export const envs = {
   withAPCore2ClerkV4,
   withDynamicKeys,
   withRestrictedMode,
+  withLegalConsent,
+  withWaitlistdMode,
+  withCombinedFlow,
 } as const;

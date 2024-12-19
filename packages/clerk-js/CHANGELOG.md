@@ -1,5 +1,540 @@
 # Change Log
 
+## 5.43.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/localizations@3.9.4
+  - @clerk/shared@2.20.4
+
+## 5.43.2
+
+### Patch Changes
+
+- Redirect to sign up start step within combined flow when there are optional fields. ([#4795](https://github.com/clerk/javascript/pull/4795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.43.1
+
+### Patch Changes
+
+- Revert #4776 to address new bug. ([#4797](https://github.com/clerk/javascript/pull/4797)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
+## 5.43.0
+
+### Minor Changes
+
+- Redirect to the current page when within modal mode and no redirect URL is provided. ([#4768](https://github.com/clerk/javascript/pull/4768)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- fix: Properly detect and create devBrowser when the suffixed version is missing but an unsuffixed version exists ([#4776](https://github.com/clerk/javascript/pull/4776)) by [@panteliselef](https://github.com/panteliselef)
+
+  If the \_\_clerk_db_jwt referred to a different instance, we’d fetch `/environment` and `/client` with mismatched publishable keys and JWTs, breaking the app.
+
+- Updated dependencies [[`1677fa46862accd25d4837c9abd9a7a70c5b7858`](https://github.com/clerk/javascript/commit/1677fa46862accd25d4837c9abd9a7a70c5b7858), [`dcd2f3973ca90500fda9e52c4f81e631c49e87fc`](https://github.com/clerk/javascript/commit/dcd2f3973ca90500fda9e52c4f81e631c49e87fc)]:
+  - @clerk/localizations@3.9.3
+
+## 5.42.1
+
+### Patch Changes
+
+- Added min and max length username settings to username field error. ([#4771](https://github.com/clerk/javascript/pull/4771)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename `toJSON()` resource methods to `__internal_toSnapshot()` to avoid issues with serializing functions. ([#4777](https://github.com/clerk/javascript/pull/4777)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`aeafa7c5efd50c893d088ac99199d7eaecc04025`](https://github.com/clerk/javascript/commit/aeafa7c5efd50c893d088ac99199d7eaecc04025), [`acd9326ef2d6942b981b3ee59c4b20ddd303323d`](https://github.com/clerk/javascript/commit/acd9326ef2d6942b981b3ee59c4b20ddd303323d)]:
+  - @clerk/localizations@3.9.2
+  - @clerk/types@4.39.4
+  - @clerk/shared@2.20.2
+
+## 5.42.0
+
+### Minor Changes
+
+- Display a UI prompt while Clerk is running in Keyless mode. ([#4761](https://github.com/clerk/javascript/pull/4761)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add additional toast UI for the claim/keyless flow ([#4756](https://github.com/clerk/javascript/pull/4756)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Using the same peerDependencies semver for react and react-dom ([#4758](https://github.com/clerk/javascript/pull/4758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Use `afterSwitchSessionUrl` instead of using`afterSignInUrl`when switching sessions within`<UserButton/>`. ([#4726](https://github.com/clerk/javascript/pull/4726)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `claimedAt` proprty inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
+
+- Handle organization membership quote exceeded error during enterprise SSO ([#4763](https://github.com/clerk/javascript/pull/4763)) by [@mzhong9723](https://github.com/mzhong9723)
+
+- Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
+
+  This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
+
+  - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+
+- Updated dependencies [[`66ad299e4b6496ea4a93799de0f1ecfad920ddad`](https://github.com/clerk/javascript/commit/66ad299e4b6496ea4a93799de0f1ecfad920ddad), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`7f7edcaa8228c26d19e9081979100ada7e982095`](https://github.com/clerk/javascript/commit/7f7edcaa8228c26d19e9081979100ada7e982095), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d)]:
+  - @clerk/shared@2.20.1
+  - @clerk/types@4.39.3
+  - @clerk/localizations@3.9.1
+
+## 5.41.0
+
+### Minor Changes
+
+- Switching to use ^ for semver ranges of internal @clerk/ production dependencies. ([#4664](https://github.com/clerk/javascript/pull/4664)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`ffa631d2480cfe77bf08c61b1302ace308e5b630`](https://github.com/clerk/javascript/commit/ffa631d2480cfe77bf08c61b1302ace308e5b630)]:
+  - @clerk/localizations@3.9.0
+  - @clerk/shared@2.20.0
+
+## 5.40.3
+
+### Patch Changes
+
+- Bug fix: When the requested Web3 provider cannot be found, use any other available injected Web3 Wallet provider, instead of blocking the sign-in/sign-up flow. ([#4734](https://github.com/clerk/javascript/pull/4734)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`cd72a27a75863dfd94b0a00ed5b2d03231556bc0`](https://github.com/clerk/javascript/commit/cd72a27a75863dfd94b0a00ed5b2d03231556bc0)]:
+  - @clerk/types@4.39.2
+  - @clerk/localizations@3.8.2
+  - @clerk/shared@2.19.4
+
+## 5.40.2
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6ea3d39510297b005cde3cd561f56b2e0ea7c61b`](https://github.com/clerk/javascript/commit/6ea3d39510297b005cde3cd561f56b2e0ea7c61b), [`08b3e4042370937b79d4b4167155d6aad1fa9356`](https://github.com/clerk/javascript/commit/08b3e4042370937b79d4b4167155d6aad1fa9356), [`1b86a1da34ce4bc309f69980ac13a691a0a633c2`](https://github.com/clerk/javascript/commit/1b86a1da34ce4bc309f69980ac13a691a0a633c2)]:
+  - @clerk/localizations@3.8.1
+  - @clerk/types@4.39.1
+  - @clerk/shared@2.19.3
+
+## 5.40.1
+
+### Patch Changes
+
+- Apply fraud protection logic to all requests ([#4709](https://github.com/clerk/javascript/pull/4709)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4cb22548da81dd8b186a6ef1cf120aea99c85c62`](https://github.com/clerk/javascript/commit/4cb22548da81dd8b186a6ef1cf120aea99c85c62)]:
+  - @clerk/shared@2.19.2
+
+## 5.40.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue during sign-up flow where a user lands on the continue step, and proceeds successfully through the sign-up process and gets redirected to AP sign-up due to signUp.id being undefined. ([#4711](https://github.com/clerk/javascript/pull/4711)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6fdffaf41f6b79c56dc017e058a670ddbaaf9f42`](https://github.com/clerk/javascript/commit/6fdffaf41f6b79c56dc017e058a670ddbaaf9f42), [`550c7e9851329688e37be29b83ea0c3b12482af7`](https://github.com/clerk/javascript/commit/550c7e9851329688e37be29b83ea0c3b12482af7), [`9393a90eeecd7a8e441a85682a7defa5cc5aa4f2`](https://github.com/clerk/javascript/commit/9393a90eeecd7a8e441a85682a7defa5cc5aa4f2), [`965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7`](https://github.com/clerk/javascript/commit/965cb6a8aa47ad57b08dd1c8859117e12ed2eaa7), [`3f640805d2a4e1616aafa56f6848d6657911bb99`](https://github.com/clerk/javascript/commit/3f640805d2a4e1616aafa56f6848d6657911bb99), [`b9a5bea404cb09d7e328d48b41bd2669feb4e518`](https://github.com/clerk/javascript/commit/b9a5bea404cb09d7e328d48b41bd2669feb4e518), [`e7abe51a9e8baa378c6ad588b4766a60bc2c4433`](https://github.com/clerk/javascript/commit/e7abe51a9e8baa378c6ad588b4766a60bc2c4433)]:
+  - @clerk/localizations@3.8.0
+  - @clerk/types@4.39.0
+  - @clerk/shared@2.19.1
+
+## 5.39.0
+
+### Minor Changes
+
+- Replace usage of `OAUTH_PROVIDERS` and `WEB3_PROVIDERS` from `@clerk/types` to `@clerk/shared`. ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3), [`0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3`](https://github.com/clerk/javascript/commit/0bc3ccc5bd4a93121bb7e7d6a32271af9c31f8c3)]:
+  - @clerk/shared@2.19.0
+  - @clerk/types@4.38.0
+  - @clerk/localizations@3.7.4
+
+## 5.38.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Fixes an issue in `UserProfile` where email and username forms could retain stale values from the previous render, leading to incorrect data being sent to FAPI ([#4713](https://github.com/clerk/javascript/pull/4713)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove side-effect from `Session` resource initialization that triggered a session cookie update. This cookie update is now explicitly part of the `Clerk.load()` flow. ([#4555](https://github.com/clerk/javascript/pull/4555)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`4e5e7f463c12893a21cb3b5f9317fc3f2945879b`](https://github.com/clerk/javascript/commit/4e5e7f463c12893a21cb3b5f9317fc3f2945879b)]:
+  - @clerk/types@4.37.0
+  - @clerk/localizations@3.7.3
+  - @clerk/shared@2.18.1
+
+## 5.37.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
+  - @clerk/localizations@3.7.2
+  - @clerk/types@4.36.0
+  - @clerk/shared@2.18.0
+
+## 5.36.0
+
+### Minor Changes
+
+- - Update the supported API version to `2024-10-01` that includes the following changes ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+    - Notification for new sign ins to users' accounts feature becomes available.
+    - The response for Sign Ins with an email address that matches a **SAML connection** is updated. Instead of responding with a status of `needs_identifier` the API will now return a status of `needs_first_factor` and the email address that matched will be returned in the identifier field. the only strategy that will be included in supported first factors is `enterprise_sso`
+
+    Read more in the [API Version docs](https://clerk.com/docs/backend-requests/versioning/available-versions#2024-10-01)
+
+  - Update components to use the new `enterprise_sso` strategy for sign ins / sign ups that match an enterprise connection and handle the new API response.
+
+    This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise SSO regardless of the underlying protocol used to authenticate the user.
+
+    For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+### Patch Changes
+
+- Fix a memory leak in email link flow polling. ([#4515](https://github.com/clerk/javascript/pull/4515)) by [@myandrienko](https://github.com/myandrienko)
+
+- Updated dependencies [[`8a28d1f403309f692d9332704f07effbf39d056d`](https://github.com/clerk/javascript/commit/8a28d1f403309f692d9332704f07effbf39d056d)]:
+  - @clerk/types@4.35.1
+  - @clerk/localizations@3.7.1
+  - @clerk/shared@2.17.1
+
+## 5.35.1
+
+### Patch Changes
+
+- Fix a bug where the the Clerk event listener was not emitting updates when a Session's user data changes. ([#4661](https://github.com/clerk/javascript/pull/4661)) by [@BRKalow](https://github.com/BRKalow)
+
+- Bug fix: Being able to revoke a session from UserProfile. ([#4653](https://github.com/clerk/javascript/pull/4653)) by [@panteliselef](https://github.com/panteliselef)
+
+## 5.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+- If a nonce is provided, it is now made available to Clerk's internal components. This allows the nonce to be passed in to style-src in CSPs and work correctly. ([#4509](https://github.com/clerk/javascript/pull/4509)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Include **BUILD_DISABLE_RHC** to allow for builds which remove remotely hosted code as it is a requirement for browser extensions. ([#4133](https://github.com/clerk/javascript/pull/4133)) by [@tmilewski](https://github.com/tmilewski)
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69)]:
+  - @clerk/shared@2.17.0
+  - @clerk/types@4.35.0
+  - @clerk/localizations@3.7.0
+
+## 5.34.6
+
+### Patch Changes
+
+- Catch and ignore any captcha errors during heartbeat ([#4629](https://github.com/clerk/javascript/pull/4629)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enable captcha for development instances ([#4620](https://github.com/clerk/javascript/pull/4620)) by [@issuedat](https://github.com/issuedat)
+
+- Add new internal UI component for accountless. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`c70994b5b6f92a6550dfe37547f01bbfa810c223`](https://github.com/clerk/javascript/commit/c70994b5b6f92a6550dfe37547f01bbfa810c223), [`7623a99594e7329200b6b374e483152d7679ce66`](https://github.com/clerk/javascript/commit/7623a99594e7329200b6b374e483152d7679ce66)]:
+  - @clerk/types@4.34.2
+  - @clerk/localizations@3.6.6
+  - @clerk/shared@2.16.1
+
+## 5.34.5
+
+### Patch Changes
+
+- Collect captcha token on load ([#4623](https://github.com/clerk/javascript/pull/4623)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.34.4
+
+### Patch Changes
+
+- Fixes issue where `FormFeedback` was rendering two elements with the same `id` attribute leading to invalid markup. ([#4552](https://github.com/clerk/javascript/pull/4552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `sign_up_restricted_waitlist` error encountered in an oauth flow ([#4603](https://github.com/clerk/javascript/pull/4603)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Exclude `_clerk_session_id` query param from `/waitlist` endpoint ([#4594](https://github.com/clerk/javascript/pull/4594)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`e47eb5882a7fd4a8dee25933c6644790d6ea3407`](https://github.com/clerk/javascript/commit/e47eb5882a7fd4a8dee25933c6644790d6ea3407), [`7510d5cf0ac4d2994849931de8dda75cf605f840`](https://github.com/clerk/javascript/commit/7510d5cf0ac4d2994849931de8dda75cf605f840), [`273d16cb0665d4d960838cb294dc356f41814745`](https://github.com/clerk/javascript/commit/273d16cb0665d4d960838cb294dc356f41814745), [`6b0961765e1f3d09679be4b163fa13ac7dd97191`](https://github.com/clerk/javascript/commit/6b0961765e1f3d09679be4b163fa13ac7dd97191)]:
+  - @clerk/shared@2.16.0
+  - @clerk/types@4.34.1
+  - @clerk/localizations@3.6.5
+
+## 5.34.3
+
+### Patch Changes
+
+- Block /tokens requests until fraud detection completes by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Enforce uppercase rendering for `<ProviderInitialIcon />`. ([#4578](https://github.com/clerk/javascript/pull/4578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the password field would not render during autofill event until the user interacted with the screen. ([#4560](https://github.com/clerk/javascript/pull/4560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`536fa996ff84a545678a3036b28409824d1c00dd`](https://github.com/clerk/javascript/commit/536fa996ff84a545678a3036b28409824d1c00dd), [`b28c5e8bc44885bf6b1533df48e872ba90c387da`](https://github.com/clerk/javascript/commit/b28c5e8bc44885bf6b1533df48e872ba90c387da)]:
+  - @clerk/shared@2.15.0
+
+## 5.34.2
+
+### Patch Changes
+
+- Display logo in `<Waitlist />` component ([#4561](https://github.com/clerk/javascript/pull/4561)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Correctly handle async requires_captcha error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.34.1
+
+### Patch Changes
+
+- Protect /tokens requests by requiring a valid captcha token if the request fails with 401 ([#4559](https://github.com/clerk/javascript/pull/4559)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`46faeb6f59b19c963fb137c858347525b1cd9e19`](https://github.com/clerk/javascript/commit/46faeb6f59b19c963fb137c858347525b1cd9e19), [`ea6c52dd751abe38b350ee07f148652c24125e22`](https://github.com/clerk/javascript/commit/ea6c52dd751abe38b350ee07f148652c24125e22)]:
+  - @clerk/shared@2.14.0
+  - @clerk/types@4.34.0
+  - @clerk/localizations@3.6.4
+
+## 5.34.0
+
+### Minor Changes
+
+- Surface enterprise accounts in `UserProfile`, allowing to display more protocols besides SAML ([#4518](https://github.com/clerk/javascript/pull/4518)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce the `experimental.rethrowOfflineNetworkErrors` option to the `ClerkProvider` component. ([#4525](https://github.com/clerk/javascript/pull/4525)) by [@anagstef](https://github.com/anagstef)
+
+  When set to `true`, Clerk will rethrow network errors that occur while the user is offline.
+
+### Patch Changes
+
+- Display additional errors from enterprise SSO ([#4553](https://github.com/clerk/javascript/pull/4553)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`1c0b5001f7f975a2f3f54ad692526ecf7257847e`](https://github.com/clerk/javascript/commit/1c0b5001f7f975a2f3f54ad692526ecf7257847e), [`6217a3f7c94311d49f873214bd406961e0b8d6f7`](https://github.com/clerk/javascript/commit/6217a3f7c94311d49f873214bd406961e0b8d6f7), [`1783025cdb94c447028704c2121fa0b8af785904`](https://github.com/clerk/javascript/commit/1783025cdb94c447028704c2121fa0b8af785904)]:
+  - @clerk/types@4.33.0
+  - @clerk/shared@2.13.0
+  - @clerk/localizations@3.6.3
+
+## 5.33.1
+
+### Patch Changes
+
+- Use fapi error long message instead of statusText when throwing API errors. ([#4511](https://github.com/clerk/javascript/pull/4511)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes satellite syncing when both the satellite and the primary apps use server-side enabled frameworks like NextJS ([#4516](https://github.com/clerk/javascript/pull/4516)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`cc741adf26d983ae199ad8e7faa6551a80999f16`](https://github.com/clerk/javascript/commit/cc741adf26d983ae199ad8e7faa6551a80999f16)]:
+  - @clerk/localizations@3.6.2
+
+## 5.33.0
+
+### Minor Changes
+
+- Replace `redirectUrl` with `afterJoinWaitlistUrl` in `<Waitlist />` component ([#4532](https://github.com/clerk/javascript/pull/4532)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Updated dependencies [[`7dbad4c5abd226d7b10941a626ead5d85b1a3f24`](https://github.com/clerk/javascript/commit/7dbad4c5abd226d7b10941a626ead5d85b1a3f24)]:
+  - @clerk/types@4.32.0
+  - @clerk/localizations@3.6.1
+  - @clerk/shared@2.12.1
+
+## 5.32.0
+
+### Minor Changes
+
+- Introduce experimental support for passkeys in Expo (iOS, Android, and Web). ([#4352](https://github.com/clerk/javascript/pull/4352)) by [@AlexNti](https://github.com/AlexNti)
+
+  To use passkeys in Expo projects, pass the `__experimental_passkeys` object, which can be imported from `@clerk/clerk-expo/passkeys`, to the `ClerkProvider` component:
+
+  ```tsx
+  import { ClerkProvider } from '@clerk/clerk-expo';
+  import { passkeys } from '@clerk/clerk-expo/passkeys';
+
+  <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
+  ```
+
+  The API for using passkeys in Expo projects is the same as the one used in web apps:
+
+  ```tsx
+  // passkey creation
+  const { user } = useUser();
+
+  const handleCreatePasskey = async () => {
+    if (!user) return;
+    try {
+      return await user.createPasskey();
+    } catch (e: any) {
+      // handle error
+    }
+  };
+
+  // passkey authentication
+  const { signIn, setActive } = useSignIn();
+
+  const handlePasskeySignIn = async () => {
+    try {
+      const signInResponse = await signIn.authenticateWithPasskey();
+      await setActive({ session: signInResponse.createdSessionId });
+    } catch (err: any) {
+      //handle error
+    }
+  };
+  ```
+
+- The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
+
+  Removed the `__experimental_` preffix.
+
+- Now sending the Frontend API version through query string params ([#4457](https://github.com/clerk/javascript/pull/4457)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fixes issues in `ClerkRouter` that were causing inaccurate pathnames within Elements flows. Also fixes a dependency issue where `@clerk/elements` was pulling in the wrong version of `@clerk/shared`. ([#4513](https://github.com/clerk/javascript/pull/4513)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Internal change to use component-specific context providers. This change does not impact consumers. ([#4486](https://github.com/clerk/javascript/pull/4486)) by [@dstaley](https://github.com/dstaley)
+
+- Add afterJoinWaitlistUrl to DisplayConfig resource ([#4524](https://github.com/clerk/javascript/pull/4524)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`75b2fa0ab30f48e8b575adf31ff9ca0e6901f885`](https://github.com/clerk/javascript/commit/75b2fa0ab30f48e8b575adf31ff9ca0e6901f885), [`5a21de1f46df3642828dc27e4862263c9858da2b`](https://github.com/clerk/javascript/commit/5a21de1f46df3642828dc27e4862263c9858da2b), [`f7472e22877f62fc7f3c8d3efe409ff2276fb4a3`](https://github.com/clerk/javascript/commit/f7472e22877f62fc7f3c8d3efe409ff2276fb4a3), [`e199037b8f484abdeeb9fc24455a1b4b8c31c8dd`](https://github.com/clerk/javascript/commit/e199037b8f484abdeeb9fc24455a1b4b8c31c8dd), [`886e294a8d8c54b39cd5bda88d46b89eace3861e`](https://github.com/clerk/javascript/commit/886e294a8d8c54b39cd5bda88d46b89eace3861e), [`0e443ad7c76643420b50e5b169193e03f6ef79f9`](https://github.com/clerk/javascript/commit/0e443ad7c76643420b50e5b169193e03f6ef79f9), [`cc24c8145f1eea7fb91550f2c3e0bac3993e4320`](https://github.com/clerk/javascript/commit/cc24c8145f1eea7fb91550f2c3e0bac3993e4320)]:
+  - @clerk/localizations@3.6.0
+  - @clerk/shared@2.12.0
+  - @clerk/types@4.31.0
+
+## 5.31.2
+
+### Patch Changes
+
+- Re-init window.Clerk options when `ClerkProvider` props change in `@clerk/clerk-react` ([#4498](https://github.com/clerk/javascript/pull/4498)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.31.1
+
+### Patch Changes
+
+- Fix an issue where protocol relative URLs were not properly detected as non-relative. ([#4483](https://github.com/clerk/javascript/pull/4483)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`8a04ae47b8305f994b348301fd8134d5baf02943`](https://github.com/clerk/javascript/commit/8a04ae47b8305f994b348301fd8134d5baf02943)]:
+  - @clerk/shared@2.11.5
+
+## 5.31.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d74a6a7c0f291104c6bba722a8c432814d7b336e`](https://github.com/clerk/javascript/commit/d74a6a7c0f291104c6bba722a8c432814d7b336e), [`1a0c8fe665869e732d3c800bde0f5219fce54301`](https://github.com/clerk/javascript/commit/1a0c8fe665869e732d3c800bde0f5219fce54301), [`0800fc3f1f4e1b6a1d13f5c02557001a283af6e8`](https://github.com/clerk/javascript/commit/0800fc3f1f4e1b6a1d13f5c02557001a283af6e8)]:
+  - @clerk/localizations@3.5.0
+  - @clerk/types@4.30.0
+  - @clerk/shared@2.11.4
+
+## 5.30.3
+
+### Patch Changes
+
+- `clerk-js` is now built with [Rspack](https://rspack.dev) instead of Webpack. This is an internal tooling change that shouldn't affect consumers. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Refactor imports from @clerk/shared to improve treeshaking support by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc), [`a7726cc12a824b278f6d2a37cb1901c38c5f70dc`](https://github.com/clerk/javascript/commit/a7726cc12a824b278f6d2a37cb1901c38c5f70dc)]:
+  - @clerk/shared@2.11.3
+  - @clerk/localizations@3.4.4
+
+## 5.30.0
+
+### Minor Changes
+
+- - Introduce `redirectUrl` property on `setActive` as a replacement for `beforeEmit`. ([#4312](https://github.com/clerk/javascript/pull/4312)) by [@issuedat](https://github.com/issuedat)
+
+  - Deprecates `beforeEmit` property on `setActive`.
+
+### Patch Changes
+
+- Experimental: `asStandalone` now accepts a callback that notifies if the standalone popover needs to unmount. ([#4423](https://github.com/clerk/javascript/pull/4423)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve checkbox label alignment to account for wrapping labels. ([#4426](https://github.com/clerk/javascript/pull/4426)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove unused `fitTextInOneLine` and `textWidthForCurrentSize` ([#4407](https://github.com/clerk/javascript/pull/4407)) by [@zythosec](https://github.com/zythosec)
+
+- Chore: Replace beforeEmit with an explicit call after `setActive`, inside the experimental UserVerification. ([#4362](https://github.com/clerk/javascript/pull/4362)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Changed `__experimental_legalAccepted` checkbox Indicator element descriptor and element id ([#4427](https://github.com/clerk/javascript/pull/4427)) by [@octoper](https://github.com/octoper)
+
+  - Changed `__experimental_legalAccepted` checkbox Label element descriptor and element id
+  - Added two new element descriptors `formFieldCheckboxInput`, `formFieldCheckboxLabel`.
+
+- Updated dependencies [[`f875463da`](https://github.com/clerk/javascript/commit/f875463da9692f2d173b6d5388743cf720750ae3), [`5be7ca9fd`](https://github.com/clerk/javascript/commit/5be7ca9fd239c937cc88e20ce8f5bfc9f3b84f22), [`c2f5071be`](https://github.com/clerk/javascript/commit/c2f5071be151130a62340eb35f19cec64313645e), [`08c5a2add`](https://github.com/clerk/javascript/commit/08c5a2add6872c76e62fc0df06db723e3728452e), [`ae0621972`](https://github.com/clerk/javascript/commit/ae0621972fcb4b8039b723436eac3f45e81487bc), [`cd2189ac8`](https://github.com/clerk/javascript/commit/cd2189ac89653e5dad8732d7f592f222962737e9), [`159877be0`](https://github.com/clerk/javascript/commit/159877be0f4aaed89d17d864cfe7ce633a4531e0), [`434b432f8`](https://github.com/clerk/javascript/commit/434b432f8c114825120eef0f2c278b8142ed1563)]:
+  - @clerk/types@4.29.0
+  - @clerk/localizations@3.4.1
+  - @clerk/shared@2.11.0
+
+## 5.29.1
+
+### Patch Changes
+
+- Move `@clerk/ui` to `devDependencies` ([#4399](https://github.com/clerk/javascript/pull/4399)) by [@dstaley](https://github.com/dstaley)
+
+- Show an error on `<UserProfile />` if the Web3 wallet is already claimed. ([#4389](https://github.com/clerk/javascript/pull/4389)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Fix for legal consent rendered on the <SignUp/> component when only social sign up is enabled ([#4403](https://github.com/clerk/javascript/pull/4403)) by [@octoper](https://github.com/octoper)
+
+## 5.29.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`3fdcdbf88`](https://github.com/clerk/javascript/commit/3fdcdbf88c38facf8b82563f634ec1b6604fd8e5), [`f9d53fe34`](https://github.com/clerk/javascript/commit/f9d53fe3444db5154dba47270a06c6a76dbea69f)]:
+  - @clerk/localizations@3.4.0
+  - @clerk/types@4.28.0
+  - @clerk/ui@0.1.10
+  - @clerk/shared@2.10.1
+
 ## 5.28.0
 
 ### Minor Changes
@@ -271,8 +806,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: "L2.secondFactor",
-      maxAge: "A1.10min",
+      level: 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
   });
   ```
@@ -629,13 +1164,24 @@
   ```jsx
   <UserButton>
     <UserButton.MenuItems>
-      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
-      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
-      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
-      custom page to have been set in `/help`)
-      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Link
+        label='Terms'
+        labelIcon={<Icon />}
+        href='/terms'
+      />
       <UserButton.Action
-        label="Chat Modal"
+        label='Help'
+        labelIcon={<Icon />}
+        open='help'
+      />{' '}
+      // Navigate to `/help` page when UserProfile opens as a modal. (Requires a custom page to have been set in
+      `/help`)
+      <UserButton.Action
+        label='manageAccount'
+        labelIcon={<Icon />}
+      />
+      <UserButton.Action
+        label='Chat Modal'
         labelIcon={<Icon />}
         onClick={() => setModal(true)}
       />
@@ -880,7 +1426,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -895,11 +1441,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === "complete") {
+      if (signInOrUp.status === 'complete') {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -970,8 +1516,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=""
-    signUpForceRedirectUrl=""
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
   />
   ```
 
@@ -1106,7 +1652,10 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn routing="hash" path="/sign-in" />
+  <SignIn
+    routing='hash'
+    path='/sign-in'
+  />
   ```
 
 - c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
@@ -1340,8 +1889,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -2294,8 +2843,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -2452,7 +3001,10 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn routing="hash" path="/sign-in" />
+  <SignIn
+    routing='hash'
+    path='/sign-in'
+  />
   ```
 
 ### Minor Changes
@@ -2716,15 +3268,19 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
-    <UserProfile.Page label="account" />
-    <UserProfile.Page label="security" />
+    <UserProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <UserProfile.Page label='account' />
+    <UserProfile.Page label='security' />
   </UserProfile>
   ```
 
@@ -2737,19 +3293,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label="External"
-      url="/home"
+      label='External'
+      url='/home'
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label="members" />
-    <OrganizationProfile.Page label="settings" />
+    <OrganizationProfile.Page label='members' />
+    <OrganizationProfile.Page label='settings' />
   </OrganizationProfile>
   ```
 

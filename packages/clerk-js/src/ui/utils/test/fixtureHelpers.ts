@@ -466,8 +466,9 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withSaml = () => {
+  const withEnterpriseSso = () => {
     us.saml = { enabled: true };
+    us.enterprise_sso = { enabled: true };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {
@@ -508,6 +509,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.legal_consent_enabled = true;
   };
 
+  const withWaitlistMode = () => {
+    us.sign_up.mode = SIGN_UP_MODES.WAITLIST;
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -520,12 +525,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withPassword,
     withPasswordComplexity,
     withSocialProvider,
-    withSaml,
+    withEnterpriseSso,
     withBackupCode,
     withAuthenticatorApp,
     withPasskey,
     withPasskeySettings,
     withRestrictedMode,
     withLegalConsent,
+    withWaitlistMode,
   };
 };

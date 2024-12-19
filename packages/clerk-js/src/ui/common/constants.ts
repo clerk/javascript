@@ -1,4 +1,4 @@
-import type { Attribute, Web3Provider } from '@clerk/types';
+import type { Attribute } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
@@ -77,27 +77,3 @@ export const PREFERRED_SIGN_IN_STRATEGIES = Object.freeze({
   Password: 'password',
   OTP: 'otp',
 });
-
-interface Web3ProviderData {
-  id: string;
-  name: string;
-}
-
-type Web3Providers = {
-  [key in Web3Provider]: Web3ProviderData;
-};
-
-export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
-  metamask: {
-    id: 'metamask',
-    name: 'MetaMask',
-  },
-  coinbase_wallet: {
-    id: 'coinbase_wallet',
-    name: 'Coinbase Wallet',
-  },
-});
-
-export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {
-  return WEB3_PROVIDERS[name];
-}

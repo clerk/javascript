@@ -1,5 +1,5 @@
-import { Poller } from '@clerk/shared';
 import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,
@@ -17,6 +17,7 @@ import type {
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
+  SignUpJSONSnapshot,
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
@@ -27,8 +28,10 @@ import type {
 import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
+  getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
 import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
@@ -37,6 +40,7 @@ import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
+  clerkUnsupportedEnvironmentWarning,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -72,50 +76,54 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
 
-  constructor(data: SignUpJSON | null = null) {
+  constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
-      retrieveCaptchaInfo(SignUp.clerk);
 
-    if (
-      !this.shouldBypassCaptchaForAttempt(params) &&
-      canUseCaptcha &&
-      captchaSiteKey &&
-      captchaURL &&
-      captchaPublicKeyInvisible
-    ) {
-      try {
-        const { captchaToken, captchaWidgetTypeUsed } = await getCaptchaToken({
-          siteKey: captchaSiteKey,
-          widgetType: captchaWidgetType,
-          invisibleSiteKey: captchaPublicKeyInvisible,
-          scriptUrl: captchaURL,
-          captchaProvider,
-        });
-        paramsWithCaptcha.captchaToken = captchaToken;
-        paramsWithCaptcha.captchaWidgetType = captchaWidgetTypeUsed;
-      } catch (e) {
-        if (e.captchaError) {
-          paramsWithCaptcha.captchaError = e.captchaError;
-        } else {
-          throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+    if (!__BUILD_DISABLE_RHC__) {
+      const {
+        captchaSiteKey,
+        canUseCaptcha,
+        captchaURL,
+        captchaWidgetType,
+        captchaProvider,
+        captchaPublicKeyInvisible,
+      } = retrieveCaptchaInfo(SignUp.clerk);
+
+      if (
+        !this.shouldBypassCaptchaForAttempt(params) &&
+        canUseCaptcha &&
+        captchaSiteKey &&
+        captchaURL &&
+        captchaPublicKeyInvisible
+      ) {
+        try {
+          const captchaParams = await getCaptchaToken({
+            siteKey: captchaSiteKey,
+            widgetType: captchaWidgetType,
+            invisibleSiteKey: captchaPublicKeyInvisible,
+            scriptUrl: captchaURL,
+            captchaProvider,
+          });
+
+          paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
+          paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
+        } catch (e) {
+          if (e.captchaError) {
+            paramsWithCaptcha.captchaError = e.captchaError;
+          } else {
+            throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
+          }
         }
       }
     }
 
     if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
       paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
-    }
-
-    // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    if (typeof params.__experimental_legalAccepted !== 'undefined') {
-      paramsWithCaptcha.legalAccepted = params.__experimental_legalAccepted;
-      paramsWithCaptcha.__experimental_legalAccepted = undefined;
     }
 
     return this._basePost({
@@ -199,15 +207,20 @@ export class SignUp extends BaseResource implements SignUpResource {
   public authenticateWithWeb3 = async (
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return this;
+    }
+
     const {
       generateSignature,
       identifier,
       unsafeMetadata,
       strategy = 'web3_metamask_signature',
-      __experimental_legalAccepted,
+      legalAccepted,
     } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -216,7 +229,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata, __experimental_legalAccepted: __experimental_legalAccepted });
+    await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
 
     const { message } = this.verifications.web3Wallet;
@@ -247,31 +260,61 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   public authenticateWithMetamask = async (
     params?: SignUpAuthenticateWithWeb3Params & {
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return this;
+    }
+
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
-      __experimental_legalAccepted: params?.__experimental_legalAccepted,
+      legalAccepted: params?.legalAccepted,
     });
   };
 
   public authenticateWithCoinbaseWallet = async (
     params?: SignUpAuthenticateWithWeb3Params & {
-      __experimental_legalAccepted?: boolean;
+      legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return this;
+    }
+
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
-      __experimental_legalAccepted: params?.__experimental_legalAccepted,
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  public authenticateWithOKXWallet = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return this;
+    }
+
+    const identifier = await getOKXWalletIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithOKXWallet,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_okx_wallet_signature',
+      legalAccepted: params?.legalAccepted,
     });
   };
 
@@ -282,7 +325,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     continueSignUp = false,
     unsafeMetadata,
     emailAddress,
-    __experimental_legalAccepted,
+    legalAccepted,
   }: AuthenticateWithRedirectParams & {
     unsafeMetadata?: SignUpUnsafeMetadata;
   }): Promise<void> => {
@@ -293,7 +336,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
-        __experimental_legalAccepted,
+        legalAccepted,
       };
       return continueSignUp && this.id ? this.update(params) : this.create(params);
     };
@@ -320,13 +363,6 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
-    // TODO(@vaggelis): Remove this once the legalAccepted is stable
-    if (typeof params.__experimental_legalAccepted !== 'undefined') {
-      // @ts-expect-error - We need to remove the __experimental_legalAccepted key from the params
-      params.legalAccepted = params.__experimental_legalAccepted;
-      params.__experimental_legalAccepted = undefined;
-    }
-
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
@@ -341,7 +377,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
   };
 
-  protected fromJSON(data: SignUpJSON | null): this {
+  protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -364,6 +400,33 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.legalAcceptedAt = data.legal_accepted_at;
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): SignUpJSONSnapshot {
+    return {
+      object: 'sign_up',
+      id: this.id || '',
+      status: this.status || null,
+      required_fields: this.requiredFields,
+      optional_fields: this.optionalFields,
+      missing_fields: this.missingFields,
+      unverified_fields: this.unverifiedFields,
+      verifications: this.verifications.__internal_toSnapshot(),
+      username: this.username,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      email_address: this.emailAddress,
+      phone_number: this.phoneNumber,
+      has_password: this.hasPassword,
+      unsafe_metadata: this.unsafeMetadata,
+      created_session_id: this.createdSessionId,
+      created_user_id: this.createdUserId,
+      abandon_at: this.abandonAt,
+      web3_wallet: this.web3wallet,
+      legal_accepted_at: this.legalAcceptedAt,
+      external_account: this.externalAccount,
+      external_account_strategy: this.externalAccount?.strategy,
+    };
   }
 
   /**

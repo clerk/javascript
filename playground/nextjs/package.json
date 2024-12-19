@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:yalc": "npm run yalc && rm -rf .next && next dev --port 4011",
-    "yalc": "yalc add @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
+    "dev:yalc": "pnpm yalc:add && rm -rf .next && next dev --port 4011",
+    "yalc:add": "pnpm yalc add @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
     "dev": "rm -rf .next && next dev --port 4011",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "beta",
-    "@clerk/themes": "beta",
-    "next": "^14.1.0",
+    "@clerk/nextjs": "canary",
+    "@clerk/themes": "canary",
+    "next": "^15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -1,3 +1,4 @@
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
 import type { TelemetryCollector } from 'telemetry';
 
 import type {
@@ -11,6 +12,7 @@ import type {
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
+  WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -34,12 +36,13 @@ import type {
 } from './redirects';
 import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
-import type { __experimental_SessionVerificationLevel } from './sessionVerification';
+import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Contains information about the SDK that the host application is using.
@@ -104,6 +107,8 @@ export interface Clerk {
    */
   loaded: boolean;
 
+  __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+
   frontendApi: string;
 
   /** Clerk Publishable Key string. */
@@ -161,16 +166,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserVerification component in a modal.
-   * @experimantal This API is still under active development and may change at any moment.
    * @param props Optional user verification configuration parameters.
    */
-  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
+  __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
   /**
    * Closes the Clerk user verification modal.
-   * @experimantal This API is still under active development and may change at any moment.
    */
-  __experimental_closeUserVerification: () => void;
+  __internal_closeReverification: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -227,6 +230,17 @@ export interface Clerk {
    * Closes the Clerk CreateOrganization modal.
    */
   closeCreateOrganization: () => void;
+
+  /**
+   * Opens the Clerk Waitlist modal.
+   * @param props Optional props that will be passed to the Waitlist component.
+   */
+  openWaitlist: (props?: WaitlistProps) => void;
+
+  /**
+   * Closes the Clerk Waitlist modal.
+   */
+  closeWaitlist: () => void;
 
   /**
    * Mounts a sign in flow component at the target element.
@@ -352,6 +366,19 @@ export interface Clerk {
   unmountOrganizationList: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a waitlist at the target element.
+   * @param targetNode Target to mount the Waitlist component.
+   * @param props Configuration parameters.
+   */
+  mountWaitlist: (targetNode: HTMLDivElement, props?: WaitlistProps) => void;
+
+  /**
+   * Unmount the Waitlist component from the target node.
+   * @param targetNode Target node to unmount the Waitlist component from.
+   */
+  unmountWaitlist: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -435,6 +462,11 @@ export interface Clerk {
   buildAfterMultiSessionSingleSignOutUrl(): string;
 
   /**
+   * Returns the configured url where <Waitlist/> is mounted or a custom waitlist page is rendered.
+   */
+  buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
+
+  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -487,6 +519,11 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
+   * Redirects to the configured URL where <Waitlist/> is mounted.
+   */
+  redirectToWaitlist: () => void;
+
+  /**
    * Completes a Google One Tap redirection flow started by
    * {@link Clerk.authenticateWithGoogleOneTap}
    */
@@ -524,6 +561,11 @@ export interface Clerk {
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their OKX Wallet browser extension
+   */
+  authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -549,6 +591,21 @@ export interface Clerk {
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
    */
   handleUnauthenticated: () => Promise<unknown>;
+
+  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * This is an optional function.
+   * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   */
+  __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
+    | undefined;
+
+  /**
+   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+   **/
+  __internal_reloadInitialResources: () => Promise<void>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -668,9 +725,13 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     signUpUrl?: string;
     /**
-     * Optional array of domains used to validate against the query param of an auth redirect. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning passed to the console.
+     * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
      */
     allowedRedirectOrigins?: Array<string | RegExp>;
+    /**
+     * An optional array of protocols to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
+     */
+    allowedRedirectProtocols?: Array<string>;
     /**
      * This option defines that the application is a satellite application.
      */
@@ -692,16 +753,29 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;
-
+    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    waitlistUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
       {
         persistClient: boolean;
+        rethrowOfflineNetworkErrors: boolean;
+        combinedFlow: boolean;
       },
       Record<string, any>
     >;
+
+    /**
+     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     */
+    __internal_claimKeylessApplicationUrl?: string;
+
+    /**
+     * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     */
+    __internal_copyInstanceKeysUrl?: string;
 
     /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
@@ -801,10 +875,17 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
+   * @deprecated use the redirectUrl parameter to redirect a user
+   *
    * Callback run just before the active session and/or organization is set to the passed object.
    * Can be used to hook up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
+
+  /**
+   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   */
+  redirectUrl?: string;
 };
 
 export type SetActive = (params: SetActiveParams) => Promise<void>;
@@ -845,7 +926,65 @@ export type SignInProps = RoutingOptions & {
   /**
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
+  __experimental?: Record<string, any> & { newComponents?: boolean; combinedProps?: SignInCombinedProps };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
+} & TransferableOption &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
+
+export type SignInCombinedProps = RoutingOptions & {
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  forceRedirectUrl?: string | null;
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  fallbackRedirectUrl?: string | null;
+  /**
+   * Full URL or path to for the sign in process.
+   * Used to fill the "Sign in" link in the SignUp component.
+   */
+  signInUrl?: string;
+  /**
+   * Full URL or path to for the sign up process.
+   * Used to fill the "Sign up" link in the SignUp component.
+   */
+  signUpUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: SignInTheme;
+  /**
+   * Initial values that are used to prefill the sign in or up forms.
+   */
+  initialValues?: SignInInitialValues & SignUpInitialValues;
+  /**
+   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+   */
   __experimental?: Record<string, any> & { newComponents?: boolean };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
+  /**
+   * Additional arbitrary metadata to be stored alongside the User object
+   */
+  unsafeMetadata?: SignUpUnsafeMetadata;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -863,10 +1002,7 @@ interface TransferableOption {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-/**
- * @experimantal
- */
-export type __experimental_UserVerificationProps = RoutingOptions & {
+export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
@@ -882,7 +1018,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
    * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
    * @default `'secondFactor'`
    */
-  level?: __experimental_SessionVerificationLevel;
+  level?: SessionVerificationLevel;
 
   /**
    * Customisation options to fully match the Clerk components to your own brand.
@@ -892,7 +1028,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
   appearance?: UserVerificationTheme;
 };
 
-export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
+export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
@@ -956,6 +1092,11 @@ export type SignUpProps = RoutingOptions & {
    * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
    */
   __experimental?: Record<string, any> & { newComponents?: boolean };
+  /**
+   * Full URL or path to for the waitlist process.
+   * Used to fill the "Join waitlist" link in the SignUp component.
+   */
+  waitlistUrl?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1064,7 +1205,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
-  __experimental_asStandalone?: boolean;
+  __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
    * Full URL or path to navigate after sign out is complete
@@ -1133,7 +1274,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * @experimental This API is experimental and may change at any moment.
      * @default undefined
      */
-    __experimental_asStandalone?: boolean;
+    __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
     /**
      * By default, users can switch between organization and their personal account.
@@ -1248,6 +1389,25 @@ export type OrganizationListProps = {
   hideSlug?: boolean;
 };
 
+export type WaitlistProps = {
+  /**
+   * Full URL or path to navigate after join waitlist.
+   */
+  afterJoinWaitlistUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: WaitlistTheme;
+  /**
+   * Full URL or path where the SignIn component is mounted.
+   */
+  signInUrl?: string;
+};
+
+export type WaitlistModalProps = WaitlistProps;
+
 export interface HandleEmailLinkVerificationParams {
   /**
    * Full URL or path to navigate after successful magic link verification
@@ -1287,15 +1447,19 @@ export interface ClerkAuthenticateWithWeb3Params {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
+
+export type JoinWaitlistParams = {
+  emailAddress: string;
+};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithCoinbaseWalletParams {
@@ -1303,12 +1467,20 @@ export interface AuthenticateWithCoinbaseWalletParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithOKXWalletParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 }
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
-  __experimental_legalAccepted?: boolean;
+  legalAccepted?: boolean;
 }
 
 export interface LoadedClerk extends Clerk {

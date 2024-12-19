@@ -147,11 +147,13 @@ type _LocalizationResource = {
     restrictedAccess: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleWaitlist: LocalizationValue;
       actionLink: LocalizationValue;
       actionText: LocalizationValue;
       blockButton__emailSupport: LocalizationValue;
+      blockButton__joinWaitlist: LocalizationValue;
     };
-    __experimental_legalConsent: {
+    legalConsent: {
       continue: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
@@ -166,6 +168,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
+      __experimental_titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
@@ -174,6 +177,8 @@ type _LocalizationResource = {
       actionLink__use_username: LocalizationValue;
       actionLink__use_email_username: LocalizationValue;
       actionLink__use_passkey: LocalizationValue;
+      actionText__join_waitlist: LocalizationValue;
+      actionLink__join_waitlist: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
@@ -301,7 +306,7 @@ type _LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
   };
-  __experimental_userVerification: {
+  reverification: {
     password: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -800,6 +805,20 @@ type _LocalizationResource = {
     next6Days: LocalizationValue;
     numeric: LocalizationValue;
   };
+  waitlist: {
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formButton: LocalizationValue;
+      actionText: LocalizationValue;
+      actionLink: LocalizationValue;
+    };
+    success: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      message: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &
@@ -888,5 +907,6 @@ type UnstableErrors = WithParamName<{
   already_a_member_in_organization: LocalizationValue;
   organization_domain_common: LocalizationValue;
   organization_domain_blocked: LocalizationValue;
+  organization_domain_exists_for_enterprise_connection: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
 }>;

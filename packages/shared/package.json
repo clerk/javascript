@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.10.0",
+  "version": "2.20.4",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -40,6 +40,36 @@
         "default": "./dist/react/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      }
+    },
+    "./workerTimers": {
+      "import": {
+        "types": "./dist/workerTimers/index.d.mts",
+        "default": "./dist/workerTimers/index.mjs"
+      },
+      "require": {
+        "types": "./dist/workerTimers/index.d.ts",
+        "default": "./dist/workerTimers/index.js"
+      }
+    },
+    "./dom": {
+      "import": {
+        "types": "./dist/dom/index.d.mts",
+        "default": "./dist/dom/index.mjs"
+      },
+      "require": {
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -47,6 +77,7 @@
     "dist",
     "scripts",
     "authorization",
+    "authorization-errors",
     "browser",
     "callWithRetry",
     "color",
@@ -54,6 +85,7 @@
     "date",
     "deprecated",
     "deriveState",
+    "dom",
     "error",
     "file",
     "globs",
@@ -76,43 +108,51 @@
     "logger",
     "webauthn",
     "router",
-    "pathToRegexp"
+    "pathToRegexp",
+    "utils",
+    "workerTimers",
+    "devBrowser",
+    "object",
+    "oauth",
+    "web3"
   ],
   "scripts": {
     "build": "tsup",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:publish": "pnpm dev -- --env.publish",
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "publish:local": "npx yalc push --replace  --sig",
+    "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.27.0",
+    "@clerk/types": "workspace:^",
+    "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
     "swr": "^2.2.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "workspace:*",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
-    "tsup": "*",
-    "typescript": "*"
+    "esbuild": "0.20.2",
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo"
   },
   "peerDependencies": {
-    "react": ">=18 || >=19.0.0-beta",
-    "react-dom": ">=18 || >=19.0.0-beta"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
     "react": {

@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:yalc": "npm run yalc && rm -rf .next && next dev --port 4011",
-    "yalc": "yalc add -- @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
+    "dev:yalc": "pnpm yalc:add && rm -rf .next && next dev --port 4011",
+    "yalc:add": "pnpm yalc add -- @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
     "dev": "next dev --port 4011",
     "build": "next build",
-    "build:yalc": "npm run yalc && rm -rf .next && next build",
+    "build:yalc": "pnpm yalc:add && rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -23,6 +23,7 @@
     "next": "^14.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "ezheaders": "^0.0.3"
   }
 }

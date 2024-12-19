@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Буцах',
   badge__default: 'Анхдагч',
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
@@ -327,6 +272,61 @@ export const mnMN: LocalizationResource = {
   paginationButton__previous: 'Өмнөх',
   paginationRowText__displaying: 'Харуулж байна',
   paginationRowText__of: 'аас',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Бүртгэл нэмэх',
@@ -452,14 +452,17 @@ export const mnMN: LocalizationResource = {
     },
     start: {
       actionLink: 'Бүртгүүлэх',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Имэйл ашиглах',
       actionLink__use_email_username: 'Имэйл эсвэл хэрэглэгчийн нэр ашиглах',
       actionLink__use_passkey: 'Passkey ашиглах',
       actionLink__use_phone: 'Утсаа ашиглах',
       actionLink__use_username: 'Хэрэглэгчийн нэрийг ашиглах',
       actionText: 'Бүртгэлгүй юу?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       title: '{{applicationName}} руу нэвтрэх',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Баталгаажуулах код',
@@ -504,12 +507,32 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Таны утасны дугаар руу илгээсэн баталгаажуулах кодыг оруулна уу',
       formTitle: 'Баталгаажуулах код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'Таны утсанд илгээсэн баталгаажуулах кодыг оруулна уу',
       title: 'Утсаар баталгаажуулах',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Нэвтрэх',
@@ -557,6 +580,7 @@ export const mnMN: LocalizationResource = {
     not_allowed_access: 'Хандалтыг зөвшөөрөгдөөгүй',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -885,6 +909,20 @@ export const mnMN: LocalizationResource = {
       successMessage: 'Таны бүртгэлд web3 wallet нэмэгдлээ.',
       title: 'Web3 wallet нэмэх',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

@@ -1,16 +1,18 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationModalProps,
+  __internal_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithOKXWalletParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
+  ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -19,6 +21,7 @@ import type {
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
+  JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
   OrganizationListProps,
@@ -41,6 +44,8 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  WaitlistProps,
+  WaitlistResource,
   Without,
 } from '@clerk/types';
 
@@ -55,6 +60,10 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor } from './utils';
+
+if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+  globalThis.__BUILD_DISABLE_RHC__ = false;
+}
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -91,6 +100,7 @@ type IsomorphicLoadedClerk = Without<
   | 'buildAfterSignOutUrl'
   | 'buildAfterMultiSessionSingleSignOutUrl'
   | 'buildUrlWithAuth'
+  | 'buildWaitlistUrl'
   | 'handleRedirectCallback'
   | 'handleGoogleOneTapCallback'
   | 'handleUnauthenticated'
@@ -100,6 +110,7 @@ type IsomorphicLoadedClerk = Without<
   | 'authenticateWithGoogleOneTap'
   | 'createOrganization'
   | 'getOrganization'
+  | 'joinWaitlist'
   | 'mountUserButton'
   | 'mountOrganizationList'
   | 'mountOrganizationSwitcher'
@@ -108,7 +119,10 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
+  | 'mountWaitlist'
   | 'client'
+  | '__internal_getCachedResources'
+  | '__internal_reloadInitialResources'
 > & {
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
@@ -117,6 +131,7 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align Promise unknown
   authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
   authenticateWithCoinbaseWallet: (params: AuthenticateWithCoinbaseWalletParams) => Promise<void>;
+  authenticateWithOKXWallet: (params: AuthenticateWithOKXWalletParams) => Promise<void>;
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<void>;
   authenticateWithGoogleOneTap: (
     params: AuthenticateWithGoogleOneTapParams,
@@ -125,6 +140,8 @@ type IsomorphicLoadedClerk = Without<
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource | void>;
   // TODO: Align return type (maybe not possible or correct)
   getOrganization: (organizationId: string) => Promise<OrganizationResource | void>;
+  // TODO: Align return type
+  joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource | void>;
 
   // TODO: Align return type
   buildSignInUrl: (opts?: RedirectOptions) => string | void;
@@ -145,6 +162,8 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align return type
   buildAfterMultiSessionSingleSignOutUrl: () => string | void;
   // TODO: Align optional props
+  buildWaitlistUrl: () => string | void;
+  // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
   mountOrganizationSwitcher: (node: HTMLDivElement, props: OrganizationSwitcherProps) => void;
@@ -153,6 +172,7 @@ type IsomorphicLoadedClerk = Without<
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
+  mountWaitlist: (node: HTMLDivElement, props: WaitlistProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -162,12 +182,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
-  private preopenUserVerification?: null | __experimental_UserVerificationProps = null;
+  private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
+  private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -177,6 +198,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
+  private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -207,7 +229,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (!inBrowser() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
+    if (
+      !inBrowser() ||
+      !this.#instance ||
+      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
+      // Allow hot swapping PKs on the client
+      this.#instance.publishableKey !== options.publishableKey
+    ) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
@@ -241,6 +269,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#proxyUrl || '';
   }
 
+  public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
+    return this.clerkjs?.__internal_getOption(key);
+  }
+
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, publishableKey } = options || {};
     this.#publishableKey = publishableKey;
@@ -254,7 +286,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
 
-    void this.loadClerkJS();
+    if (this.#publishableKey) {
+      void this.loadClerkJS();
+    }
   }
 
   get sdkMetadata(): SDKMetadata | undefined {
@@ -366,6 +400,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  buildWaitlistUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildWaitlistUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildWaitlistUrl', callback);
+    }
+  };
+
   buildUrlWithAuth = (to: string): string | void => {
     const callback = () => this.clerkjs?.buildUrlWithAuth(to) || '';
     if (this.clerkjs && this.#loaded) {
@@ -434,7 +477,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
+      } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
           await loadClerkJsScript({
@@ -511,7 +554,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenUserVerification !== null) {
-      clerkjs.__experimental_openUserVerification(this.preopenUserVerification);
+      clerkjs.__internal_openReverification(this.preopenUserVerification);
     }
 
     if (this.preopenOneTap !== null) {
@@ -524,6 +567,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     if (this.preopenCreateOrganization !== null) {
       clerkjs.openCreateOrganization(this.preopenCreateOrganization);
+    }
+
+    if (this.preOpenWaitlist !== null) {
+      clerkjs.openWaitlist(this.preOpenWaitlist);
     }
 
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
@@ -544,6 +591,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountOrganizationListNodes.forEach((props: OrganizationListProps, node: HTMLDivElement) => {
       clerkjs.mountOrganizationList(node, props);
+    });
+
+    this.premountWaitlistNodes.forEach((props: WaitlistProps, node: HTMLDivElement) => {
+      clerkjs.mountWaitlist(node, props);
     });
 
     this.#loaded = true;
@@ -625,9 +676,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
+  setActive = ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.setActive({ session, organization, beforeEmit });
+      return this.clerkjs.setActive({ session, organization, beforeEmit, redirectUrl });
     } else {
       return Promise.reject();
     }
@@ -649,17 +700,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_openUserVerification(props);
+      this.clerkjs.__internal_openReverification(props);
     } else {
       this.preopenUserVerification = props;
     }
   };
 
-  __experimental_closeUserVerification = (): void => {
+  __internal_closeReverification = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_closeUserVerification();
+      this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
     }
@@ -726,6 +777,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.closeCreateOrganization();
     } else {
       this.preopenCreateOrganization = null;
+    }
+  };
+
+  openWaitlist = (props?: WaitlistProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openWaitlist(props);
+    } else {
+      this.preOpenWaitlist = props;
+    }
+  };
+
+  closeWaitlist = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeWaitlist();
+    } else {
+      this.preOpenWaitlist = null;
     }
   };
 
@@ -882,6 +949,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  mountWaitlist = (node: HTMLDivElement, props: WaitlistProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountWaitlist(node, props);
+    } else {
+      this.premountWaitlistNodes.set(node, props);
+    }
+  };
+
+  unmountWaitlist = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountWaitlist(node);
+    } else {
+      this.premountWaitlistNodes.delete(node);
+    }
+  };
+
   addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     if (this.clerkjs) {
       return this.clerkjs.addListener(listener);
@@ -994,6 +1077,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  redirectToWaitlist = async (): Promise<unknown> => {
+    const callback = () => this.clerkjs?.redirectToWaitlist();
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('redirectToWaitlist', callback);
+      return;
+    }
+  };
+
   handleRedirectCallback = (params: HandleOAuthCallbackParams): void => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
     if (this.clerkjs && this.#loaded) {
@@ -1058,6 +1151,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  authenticateWithOKXWallet = async (params: AuthenticateWithOKXWalletParams): Promise<void> => {
+    const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
+    }
+  };
+
   authenticateWithWeb3 = async (params: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithWeb3(params);
     if (this.clerkjs && this.#loaded) {
@@ -1089,6 +1191,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
+    }
+  };
+
+  joinWaitlist = async (params: JoinWaitlistParams): Promise<WaitlistResource | void> => {
+    const callback = () => this.clerkjs?.joinWaitlist(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<WaitlistResource>;
+    } else {
+      this.premountMethodCalls.set('joinWaitlist', callback);
     }
   };
 

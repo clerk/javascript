@@ -47,6 +47,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'backRow',
   'backLink',
 
+  'socialButtonsRoot',
   'socialButtons',
   'socialButtonsIconButton',
   'socialButtonsBlockButton',
@@ -55,6 +56,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderInitialIcon',
 
   'enterpriseButtonsProviderIcon',
+
+  'providerIcon',
+  'providerInitialIcon',
+
   'alternativeMethods',
   'alternativeMethodsBlockButton',
   'alternativeMethodsBlockButtonText',
@@ -91,6 +96,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldRadioLabel',
   'formFieldRadioLabelTitle',
   'formFieldRadioLabelDescription',
+  'formFieldCheckboxInput',
+  'formFieldCheckboxLabel',
   'formFieldAction',
   'formFieldInput',
   'formFieldErrorText',
@@ -243,6 +250,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'navbarButtons',
   'navbarButton',
   'navbarButtonIcon',
+  'navbarButtonText',
   'navbarMobileMenuRow',
   'navbarMobileMenuButton',
   'navbarMobileMenuButtonIcon',
@@ -269,7 +277,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'badge',
   'notificationBadge',
   'buttonArrowIcon',
-  'providerIcon',
   'spinner',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 

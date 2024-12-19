@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.15.0",
+  "version": "1.21.4",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -76,50 +76,38 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "publish:local": "npx yalc push --replace --sig",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "publish:local": "pnpm yalc push --replace --sig",
     "build:lib": "tsup --env.NODE_ENV production",
-    "build:tests": "tsup --config tsup.config.test.ts",
     "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
-    "clean:tests": "rimraf ./tests/dist",
     "lint": "eslint src/",
     "lint:publint": "publint",
     "lint:attw": "attw --pack . --ignore-rules false-cjs",
-    "test": "run-s clean:tests build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
-    "test:node": "./tests/node/run.sh",
-    "test:edge-runtime": "./tests/edge-runtime/run.sh",
-    "test:cloudflare-miniflare": "tests/cloudflare-miniflare/run.sh",
-    "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
+    "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
+    "test:node": "vitest --environment node",
+    "test:edge-runtime": "vitest --environment edge-runtime",
+    "test:cloudflare-miniflare": "vitest --environment miniflare"
   },
   "dependencies": {
-    "@clerk/shared": "2.10.0",
-    "@clerk/types": "4.27.0",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "cookie": "0.7.0",
     "snakecase-keys": "5.4.4",
-    "tslib": "2.4.1"
+    "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "*",
-    "@cloudflare/workers-types": "^3.19.0",
-    "@types/chai": "^4.3.3",
+    "@clerk/eslint-config-custom": "workspace:*",
+    "@edge-runtime/vm": "4.0.4",
     "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
-    "@types/qunit": "^2.19.10",
-    "@types/sinon": "^10.0.13",
-    "chai": "^4.3.6",
-    "edge-runtime": "^2.5.10",
-    "esbuild": "^0.24.0",
-    "esbuild-register": "^3.6.0",
-    "miniflare": "^2.14.3",
+    "msw": "2.6.4",
     "npm-run-all": "^4.1.5",
-    "qunit": "^2.19.3",
-    "sinon": "^14.0.1",
-    "tsup": "*",
-    "typescript": "*",
-    "workerd": "^1.20240925.0"
+    "tsup": "catalog:repo",
+    "typescript": "catalog:repo",
+    "vitest-environment-miniflare": "2.14.4"
   },
   "engines": {
     "node": ">=18.17.0"

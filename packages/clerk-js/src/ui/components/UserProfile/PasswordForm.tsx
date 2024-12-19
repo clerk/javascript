@@ -1,4 +1,5 @@
-import { useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import type { UserResource } from '@clerk/types';
 import { useRef } from 'react';
 
 import { useEnvironment } from '../../contexts';
@@ -14,7 +15,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useConfirmPassword } from '../../hooks';
-import { useAssurance } from '../../hooks/useAssurance';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
@@ -37,7 +37,9 @@ type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
   const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const { handleAssurance } = useAssurance();
+  const [updatePasswordWithReverification] = useReverification(
+    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
+  );
 
   if (!user) {
     return null;
@@ -49,7 +51,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     : localizationKeys('userProfile.passwordPage.title__set');
   const card = useCardState();
 
-  const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
+  const passwordEditDisabled = user.enterpriseAccounts.some(ea => ea.active);
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -105,12 +107,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   const updatePassword = async () => {
-    const opts = {
-      newPassword: passwordField.value,
-      signOutOfOtherSessions: sessionsField.checked,
-      currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
-    } satisfies Parameters<typeof user.updatePassword>[0];
-
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled
@@ -119,7 +115,13 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
-      await handleAssurance(() => user.updatePassword(opts));
+      const opts = {
+        newPassword: passwordField.value,
+        signOutOfOtherSessions: sessionsField.checked,
+        currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
+      } satisfies Parameters<typeof user.updatePassword>[0];
+
+      await updatePasswordWithReverification(user, [opts]);
       onSuccess();
     } catch (e) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);

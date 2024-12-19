@@ -31,6 +31,7 @@ export {
   UserButton,
   UserProfile,
   GoogleOneTap,
+  Waitlist,
 } from './client-boundary/uiComponents';
 
 /**
@@ -48,6 +49,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  useReverification,
 } from './client-boundary/hooks';
 
 /**

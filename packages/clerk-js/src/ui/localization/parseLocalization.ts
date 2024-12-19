@@ -1,4 +1,4 @@
-import { fastDeepMergeAndReplace } from '@clerk/shared';
+import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type { DeepPartial, LocalizationResource } from '@clerk/types';
 import { dequal as deepEqual } from 'dequal';
 

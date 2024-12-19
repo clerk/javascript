@@ -9,4 +9,5 @@ export {
   useSessionList,
   useUser,
   useSession,
+  useReverification,
 } from '@clerk/shared/react';

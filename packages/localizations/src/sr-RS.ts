@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Nazad',
   badge__default: 'Podrazumevano',
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
@@ -325,6 +270,61 @@ export const srRS: LocalizationResource = {
   paginationButton__previous: 'Prethodni',
   paginationRowText__displaying: 'Prikazujem',
   paginationRowText__of: 'od',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Dodaj nalog',
@@ -450,14 +450,17 @@ export const srRS: LocalizationResource = {
     },
     start: {
       actionLink: 'Registruj se',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Koristi e-mail',
       actionLink__use_email_username: 'Koristi e-mail ili korisničko ime',
       actionLink__use_passkey: 'Koristi ključ za prolaz umesto toga',
       actionLink__use_phone: 'Koristi telefon',
       actionLink__use_username: 'Koristi korisničko ime',
       actionText: 'Nemaš nalog?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
       title: 'Prijavi se na {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',
@@ -502,12 +505,32 @@ export const srRS: LocalizationResource = {
         title: 'Uspešno verifikovan e-mail',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Unesi verifikacioni kod poslat na tvoj telefonski broj',
       formTitle: 'Verifikacioni kod',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
       subtitle: 'Unesi verifikacioni kod poslat na tvoj telefon',
       title: 'Verifikuj svoj telefon',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Prijavi se',
@@ -556,6 +579,7 @@ export const srRS: LocalizationResource = {
     not_allowed_access: 'Pristup nije dozvoljen.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Ključ za prolaz je već registrovan sa ovim uređajem.',
@@ -883,6 +907,20 @@ export const srRS: LocalizationResource = {
       successMessage: 'Novčanik je dodat na tvoj nalog.',
       title: 'Dodaj web3 novčanik',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

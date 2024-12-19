@@ -1,0 +1,8 @@
+---
+import type { WaitlistProps } from "@clerk/types";
+type Props = WaitlistProps
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="waitlist" />

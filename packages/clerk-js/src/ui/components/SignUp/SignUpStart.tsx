@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -20,7 +20,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { buildRequest, createPasswordError, handleError, useFormControl } from '../../utils';
+import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
@@ -39,7 +39,10 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const { navigateAfterSignUp, signInUrl, unsafeMetadata } = ctx;
+  const options = useOptions();
+  const isWithinSignInContext = !!React.useContext(SignInContext);
+  const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
+  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -49,7 +52,7 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
-    userSettings: { passwordSettings },
+    userSettings: { passwordSettings, usernameSettings },
   } = useEnvironment();
 
   const { mode } = userSettings.signUp;
@@ -75,13 +78,14 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
       transformer: value => value.trim(),
+      buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
       label: localizationKeys('formFieldLabel__phoneNumber'),
       placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     }),
-    __experimental_legalAccepted: useFormControl('__experimental_legalAccepted', '', {
+    legalAccepted: useFormControl('legalAccepted', '', {
       type: 'checkbox',
       label: '',
       defaultChecked: false,
@@ -103,6 +107,7 @@ function _SignUpStart(): JSX.Element {
   const hasTicket = !!formState.ticket.value;
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
+  const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
 
   const fields = determineActiveFields({
     attributes,
@@ -110,7 +115,7 @@ function _SignUpStart(): JSX.Element {
     hasEmail,
     activeCommIdentifierType,
     isProgressiveSignUp,
-    legalConsentRequired: userSettings.signUp.legal_consent_enabled,
+    legalConsentRequired: isLegalConsentEnabled,
   });
 
   const handleTokenFlow = () => {
@@ -136,7 +141,7 @@ function _SignUpStart(): JSX.Element {
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp });
+            return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
           },
           navigate,
         });
@@ -168,6 +173,11 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
+          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:
@@ -234,7 +244,7 @@ function _SignUpStart(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
           redirectUrl,
           redirectUrlComplete,
@@ -256,7 +266,7 @@ function _SignUpStart(): JSX.Element {
     (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
 
-  if (mode === SIGN_UP_MODES.RESTRICTED && !hasTicket) {
+  if (mode !== SIGN_UP_MODES.PUBLIC && !hasTicket) {
     return <SignUpRestrictedAccess />;
   }
 
@@ -280,7 +290,7 @@ function _SignUpStart(): JSX.Element {
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
                   continueSignUp={missingRequirementsWithTicket}
-                  legalAccepted={Boolean(formState.__experimental_legalAccepted.checked)}
+                  legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
                 />
               )}
               {shouldShowForm && (
@@ -293,11 +303,11 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
-            {!shouldShowForm && (
-              <Form.ControlRow elementId='__experimental_legalAccepted'>
+            {!shouldShowForm && isLegalConsentEnabled && (
+              <Form.ControlRow elementId='legalAccepted'>
                 <LegalCheckbox
-                  {...formState.__experimental_legalAccepted.props}
-                  isRequired={fields.__experimental_legalAccepted?.required}
+                  {...formState.legalAccepted.props}
+                  isRequired={fields.legalAccepted?.required}
                 />
               </Form.ControlRow>
             )}
@@ -310,7 +320,7 @@ function _SignUpStart(): JSX.Element {
             <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
             <Card.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
+              to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>
         </Card.Footer>

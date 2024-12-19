@@ -1,5 +1,289 @@
 # Change Log
 
+## 4.40.0
+
+### Minor Changes
+
+- Adds `oidcLoginHint` & `oidcPrompt` parameters to following types: ([#4789](https://github.com/clerk/javascript/pull/4789)) by [@octoper](https://github.com/octoper)
+
+  - `ReauthorizeExternalAccountParams`
+  - `OAuthConfig`
+  - `SignInCreateParams`
+  - `PrepareVerificationParams`
+  - `SignUpCreateParams`
+  - `CreateExternalAccountParams`
+
+## 4.39.4
+
+### Patch Changes
+
+- Added min and max length username settings to username field error. ([#4771](https://github.com/clerk/javascript/pull/4771)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename `toJSON()` resource methods to `__internal_toSnapshot()` to avoid issues with serializing functions. ([#4777](https://github.com/clerk/javascript/pull/4777)) by [@anagstef](https://github.com/anagstef)
+
+## 4.39.3
+
+### Patch Changes
+
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `claimedAt` proprty inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
+
+  This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
+
+  - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+
+## 4.39.2
+
+### Patch Changes
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.39.1
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.39.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.38.0
+
+### Minor Changes
+
+- Deprecate the following constants and functions: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OAUTH_PROVIDERS`
+  - `getOAuthProviderData()`
+  - `sortedOAuthProviders()`
+  - `WEB3_PROVIDERS`
+  - `getWeb3ProviderData()`
+
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.36.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.35.1
+
+### Patch Changes
+
+- Add support for the new `enterprise_sso` strategy. ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise Single Sign On regardless of the underlying protocol used to authenticate the user.
+  For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+  - Add a new user setting `enterpriseSSO`, this gets enabled when there is an active enterprise connection for an instance.
+  - Add support for signing in / signing up with the new `enterprise_sso` strategy.
+  - Deprecated `userSettings.saml` in favor of `enterprise_sso`.
+  - Deprecated `saml` sign in strategy in favor of `enterprise_sso`.
+
+## 4.35.0
+
+### Minor Changes
+
+- Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
+
+  Properties of Clerk class:
+
+  - `__experimental_openUserVerification` -> `__internal_openReverification`
+  - `__experimental_closeUserVerification` -> `__internal_closeReverification`
+  - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
+  - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
+
+  Properties of `Session`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+  - `__experimental_startVerification` -> `startVerification`
+  - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
+  - `__experimental_attemptFirstFactorVerification` -> `attemptFirstFactorVerification`
+  - `__experimental_prepareSecondFactorVerification` -> `prepareSecondFactorVerification`
+  - `__experimental_attemptSecondFactorVerification` -> `attemptSecondFactorVerification`
+
+  Renaming
+
+  - `__experimental_SessionVerificationResource` -> `SessionVerificationResource`
+  - `__experimental_SessionVerificationStatus` -> `SessionVerificationStatus`
+  - `__experimental_SessionVerificationLevel` -> `SessionVerificationLevel`
+  - `__experimental_ReverificationConfig` -> `ReverificationConfig`
+
+  `CheckAuthorizationParamsWithCustomPermissions` and `CheckAuthorizationParams` now include `reverification?: ReverificationConfig;`
+
+  Properties of `IntialState`:
+
+  - `__experimental_factorVerificationAge` -> `factorVerificationAge`
+
+  Localization types:
+  All properties of `__experimental_userVerification` are moved to `reverification`
+
+### Patch Changes
+
+- Rename userVerification to reverification to align with the feature name. ([#4634](https://github.com/clerk/javascript/pull/4634)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.34.2
+
+### Patch Changes
+
+- Add `__internal_claimAccountlessKeysUrl` to `ClerkOptions`. ([#4625](https://github.com/clerk/javascript/pull/4625)) by [@panteliselef](https://github.com/panteliselef)
+
+- Decouple captcha heartbeat from token refresh mechanism ([#4630](https://github.com/clerk/javascript/pull/4630)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.34.1
+
+### Patch Changes
+
+- Share hook return types ([#4583](https://github.com/clerk/javascript/pull/4583)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Inject captcha token into every X heartbeats ([#4614](https://github.com/clerk/javascript/pull/4614)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.34.0
+
+### Minor Changes
+
+- Update reverification config values to snake_case. ([#4556](https://github.com/clerk/javascript/pull/4556)) by [@panteliselef](https://github.com/panteliselef)
+
+  For `__experimental_ReverificationConfig`
+
+  - `strictMfa` changes to `strict_mfa`
+
+  For `__experimental_SessionVerificationLevel`
+
+  - `firstFactor` changes to `first_factor`
+  - - `secondFactor` changes to `second_factor`
+  - - `multiFactor` changes to `multi_factor`
+
+## 4.33.0
+
+### Minor Changes
+
+- Surface enterprise accounts in `UserProfile`, allowing to display more protocols besides SAML ([#4518](https://github.com/clerk/javascript/pull/4518)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce the `experimental.rethrowOfflineNetworkErrors` option to the `ClerkProvider` component. ([#4525](https://github.com/clerk/javascript/pull/4525)) by [@anagstef](https://github.com/anagstef)
+
+  When set to `true`, Clerk will rethrow network errors that occur while the user is offline.
+
+- Replace `veryStrict` with `strictMfa` configuration for reverification. ([#4545](https://github.com/clerk/javascript/pull/4545)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.32.0
+
+### Minor Changes
+
+- Replace `redirectUrl` with `afterJoinWaitlistUrl` in `<Waitlist />` component ([#4532](https://github.com/clerk/javascript/pull/4532)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.31.0
+
+### Minor Changes
+
+- Introduce experimental support for passkeys in Expo (iOS, Android, and Web). ([#4352](https://github.com/clerk/javascript/pull/4352)) by [@AlexNti](https://github.com/AlexNti)
+
+  To use passkeys in Expo projects, pass the `__experimental_passkeys` object, which can be imported from `@clerk/clerk-expo/passkeys`, to the `ClerkProvider` component:
+
+  ```tsx
+  import { ClerkProvider } from '@clerk/clerk-expo';
+  import { passkeys } from '@clerk/clerk-expo/passkeys';
+
+  <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
+  ```
+
+  The API for using passkeys in Expo projects is the same as the one used in web apps:
+
+  ```tsx
+  // passkey creation
+  const { user } = useUser();
+
+  const handleCreatePasskey = async () => {
+    if (!user) return;
+    try {
+      return await user.createPasskey();
+    } catch (e: any) {
+      // handle error
+    }
+  };
+
+  // passkey authentication
+  const { signIn, setActive } = useSignIn();
+
+  const handlePasskeySignIn = async () => {
+    try {
+      const signInResponse = await signIn.authenticateWithPasskey();
+      await setActive({ session: signInResponse.createdSessionId });
+    } catch (err: any) {
+      //handle error
+    }
+  };
+  ```
+
+- The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
+
+  Removed the `__experimental_` preffix.
+
+### Patch Changes
+
+- Fixes issues in `ClerkRouter` that were causing inaccurate pathnames within Elements flows. Also fixes a dependency issue where `@clerk/elements` was pulling in the wrong version of `@clerk/shared`. ([#4513](https://github.com/clerk/javascript/pull/4513)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add afterJoinWaitlistUrl to DisplayConfig resource ([#4524](https://github.com/clerk/javascript/pull/4524)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.30.0
+
+### Minor Changes
+
+- New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Allow users to request access with an email address via the new `<Waitlist />` component.
+  - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
+  - Appropriate the text in the Sign Up component when mode is `waitlist`.
+  - Added `joinWaitlist()` method in `Clerk` singleton.
+  - Added `redirectToWaitlist()` method in `Clerk` singleton to allow user to redirect to waitlist page.
+
+### Patch Changes
+
+- Expose internal `__internal_getOption` method from Clerk. ([#4456](https://github.com/clerk/javascript/pull/4456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.29.0
+
+### Minor Changes
+
+- - Introduce `redirectUrl` property on `setActive` as a replacement for `beforeEmit`. ([#4312](https://github.com/clerk/javascript/pull/4312)) by [@issuedat](https://github.com/issuedat)
+
+  - Deprecates `beforeEmit` property on `setActive`.
+
+### Patch Changes
+
+- Experimental: `asStandalone` now accepts a callback that notifies if the standalone popover needs to unmount. ([#4423](https://github.com/clerk/javascript/pull/4423)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Changed `__experimental_legalAccepted` checkbox Indicator element descriptor and element id ([#4427](https://github.com/clerk/javascript/pull/4427)) by [@octoper](https://github.com/octoper)
+
+  - Changed `__experimental_legalAccepted` checkbox Label element descriptor and element id
+  - Added two new element descriptors `formFieldCheckboxInput`, `formFieldCheckboxLabel`.
+
+## 4.28.0
+
+### Minor Changes
+
+- Adding experimental support for legal consent for `<SignUp/>` component ([#4337](https://github.com/clerk/javascript/pull/4337)) by [@octoper](https://github.com/octoper)
+
 ## 4.27.0
 
 ### Minor Changes
@@ -129,8 +413,8 @@
   ```ts
   has({
     __experimental_assurance: {
-      level: "L2.secondFactor",
-      maxAge: "A1.10min",
+      level: 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
   });
   ```
@@ -339,13 +623,24 @@
   ```jsx
   <UserButton>
     <UserButton.MenuItems>
-      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
-      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
-      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
-      custom page to have been set in `/help`)
-      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Link
+        label='Terms'
+        labelIcon={<Icon />}
+        href='/terms'
+      />
       <UserButton.Action
-        label="Chat Modal"
+        label='Help'
+        labelIcon={<Icon />}
+        open='help'
+      />{' '}
+      // Navigate to `/help` page when UserProfile opens as a modal. (Requires a custom page to have been set in
+      `/help`)
+      <UserButton.Action
+        label='manageAccount'
+        labelIcon={<Icon />}
+      />
+      <UserButton.Action
+        label='Chat Modal'
         labelIcon={<Icon />}
         onClick={() => setModal(true)}
       />
@@ -453,7 +748,7 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
@@ -468,11 +763,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async (response) => {
+    callback: async response => {
       const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      if (signInOrUp.status === "complete") {
+      if (signInOrUp.status === 'complete') {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -510,8 +805,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=""
-    signUpForceRedirectUrl=""
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
   />
   ```
 
@@ -752,8 +1047,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1092,8 +1387,8 @@
   export {};
 
   interface ClerkAuthorization {
-    permission: "";
-    role: "admin" | "basic_member" | "guest_member";
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
   }
   ```
 
@@ -1362,15 +1657,19 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
-    <UserProfile.Page label="account" />
-    <UserProfile.Page label="security" />
+    <UserProfile.Link
+      label='External'
+      url='/home'
+      labelIcon={<Icon />}
+    />
+    <UserProfile.Page label='account' />
+    <UserProfile.Page label='security' />
   </UserProfile>
   ```
 
@@ -1383,19 +1682,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label="Custom Page"
-      url="custom"
+      label='Custom Page'
+      url='custom'
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label="External"
-      url="/home"
+      label='External'
+      url='/home'
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label="members" />
-    <OrganizationProfile.Page label="settings" />
+    <OrganizationProfile.Page label='members' />
+    <OrganizationProfile.Page label='settings' />
   </OrganizationProfile>
   ```
 

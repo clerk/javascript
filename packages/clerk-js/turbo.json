@@ -2,16 +2,14 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "env": ["BUILD_ENABLE_NEW_COMPONENTS"],
       "inputs": [
         "*.d.ts",
-        "bundlewatch.config.json",
         "headless/**",
         "src/**",
         "tsconfig.json",
-        "tsconfig.build.json",
         "tsconfig.declarations.json",
-        "tsup.config.ts",
-        "webpack.config.js",
+        "rspack.config.js",
 
         "!**/*.test.*",
         "!**/test/**",
@@ -24,10 +22,14 @@
         "!node_modules/**"
       ]
     },
+    "build:sandbox": {
+      "dependsOn": ["^build"],
+      "inputs": ["sandbox/**"],
+      "outputs": ["dist/**"]
+    },
     "test": {
       "inputs": [
         "*.d.ts",
-        "bundlewatch.config.json",
         "jest.*",
         "src/**",
         "svgTransform.js",

@@ -1,10 +1,12 @@
-import { OAUTH_PROVIDERS, type OAuthProvider, WEB3_PROVIDERS, type Web3Provider } from '@clerk/types';
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
+import { WEB3_PROVIDERS } from '@clerk/shared/web3';
+import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
 export const DESCRIPTORS = [
   // Alert
   'alert',
-  'alert__error',
-  'alert__warning',
+  'alertError',
+  'alertWarning',
   'alertIcon',
 
   // Button
@@ -28,6 +30,32 @@ export const DESCRIPTORS = [
   // Connection
   'connectionList',
   'connectionListItem',
+
+  // Field
+  'fieldRoot',
+  'fieldLabel',
+  'fieldLabelEnd',
+  'fieldHint',
+  'fieldCheckbox',
+  'fieldInputGroup',
+  'fieldInputGroupEnd',
+  'fieldInput',
+  'fieldInputDefault',
+  'fieldInputOtp',
+  'fieldInputIdle',
+  'fieldInputInfo',
+  'fieldInputError',
+  'fieldInputSuccess',
+  'fieldInputWarning',
+  'fieldMessageStart',
+  'fieldMessageCenter',
+  'fieldMessageEnd',
+  'fieldMessage',
+  'fieldMessageIdle',
+  'fieldMessageInfo',
+  'fieldMessageError',
+  'fieldMessageSuccess',
+  'fieldMessageWarning',
 
   // Separator
   'separator',

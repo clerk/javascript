@@ -1,8 +1,6 @@
 import { defineConfig } from 'tsup';
 
-// @ts-expect-error for `import module with '.json' extension`
 import { version as clerkJsVersion } from '../clerk-js/package.json';
-// @ts-expect-error for `import module with '.json' extension`
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
@@ -16,7 +14,7 @@ export default defineConfig(overrideOptions => {
       errors: 'src/errors.ts',
     },
     dts: true,
-    onSuccess: shouldPublish ? 'npm run publish:local' : undefined,
+    onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,
     format: ['cjs', 'esm'],
     bundle: true,
     clean: true,

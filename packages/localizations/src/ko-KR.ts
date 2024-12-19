@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: '돌아가기',
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
@@ -323,6 +268,61 @@ export const koKR: LocalizationResource = {
   paginationButton__previous: '이전',
   paginationRowText__displaying: '표시중',
   paginationRowText__of: '의',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -446,14 +446,17 @@ export const koKR: LocalizationResource = {
     },
     start: {
       actionLink: '회원가입',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: '이메일 사용하기',
       actionLink__use_email_username: '이메일 또는 사용자 이름 사용하기',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: '휴대폰 번호 사용하기',
       actionLink__use_username: '사용자 이름 사용하기',
       actionText: '계정이 없으신가요?',
+      actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       title: '{{applicationName}}에 로그인',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '인증 코드',
@@ -498,12 +501,32 @@ export const koKR: LocalizationResource = {
         title: '이메일 인증 성공',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: '휴대폰 번호로 전송된 인증 코드를 입력하세요.',
       formTitle: '인증 코드',
       resendButton: '코드 재전송',
       subtitle: '휴대폰으로 전송된 인증 코드를 입력하세요',
       title: '휴대폰 번호 인증',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: '로그인하기',
@@ -550,6 +573,7 @@ export const koKR: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -870,6 +894,20 @@ export const koKR: LocalizationResource = {
       successMessage: '지갑이 계정에 추가되었습니다ß.',
       title: 'web3 지갑 추가',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

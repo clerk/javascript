@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Vissza',
   badge__default: 'Alapértelmezett',
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
@@ -326,6 +271,61 @@ export const huHU: LocalizationResource = {
   paginationButton__previous: 'Előző',
   paginationRowText__displaying: 'Mutat',
   paginationRowText__of: '-ból/-ből',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Fiók hozzáadása',
@@ -451,14 +451,17 @@ export const huHU: LocalizationResource = {
     },
     start: {
       actionLink: 'Regisztráció',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Email használata',
       actionLink__use_email_username: 'Használd az emailded vagy a felhasználóneved',
       actionLink__use_passkey: 'Passkey használata',
       actionLink__use_phone: 'Telefon használata',
       actionLink__use_username: 'Felhasználónév használata',
       actionText: 'Nincs fiókod?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Visszaigazoló kód',
@@ -503,12 +506,32 @@ export const huHU: LocalizationResource = {
         title: 'Sikeresen megerősítetted az email címed',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Írd be a visszaigazoló kódot, amit a telefondra kaptál',
       formTitle: 'Visszaigazoló kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be a visszaigazoló kódot, amit a telefonodra kaptál',
       title: 'Erősítsd meg a telefonszámod',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Bejelentkezés',
@@ -557,6 +580,7 @@ export const huHU: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Egy passkey már regisztrálva van ehhez az eszközhöz.',
@@ -887,6 +911,20 @@ export const huHU: LocalizationResource = {
       successMessage: 'A tárca sikeresen hozzáadva a fiókodhoz.',
       title: 'Web3 tárca hozzáadása',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

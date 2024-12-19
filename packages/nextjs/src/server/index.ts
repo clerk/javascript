@@ -63,3 +63,8 @@ export type {
   Token,
   User,
 } from '@clerk/backend';
+
+/**
+ * Utilities for reverification
+ */
+export { reverificationErrorResponse, reverificationError } from '@clerk/backend/internal';

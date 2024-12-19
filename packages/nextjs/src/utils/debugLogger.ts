@@ -99,7 +99,7 @@ function debugLogHeader(name: string) {
 }
 
 function debugLogFooter(name: string) {
-  return `[clerk debug end: ${name}] (@clerk/nextjs=${PACKAGE_VERSION},next=${nextPkg.version})`;
+  return `[clerk debug end: ${name}] (@clerk/nextjs=${PACKAGE_VERSION},next=${nextPkg.version},timestamp=${Math.round(new Date().getTime() / 1_000)})`;
 }
 
 // ref: https://stackoverflow.com/questions/57769465/javascript-truncate-text-by-bytes-length

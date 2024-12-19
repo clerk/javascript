@@ -20,7 +20,7 @@ jest.mock('../auth/devBrowser', () => ({
   }),
 }));
 
-Client.getInstance = jest.fn().mockImplementation(() => {
+Client.getOrCreateInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
 });
 Environment.getInstance = jest.fn().mockImplementation(() => {
@@ -36,6 +36,7 @@ const mockDisplayConfigWithSameOrigin = {
   homeUrl: 'http://test.host/home',
   createOrganizationUrl: 'http://test.host/create-organization',
   organizationProfileUrl: 'http://test.host/organization-profile',
+  waitlistUrl: 'http://test.host/waitlist',
 } as DisplayConfig;
 
 const mockDisplayConfigWithDifferentOrigin = {
@@ -45,6 +46,7 @@ const mockDisplayConfigWithDifferentOrigin = {
   homeUrl: 'http://another-test.host/home',
   createOrganizationUrl: 'http://another-test.host/create-organization',
   organizationProfileUrl: 'http://another-test.host/organization-profile',
+  waitlistUrl: 'http://another-test.host/waitlist',
 } as DisplayConfig;
 
 const mockUserSettings = {
@@ -96,7 +98,7 @@ describe('Clerk singleton - Redirects', () => {
 
   afterEach(() => mockNavigate.mockReset());
 
-  describe('.redirectTo(SignUp|SignIn|UserProfile|AfterSignIn|AfterSignUp|CreateOrganization|OrganizationProfile)', () => {
+  describe('.redirectTo(SignUp|SignIn|UserProfile|AfterSignIn|AfterSignUp|CreateOrganization|OrganizationProfile|Waitlist)', () => {
     let clerkForProductionInstance: Clerk;
     let clerkForDevelopmentInstance: Clerk;
 
@@ -188,6 +190,13 @@ describe('Clerk singleton - Redirects', () => {
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/organization-profile');
         expect(mockNavigate.mock.calls[1][0]).toBe('/organization-profile');
+      });
+
+      it('redirects to waitlitUrl', async () => {
+        await clerkForDevelopmentInstance.redirectToWaitlist();
+        expect(mockNavigate).toHaveBeenCalledWith('/waitlist', {
+          windowNavigate: expect.any(Function),
+        });
       });
     });
 

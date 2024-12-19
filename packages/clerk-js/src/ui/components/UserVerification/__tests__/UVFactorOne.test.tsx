@@ -20,15 +20,15 @@ describe('UserVerificationFactorOne', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_first_factor',
       supportedFirstFactors: [{ strategy: 'password' }],
     });
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Enter your password');
-      getByText('Enter the password associated with your account');
+      getByText('Verification required');
+      getByText('Enter your password to continue');
       getByLabelText(/^password/i);
     });
   });
@@ -38,19 +38,19 @@ describe('UserVerificationFactorOne', () => {
       f.withUser({ username: 'clerkuser' });
       f.withPreferredSignInStrategy({ strategy: 'otp' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_first_factor',
       supportedFirstFactors: [{ strategy: 'password' }, { strategy: 'email_code' }],
     });
-    fixtures.session?.__experimental_prepareFirstFactorVerification.mockResolvedValue({});
+    fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Check your email');
+      getByText('Verification required');
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.__experimental_prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
   });
 
   it('renders the component for with strategy:phone_code', async () => {
@@ -58,19 +58,19 @@ describe('UserVerificationFactorOne', () => {
       f.withUser({ username: 'clerkuser' });
       f.withPreferredSignInStrategy({ strategy: 'otp' });
     });
-    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_first_factor',
       supportedFirstFactors: [{ strategy: 'password' }, { strategy: 'phone_code' }],
     });
-    fixtures.session?.__experimental_prepareFirstFactorVerification.mockResolvedValue({});
+    fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
     const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
     await waitFor(() => {
-      getByText('Check your phone');
+      getByText('Verification required');
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.__experimental_prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
   });
 
   describe('Submitting', () => {
@@ -78,26 +78,26 @@ describe('UserVerificationFactorOne', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      fixtures.session?.__experimental_startVerification.mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_first_factor',
         supportedFirstFactors: [{ strategy: 'password' }],
       });
-      fixtures.session?.__experimental_attemptFirstFactorVerification.mockResolvedValue({
+      fixtures.session?.attemptFirstFactorVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedFirstFactors: [{ strategy: 'password' }],
       });
-      fixtures.session?.__experimental_prepareSecondFactorVerification.mockResolvedValue({
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedFirstFactors: [{ strategy: 'password' }],
       });
 
       const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
-      await waitFor(() => getByText('Enter your password'));
+      await waitFor(() => getByText('Verification required'));
       await userEvent.type(getByLabelText(/^password/i), 'testtest');
       await userEvent.click(getByText('Continue'));
 
-      expect(fixtures.session?.__experimental_attemptFirstFactorVerification).toHaveBeenCalledWith({
+      expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenCalledWith({
         strategy: 'password',
         password: 'testtest',
       });
@@ -109,11 +109,11 @@ describe('UserVerificationFactorOne', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      fixtures.session?.__experimental_startVerification.mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_first_factor',
         supportedFirstFactors: [{ strategy: 'password' }],
       });
-      fixtures.session?.__experimental_attemptFirstFactorVerification.mockResolvedValue({
+      fixtures.session?.attemptFirstFactorVerification.mockResolvedValue({
         status: 'complete',
         session: {
           id: '123',
@@ -123,14 +123,14 @@ describe('UserVerificationFactorOne', () => {
 
       const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
 
-      await waitFor(() => getByText('Enter your password'));
+      await waitFor(() => getByText('Verification required'));
       await userEvent.type(getByLabelText(/^password/i), 'testtest');
       await userEvent.click(screen.getByText('Continue'));
 
       await waitFor(() => {
         expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
-      expect(fixtures.session?.__experimental_attemptFirstFactorVerification).toHaveBeenCalledTimes(1);
+      expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenCalledTimes(1);
     });
   });
 

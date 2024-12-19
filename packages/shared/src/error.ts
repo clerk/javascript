@@ -94,6 +94,21 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   };
 }
 
+export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
+  return {
+    code: error?.code || '',
+    message: error?.message || '',
+    long_message: error?.longMessage,
+    meta: {
+      param_name: error?.meta?.paramName,
+      session_id: error?.meta?.sessionId,
+      email_addresses: error?.meta?.emailAddresses,
+      identifiers: error?.meta?.identifiers,
+      zxcvbn: error?.meta?.zxcvbn,
+    },
+  };
+}
+
 export class ClerkAPIResponseError extends Error {
   clerkError: true;
 
@@ -155,13 +170,18 @@ export class ClerkRuntimeError extends Error {
   code: string;
 
   constructor(message: string, { code }: { code: string }) {
-    super(message);
+    const prefix = '🔒 Clerk:';
+    const regex = new RegExp(prefix.replace(' ', '\\s*'), 'i');
+    const sanitized = message.replace(regex, '');
+    const _message = `${prefix} ${sanitized.trim()}\n\n(code="${code}")\n`;
+    super(_message);
 
     Object.setPrototypeOf(this, ClerkRuntimeError.prototype);
 
     this.code = code;
-    this.message = message;
+    this.message = _message;
     this.clerkRuntimeError = true;
+    this.name = 'ClerkRuntimeError';
   }
 
   /**
@@ -293,4 +313,30 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(message));
     },
   };
+}
+
+type ClerkWebAuthnErrorCode =
+  // Generic
+  | 'passkey_not_supported'
+  | 'passkey_pa_not_supported'
+  | 'passkey_invalid_rpID_or_domain'
+  | 'passkey_already_exists'
+  | 'passkey_operation_aborted'
+  // Retrieval
+  | 'passkey_retrieval_cancelled'
+  | 'passkey_retrieval_failed'
+  // Registration
+  | 'passkey_registration_cancelled'
+  | 'passkey_registration_failed';
+
+export class ClerkWebAuthnError extends ClerkRuntimeError {
+  /**
+   * A unique code identifying the error, can be used for localization.
+   */
+  code: ClerkWebAuthnErrorCode;
+
+  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
+    super(message, { code });
+    this.code = code;
+  }
 }

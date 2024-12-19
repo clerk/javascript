@@ -49,7 +49,7 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Build release
-        run: npx turbo build $TURBO_ARGS --force
+        run: pnpm turbo build $TURBO_ARGS --force
 
       - name: Create Release PR
         id: changesets
@@ -57,9 +57,9 @@ jobs:
         with:
           commit: 'ci(repo): Version packages'
           title: 'ci(repo): Version packages'
-          publish: npm run release
+          publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
-          version: npm run version
+          version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -126,7 +126,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [20] # NOTE: 18 is cached in the main release workflow
+        version: [22] # NOTE: 18 is cached in the main release workflow
 
     steps:
       - name: Checkout Repo

@@ -1,5 +1,23 @@
 # @clerk/upgrade
 
+## 1.2.3
+
+### Patch Changes
+
+- Updates broken Clerk documentation references by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 1.2.0
+
+### Minor Changes
+
+- Enhancing error handling throughout the SDK upgrade flow ([#4410](https://github.com/clerk/javascript/pull/4410)) by [@jacekradko](https://github.com/jacekradko)
+
+## 1.1.2
+
+### Patch Changes
+
+- Updating the CLI output to match the DX of core-1 to core-2 migration ([#4393](https://github.com/clerk/javascript/pull/4393)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 1.1.1
 
 ### Patch Changes
@@ -21,7 +39,7 @@
   Previously the `auth()` method from `@clerk/nextjs/server` was synchronous.
 
   ```typescript
-  import { auth } from "@clerk/nextjs/server";
+  import { auth } from '@clerk/nextjs/server';
 
   export function GET() {
     const { userId } = auth();

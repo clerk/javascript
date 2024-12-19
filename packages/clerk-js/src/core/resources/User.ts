@@ -8,6 +8,7 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
+  EnterpriseAccountResource,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetOrganizationMemberships,
@@ -25,6 +26,7 @@ import type {
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
+  UserJSONSnapshot,
   UserResource,
   VerifyTOTPParams,
   Web3WalletResource,
@@ -38,6 +40,7 @@ import {
   BaseResource,
   DeletedObject,
   EmailAddress,
+  EnterpriseAccount,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -61,6 +64,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  enterpriseAccounts: EnterpriseAccountResource[] = [];
   passkeys: PasskeyResource[] = [];
 
   samlAccounts: SamlAccountResource[] = [];
@@ -97,7 +101,7 @@ export class User extends BaseResource implements UserResource {
     return !!resource && resource instanceof User;
   }
 
-  constructor(data: UserJSON) {
+  constructor(data: UserJSON | UserJSONSnapshot | null) {
     super();
     this.fromJSON(data);
   }
@@ -302,7 +306,7 @@ export class User extends BaseResource implements UserResource {
     return this.phoneNumbers.filter(phone => phone.verification.status === 'verified').length > 0;
   }
 
-  protected fromJSON(data: UserJSON | null): this {
+  protected fromJSON(data: UserJSON | UserJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -346,6 +350,10 @@ export class User extends BaseResource implements UserResource {
 
     this.samlAccounts = (data.saml_accounts || []).map(sa => new SamlAccount(sa, this.path() + '/saml_accounts'));
 
+    this.enterpriseAccounts = (data.enterprise_accounts || []).map(
+      ea => new EnterpriseAccount(ea, this.path() + '/enterprise_accounts'),
+    );
+
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;
 
@@ -365,8 +373,46 @@ export class User extends BaseResource implements UserResource {
       this.legalAcceptedAt = unixEpochToDate(data.legal_accepted_at);
     }
 
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = unixEpochToDate(data.updated_at || undefined);
+    this.createdAt = unixEpochToDate(data.created_at || undefined);
     return this;
+  }
+
+  public __internal_toSnapshot(): UserJSONSnapshot {
+    return {
+      object: 'user',
+      id: this.id,
+      external_id: this.externalId,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      username: this.username,
+      public_metadata: this.publicMetadata,
+      unsafe_metadata: this.unsafeMetadata,
+      image_url: this.imageUrl,
+      has_image: this.hasImage,
+      email_addresses: this.emailAddresses.map(ea => ea.__internal_toSnapshot()),
+      phone_numbers: this.phoneNumbers.map(ph => ph.__internal_toSnapshot()),
+      web3_wallets: this.web3Wallets.map(ph => ph.__internal_toSnapshot()),
+      external_accounts: this.externalAccounts.map(ea => ea.__internal_toSnapshot()),
+      passkeys: this.passkeys.map(passkey => passkey.__internal_toSnapshot()),
+      organization_memberships: this.organizationMemberships.map(om => om.__internal_toSnapshot()),
+      saml_accounts: this.samlAccounts.map(sa => sa.__internal_toSnapshot()),
+      enterprise_accounts: this.enterpriseAccounts.map(ea => ea.__internal_toSnapshot()),
+      totp_enabled: this.totpEnabled,
+      backup_code_enabled: this.backupCodeEnabled,
+      two_factor_enabled: this.twoFactorEnabled,
+      create_organization_enabled: this.createOrganizationEnabled,
+      create_organizations_limit: this.createOrganizationsLimit,
+      delete_self_enabled: this.deleteSelfEnabled,
+      primary_email_address_id: this.primaryEmailAddressId,
+      primary_phone_number_id: this.primaryPhoneNumberId,
+      primary_web3_wallet_id: this.primaryWeb3WalletId,
+      password_enabled: this.passwordEnabled,
+      profile_image_id: this.imageUrl,
+      last_sign_in_at: this.lastSignInAt?.getTime() || null,
+      legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
+      updated_at: this.updatedAt?.getTime() || null,
+      created_at: this.createdAt?.getTime() || null,
+    };
   }
 }

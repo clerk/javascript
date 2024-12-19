@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: 'השג עזרה',
-      actionText: 'אין לך אף אחד מאלה?',
-      blockButton__backupCode: 'השתמש בקוד גיבוי',
-      blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
-      blockButton__password: 'המשך עם הסיסמה שלך',
-      blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
-      blockButton__totp: 'השתמש באפליקציית האימות שלך',
-      getHelp: {
-        blockButton__emailSupport: 'תמיכה באימייל',
-        content: 'אם יש לך בעיה באימות חשבונך, שלח לנו אימייל ואנחנו ניצור איתך קשר על מנת לשחזר את הגישה בהקדם האפשרי',
-        title: 'השג עזרה',
-      },
-      subtitle: 'נתקלת בבעיות? אתה יכול להשתמש בכל אחת מהשיטות הללו עבור אימות',
-      title: 'השתמש בשיטה אחרת',
-    },
-    backupCodeMfa: {
-      subtitle: 'קוד הגיבוי שלך הוא הקוד שקיבלת כאשר הגדרת את האימות הדו-שלבי',
-      title: 'הכנס את קוד הגיבוי',
-    },
-    emailCode: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'המשך ל {{applicationName}}',
-      title: 'בדוק את האימייל שלך',
-    },
-    noAvailableMethods: {
-      message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
-      subtitle: 'קרתה תקלה',
-      title: 'לא ניתן לאמת את חשבונך',
-    },
-    password: {
-      actionLink: 'השתמש בשיטה אחרת',
-      subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
-      title: 'הכנס סיסמה',
-    },
-    phoneCode: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'להמשך ל {{applicationName}}',
-      title: 'בדוק את הטלפון שלך',
-    },
-    phoneCodeMfa: {
-      formTitle: 'קוד אימות',
-      resendButton: 'לא קיבלת קוד? שלח שוב',
-      subtitle: 'להמשך, אנא הכנס את קוד האימות שנשלח לטלפון שלך',
-      title: 'בדוק את הטלפון שלך',
-    },
-    totpMfa: {
-      formTitle: 'קוד אימות',
-      subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
-      title: 'אימות דו-שלבי',
-    },
-  },
   backButton: 'חזור',
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
@@ -321,6 +266,61 @@ export const heIL: LocalizationResource = {
   paginationButton__previous: 'הקודם',
   paginationRowText__displaying: 'מציג',
   paginationRowText__of: 'מתוך',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'השג עזרה',
+      actionText: 'אין לך אף אחד מאלה?',
+      blockButton__backupCode: 'השתמש בקוד גיבוי',
+      blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
+      blockButton__password: 'המשך עם הסיסמה שלך',
+      blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
+      blockButton__totp: 'השתמש באפליקציית האימות שלך',
+      getHelp: {
+        blockButton__emailSupport: 'תמיכה באימייל',
+        content: 'אם יש לך בעיה באימות חשבונך, שלח לנו אימייל ואנחנו ניצור איתך קשר על מנת לשחזר את הגישה בהקדם האפשרי',
+        title: 'השג עזרה',
+      },
+      subtitle: 'נתקלת בבעיות? אתה יכול להשתמש בכל אחת מהשיטות הללו עבור אימות',
+      title: 'השתמש בשיטה אחרת',
+    },
+    backupCodeMfa: {
+      subtitle: 'קוד הגיבוי שלך הוא הקוד שקיבלת כאשר הגדרת את האימות הדו-שלבי',
+      title: 'הכנס את קוד הגיבוי',
+    },
+    emailCode: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'המשך ל {{applicationName}}',
+      title: 'בדוק את האימייל שלך',
+    },
+    noAvailableMethods: {
+      message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
+      subtitle: 'קרתה תקלה',
+      title: 'לא ניתן לאמת את חשבונך',
+    },
+    password: {
+      actionLink: 'השתמש בשיטה אחרת',
+      subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
+      title: 'הכנס סיסמה',
+    },
+    phoneCode: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשך ל {{applicationName}}',
+      title: 'בדוק את הטלפון שלך',
+    },
+    phoneCodeMfa: {
+      formTitle: 'קוד אימות',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשך, אנא הכנס את קוד האימות שנשלח לטלפון שלך',
+      title: 'בדוק את הטלפון שלך',
+    },
+    totpMfa: {
+      formTitle: 'קוד אימות',
+      subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
+      title: 'אימות דו-שלבי',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'הוסף חשבון',
@@ -444,14 +444,17 @@ export const heIL: LocalizationResource = {
     },
     start: {
       actionLink: 'הרשמה',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'השתמש בדוא"ל',
       actionLink__use_email_username: 'השתמש בדוא"ל או שם משתמש',
       actionLink__use_passkey: 'השתמש במפתח סיסמה במקום',
       actionLink__use_phone: 'השתמש בטלפון',
       actionLink__use_username: 'השתמש בשם משתמש',
       actionText: 'אין לך חשבון?',
+      actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'התחבר',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'קוד אימות',
@@ -496,12 +499,32 @@ export const heIL: LocalizationResource = {
         title: 'אימות דוא"ל הצליח',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'הכנס את קוד האימות שנשלח למספר הטלפון שלך',
       formTitle: 'קוד אימות',
       resendButton: 'שלח קוד שוב',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'אמת את מספר הטלפון שלך',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'התחבר',
@@ -547,6 +570,7 @@ export const heIL: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: 'הדומיין של ספק האימייל הזה חסום. אנא נסה אחד שונה.',
     organization_domain_common: 'הדומיין של ספק האימייל הזה נפוץ. אנא נסה אחד שונה.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'הגעת למגבלת החברות בארגון, כולל הזמנות יוצאות דופן.',
     organization_minimum_permissions_needed: 'חייב להיות חבר ארגון אחד לפחות עם ההרשאות המינימליות הנדרשות.',
     passkey_already_exists: 'מפתח הסיסמה כבר רשום במכשיר זה.',
@@ -864,6 +888,20 @@ export const heIL: LocalizationResource = {
       successMessage: 'הארנק התווסף לחשבון שלך.',
       title: 'הוסף ארנק web3',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

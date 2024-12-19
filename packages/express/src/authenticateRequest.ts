@@ -1,8 +1,8 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
+import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
 import type { IncomingMessage } from 'http';
 
@@ -97,7 +97,7 @@ const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): strin
   return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
 };
 
-export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}) => {
+export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const clerkClient = options.clerkClient || defaultClerkClient;
   const enableHandshake = options.enableHandshake ?? true;
 

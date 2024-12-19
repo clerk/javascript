@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -25,8 +25,10 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
+import { getSignUpAttributeFromIdentifier } from './utils';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -64,8 +66,10 @@ export function _SignInStart(): JSX.Element {
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
+  const options = useOptions();
   const ctx = useSignInContext();
-  const { navigateAfterSignIn, signUpUrl } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
+  const isCombinedFlow = !!options?.experimental?.combinedFlow;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -186,7 +190,7 @@ export function _SignInStart(): JSX.Element {
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
-              beforeEmit: navigateAfterSignIn,
+              redirectUrl: afterSignInUrl,
             });
           default: {
             console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -221,6 +225,12 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.USER_LOCKED:
           case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
           case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
+          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
+          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:
@@ -240,31 +250,34 @@ export function _SignInStart(): JSX.Element {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
 
     /**
-     * FAPI will return an error when password is submitted but the user's email matches requires SAML authentication.
+     * FAPI will return an error when password is submitted but the user's email matches requires enterprise sso authentication.
      * We need to strip password from the create request, and reconstruct it later.
      */
-    if (!hasPassword || userSettings.saml.enabled) {
+    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
       fields = fields.filter(f => f.name !== 'password');
     }
     return {
       ...buildRequest(fields),
-      ...(hasPassword && !userSettings.saml.enabled && { strategy: 'password' }),
+      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' }),
     } as SignInCreateParams;
   };
 
-  const safePasswordSignInForSamlInstance = (
+  const safePasswordSignInForEnterpriseSSOInstance = (
     signInCreatePromise: Promise<SignInResource>,
     fields: Array<FormControlState<string>>,
   ) => {
     return signInCreatePromise.then(signInResource => {
-      if (!userSettings.saml.enabled) {
+      if (!userSettings.enterpriseSSO.enabled) {
         return signInResource;
       }
       /**
-       * For SAML enabled instances, perform sign in with password only when it is allowed for the identified user.
+       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
+      if (
+        !passwordField ||
+        signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')
+      ) {
         return signInResource;
       }
       return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
@@ -273,23 +286,27 @@ export function _SignInStart(): JSX.Element {
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     try {
-      const res = await safePasswordSignInForSamlInstance(signIn.create(buildSignInParams(fields)), fields);
+      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
       switch (res.status) {
         case 'needs_identifier':
-          // Check if we need to initiate a saml flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
-            await authenticateWithSaml();
+          // Check if we need to initiate an enterprise sso flow
+          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')) {
+            await authenticateWithEnterpriseSSO();
           }
           break;
         case 'needs_first_factor':
+          if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+            await authenticateWithEnterpriseSSO();
+            break;
+          }
           return navigate('factor-one');
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,
-            beforeEmit: navigateAfterSignIn,
+            redirectUrl: afterSignInUrl,
           });
         default: {
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -301,12 +318,12 @@ export function _SignInStart(): JSX.Element {
     }
   };
 
-  const authenticateWithSaml = async () => {
+  const authenticateWithEnterpriseSSO = async () => {
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({
-      strategy: 'saml',
+      strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
     });
@@ -320,15 +337,57 @@ export function _SignInStart(): JSX.Element {
       (e: ClerkAPIError) =>
         e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
     );
+
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
+    );
+    const accountDoesNotExistError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) =>
+        e.code === ERROR_CODES.INVITATION_ACCOUNT_NOT_EXISTS || e.code === ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND,
     );
 
     if (instantPasswordError) {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({ session: sid, beforeEmit: navigateAfterSignIn });
+      await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
+    } else if (isCombinedFlow && accountDoesNotExistError) {
+      const attribute = getSignUpAttributeFromIdentifier(identifierField);
+
+      if (userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
+        const waitlistUrl = clerk.buildWaitlistUrl(
+          attribute === 'emailAddress'
+            ? {
+                initialValues: {
+                  [attribute]: identifierField.value,
+                },
+              }
+            : {},
+        );
+        return navigate(waitlistUrl);
+      }
+
+      clerk.client.signUp[attribute] = identifierField.value;
+      const paramsToForward = new URLSearchParams();
+      if (organizationTicket) {
+        paramsToForward.set('__clerk_ticket', organizationTicket);
+      }
+
+      const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+      const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
+      return handleCombinedFlowTransfer({
+        afterSignUpUrl: ctx.afterSignUpUrl || '/',
+        clerk,
+        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
+        identifierAttribute: attribute,
+        identifierValue: identifierField.value,
+        navigate,
+        organizationTicket,
+        signUpMode: userSettings.signUp.mode,
+        redirectUrl,
+        redirectUrlComplete,
+      });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
@@ -361,8 +420,14 @@ export function _SignInStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+            {isCombinedFlow ? (
+              <Header.Title localizationKey={localizationKeys('signIn.start.__experimental_titleCombined')} />
+            ) : (
+              <>
+                <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+                <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+              </>
+            )}
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -411,12 +476,21 @@ export function _SignInStart(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
-          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && (
+          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
             <Card.Action elementId='signIn'>
               <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
               <Card.ActionLink
                 localizationKey={localizationKeys('signIn.start.actionLink')}
                 to={clerk.buildUrlWithAuth(signUpUrl)}
+              />
+            </Card.Action>
+          )}
+          {userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText__join_waitlist')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink__join_waitlist')}
+                to={clerk.buildUrlWithAuth(waitlistUrl)}
               />
             </Card.Action>
           )}
@@ -435,7 +509,10 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   useLayoutEffect(() => {
     const intervalId = setInterval(() => {
       if (ref?.current) {
-        const autofilled = window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart';
+        const autofilled =
+          window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart' ||
+          // https://github.com/facebook/react/issues/1159#issuecomment-1025423604
+          !!ref.current?.matches('*:-webkit-autofill');
         if (autofilled) {
           setAutofilled(autofilled);
           clearInterval(intervalId);

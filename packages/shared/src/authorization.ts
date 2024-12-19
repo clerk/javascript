@@ -1,22 +1,19 @@
 import type {
-  __experimental_ReverificationConfig,
-  __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationTypes,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  ReverificationConfig,
+  SessionVerificationLevel,
+  SessionVerificationTypes,
 } from '@clerk/types';
 
-type TypesToConfig = Record<
-  __experimental_SessionVerificationTypes,
-  Exclude<__experimental_ReverificationConfig, __experimental_SessionVerificationTypes>
->;
+type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
 type AuthorizationOptions = {
   userId: string | null | undefined;
   orgId: string | null | undefined;
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
-  __experimental_factorVerificationAge: [number, number] | null;
+  factorVerificationAge: [number, number] | null;
 };
 
 type CheckOrgAuthorization = (
@@ -26,33 +23,33 @@ type CheckOrgAuthorization = (
 
 type CheckStepUpAuthorization = (
   params: {
-    __experimental_reverification?: __experimental_ReverificationConfig;
+    reverification?: ReverificationConfig;
   },
-  { __experimental_factorVerificationAge }: AuthorizationOptions,
+  { factorVerificationAge }: AuthorizationOptions,
 ) => boolean | null;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
-  veryStrict: {
+  strict_mfa: {
     afterMinutes: 10,
-    level: 'multiFactor',
+    level: 'multi_factor',
   },
   strict: {
     afterMinutes: 10,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   moderate: {
     afterMinutes: 60,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
   lax: {
     afterMinutes: 1_440,
-    level: 'secondFactor',
+    level: 'second_factor',
   },
 };
 
-const ALLOWED_LEVELS = new Set<__experimental_SessionVerificationLevel>(['firstFactor', 'secondFactor', 'multiFactor']);
+const ALLOWED_LEVELS = new Set<SessionVerificationLevel>(['first_factor', 'second_factor', 'multi_factor']);
 
-const ALLOWED_TYPES = new Set<__experimental_SessionVerificationTypes>(['veryStrict', 'strict', 'moderate', 'lax']);
+const ALLOWED_TYPES = new Set<SessionVerificationTypes>(['strict_mfa', 'strict', 'moderate', 'lax']);
 
 // Helper functions
 const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
@@ -82,19 +79,23 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   return null;
 };
 
-const validateReverificationConfig = (config: __experimental_ReverificationConfig | undefined) => {
-  const convertConfigToObject = (config: __experimental_ReverificationConfig) => {
+const validateReverificationConfig = (config: ReverificationConfig | undefined | null) => {
+  if (!config) {
+    return false;
+  }
+
+  const convertConfigToObject = (config: ReverificationConfig) => {
     if (typeof config === 'string') {
       return TYPES_TO_OBJECTS[config];
     }
     return config;
   };
 
-  if (typeof config === 'string' && isValidVerificationType(config)) {
-    return convertConfigToObject.bind(null, config);
-  }
+  const isValidStringValue = typeof config === 'string' && isValidVerificationType(config);
+  const isValidObjectValue =
+    typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes);
 
-  if (typeof config === 'object' && isValidLevel(config.level) && isValidMaxAge(config.afterMinutes)) {
+  if (isValidStringValue || isValidObjectValue) {
     return convertConfigToObject.bind(null, config);
   }
 
@@ -107,18 +108,18 @@ const validateReverificationConfig = (config: __experimental_ReverificationConfi
  * Handles different verification levels (first factor, second factor, multi-factor).
  * @returns null, if requirements or verification data are missing.
  */
-const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experimental_factorVerificationAge }) => {
-  if (!params.__experimental_reverification || !__experimental_factorVerificationAge) {
+const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVerificationAge }) => {
+  if (!params.reverification || !factorVerificationAge) {
     return null;
   }
 
-  const isValidReverification = validateReverificationConfig(params.__experimental_reverification);
+  const isValidReverification = validateReverificationConfig(params.reverification);
   if (!isValidReverification) {
     return null;
   }
 
   const { level, afterMinutes } = isValidReverification();
-  const [factor1Age, factor2Age] = __experimental_factorVerificationAge;
+  const [factor1Age, factor2Age] = factorVerificationAge;
 
   // -1 indicates the factor group (1fa,2fa) is not enabled
   // -1 for 1fa is not a valid scenario, but we need to make sure we handle it properly
@@ -126,11 +127,11 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experime
   const isValidFactor2 = factor2Age !== -1 ? afterMinutes > factor2Age : null;
 
   switch (level) {
-    case 'firstFactor':
+    case 'first_factor':
       return isValidFactor1;
-    case 'secondFactor':
+    case 'second_factor':
       return factor2Age !== -1 ? isValidFactor2 : isValidFactor1;
-    case 'multiFactor':
+    case 'multi_factor':
       return factor2Age === -1 ? isValidFactor1 : isValidFactor1 && isValidFactor2;
   }
 };
@@ -141,7 +142,7 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { __experime
  * The returned function authorizes if both checks pass, or if at least one passes
  * when the other is indeterminate. Fails if userId is missing.
  */
-export const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
+const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
     if (!options.userId) {
       return false;
@@ -157,3 +158,5 @@ export const createCheckAuthorization = (options: AuthorizationOptions): CheckAu
     return [orgAuthorization, stepUpAuthorization].every(a => a === true);
   };
 };
+
+export { createCheckAuthorization, validateReverificationConfig };

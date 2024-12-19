@@ -1,8 +1,8 @@
 import { createClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
-import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
+import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from '../utils';
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';

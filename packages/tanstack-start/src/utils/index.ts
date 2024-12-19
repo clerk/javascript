@@ -1,4 +1,4 @@
-import { buildErrorThrower } from '@clerk/shared';
+import { buildErrorThrower } from '@clerk/shared/error';
 
 export const isClient = () => typeof window !== 'undefined';
 

@@ -1,12 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import type {
-  ActJWTClaim,
-  CheckAuthorizationWithCustomPermissions,
-  GetToken,
-  OrganizationCustomRoleKey,
-  SignOut,
-} from '@clerk/types';
-import { useCallback, useEffect, useState } from 'react';
+import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
+import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -14,63 +8,6 @@ import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
-
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
-
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: undefined;
-      orgId: undefined;
-      orgRole: undefined;
-      orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: string;
-      orgRole: OrganizationCustomRoleKey;
-      orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
 
 type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 
@@ -113,48 +50,89 @@ type UseAuth = (initialAuthState?: any) => UseAuthReturn;
 export const useAuth: UseAuth = (initialAuthState = {}) => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const authContext = useAuthContext();
+  const authContextFromHook = useAuthContext();
+  let authContext = authContextFromHook;
 
-  const [authState, setAuthState] = useState(() => {
-    // This indicates the authContext is not available, and so we fallback to the provided initialState
-    if (authContext.sessionId === undefined && authContext.userId === undefined) {
-      return initialAuthState ?? {};
-    }
-    return authContext;
-  });
+  if (authContext.sessionId === undefined && authContext.userId === undefined) {
+    authContext = initialAuthState != null ? initialAuthState : {};
+  }
 
-  useEffect(() => {
-    if (authContext.sessionId === undefined && authContext.userId === undefined) {
-      return;
-    }
-    setAuthState(authContext);
-  }, [authContext]);
-
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, __experimental_factorVerificationAge } =
-    authState;
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
-  const has = useCallback(
+  return useDerivedAuth({
+    sessionId,
+    userId,
+    actor,
+    orgId,
+    orgSlug,
+    orgRole,
+    getToken,
+    signOut,
+    orgPermissions,
+    factorVerificationAge,
+  });
+};
+
+/**
+ * A hook that derives and returns authentication state and utility functions based on the provided auth object.
+ *
+ * @param authObject - An object containing authentication-related properties and functions.
+ *
+ * @returns A derived authentication state with helper methods. If the authentication state is invalid, an error is thrown.
+ *
+ * @remarks
+ * This hook inspects session, user, and organization information to determine the current authentication state.
+ * It returns an object that includes various properties such as whether the state is loaded, if a user is signed in,
+ * session and user identifiers, organization roles, and a `has` function for authorization checks.
+ * Additionally, it provides `signOut` and `getToken` functions if applicable.
+ *
+ * Example usage:
+ * ```tsx
+ * const {
+ *   isLoaded,
+ *   isSignedIn,
+ *   userId,
+ *   orgId,
+ *   has,
+ *   signOut,
+ *   getToken
+ * } = useDerivedAuth(authObject);
+ * ```
+ */
+export function useDerivedAuth(authObject: any): UseAuthReturn {
+  const {
+    sessionId,
+    userId,
+    actor,
+    orgId,
+    orgSlug,
+    orgRole,
+    has,
+    signOut,
+    getToken,
+    orgPermissions,
+    factorVerificationAge,
+  } = authObject ?? {};
+
+  const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+      if (has) {
+        return has(params);
+      }
       return createCheckAuthorization({
         userId,
         orgId,
         orgRole,
         orgPermissions,
-        __experimental_factorVerificationAge,
+        factorVerificationAge,
       })(params);
     },
-    [userId, __experimental_factorVerificationAge, orgId, orgRole, orgPermissions],
+    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
   );
-
-  return useDerivedAuth({ sessionId, userId, actor, orgId, orgSlug, orgRole, getToken, signOut, has });
-};
-
-export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const { sessionId, userId, actor, orgId, orgSlug, orgRole, has, signOut, getToken } = authObject ?? {};
 
   if (sessionId === undefined && userId === undefined) {
     return {
@@ -198,7 +176,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      has,
+      has: derivedHas,
       signOut,
       getToken,
     };
@@ -214,7 +192,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has,
+      has: derivedHas,
       signOut,
       getToken,
     };

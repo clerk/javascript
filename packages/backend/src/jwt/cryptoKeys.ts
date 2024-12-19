@@ -1,6 +1,6 @@
 import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
 
-import runtime from '../runtime';
+import { runtime } from '../runtime';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#pkcs_8_import
 function pemToBuffer(secret: string): ArrayBuffer {

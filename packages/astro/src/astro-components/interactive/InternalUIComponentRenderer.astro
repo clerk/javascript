@@ -1,13 +1,22 @@
 ---
 interface Props {
-  [key: string]: unknown
-  id?: string
-  component: 'sign-in' | 'sign-up' | 'organization-list' | 'organization-profile' | 'organization-switcher' | 'user-button' | 'user-profile' | 'google-one-tap'
+  [key: string]: unknown;
+  id?: string;
+  component:
+    | 'sign-in'
+    | 'sign-up'
+    | 'organization-list'
+    | 'organization-profile'
+    | 'organization-switcher'
+    | 'user-button'
+    | 'user-profile'
+    | 'google-one-tap'
+    | 'waitlist';
 }
 
 import { generateSafeId } from '@clerk/astro/internal';
 
-const { component, id, ...props } = Astro.props
+const { component, id, ...props } = Astro.props;
 
 const safeId = id || generateSafeId();
 ---

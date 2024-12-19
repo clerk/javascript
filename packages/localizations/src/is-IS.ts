@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Til baka',
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
@@ -327,6 +272,61 @@ export const isIS: LocalizationResource = {
   paginationButton__previous: 'Fyrri',
   paginationRowText__displaying: 'Sýnir',
   paginationRowText__of: 'af',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Bæta við reikningi',
@@ -453,14 +453,17 @@ export const isIS: LocalizationResource = {
     },
     start: {
       actionLink: 'Skrá sig',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Nota netfang',
       actionLink__use_email_username: 'Nota netfang eða notendanafn',
       actionLink__use_passkey: 'Nota lykil í staðinn',
       actionLink__use_phone: 'Nota síma',
       actionLink__use_username: 'Nota notendanafn',
       actionText: 'Ertu ekki með reikning?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
       title: 'Skrá inn í {{applicationName}}',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Staðfestingarkóði',
@@ -506,12 +509,32 @@ export const isIS: LocalizationResource = {
         title: 'Tókst að staðfesta netfang',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       formTitle: 'Staðfestingarkóði',
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       title: 'Staðfesta símanúmer',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Skrá inn',
@@ -560,6 +583,7 @@ export const isIS: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'Lykill er þegar skráður með þessu tæki.',
@@ -890,6 +914,20 @@ export const isIS: LocalizationResource = {
       successMessage: 'Veskið hefur verið bætt við reikninginn þinn.',
       title: 'Bæta við web3 veski',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

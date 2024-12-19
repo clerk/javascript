@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
@@ -11,7 +11,6 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useAssurance } from '../../hooks/useAssurance';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 
@@ -20,7 +19,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
   const { onSuccess } = props;
   const { user } = useUser();
   const card = useCardState();
-  const { handleAssurance } = useAssurance();
+  const [createBackupCode] = useReverification(() => user?.createBackupCode());
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
   React.useEffect(() => {
@@ -28,8 +27,8 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
       return;
     }
 
-    void handleAssurance(user.createBackupCode)
-      .then((backupCode: BackupCodeResource) => setBackupCode(backupCode))
+    void createBackupCode()
+      .then(backupCode => setBackupCode(backupCode))
       .catch(err => handleError(err, [], card.setError));
   }, []);
 

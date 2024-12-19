@@ -1,7 +1,7 @@
 import { snakeToCamel } from '@clerk/shared/underscore';
 import type { SignUpResource } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
-import { fromPromise, setup } from 'xstate';
+import { fromPromise, not, or, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormDefaultValues, FormFields } from '~/internals/machines/form';
@@ -62,6 +62,21 @@ export const SignUpContinueMachine = setup({
       context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignUpResource>).output }),
     sendToLoading,
   },
+  guards: {
+    isStatusMissingRequirements: ({ context }) =>
+      context.parent.getSnapshot().context.clerk?.client?.signUp?.status === 'missing_requirements',
+    hasMetPreviousMissingRequirements: ({ context }) => {
+      const signUp = context.parent.getSnapshot().context.clerk.client.signUp;
+
+      const fields = context.formRef.getSnapshot().context.fields;
+      const signUpMissingFields = signUp.missingFields.map(snakeToCamel);
+      const missingFields = Array.from(context.formRef.getSnapshot().context.fields.keys()).filter(key => {
+        return !signUpMissingFields.includes(key) && !fields.get(key)?.value && !fields.get(key)?.checked;
+      });
+
+      return missingFields.length === 0;
+    },
+  },
   types: {} as SignUpContinueSchema,
 }).createMachine({
   id: SignUpContinueMachineId,
@@ -82,6 +97,7 @@ export const SignUpContinueMachine = setup({
       description: 'Waiting for user input',
       on: {
         SUBMIT: {
+          guard: or(['hasMetPreviousMissingRequirements', not('isStatusMissingRequirements')]),
           target: 'Attempting',
           reenter: true,
         },

@@ -15,6 +15,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
@@ -153,11 +154,12 @@ const FieldLabelRow = (props: PropsWithChildren) => {
 };
 
 const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors' | 'center'>) => {
-  const { fieldId, debouncedFeedback } = useFormField();
+  const { fieldId, debouncedFeedback, errorMessageId } = useFormField();
 
   return (
     <FormFeedback
       center={props.center}
+      errorMessageId={errorMessageId}
       {...{
         ...debouncedFeedback,
         elementDescriptors: props.elementDescriptors,
@@ -208,24 +210,32 @@ const PasswordInputElement = forwardRef<HTMLInputElement>((_, ref) => {
   );
 });
 
-const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
-  const formField = useFormField();
-  const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+type CheckboxIndicatorProps = {
+  elementDescriptor?: ElementDescriptor;
+  elementId?: ElementId;
+};
 
-  return (
-    <CheckboxInput
-      ref={ref}
-      {...inputProps}
-      elementDescriptor={descriptors.formFieldInput}
-      elementId={descriptors.formFieldInput.setId(formField.fieldId)}
-      focusRing={false}
-      sx={t => ({
-        width: 'fit-content',
-        marginTop: t.space.$0x5,
-      })}
-    />
-  );
-});
+const CheckboxIndicator = forwardRef<HTMLInputElement, CheckboxIndicatorProps>(
+  ({ elementDescriptor, elementId }, ref) => {
+    const formField = useFormField();
+    const { placeholder, ...inputProps } = sanitizeInputProps(formField);
+
+    return (
+      <CheckboxInput
+        ref={ref}
+        {...inputProps}
+        elementDescriptor={elementDescriptor || descriptors.formFieldInput}
+        elementId={elementId || descriptors.formFieldInput.setId(formField.fieldId)}
+        focusRing={false}
+        sx={t => ({
+          width: 'fit-content',
+          flexShrink: 0,
+          marginTop: t.space.$0x5,
+        })}
+      />
+    );
+  },
+);
 
 const CheckboxLabel = (props: { description?: string | LocalizationKey }) => {
   const { label, id } = useFormField();

@@ -1,56 +1,10 @@
-import { titleize } from '@clerk/shared';
+import { titleize } from '@clerk/shared/underscore';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
+import type { FormControlState } from 'ui/utils';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
-
-const FONT_SIZE_STEP = 2;
-
-// creates a hidden element and returns what the text's width
-// would be if it were rendered inside the parent
-function textWidthForCurrentSize(text: string, parent: HTMLElement) {
-  const hiddenTextContainer = document.createElement('div');
-  hiddenTextContainer.style.position = 'absolute';
-  hiddenTextContainer.style.left = '-99in';
-  hiddenTextContainer.style.whiteSpace = 'nowrap';
-  hiddenTextContainer.innerHTML = text;
-
-  parent.appendChild(hiddenTextContainer);
-  const result = hiddenTextContainer.clientWidth;
-  parent.removeChild(hiddenTextContainer);
-  return result;
-}
-
-export function fitTextInOneLine(text: string, containerEl: HTMLElement, defaultSize: string): void {
-  const getContainerFontSize = () => window.getComputedStyle(containerEl).getPropertyValue('font-size');
-  const decreaseSize = () => {
-    const fontSizeWithUnit = getContainerFontSize();
-    const newSize = (Number.parseInt(fontSizeWithUnit) - FONT_SIZE_STEP) * 0.85;
-    containerEl.style.fontSize = `${newSize}px`;
-  };
-  const increaseSize = () => {
-    const fontSizeWithUnit = getContainerFontSize();
-    const newSize = Number.parseInt(fontSizeWithUnit) + FONT_SIZE_STEP / 2;
-    containerEl.style.fontSize = `${newSize}px`;
-  };
-
-  containerEl.style.fontSize = defaultSize;
-  while (textWidthForCurrentSize(text, containerEl) > containerEl.clientWidth) {
-    decreaseSize();
-  }
-
-  if (
-    getContainerFontSize() >= defaultSize ||
-    textWidthForCurrentSize(text, containerEl) > containerEl.clientWidth * 0.75
-  ) {
-    return;
-  }
-
-  while (textWidthForCurrentSize(text, containerEl) < containerEl.clientWidth) {
-    increaseSize();
-  }
-}
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
@@ -155,3 +109,16 @@ export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
+
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
+  if (identifier.type === 'tel') {
+    return 'phoneNumber';
+  }
+
+  if (isEmail(identifier.value)) {
+    return 'emailAddress';
+  }
+
+  return 'username';
+}

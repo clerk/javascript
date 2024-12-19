@@ -1,5 +1,6 @@
 import type { Clerk } from '@clerk/types';
 
+import { SUPPORTED_FAPI_VERSION } from '../constants';
 import { createFapiClient } from '../fapiClient';
 
 const mockedClerkInstance = {
@@ -73,38 +74,43 @@ afterAll(() => {
 describe('buildUrl(options)', () => {
   it('returns the full frontend API URL', () => {
     expect(fapiClient.buildUrl({ path: '/foo' }).href).toBe(
-      'https://clerk.example.com/v1/foo?_clerk_js_version=42.0.0',
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 
   it('returns the full frontend API URL using proxy url', () => {
-    expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(`${proxyUrl}/v1/foo?_clerk_js_version=42.0.0`);
+    expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(
+      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+    );
   });
 
-  it('adds _clerk_session_id as a query parameter if provided and path does not start with client', () => {
+  it('adds _clerk_session_id as a query parameter if provided and path does not start with client or waitlist', () => {
     expect(fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href).toBe(
-      'https://clerk.example.com/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=sess_42',
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=sess_42`,
     );
     expect(fapiClient.buildUrl({ path: '/client/foo', sessionId: 'sess_42' }).href).toBe(
-      'https://clerk.example.com/v1/client/foo?_clerk_js_version=42.0.0',
+      `https://clerk.example.com/v1/client/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+    );
+    expect(fapiClient.buildUrl({ path: '/waitlist', sessionId: 'sess_42' }).href).toBe(
+      `https://clerk.example.com/v1/waitlist?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 
   it('parses search params is an object with string values', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: { test: '1' } }).href).toBe(
-      'https://clerk.example.com/v1/foo?test=1&_clerk_js_version=42.0.0',
+      `https://clerk.example.com/v1/foo?test=1&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 
   it('parses string search params ', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: 'test=2' }).href).toBe(
-      'https://clerk.example.com/v1/foo?test=2&_clerk_js_version=42.0.0',
+      `https://clerk.example.com/v1/foo?test=2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 
   it('parses search params when value contains invalid url symbols', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: { bar: 'test=2' } }).href).toBe(
-      'https://clerk.example.com/v1/foo?bar=test%3D2&_clerk_js_version=42.0.0',
+      `https://clerk.example.com/v1/foo?bar=test%3D2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
     );
   });
 
@@ -116,7 +122,9 @@ describe('buildUrl(options)', () => {
           array: ['item1', 'item2'],
         },
       }).href,
-    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=42.0.0');
+    ).toBe(
+      `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+    );
   });
 
   // The return value isn't as expected.
@@ -152,7 +160,7 @@ describe('request', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      'https://clerk.example.com/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=deadbeef',
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
       expect.objectContaining({
         credentials: 'include',
         method: 'GET',
@@ -167,7 +175,7 @@ describe('request', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      `${proxyUrl}/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
+      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
       expect.objectContaining({
         credentials: 'include',
         method: 'GET',

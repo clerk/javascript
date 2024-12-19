@@ -14,61 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
-  __experimental_userVerification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-  },
   backButton: 'Späť',
   badge__default: 'Predvolené',
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
@@ -325,6 +270,61 @@ export const skSK: LocalizationResource = {
   paginationButton__previous: 'Predchádzajúce',
   paginationRowText__displaying: 'Zobrazuje sa',
   paginationRowText__of: 'z',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -449,14 +449,17 @@ export const skSK: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrovať sa',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Použiť email',
       actionLink__use_email_username: 'Použiť email alebo užívateľské meno',
       actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Použiť telefón',
       actionLink__use_username: 'Použiť užívateľské meno',
       actionText: 'Nemáte účet?',
+      actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Prihlásiť sa',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',
@@ -501,12 +504,32 @@ export const skSK: LocalizationResource = {
         title: 'Email úspešne overený',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Zadajte overovací kód poslaný na vaše telefónne číslo',
       formTitle: 'Overovací kód',
       resendButton: 'Znovu poslať kód',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Overte svoj telefón',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Prihlásiť sa',
@@ -553,6 +576,7 @@ export const skSK: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -880,6 +904,20 @@ export const skSK: LocalizationResource = {
       successMessage: 'Peňaženka bola pridaná k vášmu účtu.',
       title: 'Pridať web3 peňaženku',
       web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

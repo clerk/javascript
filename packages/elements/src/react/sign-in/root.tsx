@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import { useClerkHostRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -10,11 +9,10 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
+import { ClerkHostRouterContext, Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
-import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -118,8 +116,11 @@ export function SignInRoot({
   routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const inferredPath = usePathnameWithoutCatchAll();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
+  const pathname = router.pathname();
+  const inferredPath = router.inferredBasePath?.();
   const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
+  const isRootPath = path === pathname;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignInRoot', {
@@ -130,23 +131,19 @@ export function SignInRoot({
     }),
   );
 
-  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
-  const isRootPath = path === router.pathname();
-
   return (
-    <Router
-      basePath={path}
-      router={router}
-    >
-      <FormStoreProvider>
-        <SignInFlowProvider
-          exampleMode={exampleMode}
-          fallback={fallback}
-          isRootPath={isRootPath}
-        >
-          {children}
-        </SignInFlowProvider>
-      </FormStoreProvider>
-    </Router>
+    <ClerkHostRouterContext.Provider value={router}>
+      <Router basePath={path}>
+        <FormStoreProvider>
+          <SignInFlowProvider
+            exampleMode={exampleMode}
+            fallback={fallback}
+            isRootPath={isRootPath}
+          >
+            {children}
+          </SignInFlowProvider>
+        </FormStoreProvider>
+      </Router>
+    </ClerkHostRouterContext.Provider>
   );
 }

@@ -11,7 +11,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:import/recommended',
     'prettier',
-    'turbo',
+    'eslint-config-turbo',
     require.resolve('./rules/variables'),
   ],
   plugins: ['simple-import-sort', 'unused-imports'],
@@ -30,6 +30,29 @@ module.exports = {
   rules: {
     'simple-import-sort/imports': 'error',
     curly: 'error',
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@clerk/shared',
+            message: "Please always import from '@clerk/shared/<module>' instead of '@clerk/shared'.",
+          },
+        ],
+        patterns: [
+          {
+            group: ['!@clerk/shared/*'],
+            message: 'ignore this line -- eslint matching workaround to allow all imports except @clerk/shared',
+          },
+          {
+            group: ['@emotion/*'],
+            message:
+              'Please do not import emotion directly. Import helpers from ./design-system or ./primitives instead.',
+          },
+        ],
+      },
+    ],
+    'turbo/no-undeclared-env-vars': 'error',
   },
   overrides: [
     {

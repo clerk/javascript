@@ -17,8 +17,8 @@ Before you begin writing tests, you should already have:
 - Followed the setup instructions in the [contributing guide](../docs/CONTRIBUTING.md)
 - Access to Clerk's 1Password
 - Access to the **Integration testing** organization on Clerk (it owns the Clerk instances used in the tests)
-- Chromium installed. Run `npx playwright install chromium`.
-- WebKit installed. Run `npx playwright install webkit`.
+- Chromium installed. Run `pnpm playwright install chromium`.
+- WebKit installed. Run `pnpm playwright install webkit`.
 
 ## Initial setup
 
@@ -46,18 +46,18 @@ The **most important** scripts:
 
 - All integration tests in parallel:
   ```shell
-  npm run test:integration:base
+  pnpm test:integration:base
   ```
 - All tests for a specific preset (e.g. Next.js):
   ```shell
-  npm run test:integration:nextjs
+  pnpm test:integration:nextjs
   ```
   Check the `package.json` for more preset scripts.
 
 You can filter tests by filename, e.g. if you only want to run the tests for `email-link.test.ts` you should use:
 
 ```shell
-npm run test:integration:base -- email.link.test.ts
+pnpm test:integration:base -- email.link.test.ts
 ```
 
 Additionally, you can use two flags to configure how Playwright runs:
@@ -68,7 +68,7 @@ Additionally, you can use two flags to configure how Playwright runs:
 For example:
 
 ```shell
-npm run test:integration:base -- --ui email.link.test.ts
+pnpm test:integration:base -- --ui email.link.test.ts
 ```
 
 > [!TIP]
@@ -83,7 +83,7 @@ Below you can find code snippets for running tests in a specific manner, easily 
 During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `CLEANUP` environment variable:
 
 ```shell
-CLEANUP=0 npm run test:integration:base
+CLEANUP=0 pnpm test:integration:base
 ```
 
 For all available environment variables, check the [`constants.ts`](../integration/constants.ts) file.
@@ -99,7 +99,7 @@ You might have a similar setup to this:
 Then you can use a combination of environment variables to fast track your tests:
 
 ```shell
-E2E_APP_SK=sk_test_xxx E2E_APP_PK=pk_test_xxx E2E_APP_URL=http://localhost:3000 E2E_APP_CLERK_JS=https://xxx.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js npm run test:integration:base -- --ui
+E2E_APP_SK=sk_test_xxx E2E_APP_PK=pk_test_xxx E2E_APP_URL=http://localhost:3000 E2E_APP_CLERK_JS=https://xxx.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js pnpm test:integration:base -- --ui
 ```
 
 You need to replace all environment variables with your specific values/needs, above are just placeholders.
@@ -382,7 +382,7 @@ Assuming you have a `react-parcel` template defined in `integration/templates`, 
 Inside other presets you'll see additional `.addScript()` methods which you can use to override the default npm scripts for `setup`, `dev`, `build`, and `serve`. Ideally your template already defines these npm scripts.
 
 ```ts
-.addScript('dev', 'npm run dev')
+.addScript('dev', 'pnpm dev')
 ```
 
 You can use `.addFile()` to append another file to the template:
