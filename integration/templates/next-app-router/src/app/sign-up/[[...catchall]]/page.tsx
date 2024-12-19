@@ -7,6 +7,7 @@ export default function Page() {
         routing={'path'}
         path={'/sign-up'}
         signInUrl={'/sign-in'}
+        fallback={<>Loading sign up</>}
       />
     </div>
   );

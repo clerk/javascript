@@ -6,7 +6,7 @@ import {
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
-import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/types';
+import type { ComponentProps } from 'react';
 import React from 'react';
 
 import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
@@ -29,7 +29,7 @@ export {
 // Also the `typeof BaseUserProfile` is used to resolve the following error:
 // "The inferred type of 'UserProfile' cannot be named without a reference to ..."
 export const UserProfile: typeof BaseUserProfile = Object.assign(
-  (props: UserProfileProps) => {
+  (props: ComponentProps<typeof BaseUserProfile>) => {
     return <BaseUserProfile {...useEnforceCorrectRoutingProps('UserProfile', props)} />;
   },
   { ...BaseUserProfile },
@@ -40,16 +40,16 @@ export const UserProfile: typeof BaseUserProfile = Object.assign(
 // Also the `typeof BaseOrganizationProfile` is used to resolved the following error:
 // "The inferred type of 'OrganizationProfile' cannot be named without a reference to ..."
 export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign(
-  (props: OrganizationProfileProps) => {
+  (props: ComponentProps<typeof BaseOrganizationProfile>) => {
     return <BaseOrganizationProfile {...useEnforceCorrectRoutingProps('OrganizationProfile', props)} />;
   },
   { ...BaseOrganizationProfile },
 );
 
-export const SignIn = (props: SignInProps) => {
+export const SignIn = (props: ComponentProps<typeof BaseSignIn>) => {
   return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props, false)} />;
 };
 
-export const SignUp = (props: SignUpProps) => {
+export const SignUp = (props: ComponentProps<typeof BaseSignUp>) => {
   return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props, false)} />;
 };

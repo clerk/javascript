@@ -5,7 +5,7 @@ import { ClientId } from './client-id';
 export default function Home() {
   return (
     <main>
-      <UserButton />
+      <UserButton fallback={<>Loading user button</>} />
       <ClientId />
       <SignedIn>SignedIn</SignedIn>
       <SignedOut>SignedOut</SignedOut>
