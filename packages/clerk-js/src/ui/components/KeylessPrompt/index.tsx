@@ -62,7 +62,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
 
-          transition: 'all 310ms cubic-bezier(0.2, 0.95, 0.1, 1)',
+          transition: 'all 300ms cubic-bezier(0.2, 0.98, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -119,15 +119,15 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   width: 1rem;
                   height: 1rem;
                   transform-style: preserve-3d;
-                  animation: ${isExpanded ? 'coinFlipAnimation 6s infinite linear' : ' none'};
+                  animation: ${isExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
 
                   @keyframes coinFlipAnimation {
                     0%,
-                    40% {
+                    70% {
                       transform: rotateY(0);
                     }
-                    50%,
-                    90% {
+                    75%,
+                    95% {
                       transform: rotateY(180deg);
                     }
                     100% {
@@ -183,7 +183,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 position: relative;
                 isolation: isolate;
                 white-space: nowrap;
-                animation: show-title 180ms ease-out forwards;
+                animation: show-title 160ms ease-out forwards;
 
                 ${!claimed &&
                 `&::after {
@@ -297,7 +297,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 line-height: 1rem;
                 max-width: 14.625rem;
                 min-height: 2rem;
-                animation: show-description 260ms ease-out forwards;
+                animation: show-description 220ms ease-out forwards;
 
                 @keyframes show-description {
                   from {
@@ -370,7 +370,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 135ms cubic-bezier(0.18, 0.89, 0.1, 1);
+            transition: all 100ms cubic-bezier(0.18, 0.89, 0.1, 1);
             animation: small-btn-glow 3s infinite 500ms;
 
             @media (prefers-reduced-motion: reduce) {
