@@ -69,7 +69,6 @@ export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
   : Base['role'];
 
 export type OrganizationSystemPermissionPrefix = 'org:sys_';
-
 export type OrganizationSystemPermissionKey =
   | `${OrganizationSystemPermissionPrefix}domains:manage`
   | `${OrganizationSystemPermissionPrefix}profile:manage`
