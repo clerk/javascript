@@ -104,7 +104,7 @@ export const useSignInContext = (): SignInContextType => {
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   return {
-    ...ctx,
+    ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
     componentName,
     signUpUrl,
@@ -119,5 +119,5 @@ export const useSignInContext = (): SignInContextType => {
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
-  };
+  } as SignInContextType;
 };
