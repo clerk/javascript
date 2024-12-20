@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import type { FakeUser } from '../testUtils';
+import type { FakeOrganization, FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component smoke tests @generic', ({ app }) => {
   let fakeUser: FakeUser;
+  let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
@@ -13,12 +14,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
       withPhoneNumber: true,
       withUsername: true,
     });
-    await u.services.users.createBapiUser(fakeUser);
+    const user = await u.services.users.createBapiUser(fakeUser);
+    fakeOrganization = await u.services.users.createFakeOrganization(user.id);
   });
 
   test.afterAll(async () => {
     await app.teardown();
     await fakeUser.deleteIfExists();
+    await fakeOrganization.delete();
   });
 
   const components = [
@@ -44,6 +47,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
       protected: true,
       fallback: 'Loading user button',
     },
+    {
+      name: 'Waitlist',
+      path: '/waitlist',
+      fallback: 'Loading waitlist',
+    },
+    {
+      name: 'OrganizationSwitcher',
+      path: '/',
+      fallback: 'Loading organization switcher',
+      protected: true,
+    },
+    {
+      name: 'OrganizationProfile',
+      path: '/organization-profile',
+      fallback: 'Loading organization profile',
+      protected: true,
+    },
+    {
+      name: 'OrganizationList',
+      path: '/organization-list',
+      fallback: 'Loading organization list',
+      protected: true,
+    },
+    {
+      name: 'CreateOrganization',
+      path: '/create-organization',
+      fallback: 'Loading create organization',
+      protected: true,
+    },
   ];
 
   const signIn = async ({ app, page, context }) => {
@@ -68,7 +100,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
       }
 
       const u = createTestUtils({ app, page, context });
-      await u.page.goToRelative(component.path);
+      await u.page.goToRelative(component.path, { waitUntil: 'commit' });
       await expect(u.page.getByText(component.fallback)).toBeVisible();
 
       await signOut({ app, page, context });
