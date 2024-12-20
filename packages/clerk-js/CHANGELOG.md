@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.43.4
+
+### Patch Changes
+
+- Revalidate environment on window focus for Keyless. ([#4813](https://github.com/clerk/javascript/pull/4813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix broken enterprise connection icon for custom SAML provider ([#4809](https://github.com/clerk/javascript/pull/4809)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix(clerk-js): Rethrow errors if not requires_captcha during init ([#4812](https://github.com/clerk/javascript/pull/4812)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`fa8be89155279f00b2a04da669e5ec3e22514d42`](https://github.com/clerk/javascript/commit/fa8be89155279f00b2a04da669e5ec3e22514d42)]:
+  - @clerk/localizations@3.9.5
+
 ## 5.43.3
 
 ### Patch Changes
