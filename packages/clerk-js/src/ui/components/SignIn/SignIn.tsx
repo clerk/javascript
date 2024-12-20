@@ -2,7 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
+import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
@@ -145,14 +147,16 @@ function SignInRoutes(): JSX.Element {
 
 function SignInRoot() {
   const signInContext = useSignInContext();
+  const normalizedProps = {
+    componentName: 'SignUp',
+    ...signInContext.__experimental?.combinedProps,
+    emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
+    ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
+  } as SignUpContextType;
 
   return (
-    <SignUpContext.Provider
-      value={{
-        componentName: 'SignUp',
-        ...signInContext.__experimental?.combinedProps,
-      }}
-    >
+    <SignUpContext.Provider value={normalizedProps}>
       <SignInRoutes />
     </SignUpContext.Provider>
   );

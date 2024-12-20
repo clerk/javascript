@@ -2,9 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
-import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
-import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
@@ -17,10 +15,9 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const clerk = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const ctx = useSignUpContext();
   const signUp = useCoreSignUp();
-  const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+  const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
   const { continueSignUp = false, ...rest } = props;
 

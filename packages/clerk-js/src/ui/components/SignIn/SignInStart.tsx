@@ -387,6 +387,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        passwordEnabled: userSettings.attributes.password.required,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
