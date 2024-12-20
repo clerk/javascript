@@ -39,8 +39,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-
-          transition: 'all 310ms cubic-bezier(0.2, 0.98, 0.1, 1)',
+          transition: 'all 290ms cubic-bezier(0.2, 0.98, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -52,9 +51,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 210ms cubic-bezier(0.4, 1, 0.20, 0.9)',
-
-            id: 'keyless-prompt',
+            transition: 'all 205ms cubic-bezier(0.4, 1, 0.20, 0.9)',
           },
         })}
       >
@@ -278,8 +275,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             height='1rem'
             viewBox='0 0 16 16'
             fill='none'
-            aria-hidden={!isExpanded || claimed}
-            aria-label='Minimize keyless overlay'
+            aria-hidden
             xmlns='http://www.w3.org/2000/svg'
             css={css`
               color: #8c8c8c;
@@ -312,66 +308,64 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           </svg>
         </button>
 
-        {isExpanded && (
-          <div
-            role='region'
-            id='keyless-prompt-content'
-            aria-labelledby='keyless-prompt-button'
-            aria-label='Keyless mode information'
-            hidden={!isExpanded}
-          >
-            <p
-              css={css`
-                color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1rem;
-                max-width: 14.625rem;
-                min-height: 2rem;
-                animation: show-description 220ms ease-out forwards;
+        <div
+          role='region'
+          id='keyless-prompt-content'
+          aria-labelledby='keyless-prompt-button'
+          hidden={!isExpanded}
+        >
+          <p
+            css={css`
+              color: #b4b4b4;
+              font-size: 0.8125rem;
+              font-weight: 400;
+              line-height: 1rem;
+              max-width: 14.625rem;
+              min-height: 2rem;
+              animation: show-description 210ms ease forwards;
 
-                @keyframes show-description {
-                  from {
-                    transform: translateY(-1.8px);
-                    opacity: 0;
-                  }
-                  to {
-                    transform: translateY(0);
-                    opacity: 1;
-                  }
+              @keyframes show-description {
+                from {
+                  transform: translateY(-1.5px);
+                  opacity: 0;
                 }
-              `}
-            >
-              {claimed ? (
-                <>
-                  You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
-                  Clerk Dashboard.
-                </>
-              ) : (
-                <>
-                  We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
-                  <Link
-                    aria-label='Learn more about Clerk keyless mode'
-                    href='https://clerk.com/docs/keyless'
-                    sx={t => ({
-                      color: t.colors.$whiteAlpha600,
-                      textDecoration: 'underline solid',
-                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                      ':hover': {
-                        color: t.colors.$whiteAlpha800,
-                      },
-                    })}
-                  >
-                    Learn more
-                  </Link>
-                </>
-              )}
-            </p>
-          </div>
-        )}
+                to {
+                  transform: translateY(0);
+                  opacity: 1;
+                }
+              }
+            `}
+          >
+            {claimed ? (
+              <>
+                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
+                Clerk Dashboard.
+              </>
+            ) : (
+              <>
+                We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
+                <Link
+                  aria-label='Learn more about Clerk keyless mode'
+                  href='https://clerk.com/docs/keyless'
+                  sx={t => ({
+                    color: t.colors.$whiteAlpha600,
+                    textDecoration: 'underline solid',
+                    transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                    ':hover': {
+                      color: t.colors.$whiteAlpha800,
+                    },
+                  })}
+                >
+                  Learn more
+                </Link>
+              </>
+            )}
+          </p>
+        </div>
 
         <a
           href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+          rel='noopener noreferrer'
           data-expanded={isExpanded}
           css={css`
             display: flex;
@@ -401,7 +395,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 100ms cubic-bezier(0.18, 0.89, 0.1, 1);
+            transition: all 120ms cubic-bezier(0.1, 0.7, 0.1, 1);
             animation: small-btn-glow 3s infinite 500ms;
 
             @media (prefers-reduced-motion: reduce) {
@@ -464,7 +458,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           `}
         >
           {claimed ? 'Get API keys' : 'Claim keys'}
-          <span className='sr-only'>(opens in a new tab)</span>
         </a>
       </Flex>
     </Portal>
