@@ -396,6 +396,7 @@ export function createAllowedRedirectOrigins(
 
   origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
   origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+  origins.push(`https://${frontendApi}/oauth/authorize*`);
 
   return origins;
 }
