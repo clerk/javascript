@@ -56,8 +56,9 @@ export function handleCombinedFlowTransfer({
   // Attempt to transfer directly to sign up verification if email or phone was used, there are no optional fields, and password is not enabled. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
   if (
-    (!passwordEnabled && !hasOptionalFields(clerk.client.signUp) && identifierAttribute === 'emailAddress') ||
-    identifierAttribute === 'phoneNumber'
+    !passwordEnabled &&
+    !hasOptionalFields(clerk.client.signUp) &&
+    (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber')
   ) {
     return clerk.client.signUp
       .create({
