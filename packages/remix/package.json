@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.4.3",
+  "version": "4.4.5",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -84,11 +84,7 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
-    "@types/cookie": "^0.6.0",
-    "@types/node": "^18.19.33",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
-    "typescript": "catalog:repo"
+    "@types/cookie": "^0.6.0"
   },
   "peerDependencies": {
     "@remix-run/react": "^2.0.0",

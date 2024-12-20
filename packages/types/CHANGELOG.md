@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.40.0
+
+### Minor Changes
+
+- Adds `oidcLoginHint` & `oidcPrompt` parameters to following types: ([#4789](https://github.com/clerk/javascript/pull/4789)) by [@octoper](https://github.com/octoper)
+
+  - `ReauthorizeExternalAccountParams`
+  - `OAuthConfig`
+  - `SignInCreateParams`
+  - `PrepareVerificationParams`
+  - `SignUpCreateParams`
+  - `CreateExternalAccountParams`
+
 ## 4.39.4
 
 ### Patch Changes

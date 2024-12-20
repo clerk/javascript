@@ -12,6 +12,10 @@ import UserProfileCustom from './custom-user-profile';
 import UserButtonCustom from './custom-user-button';
 import UserButtonCustomTrigger from './custom-user-button-trigger';
 import UserButton from './user-button';
+import Waitlist from './waitlist';
+import OrganizationProfile from './organization-profile';
+import OrganizationList from './organization-list';
+import CreateOrganization from './create-organization';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -73,6 +77,22 @@ const router = createBrowserRouter([
       {
         path: '/custom-user-button-trigger',
         element: <UserButtonCustomTrigger />,
+      },
+      {
+        path: '/waitlist',
+        element: <Waitlist />,
+      },
+      {
+        path: '/organization-profile',
+        element: <OrganizationProfile />,
+      },
+      {
+        path: '/organization-list',
+        element: <OrganizationList />,
+      },
+      {
+        path: '/create-organization',
+        element: <CreateOrganization />,
       },
     ],
   },
