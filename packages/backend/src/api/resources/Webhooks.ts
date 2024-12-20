@@ -1,6 +1,7 @@
 import type {
   DeletedObjectJSON,
   EmailJSON,
+  OrganizationDomainJSON,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -30,6 +31,10 @@ export type OrganizationWebhookEvent =
   | Webhook<'organization.created' | 'organization.updated', OrganizationJSON>
   | Webhook<'organization.deleted', DeletedObjectJSON>;
 
+export type OrganizationDomainWebhookEvent =
+  | Webhook<'organizationDomain.created' | 'organizationDomain.updated', OrganizationDomainJSON>
+  | Webhook<'organizationDomain.deleted', DeletedObjectJSON>;
+
 export type OrganizationMembershipWebhookEvent = Webhook<
   'organizationMembership.created' | 'organizationMembership.deleted' | 'organizationMembership.updated',
   OrganizationMembershipJSON
@@ -53,6 +58,7 @@ export type WebhookEvent =
   | EmailWebhookEvent
   | SMSWebhookEvent
   | OrganizationWebhookEvent
+  | OrganizationDomainWebhookEvent
   | OrganizationMembershipWebhookEvent
   | OrganizationInvitationWebhookEvent
   | RoleWebhookEvent
