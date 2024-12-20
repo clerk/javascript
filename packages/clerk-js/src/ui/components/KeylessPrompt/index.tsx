@@ -489,7 +489,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             }
           `}
         >
-          Skip to keyless mode content
+          Skip to Clerk keyless mode content
         </a>
       </BodyPortal>
     </Portal>
