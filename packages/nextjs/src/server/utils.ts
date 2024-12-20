@@ -11,8 +11,15 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
+import { canUseKeyless__server } from '../utils/feature-flags';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import {
+  authSignatureInvalid,
+  encryptionKeyInvalid,
+  encryptionKeyInvalidDev,
+  missingDomainAndProxy,
+  missingSignInUrlInDev,
+} from './errors';
 import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
@@ -280,10 +287,34 @@ export function decryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, maybeKeylessEncryptionKey);
-    const encoded = decryptedBytes.toString(encUtf8);
-    return JSON.parse(encoded);
+    return decryptData(encryptedRequestData, maybeKeylessEncryptionKey);
   } catch (err) {
+    /**
+     * There is a great chance when running on Keyless mode that the above fails,
+     * because the keys hot-swapped and the Next.js dev server has not yet fully rebuilt middleware and routes.
+     *
+     * Attempt one more time with the default dummy value.
+     */
+    if (canUseKeyless__server) {
+      try {
+        return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
+      } catch (e) {
+        throwInvalidEncryptionKey();
+      }
+    }
+    throwInvalidEncryptionKey();
+  }
+}
+
+function throwInvalidEncryptionKey(): never {
+  if (isProductionEnvironment()) {
     throw new Error(encryptionKeyInvalid);
   }
+  throw new Error(encryptionKeyInvalidDev);
+}
+
+function decryptData(data: string, key: string) {
+  const decryptedBytes = AES.decrypt(data, key);
+  const encoded = decryptedBytes.toString(encUtf8);
+  return JSON.parse(encoded);
 }

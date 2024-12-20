@@ -14,6 +14,7 @@ type CreateSamlConnectionParams = {
   name: string;
   provider: SamlIdpSlug;
   domain: string;
+  organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
   idpCertificate?: string;
@@ -31,6 +32,7 @@ type UpdateSamlConnectionParams = {
   name?: string;
   provider?: SamlIdpSlug;
   domain?: string;
+  organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
   idpCertificate?: string;

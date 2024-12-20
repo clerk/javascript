@@ -1,5 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
+import { linkPackage } from './utils';
 
 const nuxtNode = applicationConfig()
   .setName('nuxt-node')
@@ -10,7 +11,7 @@ const nuxtNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/nuxt', '*');
+  .addDependency('@clerk/nuxt', linkPackage('nuxt'));
 
 export const nuxt = {
   node: nuxtNode,

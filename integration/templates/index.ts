@@ -9,7 +9,6 @@ export const templates = {
   'react-cra': resolve(__dirname, './react-cra'),
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),
-  'remix-node': resolve(__dirname, './remix-node'),
   'elements-next': resolve(__dirname, './elements-next'),
   'astro-node': resolve(__dirname, './astro-node'),
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),
@@ -19,6 +18,7 @@ export const templates = {
   'vue-vite': resolve(__dirname, './vue-vite'),
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
+  'react-router-library': resolve(__dirname, './react-router-library'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

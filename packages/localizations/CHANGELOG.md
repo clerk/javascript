@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+
+## 3.9.3
+
+### Patch Changes
+
+- Improve `el-GR` localization. ([#4757](https://github.com/clerk/javascript/pull/4757)) by [@dikaioai](https://github.com/dikaioai)
+
+- Improve `pl-PL` localization. ([#4781](https://github.com/clerk/javascript/pull/4781)) by [@mic0ishere](https://github.com/mic0ishere)
+
 ## 3.9.2
 
 ### Patch Changes

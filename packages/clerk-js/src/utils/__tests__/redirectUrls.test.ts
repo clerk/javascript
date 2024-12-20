@@ -244,6 +244,21 @@ describe('redirectUrls', () => {
       expect(redirectUrls.getAfterSignInUrl()).toBe(`${mockWindowLocation.href}search-param-redirect-url`);
       expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}search-param-redirect-url`);
     });
+
+    it('returns to `/` when no redirect_url is found', () => {
+      const redirectUrls = new RedirectUrls({}, {}, {});
+      expect(redirectUrls.getAfterSignInUrl()).toBe('/');
+      expect(redirectUrls.getAfterSignUpUrl()).toBe('/');
+    });
+
+    it('returns current window location when in modal mode and no redirect_url is found', () => {
+      const aboutPageUrl = 'https://www.clerk.com/about';
+      mockWindowLocation = new URL(aboutPageUrl) as any as Window['location'];
+      Object.defineProperty(global.window, 'location', { value: mockWindowLocation });
+      const redirectUrls = new RedirectUrls({}, {}, {}, 'modal');
+      expect(redirectUrls.getAfterSignInUrl()).toBe(aboutPageUrl);
+      expect(redirectUrls.getAfterSignUpUrl()).toBe(aboutPageUrl);
+    });
   });
 
   describe('search params', () => {

@@ -8,7 +8,7 @@ type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 } & Pick<
   SignUpProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl' | 'initialValues'
 >;
 
 export const SignUpButton = defineComponent(
@@ -51,6 +51,7 @@ export const SignUpButton = defineComponent(
       'fallbackRedirectUrl',
       'forceRedirectUrl',
       'mode',
+      'initialValues',
     ],
   },
 );

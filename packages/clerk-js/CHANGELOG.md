@@ -1,5 +1,44 @@
 # Change Log
 
+## 5.43.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/localizations@3.9.4
+  - @clerk/shared@2.20.4
+
+## 5.43.2
+
+### Patch Changes
+
+- Redirect to sign up start step within combined flow when there are optional fields. ([#4795](https://github.com/clerk/javascript/pull/4795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.43.1
+
+### Patch Changes
+
+- Revert #4776 to address new bug. ([#4797](https://github.com/clerk/javascript/pull/4797)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
+## 5.43.0
+
+### Minor Changes
+
+- Redirect to the current page when within modal mode and no redirect URL is provided. ([#4768](https://github.com/clerk/javascript/pull/4768)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- fix: Properly detect and create devBrowser when the suffixed version is missing but an unsuffixed version exists ([#4776](https://github.com/clerk/javascript/pull/4776)) by [@panteliselef](https://github.com/panteliselef)
+
+  If the \_\_clerk_db_jwt referred to a different instance, we’d fetch `/environment` and `/client` with mismatched publishable keys and JWTs, breaking the app.
+
+- Updated dependencies [[`1677fa46862accd25d4837c9abd9a7a70c5b7858`](https://github.com/clerk/javascript/commit/1677fa46862accd25d4837c9abd9a7a70c5b7858), [`dcd2f3973ca90500fda9e52c4f81e631c49e87fc`](https://github.com/clerk/javascript/commit/dcd2f3973ca90500fda9e52c4f81e631c49e87fc)]:
+  - @clerk/localizations@3.9.3
+
 ## 5.42.1
 
 ### Patch Changes

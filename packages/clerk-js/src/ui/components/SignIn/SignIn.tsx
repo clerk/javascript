@@ -176,6 +176,7 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
           componentName: 'SignIn',
           ...signInProps,
           routing: 'virtual',
+          mode: 'modal',
         }}
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}

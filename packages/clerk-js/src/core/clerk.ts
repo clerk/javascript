@@ -1898,6 +1898,8 @@ export class Clerk implements ClerkInterface {
             await initEnvironmentPromise;
             initComponents();
             await initClient();
+          } else {
+            throw e;
           }
         });
 
