@@ -338,8 +338,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           >
             {claimed ? (
               <>
-                You claimed this application, but haven&apos;t set keys in your environment. Get your keys from the
-                Clerk Dashboard.
+                You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
+                Dashboard.
               </>
             ) : (
               <>
