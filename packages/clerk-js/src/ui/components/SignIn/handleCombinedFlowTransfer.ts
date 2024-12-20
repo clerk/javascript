@@ -14,6 +14,7 @@ type HandleCombinedFlowTransferProps = {
   handleError: (err: any) => void;
   redirectUrl?: string;
   redirectUrlComplete?: string;
+  passwordEnabled: boolean;
 };
 
 /**
@@ -31,6 +32,7 @@ export function handleCombinedFlowTransfer({
   handleError,
   redirectUrl,
   redirectUrlComplete,
+  passwordEnabled,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -54,7 +56,7 @@ export function handleCombinedFlowTransfer({
   // Attempt to transfer directly to sign up verification if email or phone was used and there are no optional fields. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
   if (
-    (!hasOptionalFields(clerk.client.signUp) && identifierAttribute === 'emailAddress') ||
+    (!passwordEnabled && !hasOptionalFields(clerk.client.signUp) && identifierAttribute === 'emailAddress') ||
     identifierAttribute === 'phoneNumber'
   ) {
     return clerk.client.signUp
