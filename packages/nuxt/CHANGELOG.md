@@ -1,5 +1,18 @@
 # @clerk/nuxt
 
+## 1.0.0
+
+### Major Changes
+
+- Introduce the official Clerk SDK for Vue and Nuxt. ([#4791](https://github.com/clerk/javascript/pull/4791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix Vite optimization issue that caused duplicate versions of @clerk/vue to be created on first load, resulting in the Vue plugin losing context. ([#4820](https://github.com/clerk/javascript/pull/4820)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8ad1866264ce5cf60a125d3a270597e8044b04c7`](https://github.com/clerk/javascript/commit/8ad1866264ce5cf60a125d3a270597e8044b04c7)]:
+  - @clerk/vue@1.0.0
+
 ## 0.1.5
 
 ### Patch Changes
