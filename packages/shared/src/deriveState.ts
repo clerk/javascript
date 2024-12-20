@@ -1,5 +1,6 @@
 import type {
   InitialState,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
@@ -23,6 +24,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
   const session = initialState.session as SignedInSessionResource;
+  const sessionClaims = initialState.sessionClaims;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as OrganizationCustomRoleKey;
@@ -36,6 +38,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     user,
     sessionId,
     session,
+    sessionClaims,
     organization,
     orgId,
     orgRole,
@@ -51,6 +54,9 @@ const deriveFromClientSideState = (state: Resources) => {
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
+  const sessionClaims: JwtPayload | null | undefined = state.session
+    ? state.session.lastActiveToken?.jwt?.claims
+    : state.session;
   const factorVerificationAge: [number, number] | null = state.session ? state.session.factorVerificationAge : null;
   const actor = session?.actor;
   const organization = state.organization;
@@ -67,6 +73,7 @@ const deriveFromClientSideState = (state: Resources) => {
     user,
     sessionId,
     session,
+    sessionClaims,
     organization,
     orgId,
     orgRole,
