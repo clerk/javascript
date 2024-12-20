@@ -1,7 +1,7 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import type {
   ActClaim,
-  CheckAuthorizationWithCustomPermissions,
+  CheckAuthorizationFromSessionClaims,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -42,7 +42,7 @@ export type SignedInAuthObject = {
    */
   factorVerificationAge: [number, number] | null;
   getToken: ServerGetToken;
-  has: CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
 };
 
@@ -65,7 +65,7 @@ export type SignedOutAuthObject = {
    */
   factorVerificationAge: null;
   getToken: ServerGetToken;
-  has: CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
 };
 

@@ -15,6 +15,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationPermissionKey,
+  OrganizationSystemPermissionPrefix,
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
 import type {
@@ -24,6 +25,29 @@ import type {
 } from './sessionVerification';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
+
+type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSystemPermissionPrefix}${string}`
+  ? 'System permissions are not included in session claims and cannot be used on the server-side'
+  : P;
+
+/**
+ * Type guard for server-side authorization checks using session claims.
+ * System permissions are not allowed since they are not included
+ * in session claims and cannot be verified on the server side.
+ */
+export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
+  isAuthorizedParams: WithReverification<
+    | {
+        role: OrganizationCustomRoleKey;
+        permission?: never;
+      }
+    | {
+        role?: never;
+        permission: DisallowSystemPermissions<P>;
+      }
+    | { role?: never; permission?: never }
+  >,
+) => boolean;
 
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
