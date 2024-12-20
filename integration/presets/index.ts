@@ -8,7 +8,6 @@ import { next } from './next';
 import { nuxt } from './nuxt';
 import { react } from './react';
 import { reactRouter } from './react-router';
-import { remix } from './remix';
 import { tanstack } from './tanstack';
 
 export const appConfigs = {
@@ -17,7 +16,6 @@ export const appConfigs = {
   longRunningApps: createLongRunningApps(),
   next,
   react,
-  remix,
   elements,
   expo,
   astro,

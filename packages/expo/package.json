@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.6.2",
+  "version": "2.6.5",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -78,15 +78,11 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
-    "@types/node": "^20.11.24",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.73.9",
-    "typescript": "catalog:repo"
+    "react-native": "^0.73.9"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
@@ -94,8 +90,8 @@
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
-    "react": ">=18",
-    "react-dom": ">=18",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react",
     "react-native": ">=0.73"
   },
   "peerDependenciesMeta": {

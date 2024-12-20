@@ -183,6 +183,8 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;

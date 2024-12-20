@@ -360,6 +360,7 @@ export interface PaginatedResponseJSON {
 export interface SamlConnectionJSON extends ClerkResourceJSON {
   name: string;
   domain: string;
+  organization_id: string | null;
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;

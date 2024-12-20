@@ -1,5 +1,29 @@
 # Change Log
 
+## 5.43.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/localizations@3.9.4
+  - @clerk/shared@2.20.4
+
+## 5.43.2
+
+### Patch Changes
+
+- Redirect to sign up start step within combined flow when there are optional fields. ([#4795](https://github.com/clerk/javascript/pull/4795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.43.1
+
+### Patch Changes
+
+- Revert #4776 to address new bug. ([#4797](https://github.com/clerk/javascript/pull/4797)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
 ## 5.43.0
 
 ### Minor Changes
