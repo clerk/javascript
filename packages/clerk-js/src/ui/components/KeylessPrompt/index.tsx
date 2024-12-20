@@ -1,6 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import { useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link } from '../../customizables';
@@ -14,9 +16,12 @@ type KeylessPromptProps = {
   copyKeysUrl: string;
 };
 
+const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
+const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
+const contentIdentifier = `${buttonIdentifierPrefix}-content`;
+
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
   const claimed = Boolean(useEnvironment().authConfig.claimedAt);
 
   return (
@@ -58,8 +63,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
         <button
           type='button'
           aria-expanded={isExpanded}
-          aria-controls='keyless-prompt-content'
-          id='keyless-prompt-button'
+          aria-controls={contentIdentifier}
+          id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
           css={css`
             width: 100%;
@@ -253,12 +258,12 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     background-position: -60% center;
                   }
                 }
-              `}
-                @keyframes show-title {
+              `} @keyframes show-title {
                   from {
                     transform: translateY(-1.5px);
                     opacity: 0;
                   }
+
                   to {
                     transform: translateY(0);
                     opacity: 1;
@@ -281,9 +286,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               color: #8c8c8c;
               transition: color 130ms ease-out;
               visibility: ${isExpanded && !claimed ? 'visible' : 'hidden'};
+
               :hover {
                 color: #eeeeee;
               }
+
               animation: show-button 200ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
 
               @keyframes show-button {
@@ -310,8 +317,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
         <div
           role='region'
-          id='keyless-prompt-content'
-          aria-labelledby='keyless-prompt-button'
+          id={contentIdentifier}
+          aria-labelledby={buttonIdentifier}
           hidden={!isExpanded}
         >
           <p
@@ -460,6 +467,34 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           {claimed ? 'Get API keys' : 'Claim keys'}
         </a>
       </Flex>
+      <BodyPortal>
+        <a
+          href={`#${buttonIdentifier}`}
+          css={css`
+            position: fixed;
+            left: -999px;
+            top: 1rem;
+            z-index: 999999;
+            border-radius: 0.375rem;
+            background-color: white;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            font-size: 0.875rem;
+            color: black;
+            text-decoration: underline;
+
+            &:focus {
+              left: 1rem;
+              outline: 2px solid;
+              outline-offset: 2px;
+            }
+          `}
+        >
+          Skip to keyless mode content
+        </a>
+      </BodyPortal>
     </Portal>
   );
 };
@@ -469,3 +504,21 @@ export const KeylessPrompt = (props: KeylessPromptProps) => (
     <_KeylessPrompt {...props} />
   </InternalThemeProvider>
 );
+
+const BodyPortal = ({ children }: PropsWithChildren) => {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const container = document.createElement('div');
+    setPortalContainer(container);
+    document.body.insertBefore(container, document.body.firstChild);
+    return () => {
+      if (container) {
+        document.body.removeChild(container);
+      }
+    };
+  }, []);
+
+  // Render the children inside the dynamically created div
+  return portalContainer ? createPortal(children, portalContainer) : null;
+};
