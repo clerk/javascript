@@ -1,6 +1,5 @@
-import type { AuthConfigJSONSnapshot } from 'snapshots';
-
 import type { ClerkResource } from './resource';
+import type { AuthConfigJSONSnapshot } from './snapshots';
 
 export interface AuthConfigResource extends ClerkResource {
   /**
