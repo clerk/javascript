@@ -134,6 +134,11 @@ export type PrepareVerificationParams =
       strategy: SamlStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+    }
+  | {
+      strategy: EnterpriseSSOStrategy;
+      redirectUrl?: string;
+      actionCompleteRedirectUrl?: string;
     };
 
 export type AttemptVerificationParams =

@@ -3,7 +3,7 @@ import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildEmailLinkRedirectUrl } from '../../common/redirects';
+import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { VerificationLinkCard } from '../../elements';
@@ -36,7 +36,7 @@ export const SignUpEmailLinkCard = () => {
   };
 
   const startEmailLinkVerification = () => {
-    return startEmailLinkFlow({ redirectUrl: buildEmailLinkRedirectUrl(signUpContext, displayConfig.signUpUrl) })
+    return startEmailLinkFlow({ redirectUrl: buildVerificationRedirectUrl(signUpContext, displayConfig.signUpUrl) })
       .then(res => handleVerificationResult(res))
       .catch(err => {
         handleError(err, [], card.setError);
