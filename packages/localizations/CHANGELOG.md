@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.9.5
+
+### Patch Changes
+
+- Fix delete account action for `nb-NO` localization. ([#4821](https://github.com/clerk/javascript/pull/4821)) by [@lasseklovstad](https://github.com/lasseklovstad)
+
 ## 3.9.4
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.21.0
+
+### Minor Changes
+
+- Adds support for a `fallback` prop on Clerk's components. This allows rendering of a placeholder element while Clerk's components are mounting. Use this to help mitigate layout shift when using Clerk's components. Example usage: ([#4723](https://github.com/clerk/javascript/pull/4723)) by [@BRKalow](https://github.com/BRKalow)
+
+  ```tsx
+  <SignIn fallback={<LoadingSkeleton />} />
+  ```
+
+- Allow `<SignInButton />`, <SignUpButton />`, `<SignOutButton />`, and `<SignInWithMetamaskButton />` to render while clerk-js is still loading. This reduces any layout shift that might be caused by these components not rendering immediately. ([#4810](https://github.com/clerk/javascript/pull/4810)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 5.20.4
 
 ### Patch Changes
