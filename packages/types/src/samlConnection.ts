@@ -1,6 +1,5 @@
-import type { SamlAccountConnectionJSONSnapshot } from 'snapshots';
-
 import type { ClerkResource } from './resource';
+import type { SamlAccountConnectionJSONSnapshot } from './snapshots';
 
 export interface SamlAccountConnectionResource extends ClerkResource {
   id: string;

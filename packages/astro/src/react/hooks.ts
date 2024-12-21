@@ -1,11 +1,4 @@
-import type {
-  ActJWTClaim,
-  CheckAuthorizationWithCustomPermissions,
-  Clerk,
-  GetToken,
-  OrganizationCustomRoleKey,
-  SignOut,
-} from '@clerk/types';
+import type { Clerk, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 
@@ -14,9 +7,6 @@ import { authAsyncStorage } from '#async-local-storage';
 
 import { $authStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
-
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
  * @internal
@@ -54,60 +44,6 @@ const createSignOut = () => {
   };
 };
 
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: undefined;
-      orgId: undefined;
-      orgRole: undefined;
-      orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      orgId: string;
-      orgRole: OrganizationCustomRoleKey;
-      orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
-
 type UseAuth = () => UseAuthReturn;
 
 /**
@@ -142,13 +78,13 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useStore($authStore);
+  const { sessionId, sessionClaims, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useStore($authStore);
 
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
 
-  const has = useCallback(
-    (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+  const has = useCallback<NonNullable<UseAuthReturn['has']>>(
+    params => {
       if (!params?.permission && !params?.role) {
         throw new Error(
           'Missing parameters. `has` from `useAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
@@ -177,6 +113,7 @@ export const useAuth: UseAuth = () => {
       isLoaded: false,
       isSignedIn: undefined,
       sessionId,
+      sessionClaims: undefined,
       userId,
       actor: undefined,
       orgId: undefined,
@@ -193,6 +130,7 @@ export const useAuth: UseAuth = () => {
       isLoaded: true,
       isSignedIn: false,
       sessionId,
+      sessionClaims: null,
       userId,
       actor: null,
       orgId: null,
@@ -204,11 +142,12 @@ export const useAuth: UseAuth = () => {
     };
   }
 
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+  if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId,
@@ -220,11 +159,12 @@ export const useAuth: UseAuth = () => {
     };
   }
 
-  if (!!sessionId && !!userId && !orgId) {
+  if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId: null,

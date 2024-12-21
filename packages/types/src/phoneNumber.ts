@@ -1,7 +1,6 @@
-import type { PhoneNumberJSONSnapshot } from 'snapshots';
-
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
+import type { PhoneNumberJSONSnapshot } from './snapshots';
 import type { PhoneCodeStrategy } from './strategies';
 import type { VerificationResource } from './verification';
 

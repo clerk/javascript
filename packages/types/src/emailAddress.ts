@@ -1,7 +1,6 @@
-import type { EmailAddressJSONSnapshot } from 'snapshots';
-
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
+import type { EmailAddressJSONSnapshot } from './snapshots';
 import type { EmailCodeStrategy, EmailLinkStrategy } from './strategies';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 
