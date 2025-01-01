@@ -1,9 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
-import type { InitialState, Without } from '@clerk/types';
-import { headers } from 'next/headers';
+import type { Without } from '@clerk/types';
 import React from 'react';
 
-import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless__server } from '../../utils/feature-flags';
@@ -12,23 +10,47 @@ import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
-const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
+// const getNonceFromCSPHeader = async function getNonceFromCSPHeader() {
+//   // const request =
+//   // await buildRequestLike();
+//   // return '';
+//   const request = await buildRequestLike();
+//   // const data =
+//   getDynamicAuthData(request);
+//
+//   return '';
+//   // try {
+//   // return getScriptNonceFromHeader(request.headers.get('Content-Security-Policy') || '') || '';
+//   // } catch (e) {
+//   //   console.log('Failed from getNonceFromCSPHeader', e);
+//   // }
+//   // return '';
+// };
+
+const getDynamicClerkState = async function getDynamicClerkState() {
+  // try {
   const request = await buildRequestLike();
   const data = getDynamicAuthData(request);
 
-  return data;
-});
+  return [data, getScriptNonceFromHeader(request.headers.get('Content-Security-Policy') || '') || ''] as [
+    AuthObject,
+    string,
+  ];
+  // } catch (e) {
+  //   console.log('Failed getDynamicClerkState', e);
+  // }
+  // return null;
+};
+getDynamicClerkState;
 
-const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
-  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
-});
+// getNonceFromCSPHeader;
 
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
-  let statePromise: Promise<null | AuthObject> = Promise.resolve(null);
-  let nonce = Promise.resolve('');
+  let statePromise: Promise<[null | AuthObject, string]> = Promise.resolve([null, '']);
+  // const nonce = Promise.resolve('');
 
   if (dynamic) {
     if (isNext13) {
@@ -36,11 +58,11 @@ export async function ClerkProvider(
        * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
        * Without the await here, Next will throw a DynamicServerError during build.
        */
-      statePromise = Promise.resolve(await getDynamicClerkState());
-      nonce = Promise.resolve(await getNonceFromCSPHeader());
+      // statePromise = Promise.resolve(await getDynamicClerkState());
+      // nonce = Promise.resolve(await getNonceFromCSPHeader());
     } else {
       statePromise = getDynamicClerkState();
-      nonce = getNonceFromCSPHeader();
+      // nonce = getNonceFromCSPHeader();
     }
   }
 
@@ -51,8 +73,8 @@ export async function ClerkProvider(
   let output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={await nonce}
-      initialState={await statePromise}
+      initialState={(await statePromise)[0]}
+      nonce={(await statePromise)[1]}
     >
       {children}
     </ClientClerkProvider>
@@ -75,8 +97,8 @@ export async function ClerkProvider(
               __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
               __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             })}
-            nonce={await nonce}
-            initialState={await statePromise}
+            initialState={(await statePromise)[0]}
+            nonce={(await statePromise)[1]}
           >
             {children}
           </ClientClerkProvider>
@@ -85,14 +107,14 @@ export async function ClerkProvider(
     }
   }
 
-  if (dynamic) {
-    return (
-      // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
-        {output}
-      </PromisifiedAuthProvider>
-    );
-  }
+  // if (dynamic) {
+  //   return (
+  //     // TODO: fix types so AuthObject is compatible with InitialState
+  //     <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
+  //       {output}
+  //     </PromisifiedAuthProvider>
+  //   );
+  // }
 
   return output;
 }
