@@ -43,7 +43,9 @@ export async function buildRequestLike(): Promise<NextRequest> {
   } catch (e: any) {
     // While generating the static shell usage of `headers()` will throw. We can gracefully return an empty request.
     if (e && isDynamicIOPrerenderingBailout(e)) {
-      return new NextRequest('https://placeholder.com');
+      return new NextRequest('https://placeholder.com', {
+        headers: new Headers({ 'x-clerk-auth-status': 'signed-out' }),
+      });
     }
 
     // rethrow the error when react throws a prerendering bailout
