@@ -19,7 +19,21 @@ export const isPrerenderingBailout = (e: unknown) => {
   return routeRegex.test(message) || dynamicServerUsage || bailOutPrerendering;
 };
 
-export async function buildRequestLike() {
+/**
+ * Detects dynamic APIs when dynamicIO is enabled (Canary only).
+ * https://github.com/vercel/next.js/blob/35acd7e1faae66feddeffe6362fae9fb5a5b1281/packages/next/src/server/dynamic-rendering-utils.ts#L18
+ */
+export const isDynamicIOPrerenderingBailout = (e: unknown) => {
+  if (!(e instanceof Error) || !('message' in e)) {
+    return false;
+  }
+
+  const { message } = e;
+  const routeRegex = /^During prerendering, .* rejects when the prerender is complete/;
+  return routeRegex.test(message);
+};
+
+export async function buildRequestLike(): Promise<NextRequest> {
   try {
     // Dynamically import next/headers, otherwise Next12 apps will break
     // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
@@ -27,6 +41,11 @@ export async function buildRequestLike() {
     const resolvedHeaders = await headers();
     return new NextRequest('https://placeholder.com', { headers: resolvedHeaders });
   } catch (e: any) {
+    // While generating the static shell usage of `headers()` will throw. We can gracefully return an empty request.
+    if (e && isDynamicIOPrerenderingBailout(e)) {
+      return new NextRequest('https://placeholder.com');
+    }
+
     // rethrow the error when react throws a prerendering bailout
     // https://nextjs.org/docs/messages/ppr-caught-error
     if (e && isPrerenderingBailout(e)) {
