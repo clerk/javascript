@@ -94,8 +94,8 @@
   "dependencies": {
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "cookie": "0.7.0",
-    "snakecase-keys": "5.4.4",
+    "cookie": "0.7.2",
+    "snakecase-keys": "5.5.0",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
