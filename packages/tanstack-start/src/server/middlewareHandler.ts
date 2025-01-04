@@ -30,8 +30,6 @@ export function createClerkHandler<TRouter extends AnyRouter>(
         router.update({
           context: { ...router.options.context, ...clerkInitialState },
         });
-
-        await router.load();
       } catch (error) {
         if (error instanceof Response) {
           // returning the response
