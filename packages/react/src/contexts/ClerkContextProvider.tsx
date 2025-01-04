@@ -28,7 +28,11 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   });
 
   React.useEffect(() => {
-    return clerk.addListener(e => setState({ ...e }));
+    return clerk.addListener((e: any) => {
+      React.startTransition(() => {
+        setState({ ...e });
+      });
+    });
   }, []);
 
   const derivedState = deriveState(clerkLoaded, state, initialState);
@@ -100,7 +104,11 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   }, [options.localization]);
 
   React.useEffect(() => {
-    isomorphicClerk.addOnLoaded(() => setLoaded(true));
+    isomorphicClerk.addOnLoaded(() => {
+      React.startTransition(() => {
+        setLoaded(true);
+      });
+    });
   }, []);
 
   React.useEffect(() => {
