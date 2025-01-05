@@ -16,7 +16,7 @@ function clerkLoaded(clerk: ShallowRef<Clerk | null>) {
       clerk,
       value => {
         if (value?.loaded) {
-          resolve(clerk.value!);
+          resolve(value);
         }
       },
       { immediate: true },
