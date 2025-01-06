@@ -12,12 +12,15 @@ import { useClerkContext } from './useClerkContext';
  */
 function clerkLoaded(clerk: ShallowRef<Clerk | null>) {
   return new Promise<Clerk>(resolve => {
-    const unwatch = watch(clerk, value => {
-      if (value?.loaded) {
-        unwatch();
-        resolve(clerk.value!);
-      }
-    });
+    watch(
+      clerk,
+      value => {
+        if (value?.loaded) {
+          resolve(value);
+        }
+      },
+      { immediate: true },
+    );
   });
 }
 
@@ -73,11 +76,11 @@ type UseAuth = () => ToComputedRefs<UseAuthReturn>;
 export const useAuth: UseAuth = () => {
   const { clerk, authCtx } = useClerkContext();
 
+  const getToken: GetToken = createGetToken(clerk);
+  const signOut: SignOut = createSignOut(clerk);
+
   const result = computed<UseAuthReturn>(() => {
     const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = authCtx.value;
-
-    const getToken: GetToken = createGetToken(clerk);
-    const signOut: SignOut = createSignOut(clerk);
 
     const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
       if (!params?.permission && !params?.role) {
