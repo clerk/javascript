@@ -1,11 +1,12 @@
-import { SignedIn, SignedOut, SignIn, UserButton, Protect } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignIn, UserButton, Protect, OrganizationSwitcher } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ClientId } from './client-id';
 
 export default function Home() {
   return (
     <main>
-      <UserButton />
+      <UserButton fallback={<>Loading user button</>} />
+      <OrganizationSwitcher fallback={<>Loading organization switcher</>} />
       <ClientId />
       <SignedIn>SignedIn</SignedIn>
       <SignedOut>SignedOut</SignedOut>

@@ -1,5 +1,11 @@
 # @clerk/vue
 
+## 1.0.0
+
+### Major Changes
+
+- Introduce the official Clerk SDK for Vue and Nuxt. ([#4791](https://github.com/clerk/javascript/pull/4791)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.1.5
 
 ### Patch Changes
