@@ -188,4 +188,12 @@ describe('useDerivedAuth', () => {
     expect(current.has?.({ permission: 'test' })).toBe('mocked-result');
     expect(mockHas).toHaveBeenCalledWith({ permission: 'test' });
   });
+
+  it('allows to pass system permissions', () => {
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth({ sessionId: null, userId: null }));
+
+    current.has?.({ permission: 'org:sys_foo' });
+  });
 });
