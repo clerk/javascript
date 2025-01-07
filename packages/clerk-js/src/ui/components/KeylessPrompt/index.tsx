@@ -197,7 +197,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
-                  speak: none;
                   -webkit-user-select: none;
                   user-select: none;
                 }
@@ -227,7 +226,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
-                  speak: none;
                   -webkit-user-select: none;
                   user-select: none;
                 }
