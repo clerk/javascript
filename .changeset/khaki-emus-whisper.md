@@ -2,4 +2,4 @@
 '@clerk/localizations': patch
 ---
 
-add Greek translations for profile modal
+Improve el-GR localization strings for profile modal.
