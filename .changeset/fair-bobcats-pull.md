@@ -1,6 +1,7 @@
 ---
 '@clerk/backend': patch
 '@clerk/types': patch
+'@clerk/nextjs': patch
 ---
 
 Add type-level validation to prevent server-side usage of system permissions
