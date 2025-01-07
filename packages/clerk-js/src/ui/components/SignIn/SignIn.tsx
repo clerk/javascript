@@ -156,7 +156,7 @@ function SignInRoot() {
   } as SignUpContextType;
 
   return (
-    <SignUpContext.Provider value={normalizedProps}>
+    <SignUpContext.Provider value={normalizedSignUpContext}>
       <SignInRoutes />
     </SignUpContext.Provider>
   );
