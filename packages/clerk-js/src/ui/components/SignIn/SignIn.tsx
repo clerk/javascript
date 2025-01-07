@@ -153,7 +153,7 @@ function SignInRoot() {
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
-  } as SignUpContextType;
+  } satisfies SignUpContextType;
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>
