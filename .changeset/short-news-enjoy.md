@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Improve keyless prompt accessibility based on feedback
+Improve accessibility of the Keyless prompt.
