@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.20.4
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+
+## 2.20.3
+
+### Patch Changes
+
+- Improve error message when Publishable Key is missing when trying to parse it. ([#4785](https://github.com/clerk/javascript/pull/4785)) by [@anagstef](https://github.com/anagstef)
+
+## 2.20.2
+
+### Patch Changes
+
+- Updated dependencies [[`aeafa7c5efd50c893d088ac99199d7eaecc04025`](https://github.com/clerk/javascript/commit/aeafa7c5efd50c893d088ac99199d7eaecc04025), [`acd9326ef2d6942b981b3ee59c4b20ddd303323d`](https://github.com/clerk/javascript/commit/acd9326ef2d6942b981b3ee59c4b20ddd303323d)]:
+  - @clerk/types@4.39.4
+
 ## 2.20.1
 
 ### Patch Changes

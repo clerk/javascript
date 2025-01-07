@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.4.1",
+  "version": "1.4.4",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -71,10 +71,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@playwright/test": "^1.44.0",
-    "@types/node": "^18.19.33",
-    "cypress": "^13.9.0",
-    "tsup": "catalog:repo",
-    "typescript": "catalog:repo"
+    "cypress": "^13.9.0"
   },
   "peerDependencies": {
     "@playwright/test": "^1",

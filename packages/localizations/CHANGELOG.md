@@ -1,5 +1,35 @@
 # Change Log
 
+## 3.9.5
+
+### Patch Changes
+
+- Fix delete account action for `nb-NO` localization. ([#4821](https://github.com/clerk/javascript/pull/4821)) by [@lasseklovstad](https://github.com/lasseklovstad)
+
+## 3.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+
+## 3.9.3
+
+### Patch Changes
+
+- Improve `el-GR` localization. ([#4757](https://github.com/clerk/javascript/pull/4757)) by [@dikaioai](https://github.com/dikaioai)
+
+- Improve `pl-PL` localization. ([#4781](https://github.com/clerk/javascript/pull/4781)) by [@mic0ishere](https://github.com/mic0ishere)
+
+## 3.9.2
+
+### Patch Changes
+
+- Added min and max length username settings to username field error. ([#4771](https://github.com/clerk/javascript/pull/4771)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`aeafa7c5efd50c893d088ac99199d7eaecc04025`](https://github.com/clerk/javascript/commit/aeafa7c5efd50c893d088ac99199d7eaecc04025), [`acd9326ef2d6942b981b3ee59c4b20ddd303323d`](https://github.com/clerk/javascript/commit/acd9326ef2d6942b981b3ee59c4b20ddd303323d)]:
+  - @clerk/types@4.39.4
+
 ## 3.9.1
 
 ### Patch Changes

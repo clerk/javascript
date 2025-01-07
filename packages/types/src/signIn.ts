@@ -112,7 +112,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
-  toJSON: () => SignInJSONSnapshot;
+  __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =
@@ -183,6 +183,8 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;

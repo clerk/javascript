@@ -22,5 +22,5 @@ export interface ClientResource extends ClerkResource {
   cookieExpiresAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-  toJSON: () => ClientJSONSnapshot;
+  __internal_toSnapshot: () => ClientJSONSnapshot;
 }

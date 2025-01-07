@@ -15,7 +15,7 @@ export interface VerificationResource extends ClerkResource {
   strategy: string | null;
   verifiedAtClient: string | null;
   verifiedFromTheSameClient: () => boolean;
-  toJSON: () => VerificationJSONSnapshot;
+  __internal_toSnapshot: () => VerificationJSONSnapshot;
 }
 
 export interface PasskeyVerificationResource extends VerificationResource {

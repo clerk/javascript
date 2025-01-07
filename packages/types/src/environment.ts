@@ -16,5 +16,5 @@ export interface EnvironmentResource extends ClerkResource {
   isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
-  toJSON: () => EnvironmentJSONSnapshot;
+  __internal_toSnapshot: () => EnvironmentJSONSnapshot;
 }

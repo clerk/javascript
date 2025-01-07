@@ -14,5 +14,5 @@ export interface SamlAccountConnectionResource extends ClerkResource {
   disableAdditionalIdentifications: boolean;
   createdAt: Date;
   updatedAt: Date;
-  toJSON: () => SamlAccountConnectionJSONSnapshot;
+  __internal_toSnapshot: () => SamlAccountConnectionJSONSnapshot;
 }

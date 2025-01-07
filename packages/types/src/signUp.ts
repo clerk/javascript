@@ -102,7 +102,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
-  toJSON: () => SignUpJSONSnapshot;
+  __internal_toSnapshot: () => SignUpJSONSnapshot;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -127,6 +127,8 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: SamlStrategy;
@@ -171,6 +173,8 @@ export type SignUpCreateParams = Partial<
     ticket: string;
     token: string;
     legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
@@ -190,11 +194,11 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
-  toJSON: () => SignUpVerificationsJSONSnapshot;
+  __internal_toSnapshot: () => SignUpVerificationsJSONSnapshot;
 }
 
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
-  toJSON: () => SignUpVerificationJSONSnapshot;
+  __internal_toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

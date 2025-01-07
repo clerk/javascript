@@ -127,7 +127,7 @@ export interface UserResource extends ClerkResource {
 
   get hasVerifiedPhoneNumber(): boolean;
 
-  toJSON: () => UserJSONSnapshot;
+  __internal_toSnapshot: () => UserJSONSnapshot;
 }
 
 export type CreateEmailAddressParams = { email: string };
@@ -138,6 +138,8 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 export type VerifyTOTPParams = { code: string };
 
