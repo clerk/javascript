@@ -10,6 +10,7 @@ import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
+import { useRevalidateEnvironment } from './use-revalidate-environment';
 
 type KeylessPromptProps = {
   claimUrl: string;
