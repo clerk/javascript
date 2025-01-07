@@ -117,6 +117,10 @@ describe('ClerkMiddleware type tests', () => {
     clerkMiddlewareMock(async (auth, _event, _request) => {
       // @ts-expect-error - system permissions are not allowed
       (await auth()).has({ permission: 'org:sys_foo' });
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect(has => has({ permission: 'org:sys_foo' }));
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect({ permission: 'org:sys_foo' });
     });
   });
 

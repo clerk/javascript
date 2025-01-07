@@ -30,25 +30,6 @@ type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSyst
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
-/**
- * Type guard for server-side authorization checks using session claims.
- * System permissions are not allowed since they are not included
- * in session claims and cannot be verified on the server side.
- */
-export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
-  isAuthorizedParams: WithReverification<
-    | {
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        role?: never;
-        permission: DisallowSystemPermissions<P>;
-      }
-    | { role?: never; permission?: never }
-  >,
-) => boolean;
-
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
 export type CheckAuthorizationWithCustomPermissions =
@@ -85,6 +66,27 @@ type CheckAuthorizationParams = WithReverification<
       role?: never;
       permission?: never;
     }
+>;
+
+/**
+ * Type guard for server-side authorization checks using session claims.
+ * System permissions are not allowed since they are not included
+ * in session claims and cannot be verified on the server side.
+ */
+export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
+  isAuthorizedParams: CheckAuthorizationParamsFromSessionClaims<P>,
+) => boolean;
+
+export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
+  | {
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      role?: never;
+      permission: DisallowSystemPermissions<P>;
+    }
+  | { role?: never; permission?: never }
 >;
 
 export interface SessionResource extends ClerkResource {
