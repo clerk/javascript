@@ -58,6 +58,8 @@ export type UserProfileCtx = UserProfileProps & {
 export type SignUpCtx = SignUpProps & {
   componentName: 'SignUp';
   mode?: ComponentMode;
+  emailLinkRedirectUrl?: string;
+  ssoCallbackUrl?: string;
 };
 
 export type UserButtonCtx = UserButtonProps & {
