@@ -44,7 +44,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 290ms cubic-bezier(0.32, 0.98, 0.1, 1)',
+          transition: 'all 325ms cubic-bezier(0.18, 0.98, 0.1, 1)',
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -291,7 +291,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 color: #eeeeee;
               }
 
-              animation: show-button 200ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
+              animation: show-button 285ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
 
               @keyframes show-button {
                 from {
@@ -402,7 +402,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
               0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 136ms cubic-bezier(0.15, 0.7, 0.1, 1);
+            transition: all 138ms cubic-bezier(0.09, 0.7, 0.1, 1);
             animation: small-btn-glow 3s infinite 500ms;
 
             @media (prefers-reduced-motion: reduce) {
