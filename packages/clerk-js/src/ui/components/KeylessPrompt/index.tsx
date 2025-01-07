@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useEnvironment } from '../../contexts';
-import { descriptors, Flex, Link } from '../../customizables';
+import { Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -30,7 +30,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
       <Flex
         data-expanded={isExpanded}
         align='center'
-        elementDescriptor={descriptors.impersonationFab}
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
