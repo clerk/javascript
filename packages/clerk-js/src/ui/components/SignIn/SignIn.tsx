@@ -147,7 +147,7 @@ function SignInRoutes(): JSX.Element {
 
 function SignInRoot() {
   const signInContext = useSignInContext();
-  const normalizedProps = {
+  const normalizedSignUpContext = {
     componentName: 'SignUp',
     ...signInContext.__experimental?.combinedProps,
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
