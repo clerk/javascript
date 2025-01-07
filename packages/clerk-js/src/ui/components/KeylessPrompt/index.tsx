@@ -4,7 +4,6 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { useEnvironment } from '../../contexts';
 import { Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
@@ -23,7 +22,7 @@ const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const claimed = Boolean(useEnvironment().authConfig.claimedAt);
+  const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
   return (
     <Portal>
