@@ -16,6 +16,7 @@ import Waitlist from './waitlist';
 import OrganizationProfile from './organization-profile';
 import OrganizationList from './organization-list';
 import CreateOrganization from './create-organization';
+import OrganizationSwitcher from './organization-switcher';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
       {
         path: '/organization-list',
         element: <OrganizationList />,
+      },
+      {
+        path: '/organization-switcher',
+        element: <OrganizationSwitcher />,
       },
       {
         path: '/create-organization',
