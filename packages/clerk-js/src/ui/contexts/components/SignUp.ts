@@ -66,7 +66,6 @@ export const useSignUpContext = (): SignUpContextType => {
   // SignUp's own options won't have a `signUpUrl` property, so we have to get the value
   // from the `path` prop instead, when the routing is set to 'path'.
   let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
-  console.log({ signUpUrlBeforeBuildUrlInSignUp: signUpUrl });
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   let waitlistUrl = ctx.waitlistUrl || options.waitlistUrl || displayConfig.waitlistUrl;
 
