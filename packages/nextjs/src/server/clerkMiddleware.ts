@@ -171,7 +171,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
-        handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
+        handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
 
       // TODO @nikos: we need to make this more generic
@@ -314,11 +314,16 @@ const createMiddlewareProtect = (
 // especially when copy-pasting code from one place to another.
 // This function handles the known errors thrown by the APIs described above,
 // and returns the appropriate response.
-const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
+const handleControlFlowErrors = (
+  e: any,
+  clerkRequest: ClerkRequest,
+  nextRequest: NextRequest,
+  requestState: RequestState,
+): Response => {
   if (isNextjsNotFoundError(e)) {
     // Rewrite to a bogus URL to force not found error
     return setHeader(
-      NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
+      NextResponse.rewrite(new URL(`/clerk_${Date.now()}`, nextRequest.url)),
       constants.Headers.AuthReason,
       'protect-rewrite',
     );
