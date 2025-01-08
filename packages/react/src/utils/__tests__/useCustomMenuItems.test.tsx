@@ -1,12 +1,13 @@
 import { renderHook } from '@testing-library/react';
 import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MenuAction, MenuItems, MenuLink } from '../../components/uiComponents';
 import { useUserButtonCustomMenuItems } from '../useCustomMenuItems';
 
 // Mock the logErrorInDevMode function
-jest.mock('@clerk/shared', () => ({
-  logErrorInDevMode: jest.fn(),
+vi.mock('@clerk/shared', () => ({
+  logErrorInDevMode: vi.fn(),
 }));
 
 describe('useUserButtonCustomMenuItems', () => {
@@ -108,7 +109,7 @@ describe('useUserButtonCustomMenuItems', () => {
   });
 
   it('should process valid MenuAction items and call onClick when triggered', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     const children = (
       <MenuItems>
         <MenuAction

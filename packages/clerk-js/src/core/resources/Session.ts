@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { is4xxError } from '@clerk/shared/error';
 import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type {
   ActJWTClaim,
@@ -9,6 +9,7 @@ import type {
   GetTokenOptions,
   PhoneCodeConfig,
   SessionJSON,
+  SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
   SessionVerificationJSON,
@@ -25,7 +26,6 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
-import { fraudProtection } from '../fraudProtection';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
@@ -51,7 +51,7 @@ export class Session extends BaseResource implements SessionResource {
     return !!resource && resource instanceof Session;
   }
 
-  constructor(data: SessionJSON) {
+  constructor(data: SessionJSON | SessionJSONSnapshot) {
     super();
 
     this.fromJSON(data);
@@ -107,7 +107,6 @@ export class Session extends BaseResource implements SessionResource {
         tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
-      eventBus.dispatch(events.TokenUpdate, { token });
     }
   };
 
@@ -209,7 +208,7 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  protected fromJSON(data: SessionJSON | null): this {
+  protected fromJSON(data: SessionJSON | SessionJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -219,7 +218,7 @@ export class Session extends BaseResource implements SessionResource {
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.factorVerificationAge = data.factor_verification_age;
-    this.lastActiveAt = unixEpochToDate(data.last_active_at);
+    this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
     this.createdAt = unixEpochToDate(data.created_at);
@@ -233,6 +232,25 @@ export class Session extends BaseResource implements SessionResource {
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
 
     return this;
+  }
+
+  public __internal_toSnapshot(): SessionJSONSnapshot {
+    return {
+      object: 'session',
+      id: this.id,
+      status: this.status,
+      expire_at: this.expireAt.getTime(),
+      abandon_at: this.abandonAt.getTime(),
+      factor_verification_age: this.factorVerificationAge,
+      last_active_at: this.lastActiveAt.getTime(),
+      last_active_organization_id: this.lastActiveOrganizationId,
+      actor: this.actor,
+      user: this.user?.__internal_toSnapshot() || null,
+      public_user_data: this.publicUserData.__internal_toSnapshot(),
+      last_active_token: this.lastActiveToken?.__internal_toSnapshot() || null,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 
   private async _getToken(options?: GetTokenOptions): Promise<string | null> {
@@ -270,20 +288,9 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    // this handles all getToken invocations with skipCache: true
-    await fraudProtection.blockUntilReady();
-
-    const tokenResolver = Token.create(path, params).catch(e => {
-      if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-        return fraudProtection.execute(async () => {
-          const captchaParams = await fraudProtection.managedChallenge(Session.clerk);
-          return Token.create(path, { ...params, ...captchaParams });
-        });
-      }
-      throw e;
-    });
-
+    const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
+
     return tokenResolver.then(token => {
       if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token });

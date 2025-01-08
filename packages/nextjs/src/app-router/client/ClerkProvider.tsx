@@ -2,6 +2,7 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import nextPackage from 'next/package.json';
 import React, { useEffect, useTransition } from 'react';
@@ -10,10 +11,20 @@ import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEf
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
+import { canUseKeyless__client } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
+
+/**
+ * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
+ * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
+ */
+const LazyCreateKeylessApplication = dynamic(() =>
+  import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
+);
 
 declare global {
   export interface Window {
@@ -26,10 +37,8 @@ declare global {
   }
 }
 
-const isDeprecatedNextjsVersion = nextPackage.version.startsWith('13.') || nextPackage.version.startsWith('14.0');
-
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  if (isDeprecatedNextjsVersion) {
+const NextClientClerkProvider = (props: NextClerkProviderProps) => {
+  if (isNextWithUnstableServerActions) {
     const deprecationWarning = `Clerk:\nYour current Next.js version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to next@14.1.0 or later.`;
     if (inBrowser()) {
       logger.warnOnce(deprecationWarning);
@@ -111,5 +120,20 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
+  );
+};
+
+export const ClientClerkProvider = (props: NextClerkProviderProps) => {
+  const { children, ...rest } = props;
+  const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
+
+  if (safePublishableKey || !canUseKeyless__client) {
+    return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
+  }
+
+  return (
+    <LazyCreateKeylessApplication>
+      <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
+    </LazyCreateKeylessApplication>
   );
 };

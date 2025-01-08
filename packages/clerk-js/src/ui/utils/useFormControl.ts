@@ -33,6 +33,13 @@ type Options = {
       radioOptions?: never;
     }
   | {
+      label: string | LocalizationKey;
+      type: Extract<HTMLInputTypeAttribute, 'text'>;
+      validatePassword?: never;
+      buildErrorMessage?: (err: ClerkAPIError[]) => ClerkAPIError | string | undefined;
+      radioOptions?: never;
+    }
+  | {
       validatePassword?: never;
       buildErrorMessage?: never;
       type: Extract<HTMLInputTypeAttribute, 'radio'>;

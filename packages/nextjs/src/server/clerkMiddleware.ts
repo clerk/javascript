@@ -1,22 +1,23 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
+import { canUseKeyless__server } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
+import { getKeylessCookieValue } from './keyless';
+import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
-  nextjsNotFound,
   nextjsRedirectError,
   redirectToSignInError,
 } from './nextErrors';
@@ -37,6 +38,7 @@ export type ClerkMiddlewareAuthObject = AuthObject & {
 
 export interface ClerkMiddlewareAuth {
   (): Promise<ClerkMiddlewareAuthObject>;
+
   protect: AuthProtect;
 }
 
@@ -46,7 +48,9 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
-export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  debug?: boolean;
+};
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
 
@@ -80,23 +84,24 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-const clerkMiddlewareRequestDataStore = new Map<'requestData', AuthenticateRequestOptions>();
-export const clerkMiddlewareRequestDataStorage = new AsyncLocalStorage<typeof clerkMiddlewareRequestDataStore>();
-
 // @ts-expect-error TS is not happy here. Will dig into it
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
-    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? params(request) : params;
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
+      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
+      const publishableKey = assertKey(
+        resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
+        () => errorThrower.throwMissingPublishableKeyError(),
       );
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
+
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
         errorThrower.throwMissingSecretKeyError(),
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
@@ -112,7 +117,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
-
       const resolvedClerkClient = await clerkClient();
 
       resolvedClerkClient.telemetry.record(
@@ -187,10 +191,46 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams);
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
+        publishableKey: keyless?.publishableKey,
+        secretKey: keyless?.secretKey,
+      });
 
       return handlerResult;
     });
+
+    const keylessMiddleware: NextMiddleware = async (request, event) => {
+      /**
+       * This mechanism replaces a full-page reload. Ensures that middleware will re-run and authenticate the request properly without the secret key or publishable key to be missing.
+       */
+      if (isKeylessSyncRequest(request)) {
+        return returnBackFromKeylessSync(request);
+      }
+
+      const resolvedParams = typeof params === 'function' ? params(request) : params;
+      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
+      /**
+       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
+       */
+      if (isMissingPublishableKey) {
+        const res = NextResponse.next();
+        setRequestHeadersOnNextResponse(res, request, {
+          [constants.Headers.AuthStatus]: 'signed-out',
+        });
+        return res;
+      }
+
+      return baseNextMiddleware(request, event);
+    };
+
+    const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (canUseKeyless__server) {
+        return keylessMiddleware(request, event);
+      }
+
+      return baseNextMiddleware(request, event);
+    };
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
@@ -216,6 +256,17 @@ const parseHandlerAndOptions = (args: unknown[]) => {
     typeof args[0] === 'function' ? args[0] : undefined,
     (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback];
+};
+
+const isKeylessSyncRequest = (request: NextMiddlewareRequestParam) =>
+  request.nextUrl.pathname === '/clerk-sync-keyless';
+
+const returnBackFromKeylessSync = (request: NextMiddlewareRequestParam) => {
+  const returnUrl = request.nextUrl.searchParams.get('returnUrl');
+  const url = new URL(request.url);
+  url.pathname = '';
+
+  return NextResponse.redirect(returnUrl || url.toString());
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];

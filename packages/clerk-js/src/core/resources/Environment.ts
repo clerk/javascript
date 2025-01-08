@@ -2,6 +2,7 @@ import type {
   AuthConfigResource,
   DisplayConfigResource,
   EnvironmentJSON,
+  EnvironmentJSONSnapshot,
   EnvironmentResource,
   OrganizationSettingsResource,
   UserSettingsResource,
@@ -28,16 +29,16 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return Environment.instance;
   }
 
-  constructor(data: EnvironmentJSON | null = null) {
+  constructor(data: EnvironmentJSON | EnvironmentJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
-  fetch({ touch }: { touch: boolean } = { touch: false }): Promise<Environment> {
+  fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
     if (touch) {
       return this._basePatch({});
     }
-    return this._baseGet();
+    return this._baseGet({ fetchMaxTries });
   }
 
   isSingleSession = (): boolean => {
@@ -56,7 +57,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this.displayConfig.backendHost === window.location.host;
   };
 
-  protected fromJSON(data: EnvironmentJSON | null): this {
+  protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
       this.displayConfig = new DisplayConfig(data.display_config);
@@ -65,5 +66,17 @@ export class Environment extends BaseResource implements EnvironmentResource {
       this.maintenanceMode = data.maintenance_mode;
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): EnvironmentJSONSnapshot {
+    return {
+      object: 'environment',
+      id: this.id || '',
+      auth_config: this.authConfig.__internal_toSnapshot(),
+      display_config: this.displayConfig.__internal_toSnapshot(),
+      user_settings: this.userSettings.__internal_toSnapshot(),
+      organization_settings: this.organizationSettings.__internal_toSnapshot(),
+      maintenance_mode: this.maintenanceMode,
+    };
   }
 }

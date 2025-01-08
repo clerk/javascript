@@ -1,3 +1,5 @@
+import type { EnvironmentJSONSnapshot } from 'snapshots';
+
 import type { AuthConfigResource } from './authConfig';
 import type { DisplayConfigResource } from './displayConfig';
 import type { OrganizationSettingsResource } from './organizationSettings';
@@ -14,4 +16,5 @@ export interface EnvironmentResource extends ClerkResource {
   isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
+  __internal_toSnapshot: () => EnvironmentJSONSnapshot;
 }
