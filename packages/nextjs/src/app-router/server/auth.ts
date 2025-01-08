@@ -11,19 +11,32 @@ import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../..
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
+type MachineAuth = Omit<AuthObject, 'SignedInAuthObject' | 'SignedOutAuthObject'> & {
+  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+};
+
+type AuthOptions = { entity?: 'user' | 'machine' };
 
 export interface AuthFn {
-  (): Promise<Auth>;
+  (options?: AuthOptions): Promise<Auth>;
+  protect: AuthProtect;
+}
+export interface MachineAuthFn {
+  (options?: AuthOptions): Promise<MachineAuth>;
   protect: AuthProtect;
 }
 
-export const auth: AuthFn = async () => {
+export function auth(options?: AuthOptions & { entity: 'user' }): Promise<Auth>;
+export function auth(options?: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
+export async function auth(options?: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions) {
   require('server-only');
 
   const request = await buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
+    options,
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -50,9 +63,9 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn });
-};
+}
 
-auth.protect = async (...args) => {
+auth.protect = async (...args: Parameters<AuthProtect>) => {
   require('server-only');
 
   const request = await buildRequestLike();
@@ -66,6 +79,5 @@ auth.protect = async (...args) => {
     redirect,
   });
 
-  // @ts-expect-error TS flattens all possible combinations of the for AuthProtect signatures in a union.
   return protect(...args);
 };

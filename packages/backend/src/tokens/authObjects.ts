@@ -212,7 +212,7 @@ export function authenticatedMachineObject(
   };
 }
 
-export function unauthenticatedMachineObject(debugData?: AuthObjectDebug): UnauthenticatedMachineObject {
+export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
   return {
     sessionClaims: null,
     claims: null,

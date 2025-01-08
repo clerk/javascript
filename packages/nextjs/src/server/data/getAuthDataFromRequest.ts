@@ -1,5 +1,12 @@
 import type { AuthObject } from '@clerk/backend';
-import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
+import {
+  authenticatedMachineObject,
+  AuthStatus,
+  constants,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
@@ -13,7 +20,15 @@ import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, g
  */
 export function getAuthDataFromRequest(
   req: RequestLike,
-  opts: { secretKey?: string; logger?: LoggerNoCommit } = {},
+  opts: { secretKey?: string; logger?: LoggerNoCommit; entity: 'machine' },
+): Omit<AuthObject, 'SignedInAuthObject' | 'SignedOutAuthObject'>;
+export function getAuthDataFromRequest(
+  req: RequestLike,
+  opts: { secretKey?: string; logger?: LoggerNoCommit; entity: 'user' },
+): Omit<AuthObject, 'AuthenticatedMachineObject' | 'UnauthenticatedMachineObject'>;
+export function getAuthDataFromRequest(
+  req: RequestLike,
+  opts: { secretKey?: string; logger?: LoggerNoCommit; entity?: 'user' | 'machine' } = {},
 ): AuthObject {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
@@ -39,7 +54,17 @@ export function getAuthDataFromRequest(
   opts.logger?.debug('auth options', options);
 
   let authObject;
-  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+
+  if (opts.entity === 'machine' && (!authStatus || authStatus !== AuthStatus.MachineAuthenticated)) {
+    authObject = unauthenticatedMachineObject(options);
+  } else if (opts.entity === 'machine' && authStatus === AuthStatus.MachineAuthenticated) {
+    assertTokenSignature(authToken as string, options.secretKey, authSignature);
+
+    const jwt = decodeJwt(authToken as string);
+
+    opts.logger?.debug('jwt', jwt.raw);
+    authObject = authenticatedMachineObject(jwt.raw.text, jwt.payload);
+  } else if (!authStatus || authStatus !== AuthStatus.SignedIn) {
     authObject = signedOutAuthObject(options);
   } else {
     assertTokenSignature(authToken as string, options.secretKey, authSignature);

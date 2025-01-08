@@ -9,12 +9,15 @@ import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { assertAuthStatus, getCookie, getHeader } from './utils';
 
+type GetAuthOptions = { entity?: 'user' | 'machine' };
 export const createGetAuth = ({
   noAuthStatusMessage,
   debugLoggerName,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
@@ -24,7 +27,7 @@ export const createGetAuth = ({
 
       assertAuthStatus(req, noAuthStatusMessage);
 
-      return getAuthDataFromRequest(req, { ...opts, logger });
+      return getAuthDataFromRequest(req, { ...opts, logger, entity: options?.entity });
     };
   });
 
