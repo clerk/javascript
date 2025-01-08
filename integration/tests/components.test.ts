@@ -54,7 +54,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
     },
     {
       name: 'OrganizationSwitcher',
-      path: '/',
+      path: '/organization-switcher',
       fallback: 'Loading organization switcher',
       protected: true,
     },
