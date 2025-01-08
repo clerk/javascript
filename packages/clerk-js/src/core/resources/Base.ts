@@ -2,7 +2,6 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
-import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
@@ -67,9 +66,7 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    return FraudProtection.getInstance(Client, CaptchaChallenge).execute(this.clerk, () =>
-      this._baseFetch<J>(requestInit, opts),
-    );
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
