@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Update keyless toast UI's collapse behavior
+Updates Keyless UI to automatically expand when the application has been claimed.
