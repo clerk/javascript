@@ -102,8 +102,8 @@ type RootAuthLoaderCallbackReturn =
   | Response
   | Promise<ObjectLike>
   | ObjectLike
-  | UNSAFE_DataWithResponseInit<Record<string, unknown>>
-  | Promise<UNSAFE_DataWithResponseInit<Record<string, unknown>>>;
+  | UNSAFE_DataWithResponseInit<unknown>
+  | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
 // TODO: Figure out how to use the Route.LoaderArgs from userland code
 export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;
