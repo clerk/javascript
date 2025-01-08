@@ -3,8 +3,7 @@ import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
-import { buildEmailLinkRedirectUrl } from '../../common/redirects';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
@@ -19,7 +18,6 @@ export const SignUpEmailLinkCard = () => {
   const signUpContext = useSignUpContext();
   const { afterSignUpUrl } = signUpContext;
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { setActive } = useClerk();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
@@ -36,7 +34,9 @@ export const SignUpEmailLinkCard = () => {
   };
 
   const startEmailLinkVerification = () => {
-    return startEmailLinkFlow({ redirectUrl: buildEmailLinkRedirectUrl(signUpContext, displayConfig.signUpUrl) })
+    return startEmailLinkFlow({
+      redirectUrl: signUpContext.emailLinkRedirectUrl,
+    })
       .then(res => handleVerificationResult(res))
       .catch(err => {
         handleError(err, [], card.setError);
@@ -52,6 +52,7 @@ export const SignUpEmailLinkCard = () => {
     } else {
       await completeSignUpFlow({
         signUp: su,
+        continuePath: '../continue',
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
         handleComplete: () => setActive({ session: su.createdSessionId, redirectUrl: afterSignUpUrl }),
