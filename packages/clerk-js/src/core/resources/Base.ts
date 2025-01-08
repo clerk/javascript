@@ -195,16 +195,16 @@ export abstract class BaseResource {
     return this._baseMutate<J>({ ...params, method: 'POST' });
   }
 
+  protected async _basePostBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
+    return this._baseMutateBypass<J>({ ...params, method: 'POST' });
+  }
+
   protected async _basePut<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PUT' });
   }
 
   protected async _basePatch<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PATCH' });
-  }
-
-  protected async _basePatchBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
-    return this._baseMutateBypass<J>({ ...params, method: 'PATCH' });
   }
 
   protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
