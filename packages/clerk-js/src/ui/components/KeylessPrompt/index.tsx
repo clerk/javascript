@@ -24,10 +24,12 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
+  const isForcedExpanded = claimed || isExpanded;
+
   return (
     <Portal>
       <Flex
-        data-expanded={isExpanded}
+        data-expanded={isForcedExpanded}
         align='center'
         sx={t => ({
           position: 'fixed',
@@ -61,7 +63,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
       >
         <button
           type='button'
-          aria-expanded={isExpanded}
+          aria-expanded={isForcedExpanded}
           aria-controls={contentIdentifier}
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
@@ -103,7 +105,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   width: 1rem;
                   height: 1rem;
                   transform-style: preserve-3d;
-                  animation: ${isExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
+                  animation: ${isForcedExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
 
                   @keyframes coinFlipAnimation {
                     0%,
@@ -160,7 +162,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
             <p
               data-text='Clerk is in keyless mode'
-              aria-label={claimed && isExpanded ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              aria-label={claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
               css={css`
                 color: #d9d9d9;
                 font-size: 0.875rem;
@@ -191,7 +193,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   background-clip: text;
                   filter: blur(1.2px);
                   animation: ${
-                    isExpanded
+                    isForcedExpanded
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
@@ -220,7 +222,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   background-size: 180% 100%;
                   background-clip: text;
                   animation: ${
-                    isExpanded
+                    isForcedExpanded
                       ? 'text-shimmer-expanded 3s infinite ease-out forwards'
                       : 'text-shimmer 3s infinite ease-out forwards'
                   };
@@ -316,7 +318,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           role='region'
           id={contentIdentifier}
           aria-labelledby={buttonIdentifier}
-          hidden={!isExpanded}
+          hidden={!isForcedExpanded}
         >
           <p
             css={css`
@@ -371,7 +373,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           href={claimed ? _props.copyKeysUrl : _props.claimUrl}
           target='_blank'
           rel='noopener noreferrer'
-          data-expanded={isExpanded}
+          data-expanded={isForcedExpanded}
           css={css`
             display: flex;
             align-items: center;
