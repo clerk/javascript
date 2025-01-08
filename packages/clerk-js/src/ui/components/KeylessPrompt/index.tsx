@@ -369,6 +369,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
         <a
           href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+          target='_blank'
           rel='noopener noreferrer'
           data-expanded={isExpanded}
           css={css`
