@@ -591,7 +591,7 @@ describe('clerkMiddleware(params)', () => {
 
   describe('debug', () => {
     beforeEach(() => {
-      global.console.log.mockClear();
+      (global.console.log as ReturnType<typeof vi.fn>).mockClear();
     });
 
     it('outputs debug logs when used with only params', async () => {

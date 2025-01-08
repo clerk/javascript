@@ -8,7 +8,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { LoaderFunction } from 'react-router';
+import type { LoaderFunction, UNSAFE_DataWithResponseInit } from 'react-router';
 import type { CreateServerLoaderArgs } from 'react-router/route-module';
 
 type Func = (...args: any[]) => unknown;
@@ -97,7 +97,13 @@ type ObjectLike = Record<string, unknown> | null;
  *
  * In the case of `null`, we will return an object containing only the authentication state.
  */
-export type RootAuthLoaderCallbackReturn = Promise<Response> | Response | Promise<ObjectLike> | ObjectLike;
+type RootAuthLoaderCallbackReturn =
+  | Promise<Response>
+  | Response
+  | Promise<ObjectLike>
+  | ObjectLike
+  | UNSAFE_DataWithResponseInit<unknown>
+  | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
 // TODO: Figure out how to use the Route.LoaderArgs from userland code
 export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;
