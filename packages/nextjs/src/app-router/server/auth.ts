@@ -65,7 +65,11 @@ export async function auth(options?: AuthOptions) {
   return Object.assign(authObject, { redirectToSignIn });
 }
 
+<<<<<<< HEAD
 auth.protect = async (...args: Parameters<AuthProtect>) => {
+=======
+auth.protect = async (...args: any[]) => {
+>>>>>>> 44cab6038 (chore(backend,nextjs,types): Prevent system permissions usage in server-side (#4816))
   require('server-only');
 
   const request = await buildRequestLike();
