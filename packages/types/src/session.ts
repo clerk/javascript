@@ -1,5 +1,3 @@
-import type { SessionJSONSnapshot } from 'snapshots';
-
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -22,6 +20,7 @@ import type {
   SessionVerificationLevel,
   SessionVerificationResource,
 } from './sessionVerification';
+import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
