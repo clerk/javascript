@@ -168,6 +168,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
+      __experimental_titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
@@ -906,5 +907,6 @@ type UnstableErrors = WithParamName<{
   already_a_member_in_organization: LocalizationValue;
   organization_domain_common: LocalizationValue;
   organization_domain_blocked: LocalizationValue;
+  organization_domain_exists_for_enterprise_connection: LocalizationValue;
   organization_membership_quota_exceeded: LocalizationValue;
 }>;

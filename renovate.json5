@@ -636,6 +636,65 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "expo-passkeys-dev-minor",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "expo-passkeys-dev-major",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "expo-passkeys-prod-minor",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "expo-passkeys-prod-major",
+      "matchFileNames": [
+        "packages/expo-passkeys/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "expo-passkeys"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "express-dev-minor",
       "matchFileNames": [
         "packages/express/package.json"
@@ -869,6 +928,124 @@
         "major"
       ],
       "semanticCommitScope": "nextjs"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "nuxt-dev-minor",
+      "matchFileNames": [
+        "packages/nuxt/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "nuxt"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "nuxt-dev-major",
+      "matchFileNames": [
+        "packages/nuxt/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "nuxt"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "nuxt-prod-minor",
+      "matchFileNames": [
+        "packages/nuxt/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "nuxt"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "nuxt-prod-major",
+      "matchFileNames": [
+        "packages/nuxt/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "nuxt"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "react-router-dev-minor",
+      "matchFileNames": [
+        "packages/react-router/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "react-router"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "react-router-dev-major",
+      "matchFileNames": [
+        "packages/react-router/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "react-router"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "react-router-prod-minor",
+      "matchFileNames": [
+        "packages/react-router/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "react-router"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "react-router-prod-major",
+      "matchFileNames": [
+        "packages/react-router/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "react-router"
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
@@ -1402,6 +1579,65 @@
       "semanticCommitScope": "upgrade"
     },
     {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "vue-dev-minor",
+      "matchFileNames": [
+        "packages/vue/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "vue"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "vue-dev-major",
+      "matchFileNames": [
+        "packages/vue/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "vue"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "vue-prod-minor",
+      "matchFileNames": [
+        "packages/vue/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "vue"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "vue-prod-major",
+      "matchFileNames": [
+        "packages/vue/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "vue"
+    },
+    {
       "matchManagers": [
         "npm"
       ],
@@ -1487,15 +1723,15 @@
     {
       "groupName": "common TypeScript types",
       "matchPackageNames": [
-        "@types/node",
-        "@types/react",
-        "@types/react-dom"
+        "@types/node"
       ],
       "rangeStrategy": "bump"
     },
     {
       "groupName": "React",
       "matchPackageNames": [
+        "@types/react",
+        "@types/react-dom",
         "react",
         "react-dom"
       ],

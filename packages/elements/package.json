@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.19.8",
+  "version": "0.22.5",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -71,33 +71,28 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@xstate/react": "^4.1.1",
     "client-only": "^0.0.1",
+    "tslib": "catalog:repo",
     "xstate": "^5.15.0"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@statelyai/inspect": "^0.4.0",
-    "@types/node": "^18.19.33",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
     "concurrently": "^8.2.2",
-    "next": "^14.2.10",
-    "tslib": "catalog:repo",
-    "tsup": "catalog:repo",
-    "type-fest": "^4.9.0",
-    "typescript": "catalog:repo"
+    "next": "^14.2.18",
+    "type-fest": "^4.29.0"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15",
-    "react": "^18.0.0 || ^19.0.0-beta",
-    "react-dom": "^18.0.0 || ^19.0.0-beta"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
     "next": {

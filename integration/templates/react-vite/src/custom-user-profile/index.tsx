@@ -22,7 +22,10 @@ function Page1() {
 export default function Page() {
   return (
     <PageContextProvider>
-      <UserProfile path={'/custom-user-profile'}>
+      <UserProfile
+        fallback={<>Loading user profile</>}
+        path={'/custom-user-profile'}
+      >
         <UserProfile.Page
           label={'Page 1'}
           labelIcon={<p data-label-icon={'page-1'}>🙃</p>}

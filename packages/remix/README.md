@@ -25,13 +25,15 @@
 
 </div>
 
+> [!IMPORTANT] If you're starting a new project with React Router v7 or are in the process of upgrading a Remix v2 application, please use the [`@clerk/react-router`](https://clerk.com/docs/references/react-router/overview) SDK. `@clerk/remix` is only compatible with Remix v2.
+
 ## Getting Started
 
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_remix) is the easiest way to add authentication and user management to your Remix application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
-- Remix `^2.0.0` or later
+- Remix `^2.0.0`
 - React 18 or later
 - Node.js `>=18.17.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_remix).

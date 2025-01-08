@@ -1,20 +1,21 @@
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
-const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
-const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
+export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
+export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
 export function buildEmailLinkRedirectUrl(
   ctx: SignInContextType | SignUpContextType | UserProfileContextType,
   baseUrl: string | undefined = '',
 ): string {
   const { routing, authQueryString, path } = ctx;
+  const isCombinedFlow = '__experimental' in ctx && ctx.__experimental?.combinedProps;
   return buildRedirectUrl({
     routing,
     baseUrl,
     authQueryString,
     path,
-    endpoint: MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint: isCombinedFlow ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
 }
 
@@ -42,7 +43,13 @@ type BuildRedirectUrlParams = {
   endpoint: string;
 };
 
-const buildRedirectUrl = ({ routing, authQueryString, baseUrl, path, endpoint }: BuildRedirectUrlParams): string => {
+export const buildRedirectUrl = ({
+  routing,
+  authQueryString,
+  baseUrl,
+  path,
+  endpoint,
+}: BuildRedirectUrlParams): string => {
   // If a routing strategy is not provided, default to hash routing
   // All routing strategies know how to convert a hash-based url to their own format
   // Example: navigating from a hash-based to a path-based component,

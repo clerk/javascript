@@ -1,5 +1,105 @@
 # Change Log
 
+## 4.40.0
+
+### Minor Changes
+
+- Adds `oidcLoginHint` & `oidcPrompt` parameters to following types: ([#4789](https://github.com/clerk/javascript/pull/4789)) by [@octoper](https://github.com/octoper)
+
+  - `ReauthorizeExternalAccountParams`
+  - `OAuthConfig`
+  - `SignInCreateParams`
+  - `PrepareVerificationParams`
+  - `SignUpCreateParams`
+  - `CreateExternalAccountParams`
+
+## 4.39.4
+
+### Patch Changes
+
+- Added min and max length username settings to username field error. ([#4771](https://github.com/clerk/javascript/pull/4771)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename `toJSON()` resource methods to `__internal_toSnapshot()` to avoid issues with serializing functions. ([#4777](https://github.com/clerk/javascript/pull/4777)) by [@anagstef](https://github.com/anagstef)
+
+## 4.39.3
+
+### Patch Changes
+
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `claimedAt` proprty inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
+
+  This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
+
+  - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+
+## 4.39.2
+
+### Patch Changes
+
+- Introduce the `navbarButtonText` element descriptor. ([#4635](https://github.com/clerk/javascript/pull/4635)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.39.1
+
+### Patch Changes
+
+- Add `socialButtonsRoot` descriptor. ([#4729](https://github.com/clerk/javascript/pull/4729)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.39.0
+
+### Minor Changes
+
+- Replace `__internal_claimAccountlessKeysUrl` with `__internal_claimKeylessApplicationUrl`. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Introduce experimental sign-in combined flow. ([#4607](https://github.com/clerk/javascript/pull/4607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.38.0
+
+### Minor Changes
+
+- Deprecate the following constants and functions: ([#4716](https://github.com/clerk/javascript/pull/4716)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OAUTH_PROVIDERS`
+  - `getOAuthProviderData()`
+  - `sortedOAuthProviders()`
+  - `WEB3_PROVIDERS`
+  - `getWeb3ProviderData()`
+
+## 4.37.0
+
+### Minor Changes
+
+- Introduce a new `allowedRedirectProtocols` option to pass additional allowed protocols for user-provided redirect validation. ([#4705](https://github.com/clerk/javascript/pull/4705)) by [@BRKalow](https://github.com/BRKalow)
+
+## 4.36.0
+
+### Minor Changes
+
+- Support OKW Wallet Web3 provider and authentication strategy ([#4696](https://github.com/clerk/javascript/pull/4696)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Translates a FAPI error message for when an organization domain is already in use for an organization's SSO ([#4671](https://github.com/clerk/javascript/pull/4671)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.35.1
+
+### Patch Changes
+
+- Add support for the new `enterprise_sso` strategy. ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
+
+  This strategy supersedes SAML to provide a single strategy as the entry point for Enterprise Single Sign On regardless of the underlying protocol used to authenticate the user.
+  For now there are two new types of connections that are supported in addition to SAML, Custom OAuth and EASIE (multi-tenant OAuth).
+
+  - Add a new user setting `enterpriseSSO`, this gets enabled when there is an active enterprise connection for an instance.
+  - Add support for signing in / signing up with the new `enterprise_sso` strategy.
+  - Deprecated `userSettings.saml` in favor of `enterprise_sso`.
+  - Deprecated `saml` sign in strategy in favor of `enterprise_sso`.
+
 ## 4.35.0
 
 ### Minor Changes

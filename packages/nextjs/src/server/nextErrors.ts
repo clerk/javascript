@@ -2,7 +2,6 @@
  * Clerk's identifiers that are used alongside the ones from Next.js
  */
 const CONTROL_FLOW_ERROR = {
-  FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
   REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
 };
@@ -11,30 +10,65 @@ const CONTROL_FLOW_ERROR = {
  * In-house implementation of `notFound()`
  * https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/not-found.ts
  */
-const NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND';
+const LEGACY_NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND' as const;
 
-type NotFoundError = Error & {
-  digest: typeof NOT_FOUND_ERROR_CODE;
-  clerk_digest: typeof CONTROL_FLOW_ERROR.FORCE_NOT_FOUND;
+type LegacyNotFoundError = Error & {
+  digest: typeof LEGACY_NOT_FOUND_ERROR_CODE;
 };
 
-function isNextjsNotFoundError(error: unknown): error is NotFoundError {
+/**
+ * Checks for the error thrown from `notFound()` for versions <= next@15.0.4
+ */
+function isLegacyNextjsNotFoundError(error: unknown): error is LegacyNotFoundError {
   if (typeof error !== 'object' || error === null || !('digest' in error)) {
     return false;
   }
 
-  return error.digest === NOT_FOUND_ERROR_CODE;
+  return error.digest === LEGACY_NOT_FOUND_ERROR_CODE;
 }
 
-function nextjsNotFound(): never {
-  const error = new Error(NOT_FOUND_ERROR_CODE);
-  (error as NotFoundError).digest = NOT_FOUND_ERROR_CODE;
-  (error as NotFoundError).clerk_digest = CONTROL_FLOW_ERROR.FORCE_NOT_FOUND;
-  throw error;
+const HTTPAccessErrorStatusCodes = {
+  NOT_FOUND: 404,
+  FORBIDDEN: 403,
+  UNAUTHORIZED: 401,
+};
+
+const ALLOWED_CODES = new Set(Object.values(HTTPAccessErrorStatusCodes));
+
+export const HTTP_ERROR_FALLBACK_ERROR_CODE = 'NEXT_HTTP_ERROR_FALLBACK' as const;
+
+export type HTTPAccessFallbackError = Error & {
+  digest: `${typeof HTTP_ERROR_FALLBACK_ERROR_CODE};${string}`;
+};
+
+export function isHTTPAccessFallbackError(error: unknown): error is HTTPAccessFallbackError {
+  if (typeof error !== 'object' || error === null || !('digest' in error) || typeof error.digest !== 'string') {
+    return false;
+  }
+  const [prefix, httpStatus] = error.digest.split(';');
+
+  return prefix === HTTP_ERROR_FALLBACK_ERROR_CODE && ALLOWED_CODES.has(Number(httpStatus));
+}
+
+export function whichHTTPAccessFallbackError(error: unknown): number | undefined {
+  if (!isHTTPAccessFallbackError(error)) {
+    return undefined;
+  }
+
+  const [, httpStatus] = error.digest.split(';');
+  return Number(httpStatus);
+}
+
+function isNextjsNotFoundError(error: unknown): error is LegacyNotFoundError | HTTPAccessFallbackError {
+  return (
+    isLegacyNextjsNotFoundError(error) ||
+    // Checks for the error thrown from `notFound()` for canary versions of next@15
+    whichHTTPAccessFallbackError(error) === HTTPAccessErrorStatusCodes.NOT_FOUND
+  );
 }
 
 /**
- * In-house implementation of `redirect()`
+ * In-house implementation of `redirect()` extended with a `clerk_digest` property
  * https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/redirect.ts
  */
 
@@ -103,7 +137,7 @@ function isRedirectToSignInError(error: unknown): error is RedirectError<{ retur
 
 export {
   isNextjsNotFoundError,
-  nextjsNotFound,
+  isLegacyNextjsNotFoundError,
   redirectToSignInError,
   nextjsRedirectError,
   isNextjsRedirectError,

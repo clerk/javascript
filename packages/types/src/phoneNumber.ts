@@ -1,3 +1,5 @@
+import type { PhoneNumberJSONSnapshot } from 'snapshots';
+
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
 import type { PhoneCodeStrategy } from './strategies';
@@ -32,4 +34,5 @@ export interface PhoneNumberResource extends ClerkResource {
   setReservedForSecondFactor: (params: SetReservedForSecondFactorParams) => Promise<PhoneNumberResource>;
   destroy: () => Promise<void>;
   create: () => Promise<PhoneNumberResource>;
+  __internal_toSnapshot: () => PhoneNumberJSONSnapshot;
 }

@@ -132,7 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         'src/app/nested-provider/page.tsx',
         () => `import { ClerkProvider } from '@clerk/nextjs';
       import { ClientComponent } from './client';
-      
+
       export default function Page() {
         return (
           <ClerkProvider dynamic>
@@ -147,10 +147,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         () => `'use client';
 
       import { useAuth } from '@clerk/nextjs';
-      
+
       export function ClientComponent() {
         useAuth();
-      
+
         return <p>I am dynamically rendered</p>;
       }
       `,

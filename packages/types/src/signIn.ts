@@ -1,3 +1,5 @@
+import type { SignInJSONSnapshot } from 'snapshots';
+
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -103,11 +105,14 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithCoinbaseWallet: () => Promise<SignInResource>;
 
+  authenticateWithOKXWallet: () => Promise<SignInResource>;
+
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =
@@ -178,6 +183,8 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;

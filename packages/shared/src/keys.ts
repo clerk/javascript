@@ -39,7 +39,12 @@ export function parsePublishableKey(
   key = key || '';
 
   if (!key || !isPublishableKey(key)) {
-    if (options.fatal) {
+    if (options.fatal && !key) {
+      throw new Error(
+        'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
+      );
+    }
+    if (options.fatal && !isPublishableKey(key)) {
       throw new Error('Publishable key not valid.');
     }
     return null;

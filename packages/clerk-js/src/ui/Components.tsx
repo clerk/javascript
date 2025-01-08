@@ -23,10 +23,10 @@ import type { AppearanceCascade } from './customizables/parseAppearance';
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
-  AccountlessPrompt,
   BlankCaptchaModal,
   CreateOrganizationModal,
   ImpersonationFab,
+  KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
   SignInModal,
@@ -517,13 +517,14 @@ const Components = (props: ComponentsProps) => {
           </LazyImpersonationFabProvider>
         )}
 
-        {__BUILD_FLAG_ACCOUNTLESS_UI__
-          ? state.options?.__internal_claimAccountlessKeysUrl && (
-              <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-                <AccountlessPrompt url={state.options.__internal_claimAccountlessKeysUrl} />
-              </LazyImpersonationFabProvider>
-            )
-          : null}
+        {state.options?.__internal_claimKeylessApplicationUrl && state.options?.__internal_copyInstanceKeysUrl && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <KeylessPrompt
+              claimUrl={state.options.__internal_claimKeylessApplicationUrl}
+              copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
+            />
+          </LazyImpersonationFabProvider>
+        )}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>

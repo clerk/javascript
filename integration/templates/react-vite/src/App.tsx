@@ -6,7 +6,7 @@ function App() {
   return (
     <main>
       <UserButton afterSignOutUrl={'/'} />
-      <OrganizationSwitcher />
+      <OrganizationSwitcher fallback={<>Loading organization switcher</>} />
       <ClientId />
       <SignedOut>SignedOut</SignedOut>
       <SignedIn>SignedIn</SignedIn>

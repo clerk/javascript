@@ -29,7 +29,7 @@
 
 ### Prerequisites
 
-- Astro 3.2 or later
+- Astro 4.15.0 or later
 - Node.js `>=18.17.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_astro).
 
