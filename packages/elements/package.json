@@ -68,7 +68,8 @@
     "lint:attw": "attw --pack . --ignore-rules no-resolution",
     "lint:publint": "publint",
     "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr"
+    "test:cache:clear": "jest --clearCache --useStderr",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/clerk-react": "workspace:^",

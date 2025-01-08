@@ -37,7 +37,8 @@
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr"
+    "test:cache:clear": "jest --clearCache --useStderr",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

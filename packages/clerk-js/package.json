@@ -49,6 +49,7 @@
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "typecheck": "tsc --noEmit",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
   "browserslist": "last 2 years, Safari > 12, iOS > 12",

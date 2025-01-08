@@ -52,7 +52,8 @@
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "test:ci": "jest --maxWorkers=70%",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
