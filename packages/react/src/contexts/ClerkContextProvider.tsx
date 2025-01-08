@@ -16,7 +16,7 @@ type ClerkContextProvider = {
 
 export type ClerkContextProviderState = Resources;
 
-export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element | null {
+export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
   const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
@@ -106,6 +106,7 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   React.useEffect(() => {
     return () => {
       IsomorphicClerk.clearInstance();
+      setLoaded(false);
     };
   }, []);
 

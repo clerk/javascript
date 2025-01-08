@@ -1,5 +1,6 @@
 import { expectTypeOf } from 'expect-type';
 import type React from 'react';
+import { describe, test } from 'vitest';
 
 import type { UserProfile } from '..';
 

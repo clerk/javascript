@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.10
+
+### Patch Changes
+
+- Add support for pnpm and workspace dependencies ([#4722](https://github.com/clerk/javascript/pull/4722)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.9
 
 ### Patch Changes

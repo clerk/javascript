@@ -1,8 +1,6 @@
 import { defineConfig } from 'tsup';
 
-// @ts-expect-error for `import module with '.json' extension`
 import { version as clerkJsVersion } from '../clerk-js/package.json';
-// @ts-expect-error for `import module with '.json' extension`
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {

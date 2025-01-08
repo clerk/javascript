@@ -1,6 +1,7 @@
 import { titleize } from '@clerk/shared/underscore';
 import type {
   ExternalAccountJSON,
+  ExternalAccountJSONSnapshot,
   ExternalAccountResource,
   OAuthProvider,
   ReauthorizeExternalAccountParams,
@@ -25,8 +26,8 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   label = '';
   verification: VerificationResource | null = null;
 
-  public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
-  public constructor(data: ExternalAccountJSON, pathRoot: string) {
+  public constructor(data: Partial<ExternalAccountJSON | ExternalAccountJSONSnapshot>, pathRoot: string);
+  public constructor(data: ExternalAccountJSON | ExternalAccountJSONSnapshot, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
     this.fromJSON(data);
@@ -42,7 +43,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   };
   destroy = (): Promise<void> => this._baseDelete();
 
-  protected fromJSON(data: ExternalAccountJSON | null): this {
+  protected fromJSON(data: ExternalAccountJSON | ExternalAccountJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -65,6 +66,25 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
       this.verification = new Verification(data.verification);
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): ExternalAccountJSONSnapshot {
+    return {
+      object: 'external_account',
+      id: this.id,
+      identification_id: this.identificationId,
+      provider: this.provider,
+      provider_user_id: this.providerUserId,
+      email_address: this.emailAddress,
+      approved_scopes: this.approvedScopes,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      image_url: this.imageUrl,
+      username: this.username,
+      public_metadata: this.publicMetadata,
+      label: this.label,
+      verification: this.verification?.__internal_toSnapshot() || null,
+    };
   }
 
   providerSlug(): OAuthProvider {

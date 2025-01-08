@@ -22,7 +22,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const environment = useEnvironment();
   const preferEmailLinks = emailLinksEnabledForInstance(environment);
 
-  const [createEmailAddress] = useReverification(() => user?.createEmailAddress({ email: emailField.value }));
+  const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const wizard = useWizard({
@@ -44,7 +44,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
     if (!user) {
       return;
     }
-    return createEmailAddress()
+    return createEmailAddress(emailField.value)
       .then(res => {
         emailAddressRef.current = res;
         wizard.nextStep();

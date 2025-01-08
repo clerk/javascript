@@ -52,7 +52,7 @@ export const nbNO: LocalizationResource = {
   formFieldHintText__optional: 'Valgfritt',
   formFieldHintText__slug: 'En slug er en menneskelesbar ID som må være unik. Den brukes ofte i URL-er.',
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett bruker',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett konto',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
@@ -271,6 +271,61 @@ export const nbNO: LocalizationResource = {
   paginationButton__previous: 'Forrige',
   paginationRowText__displaying: 'Viser',
   paginationRowText__of: 'av',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Legg til konto',
@@ -406,6 +461,7 @@ export const nbNO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
+      __experimental_titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',
@@ -523,6 +579,7 @@ export const nbNO: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: undefined,
     organization_minimum_permissions_needed: undefined,
     passkey_already_exists: undefined,
@@ -618,7 +675,7 @@ export const nbNO: LocalizationResource = {
       title: 'Legg til tilknyttet konto',
     },
     deletePage: {
-      actionDescription: 'Skriv inn "Delete account" under for å fortsette.',
+      actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
       messageLine1: 'Er du sikker på at du vil slette kontoen din?',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
@@ -851,61 +908,6 @@ export const nbNO: LocalizationResource = {
       successMessage: 'Lommeboken har blitt lagt til kontoen din.',
       title: 'Legg til web3-lommebok',
       web3WalletButtonsBlockButton: undefined,
-    },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__backupCode: undefined,
-      blockButton__emailCode: undefined,
-      blockButton__password: undefined,
-      blockButton__phoneCode: undefined,
-      blockButton__totp: undefined,
-      getHelp: {
-        blockButton__emailSupport: undefined,
-        content: undefined,
-        title: undefined,
-      },
-      subtitle: undefined,
-      title: undefined,
-    },
-    backupCodeMfa: {
-      subtitle: undefined,
-      title: undefined,
-    },
-    emailCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    noAvailableMethods: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    password: {
-      actionLink: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCode: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    phoneCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
-    },
-    totpMfa: {
-      formTitle: undefined,
-      subtitle: undefined,
-      title: undefined,
     },
   },
   waitlist: {

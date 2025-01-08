@@ -1,5 +1,4 @@
 export {
-  useAuth,
   useClerk,
   useEmailLink,
   useOrganization,
@@ -12,3 +11,4 @@ export {
 } from '@clerk/clerk-react';
 
 export * from './useOAuth';
+export * from './useAuth';

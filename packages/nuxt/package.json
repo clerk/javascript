@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -33,6 +33,14 @@
     "./server": {
       "types": "./dist/runtime/server/index.d.ts",
       "import": "./dist/runtime/server/index.js"
+    },
+    "./components": {
+      "types": "./dist/runtime/components/index.d.ts",
+      "import": "./dist/runtime/components/index.js"
+    },
+    "./composables": {
+      "types": "./dist/runtime/composables/index.d.ts",
+      "import": "./dist/runtime/composables/index.js"
     }
   },
   "main": "./dist/module.js",
@@ -50,10 +58,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
-    "@clerk/vue": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^3.14.159",
     "@nuxt/schema": "^3.14.159",
     "h3": "^1.13.0"

@@ -15,6 +15,7 @@ import type {
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationJSON,
+  OrganizationJSONSnapshot,
   OrganizationMembershipJSON,
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
@@ -48,7 +49,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
 
-  constructor(data: OrganizationJSON) {
+  constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -260,7 +261,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  protected fromJSON(data: OrganizationJSON | null): this {
+  protected fromJSON(data: OrganizationJSON | OrganizationJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -278,6 +279,24 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
+  }
+
+  public __internal_toSnapshot(): OrganizationJSONSnapshot {
+    return {
+      object: 'organization',
+      id: this.id,
+      name: this.name,
+      slug: this.slug,
+      image_url: this.imageUrl,
+      has_image: this.hasImage,
+      public_metadata: this.publicMetadata,
+      members_count: this.membersCount,
+      pending_invitations_count: this.pendingInvitationsCount,
+      max_allowed_memberships: this.maxAllowedMemberships,
+      admin_delete_enabled: this.adminDeleteEnabled,
+      created_at: this.createdAt.getTime(),
+      updated_at: this.updatedAt.getTime(),
+    };
   }
 
   public async reload(params?: ClerkResourceReloadParams): Promise<this> {

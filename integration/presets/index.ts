@@ -7,7 +7,7 @@ import { createLongRunningApps } from './longRunningApps';
 import { next } from './next';
 import { nuxt } from './nuxt';
 import { react } from './react';
-import { remix } from './remix';
+import { reactRouter } from './react-router';
 import { tanstack } from './tanstack';
 
 export const appConfigs = {
@@ -16,12 +16,12 @@ export const appConfigs = {
   longRunningApps: createLongRunningApps(),
   next,
   react,
-  remix,
   elements,
   expo,
   astro,
   tanstack,
   nuxt,
+  reactRouter,
   secrets: {
     instanceKeys,
   },

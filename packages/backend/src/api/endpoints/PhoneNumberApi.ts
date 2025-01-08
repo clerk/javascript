@@ -9,11 +9,13 @@ type CreatePhoneNumberParams = {
   phoneNumber: string;
   verified?: boolean;
   primary?: boolean;
+  reservedForSecondFactor?: boolean;
 };
 
 type UpdatePhoneNumberParams = {
   verified?: boolean;
   primary?: boolean;
+  reservedForSecondFactor?: boolean;
 };
 
 export class PhoneNumberAPI extends AbstractAPI {

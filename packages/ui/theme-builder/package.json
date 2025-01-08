@@ -30,14 +30,10 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
     "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.6.3",
+    "tailwindcss": "^3.4.17",
     "zx": "^8.1.9"
   }
 }

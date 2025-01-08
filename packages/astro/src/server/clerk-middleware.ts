@@ -1,7 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { isDevelopmentFromPublishableKey, isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -10,6 +10,7 @@ import type { APIContext } from 'astro';
 // @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
+import { NETLIFY_CACHE_BUST_PARAM } from '../internal';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
@@ -62,7 +63,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
   const astroMiddleware: AstroMiddleware = async (context, next) => {
     // if the current page is prerendered, do nothing
-    if ('isPrerendered' in context && context.isPrerendered) {
+    if (isPrerenderedPage(context)) {
       return next();
     }
 
@@ -83,6 +84,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
+      handleNetlifyCacheInDevInstance(locationHeader, requestState);
+
       const res = new Response(null, { status: 307, headers: requestState.headers });
       return decorateResponseWithObservabilityHeaders(res, requestState);
     } else if (requestState.status === AuthStatus.Handshake) {
@@ -127,6 +130,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   };
 
   return astroMiddleware;
+};
+
+const isPrerenderedPage = (context: APIContext) => {
+  return (
+    // for Astro v5
+    ('isPrerendered' in context && context.isPrerendered) ||
+    // for Astro v4
+    ('_isPrerendered' in context && context._isPrerendered)
+  );
 };
 
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
@@ -224,6 +236,25 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 2) With environment variables e.g.
    PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    PUBLIC_CLERK_IS_SATELLITE='true'`;
+
+/**
+ * Prevents infinite redirects in Netlify's functions
+ * by adding a cache bust parameter to the original redirect URL. This ensures Netlify
+ * doesn't serve a cached response during the authentication flow.
+ */
+function handleNetlifyCacheInDevInstance(locationHeader: string, requestState: RequestState) {
+  // Only run on Netlify environment and Clerk development instance
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  if (import.meta.env.NETLIFY && isDevelopmentFromPublishableKey(requestState.publishableKey)) {
+    const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
+    // If location header is the original URL before the handshake redirects, add cache bust param
+    if (!hasHandshakeQueryParam) {
+      const url = new URL(locationHeader);
+      url.searchParams.append(NETLIFY_CACHE_BUST_PARAM, Date.now().toString());
+      requestState.headers.set('Location', url.toString());
+    }
+  }
+}
 
 function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;
