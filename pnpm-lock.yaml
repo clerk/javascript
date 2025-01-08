@@ -509,11 +509,11 @@ importers:
   packages/eslint-config-custom:
     dependencies:
       '@next/eslint-plugin-next':
-        specifier: ^12.3.0
+        specifier: ^12.3.4
         version: 12.3.4
       '@vercel/style-guide':
-        specifier: ^5.0.1
-        version: 5.0.1(@next/eslint-plugin-next@12.3.4)(eslint@8.49.0)(jest@29.7.0(@types/node@22.9.0)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3)))(prettier@3.3.3)(typescript@5.6.3)
+        specifier: ^5.2.0
+        version: 5.2.0(@next/eslint-plugin-next@12.3.4)(eslint@8.49.0)(jest@29.7.0(@types/node@22.9.0)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3)))(prettier@3.3.3)(typescript@5.6.3)
       any-eslint-parser:
         specifier: ^1.0.1
         version: 1.0.1(eslint@8.49.0)
@@ -5686,11 +5686,11 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  '@vercel/style-guide@5.0.1':
-    resolution: {integrity: sha512-3J/5xpwJ2Wk+cKB3EGY2KCdVQycaThLKhjBmgXPfIKb+E74lPpXVIDfaQE0D2JoAyIzGsqdH7Lbmr+DojwofxQ==}
+  '@vercel/style-guide@5.2.0':
+    resolution: {integrity: sha512-fNSKEaZvSkiBoF6XEefs8CcgAV9K9e+MbcsDZjUsktHycKdA0jvjAzQi1W/FzLS+Nr5zZ6oejCwq/97dHUKe0g==}
     engines: {node: '>=16'}
     peerDependencies:
-      '@next/eslint-plugin-next': '>=12.3.0 <14'
+      '@next/eslint-plugin-next': '>=12.3.0 <15'
       eslint: '>=8.48.0 <9'
       prettier: '>=3.0.0 <4'
       typescript: '>=4.8.0 <6'
@@ -21302,7 +21302,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@vercel/style-guide@5.0.1(@next/eslint-plugin-next@12.3.4)(eslint@8.49.0)(jest@29.7.0(@types/node@22.9.0)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3)))(prettier@3.3.3)(typescript@5.6.3)':
+  '@vercel/style-guide@5.2.0(@next/eslint-plugin-next@12.3.4)(eslint@8.49.0)(jest@29.7.0(@types/node@22.9.0)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3)))(prettier@3.3.3)(typescript@5.6.3)':
     dependencies:
       '@babel/core': 7.26.0
       '@babel/eslint-parser': 7.22.15(@babel/core@7.26.0)(eslint@8.49.0)
