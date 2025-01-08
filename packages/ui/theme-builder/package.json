@@ -23,7 +23,7 @@
     "change-case": "^5.4.4",
     "clsx": "^2.1.1",
     "colorjs.io": "^0.5.0",
-    "next": "14.2.10",
+    "next": "14.2.21",
     "react": "18.3.1",
     "react-colorful": "^5.6.1",
     "react-dom": "18.3.1",
@@ -32,8 +32,8 @@
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
     "zx": "^8.1.9"
   }
 }
