@@ -94,6 +94,21 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   };
 }
 
+export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
+  return {
+    code: error?.code || '',
+    message: error?.message || '',
+    long_message: error?.longMessage,
+    meta: {
+      param_name: error?.meta?.paramName,
+      session_id: error?.meta?.sessionId,
+      email_addresses: error?.meta?.emailAddresses,
+      identifiers: error?.meta?.identifiers,
+      zxcvbn: error?.meta?.zxcvbn,
+    },
+  };
+}
+
 export class ClerkAPIResponseError extends Error {
   clerkError: true;
 

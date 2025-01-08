@@ -1,5 +1,5 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
@@ -28,12 +28,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   const { title, onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
-  const [createTOTP] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.createTOTP();
-  });
+  const [createTOTP] = useReverification(() => user?.createTOTP());
   const { close } = useActionContext();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');

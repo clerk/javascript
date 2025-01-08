@@ -1,4 +1,5 @@
-import { __experimental_useReverification as useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import type { UserResource } from '@clerk/types';
 import { useRef } from 'react';
 
 import { useEnvironment } from '../../contexts';
@@ -36,19 +37,9 @@ type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
   const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const [updatePasswordWithReverification] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-
-    const opts = {
-      newPassword: passwordField.value,
-      signOutOfOtherSessions: sessionsField.checked,
-      currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
-    } satisfies Parameters<typeof user.updatePassword>[0];
-
-    return user.updatePassword(opts);
-  });
+  const [updatePasswordWithReverification] = useReverification(
+    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
+  );
 
   if (!user) {
     return null;
@@ -124,7 +115,13 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
-      await updatePasswordWithReverification();
+      const opts = {
+        newPassword: passwordField.value,
+        signOutOfOtherSessions: sessionsField.checked,
+        currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
+      } satisfies Parameters<typeof user.updatePassword>[0];
+
+      await updatePasswordWithReverification(user, [opts]);
       onSuccess();
     } catch (e) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);

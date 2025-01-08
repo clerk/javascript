@@ -6,8 +6,9 @@ import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
 import { next } from './next';
+import { nuxt } from './nuxt';
 import { react } from './react';
-import { remix } from './remix';
+import { reactRouter } from './react-router';
 import { tanstack } from './tanstack';
 import { vue } from './vue';
 
@@ -22,7 +23,6 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
-    { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
     {
       id: 'next.appRouter.withEmailCodes_persist_client',
@@ -31,6 +31,7 @@ export const createLongRunningApps = () => {
     },
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'next.appRouter.withReverification', config: next.appRouter, env: envs.withReverification },
+    { id: 'next.appRouter.withCombinedFlow', config: next.appRouter, env: envs.withCombinedFlow },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
@@ -39,6 +40,8 @@ export const createLongRunningApps = () => {
     { id: 'tanstack.start', config: tanstack.start, env: envs.withEmailCodes },
     { id: 'tanstack.router', config: tanstack.router, env: envs.withEmailCodes },
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },
+    { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
+    { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

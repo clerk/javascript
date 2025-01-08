@@ -1,3 +1,4 @@
+export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
 export * from './Client';
 export * from './DeletedObject';

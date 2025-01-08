@@ -5,6 +5,7 @@ import type { OrganizationMembershipRequestResource } from './organizationMember
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
+import type { OrganizationJSONSnapshot } from './snapshots';
 
 declare global {
   /**
@@ -56,6 +57,7 @@ export interface OrganizationResource extends ClerkResource {
   getDomain: ({ domainId }: { domainId: string }) => Promise<OrganizationDomainResource>;
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
+  __internal_toSnapshot: () => OrganizationJSONSnapshot;
 }
 
 export type GetRolesParams = ClerkPaginationParams;

@@ -2,6 +2,7 @@ import type { ClerkResource } from './resource';
 import type { ActiveSessionResource, SessionResource } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { ClientJSONSnapshot } from './snapshots';
 
 export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
@@ -10,6 +11,7 @@ export interface ClientResource extends ClerkResource {
   signIn: SignInResource;
   isNew: () => boolean;
   create: () => Promise<ClientResource>;
+  sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   destroy: () => Promise<void>;
   removeSessions: () => Promise<ClientResource>;
   clearCache: () => void;
@@ -19,4 +21,5 @@ export interface ClientResource extends ClerkResource {
   cookieExpiresAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  __internal_toSnapshot: () => ClientJSONSnapshot;
 }

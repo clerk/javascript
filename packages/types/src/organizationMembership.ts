@@ -1,6 +1,7 @@
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
+import type { OrganizationMembershipJSONSnapshot } from './snapshots';
 import type { Autocomplete } from './utils';
 
 interface Base {
@@ -48,6 +49,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
+  __internal_toSnapshot: () => OrganizationMembershipJSONSnapshot;
 }
 
 export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder

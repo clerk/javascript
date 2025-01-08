@@ -112,6 +112,7 @@ export interface SignInRouterContext extends BaseRouterContext {
   loading: SignInRouterLoadingContext;
   signUpPath: string;
   webAuthnAutofillSupport: boolean;
+  ticket: string | undefined;
 }
 
 // ---------------------------------- Input ---------------------------------- //

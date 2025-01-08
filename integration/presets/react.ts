@@ -1,9 +1,7 @@
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-
-const clerkReactLocal = `file:${process.cwd()}/packages/react`;
-const clerkThemesLocal = `file:${process.cwd()}/packages/themes`;
+import { linkPackage } from './utils';
 
 const cra = applicationConfig()
   .setName('react-cra')
@@ -13,8 +11,8 @@ const cra = applicationConfig()
   .addScript('dev', 'pnpm start')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || clerkReactLocal)
-  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || clerkThemesLocal);
+  .addDependency('@clerk/clerk-react', constants.E2E_CLERK_VERSION || linkPackage('react'))
+  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || linkPackage('themes'));
 
 const vite = cra
   .clone()

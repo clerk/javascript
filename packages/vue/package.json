@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "0.0.5",
+  "version": "1.0.1",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -46,18 +46,17 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig",
+    "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest",
     "test:ci": "vitest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0"
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "typescript": "*",
     "vue": "3.5.12"
   },
   "peerDependencies": {

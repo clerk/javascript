@@ -3,12 +3,13 @@ import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
-  __experimental_UserVerificationProps,
+  __internal_UserVerificationModalProps,
+  __internal_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithOKXWalletParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
@@ -59,6 +60,10 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor } from './utils';
+
+if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+  globalThis.__BUILD_DISABLE_RHC__ = false;
+}
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -116,6 +121,8 @@ type IsomorphicLoadedClerk = Without<
   | 'mountUserProfile'
   | 'mountWaitlist'
   | 'client'
+  | '__internal_getCachedResources'
+  | '__internal_reloadInitialResources'
 > & {
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
@@ -124,6 +131,7 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align Promise unknown
   authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
   authenticateWithCoinbaseWallet: (params: AuthenticateWithCoinbaseWalletParams) => Promise<void>;
+  authenticateWithOKXWallet: (params: AuthenticateWithOKXWalletParams) => Promise<void>;
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<void>;
   authenticateWithGoogleOneTap: (
     params: AuthenticateWithGoogleOneTapParams,
@@ -174,7 +182,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
-  private preopenUserVerification?: null | __experimental_UserVerificationProps = null;
+  private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -221,7 +229,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // During CSR: use the cached instance for the whole lifetime of the app
     // Also will recreate the instance if the provided Clerk instance changes
     // This method should be idempotent in both scenarios
-    if (!inBrowser() || !this.#instance || (options.Clerk && this.#instance.Clerk !== options.Clerk)) {
+    if (
+      !inBrowser() ||
+      !this.#instance ||
+      (options.Clerk && this.#instance.Clerk !== options.Clerk) ||
+      // Allow hot swapping PKs on the client
+      this.#instance.publishableKey !== options.publishableKey
+    ) {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
@@ -272,7 +286,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
 
-    void this.loadClerkJS();
+    if (this.#publishableKey) {
+      void this.loadClerkJS();
+    }
   }
 
   get sdkMetadata(): SDKMetadata | undefined {
@@ -461,7 +477,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         }
 
         global.Clerk = c;
-      } else {
+      } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
           await loadClerkJsScript({
@@ -538,7 +554,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenUserVerification !== null) {
-      clerkjs.__experimental_openUserVerification(this.preopenUserVerification);
+      clerkjs.__internal_openReverification(this.preopenUserVerification);
     }
 
     if (this.preopenOneTap !== null) {
@@ -684,17 +700,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_openUserVerification(props);
+      this.clerkjs.__internal_openReverification(props);
     } else {
       this.preopenUserVerification = props;
     }
   };
 
-  __experimental_closeUserVerification = (): void => {
+  __internal_closeReverification = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_closeUserVerification();
+      this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
     }
@@ -1132,6 +1148,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+    }
+  };
+
+  authenticateWithOKXWallet = async (params: AuthenticateWithOKXWalletParams): Promise<void> => {
+    const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
     }
   };
 

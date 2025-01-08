@@ -26,6 +26,16 @@ const routes = [
     path: '/unstyled',
     component: () => import('./views/Unstyled.vue'),
   },
+  {
+    name: 'CustomUserProfile',
+    path: '/custom-pages/user-profile',
+    component: () => import('./views/custom-pages/UserProfile.vue'),
+  },
+  {
+    name: 'CustomOrganizationProfile',
+    path: '/custom-pages/organization-profile',
+    component: () => import('./views/custom-pages/OrganizationProfile.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -35,6 +45,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const { isSignedIn, isLoaded } = useAuth();
+  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile'];
 
   if (!isLoaded.value) {
     await waitForClerkJsLoaded(isLoaded);
@@ -42,7 +53,7 @@ router.beforeEach(async (to, _, next) => {
 
   if (isSignedIn.value && to.name === 'Sign in') {
     next('/profile');
-  } else if (!isSignedIn.value && ['Profile', 'Admin'].includes(to.name as string)) {
+  } else if (!isSignedIn.value && authenticatedPages.includes(to.name)) {
     next('/sign-in');
   } else {
     next();

@@ -9,21 +9,24 @@ import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared
 import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_UserVerificationModalProps,
+  __internal_UserVerificationModalProps,
   ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithOKXWalletParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClientJSONSnapshot,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
   DomainOrProxyUrl,
   EnvironmentJSON,
+  EnvironmentJSONSnapshot,
   EnvironmentResource,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
@@ -77,6 +80,7 @@ import {
   errorThrower,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
@@ -99,6 +103,7 @@ import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
+import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
 import {
   clerkErrorInitFailed,
@@ -108,6 +113,7 @@ import {
   clerkMissingSignInUrlAsSatellite,
   clerkOAuthCallbackDidNotCompleteSignInSignUp,
   clerkRedirectUrlIsMissingScheme,
+  clerkUnsupportedEnvironmentWarning,
 } from './errors';
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
@@ -118,6 +124,7 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
+  isClerkRuntimeError,
   Organization,
   Waitlist,
 } from './resources/internal';
@@ -174,10 +181,11 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #publishableKey: string = '';
+  #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
+  #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
@@ -189,6 +197,10 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+
+  public __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
+    | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -261,7 +273,9 @@ export class Clerk implements ClerkInterface {
     const publishableKey = parsePublishableKey(this.publishableKey);
 
     if (!publishableKey) {
-      return errorThrower.throwInvalidPublishableKeyError({ key: this.publishableKey });
+      return errorThrower.throwInvalidPublishableKeyError({
+        key: this.publishableKey,
+      });
     }
 
     return publishableKey.frontendApi;
@@ -351,6 +365,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  #isCombinedFlow(): boolean {
+    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -358,8 +376,21 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
-    const defaultCb = () => this.navigate(redirectUrl);
-    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
+
+    const handleSetActive = () => {
+      const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+      if (signOutCallback) {
+        return this.setActive({
+          session: null,
+          beforeEmit: ignoreEventValue(signOutCallback),
+        });
+      }
+
+      return this.setActive({
+        session: null,
+        redirectUrl,
+      });
+    };
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
@@ -368,22 +399,14 @@ export class Clerk implements ClerkInterface {
         await this.client.destroy();
       }
 
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
   };
 
@@ -420,7 +443,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+  public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -435,6 +458,11 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
+  public __internal_closeReverification = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
+  };
+
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
     this.assertComponentsReady(this.#componentControls);
     return this.#componentControls
@@ -447,11 +475,6 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
-  };
-
-  public __experimental_closeUserVerification = (): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -555,7 +578,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+    if (props?.__experimental?.newComponents && this.__experimental_ui) {
       this.__experimental_ui.mount('SignIn', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
@@ -581,7 +604,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    if (props && props.__experimental?.newComponents && this.__experimental_ui) {
+    if (props?.__experimental?.newComponents && this.__experimental_ui) {
       this.__experimental_ui.mount('SignUp', node, props);
     } else {
       this.assertComponentsReady(this.#componentControls);
@@ -895,12 +918,15 @@ export class Clerk implements ClerkInterface {
     if (beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
-      deprecated('beforeEmit', 'Use the `redirectUrl` property instead.');
+      deprecated(
+        'Clerk.setActive({beforeEmit})',
+        'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
+      );
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl) {
+    if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -953,7 +979,7 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
         `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
       );
@@ -967,7 +993,8 @@ export class Clerk implements ClerkInterface {
       console.log(`Clerk is navigating to: ${toURL}`);
     }
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
+    if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
@@ -1044,14 +1071,13 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
   }
 
-  public buildWaitlistUrl(): string {
+  public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
     if (!this.environment || !this.environment.displayConfig) {
       return '';
     }
-
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
-
-    return buildURL({ base: waitlistUrl }, { stringify: true });
+    const initValues = new URLSearchParams(options?.initialValues || {});
+    return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1323,7 +1349,13 @@ export class Clerk implements ClerkInterface {
         signUp,
         verifyEmailPath:
           params.verifyEmailAddressUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
+          buildURL(
+            {
+              base: displayConfig.signUpUrl,
+              hashPath: '/verify-email-address',
+            },
+            { stringify: true },
+          ),
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
@@ -1371,7 +1403,8 @@ export class Clerk implements ClerkInterface {
       return navigateToSignIn();
     }
 
-    const userHasUnverifiedEmail = si.status === 'needs_first_factor';
+    const userHasUnverifiedEmail =
+      si.status === 'needs_first_factor' && !signIn.supportedFirstFactors?.every(f => f.strategy === 'enterprise_sso');
 
     if (userHasUnverifiedEmail) {
       return navigateToFactorOne();
@@ -1470,7 +1503,7 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const newClient = await Client.getInstance().fetch();
+    const newClient = await Client.getOrCreateInstance().fetch();
     this.updateClient(newClient);
     if (this.session) {
       return;
@@ -1484,6 +1517,11 @@ export class Clerk implements ClerkInterface {
   public authenticateWithGoogleOneTap = async (
     params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Google One Tap');
+      return this.client!.signIn; // TODO: Remove not null assertion
+    }
+
     return this.client?.signIn
       .create({
         strategy: 'google_one_tap',
@@ -1502,11 +1540,39 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Metamask');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_metamask_signature',
+    });
   };
 
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
-    await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_wallet_signature' });
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_coinbase_wallet_signature',
+    });
+  };
+
+  public authenticateWithOKXWallet = async (props: AuthenticateWithOKXWalletParams = {}): Promise<void> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('OKX Wallet');
+      return;
+    }
+
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_okx_wallet_signature',
+    });
   };
 
   public authenticateWithWeb3 = async ({
@@ -1517,20 +1583,33 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Web3');
+      return;
+    }
+
     if (!this.client || !this.environment) {
       return;
     }
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
-      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
+      provider === 'metamask'
+        ? generateSignatureWithMetamask
+        : provider === 'coinbase_wallet'
+          ? generateSignatureWithCoinbaseWallet
+          : generateSignatureWithOKXWallet;
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
+      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
+        identifier,
+        generateSignature,
+        strategy,
+      });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
@@ -1573,7 +1652,6 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
-    this.#authService?.setEnvironment(environment);
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -1605,7 +1683,12 @@ export class Clerk implements ClerkInterface {
 
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
+
+      // Note: this might set this.session to null
       this.#setAccessors(session);
+
+      // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();
@@ -1640,7 +1723,10 @@ export class Clerk implements ClerkInterface {
     // 2. clerk-js initializes propA with a default value
     // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
     // 4. If we don't merge the new props with the current options, propA will be reset to undefined
-    const props = { ..._props, options: this.#initOptions({ ...this.#options, ..._props.options }) };
+    const props = {
+      ..._props,
+      options: this.#initOptions({ ...this.#options, ..._props.options }),
+    };
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
@@ -1736,7 +1822,13 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = await AuthCookieService.create(this, this.#fapiClient);
+    /**
+     * 0. Init auth service and setup dev browser
+     * This is not needed for production instances hence the .clear()
+     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
+     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
+     */
+    this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
      * 1. Multi-domain SSO handling
@@ -1748,18 +1840,6 @@ export class Clerk implements ClerkInterface {
       await this.#syncWithPrimary();
       // ClerkJS is not considered loaded during the sync/link process with the primary domain
       return false;
-    }
-
-    /**
-     * 2. Setup dev browser.
-     * This is not needed for production instances hence the .clear()
-     * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
-     * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
-     */
-    if (this.#instanceType === 'production') {
-      this.#authService?.setupProduction();
-    } else {
-      await this.#authService?.setupDevelopment();
     }
 
     /**
@@ -1790,26 +1870,46 @@ export class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: shouldTouchEnv }),
-          Client.getInstance().fetch(),
-        ]);
+        const initEnvironmentPromise = Environment.getInstance()
+          .fetch({ touch: shouldTouchEnv })
+          .then(res => {
+            this.updateEnvironment(res);
+          });
 
-        this.updateClient(client);
-        // updateEnvironment should be called after updateClient
-        // because authService#setEnvironment depends on clerk.session that is being
-        // set in updateClient
-        this.updateEnvironment(environment);
+        const initClient = () => {
+          return Client.getOrCreateInstance()
+            .fetch()
+            .then(res => this.updateClient(res));
+        };
 
-        this.#authService.setActiveOrganizationInStorage();
+        const initComponents = () => {
+          if (Clerk.mountComponentRenderer && !this.#componentControls) {
+            this.#componentControls = Clerk.mountComponentRenderer(
+              this,
+              this.environment as Environment,
+              this.#options,
+            );
+          }
+        };
+
+        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
+          // limit the changes for this specific error for now
+          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+            await initEnvironmentPromise;
+            initComponents();
+            await initClient();
+          } else {
+            throw e;
+          }
+        });
+
+        this.#authService?.setClientUatCookieForDevelopmentInstances();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
 
-        if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment as Environment, this.#options);
-        }
+        initComponents();
 
         break;
       } catch (err) {
@@ -1828,17 +1928,36 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    this.#captchaHeartbeat = new CaptchaHeartbeat(this);
+    void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
-
     this.#handleImpersonationFab();
+    this.#handleKeylessPrompt();
     return true;
   };
 
+  private shouldFallbackToCachedResources = (): boolean => {
+    return !!this.__internal_getCachedResources;
+  };
+
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false }),
-      Client.getInstance().fetch(),
-    ]);
+    let environment: Environment, client: Client;
+    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    try {
+      [environment, client] = await Promise.all([
+        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
+        Client.getOrCreateInstance().fetch({ fetchMaxTries }),
+      ]);
+    } catch (err) {
+      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+        const cachedResources = await this.__internal_getCachedResources?.();
+        environment = new Environment(cachedResources?.environment);
+        Client.clearInstance();
+        client = Client.getOrCreateInstance(cachedResources?.client);
+      } else {
+        throw err;
+      }
+    }
 
     this.updateClient(client);
     this.updateEnvironment(environment);
@@ -1850,6 +1969,19 @@ export class Clerk implements ClerkInterface {
     }
 
     return true;
+  };
+
+  // This is used by @clerk/clerk-expo
+  __internal_reloadInitialResources = async (): Promise<void> => {
+    const [environment, client] = await Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
+      Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
+    ]);
+
+    this.updateClient(client);
+    this.updateEnvironment(environment);
+
+    this.#emit();
   };
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
@@ -1960,6 +2092,19 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  #handleKeylessPrompt = () => {
+    void this.#componentControls?.ensureMounted().then(controls => {
+      if (this.#options.__internal_claimKeylessApplicationUrl) {
+        controls.updateProps({
+          options: {
+            __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
+            __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+          },
+        });
+      }
+    });
+  };
+
   #buildUrl = (
     key: 'signInUrl' | 'signUpUrl',
     options: RedirectOptions,
@@ -1968,10 +2113,18 @@ export class Clerk implements ClerkInterface {
     if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
     const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
-    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    const url = buildURL(
+      {
+        base: signInOrUpUrl,
+        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashSearchParams: [initValues, redirectUrls],
+      },
+      { stringify: true },
+    );
     return this.buildUrlWithAuth(url);
   };
 
@@ -2032,4 +2185,14 @@ export class Clerk implements ClerkInterface {
       // ignore
     }
   };
+
+  get #allowedRedirectProtocols() {
+    let allowedProtocols = ALLOWED_PROTOCOLS;
+
+    if (this.#options.allowedRedirectProtocols) {
+      allowedProtocols = allowedProtocols.concat(this.#options.allowedRedirectProtocols);
+    }
+
+    return allowedProtocols;
+  }
 }

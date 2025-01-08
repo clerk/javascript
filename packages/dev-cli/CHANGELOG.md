@@ -1,5 +1,17 @@
 # @clerk/dev-cli
 
+## 0.0.10
+
+### Patch Changes
+
+- Add support for pnpm and workspace dependencies ([#4722](https://github.com/clerk/javascript/pull/4722)) by [@dstaley](https://github.com/dstaley)
+
+## 0.0.9
+
+### Patch Changes
+
+- Fix framework detection for Next.js. `clerk-dev` will now check for `next` as a dependency. ([#4612](https://github.com/clerk/javascript/pull/4612)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.0.8
 
 ### Patch Changes

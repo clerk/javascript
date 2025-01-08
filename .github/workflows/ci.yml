@@ -1,12 +1,6 @@
 name: CI
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_integration_tests:
-        description: 'Run integration tests'
-        type: boolean
-        default: false
   merge_group:
   pull_request:
     branches:
@@ -18,7 +12,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
+  check-permissions:
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
   formatting-linting:
+    needs: [check-permissions]
     name: Formatting, linting & changeset checks
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -85,6 +100,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
+    needs: [check-permissions]
     name: Unit Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -118,9 +134,9 @@ jobs:
         run: |
           if [ "${{ matrix.node-version }}" == "18" ]; then
             echo "Running tests on Node 18 only for packages with LTS support."
-            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt"
+            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
           else
-            echo "Running tests for all packages on Node 20."
+            echo "Running tests for all packages on Node 22."
             pnpm turbo test $TURBO_ARGS
           fi
         env:
@@ -136,6 +152,7 @@ jobs:
           retention-days: 5
 
   integration-tests:
+    needs: [check-permissions]
     name: Integration Tests
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
@@ -143,7 +160,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue']
+        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue', 'nuxt', 'react-router']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -157,30 +174,11 @@ jobs:
             next-version: '15'
 
     steps:
-      # Skip integration tests from fork PRs to prevent secret exfiltration
-      - name: Get User Permission
-        id: checkAccess
-        uses: actions-cool/check-user-permission@v2
-        with:
-          require: write
-          username: ${{ github.triggering_actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check User Permission
-        if: steps.checkAccess.outputs.require-result == 'false'
-        run: |
-          echo "${{ github.triggering_actor }} does not have permissions on this repo."
-          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
-          echo "Job originally triggered by ${{ github.actor }}"
-          exit 1
-
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
-          # We must first verify the user permissions before checking out PR code
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup
         id: config
@@ -211,6 +209,9 @@ jobs:
         with:
           publish-cmd: |
             if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}

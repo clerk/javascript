@@ -1,5 +1,3 @@
-import { without } from '@clerk/shared/object';
-import { isDeeplyEqual } from '@clerk/shared/react';
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   CreateOrganizationProps,
@@ -14,7 +12,7 @@ import type {
   WaitlistProps,
   Without,
 } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
 import {
@@ -29,7 +27,6 @@ import {
 import type {
   CustomPortalsRendererProps,
   MountProps,
-  OpenProps,
   OrganizationProfileLinkProps,
   OrganizationProfilePageProps,
   UserButtonActionProps,
@@ -44,7 +41,16 @@ import {
   useUserButtonCustomMenuItems,
   useUserProfileCustomPages,
 } from '../utils';
+import { useWaitForComponentMount } from '../utils/useWaitForComponentMount';
+import { ClerkHostRenderer } from './ClerkHostRenderer';
 import { withClerk } from './withClerk';
+
+type FallbackProp = {
+  /**
+   * An optional element to render while the component is mounting.
+   */
+  fallback?: ReactNode;
+};
 
 type UserProfileExportType = typeof _UserProfile & {
   Page: typeof UserProfilePage;
@@ -59,10 +65,8 @@ type UserButtonExportType = typeof _UserButton & {
   Link: typeof MenuLink;
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
-   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
-   * that could be mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   * of the `<UserButton />` without affecting its configuration or any custom pages that could be mounted
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_Outlet: typeof UserButtonOutlet;
 };
@@ -91,10 +95,8 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   OrganizationProfileLink: typeof OrganizationProfileLink;
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
-   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages
-   * that could be mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages that could be mounted
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_Outlet: typeof OrganizationSwitcherOutlet;
 };
@@ -113,103 +115,6 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   __experimental_asProvider?: boolean;
 };
 
-const isMountProps = (props: any): props is MountProps => {
-  return 'mount' in props;
-};
-
-const isOpenProps = (props: any): props is OpenProps => {
-  return 'open' in props;
-};
-
-// README: <Portal/> should be a class pure component in order for mount and unmount
-// lifecycle props to be invoked correctly. Replacing the class component with a
-// functional component wrapped with a React.memo is not identical to the original
-// class implementation due to React intricacies such as the useEffect’s cleanup
-// seems to run AFTER unmount, while componentWillUnmount runs BEFORE.
-
-// More information can be found at https://clerk.slack.com/archives/C015S0BGH8R/p1624891993016300
-
-// The function Portal implementation is commented out for future reference.
-
-// const Portal = React.memo(({ props, mount, unmount }: MountProps) => {
-//   const portalRef = React.createRef<HTMLDivElement>();
-
-//   useEffect(() => {
-//     if (portalRef.current) {
-//       mount(portalRef.current, props);
-//     }
-//     return () => {
-//       if (portalRef.current) {
-//         unmount(portalRef.current);
-//       }
-//     };
-//   }, []);
-
-//   return <div ref={portalRef} />;
-// });
-
-// Portal.displayName = 'ClerkPortal';
-
-class Portal extends React.PureComponent<
-  PropsWithChildren<(MountProps | OpenProps) & { hideRootHtmlElement?: boolean }>
-> {
-  private portalRef = React.createRef<HTMLDivElement>();
-
-  componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
-    if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
-      return;
-    }
-
-    // Remove children and customPages from props before comparing
-    // children might hold circular references which deepEqual can't handle
-    // and the implementation of customPages or customMenuItems relies on props getting new references
-    const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
-    const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
-    // instead, we simply use the length of customPages to determine if it changed or not
-    const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
-    const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
-
-    if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
-      if (this.portalRef.current) {
-        this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
-      }
-    }
-  }
-
-  componentDidMount() {
-    if (this.portalRef.current) {
-      if (isMountProps(this.props)) {
-        this.props.mount(this.portalRef.current, this.props.props);
-      }
-
-      if (isOpenProps(this.props)) {
-        this.props.open(this.props.props);
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.portalRef.current) {
-      if (isMountProps(this.props)) {
-        this.props.unmount(this.portalRef.current);
-      }
-      if (isOpenProps(this.props)) {
-        this.props.close();
-      }
-    }
-  }
-
-  render() {
-    const { hideRootHtmlElement = false } = this.props;
-    return (
-      <>
-        {!hideRootHtmlElement && <div ref={this.portalRef} />}
-        {this.props.children}
-      </>
-    );
-  }
-}
-
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
@@ -219,27 +124,61 @@ const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   );
 };
 
-export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountSignIn}
-      unmount={clerk.unmountSignIn}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'SignIn');
+export const SignIn = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<SignInProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
-export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountSignUp}
-      unmount={clerk.unmountSignUp}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'SignUp');
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountSignIn}
+            unmount={clerk.unmountSignIn}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'SignIn', renderWhileLoading: true },
+);
+
+export const SignUp = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<SignUpProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountSignUp}
+            unmount={clerk.unmountSignUp}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'SignUp', renderWhileLoading: true },
+);
 
 export function UserProfilePage({ children }: PropsWithChildren<UserProfilePageProps>) {
   logErrorInDevMode(userProfilePageRenderedError);
@@ -252,20 +191,37 @@ export function UserProfileLink({ children }: PropsWithChildren<UserProfileLinkP
 }
 
 const _UserProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<UserProfileProps, 'customPages'>>>) => {
+  ({
+    clerk,
+    component,
+    fallback,
+    ...props
+  }: WithClerkProp<PropsWithChildren<Without<UserProfileProps, 'customPages'>> & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     return (
-      <Portal
-        mount={clerk.mountUserProfile}
-        unmount={clerk.unmountUserProfile}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, customPages }}
-      >
-        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-      </Portal>
+      <>
+        {shouldShowFallback && fallback}
+        <ClerkHostRenderer
+          component={component}
+          mount={clerk.mountUserProfile}
+          unmount={clerk.unmountUserProfile}
+          updateProps={(clerk as any).__unstable__updateProps}
+          props={{ ...props, customPages }}
+          rootProps={rendererRootProps}
+        >
+          <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+        </ClerkHostRenderer>
+      </>
     );
   },
-  'UserProfile',
+  { component: 'UserProfile', renderWhileLoading: true },
 );
 
 export const UserProfile: UserProfileExportType = Object.assign(_UserProfile, {
@@ -280,7 +236,19 @@ const UserButtonContext = createContext<MountProps>({
 });
 
 const _UserButton = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages>>) => {
+  ({
+    clerk,
+    component,
+    fallback,
+    ...props
+  }: WithClerkProp<PropsWithChildren<UserButtonPropsWithoutCustomPages> & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
@@ -301,18 +269,23 @@ const _UserButton = withClerk(
 
     return (
       <UserButtonContext.Provider value={passableProps}>
-        <Portal
-          {...passableProps}
-          hideRootHtmlElement={!!props.__experimental_asProvider}
-        >
-          {/*This mimics the previous behaviour before asProvider existed*/}
-          {props.__experimental_asProvider ? sanitizedChildren : null}
-          <CustomPortalsRenderer {...portalProps} />
-        </Portal>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            {...passableProps}
+            hideRootHtmlElement={!!props.__experimental_asProvider}
+            rootProps={rendererRootProps}
+          >
+            {/*This mimics the previous behaviour before asProvider existed*/}
+            {props.__experimental_asProvider ? sanitizedChildren : null}
+            <CustomPortalsRenderer {...portalProps} />
+          </ClerkHostRenderer>
+        )}
       </UserButtonContext.Provider>
     );
   },
-  'UserButton',
+  { component: 'UserButton', renderWhileLoading: true },
 );
 
 export function MenuItems({ children }: PropsWithChildren) {
@@ -341,7 +314,7 @@ export function UserButtonOutlet(outletProps: Without<UserButtonProps, 'userProf
     },
   } satisfies MountProps;
 
-  return <Portal {...portalProps} />;
+  return <ClerkHostRenderer {...portalProps} />;
 }
 
 export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
@@ -364,20 +337,39 @@ export function OrganizationProfileLink({ children }: PropsWithChildren<Organiza
 }
 
 const _OrganizationProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<Without<OrganizationProfileProps, 'customPages'>>>) => {
+  ({
+    clerk,
+    component,
+    fallback,
+    ...props
+  }: WithClerkProp<PropsWithChildren<Without<OrganizationProfileProps, 'customPages'>> & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children);
     return (
-      <Portal
-        mount={clerk.mountOrganizationProfile}
-        unmount={clerk.unmountOrganizationProfile}
-        updateProps={(clerk as any).__unstable__updateProps}
-        props={{ ...props, customPages }}
-      >
-        <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-      </Portal>
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountOrganizationProfile}
+            unmount={clerk.unmountOrganizationProfile}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={{ ...props, customPages }}
+            rootProps={rendererRootProps}
+          >
+            <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+          </ClerkHostRenderer>
+        )}
+      </>
     );
   },
-  'OrganizationProfile',
+  { component: 'OrganizationProfile', renderWhileLoading: true },
 );
 
 export const OrganizationProfile: OrganizationProfileExportType = Object.assign(_OrganizationProfile, {
@@ -385,16 +377,33 @@ export const OrganizationProfile: OrganizationProfileExportType = Object.assign(
   Link: OrganizationProfileLink,
 });
 
-export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<CreateOrganizationProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountCreateOrganization}
-      unmount={clerk.unmountCreateOrganization}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'CreateOrganization');
+export const CreateOrganization = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<CreateOrganizationProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountCreateOrganization}
+            unmount={clerk.unmountCreateOrganization}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'CreateOrganization', renderWhileLoading: true },
+);
 
 const OrganizationSwitcherContext = createContext<MountProps>({
   mount: () => {},
@@ -403,7 +412,19 @@ const OrganizationSwitcherContext = createContext<MountProps>({
 });
 
 const _OrganizationSwitcher = withClerk(
-  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages>>) => {
+  ({
+    clerk,
+    component,
+    fallback,
+    ...props
+  }: WithClerkProp<PropsWithChildren<OrganizationSwitcherPropsWithoutCustomPages> & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
@@ -415,6 +436,8 @@ const _OrganizationSwitcher = withClerk(
       unmount: clerk.unmountOrganizationSwitcher,
       updateProps: (clerk as any).__unstable__updateProps,
       props: { ...props, organizationProfileProps },
+      rootProps: rendererRootProps,
+      component,
     };
 
     /**
@@ -424,18 +447,23 @@ const _OrganizationSwitcher = withClerk(
 
     return (
       <OrganizationSwitcherContext.Provider value={passableProps}>
-        <Portal
-          {...passableProps}
-          hideRootHtmlElement={!!props.__experimental_asProvider}
-        >
-          {/*This mimics the previous behaviour before asProvider existed*/}
-          {props.__experimental_asProvider ? sanitizedChildren : null}
-          <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
-        </Portal>
+        <>
+          {shouldShowFallback && fallback}
+          {clerk.loaded && (
+            <ClerkHostRenderer
+              {...passableProps}
+              hideRootHtmlElement={!!props.__experimental_asProvider}
+            >
+              {/*This mimics the previous behaviour before asProvider existed*/}
+              {props.__experimental_asProvider ? sanitizedChildren : null}
+              <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
+            </ClerkHostRenderer>
+          )}
+        </>
       </OrganizationSwitcherContext.Provider>
     );
   },
-  'OrganizationSwitcher',
+  { component: 'OrganizationSwitcher', renderWhileLoading: true },
 );
 
 export function OrganizationSwitcherOutlet(
@@ -451,7 +479,7 @@ export function OrganizationSwitcherOutlet(
     },
   } satisfies MountProps;
 
-  return <Portal {...portalProps} />;
+  return <ClerkHostRenderer {...portalProps} />;
 }
 
 export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assign(_OrganizationSwitcher, {
@@ -460,34 +488,86 @@ export const OrganizationSwitcher: OrganizationSwitcherExportType = Object.assig
   __experimental_Outlet: OrganizationSwitcherOutlet,
 });
 
-export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationListProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountOrganizationList}
-      unmount={clerk.unmountOrganizationList}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'OrganizationList');
+export const OrganizationList = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OrganizationListProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
-export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<GoogleOneTapProps>) => {
-  return (
-    <Portal
-      open={clerk.openGoogleOneTap}
-      close={clerk.closeGoogleOneTap}
-      props={props}
-    />
-  );
-}, 'GoogleOneTap');
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
 
-export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistProps>) => {
-  return (
-    <Portal
-      mount={clerk.mountWaitlist}
-      unmount={clerk.unmountWaitlist}
-      updateProps={(clerk as any).__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'Waitlist');
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountOrganizationList}
+            unmount={clerk.unmountOrganizationList}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'OrganizationList', renderWhileLoading: true },
+);
+
+export const GoogleOneTap = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<GoogleOneTapProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            open={clerk.openGoogleOneTap}
+            close={clerk.closeGoogleOneTap}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'GoogleOneTap', renderWhileLoading: true },
+);
+
+export const Waitlist = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<WaitlistProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountWaitlist}
+            unmount={clerk.unmountWaitlist}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'Waitlist', renderWhileLoading: true },
+);

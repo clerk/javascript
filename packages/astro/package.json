@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "1.4.13",
+  "version": "2.1.5",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -78,22 +78,20 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.17.0",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
-    "nanoid": "5.0.7",
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "nanoid": "5.0.9",
     "nanostores": "0.11.3"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
-    "react": "18.3.1",
-    "typescript": "*"
+    "@clerk/eslint-config-custom": "workspace:*"
   },
   "peerDependencies": {
-    "astro": "^3.2.0 || ^4.0.0"
+    "astro": "^4.15.0 || ^5.0.0"
   },
   "engines": {
     "node": ">=18.17.0"

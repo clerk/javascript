@@ -1,4 +1,5 @@
 import type { ClerkResource } from './resource';
+import type { SamlAccountConnectionJSONSnapshot } from './snapshots';
 
 export interface SamlAccountConnectionResource extends ClerkResource {
   id: string;
@@ -12,4 +13,5 @@ export interface SamlAccountConnectionResource extends ClerkResource {
   disableAdditionalIdentifications: boolean;
   createdAt: Date;
   updatedAt: Date;
+  __internal_toSnapshot: () => SamlAccountConnectionJSONSnapshot;
 }

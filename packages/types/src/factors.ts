@@ -3,6 +3,7 @@ import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
+  EnterpriseSSOStrategy,
   OAuthStrategy,
   PasskeyStrategy,
   PasswordStrategy,
@@ -58,6 +59,10 @@ export type SamlFactor = {
   strategy: SamlStrategy;
 };
 
+export type EnterpriseSSOFactor = {
+  strategy: EnterpriseSSOStrategy;
+};
+
 export type TOTPFactor = {
   strategy: TOTPStrategy;
 };
@@ -96,9 +101,16 @@ export type PassKeyConfig = PasskeyFactor;
 export type OAuthConfig = OauthFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 
 export type SamlConfig = SamlFactor & {
+  redirectUrl: string;
+  actionCompleteRedirectUrl: string;
+};
+
+export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
 };

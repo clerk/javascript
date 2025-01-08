@@ -1,5 +1,6 @@
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
+import type { EmailAddressJSONSnapshot } from './snapshots';
 import type { EmailCodeStrategy, EmailLinkStrategy } from './strategies';
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 
@@ -27,4 +28,5 @@ export interface EmailAddressResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
   destroy: () => Promise<void>;
   create: () => Promise<EmailAddressResource>;
+  __internal_toSnapshot: () => EmailAddressJSONSnapshot;
 }

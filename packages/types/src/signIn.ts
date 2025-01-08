@@ -6,6 +6,8 @@ import type {
   EmailCodeFactor,
   EmailLinkConfig,
   EmailLinkFactor,
+  EnterpriseSSOConfig,
+  EnterpriseSSOFactor,
   OAuthConfig,
   OauthFactor,
   PasskeyAttempt,
@@ -47,10 +49,12 @@ import type {
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignInJSONSnapshot } from './snapshots';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
+  EnterpriseSSOStrategy,
   GoogleOneTapStrategy,
   OAuthStrategy,
   PasskeyStrategy,
@@ -100,11 +104,14 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithCoinbaseWallet: () => Promise<SignInResource>;
 
+  authenticateWithOKXWallet: () => Promise<SignInResource>;
+
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =
@@ -130,7 +137,8 @@ export type SignInFirstFactor =
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
   | OauthFactor
-  | SamlFactor;
+  | SamlFactor
+  | EnterpriseSSOFactor;
 
 export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
 
@@ -152,7 +160,8 @@ export type PrepareFirstFactorParams =
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
-  | SamlConfig;
+  | SamlConfig
+  | EnterpriseSSOConfig;
 
 export type AttemptFirstFactorParams =
   | PasskeyAttempt
@@ -169,10 +178,12 @@ export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupC
 
 export type SignInCreateParams = (
   | {
-      strategy: OAuthStrategy | SamlStrategy;
+      strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;
@@ -234,7 +245,8 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | SamlStrategy;
+  | SamlStrategy
+  | EnterpriseSSOStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';

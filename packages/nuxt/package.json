@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -33,6 +33,14 @@
     "./server": {
       "types": "./dist/runtime/server/index.d.ts",
       "import": "./dist/runtime/server/index.js"
+    },
+    "./components": {
+      "types": "./dist/runtime/components/index.d.ts",
+      "import": "./dist/runtime/components/index.js"
+    },
+    "./composables": {
+      "types": "./dist/runtime/composables/index.d.ts",
+      "import": "./dist/runtime/composables/index.js"
     }
   },
   "main": "./dist/module.js",
@@ -46,20 +54,21 @@
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
-    "publish:local": "pnpm dlx yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "1.17.0",
-    "@clerk/shared": "2.15.0",
-    "@clerk/types": "4.34.0",
-    "@clerk/vue": "0.0.5",
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^3.14.159",
     "@nuxt/schema": "^3.14.159",
     "h3": "^1.13.0"
   },
   "devDependencies": {
     "nuxt": "^3.14.159",
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "engines": {
     "node": ">=18.17.0"

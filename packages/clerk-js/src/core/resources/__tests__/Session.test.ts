@@ -11,41 +11,6 @@ describe('Session', () => {
     SessionTokenCache.clear();
   });
 
-  describe('creating new session', () => {
-    let dispatchSpy;
-
-    beforeEach(() => {
-      dispatchSpy = jest.spyOn(eventBus, 'dispatch');
-      BaseResource.clerk = clerkMock() as any;
-    });
-
-    afterEach(() => {
-      dispatchSpy?.mockRestore();
-      BaseResource.clerk = null as any;
-      // @ts-ignore
-      global.fetch?.mockClear();
-      SessionTokenCache.clear();
-    });
-
-    it('dispatches token:update event on initialization with lastActiveToken', () => {
-      new Session({
-        status: 'active',
-        id: 'session_1',
-
-        object: 'session',
-        user: createUser({}),
-        last_active_organization_id: 'activeOrganization',
-        last_active_token: { object: 'token', jwt: mockJwt },
-        actor: null,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as SessionJSON);
-
-      expect(dispatchSpy).toHaveBeenCalledTimes(1);
-      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
-    });
-  });
-
   describe('getToken()', () => {
     let dispatchSpy;
 
@@ -101,7 +66,7 @@ describe('Session', () => {
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
 
       expect(token).toEqual(mockJwt);
-      expect(dispatchSpy).toHaveBeenCalledTimes(3);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
     });
 
     it('dispatches token:update event on getToken with active organization', async () => {
@@ -311,7 +276,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -338,7 +303,7 @@ describe('Session', () => {
 
       const isAuthorized = session.checkAuthorization({
         permission: 'org:sys_profile:delete',
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -362,7 +327,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -386,7 +351,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -410,7 +375,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -434,7 +399,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -458,7 +423,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -482,7 +447,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'strict',
+        reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(false);
@@ -503,7 +468,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'strict_mfa',
+        reverification: 'strict_mfa',
       });
 
       expect(isAuthorized).toBe(true);
@@ -524,7 +489,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -548,7 +513,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -572,7 +537,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multiFactor',
           afterMinutes: 10,
         },
@@ -596,7 +561,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multiFactor',
           afterMinutes: 10,
         },
@@ -620,7 +585,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multiFactor',
           afterMinutes: 10,
         },
@@ -644,7 +609,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'first_factor',
           afterMinutes: 10,
         },
@@ -668,7 +633,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'strict',
+        reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(false);
@@ -677,7 +642,7 @@ describe('Session', () => {
     /**
      * Test for invalid input
      */
-    it('incorrect params for __experimental_reverification', async () => {
+    it('incorrect params for reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -692,7 +657,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           //@ts-expect-error
           level: 'any level',
           afterMinutes: 10,
@@ -702,7 +667,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_reverification', async () => {
+    it('incorrect params for reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -717,7 +682,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           //@ts-expect-error
           level: 'any level',
           //@ts-expect-error
@@ -728,7 +693,7 @@ describe('Session', () => {
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_reverification', async () => {
+    it('incorrect params for reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -743,13 +708,14 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'invalid-value',
+        // @ts-expect-error
+        reverification: 'invalid-value',
       });
 
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_reverification', async () => {
+    it('incorrect params for reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -764,13 +730,14 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 123,
+        // @ts-expect-error
+        reverification: 123,
       });
 
       expect(isAuthorized).toBe(false);
     });
 
-    it('incorrect params for __experimental_reverification', async () => {
+    it('incorrect params for reverification', async () => {
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -785,7 +752,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'first_factor',
           //@ts-expect-error
           afterMinutes: '10',
@@ -813,7 +780,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'multi_factor',
           afterMinutes: 10,
         },
@@ -837,7 +804,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: {
+        reverification: {
           level: 'first_factor',
           afterMinutes: 10,
         },
@@ -861,7 +828,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = session.checkAuthorization({
-        __experimental_reverification: 'strict',
+        reverification: 'strict',
       });
 
       expect(isAuthorized).toBe(true);

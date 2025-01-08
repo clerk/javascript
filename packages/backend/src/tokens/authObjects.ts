@@ -36,11 +36,11 @@ export type SignedInAuthObject = {
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   /**
-   * The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
    */
-  __experimental_factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -59,11 +59,11 @@ export type SignedOutAuthObject = {
   orgSlug: null;
   orgPermissions: null;
   /**
-   * The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
    */
-  __experimental_factorVerificationAge: null;
+  factorVerificationAge: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -109,7 +109,7 @@ export function signedInAuthObject(
   });
 
   // fva can be undefined for instances that have not opt-in
-  const __experimental_factorVerificationAge = fva ?? null;
+  const factorVerificationAge = fva ?? null;
 
   return {
     actor,
@@ -120,9 +120,9 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
     getToken,
-    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, __experimental_factorVerificationAge }),
+    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, factorVerificationAge }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -140,7 +140,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    __experimental_factorVerificationAge: null,
+    factorVerificationAge: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),

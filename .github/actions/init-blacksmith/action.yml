@@ -114,6 +114,8 @@ runs:
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install PNPM Dependencies
+      env:
+        CYPRESS_INSTALL_BINARY: 0
       run: pnpm install
       shell: bash
 
@@ -121,8 +123,10 @@ runs:
       if: inputs.playwright-enabled == 'true'
       shell: bash
       id: playwright-version
-      run: echo "VERSION=$(node -e "console.log($(npm ls @playwright/test --json).dependencies['@playwright/test'].version)")" >> "$GITHUB_OUTPUT"
-
+      run: |
+        VERSION=$(node -p "require('@playwright/test/package.json').version")
+        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+        
     - name: Cache Playwright Binaries
       if: inputs.playwright-enabled == 'true'
       uses: useblacksmith/cache@v5

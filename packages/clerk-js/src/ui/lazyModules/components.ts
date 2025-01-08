@@ -16,6 +16,7 @@ const componentImportPaths = {
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
+  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -82,6 +83,9 @@ export const BlankCaptchaModal = lazy(() =>
 
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
+);
+export const KeylessPrompt = lazy(() =>
+  componentImportPaths.KeylessPrompt().then(module => ({ default: module.KeylessPrompt })),
 );
 
 export const preloadComponent = async (component: unknown) => {

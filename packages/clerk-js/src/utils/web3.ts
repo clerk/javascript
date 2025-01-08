@@ -10,6 +10,8 @@ type GetWeb3IdentifierParams = {
 export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promise<string> {
   const { provider } = params;
   const ethereum = await getEthereumProvider(provider);
+
+  // TODO - core-3: Improve error handling for the case when the provider is not found
   if (!ethereum) {
     // If a plugin for the requested provider is not found,
     // the flow will fail as it has been the expected behavior so far.
@@ -28,6 +30,8 @@ type GenerateWeb3SignatureParams = GenerateSignatureParams & {
 export async function generateWeb3Signature(params: GenerateWeb3SignatureParams): Promise<string> {
   const { identifier, nonce, provider } = params;
   const ethereum = await getEthereumProvider(provider);
+
+  // TODO - core-3: Improve error handling for the case when the provider is not found
   if (!ethereum) {
     // If a plugin for the requested provider is not found,
     // the flow will fail as it has been the expected behavior so far.
@@ -48,6 +52,10 @@ export async function getCoinbaseWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'coinbase_wallet' });
 }
 
+export async function getOKXWalletIdentifier(): Promise<string> {
+  return await getWeb3Identifier({ provider: 'okx_wallet' });
+}
+
 type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
@@ -59,6 +67,10 @@ export async function generateSignatureWithMetamask(params: GenerateSignaturePar
 
 export async function generateSignatureWithCoinbaseWallet(params: GenerateSignatureParams): Promise<string> {
   return await generateWeb3Signature({ ...params, provider: 'coinbase_wallet' });
+}
+
+export async function generateSignatureWithOKXWallet(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'okx_wallet' });
 }
 
 async function getEthereumProvider(provider: Web3Provider) {

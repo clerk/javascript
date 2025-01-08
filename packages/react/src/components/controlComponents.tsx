@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
@@ -14,44 +15,44 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedIn');
 
   const { userId } = useAuthContext();
   if (userId) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
 
-export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedOut');
 
   const { userId } = useAuthContext();
   if (userId === null) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
 
-export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
   const isomorphicClerk = useIsomorphicClerkContext();
   if (!isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
-export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
   if (isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
@@ -108,9 +109,9 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  const unauthorized = <>{fallback ?? null}</>;
+  const unauthorized = fallback ?? null;
 
-  const authorized = <>{children}</>;
+  const authorized = children;
 
   if (!userId) {
     return unauthorized;
@@ -164,24 +165,36 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
   return null;
 }, 'RedirectToSignUp');
 
+/**
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToUserProfile', 'Use the `redirectToUserProfile()` method instead.');
     void clerk.redirectToUserProfile();
   }, []);
 
   return null;
 }, 'RedirectToUserProfile');
 
+/**
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToOrganizationProfile', 'Use the `redirectToOrganizationProfile()` method instead.');
     void clerk.redirectToOrganizationProfile();
   }, []);
 
   return null;
 }, 'RedirectToOrganizationProfile');
 
+/**
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {
+    deprecated('RedirectToCreateOrganization', 'Use the `redirectToCreateOrganization()` method instead.');
     void clerk.redirectToCreateOrganization();
   }, []);
 
@@ -199,7 +212,7 @@ export const AuthenticateWithRedirectCallback = withClerk(
   'AuthenticateWithRedirectCallback',
 );
 
-export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {
+export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('MultisessionAppSupport');
 
   const session = useSessionContext();

@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useClerk, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
@@ -191,12 +191,7 @@ const AddPasskeyButton = () => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
-  const [createPasskey] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.createPasskey();
-  });
+  const [createPasskey] = useReverification(() => user?.createPasskey());
 
   const handleCreatePasskey = async () => {
     if (!user) {

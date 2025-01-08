@@ -14,8 +14,8 @@
   "license": "MIT",
   "author": "Clerk",
   "dependencies": {
-    "@next/eslint-plugin-next": "^12.3.0",
-    "@vercel/style-guide": "^5.0.1",
+    "@next/eslint-plugin-next": "^12.3.4",
+    "@vercel/style-guide": "^5.2.0",
     "any-eslint-parser": "^1.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-turbo": "^2.0.3",
@@ -25,7 +25,7 @@
     "eslint-plugin-unused-imports": "^3.2.0"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": "catalog:repo"
   },
   "publishConfig": {
     "access": "public"

@@ -104,7 +104,35 @@ describe('completeSignUpFlow', () => {
     expect(mockHandleComplete).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(mockAuthenticateWithRedirect).toHaveBeenCalledWith({
-      strategy: 'saml',
+      strategy: 'enterprise_sso',
+      redirectUrl,
+      redirectUrlComplete,
+      continueSignUp: true,
+    });
+  });
+
+  it('initiates a Enterprise SSO flow if enterprise_sso is listed as a missing field', async () => {
+    const redirectUrl = 'https://www.in.gr/acs';
+    const redirectUrlComplete = 'https://www.in.gr/tada';
+
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+      redirectUrl: 'https://www.in.gr/acs',
+      redirectUrlComplete: 'https://www.in.gr/tada',
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockAuthenticateWithRedirect).toHaveBeenCalledWith({
+      strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
       continueSignUp: true,

@@ -31,6 +31,7 @@ export type SignInStartInput = {
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  ticket?: string | undefined;
 };
 
 // ---------------------------------- Context ---------------------------------- //
@@ -41,6 +42,7 @@ export interface SignInStartContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
   loadingStep: 'start';
+  ticket?: string | undefined;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

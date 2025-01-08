@@ -16,7 +16,7 @@ type ClerkContextProvider = {
 
 export type ClerkContextProviderState = Resources;
 
-export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element | null {
+export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
   const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
@@ -46,7 +46,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_factorVerificationAge,
+    factorVerificationAge,
   } = derivedState;
 
   const authCtx = React.useMemo(() => {
@@ -58,10 +58,10 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
       orgRole,
       orgSlug,
       orgPermissions,
-      __experimental_factorVerificationAge,
+      factorVerificationAge,
     };
     return { value };
-  }, [sessionId, userId, actor, orgId, orgRole, orgSlug, __experimental_factorVerificationAge]);
+  }, [sessionId, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge]);
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const organizationCtx = React.useMemo(() => {
@@ -106,6 +106,7 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   React.useEffect(() => {
     return () => {
       IsomorphicClerk.clearInstance();
+      setLoaded(false);
     };
   }, []);
 

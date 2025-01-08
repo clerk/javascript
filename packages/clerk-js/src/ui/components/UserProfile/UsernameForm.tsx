@@ -1,4 +1,4 @@
-import { __experimental_useReverification as useReverification, useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
@@ -12,12 +12,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   const { onSuccess, onReset } = props;
   const { user } = useUser();
 
-  const [updateUsername] = useReverification(() => {
-    if (!user) {
-      return Promise.resolve(undefined);
-    }
-    return user.update({ username: usernameField.value });
-  });
+  const [updateUsername] = useReverification((username: string) => user?.update({ username }));
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
@@ -38,7 +33,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
 
   const submitUpdate = async () => {
     try {
-      await updateUsername();
+      await updateUsername(usernameField.value);
       onSuccess();
     } catch (e) {
       handleError(e, [usernameField], card.setError);

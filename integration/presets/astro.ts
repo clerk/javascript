@@ -1,9 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
-
-const clerkAstroLocal = `file:${process.cwd()}/packages/astro`;
-const clerkTypesLocal = `file:${process.cwd()}/packages/types`;
-const clerkLocalizationLocal = `file:${process.cwd()}/packages/localizations`;
+import { linkPackage } from './utils';
 
 const astroNode = applicationConfig()
   .setName('astro-node')
@@ -13,9 +10,9 @@ const astroNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/astro', clerkAstroLocal)
-  .addDependency('@clerk/types', clerkTypesLocal)
-  .addDependency('@clerk/localizations', clerkLocalizationLocal);
+  .addDependency('@clerk/astro', linkPackage('astro'))
+  .addDependency('@clerk/types', linkPackage('types'))
+  .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 const astroStatic = astroNode.clone().setName('astro-hybrid').useTemplate(templates['astro-hybrid']);
 

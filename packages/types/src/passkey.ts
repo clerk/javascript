@@ -1,6 +1,7 @@
 import type { DeletedObjectResource } from './deletedObject';
 import type { PasskeyJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { PasskeyJSONSnapshot } from './snapshots';
 import type { SnakeToCamel } from './utils';
 import type { PasskeyVerificationResource } from './verification';
 
@@ -18,6 +19,7 @@ export interface PasskeyResource extends ClerkResource {
 
   update: (params: UpdatePasskeyParams) => Promise<PasskeyResource>;
   delete: () => Promise<DeletedObjectResource>;
+  __internal_toSnapshot: () => PasskeyJSONSnapshot;
 }
 
 export type PublicKeyCredentialCreationOptionsWithoutExtensions = Omit<
