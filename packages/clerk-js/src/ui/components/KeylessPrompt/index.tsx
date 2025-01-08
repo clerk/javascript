@@ -27,7 +27,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   return (
     <Portal>
       <Flex
-        data-expanded={isExpanded}
+        data-expanded={claimed || isExpanded}
         align='center'
         sx={t => ({
           position: 'fixed',
@@ -61,7 +61,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
       >
         <button
           type='button'
-          aria-expanded={isExpanded}
+          aria-expanded={claimed || isExpanded}
           aria-controls={contentIdentifier}
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
