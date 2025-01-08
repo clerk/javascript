@@ -1,9 +1,8 @@
-import type { OAuthProvider } from 'oauth';
-import type { SamlIdpSlug } from 'saml';
-import type { EnterpriseAccountConnectionJSONSnapshot, EnterpriseAccountJSONSnapshot } from 'snapshots';
-import type { VerificationResource } from 'verification';
-
+import type { OAuthProvider } from './oauth';
 import type { ClerkResource } from './resource';
+import type { SamlIdpSlug } from './saml';
+import type { EnterpriseAccountConnectionJSONSnapshot, EnterpriseAccountJSONSnapshot } from './snapshots';
+import type { VerificationResource } from './verification';
 
 export type EnterpriseProtocol = 'saml' | 'oauth';
 
