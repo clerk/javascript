@@ -3,7 +3,7 @@ import { ClerkInstanceContext } from '@clerk/shared/react';
 import type { LoadedClerk } from '@clerk/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
 
 import { AuthContext } from '../../contexts/AuthContext';
 import { errorThrower } from '../../errors/errorThrower';
@@ -175,7 +175,7 @@ describe('useDerivedAuth', () => {
   });
 
   it('uses provided has function if available', () => {
-    const mockHas = vi.fn().mockReturnValue('mocked-result');
+    const mockHas = vi.fn().mockReturnValue(false);
     const authObject = {
       sessionId: 'session123',
       userId: 'user123',
@@ -185,7 +185,13 @@ describe('useDerivedAuth', () => {
       result: { current },
     } = renderHook(() => useDerivedAuth(authObject));
 
-    expect(current.has?.({ permission: 'test' })).toBe('mocked-result');
+    if (!current.userId) {
+      throw 'Invalid state';
+    }
+
+    const result = current.has({ permission: 'test' });
+    expect(result).toBe(false);
+    expectTypeOf(result).toBeBoolean();
     expect(mockHas).toHaveBeenCalledWith({ permission: 'test' });
   });
 });
