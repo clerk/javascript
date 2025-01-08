@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix an issue where `getToken()` from `useAuth()` composable returns an empty value ([#4837](https://github.com/clerk/javascript/pull/4837)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
 ## 1.0.0
 
 ### Major Changes
