@@ -2,16 +2,21 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkMiddleware } from '@clerk/express';
 import express from 'express';
 import ViteExpress from 'vite-express';
 
 const app = express();
 
+app.use(clerkMiddleware());
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
-app.get('/api/protected', [clerkClient.expressRequireAuth() as any], (_req: any, res: any) => {
+app.get('/api/protected', (req: any, res: any, next: any) => {
+  if (!req.auth.userId) {
+    return next(new Error('Unauthenticated'));
+  }
+
   res.send('Protected API response').end();
 });
 
