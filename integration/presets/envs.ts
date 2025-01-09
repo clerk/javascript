@@ -118,7 +118,7 @@ const withCombinedFlow = withEmailCodes
   .setId('withCombinedFlow')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in');
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
 export const envs = {
   base,
