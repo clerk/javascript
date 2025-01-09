@@ -4,6 +4,36 @@ import { createSession, createSignIn, createSignUp, createUser } from '../../tes
 import { BaseResource, Client } from '../internal';
 
 describe('Client Singleton', () => {
+  it('sends captcha token', async () => {
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const session = createSession({ id: 'session_1' }, user);
+    const clientObjectJSON: ClientJSON = {
+      object: 'client',
+      id: 'test_id',
+      status: 'active',
+      last_active_session_id: 'test_session_id',
+      sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
+      sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
+      sessions: [session],
+      created_at: jest.now() - 1000,
+      updated_at: jest.now(),
+    } as any;
+
+    // @ts-expect-error This is a private method that we are mocking
+    BaseResource._baseFetch = jest.fn();
+
+    const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
+    await client.sendCaptchaToken({ captcha_token: 'test_captcha_token' });
+    // @ts-expect-error This is a private method that we are mocking
+    expect(BaseResource._baseFetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: `/client/verify`,
+      body: {
+        captcha_token: 'test_captcha_token',
+      },
+    });
+  });
+
   it('destroy', async () => {
     const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
     const session = createSession({ id: 'session_1' }, user);

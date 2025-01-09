@@ -1,5 +1,6 @@
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
+import { linkPackage } from './utils';
 
 const vite = applicationConfig()
   .setName('vue-vite')
@@ -9,7 +10,7 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/vue', '*');
+  .addDependency('@clerk/vue', linkPackage('vue'));
 
 export const vue = {
   vite,

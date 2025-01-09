@@ -1,6 +1,3 @@
-import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
-import type { TelemetryCollector } from 'telemetry';
-
 import type {
   Appearance,
   CreateOrganizationTheme,
@@ -39,7 +36,9 @@ import type { ActiveSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
+import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';

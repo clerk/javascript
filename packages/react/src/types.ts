@@ -70,7 +70,7 @@ export interface HeadlessBrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
 }
 
-export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };
+export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk; component?: string };
 
 export interface CustomPortalsRendererProps {
   customPagesPortals?: any[];

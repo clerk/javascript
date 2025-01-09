@@ -1,5 +1,44 @@
 # Change Log
 
+## 1.21.6
+
+### Patch Changes
+
+- Add type-level validation to prevent server-side usage of system permissions ([#4816](https://github.com/clerk/javascript/pull/4816)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  System permissions (e.g., `org:sys_domains:manage`) are intentionally excluded from session claims to maintain reasonable JWT sizes. For more information, refer to our docs: https://clerk.com/docs/organizations/roles-permissions#system-permissions
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/types@4.40.2
+  - @clerk/shared@2.20.6
+
+## 1.21.5
+
+### Patch Changes
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
+## 1.21.4
+
+### Patch Changes
+
+- Allow to create and update SAML connections with organization IDs. ([#4792](https://github.com/clerk/javascript/pull/4792)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  When users sign in or up using an organization's SAML connection, they're automatically added as members of that organization. For more information, refer to our docs: https://clerk.com/docs/organizations/manage-sso
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/shared@2.20.4
+
+## 1.21.3
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
 ## 1.21.2
 
 ### Patch Changes
