@@ -1,6 +1,5 @@
-import type { Web3WalletJSONSnapshot } from 'snapshots';
-
 import type { ClerkResource } from './resource';
+import type { Web3WalletJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';

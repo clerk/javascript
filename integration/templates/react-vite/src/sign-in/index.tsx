@@ -6,6 +6,7 @@ export default function Page() {
       <SignIn
         path={'/sign-in'}
         signUpUrl={'/sign-up'}
+        fallback={<>Loading sign in</>}
       />
     </div>
   );

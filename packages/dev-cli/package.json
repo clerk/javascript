@@ -29,9 +29,7 @@
     "jscodeshift": "^0.16.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
-    "@types/node": "^20.14.8",
-    "typescript": "catalog:repo"
+    "@clerk/eslint-config-custom": "workspace:*"
   },
   "engines": {
     "node": ">=18.17.0"

@@ -1,5 +1,3 @@
-import type { UserJSONSnapshot } from 'snapshots';
-
 import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
@@ -17,6 +15,7 @@ import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
+import type { UserJSONSnapshot } from './snapshots';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
@@ -138,6 +137,8 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 export type VerifyTOTPParams = { code: string };
 

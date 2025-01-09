@@ -5,6 +5,7 @@ import { createContext, useContext, useMemo } from 'react';
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
+import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -22,6 +23,8 @@ export type SignUpContextType = SignUpCtx & {
   afterSignInUrl: string;
   waitlistUrl: string;
   isCombinedFlow: boolean;
+  emailLinkRedirectUrl: string;
+  ssoCallbackUrl: string;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -74,6 +77,27 @@ export const useSignUpContext = (): SignUpContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
+  const emailLinkRedirectUrl =
+    ctx.emailLinkRedirectUrl ??
+    buildRedirectUrl({
+      routing: ctx.routing,
+      baseUrl: signUpUrl,
+      authQueryString: '',
+      path: ctx.path,
+      endpoint: options.experimental?.combinedFlow
+        ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE
+        : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    });
+  const ssoCallbackUrl =
+    ctx.ssoCallbackUrl ??
+    buildRedirectUrl({
+      routing: ctx.routing,
+      baseUrl: signUpUrl,
+      authQueryString: '',
+      path: ctx.path,
+      endpoint: options.experimental?.combinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+    });
+
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
@@ -86,6 +110,8 @@ export const useSignUpContext = (): SignUpContextType => {
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
+    emailLinkRedirectUrl,
+    ssoCallbackUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
