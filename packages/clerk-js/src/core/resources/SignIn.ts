@@ -250,7 +250,14 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
+  public authenticateWithWeb3 = async (
+    params: AuthenticateWithWeb3Params & {
+      /**
+       * @experimental
+       */
+      __experimental_skipInitialization?: boolean;
+    },
+  ): Promise<SignInResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
       return this;
@@ -263,15 +270,15 @@ export class SignIn extends BaseResource implements SignInResource {
       clerkMissingOptionError('generateSignature');
     }
 
-    await this.create({ identifier });
+    if (!params.__experimental_skipInitialization) {
+      await this.create({ identifier });
+      const web3FirstFactor = this.supportedFirstFactors?.find(f => f.strategy === strategy) as Web3SignatureFactor;
+      if (!web3FirstFactor) {
+        clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
+      }
 
-    const web3FirstFactor = this.supportedFirstFactors?.find(f => f.strategy === strategy) as Web3SignatureFactor;
-
-    if (!web3FirstFactor) {
-      clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
+      await this.prepareFirstFactor(web3FirstFactor);
     }
-
-    await this.prepareFirstFactor(web3FirstFactor);
 
     const { message } = this.firstFactorVerification;
     if (!message) {

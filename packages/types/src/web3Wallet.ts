@@ -31,6 +31,7 @@ export interface AuthenticateWithWeb3Params {
   identifier: string;
   generateSignature: GenerateSignature;
   strategy?: Web3Strategy;
+  __experimental_throwOnCoinbaseSDKBlocked?: boolean;
 }
 
 export interface GenerateSignatureParams {

@@ -98,7 +98,14 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
-  authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
+  authenticateWithWeb3: (
+    params: AuthenticateWithWeb3Params & {
+      /**
+       * @experimental
+       */
+      __experimental_skipInitialization?: boolean;
+    },
+  ) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
 

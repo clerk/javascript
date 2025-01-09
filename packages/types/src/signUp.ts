@@ -95,6 +95,10 @@ export interface SignUpResource extends ClerkResource {
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
       legalAccepted?: boolean;
+      /**
+       * @experimental
+       */
+      __experimental_skipInitialization?: boolean;
     },
   ) => Promise<SignUpResource>;
 

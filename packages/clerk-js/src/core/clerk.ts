@@ -1600,6 +1600,8 @@ export class Clerk implements ClerkInterface {
     unsafeMetadata,
     strategy,
     legalAccepted,
+    __experimental_throwOnCoinbaseSDKBlocked,
+    __experimental_intent,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
@@ -1621,30 +1623,75 @@ export class Clerk implements ClerkInterface {
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
-    let signInOrSignUp: SignInResource | SignUpResource;
-    try {
-      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
-        identifier,
-        generateSignature,
-        strategy,
-      });
-    } catch (err) {
-      if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
+    const handleSignUp = async ({
+      skipInitialization,
+      client,
+    }: {
+      skipInitialization: boolean;
+      client: ClientResource;
+    }) => {
+      const _signUp = await client.signUp
+        .authenticateWithWeb3({
           identifier,
           generateSignature,
           unsafeMetadata,
           strategy,
           legalAccepted,
+          __experimental_skipInitialization: skipInitialization,
+        })
+        .catch(e => {
+          if (
+            __experimental_throwOnCoinbaseSDKBlocked &&
+            isClerkRuntimeError(e) &&
+            e.code === 'coinbase_signature_blocked_by_pop_window'
+          ) {
+            throw new ClerkRuntimeError('', {
+              code: 'coinbase_signature_blocked_by_pop_window__intent_sign_up',
+            });
+          }
+          throw e;
         });
 
-        if (
-          signUpContinueUrl &&
-          signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
-        ) {
-          await navigate(signUpContinueUrl);
-        }
+      if (
+        signUpContinueUrl &&
+        _signUp.status === 'missing_requirements' &&
+        _signUp.verifications.web3Wallet.status === 'verified'
+      ) {
+        await navigate(signUpContinueUrl);
+      }
+      return _signUp;
+    };
+
+    let signInOrSignUp: SignInResource | SignUpResource;
+    try {
+      if (!__experimental_intent || __experimental_intent === 'signIn') {
+        signInOrSignUp = await this.client.signIn
+          .authenticateWithWeb3({
+            identifier,
+            generateSignature,
+            strategy,
+            __experimental_skipInitialization: __experimental_intent === 'signIn',
+          })
+          .catch(e => {
+            if (
+              __experimental_throwOnCoinbaseSDKBlocked &&
+              isClerkRuntimeError(e) &&
+              e.code === 'coinbase_signature_blocked_by_pop_window'
+            ) {
+              throw new ClerkRuntimeError('', {
+                code: 'coinbase_signature_blocked_by_pop_window__intent_sign_in',
+              });
+            }
+            throw e;
+          });
+      } else if (__experimental_intent === 'signUp') {
+        signInOrSignUp = await handleSignUp({ skipInitialization: true, client: this.client });
+      } else {
+        throw 'Invalid intent';
+      }
+    } catch (err) {
+      if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+        signInOrSignUp = await handleSignUp({ skipInitialization: false, client: this.client });
       } else {
         throw err;
       }

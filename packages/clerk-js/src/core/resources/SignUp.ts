@@ -208,6 +208,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     params: AuthenticateWithWeb3Params & {
       unsafeMetadata?: SignUpUnsafeMetadata;
       legalAccepted?: boolean;
+      /**
+       * @experimental
+       */
+      __experimental_skipInitialization?: boolean;
     },
   ): Promise<SignUpResource> => {
     if (__BUILD_DISABLE_RHC__) {
@@ -229,8 +233,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
-    await this.prepareWeb3WalletVerification({ strategy });
+    if (!params.__experimental_skipInitialization) {
+      await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
+      await this.prepareWeb3WalletVerification({ strategy });
+    }
 
     const { message } = this.verifications.web3Wallet;
     if (!message) {

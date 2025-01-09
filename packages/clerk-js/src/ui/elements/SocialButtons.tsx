@@ -1,6 +1,8 @@
+import { isClerkRuntimeError } from '@clerk/shared/error';
+import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
-import React, { forwardRef, isValidElement } from 'react';
+import React, { forwardRef, isValidElement, useState } from 'react';
 
 import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
@@ -19,7 +21,7 @@ import {
 } from '../customizables';
 import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
 import { mqu, type PropsOfComponent } from '../styledSystem';
-import { sleep } from '../utils';
+import { sleep, web3CallbackErrorHandler } from '../utils';
 import { useCardState } from './contexts';
 import { distributeStrategiesIntoRows } from './utils';
 
@@ -30,6 +32,8 @@ const MAX_STRATEGIES_PER_ROW = 6;
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
   enableWeb3Providers: boolean;
+  signUpContinueUrl: string;
+  redirectUrlComplete: string;
 }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
@@ -47,6 +51,10 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
   const [firstStrategyRef, firstElementRect] = useResizeObserver();
+
+  const { authenticateWithWeb3 } = useClerk();
+
+  const [coinbaseFailedIntent, setCoinbaseFailedIntent] = useState<'signIn' | 'signUp' | null>(null);
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
@@ -70,7 +78,34 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     card.setLoading(strategy);
     try {
       if (isWeb3Strategy(strategy)) {
-        await web3Callback(strategy);
+        if (coinbaseFailedIntent === 'signIn') {
+          await authenticateWithWeb3({
+            redirectUrl: props.redirectUrlComplete,
+            strategy,
+            __experimental_intent: 'signIn',
+          }).catch(err => web3CallbackErrorHandler(err, card.setError));
+        } else if (coinbaseFailedIntent === 'signUp') {
+          await authenticateWithWeb3({
+            redirectUrl: props.redirectUrlComplete,
+            strategy,
+            signUpContinueUrl: props.signUpContinueUrl,
+            __experimental_intent: 'signUp',
+          }).catch(err => web3CallbackErrorHandler(err, card.setError));
+        } else {
+          await web3Callback(strategy).catch(err => {
+            if (isClerkRuntimeError(err) && err.code === 'coinbase_signature_blocked_by_pop_window__intent_sign_up') {
+              setCoinbaseFailedIntent('signUp');
+              return;
+            }
+
+            if (isClerkRuntimeError(err) && err.code === 'coinbase_signature_blocked_by_pop_window__intent_sign_in') {
+              setCoinbaseFailedIntent('signIn');
+              return;
+            }
+
+            return web3CallbackErrorHandler(err, card.setError);
+          });
+        }
       } else {
         await oauthCallback(strategy);
       }
@@ -78,7 +113,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       await sleep(1000);
       card.setIdle();
     }
-    await sleep(5000);
+    // await sleep(5000);
     card.setIdle();
   };
 
@@ -90,79 +125,99 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       gap={2}
       elementDescriptor={descriptors.socialButtonsRoot}
     >
-      {strategyRows.map((row, rowIndex) => (
-        <Grid
-          key={row.join('-')}
-          elementDescriptor={descriptors.socialButtons}
-          gap={2}
-          sx={{
-            justifyContent: 'center',
-            [mqu.sm]: {
-              gridTemplateColumns: 'repeat(1, 1fr)',
-            },
-            gridTemplateColumns:
-              strategies.length < 1
-                ? `repeat(1, 1fr)`
-                : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
-          }}
-        >
-          {row.map((strategy, strategyIndex) => {
-            const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? `Continue with ${strategyToDisplayData[strategy].name}`
-                : strategyToDisplayData[strategy].name;
+      {strategyRows.map((row, rowIndex) => {
+        return (
+          <Grid
+            key={row.join('-')}
+            elementDescriptor={descriptors.socialButtons}
+            gap={2}
+            sx={{
+              justifyContent: 'center',
+              [mqu.sm]: {
+                gridTemplateColumns: 'repeat(1, 1fr)',
+              },
+              gridTemplateColumns:
+                strategies.length < 1
+                  ? `repeat(1, 1fr)`
+                  : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
+            }}
+          >
+            {row.map((strategy, strategyIndex) => {
+              const label =
+                strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+                  ? `Continue with ${strategyToDisplayData[strategy].name}`
+                  : strategyToDisplayData[strategy].name;
 
-            const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? localizationKeys('socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
-                  })
-                : localizationKeys('socialButtonsBlockButtonManyInView', {
-                    provider: strategyToDisplayData[strategy].name,
-                  });
+              const localizedText =
+                strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+                  ? localizationKeys('socialButtonsBlockButton', {
+                      provider: strategyToDisplayData[strategy].name,
+                    })
+                  : localizationKeys('socialButtonsBlockButtonManyInView', {
+                      provider: strategyToDisplayData[strategy].name,
+                    });
 
-            // When strategies break into 2 rows or more, use the first item of the first
-            // row as reference for the width of the buttons in the second row and beyond
-            const ref =
-              strategies.length > MAX_STRATEGIES_PER_ROW && rowIndex === 0 && strategyIndex === 0
-                ? firstStrategyRef
-                : null;
+              // When strategies break into 2 rows or more, use the first item of the first
+              // row as reference for the width of the buttons in the second row and beyond
+              const ref =
+                strategies.length > MAX_STRATEGIES_PER_ROW && rowIndex === 0 && strategyIndex === 0
+                  ? firstStrategyRef
+                  : null;
 
-            const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
-              <Image
-                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                src={strategyToDisplayData[strategy].iconUrl}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-              />
-            ) : (
-              <ProviderInitialIcon
-                id={strategyToDisplayData[strategy].id}
-                value={strategyToDisplayData[strategy].name}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-              />
-            );
+              const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
+                <Image
+                  elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                  elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+                  isLoading={card.loadingMetadata === strategy}
+                  isDisabled={card.isLoading}
+                  src={strategyToDisplayData[strategy].iconUrl}
+                  alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                  sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+                />
+              ) : (
+                <ProviderInitialIcon
+                  id={strategyToDisplayData[strategy].id}
+                  value={strategyToDisplayData[strategy].name}
+                  isLoading={card.loadingMetadata === strategy}
+                  isDisabled={card.isLoading}
+                />
+              );
 
-            return (
-              <ButtonElement
-                key={strategy}
-                id={strategyToDisplayData[strategy].id}
-                ref={ref}
-                onClick={startOauth(strategy)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
-                label={label}
-                textLocalizationKey={localizedText}
-                icon={imageOrInitial}
-              />
-            );
-          })}
-        </Grid>
-      ))}
+              if (strategy === 'web3_coinbase_wallet_signature') {
+                return (
+                  <ButtonElement
+                    key={strategy}
+                    id={strategyToDisplayData[strategy].id}
+                    ref={ref}
+                    onClick={startOauth(strategy)}
+                    isLoading={card.loadingMetadata === strategy}
+                    isDisabled={card.isLoading}
+                    label={coinbaseFailedIntent ? 'click again' : label}
+                    // TODO: Add localizatoin Key
+                    // @ts-ignore
+                    textLocalizationKey={coinbaseFailedIntent ? 'click again' : localizedText}
+                    icon={imageOrInitial}
+                  />
+                );
+              }
+
+              return (
+                <ButtonElement
+                  key={strategy}
+                  id={strategyToDisplayData[strategy].id}
+                  ref={ref}
+                  onClick={startOauth(strategy)}
+                  isLoading={card.loadingMetadata === strategy}
+                  isDisabled={card.isLoading}
+                  label={label}
+                  textLocalizationKey={localizedText}
+                  icon={imageOrInitial}
+                />
+              );
+            })}
+          </Grid>
+        );
+      })}
     </Flex>
   );
 });

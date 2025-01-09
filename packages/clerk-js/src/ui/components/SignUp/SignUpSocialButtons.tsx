@@ -7,9 +7,12 @@ import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError, web3CallbackErrorHandler } from '../../utils';
+import { handleError } from '../../utils';
 
-export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean; legalAccepted?: boolean };
+export type SignUpSocialButtonsProps = Omit<SocialButtonsProps, 'signUpContinueUrl' | 'redirectUrlComplete'> & {
+  continueSignUp?: boolean;
+  legalAccepted?: boolean;
+};
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
   const clerk = useClerk();
@@ -24,6 +27,8 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   return (
     <SocialButtons
       {...rest}
+      signUpContinueUrl={'continue'}
+      redirectUrlComplete={redirectUrlComplete}
       oauthCallback={(strategy: OAuthStrategy) => {
         return signUp
           .authenticateWithRedirect({
@@ -36,18 +41,17 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
           })
           .catch(err => handleError(err, [], card.setError));
       }}
-      web3Callback={strategy => {
-        return clerk
-          .authenticateWithWeb3({
-            customNavigate: navigate,
-            redirectUrl: redirectUrlComplete,
-            signUpContinueUrl: 'continue',
-            unsafeMetadata: ctx.unsafeMetadata,
-            strategy,
-            legalAccepted: props.legalAccepted,
-          })
-          .catch(err => web3CallbackErrorHandler(err, card.setError));
-      }}
+      web3Callback={strategy =>
+        clerk.authenticateWithWeb3({
+          customNavigate: navigate,
+          redirectUrl: redirectUrlComplete,
+          signUpContinueUrl: 'continue',
+          unsafeMetadata: ctx.unsafeMetadata,
+          strategy,
+          legalAccepted: props.legalAccepted,
+          __experimental_throwOnCoinbaseSDKBlocked: true,
+        })
+      }
     />
   );
 });

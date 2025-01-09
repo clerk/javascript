@@ -1447,6 +1447,17 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
   legalAccepted?: boolean;
+  /**
+   * @experimental
+   * Handle coinbase sdk pop ups getting blocked
+   */
+  __experimental_throwOnCoinbaseSDKBlocked?: boolean;
+
+  /**
+   * @experimental
+   * Handle coinbase sdk pop ups getting blocked
+   */
+  __experimental_intent?: 'signIn' | 'signUp';
 }
 
 export type JoinWaitlistParams = {

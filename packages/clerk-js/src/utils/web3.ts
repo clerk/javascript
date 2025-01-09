@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { Web3Provider } from '@clerk/types';
 
 import { toHex } from './hex';
@@ -38,10 +39,19 @@ export async function generateWeb3Signature(params: GenerateWeb3SignatureParams)
     return '';
   }
 
-  return await ethereum.request({
-    method: 'personal_sign',
-    params: [`0x${toHex(nonce)}`, identifier],
-  });
+  try {
+    return await ethereum.request({
+      method: 'personal_sign',
+      params: [`0x${toHex(nonce)}`, identifier],
+    });
+  } catch (e) {
+    if (e.message === 'Pop up window failed to open') {
+      throw new ClerkRuntimeError(`${provider} failed to request signature. Pop up window blocked by browser`, {
+        code: 'coinbase_signature_blocked_by_pop_window',
+      });
+    }
+    throw e;
+  }
 }
 
 export async function getMetamaskIdentifier(): Promise<string> {
