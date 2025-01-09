@@ -7,7 +7,11 @@ import ViteExpress from 'vite-express';
 
 const app = express();
 
-app.use(clerkMiddleware());
+app.use(
+  clerkMiddleware({
+    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+  }),
+);
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
