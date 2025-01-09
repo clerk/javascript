@@ -1,6 +1,5 @@
 // Should be at the top of the file - used to load clerk secret key
-import * as dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 
 import { clerkMiddleware } from '@clerk/express';
 import express from 'express';
@@ -12,12 +11,16 @@ app.use(clerkMiddleware());
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
-app.get('/api/protected', (req: any, res: any, next: any) => {
+const legacyRequireAuth = (req: any, _res: any, next: any) => {
   if (!req.auth.userId) {
     return next(new Error('Unauthenticated'));
   }
 
-  res.send('Protected API response').end();
+  next();
+};
+
+app.get('/api/protected', legacyRequireAuth, (_req: any, res: any, _next: any) => {
+  return res.send('Protected API response');
 });
 
 app.get('/sign-in', (_req: any, res: any) => {
