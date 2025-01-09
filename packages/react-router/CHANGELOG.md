@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.1.7
+
+### Patch Changes
+
+- Previously, when the `data()` utility was used inside the callback of `rootAuthLoader()` type errors were thrown. These issues should be fixed now. ([#4853](https://github.com/clerk/javascript/pull/4853)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/backend@1.21.6
+  - @clerk/types@4.40.2
+  - @clerk/clerk-react@5.21.2
+  - @clerk/shared@2.20.6
+
 ## 0.1.6
 
 ### Patch Changes
