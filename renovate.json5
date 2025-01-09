@@ -400,65 +400,6 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "clerk-sdk-node-dev-minor",
-      "matchFileNames": [
-        "packages/clerk-sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "automerge": true,
-      "semanticCommitScope": "clerk-sdk-node"
-    },
-    {
-      "groupName": "[DEV] major dependencies",
-      "groupSlug": "clerk-sdk-node-dev-major",
-      "matchFileNames": [
-        "packages/clerk-sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "clerk-sdk-node"
-    },
-    {
-      "groupName": "minor & patch dependencies",
-      "groupSlug": "clerk-sdk-node-prod-minor",
-      "matchFileNames": [
-        "packages/clerk-sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "semanticCommitScope": "clerk-sdk-node"
-    },
-    {
-      "groupName": "major dependencies",
-      "groupSlug": "clerk-sdk-node-prod-major",
-      "matchFileNames": [
-        "packages/clerk-sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "clerk-sdk-node"
-    },
-    {
-      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "dev-cli-dev-minor",
       "matchFileNames": [
         "packages/dev-cli/package.json"
@@ -1723,15 +1664,15 @@
     {
       "groupName": "common TypeScript types",
       "matchPackageNames": [
-        "@types/node"
+        "@types/node",
+        "@types/react",
+        "@types/react-dom"
       ],
       "rangeStrategy": "bump"
     },
     {
       "groupName": "React",
       "matchPackageNames": [
-        "@types/react",
-        "@types/react-dom",
         "react",
         "react-dom"
       ],
