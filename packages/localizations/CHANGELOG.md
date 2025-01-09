@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.9.7
+
+### Patch Changes
+
+- Improve `el-GR` localization strings for profile modal. ([#4828](https://github.com/clerk/javascript/pull/4828)) by [@tbjers](https://github.com/tbjers)
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/types@4.40.2
+
 ## 3.9.6
 
 ### Patch Changes
