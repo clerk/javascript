@@ -7,11 +7,7 @@ import ViteExpress from 'vite-express';
 
 const app = express();
 
-app.use(
-  clerkMiddleware({
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
-  }),
-);
+app.use(clerkMiddleware());
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
@@ -29,28 +25,28 @@ app.get('/api/protected', legacyRequireAuth, (_req: any, res: any, _next: any) =
 
 app.get('/sign-in', (_req: any, res: any) => {
   return res.render('sign-in.ejs', {
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
     signInUrl: process.env.CLERK_SIGN_IN_URL,
   });
 });
 
 app.get('/', (_req: any, res: any) => {
   return res.render('index.ejs', {
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
     signInUrl: process.env.CLERK_SIGN_IN_URL,
   });
 });
 
 app.get('/sign-up', (_req: any, res: any) => {
   return res.render('sign-up.ejs', {
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
     signUpUrl: process.env.CLERK_SIGN_UP_URL,
   });
 });
 
 app.get('/protected', (_req: any, res: any) => {
   return res.render('protected.ejs', {
-    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
     signInUrl: process.env.CLERK_SIGN_IN_URL,
     signUpUrl: process.env.CLERK_SIGN_UP_URL,
   });
