@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
 import React from 'react';
@@ -27,21 +26,35 @@ export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
-  let statePromise: Promise<null | AuthObject> = Promise.resolve(null);
-  let nonce = Promise.resolve('');
 
-  if (dynamic) {
-    if (isNext13) {
-      /**
-       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-       * Without the await here, Next will throw a DynamicServerError during build.
-       */
-      statePromise = Promise.resolve(await getDynamicClerkState());
-      nonce = Promise.resolve(await getNonceFromCSPHeader());
-    } else {
-      statePromise = getDynamicClerkState();
-      nonce = getNonceFromCSPHeader();
+  async function generateStatePromise() {
+    if (dynamic) {
+      if (isNext13) {
+        /**
+         * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+         * Without the await here, Next will throw a DynamicServerError during build.
+         */
+        return Promise.resolve(await getDynamicClerkState());
+      } else {
+        return getDynamicClerkState();
+      }
     }
+    return Promise.resolve(null);
+  }
+
+  async function generateNonce() {
+    if (dynamic) {
+      if (isNext13) {
+        /**
+         * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+         * Without the await here, Next will throw a DynamicServerError during build.
+         */
+        return Promise.resolve(await getNonceFromCSPHeader());
+      } else {
+        return getNonceFromCSPHeader();
+      }
+    }
+    return Promise.resolve('');
   }
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
@@ -51,8 +64,8 @@ export async function ClerkProvider(
   let output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={await nonce}
-      initialState={await statePromise}
+      nonce={await generateNonce()}
+      initialState={await generateStatePromise()}
     >
       {children}
     </ClientClerkProvider>
@@ -75,8 +88,8 @@ export async function ClerkProvider(
               __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
               __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             })}
-            nonce={await nonce}
-            initialState={await statePromise}
+            nonce={await generateNonce()}
+            initialState={await generateStatePromise()}
           >
             {children}
           </ClientClerkProvider>
@@ -88,7 +101,7 @@ export async function ClerkProvider(
   if (dynamic) {
     return (
       // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
+      <PromisifiedAuthProvider authPromise={generateStatePromise() as unknown as Promise<InitialState>}>
         {output}
       </PromisifiedAuthProvider>
     );
