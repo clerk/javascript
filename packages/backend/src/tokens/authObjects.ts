@@ -81,7 +81,7 @@ export type AuthenticatedMachineObject = {
   orgSlug: null;
   orgPermissions: null;
   __experimental_factorVerificationAge: null;
-  has: CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationFromSessionClaims;
   getToken: () => string;
   debug: AuthObjectDebug;
 };
@@ -98,7 +98,7 @@ export type UnauthenticatedMachineObject = {
   orgSlug: null;
   orgPermissions: null;
   __experimental_factorVerificationAge: null;
-  has: CheckAuthorizationWithCustomPermissions;
+  has: CheckAuthorizationFromSessionClaims;
   getToken: ServerGetToken;
   debug: AuthObjectDebug;
 };

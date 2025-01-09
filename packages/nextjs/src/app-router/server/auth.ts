@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -11,7 +12,11 @@ import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../..
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
+<<<<<<< HEAD
 type MachineAuth = Omit<AuthObject, 'SignedInAuthObject' | 'SignedOutAuthObject'> & {
+=======
+type MachineAuth = Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject> & {
+>>>>>>> 24e3ef125 (auth function changes)
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 };
 
@@ -26,10 +31,18 @@ export interface MachineAuthFn {
   protect: AuthProtect;
 }
 
+<<<<<<< HEAD
 export function auth(options?: AuthOptions & { entity: 'user' }): Promise<Auth>;
 export function auth(options?: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
 export async function auth(options?: AuthOptions): Promise<Auth>;
 export async function auth(options?: AuthOptions) {
+=======
+export async function auth(options?: AuthOptions & { entity: 'user' }): Promise<Auth>;
+export async function auth(options?: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
+export async function auth(options?: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions) {
+  // export const auth: AuthFn = async (options?: AuthOptions) => {
+>>>>>>> 24e3ef125 (auth function changes)
   require('server-only');
 
   const request = await buildRequestLike();

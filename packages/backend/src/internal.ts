@@ -9,7 +9,17 @@ export { debugRequestState } from './tokens/request';
 
 export type { AuthenticateRequestOptions, OrganizationSyncOptions } from './tokens/types';
 
+<<<<<<< HEAD
 export type { SignedInAuthObjectOptions, SignedInAuthObject, SignedOutAuthObject } from './tokens/authObjects';
+=======
+export type {
+  SignedInAuthObjectOptions,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+  AuthenticatedMachineObject,
+} from './tokens/authObjects';
+>>>>>>> 24e3ef125 (auth function changes)
 export {
   makeAuthObjectSerializable,
   signedOutAuthObject,

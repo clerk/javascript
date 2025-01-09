@@ -1,4 +1,13 @@
 import type { AuthObject } from '@clerk/backend';
+<<<<<<< HEAD
+=======
+import type {
+  AuthenticatedMachineObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from '@clerk/backend/internal';
+>>>>>>> 24e3ef125 (auth function changes)
 import {
   authenticatedMachineObject,
   AuthStatus,
@@ -9,6 +18,7 @@ import {
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
+// import { NextRequest } from 'next/server';
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import type { RequestLike } from '../types';
@@ -18,8 +28,15 @@ import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, g
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
+
+export type GetAuthDataFromRequestOptions = {
+  secretKey?: string;
+  logger?: LoggerNoCommit;
+  entity?: 'user' | 'machine';
+};
 export function getAuthDataFromRequest(
   req: RequestLike,
+<<<<<<< HEAD
   opts: { secretKey?: string; logger?: LoggerNoCommit; entity: 'machine' },
 ): Omit<AuthObject, 'SignedInAuthObject' | 'SignedOutAuthObject'>;
 export function getAuthDataFromRequest(
@@ -30,6 +47,16 @@ export function getAuthDataFromRequest(
   req: RequestLike,
   opts: { secretKey?: string; logger?: LoggerNoCommit; entity?: 'user' | 'machine' } = {},
 ): AuthObject {
+=======
+  opts: GetAuthDataFromRequestOptions & { entity: 'machine' },
+): Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject>;
+export function getAuthDataFromRequest(
+  req: RequestLike,
+  opts: GetAuthDataFromRequestOptions & { entity: 'user' },
+): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
+export function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
+export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
+>>>>>>> 24e3ef125 (auth function changes)
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
@@ -79,3 +106,6 @@ export function getAuthDataFromRequest(
 
   return authObject;
 }
+
+// const req = new NextRequest();
+// const help = getAuthDataFromRequest(req, { secretKey: undefined, entity: 'machine' });
