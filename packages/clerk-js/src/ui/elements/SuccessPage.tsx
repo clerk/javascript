@@ -20,6 +20,8 @@ export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title, finishLabel, onFinish, contents, ...rest } = props;
   const { navigateToFlowStart } = useNavigateToFlowStart();
 
+  console.log('SuccessPage', props.contents);
+
   return (
     <Col
       {...rest}

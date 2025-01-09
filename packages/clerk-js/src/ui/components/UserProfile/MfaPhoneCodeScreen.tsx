@@ -58,10 +58,14 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
       {isInstanceWithBackupCodes && (
         <SuccessPage
           title={localizationKeys('userProfile.mfaPhoneCodePage.successTitle')}
-          text={[
-            localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
-            localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
-          ]}
+          text={
+            ref.current?.backupCodes && ref.current?.backupCodes.length > 0
+              ? [
+                  localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
+                  localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
+                ]
+              : [localizationKeys('userProfile.mfaPhoneCodePage.successMessage1')]
+          }
           onFinish={onReset}
           contents={<MfaBackupCodeList backupCodes={ref.current?.backupCodes} />}
         />
