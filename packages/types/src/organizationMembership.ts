@@ -1,8 +1,7 @@
-import type { OrganizationMembershipJSONSnapshot } from 'snapshots';
-
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
+import type { OrganizationMembershipJSONSnapshot } from './snapshots';
 import type { Autocomplete } from './utils';
 
 interface Base {
@@ -68,13 +67,14 @@ export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
     : Base['role']
   : Base['role'];
 
+export type OrganizationSystemPermissionPrefix = 'org:sys_';
 export type OrganizationSystemPermissionKey =
-  | 'org:sys_domains:manage'
-  | 'org:sys_profile:manage'
-  | 'org:sys_profile:delete'
-  | 'org:sys_memberships:read'
-  | 'org:sys_memberships:manage'
-  | 'org:sys_domains:read';
+  | `${OrganizationSystemPermissionPrefix}domains:manage`
+  | `${OrganizationSystemPermissionPrefix}profile:manage`
+  | `${OrganizationSystemPermissionPrefix}profile:delete`
+  | `${OrganizationSystemPermissionPrefix}memberships:read`
+  | `${OrganizationSystemPermissionPrefix}memberships:manage`
+  | `${OrganizationSystemPermissionPrefix}domains:read`;
 
 /**
  * OrganizationPermissionKey is a combination of system and custom permissions.

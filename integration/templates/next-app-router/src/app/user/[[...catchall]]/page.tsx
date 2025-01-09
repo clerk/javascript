@@ -3,7 +3,7 @@ import { UserProfile } from '@clerk/nextjs';
 export default function Page() {
   return (
     <div>
-      <UserProfile />
+      <UserProfile fallback={<>Loading user profile</>} />
     </div>
   );
 }
