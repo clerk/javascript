@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.9.6
+
+### Patch Changes
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+
+## 3.9.5
+
+### Patch Changes
+
+- Fix delete account action for `nb-NO` localization. ([#4821](https://github.com/clerk/javascript/pull/4821)) by [@lasseklovstad](https://github.com/lasseklovstad)
+
+## 3.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+
 ## 3.9.3
 
 ### Patch Changes

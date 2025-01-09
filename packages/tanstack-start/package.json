@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.8.2",
+  "version": "0.8.6",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -69,11 +69,7 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@tanstack/react-router": "^1.81.9",
     "@tanstack/start": "^1.81.9",
-    "@types/node": "^18.19.43",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
     "esbuild-plugin-file-path-extensions": "^2.1.2",
-    "typescript": "catalog:repo",
     "vinxi": "^0.4.1"
   },
   "peerDependencies": {

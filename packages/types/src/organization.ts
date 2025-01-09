@@ -1,5 +1,3 @@
-import type { OrganizationJSONSnapshot } from 'snapshots';
-
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -7,6 +5,7 @@ import type { OrganizationMembershipRequestResource } from './organizationMember
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
+import type { OrganizationJSONSnapshot } from './snapshots';
 
 declare global {
   /**

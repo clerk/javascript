@@ -52,7 +52,7 @@ export const nbNO: LocalizationResource = {
   formFieldHintText__optional: 'Valgfritt',
   formFieldHintText__slug: 'En slug er en menneskelesbar ID som må være unik. Den brukes ofte i URL-er.',
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett bruker',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett konto',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
@@ -675,7 +675,7 @@ export const nbNO: LocalizationResource = {
       title: 'Legg til tilknyttet konto',
     },
     deletePage: {
-      actionDescription: 'Skriv inn "Delete account" under for å fortsette.',
+      actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
       messageLine1: 'Er du sikker på at du vil slette kontoen din?',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',

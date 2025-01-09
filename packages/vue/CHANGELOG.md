@@ -1,5 +1,38 @@
 # @clerk/vue
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix an issue where `getToken()` from `useAuth()` composable returns an empty value ([#4837](https://github.com/clerk/javascript/pull/4837)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
+## 1.0.0
+
+### Major Changes
+
+- Introduce the official Clerk SDK for Vue and Nuxt. ([#4791](https://github.com/clerk/javascript/pull/4791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 0.1.5
+
+### Patch Changes
+
+- Add `initialValues` option to `<SignInButton />` and `<SignUpButton />` components. ([#4801](https://github.com/clerk/javascript/pull/4801)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/shared@2.20.4
+
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
 ## 0.1.3
 
 ### Patch Changes

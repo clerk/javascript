@@ -1,5 +1,3 @@
-import type { SignInJSONSnapshot } from 'snapshots';
-
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -51,6 +49,7 @@ import type {
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignInJSONSnapshot } from './snapshots';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -183,6 +182,8 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;
