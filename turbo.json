@@ -154,7 +154,6 @@
       "dependsOn": [
         "@clerk/clerk-js#build",
         "@clerk/backend#build",
-        "@clerk/clerk-sdk-node#build",
         "@clerk/express#build",
         "@clerk/clerk-react#build"
       ],
