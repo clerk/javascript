@@ -1,5 +1,29 @@
 # Change Log
 
+## 6.9.8
+
+### Patch Changes
+
+- Add type-level validation to prevent server-side usage of system permissions ([#4816](https://github.com/clerk/javascript/pull/4816)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  System permissions (e.g., `org:sys_domains:manage`) are intentionally excluded from session claims to maintain reasonable JWT sizes. For more information, refer to our docs: https://clerk.com/docs/organizations/roles-permissions#system-permissions
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/backend@1.21.6
+  - @clerk/types@4.40.2
+  - @clerk/clerk-react@5.21.2
+  - @clerk/shared@2.20.6
+
+## 6.9.7
+
+### Patch Changes
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/clerk-react@5.21.1
+  - @clerk/backend@1.21.5
+  - @clerk/shared@2.20.5
+
 ## 6.9.6
 
 ### Patch Changes

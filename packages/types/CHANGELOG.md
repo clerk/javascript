@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.40.2
+
+### Patch Changes
+
+- Add type-level validation to prevent server-side usage of system permissions ([#4816](https://github.com/clerk/javascript/pull/4816)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  System permissions (e.g., `org:sys_domains:manage`) are intentionally excluded from session claims to maintain reasonable JWT sizes. For more information, refer to our docs: https://clerk.com/docs/organizations/roles-permissions#system-permissions
+
+## 4.40.1
+
+### Patch Changes
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 4.40.0
 
 ### Minor Changes

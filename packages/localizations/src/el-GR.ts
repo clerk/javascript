@@ -769,10 +769,10 @@ export const elGR: LocalizationResource = {
     },
     mobileButton__menu: 'Μενού',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'Προφίλ',
+      description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
+      security: 'Ασφάλεια',
+      title: 'Λογαριασμός',
     },
     passkeyScreen: {
       removeResource: {

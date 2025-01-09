@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.9.7
+
+### Patch Changes
+
+- Improve `el-GR` localization strings for profile modal. ([#4828](https://github.com/clerk/javascript/pull/4828)) by [@tbjers](https://github.com/tbjers)
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/types@4.40.2
+
+## 3.9.6
+
+### Patch Changes
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+
 ## 3.9.5
 
 ### Patch Changes

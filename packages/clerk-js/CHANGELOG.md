@@ -1,5 +1,39 @@
 # Change Log
 
+## 5.43.6
+
+### Patch Changes
+
+- Opens new tab when claiming keys on Keyless mode. ([#4852](https://github.com/clerk/javascript/pull/4852)) by [@panteliselef](https://github.com/panteliselef)
+
+- Initially render Keyless UI as collapsed. ([#4857](https://github.com/clerk/javascript/pull/4857)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updates Keyless UI to automatically expand when the application has been claimed. ([#4855](https://github.com/clerk/javascript/pull/4855)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Post captcha tokens to /client/verify instead of PATCH /client ([#4850](https://github.com/clerk/javascript/pull/4850)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85), [`a3de23c85083fc061762e2533618a6c47d00c480`](https://github.com/clerk/javascript/commit/a3de23c85083fc061762e2533618a6c47d00c480)]:
+  - @clerk/types@4.40.2
+  - @clerk/localizations@3.9.7
+  - @clerk/shared@2.20.6
+
+## 5.43.5
+
+### Patch Changes
+
+- Fix combined flow routing. ([#4817](https://github.com/clerk/javascript/pull/4817)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Fix username field error message rendering within sign-up continue flow. ([#4840](https://github.com/clerk/javascript/pull/4840)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve accessibility of the Keyless prompt. ([#4806](https://github.com/clerk/javascript/pull/4806)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/localizations@3.9.6
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
 ## 5.43.4
 
 ### Patch Changes
