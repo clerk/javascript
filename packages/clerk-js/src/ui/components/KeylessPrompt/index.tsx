@@ -21,7 +21,7 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
   const isForcedExpanded = claimed || isExpanded;
