@@ -323,6 +323,9 @@ const handleControlFlowErrors = (
   if (isNextjsNotFoundError(e)) {
     // Rewrite to a bogus URL to force not found error
     return setHeader(
+      // This is an internal rewrite purely to trigger a not found error. We do not want Next.js to think that the
+      // destination URL is a valid page, so we use `nextRequest.url` as the base for the fake URL, which Next.js
+      // understands is an internal URL and won't run middleware against the request.
       NextResponse.rewrite(new URL(`/clerk_${Date.now()}`, nextRequest.url)),
       constants.Headers.AuthReason,
       'protect-rewrite',
