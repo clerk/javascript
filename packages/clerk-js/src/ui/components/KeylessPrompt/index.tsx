@@ -37,15 +37,18 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           right: '1.25rem',
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
-          minWidth: '18.5625rem',
-          maxWidth: 'fit-content',
+          minWidth: '16.125rem',
           padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
           borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 325ms cubic-bezier(0.18, 0.98, 0.1, 1)',
+          transition: 'all 160ms cubic-bezier(0.6, 0.6, 0, 1)',
+
+          '&[data-expanded="false"]:hover': {
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
+          },
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
@@ -57,7 +60,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 205ms cubic-bezier(0.4, 1, 0.20, 0.9)',
+            transition: 'all 220ms cubic-bezier(0.5, 1, 0.20, 0.8)',
           },
         })}
       >
@@ -109,10 +112,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
                   @keyframes coinFlipAnimation {
                     0%,
-                    70% {
+                    55% {
                       transform: rotateY(0);
                     }
-                    75%,
+                    60%,
                     95% {
                       transform: rotateY(180deg);
                     }
@@ -172,7 +175,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 white-space: nowrap;
                 animation: show-title 160ms ease-out forwards;
 
-                ${!claimed &&
+                ${!isForcedExpanded &&
                 `&::after {
                   content: attr(data-text);
                   z-index: 1;
@@ -192,11 +195,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   background-size: 180% 100%;
                   background-clip: text;
                   filter: blur(1.2px);
-                  animation: ${
-                    isForcedExpanded
-                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                      : 'text-shimmer 3s infinite ease-out forwards'
-                  };
+                 animation: text-shimmer 6.5s infinite ease-out forwards;
                   -webkit-user-select: none;
                   user-select: none;
                 }
@@ -221,11 +220,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   );
                   background-size: 180% 100%;
                   background-clip: text;
-                  animation: ${
-                    isForcedExpanded
-                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                      : 'text-shimmer 3s infinite ease-out forwards'
-                  };
+                 animation: text-shimmer 6.5s infinite ease-out forwards;
                   -webkit-user-select: none;
                   user-select: none;
                 }
@@ -238,25 +233,21 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   }
                 }
 
-                @keyframes text-shimmer {
+				  @keyframes text-shimmer {
                   0% {
                     background-position: 120% center;
                   }
-                  30%,
+                  15% {
+                    background-position: -60% center;
+                  }
+                  85% {
+                    background-position: -60% center;
+                  }
                   100% {
                     background-position: -60% center;
                   }
                 }
 
-                @keyframes text-shimmer-expanded {
-                  0% {
-                    background-position: 120% center;
-                  }
-                  30%,
-                  100% {
-                    background-position: -60% center;
-                  }
-                }
               `} @keyframes show-title {
                   from {
                     transform: translateY(-1.5px);
@@ -328,11 +319,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               line-height: 1rem;
               max-width: 14.625rem;
               min-height: 2rem;
-              animation: show-description 208ms ease forwards;
+              animation: show-description 210ms ease forwards;
 
               @keyframes show-description {
                 from {
-                  transform: translateY(-1.5px);
+                  transform: translateY(-3px);
                   opacity: 0;
                 }
                 to {
@@ -351,6 +342,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               <>
                 We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
                 <Link
+                  isExternal
                   aria-label='Learn more about Clerk keyless mode'
                   href='https://clerk.com/docs/keyless'
                   sx={t => ({
@@ -369,55 +361,38 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           </p>
         </div>
 
-        <a
-          href={claimed ? _props.copyKeysUrl : _props.claimUrl}
-          target='_blank'
-          rel='noopener noreferrer'
-          data-expanded={isForcedExpanded}
-          css={css`
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            right: 0.375rem;
-            bottom: 0.375rem;
-            height: 1.75rem;
-            width: 5.125rem;
-            max-width: 14.625rem;
-            padding: 0.25rem 0.625rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.12px;
-            color: white;
-            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #636363;
-            box-shadow:
-              0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-              0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-              0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-              0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-              0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
-
-            transition: all 138ms cubic-bezier(0.09, 0.7, 0.1, 1);
-            animation: small-btn-glow 3s infinite 500ms;
-
-            @media (prefers-reduced-motion: reduce) {
-              animation: none;
-            }
-
-            &[data-expanded='true'] {
+        {isForcedExpanded && (
+          <a
+            href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            data-expanded={isForcedExpanded}
+            css={css`
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              position: absolute;
               right: 0.75rem;
               bottom: 0.75rem;
               width: calc(100% - 1.5rem);
-              color: ${claimed ? 'white' : '#fde047'};
+              height: 1.75rem;
+              max-width: 14.625rem;
+              padding: 0.25rem 0.625rem;
               border-radius: 0.375rem;
+              font-size: 0.75rem;
+              font-weight: 500;
+              letter-spacing: 0.12px;
+              color: ${claimed ? 'white' : '#fde047'};
+              text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
+              white-space: nowrap;
+              user-select: none;
               background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-              transition: all 190ms cubic-bezier(0.38, 0.8, 0.2, 1);
-              animation: none;
+              box-shadow:
+                0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+                0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
               &:hover {
                 ${claimed
@@ -432,40 +407,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
               }
-
-              box-shadow:
-                0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
-                0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-            }
-
-            @keyframes small-btn-glow {
-              0%,
-              5%,
-              95% {
-                box-shadow:
-                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              }
-
-              22% {
-                box-shadow:
-                  0px 0px 6px 0px #fde047 inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              }
-            }
-          `}
-        >
-          {claimed ? 'Get API keys' : 'Claim keys'}
-        </a>
+            `}
+          >
+            {claimed ? 'Get API keys' : 'Claim keys'}
+          </a>
+        )}
       </Flex>
       <BodyPortal>
         <a
