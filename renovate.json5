@@ -1664,15 +1664,15 @@
     {
       "groupName": "common TypeScript types",
       "matchPackageNames": [
-        "@types/node",
-        "@types/react",
-        "@types/react-dom"
+        "@types/node"
       ],
       "rangeStrategy": "bump"
     },
     {
       "groupName": "React",
       "matchPackageNames": [
+        "@types/react",
+        "@types/react-dom",
         "react",
         "react-dom"
       ],
