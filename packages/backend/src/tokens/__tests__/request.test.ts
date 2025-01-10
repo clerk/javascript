@@ -71,7 +71,7 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `expected to be signed out`,
+        message: () => `expected to be signed out, but got ${received.status}`,
         pass: false,
       };
     }
@@ -190,7 +190,7 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `expected to be signed in`,
+        message: () => `expected to be signed in, but got ${received.status}`,
         pass: false,
       };
     }
@@ -603,6 +603,42 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeNull();
   });
 
+  test('cookieToken: redirects to signInUrl when is satellite dev and not synced', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __client_uat: '0',
+        },
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_TEST,
+        clientUat: '0',
+        isSatellite: true,
+        signInUrl: 'https://primary.dev/sign-in',
+        domain: 'satellite.dev',
+      }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      signInUrl: 'https://primary.dev/sign-in',
+      domain: 'satellite.dev',
+    });
+    expect(requestState.message).toBe('');
+    expect(requestState.headers.get('location')).toMatchInlineSnapshot(
+      `"https://primary.dev/sign-in?__clerk_redirect_url=http%3A%2F%2Fexample.com%2Fpath"`,
+    );
+  });
+
   test('cookieToken: returns signed out is satellite but a non-browser request [11y]', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
@@ -650,6 +686,32 @@ describe('tokens.authenticateRequest(options)', () => {
     });
     expect(requestState.message).toBe('');
     expect(requestState.toAuth()).toBeNull();
+  });
+
+  test('cookieToken: does not trigger satellite sync if just synced', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: mockJwt,
+        },
+        `http://satellite.example/path?__clerk_synced=true`,
+      ),
+      mockOptions({
+        secretKey: 'sk_test_deadbeef',
+        signInUrl: 'http://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SessionTokenAndUATMissing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'http://primary.example/sign-in',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
   test('cookieToken: returns handshake when app is not satellite and responds to syncing on dev instances[12y]', async () => {
