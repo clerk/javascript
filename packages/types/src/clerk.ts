@@ -767,7 +767,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     >;
 
     /**
-     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
      */
     __internal_claimKeylessApplicationUrl?: string;
 

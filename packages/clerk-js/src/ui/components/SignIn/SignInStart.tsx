@@ -175,7 +175,7 @@ export function _SignInStart(): JSX.Element {
     if (clerkStatus === 'sign_up') {
       // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
       // signUpUrl triggers a full page reload when used with the hash router.
-      void navigate(isCombinedFlow ? 'create' : signUpUrl);
+      navigate(isCombinedFlow ? 'create' : signUpUrl);
       return;
     }
 
@@ -417,6 +417,8 @@ export function _SignInStart(): JSX.Element {
   }, [identifierField.type]);
 
   if (status.isLoading || clerkStatus === 'sign_up') {
+    // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
+    // rendering the sign in flow.
     return <LoadingCard />;
   }
 
