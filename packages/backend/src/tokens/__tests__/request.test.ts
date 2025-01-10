@@ -634,8 +634,8 @@ describe('tokens.authenticateRequest(options)', () => {
       domain: 'satellite.dev',
     });
     expect(requestState.message).toBe('');
-    expect(requestState.headers.get('location')).toMatchInlineSnapshot(
-      `"https://primary.dev/sign-in?__clerk_redirect_url=http%3A%2F%2Fexample.com%2Fpath"`,
+    expect(requestState.headers.get('location')).toEqual(
+      `https://primary.dev/sign-in?__clerk_redirect_url=http%3A%2F%2Fexample.com%2Fpath`,
     );
   });
 
