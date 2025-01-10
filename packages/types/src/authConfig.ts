@@ -1,4 +1,5 @@
 import type { ClerkResource } from './resource';
+import type { AuthConfigJSONSnapshot } from './snapshots';
 
 export interface AuthConfigResource extends ClerkResource {
   /**
@@ -10,4 +11,5 @@ export interface AuthConfigResource extends ClerkResource {
    * Defaults to `null`.
    */
   claimedAt: Date | null;
+  __internal_toSnapshot: () => AuthConfigJSONSnapshot;
 }

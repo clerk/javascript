@@ -1,5 +1,6 @@
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { UserSettingsJSONSnapshot } from './snapshots';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
 
 export type Attribute =
@@ -70,6 +71,11 @@ export type PasswordSettingsData = {
   min_zxcvbn_strength: number;
 };
 
+export type UsernameSettingsData = {
+  min_length: number;
+  max_length: number;
+};
+
 export type PasskeySettingsData = {
   allow_autofill: boolean;
   show_sign_in_button: boolean;
@@ -117,6 +123,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
   passkey_settings: PasskeySettingsData;
+  username_settings: UsernameSettingsData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -134,6 +141,7 @@ export interface UserSettingsResource extends ClerkResource {
   signIn: SignInData;
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;
+  usernameSettings: UsernameSettingsData;
   passkeySettings: PasskeySettingsData;
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];
@@ -141,4 +149,5 @@ export interface UserSettingsResource extends ClerkResource {
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;
+  __internal_toSnapshot: () => UserSettingsJSONSnapshot;
 }

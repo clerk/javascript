@@ -82,12 +82,7 @@ const defaultRules = [
   },
   {
     groupName: 'common TypeScript types',
-    matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
-    rangeStrategy: 'bump',
-  },
-  {
-    groupName: 'React',
-    matchPackageNames: ['react', 'react-dom'],
+    matchPackageNames: ['@types/node'],
     rangeStrategy: 'bump',
   },
   {
@@ -158,17 +153,19 @@ for (const pkg of packageNames) {
 
 const renovateConfig = {
   extends: [
-    ':separateMajorReleases',
     ':combinePatchMinorReleases',
-    ':ignoreUnstable',
-    ':disablePeerDependencies',
-    ':maintainLockFilesDisabled',
-    ':label(dependencies)',
     ':dependencyDashboard',
+    ':disablePeerDependencies',
     ':enableVulnerabilityAlerts',
     ':ignoreModulesAndTests',
+    ':ignoreUnstable',
+    ':label(dependencies)',
+    ':maintainLockFilesDisabled',
     ':prImmediately',
     ':semanticPrefixFixDepsChoreOthers',
+    ':separateMajorReleases',
+    'group:monorepos',
+    'group:recommended',
   ],
   includePaths: ['package.json', 'packages/**', 'integration/templates/**'],
   ignorePaths: ['**/node_modules/**', '.nvmrc'],

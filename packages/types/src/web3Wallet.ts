@@ -1,4 +1,5 @@
 import type { ClerkResource } from './resource';
+import type { Web3WalletJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
@@ -21,6 +22,7 @@ export interface Web3WalletResource extends ClerkResource {
   attemptVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<Web3WalletResource>;
   destroy: () => Promise<void>;
   create: () => Promise<Web3WalletResource>;
+  __internal_toSnapshot: () => Web3WalletJSONSnapshot;
 }
 
 export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<string>;

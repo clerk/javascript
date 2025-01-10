@@ -1,6 +1,6 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
-import { deepSnakeToCamel } from '@clerk/shared/underscore';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
 import {
   isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
@@ -28,6 +28,7 @@ import type {
   SignInFirstFactor,
   SignInIdentifier,
   SignInJSON,
+  SignInJSONSnapshot,
   SignInResource,
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
@@ -79,7 +80,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
 
-  constructor(data: SignInJSON | null = null) {
+  constructor(data: SignInJSON | SignInJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -420,7 +421,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  protected fromJSON(data: SignInJSON | null): this {
+  protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -434,5 +435,21 @@ export class SignIn extends BaseResource implements SignInResource {
       this.userData = new UserData(data.user_data);
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): SignInJSONSnapshot {
+    return {
+      object: 'sign_in',
+      id: this.id || '',
+      status: this.status || null,
+      supported_identifiers: this.supportedIdentifiers,
+      supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
+      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
+      second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
+      identifier: this.identifier,
+      created_session_id: this.createdSessionId,
+      user_data: this.userData.__internal_toSnapshot(),
+    };
   }
 }

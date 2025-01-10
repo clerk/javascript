@@ -51,7 +51,6 @@ const getReleaseChannel = version => {
 const slackFormatter = {
   generateChangelog: ({ packageData, releasePrUrl, pusher }) => {
     const markdown = text => ({ type: 'section', text: { type: 'mrkdwn', text } });
-    const divider = () => ({ type: 'divider' });
     const header = text => ({ type: 'header', text: { type: 'plain_text', text } });
     const context = (imgUrl, text) => ({
       type: 'context',
@@ -64,20 +63,45 @@ const slackFormatter = {
 
     const releaseChannel = getReleaseChannel(packageData?.[0]?.version);
     blocks.push(header(`Javascript SDKs - ${releaseChannel} Release - ${new Date().toLocaleDateString('en-US')}`));
-
-    let body = '';
-    for (const { name, version, changelogUrl } of packageData) {
-      body += `• <${changelogUrl}|Changelog> - \`${name}@${version}\`\n`;
-    }
-
     blocks.push(markdown(`All release PRs for this day can be found <${releasePrUrl}|here>.\nReleased packages:\n`));
-    blocks.push(markdown(body));
-    // blocks.push(divider());
+
+    createPackagesBody(packageData).forEach(body => {
+      blocks.push(markdown(body));
+    });
+
     blocks.push(markdown('\n'));
     blocks.push(context(pusher.avatarUrl, `<${pusher.profileUrl}|*${pusher.username}*> triggered this release.`));
 
     return JSON.stringify({ blocks });
   },
+};
+
+/**
+ * @property {PackageData[]} packageData
+ */
+const createPackagesBody = packageData => {
+  // The Slack API has a limitation of ~3000 characters per block and
+  // also there is a limit on the number of blocks that can be sent in a single message.
+  // So, we split the body into fragments of 10 packages each.
+  const fragments = [];
+  let body = '';
+  let count = 0;
+  for (const { name, version, changelogUrl } of packageData) {
+    body += `• <${changelogUrl}|Changelog> - \`${name}@${version}\`\n`;
+    count++;
+
+    if (count === 10) {
+      fragments.push(body);
+      body = '';
+      count = 0;
+    }
+  }
+  // This is the remaining
+  if (body) {
+    fragments.push(body);
+  }
+
+  return fragments;
 };
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.20.0",
+  "version": "5.21.2",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -71,9 +71,7 @@
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%"
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
@@ -84,9 +82,7 @@
     "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/localizations": "workspace:*",
     "@clerk/themes": "workspace:*",
-    "@types/node": "^18.19.33",
-    "@types/semver": "^7.5.8",
-    "typescript": "catalog:repo"
+    "@types/semver": "^7.5.8"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
