@@ -273,5 +273,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
 
       await fakeUser.deleteIfExists();
     });
+
+    test('sign up ticket transfer', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo({
+        searchParams: new URLSearchParams({ __clerk_ticket: '123', __clerk_status: 'sign_up' }),
+      });
+      await u.page.waitForAppUrl('/sign-in/create');
+      await expect(u.page.getByText(`Create your account`)).toBeVisible();
+    });
   });
 });

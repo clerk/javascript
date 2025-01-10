@@ -92,6 +92,7 @@ export function _SignInStart(): JSX.Element {
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
+  const clerkStatus = getClerkQueryParam('__clerk_status') || '';
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -168,6 +169,13 @@ export function _SignInStart(): JSX.Element {
 
   useEffect(() => {
     if (!organizationTicket) {
+      return;
+    }
+
+    if (clerkStatus === 'sign_up') {
+      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
+      // signUpUrl triggers a full page reload when used with the hash router.
+      void navigate(isCombinedFlow ? 'create' : signUpUrl);
       return;
     }
 
@@ -408,7 +416,7 @@ export function _SignInStart(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading) {
+  if (status.isLoading || clerkStatus === 'sign_up') {
     return <LoadingCard />;
   }
 
