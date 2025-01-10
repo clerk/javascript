@@ -60,8 +60,5 @@ try {
   console.log('Cannot access playground directory');
 }
 
-// Remove `.turbo` directory
-await $`rm -rf .turbo`.then(() => console.log('Removed root .turbo directory'));
-
-// Remove root `node_modules`
-await $`rm -rf node_modules`.then(() => console.log('Removed root node_modules'));
+await $$`rm -rf .turbo`.then(() => console.log('Removed root .turbo directory'));
+await $$`rm -rf node_modules`.then(() => console.log('Removed root node_modules'));
