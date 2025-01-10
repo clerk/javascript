@@ -23,7 +23,7 @@ export type SignInContextType = SignInCtx & {
   afterSignInUrl: string;
   transferable: boolean;
   waitlistUrl: string;
-  isCombinedFlow: boolean;
+  withSignUp: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
 };
@@ -43,7 +43,7 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const isCombinedFlow =
-    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) || context.combinedFlow;
+    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) || context.withSignUp;
 
   const { componentName, mode, ..._ctx } = context;
   const ctx = _ctx.__experimental?.combinedProps ? { ..._ctx, ..._ctx.__experimental?.combinedProps } : _ctx;

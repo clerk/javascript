@@ -14,7 +14,7 @@ export const SignInButton = withClerk(
       signUpForceRedirectUrl,
       mode,
       initialValues,
-      combinedFlow,
+      withSignUp,
       ...rest
     } = props;
     children = normalizeWithDefaultValue(children, 'Sign in');
@@ -27,7 +27,7 @@ export const SignInButton = withClerk(
         signUpFallbackRedirectUrl,
         signUpForceRedirectUrl,
         initialValues,
-        combinedFlow,
+        withSignUp,
       };
 
       if (mode === 'modal') {

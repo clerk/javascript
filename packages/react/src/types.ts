@@ -122,7 +122,7 @@ export type SignInButtonProps = ButtonProps &
     | 'signUpForceRedirectUrl'
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
-    | 'combinedFlow'
+    | 'withSignUp'
   >;
 
 export type SignUpButtonProps = {

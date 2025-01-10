@@ -941,9 +941,9 @@ export type SignInProps = RoutingOptions & {
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
   /**
-   * Enable the combined sign-in-or-up flow for `<SignIn />` component instance.
+   * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
-  combinedFlow?: boolean;
+  withSignUp?: boolean;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
