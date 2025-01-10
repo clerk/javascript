@@ -274,7 +274,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await fakeUser.deleteIfExists();
     });
 
-    test('sign up ticket transfer', async ({ page, context }) => {
+    test('sign in with ticket renders sign up', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo({
         searchParams: new URLSearchParams({ __clerk_ticket: '123', __clerk_status: 'sign_up' }),
