@@ -38,6 +38,7 @@ export const createEmailService = () => {
         if ('error' in json) {
           throw new Error(`Mailsac API Error: ${json.error} - ${json.message}`);
         }
+        throw new Error(Object.keys(json).join(', '));
 
         const message = json.messages[0];
         if (!message) {
