@@ -35,7 +35,7 @@ export const createEmailService = () => {
       async () => {
         const res = await fetcher(url);
         const json = (await res.json()) as InboxFilterResponse;
-        if ('error' in json) {
+        if ('message' in json) {
           throw new Error(`Mailsac API Error: ${json.error} - ${json.message}`);
         }
         throw new Error(Object.keys(json).join(', '));
