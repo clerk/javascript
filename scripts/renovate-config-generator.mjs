@@ -82,12 +82,7 @@ const defaultRules = [
   },
   {
     groupName: 'common TypeScript types',
-    matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
-    rangeStrategy: 'bump',
-  },
-  {
-    groupName: 'React',
-    matchPackageNames: ['react', 'react-dom'],
+    matchPackageNames: ['@types/node'],
     rangeStrategy: 'bump',
   },
   {
