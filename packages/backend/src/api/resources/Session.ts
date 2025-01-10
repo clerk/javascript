@@ -3,25 +3,25 @@ import type { SessionActivityJSON, SessionJSON } from './JSON';
 export class SessionActivity {
   constructor(
     readonly id: string,
-    readonly deviceType: string,
     readonly isMobile: boolean,
-    readonly browserName: string,
-    readonly browserVersion: string,
-    readonly ipAddress: string,
-    readonly city: string,
-    readonly country: string,
+    readonly ipAddress?: string,
+    readonly city?: string,
+    readonly country?: string,
+    readonly browserVersion?: string,
+    readonly browserName?: string,
+    readonly deviceType?: string,
   ) {}
 
   static fromJSON(data: SessionActivityJSON): SessionActivity {
     return new SessionActivity(
       data.id,
-      data.device_type,
       data.is_mobile,
-      data.browser_name,
-      data.browser_version,
       data.ip_address,
       data.city,
       data.country,
+      data.browser_version,
+      data.browser_name,
+      data.device_type,
     );
   }
 }
@@ -37,8 +37,8 @@ export class Session {
     readonly abandonAt: number,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly lastActiveOrganizationId: string | null,
-    readonly latestActivity: SessionActivity | null = null,
+    readonly lastActiveOrganizationId?: string,
+    readonly latestActivity?: SessionActivity,
     readonly actor: Record<string, unknown> | null = null,
   ) {}
 

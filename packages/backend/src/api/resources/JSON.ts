@@ -231,13 +231,13 @@ export interface RedirectUrlJSON extends ClerkResourceJSON {
 
 export interface SessionActivityJSON extends ClerkResourceJSON {
   id: string;
-  device_type: string;
+  device_type?: string;
   is_mobile: boolean;
-  browser_name: string;
-  browser_version: string;
-  ip_address: string;
-  city: string;
-  country: string;
+  browser_name?: string;
+  browser_version?: string;
+  ip_address?: string;
+  city?: string;
+  country?: string;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
@@ -245,9 +245,9 @@ export interface SessionJSON extends ClerkResourceJSON {
   client_id: string;
   user_id: string;
   status: string;
-  last_active_organization_id: string | null;
+  last_active_organization_id?: string;
   actor: Record<string, unknown> | null;
-  latest_activity: SessionActivityJSON | null;
+  latest_activity?: SessionActivityJSON;
   last_active_at: number;
   expire_at: number;
   abandon_at: number;
