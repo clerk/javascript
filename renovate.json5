@@ -11,7 +11,8 @@
     ":enableVulnerabilityAlerts",
     ":ignoreModulesAndTests",
     ":prImmediately",
-    ":semanticPrefixFixDepsChoreOthers"
+    ":semanticPrefixFixDepsChoreOthers",
+    "group:monorepos"
   ],
   "includePaths": [
     "package.json",
@@ -1723,15 +1724,15 @@
     {
       "groupName": "common TypeScript types",
       "matchPackageNames": [
-        "@types/node"
+        "@types/node",
+        "@types/react",
+        "@types/react-dom"
       ],
       "rangeStrategy": "bump"
     },
     {
       "groupName": "React",
       "matchPackageNames": [
-        "@types/react",
-        "@types/react-dom",
         "react",
         "react-dom"
       ],

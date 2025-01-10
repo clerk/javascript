@@ -169,6 +169,7 @@ const renovateConfig = {
     ':ignoreModulesAndTests',
     ':prImmediately',
     ':semanticPrefixFixDepsChoreOthers',
+    'group:monorepos',
   ],
   includePaths: ['package.json', 'packages/**', 'integration/templates/**'],
   ignorePaths: ['**/node_modules/**', '.nvmrc'],
