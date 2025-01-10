@@ -24,3 +24,4 @@ export * from './ExternalElementMounter';
 export * from './colorOptionToHslaScale';
 export * from './createCustomMenuItems';
 export * from './usernameUtils';
+export * from './web3CallbackErrorHandler';

@@ -79,6 +79,11 @@ export default defineNuxtModule<ModuleOptions>({
     // Handle Nuxt-specific imports (e.g #imports)
     nuxt.options.build.transpile.push(resolver.resolve('./runtime'));
 
+    // Optimize @clerk/vue to avoid missing injection Symbol key errors
+    nuxt.options.vite.optimizeDeps = nuxt.options.vite.optimizeDeps || {};
+    nuxt.options.vite.optimizeDeps.include = nuxt.options.vite.optimizeDeps.include || [];
+    nuxt.options.vite.optimizeDeps.include.push('@clerk/vue');
+
     // Add the `@clerk/vue` plugin
     addPlugin(resolver.resolve('./runtime/plugin'));
 

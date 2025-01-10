@@ -79,7 +79,7 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
 }
 
 const createMessage = (keys: AccountlessApplication) => {
-  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running on keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
+  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 };
 
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
@@ -152,7 +152,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   // TODO-KEYLESS: Add link to official documentation.
   const README_NOTIFICATION = `
 ## DO NOT COMMIT
-This directory is auto-generated from \`@clerk/nextjs\` because you are running on Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
+This directory is auto-generated from \`@clerk/nextjs\` because you are running in Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
   `;
 
   writeFileSync(README_PATH, README_NOTIFICATION, {

@@ -16,7 +16,7 @@ const ClerkQueryParams = [
 type ClerkQueryParam = (typeof ClerkQueryParams)[number];
 
 type ClerkQueryParamsToValuesMap = {
-  __clerk_status: VerificationStatus;
+  __clerk_status: VerificationStatus | TicketStatus;
 } & Record<(typeof ClerkQueryParams)[number], string>;
 
 export type VerificationStatus =
@@ -26,6 +26,8 @@ export type VerificationStatus =
   | 'verified'
   | 'verified_switch_tab'
   | 'client_mismatch';
+
+type TicketStatus = 'sign_in' | 'sign_up';
 
 export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQueryParamsToValuesMap[T] | null {
   const val = new URL(window.location.href).searchParams.get(param);

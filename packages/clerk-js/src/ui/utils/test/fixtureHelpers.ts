@@ -250,6 +250,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
           status: emailVerificationStatus,
         },
       },
+      missing_fields: [],
     } as SignUpJSON;
   };
 
@@ -339,6 +340,11 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   us.sign_up = {
     ...us.sign_up,
     mode: SIGN_UP_MODES.PUBLIC,
+  };
+
+  us.username_settings = {
+    min_length: 4,
+    max_length: 40,
   };
 
   const emptyAttribute = {

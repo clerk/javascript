@@ -1,7 +1,9 @@
-import { OAUTH_PROVIDERS } from '@clerk/types';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
-import { render, screen } from '../../../../testUtils';
+import { render, runFakeTimers, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpContinue } from '../SignUpContinue';
 
@@ -104,6 +106,86 @@ describe('SignUpContinue', () => {
 
     render(<SignUpContinue />, { wrapper });
     screen.getByText(`Continue with ${name}`);
+  });
+
+  it('renders error for invalid username length', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withUsername({ required: true });
+      f.startSignUpWithEmailAddress({
+        emailVerificationStatus: 'verified',
+      });
+    });
+
+    fixtures.signUp.update.mockRejectedValue(
+      new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'form_username_invalid_length',
+            long_message: 'some server error',
+            message: 'some server error',
+            meta: { param_name: 'username' },
+          },
+        ],
+        status: 400,
+      }),
+    );
+
+    await runFakeTimers(async timers => {
+      const { userEvent } = render(<SignUpContinue />, { wrapper });
+      expect(screen.queryByText(/username/i)).toBeInTheDocument();
+      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+      timers.runOnlyPendingTimers();
+      const button = screen.getByText('Continue');
+      await userEvent.click(button);
+      timers.runOnlyPendingTimers();
+
+      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+      timers.runOnlyPendingTimers();
+      await waitFor(() =>
+        expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
+      );
+    });
+  });
+
+  it('renders error for existing username', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withUsername({ required: true });
+      f.startSignUpWithEmailAddress({
+        emailVerificationStatus: 'verified',
+      });
+    });
+
+    fixtures.signUp.update.mockRejectedValue(
+      new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'form_identifier_exists',
+            long_message: 'some server error',
+            message: 'some server error',
+            meta: { param_name: 'username' },
+          },
+        ],
+        status: 400,
+      }),
+    );
+
+    await runFakeTimers(async timers => {
+      const { userEvent } = render(<SignUpContinue />, { wrapper });
+      expect(screen.queryByText(/username/i)).toBeInTheDocument();
+      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+      timers.runOnlyPendingTimers();
+      const button = screen.getByText('Continue');
+      await userEvent.click(button);
+      timers.runOnlyPendingTimers();
+
+      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+      timers.runOnlyPendingTimers();
+      await waitFor(() =>
+        expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
+      );
+    });
   });
 
   describe('Sign in Link', () => {

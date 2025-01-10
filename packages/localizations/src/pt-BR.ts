@@ -824,7 +824,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
-        subtitle__disconnected: 'Esta conta foi descontectada',
+        subtitle__disconnected: 'Esta conta foi desconectada',
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
@@ -926,7 +926,7 @@ export const ptBR: LocalizationResource = {
       title: 'Entre na lista de espera',
     },
     success: {
-      message: 'Te redireceionando em breve...',
+      message: 'Te redirecionando em breve...',
       subtitle: 'Entraremos em contato quando seu lugar estiver disponível',
       title: 'Obrigado por entrar na lista de espera!',
     },

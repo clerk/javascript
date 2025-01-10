@@ -113,6 +113,17 @@ describe('ClerkMiddleware type tests', () => {
     clerkMiddlewareMock();
   });
 
+  it('prevents usage of system permissions with auth.has()', () => {
+    clerkMiddlewareMock(async (auth, _event, _request) => {
+      // @ts-expect-error - system permissions are not allowed
+      (await auth()).has({ permission: 'org:sys_foo' });
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect(has => has({ permission: 'org:sys_foo' }));
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect({ permission: 'org:sys_foo' });
+    });
+  });
+
   describe('Multi domain', () => {
     const defaultProps = { publishableKey: '', secretKey: '' };
 
@@ -591,7 +602,7 @@ describe('clerkMiddleware(params)', () => {
 
   describe('debug', () => {
     beforeEach(() => {
-      global.console.log.mockClear();
+      (global.console.log as ReturnType<typeof vi.fn>).mockClear();
     });
 
     it('outputs debug logs when used with only params', async () => {

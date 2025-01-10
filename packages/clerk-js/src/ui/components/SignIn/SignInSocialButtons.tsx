@@ -8,7 +8,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
+import { handleError, web3CallbackErrorHandler } from '../../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useClerk();
@@ -36,7 +36,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
             signUpContinueUrl: ctx.signUpContinueUrl,
             strategy,
           })
-          .catch(err => handleError(err, [], card.setError));
+          .catch(err => web3CallbackErrorHandler(err, card.setError));
       }}
     />
   );

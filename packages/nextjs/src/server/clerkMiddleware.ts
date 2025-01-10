@@ -171,7 +171,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         );
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
-        handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
+        handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
 
       // TODO @nikos: we need to make this more generic
@@ -314,11 +314,19 @@ const createMiddlewareProtect = (
 // especially when copy-pasting code from one place to another.
 // This function handles the known errors thrown by the APIs described above,
 // and returns the appropriate response.
-const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestState: RequestState): Response => {
+const handleControlFlowErrors = (
+  e: any,
+  clerkRequest: ClerkRequest,
+  nextRequest: NextRequest,
+  requestState: RequestState,
+): Response => {
   if (isNextjsNotFoundError(e)) {
     // Rewrite to a bogus URL to force not found error
     return setHeader(
-      NextResponse.rewrite(`${clerkRequest.clerkUrl.origin}/clerk_${Date.now()}`),
+      // This is an internal rewrite purely to trigger a not found error. We do not want Next.js to think that the
+      // destination URL is a valid page, so we use `nextRequest.url` as the base for the fake URL, which Next.js
+      // understands is an internal URL and won't run middleware against the request.
+      NextResponse.rewrite(new URL(`/clerk_${Date.now()}`, nextRequest.url)),
       constants.Headers.AuthReason,
       'protect-rewrite',
     );

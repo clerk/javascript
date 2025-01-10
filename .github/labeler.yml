@@ -1,5 +1,8 @@
 # See https://github.com/actions/labeler
 
+astro:
+  - packages/astro/**
+
 backend:
   - packages/backend/**
 
@@ -12,11 +15,11 @@ clerk-js:
 elements:
   - packages/elements/**
 
-express:
-  - packages/express/**
-
 expo:
   - packages/expo/**
+
+express:
+  - packages/express/**
 
 fastify:
   - packages/fastify/**
@@ -27,14 +30,23 @@ localizations:
 nextjs:
   - packages/nextjs/**
 
+nuxt:
+  - packages/nuxt/**
+
 react:
   - packages/react/**
+
+react-router:
+  - packages/react-router/**
 
 remix:
   - packages/remix/**
 
-sdk-node:
-  - packages/sdk-node/**
+tanstack:
+  - packages/tanstack-start/**
+
+testing:
+  - packages/testing/**
 
 themes:
   - packages/themes/**
@@ -42,8 +54,8 @@ themes:
 types:
   - packages/types/**
 
-testing:
-  - packages/testing/**
+vue:
+  - packages/vue/**
 
 playground:
   - playground/**
@@ -53,6 +65,3 @@ actions:
 
 integration:
   - integration/**
-
-tanstack:
-  - packages/tanstack-start/**

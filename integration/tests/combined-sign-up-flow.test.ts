@@ -23,14 +23,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCombinedFlow] })('combine
     // Fill in sign in form
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/create');
 
-    // Verify email
-    await u.po.signUp.enterTestOtpCode();
-
-    await u.page.waitForAppUrl('/sign-in/create/continue');
+    const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
+    expect(prefilledEmail).toBe(fakeUser.email);
 
     await u.po.signUp.setPassword(fakeUser.password);
     await u.po.signUp.continue();
+
+    // Verify email
+    await u.po.signUp.enterTestOtpCode();
 
     // Check if user is signed in
     await u.po.expect.toBeSignedIn();
@@ -69,7 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCombinedFlow] })('combine
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,
-      withPhoneNumber: true,
+      withPassword: true,
       withUsername: true,
     });
 
@@ -79,14 +81,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCombinedFlow] })('combine
     // Fill in sign in form
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/create');
 
-    // Verify email
-    await u.po.signUp.enterTestOtpCode();
-
-    await u.page.waitForAppUrl('/sign-in/create/continue');
+    const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
+    expect(prefilledEmail).toBe(fakeUser.email);
 
     await u.po.signUp.setPassword(fakeUser.password);
     await u.po.signUp.continue();
+
+    // Verify email
+    await u.po.signUp.enterTestOtpCode();
 
     // Check if user is signed in
     await u.po.expect.toBeSignedIn();

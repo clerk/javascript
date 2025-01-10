@@ -106,7 +106,7 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   public sendCaptchaToken(params: unknown): Promise<ClientResource> {
-    return this._basePatchBypass({ body: params });
+    return this._basePostBypass({ body: params, path: this.path() + '/verify' });
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {

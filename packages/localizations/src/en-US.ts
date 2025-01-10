@@ -582,6 +582,7 @@ export const enUS: LocalizationResource = {
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
     passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
+    web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',

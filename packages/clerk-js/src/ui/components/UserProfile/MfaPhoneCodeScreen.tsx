@@ -18,7 +18,8 @@ import {
 import { Plus } from '../../icons';
 import { getCountryFromPhoneString, handleError, stringToFormattedPhoneString } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
-import { AddPhone, VerifyPhone } from './PhoneForm';
+import { AddPhone } from './PhoneForm';
+import { VerifyWithCode } from './VerifyWithCode';
 
 type MfaPhoneCodeScreenProps = FormProps;
 export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScreenProps) => {
@@ -37,10 +38,10 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
         onUseExistingNumberClick={() => wizard.goToStep(2)}
         onReset={onReset}
       />
-      <VerifyPhone
+      <MFAVerifyPhone
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
-        onSuccess={wizard.nextStep}
+        onSuccess={() => (isInstanceWithBackupCodes ? wizard.goToStep(3) : onSuccess)}
         onReset={() => wizard.goToStep(2)}
       />
       <AddMfa
@@ -57,10 +58,14 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
       {isInstanceWithBackupCodes && (
         <SuccessPage
           title={localizationKeys('userProfile.mfaPhoneCodePage.successTitle')}
-          text={[
-            localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
-            localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
-          ]}
+          text={
+            ref.current?.backupCodes && ref.current?.backupCodes.length > 0
+              ? [
+                  localizationKeys('userProfile.mfaPhoneCodePage.successMessage1'),
+                  localizationKeys('userProfile.mfaPhoneCodePage.successMessage2'),
+                ]
+              : [localizationKeys('userProfile.mfaPhoneCodePage.successMessage1')]
+          }
           onFinish={onReset}
           contents={<MfaBackupCodeList backupCodes={ref.current?.backupCodes} />}
         />
@@ -117,6 +122,50 @@ const EnableMFAButtonForPhone = (
     >
       {country.iso.toUpperCase()} {formattedPhone}
     </Button>
+  );
+};
+
+type MFAVerifyPhoneProps = FormProps & {
+  title: LocalizationKey;
+  resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+};
+
+export const MFAVerifyPhone = (props: MFAVerifyPhoneProps) => {
+  const { title, onSuccess, resourceRef, onReset } = props;
+  const card = useCardState();
+  const phone = resourceRef.current;
+  const [setReservedForSecondFactor] = useReverification(() => phone?.setReservedForSecondFactor({ reserved: true }));
+
+  const enableMfa = async () => {
+    card.setLoading(phone?.id);
+    try {
+      await setReservedForSecondFactor();
+      resourceRef.current = phone;
+      onSuccess();
+    } catch (err) {
+      handleError(err, [], card.setError);
+    } finally {
+      card.setIdle();
+    }
+  };
+
+  return (
+    <FormContainer
+      headerTitle={title}
+      headerSubtitle={localizationKeys('userProfile.phoneNumberPage.verifySubtitle', {
+        identifier: resourceRef.current?.phoneNumber,
+      })}
+    >
+      <VerifyWithCode
+        nextStep={() => {
+          void enableMfa();
+        }}
+        identification={resourceRef.current}
+        identifier={resourceRef.current?.phoneNumber}
+        prepareVerification={resourceRef.current?.prepareVerification}
+        onReset={onReset}
+      />
+    </FormContainer>
   );
 };
 
