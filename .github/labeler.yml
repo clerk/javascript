@@ -42,9 +42,6 @@ react-router:
 remix:
   - packages/remix/**
 
-sdk-node:
-  - packages/sdk-node/**
-
 tanstack:
   - packages/tanstack-start/**
 
