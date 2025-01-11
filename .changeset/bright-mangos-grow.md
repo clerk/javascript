@@ -2,4 +2,7 @@
 '@clerk/backend': minor
 ---
 
-Align Session resource with OpenAPI spec
+Update Session resource with new properties to align with OpenAPI spec
+- `lastActiveOrganizationId`
+- `latestActivity`
+- `actor`
