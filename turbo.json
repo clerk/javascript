@@ -164,7 +164,7 @@
     },
     "//#test:integration:nextjs": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "MAILSAC_API_KEY"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
