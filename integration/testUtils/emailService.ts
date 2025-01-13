@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import { runWithExponentialBackOff } from '@clerk/shared';
 
 type Message = {
@@ -37,18 +36,8 @@ export const createEmailService = () => {
         const res = await fetcher(url);
         const json = (await res.json()) as InboxFilterResponse;
         if ('message' in json) {
-          if (
-            crypto.createHash('sha256').update(process.env.MAILSAC_API_KEY).digest('hex') !==
-            'cfc1da314fac104cb5d54d1e0d7b4edf1ecdffa7d5670e6a0ac9f2909851e62e'
-          ) {
-            throw new Error(
-              `Mailsac API key is malformed, length was ${process.env.MAILSAC_API_KEY.length}, expected 48`,
-            );
-          }
-
           throw new Error(`Mailsac API Error: ${json.error} - ${json.message}`);
         }
-        throw new Error(Object.keys(json).join(', '));
 
         const message = json.messages[0];
         if (!message) {
