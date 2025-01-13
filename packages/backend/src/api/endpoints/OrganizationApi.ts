@@ -25,6 +25,7 @@ type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
   orderBy?: WithSign<'name' | 'created_at' | 'members_count'>;
+  organizationId?: string[];
 }>;
 
 type CreateParams = {
