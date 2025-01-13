@@ -261,11 +261,11 @@ importers:
         specifier: workspace:^
         version: link:../types
       cookie:
-        specifier: 0.7.0
-        version: 0.7.0
+        specifier: 1.0.2
+        version: 1.0.2
       snakecase-keys:
-        specifier: 5.4.4
-        version: 5.4.4
+        specifier: 8.0.1
+        version: 8.0.1
       tslib:
         specifier: catalog:repo
         version: 2.4.1
@@ -276,9 +276,6 @@ importers:
       '@edge-runtime/vm':
         specifier: 5.0.0
         version: 5.0.0
-      '@types/cookie':
-        specifier: ^1.0.0
-        version: 1.0.0
       msw:
         specifier: 2.6.4
         version: 2.6.4(@types/node@22.9.0)(typescript@5.6.3)
@@ -5220,10 +5217,6 @@ packages:
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
-
-  '@types/cookie@1.0.0':
-    resolution: {integrity: sha512-mGFXbkDQJ6kAXByHS7QAggRXgols0mAdP4MuXgloGY1tXokvzaFFM4SMqWvf7AH0oafI7zlFJwoGWzmhDqTZ9w==}
-    deprecated: This is a stub types definition. cookie provides its own type definitions, so you do not need this installed.
 
   '@types/cookiejar@2.1.5':
     resolution: {integrity: sha512-he+DHOWReW0nghN24E1WUqM0efK4kI9oTqDm6XmK8ZPe2djZ90BSNdGnIyCLzCPw7/pogPlGbzI2wHGGmi4O/Q==}
@@ -13069,9 +13062,9 @@ packages:
   snake-case@3.0.4:
     resolution: {integrity: sha512-LAOh4z89bGQvl9pFfNF8V146i7o7/CqFPbqzYgP+yYzDIDeS9HaNFtXABamRW+AQzEVODcvE79ljJ+8a9YSdMg==}
 
-  snakecase-keys@5.4.4:
-    resolution: {integrity: sha512-YTywJG93yxwHLgrYLZjlC75moVEX04LZM4FHfihjHe1FCXm+QaLOFfSf535aXOAd0ArVQMWUAe8ZPm4VtWyXaA==}
-    engines: {node: '>=12'}
+  snakecase-keys@8.0.1:
+    resolution: {integrity: sha512-Sj51kE1zC7zh6TDlNNz0/Jn1n5HiHdoQErxO8jLtnyrkJW/M5PrI7x05uDgY3BO7OUQYKCvmeMurW6BPUdwEOw==}
+    engines: {node: '>=18'}
 
   socket.io-adapter@2.5.5:
     resolution: {integrity: sha512-eLDQas5dzPgOWCk9GuuJC2lBqItuhKI4uxGgo9aIV7MYbk2h9Q6uULEh8WBzThoI7l+qU9Ast9fVUmkqPP9wYg==}
@@ -20682,10 +20675,6 @@ snapshots:
   '@types/cookie@0.4.1': {}
 
   '@types/cookie@0.6.0': {}
-
-  '@types/cookie@1.0.0':
-    dependencies:
-      cookie: 0.7.0
 
   '@types/cookiejar@2.1.5': {}
 
@@ -30782,11 +30771,11 @@ snapshots:
       dot-case: 3.0.4
       tslib: 2.8.1
 
-  snakecase-keys@5.4.4:
+  snakecase-keys@8.0.1:
     dependencies:
       map-obj: 4.3.0
       snake-case: 3.0.4
-      type-fest: 2.19.0
+      type-fest: 4.31.0
 
   socket.io-adapter@2.5.5:
     dependencies:
