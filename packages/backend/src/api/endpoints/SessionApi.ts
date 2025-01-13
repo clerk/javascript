@@ -22,7 +22,7 @@ type RefreshTokenParams = {
   request_originating_ip?: string;
   request_headers?: Record<string, string[]>;
   suffixed_cookies?: boolean;
-  format?: 'token' | 'cookies';
+  format?: 'token' | 'cookie';
 };
 
 export class SessionAPI extends AbstractAPI {
@@ -68,16 +68,16 @@ export class SessionAPI extends AbstractAPI {
   }
 
   public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'token ' }): Promise<Token>;
-  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'cookies' }): Promise<Cookies>;
+  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'cookie' }): Promise<Cookies>;
   public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token>;
   public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token | Cookies> {
     this.requireId(sessionId);
-    const { format = 'token', suffixed_cookies, ...restParams } = params;
+    const { suffixed_cookies, ...restParams } = params;
     return this.request({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'refresh'),
       bodyParams: restParams,
-      queryParams: { format, suffixed_cookies },
+      queryParams: { suffixed_cookies },
     });
   }
 }

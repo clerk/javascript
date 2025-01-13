@@ -274,7 +274,7 @@ ${error.getFullMessage()}`,
     try {
       // Perform the actual token refresh.
       const response = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
-        format: 'cookies',
+        format: 'cookie',
         suffixed_cookies: authenticateContext.usesSuffixedCookies(),
         expired_token: expiredSessionToken || '',
         refresh_token: refreshToken || '',
