@@ -23,9 +23,9 @@ export type SignInContextType = SignInCtx & {
   afterSignInUrl: string;
   transferable: boolean;
   waitlistUrl: string;
-  withSignUp: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -123,6 +123,6 @@ export const useSignInContext = (): SignInContextType => {
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
-    isCombinedFlow,
+    isCombinedFlow: isCombinedFlow ?? false,
   };
 };
