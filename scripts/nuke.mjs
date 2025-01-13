@@ -21,11 +21,7 @@ try {
   try {
     const packages = await readdir(packagesDir);
     const promises = packages.map(
-      dir =>
-        $$({
-          // eslint-disable-next-line turbo/no-undeclared-env-vars
-          verbose: !!process.env.VERBOSE,
-        })`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(packagesDir, dir), directory))}`,
+      dir => $$`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(packagesDir, dir), directory))}`,
     );
 
     await Promise.all(promises).then(() => void console.log(`Cleaned ${promises.length} packages`));
@@ -43,16 +39,22 @@ try {
   try {
     const playgrounds = await readdir(playgroundDir);
     for (const dir of playgrounds) {
-      // Remove `yalc` packages
-      await $$({
-        cwd: join(playgroundDir, dir),
-      })`rm -rf .yalc`.then(() => console.log('Removed all yalc packages'));
+      try {
+        await access(join(playgroundDir, dir, '.yalc'), constants.R_OK);
+        console.log('Checking', join(playgroundDir, dir));
+        $$({
+          cwd: join(playgroundDir, dir),
+        })`rm -rf .yalc`.then(() => console.log('Removed .yalc from', dir));
+      } catch {
+        // Ignore
+      }
     }
-    const promises = playgrounds.map(
-      dir => $$`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(playgroundDir, dir), directory))}`,
-    );
 
-    await Promise.allSettled(promises).then(() => void console.log(`Cleaned ${promises.length} playgrounds`));
+    await Promise.allSettled(
+      playgrounds.map(
+        dir => $$`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(playgroundDir, dir), directory))}`,
+      ),
+    ).then(() => void console.log(`Cleaned ${promises.length} playgrounds`));
   } catch (error) {
     console.error(error);
   }
