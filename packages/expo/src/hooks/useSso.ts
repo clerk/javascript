@@ -50,14 +50,14 @@ export function useSso(useSsoParams: UseSsoParams) {
     //
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
-    const redirectUrl =
+    const oauthRedirectUrl =
       startSsoFlowParams?.redirectUrl ||
       useSsoParams.redirectUrl ||
       AuthSession.makeRedirectUri({
         path: 'sso-native-callback',
       });
 
-    await signIn.create({ strategy, redirectUrl });
+    await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
@@ -67,10 +67,10 @@ export function useSso(useSsoParams: UseSsoParams) {
 
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
       externalVerificationRedirectURL.toString(),
-      redirectUrl,
+      oauthRedirectUrl,
     );
 
-    // @ts-ignore
+    // @ts-expect-error
     const { type, url } = authSessionResult || {};
 
     // TODO: Check all the possible AuthSession results
