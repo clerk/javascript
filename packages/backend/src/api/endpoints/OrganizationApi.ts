@@ -126,10 +126,15 @@ type DeleteOrganizationDomainParams = {
 
 export class OrganizationAPI extends AbstractAPI {
   public async getOrganizationList(params?: GetOrganizationListParams) {
+    const { organizationId, ...restParams } = params ?? {};
+
     return this.request<PaginatedResourceResponse<Organization[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: params,
+      queryParams: {
+        ...restParams,
+        ...(organizationId && { query: organizationId.join(',') }),
+      },
     });
   }
 
