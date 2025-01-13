@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.22.0
+
+### Minor Changes
+
+- Update Session resource with new properties to align with OpenAPI spec ([#4869](https://github.com/clerk/javascript/pull/4869)) by [@octoper](https://github.com/octoper)
+
+  - `lastActiveOrganizationId`
+  - `latestActivity`
+  - `actor`
+
+### Patch Changes
+
+- Fixes an issue with the satellite sync flow for development instances. ([#4864](https://github.com/clerk/javascript/pull/4864)) by [@BRKalow](https://github.com/BRKalow)
+
+- Upgrading cookies@1.0.2 and snakecase-keys@8.0.1 ([#4881](https://github.com/clerk/javascript/pull/4881)) by [@renovate](https://github.com/apps/renovate)
+
 ## 1.21.6
 
 ### Patch Changes
