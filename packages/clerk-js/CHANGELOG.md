@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.44.0
+
+### Minor Changes
+
+- Improve UX when adding a new phone number as an MFA option ([#4860](https://github.com/clerk/javascript/pull/4860)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Redirect to sign-up based on clerk_status ([#4863](https://github.com/clerk/javascript/pull/4863)) by [@dstaley](https://github.com/dstaley)
+
 ## 5.43.7
 
 ### Patch Changes
