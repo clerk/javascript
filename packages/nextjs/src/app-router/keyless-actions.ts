@@ -1,12 +1,11 @@
 'use server';
 import type { AccountlessApplication } from '@clerk/backend';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect, RedirectType } from 'next/navigation';
 
+import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName } from '../server/keyless';
-import { detectClerkMiddleware } from '../server/utils';
 import { canUseKeyless__server } from '../utils/feature-flags';
-import { buildRequestLike } from './server/utils';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
@@ -16,8 +15,10 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
     httpOnly: true,
   });
 
-  const request = await buildRequestLike();
+  const request = new Request('https://placeholder.com', { headers: await headers() });
 
+  // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
+  // @ts-expect-error Request will work as well
   if (detectClerkMiddleware(request)) {
     /**
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
