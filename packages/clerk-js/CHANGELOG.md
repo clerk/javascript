@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.43.7
+
+### Patch Changes
+
+- Fixes username form field errors to display messages according to the respective code sent in the error response. ([#4858](https://github.com/clerk/javascript/pull/4858)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.43.6
 
 ### Patch Changes
