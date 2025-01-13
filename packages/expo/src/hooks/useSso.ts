@@ -1,22 +1,22 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
 
-export type UseOAuthFlowParams = {
-  strategy: OAuthStrategy;
+export type UseSsoParams = {
+  strategy: OAuthStrategy | EnterpriseSSOStrategy;
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
-export type StartOAuthFlowParams = {
+export type StartSsoParams = {
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
-export type StartOAuthFlowReturnType = {
+export type StartSsoFlowReturnType = {
   createdSessionId: string;
   setActive?: SetActive;
   signIn?: SignInResource;
@@ -24,16 +24,16 @@ export type StartOAuthFlowReturnType = {
   authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
-export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
-  const { strategy } = useOAuthParams || {};
+export function useSso(useSsoParams: UseSsoParams) {
+  const { strategy } = useSsoParams || {};
   if (!strategy) {
-    return errorThrower.throw('Missing oauth strategy');
+    return errorThrower.throw('Missing strategy');
   }
 
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startOAuthFlow(startOAuthFlowParams?: StartOAuthFlowParams): Promise<StartOAuthFlowReturnType> {
+  async function startFlow(startSsoFlowParams?: StartSsoParams): Promise<StartSsoFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: '',
@@ -50,24 +50,27 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     //
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
-    const oauthRedirectUrl =
-      startOAuthFlowParams?.redirectUrl ||
-      useOAuthParams.redirectUrl ||
+    const redirectUrl =
+      startSsoFlowParams?.redirectUrl ||
+      useSsoParams.redirectUrl ||
       AuthSession.makeRedirectUri({
-        path: 'oauth-native-callback',
+        path: 'sso-native-callback',
       });
 
-    await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
+    await signIn.create({ strategy, redirectUrl });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
+    if (!externalVerificationRedirectURL) {
+      return errorThrower.throw('Missing external verification redirect URL for SSO flow');
+    }
+
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
-      // @ts-ignore
       externalVerificationRedirectURL.toString(),
-      oauthRedirectUrl,
+      redirectUrl,
     );
 
-    // @ts-expect-error
+    // @ts-ignore
     const { type, url } = authSessionResult || {};
 
     // TODO: Check all the possible AuthSession results
@@ -96,7 +99,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
-        unsafeMetadata: startOAuthFlowParams?.unsafeMetadata || useOAuthParams.unsafeMetadata,
+        unsafeMetadata: startSsoFlowParams?.unsafeMetadata || useSsoParams.unsafeMetadata,
       });
       createdSessionId = signUp.createdSessionId || '';
     }
@@ -111,6 +114,6 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   }
 
   return {
-    startOAuthFlow,
+    startFlow,
   };
 }

@@ -10,5 +10,5 @@ export {
   useUser,
 } from '@clerk/clerk-react';
 
-export * from './useOAuth';
+export * from './useSso';
 export * from './useAuth';
