@@ -4,8 +4,9 @@ import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
+import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
 import type { RequestLike } from '../types';
-import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../utils';
+import { assertTokenSignature, decryptClerkRequestData } from '../utils';
 
 /**
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
