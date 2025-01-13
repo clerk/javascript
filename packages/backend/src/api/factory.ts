@@ -5,6 +5,7 @@ import {
   DomainAPI,
   EmailAddressAPI,
   InvitationAPI,
+  MachineTokensAPI,
   OrganizationAPI,
   PhoneNumberAPI,
   RedirectUrlAPI,
@@ -27,6 +28,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     __experimental_accountlessApplications: new AccountlessApplicationAPI(
       buildRequest({ ...options, requireSecretKey: false }),
     ),
+    __internal_machineTokens: new MachineTokensAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),

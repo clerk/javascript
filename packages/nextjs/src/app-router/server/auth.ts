@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -12,18 +13,33 @@ import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
+type MachineAuth = Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject> & {
+  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+};
+
+type AuthOptions = { entity?: 'user' | 'machine' };
+
 export interface AuthFn {
   (): Promise<Auth>;
   protect: AuthProtect;
 }
 
-export const auth: AuthFn = async () => {
+export interface MachineAuthFn {
+  (options?: AuthOptions): Promise<MachineAuth>;
+  protect: AuthProtect;
+}
+
+export function auth(options?: AuthOptions & { entity: 'user' }): Promise<Auth>;
+export function auth(options?: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
+export async function auth(options?: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions) {
   require('server-only');
 
   const request = await buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
+    options,
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -50,7 +66,7 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn });
-};
+}
 
 auth.protect = async (...args: any[]) => {
   require('server-only');
