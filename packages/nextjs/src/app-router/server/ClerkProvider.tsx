@@ -28,33 +28,31 @@ export async function ClerkProvider(
   const { children, dynamic, ...rest } = props;
 
   async function generateStatePromise() {
-    if (dynamic) {
-      if (isNext13) {
-        /**
-         * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-         * Without the await here, Next will throw a DynamicServerError during build.
-         */
-        return Promise.resolve(await getDynamicClerkState());
-      } else {
-        return getDynamicClerkState();
-      }
+    if (!dynamic) {
+      return Promise.resolve(null);
     }
-    return Promise.resolve(null);
+    if (isNext13) {
+      /**
+       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+       * Without the await here, Next will throw a DynamicServerError during build.
+       */
+      return Promise.resolve(await getDynamicClerkState());
+    }
+    return getDynamicClerkState();
   }
 
   async function generateNonce() {
-    if (dynamic) {
-      if (isNext13) {
-        /**
-         * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-         * Without the await here, Next will throw a DynamicServerError during build.
-         */
-        return Promise.resolve(await getNonceFromCSPHeader());
-      } else {
-        return getNonceFromCSPHeader();
-      }
+    if (!dynamic) {
+      return Promise.resolve('');
     }
-    return Promise.resolve('');
+    if (isNext13) {
+      /**
+       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+       * Without the await here, Next will throw a DynamicServerError during build.
+       */
+      return Promise.resolve(await getNonceFromCSPHeader());
+    }
+    return getNonceFromCSPHeader();
   }
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
