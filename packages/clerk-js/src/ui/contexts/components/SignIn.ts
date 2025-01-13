@@ -43,7 +43,9 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const isCombinedFlow =
-    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) || context.withSignUp;
+    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
+    context.withSignUp ||
+    false;
 
   const { componentName, mode, ..._ctx } = context;
   const ctx = _ctx.__experimental?.combinedProps ? { ..._ctx, ..._ctx.__experimental?.combinedProps } : _ctx;
@@ -123,6 +125,6 @@ export const useSignInContext = (): SignInContextType => {
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
-    isCombinedFlow: isCombinedFlow ?? false,
+    isCombinedFlow,
   };
 };
