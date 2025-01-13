@@ -37,14 +37,14 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           right: '1.25rem',
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
-          minWidth: '16.125rem',
+          minWidth: '13.4rem',
           padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
           borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 120ms cubic-bezier(0.3, 0, 0.2, 1)',
+          transition: 'all 135ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -60,7 +60,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 220ms cubic-bezier(0.5, 1, 0.20, 0.8)',
+            transition: 'all 210ms cubic-bezier(0.3, 0, 0.2, 1)',
           },
         })}
       >
@@ -173,7 +173,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 position: relative;
                 isolation: isolate;
                 white-space: nowrap;
-                animation: show-title 160ms ease-out forwards;
 
                 ${!isForcedExpanded &&
                 `&::after {
@@ -248,17 +247,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   }
                 }
 
-              `} @keyframes show-title {
-                  from {
-                    transform: translateY(-1.5px);
-                    opacity: 0;
-                  }
-
-                  to {
-                    transform: translateY(0);
-                    opacity: 1;
-                  }
-                }
+              `}
               `}
             >
               {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
@@ -275,13 +264,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             css={css`
               color: #8c8c8c;
               transition: color 130ms ease-out;
-              visibility: ${isExpanded && !claimed ? 'visible' : 'hidden'};
+              display: ${isExpanded && !claimed ? 'block' : 'none'};
 
               :hover {
                 color: #eeeeee;
               }
 
-              animation: show-button 285ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
+              animation: show-button 220ms ease;
 
               @keyframes show-button {
                 from {
@@ -318,16 +307,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               font-weight: 400;
               line-height: 1rem;
               max-width: 14.625rem;
-              min-height: 2rem;
-              animation: show-description 210ms ease forwards;
+              animation: show-description 290ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 
               @keyframes show-description {
                 from {
-                  transform: translateY(-3px);
                   opacity: 0;
                 }
                 to {
-                  transform: translateY(0);
                   opacity: 1;
                 }
               }
