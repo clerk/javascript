@@ -41,7 +41,6 @@ try {
     for (const dir of playgrounds) {
       try {
         await access(join(playgroundDir, dir, '.yalc'), constants.R_OK);
-        console.log('Checking', join(playgroundDir, dir));
         $$({
           cwd: join(playgroundDir, dir),
         })`rm -rf .yalc`.then(() => console.log('Removed .yalc from', dir));
