@@ -14,6 +14,7 @@ export type UseSsoParams = {
 export type StartSsoParams = {
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  identifier?: string;
 };
 
 export type StartSsoFlowReturnType = {
@@ -57,7 +58,7 @@ export function useSso(useSsoParams: UseSsoParams) {
         path: 'sso-native-callback',
       });
 
-    await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
+    await signIn.create({ strategy, redirectUrl: oauthRedirectUrl, identifier: startSsoFlowParams?.identifier });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
