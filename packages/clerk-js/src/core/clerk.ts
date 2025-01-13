@@ -1612,6 +1612,11 @@ export class Clerk implements ClerkInterface {
       return;
     }
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    const url = 'https://keys.coinbase.com/connect';
+    const popup = window.open(url, 'Smart Wallet');
+    popup?.focus();
+
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
       provider === 'metamask'
