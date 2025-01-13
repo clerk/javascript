@@ -4,19 +4,29 @@ import { cookies } from 'next/headers';
 import { redirect, RedirectType } from 'next/navigation';
 
 import { getKeylessCookieName } from '../server/keyless';
+import { detectClerkMiddleware } from '../server/utils';
 import { canUseKeyless__server } from '../utils/feature-flags';
+import { buildRequestLike } from './server/utils';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
-  void (await cookies()).set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  const cookieStore = await cookies();
+  cookieStore.set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
 
-  /**
-   * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
-   */
-  redirect(`/clerk-sync-keyless?returnUrl=${returnUrl}`, RedirectType.replace);
+  const request = await buildRequestLike();
+
+  if (detectClerkMiddleware(request)) {
+    /**
+     * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
+     */
+    redirect(`/clerk-sync-keyless?returnUrl=${returnUrl}`, RedirectType.replace);
+    return;
+  }
+
+  return;
 }
 
 export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {

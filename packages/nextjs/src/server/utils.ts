@@ -197,10 +197,12 @@ export const redirectAdapter = (url: string | URL) => {
   return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
-export function assertAuthStatus(req: RequestLike, error: string) {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+export function detectClerkMiddleware(req: RequestLike): boolean {
+  return Boolean(getAuthKeyFromRequest(req, 'AuthStatus'));
+}
 
-  if (!authStatus) {
+export function assertAuthStatus(req: RequestLike, error: string) {
+  if (!detectClerkMiddleware(req)) {
     throw new Error(error);
   }
 }
