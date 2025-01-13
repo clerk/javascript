@@ -52,7 +52,7 @@ export const auth: AuthFn = async () => {
   return Object.assign(authObject, { redirectToSignIn });
 };
 
-auth.protect = async (...args) => {
+auth.protect = async (...args: any[]) => {
   require('server-only');
 
   const request = await buildRequestLike();
@@ -66,6 +66,5 @@ auth.protect = async (...args) => {
     redirect,
   });
 
-  // @ts-expect-error TS flattens all possible combinations of the for AuthProtect signatures in a union.
   return protect(...args);
 };

@@ -1,6 +1,3 @@
-import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from 'snapshots';
-import type { TelemetryCollector } from 'telemetry';
-
 import type {
   Appearance,
   CreateOrganizationTheme,
@@ -39,7 +36,9 @@ import type { ActiveSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
+import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
@@ -768,7 +767,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     >;
 
     /**
-     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
      */
     __internal_claimKeylessApplicationUrl?: string;
 
