@@ -54,7 +54,7 @@ try {
       playgrounds.map(
         dir => $$`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(playgroundDir, dir), directory))}`,
       ),
-    ).then(() => void console.log(`Cleaned ${promises.length} playgrounds`));
+    ).then(() => void console.log(`Cleaned playground directories`));
   } catch (error) {
     console.error(error);
   }
