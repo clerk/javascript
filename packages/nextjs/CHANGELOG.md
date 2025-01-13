@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.9.9
+
+### Patch Changes
+
+- Always use nextUrl to build rewritten URLs ([#4856](https://github.com/clerk/javascript/pull/4856)) by [@dstaley](https://github.com/dstaley)
+
 ## 6.9.8
 
 ### Patch Changes

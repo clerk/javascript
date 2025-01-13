@@ -521,7 +521,11 @@ ${error.getFullMessage()}`,
     }
 
     // Multi-domain development sync flow
-    if (authenticateContext.instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
+    if (
+      authenticateContext.instanceType === 'development' &&
+      isRequestEligibleForMultiDomainSync &&
+      !authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
+    ) {
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
@@ -529,10 +533,6 @@ ${error.getFullMessage()}`,
       redirectURL.searchParams.append(
         constants.QueryParameters.ClerkRedirectUrl,
         authenticateContext.clerkUrl.toString(),
-      );
-      redirectURL.searchParams.append(
-        constants.QueryParameters.HandshakeReason,
-        AuthErrorReason.SatelliteCookieNeedsSyncing,
       );
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
@@ -554,11 +554,9 @@ ${error.getFullMessage()}`,
         );
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
-      const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
-      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
     /**
      * End multi-domain sync flows
