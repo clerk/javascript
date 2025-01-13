@@ -35,69 +35,13 @@
 
 ### Installation
 
-Add `@clerk/nuxt` as a dependency
+The fastest way to get started with Clerk is by following the [Nuxt Quickstart](https://clerk.com/docs/quickstarts/nuxt?utm_source=github&utm_medium=clerk_nuxt).
 
-```bash
-npm install @clerk/nuxt
-```
-
-### Build
-
-To build the package locally with the TypeScript compiler, run:
-
-```bash
-npm run build
-```
+You'll learn how to install `@clerk/nuxt`, set up your environment keys, add the Clerk module, and use Clerk's prebuilt components.
 
 ## Usage
 
-Make sure the following environment variables are set in a `.env` file in your Nuxt project:
-
-```
-NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[publishable-key]
-NUXT_CLERK_SECRET_KEY=[secret-key]
-```
-
-Then, add `@clerk/nuxt` to the `modules` section of `nuxt.config.ts`:
-
-```js
-export default defineNuxtConfig({
-  modules: ['@clerk/nuxt'],
-});
-```
-
-You can now start using Clerk's components. Here's a basic example showing a header component:
-
-```vue
-<template>
-  <header>
-    <h1>My App</h1>
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
-    <SignedOut>
-      <SignInButton mode="modal" />
-    </SignedOut>
-  </header>
-</template>
-```
-
-To protect an API route, you can access the `event.context.auth` object and check the value of `userId` to determine if the user is authenticated:
-
-```ts
-export default eventHandler(event => {
-  const { userId } = event.context.auth;
-
-  if (!userId) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized',
-    });
-  }
-
-  return { userId };
-});
-```
+For further information, guides, and examples visit the [Nuxt reference documentation](https://clerk.com/docs/references/nuxt/overview?utm_source=github&utm_medium=clerk_nuxt).
 
 ## Support
 
@@ -122,4 +66,4 @@ _For more information and to report security issues, please refer to our [securi
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/vue/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/nuxt/LICENSE) for more information.
