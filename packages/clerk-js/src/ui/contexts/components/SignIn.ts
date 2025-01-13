@@ -23,9 +23,9 @@ export type SignInContextType = SignInCtx & {
   afterSignInUrl: string;
   transferable: boolean;
   waitlistUrl: string;
-  isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -37,11 +37,15 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
+
+  const isCombinedFlow =
+    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
+    context.withSignUp ||
+    false;
 
   const { componentName, mode, ..._ctx } = context;
   const ctx = _ctx.__experimental?.combinedProps ? { ..._ctx, ..._ctx.__experimental?.combinedProps } : _ctx;

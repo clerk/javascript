@@ -940,6 +940,10 @@ export type SignInProps = RoutingOptions & {
    * Additional arbitrary metadata to be stored alongside the User object
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Enable sign-in-or-up flow for `<SignIn />` component instance.
+   */
+  withSignUp?: boolean;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
