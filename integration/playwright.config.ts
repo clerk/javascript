@@ -4,6 +4,9 @@ import type { PlaywrightTestConfig } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
 import * as path from 'path';
+import crypto from 'node:crypto';
+
+console.log(crypto.createHash('sha256').update(process.env.MAILSAC_API_KEY).digest('hex'));
 
 config({ path: path.resolve(__dirname, '.env.local') });
 
