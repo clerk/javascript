@@ -113,11 +113,14 @@ const withWaitlistdMode = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
 
-const withCombinedFlow = withEmailCodes
+const withSignInOrUpFlow = withEmailCodes
   .clone()
-  .setId('withCombinedFlow')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
+  .setId('withSignInOrUpFlow')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
+
+const withSignInOrUpEmailLinksFlow = withEmailLinks
+  .clone()
+  .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
 export const envs = {
@@ -136,5 +139,6 @@ export const envs = {
   withRestrictedMode,
   withLegalConsent,
   withWaitlistdMode,
-  withCombinedFlow,
+  withSignInOrUpFlow,
+  withSignInOrUpEmailLinksFlow,
 } as const;
