@@ -544,7 +544,7 @@ export const nlNL: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
     captcha_invalid:
