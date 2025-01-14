@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.8.2",
+  "version": "6.9.10",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -65,10 +65,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "workspace:*",
-    "@clerk/clerk-react": "workspace:*",
-    "@clerk/shared": "workspace:*",
-    "@clerk/types": "workspace:*",
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
     "crypto-js": "4.2.0",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"
@@ -76,14 +76,12 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/crypto-js": "4.2.2",
-    "@types/node": "^18.19.33",
-    "next": "^14.2.10",
-    "typescript": "catalog:repo"
+    "next": "^14.2.20"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15.0.0",
-    "react": "^18 || ^19.0.0-0",
-    "react-dom": "^18 || ^19.0.0-0"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

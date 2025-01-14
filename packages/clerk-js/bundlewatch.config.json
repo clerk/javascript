@@ -16,6 +16,8 @@
     { "path": "./dist/userbutton*.js", "maxSize": "5KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "15KB" },
     { "path": "./dist/userverification*.js", "maxSize": "5KB" },
-    { "path": "./dist/onetap*.js", "maxSize": "2KB" }
+    { "path": "./dist/onetap*.js", "maxSize": "1KB" },
+    { "path": "./dist/waitlist*.js", "maxSize": "1.3KB" },
+    { "path": "./dist/keylessPrompt*.js", "maxSize": "4.9KB" }
   ]
 }

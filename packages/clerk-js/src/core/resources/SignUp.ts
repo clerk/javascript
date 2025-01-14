@@ -17,6 +17,7 @@ import type {
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
+  SignUpJSONSnapshot,
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
@@ -75,7 +76,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
 
-  constructor(data: SignUpJSON | null = null) {
+  constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -376,7 +377,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
   };
 
-  protected fromJSON(data: SignUpJSON | null): this {
+  protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.status = data.status;
@@ -399,6 +400,33 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.legalAcceptedAt = data.legal_accepted_at;
     }
     return this;
+  }
+
+  public __internal_toSnapshot(): SignUpJSONSnapshot {
+    return {
+      object: 'sign_up',
+      id: this.id || '',
+      status: this.status || null,
+      required_fields: this.requiredFields,
+      optional_fields: this.optionalFields,
+      missing_fields: this.missingFields,
+      unverified_fields: this.unverifiedFields,
+      verifications: this.verifications.__internal_toSnapshot(),
+      username: this.username,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      email_address: this.emailAddress,
+      phone_number: this.phoneNumber,
+      has_password: this.hasPassword,
+      unsafe_metadata: this.unsafeMetadata,
+      created_session_id: this.createdSessionId,
+      created_user_id: this.createdUserId,
+      abandon_at: this.abandonAt,
+      web3_wallet: this.web3wallet,
+      legal_accepted_at: this.legalAcceptedAt,
+      external_account: this.externalAccount,
+      external_account_strategy: this.externalAccount?.strategy,
+    };
   }
 
   /**

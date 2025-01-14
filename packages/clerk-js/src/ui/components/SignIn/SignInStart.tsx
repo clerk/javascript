@@ -94,6 +94,7 @@ export function _SignInStart(): JSX.Element {
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
+  const clerkStatus = getClerkQueryParam('__clerk_status') || '';
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -173,6 +174,13 @@ export function _SignInStart(): JSX.Element {
       return;
     }
 
+    if (clerkStatus === 'sign_up') {
+      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
+      // signUpUrl triggers a full page reload when used with the hash router.
+      navigate(isCombinedFlow ? 'create' : signUpUrl);
+      return;
+    }
+
     status.setLoading();
     card.setLoading();
     signIn
@@ -230,6 +238,7 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:
@@ -386,6 +395,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        passwordEnabled: userSettings.attributes.password.required,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -408,7 +418,9 @@ export function _SignInStart(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading) {
+  if (status.isLoading || clerkStatus === 'sign_up') {
+    // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
+    // rendering the sign in flow.
     return <LoadingCard />;
   }
 

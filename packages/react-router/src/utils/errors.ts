@@ -3,7 +3,6 @@ const createErrorMessage = (msg: string) => {
 
 For more info, check out the docs: https://clerk.com/docs,
 or come say hi in our discord server: https://clerk.com/discord
-
 `;
 };
 

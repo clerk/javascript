@@ -15,6 +15,7 @@ import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
+import type { UserJSONSnapshot } from './snapshots';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
@@ -124,6 +125,8 @@ export interface UserResource extends ClerkResource {
   get hasVerifiedEmailAddress(): boolean;
 
   get hasVerifiedPhoneNumber(): boolean;
+
+  __internal_toSnapshot: () => UserJSONSnapshot;
 }
 
 export type CreateEmailAddressParams = { email: string };
@@ -134,6 +137,8 @@ export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
   additionalScopes?: OAuthScope[];
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 export type VerifyTOTPParams = { code: string };
 

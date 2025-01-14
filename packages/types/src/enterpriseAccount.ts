@@ -1,8 +1,8 @@
-import type { OAuthProvider } from 'oauth';
-import type { SamlIdpSlug } from 'saml';
-import type { VerificationResource } from 'verification';
-
+import type { OAuthProvider } from './oauth';
 import type { ClerkResource } from './resource';
+import type { SamlIdpSlug } from './saml';
+import type { EnterpriseAccountConnectionJSONSnapshot, EnterpriseAccountJSONSnapshot } from './snapshots';
+import type { VerificationResource } from './verification';
 
 export type EnterpriseProtocol = 'saml' | 'oauth';
 
@@ -19,6 +19,7 @@ export interface EnterpriseAccountResource extends ClerkResource {
   providerUserId: string | null;
   publicMetadata: Record<string, unknown> | null;
   verification: VerificationResource | null;
+  __internal_toSnapshot: () => EnterpriseAccountJSONSnapshot;
 }
 
 export interface EnterpriseAccountConnectionResource extends ClerkResource {
@@ -32,4 +33,5 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   syncUserAttributes: boolean;
+  __internal_toSnapshot: () => EnterpriseAccountConnectionJSONSnapshot;
 }

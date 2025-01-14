@@ -517,13 +517,14 @@ const Components = (props: ComponentsProps) => {
           </LazyImpersonationFabProvider>
         )}
 
-        {__BUILD_FLAG_KEYLESS_UI__
-          ? state.options?.__internal_claimKeylessApplicationUrl && (
-              <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-                <KeylessPrompt url={state.options.__internal_claimKeylessApplicationUrl} />
-              </LazyImpersonationFabProvider>
-            )
-          : null}
+        {state.options?.__internal_claimKeylessApplicationUrl && state.options?.__internal_copyInstanceKeysUrl && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <KeylessPrompt
+              claimUrl={state.options.__internal_claimKeylessApplicationUrl}
+              copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
+            />
+          </LazyImpersonationFabProvider>
+        )}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>

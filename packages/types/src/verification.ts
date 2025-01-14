@@ -1,6 +1,7 @@
 import type { ClerkAPIError } from './api';
 import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
 import type { ClerkResource } from './resource';
+import type { VerificationJSONSnapshot } from './snapshots';
 
 export interface VerificationResource extends ClerkResource {
   attempts: number | null;
@@ -13,6 +14,7 @@ export interface VerificationResource extends ClerkResource {
   strategy: string | null;
   verifiedAtClient: string | null;
   verifiedFromTheSameClient: () => boolean;
+  __internal_toSnapshot: () => VerificationJSONSnapshot;
 }
 
 export interface PasskeyVerificationResource extends VerificationResource {

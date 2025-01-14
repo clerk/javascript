@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import React from 'react';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { useMaxAllowedInstancesGuard, withMaxAllowedInstancesGuard } from '../useMaxAllowedInstancesGuard';
 
@@ -8,7 +9,7 @@ const ERR = 'usedMoreThanOnceError';
 
 describe('Max allowed instances Hook & Hoc', () => {
   beforeAll(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
 
   afterAll(() => {

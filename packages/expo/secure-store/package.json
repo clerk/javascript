@@ -1,0 +1,4 @@
+{
+  "main": "../dist/secure-store/index.js",
+  "types": "../dist/secure-store/index.d.ts"
+}

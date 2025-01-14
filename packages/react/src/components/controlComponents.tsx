@@ -15,44 +15,44 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedIn');
 
   const { userId } = useAuthContext();
   if (userId) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
 
-export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('SignedOut');
 
   const { userId } = useAuthContext();
   if (userId === null) {
-    return <>{children}</>;
+    return children;
   }
   return null;
 };
 
-export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
   const isomorphicClerk = useIsomorphicClerkContext();
   if (!isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
-export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
   if (isomorphicClerk.loaded) {
     return null;
   }
-  return <>{children}</>;
+  return children;
 };
 
 export type ProtectProps = React.PropsWithChildren<
@@ -109,9 +109,9 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed
    */
-  const unauthorized = <>{fallback ?? null}</>;
+  const unauthorized = fallback ?? null;
 
-  const authorized = <>{children}</>;
+  const authorized = children;
 
   if (!userId) {
     return unauthorized;
@@ -212,7 +212,7 @@ export const AuthenticateWithRedirectCallback = withClerk(
   'AuthenticateWithRedirectCallback',
 );
 
-export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {
+export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('MultisessionAppSupport');
 
   const session = useSessionContext();

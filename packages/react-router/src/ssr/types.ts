@@ -8,7 +8,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from '@clerk/types';
-import type { LoaderFunction } from 'react-router';
+import type { LoaderFunction, UNSAFE_DataWithResponseInit } from 'react-router';
 import type { CreateServerLoaderArgs } from 'react-router/route-module';
 
 type Func = (...args: any[]) => unknown;
@@ -41,8 +41,17 @@ export type RouteInfo = {
 export type GetAuthReturn = Promise<AuthObject>;
 
 export type RootAuthLoaderOptions = {
+  /**
+   * Used to override the default VITE_CLERK_PUBLISHABLE_KEY env variable if needed.
+   */
   publishableKey?: string;
+  /**
+   * Used to override the CLERK_JWT_KEY env variable if needed.
+   */
   jwtKey?: string;
+  /**
+   * Used to override the CLERK_SECRET_KEY env variable if needed.
+   */
   secretKey?: string;
   /**
    * @deprecated This option will be removed in the next major version.
@@ -88,7 +97,13 @@ type ObjectLike = Record<string, unknown> | null;
  *
  * In the case of `null`, we will return an object containing only the authentication state.
  */
-export type RootAuthLoaderCallbackReturn = Promise<Response> | Response | Promise<ObjectLike> | ObjectLike;
+type RootAuthLoaderCallbackReturn =
+  | Promise<Response>
+  | Response
+  | Promise<ObjectLike>
+  | ObjectLike
+  | UNSAFE_DataWithResponseInit<unknown>
+  | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
 // TODO: Figure out how to use the Route.LoaderArgs from userland code
 export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;

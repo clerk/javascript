@@ -8,7 +8,9 @@ import type {
   SamlSettings,
   SignInData,
   SignUpData,
+  UsernameSettingsData,
   UserSettingsJSON,
+  UserSettingsJSONSnapshot,
   UserSettingsResource,
   Web3Strategy,
 } from '@clerk/types';
@@ -17,6 +19,9 @@ import { BaseResource } from './internal';
 
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;
+
+const defaultMinUsernameLength = 4;
+const defaultMaxUsernameLength = 64;
 
 export type Actions = {
   create_organization: boolean;
@@ -39,13 +44,14 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   signUp!: SignUpData;
   passwordSettings!: PasswordSettingsData;
   passkeySettings!: PasskeySettingsData;
+  usernameSettings!: UsernameSettingsData;
 
   socialProviderStrategies: OAuthStrategy[] = [];
   authenticatableSocialStrategies: OAuthStrategy[] = [];
   web3FirstFactors: Web3Strategy[] = [];
   enabledFirstFactorIdentifiers: Array<keyof UserSettingsResource['attributes']> = [];
 
-  public constructor(data: UserSettingsJSON) {
+  public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
@@ -62,7 +68,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     );
   }
 
-  protected fromJSON(data: UserSettingsJSON | null): this {
+  protected fromJSON(data: UserSettingsJSON | UserSettingsJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -84,6 +90,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
           ? defaultMaxPasswordLength
           : Math.min(data?.password_settings?.max_length, defaultMaxPasswordLength),
     };
+    this.usernameSettings = {
+      ...data.username_settings,
+      min_length: Math.max(data?.username_settings?.min_length, defaultMinUsernameLength),
+      max_length: Math.min(data?.username_settings?.max_length, defaultMaxUsernameLength),
+    };
     this.passkeySettings = data.passkey_settings;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
@@ -91,6 +102,19 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(this.attributes);
 
     return this;
+  }
+
+  public __internal_toSnapshot(): UserSettingsJSONSnapshot {
+    return {
+      social: this.social,
+      saml: this.saml,
+      attributes: this.attributes,
+      actions: this.actions,
+      sign_in: this.signIn,
+      sign_up: this.signUp,
+      password_settings: this.passwordSettings,
+      passkey_settings: this.passkeySettings,
+    } as unknown as UserSettingsJSONSnapshot;
   }
 
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {
