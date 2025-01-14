@@ -1125,15 +1125,12 @@ export class Clerk implements ClerkInterface {
       [CLERK_SYNCED]: 'true',
     });
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL) || getClerkQueryParam(CLERK_REDIRECT_URL);
     if (!satelliteUrl || !isHttpOrHttps(satelliteUrl)) {
       clerkRedirectUrlIsMissingScheme();
     }
 
-    const backToSatelliteUrl = buildURL(
-      { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
-      { stringify: true },
-    );
+    const backToSatelliteUrl = buildURL({ base: satelliteUrl, searchParams }, { stringify: true });
     return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
