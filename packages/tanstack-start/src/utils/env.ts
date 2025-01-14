@@ -1,5 +1,4 @@
 import { isTruthy } from '@clerk/shared/underscore';
-import { getContext } from 'vinxi/http';
 
 /**
  *
@@ -20,12 +19,6 @@ export const getEnvVariable = (name: string, defaultVaue: string = ''): string =
   // Vite specific envs
   if (typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env[name] === 'string') {
     return import.meta.env[name];
-  }
-
-  // Cloudflare workers envs
-  // Nitro injects CF envs into event.context.cloudflare.env property
-  if (getContext('cloudflare')) {
-    return getContext('cloudflare').env[name];
   }
 
   return defaultVaue;
