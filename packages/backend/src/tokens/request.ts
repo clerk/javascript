@@ -449,6 +449,10 @@ ${error.getFullMessage()}`,
 
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
+    const { data: decodeResult } = decodeJwt(sessionTokenInHeader!);
+    if (decodeResult?.payload.sub.startsWith('mch_')) {
+      return signedOut(authenticateContext, 'Machine tokens cannot be used to authenticate user requests');
+    }
 
     try {
       const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
