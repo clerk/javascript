@@ -112,7 +112,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     // Internal serializable state that will be passed to the client
     event.context.__clerk_initial_state = createInitialState(authObject);
 
-    handler?.(event);
+    await handler?.(event);
   });
 };
 
