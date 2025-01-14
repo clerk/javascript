@@ -147,7 +147,6 @@ function SignInRoot() {
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
     componentName: 'SignUp',
-    ...signInContext.__experimental?.combinedProps,
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),

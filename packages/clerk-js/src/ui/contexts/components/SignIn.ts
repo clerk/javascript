@@ -47,8 +47,7 @@ export const useSignInContext = (): SignInContextType => {
     context.withSignUp ||
     false;
 
-  const { componentName, mode, ..._ctx } = context;
-  const ctx = _ctx.__experimental?.combinedProps ? { ..._ctx, ..._ctx.__experimental?.combinedProps } : _ctx;
+  const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
     [],
