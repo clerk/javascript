@@ -86,12 +86,12 @@ const common = ({ mode, disableRHC = false }) => {
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
-          userProfileRest: {
-            minChunks: 1,
-            name: 'user-profile-lazy',
-            priority: -20,
-            test: module => module.resource && module.resource.includes('/ui/components/UserProfile/lazy'),
-          },
+          // userProfileRest: {
+          //   minChunks: 1,
+          //   name: 'user-profile-lazy',
+          //   priority: -20,
+          //   test: module => module.resource && module.resource.includes('/ui/components/UserProfile/lazy'),
+          // },
           common: {
             minChunks: 1,
             name: 'ui-common',

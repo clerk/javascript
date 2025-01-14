@@ -243,11 +243,23 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       path: 'security',
     },
     {
-      name: 'lol',
-      id: 'lol',
+      name: 'Lazy Page',
+      id: 'lpage',
       icon: TickShield,
-      path: 'lol',
+      path: 'lazy-page',
       preload: () => import('../components/UserProfile/lazy/test').then(m => ({ default: m.LazyTest })),
+      // preload: async function () {
+      //   console.log('aaa', this.done);
+      //   // @ts-ignore
+      //   if (this.done) {
+      //     // @ts-ignore
+      //     return this.done;
+      //   }
+      //   const d = await import('../components/UserProfile/lazy/test').then(m => ({ default: m.LazyTest }));
+      //   // @ts-ignore
+      //   this.done = d;
+      //   return d;
+      // },
     },
   ];
 

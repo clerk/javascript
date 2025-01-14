@@ -34,7 +34,7 @@ export const UserProfileRoutes = () => {
   return (
     <Switch>
       {customPageRoutesWithContents}
-      <Route path={'lol'}>
+      <Route path={'lazy-page'}>
         <LazyTest />
       </Route>
       <Route>
