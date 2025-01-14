@@ -79,6 +79,8 @@ export function useSSO(useSSOParams: UseSSOParams) {
       };
     }
 
+    WebBrowser.maybeCompleteAuthSession();
+
     const params = new URL(authSessionResult.url).searchParams;
     const rotatingTokenNonce = params.get('rotating_token_nonce');
     if (!rotatingTokenNonce) {
