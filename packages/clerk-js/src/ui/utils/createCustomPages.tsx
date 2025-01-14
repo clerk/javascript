@@ -242,6 +242,13 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       icon: TickShield,
       path: 'security',
     },
+    {
+      name: 'lol',
+      id: 'lol',
+      icon: TickShield,
+      path: 'lol',
+      preload: () => import('../components/UserProfile/lazy/test').then(m => ({ default: m.LazyTest })),
+    },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {

@@ -1,9 +1,14 @@
+import { lazy } from 'react';
+
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { SecurityPage } from './SecurityPage';
+const LazyTest = lazy(() =>
+  import(/* webpackChunkName: "lalalazyTest" */ './lazy/test').then(m => ({ default: m.LazyTest })),
+);
 
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
@@ -29,6 +34,9 @@ export const UserProfileRoutes = () => {
   return (
     <Switch>
       {customPageRoutesWithContents}
+      <Route path={'lol'}>
+        <LazyTest />
+      </Route>
       <Route>
         <Route path={isAccountPageRoot ? undefined : 'account'}>
           <Switch>

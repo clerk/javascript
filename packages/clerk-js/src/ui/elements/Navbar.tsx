@@ -32,6 +32,7 @@ export type NavbarRoute = {
   id: string;
   icon: React.ComponentType;
   path: string;
+  preload?: () => Promise<any>;
   external?: boolean;
 };
 type NavBarProps = {
@@ -53,7 +54,12 @@ export const NavBar = (props: NavBarProps) => {
     if (route?.external) {
       return () => navigate(route.path);
     } else {
-      return () => navigateToInternalRoute(route);
+      return async () => {
+        if (route.preload) {
+          await route.preload();
+        }
+        return navigateToInternalRoute(route);
+      };
     }
   };
 
