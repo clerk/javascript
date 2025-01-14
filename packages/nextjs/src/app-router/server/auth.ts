@@ -5,9 +5,10 @@ import { notFound, redirect } from 'next/navigation';
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
+import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
-import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
+import { decryptClerkRequestData } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
@@ -52,7 +53,7 @@ export const auth: AuthFn = async () => {
   return Object.assign(authObject, { redirectToSignIn });
 };
 
-auth.protect = async (...args) => {
+auth.protect = async (...args: any[]) => {
   require('server-only');
 
   const request = await buildRequestLike();
@@ -66,6 +67,5 @@ auth.protect = async (...args) => {
     redirect,
   });
 
-  // @ts-expect-error TS flattens all possible combinations of the for AuthProtect signatures in a union.
   return protect(...args);
 };

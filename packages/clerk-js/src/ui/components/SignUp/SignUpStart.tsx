@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
+import { withRedirectToAfterSignUp } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
@@ -20,7 +20,7 @@ import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { buildRequest, createPasswordError, handleError, useFormControl } from '../../utils';
+import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
@@ -34,7 +34,7 @@ function _SignUpStart(): JSX.Element {
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
-  const { userSettings, displayConfig } = useEnvironment();
+  const { userSettings } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
   const { setActive } = useClerk();
@@ -52,7 +52,7 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const {
-    userSettings: { passwordSettings },
+    userSettings: { passwordSettings, usernameSettings },
   } = useEnvironment();
 
   const { mode } = userSettings.signUp;
@@ -78,6 +78,7 @@ function _SignUpStart(): JSX.Element {
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
       transformer: value => value.trim(),
+      buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
@@ -176,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
             card.setError(error);
             break;
           default:
@@ -232,7 +234,7 @@ function _SignUpStart(): JSX.Element {
     card.setLoading();
     card.setError(undefined);
 
-    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+    const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     return signUp

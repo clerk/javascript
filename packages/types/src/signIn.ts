@@ -49,6 +49,7 @@ import type {
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignInJSONSnapshot } from './snapshots';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -110,6 +111,7 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
 export type SignInStatus =
@@ -180,6 +182,8 @@ export type SignInCreateParams = (
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: TicketStrategy;

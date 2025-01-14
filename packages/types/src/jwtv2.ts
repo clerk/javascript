@@ -97,7 +97,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_role?: OrganizationCustomRoleKey;
 
   /**
-   * Active organization role
+   * Active organization permissions
    */
   org_permissions?: OrganizationCustomPermissionKey[];
 

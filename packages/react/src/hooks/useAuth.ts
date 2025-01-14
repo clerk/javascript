@@ -77,6 +77,32 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
   });
 };
 
+/**
+ * A hook that derives and returns authentication state and utility functions based on the provided auth object.
+ *
+ * @param authObject - An object containing authentication-related properties and functions.
+ *
+ * @returns A derived authentication state with helper methods. If the authentication state is invalid, an error is thrown.
+ *
+ * @remarks
+ * This hook inspects session, user, and organization information to determine the current authentication state.
+ * It returns an object that includes various properties such as whether the state is loaded, if a user is signed in,
+ * session and user identifiers, organization roles, and a `has` function for authorization checks.
+ * Additionally, it provides `signOut` and `getToken` functions if applicable.
+ *
+ * Example usage:
+ * ```tsx
+ * const {
+ *   isLoaded,
+ *   isSignedIn,
+ *   userId,
+ *   orgId,
+ *   has,
+ *   signOut,
+ *   getToken
+ * } = useDerivedAuth(authObject);
+ * ```
+ */
 export function useDerivedAuth(authObject: any): UseAuthReturn {
   const {
     sessionId,

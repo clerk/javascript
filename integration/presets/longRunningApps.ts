@@ -9,7 +9,6 @@ import { next } from './next';
 import { nuxt } from './nuxt';
 import { react } from './react';
 import { reactRouter } from './react-router';
-import { remix } from './remix';
 import { tanstack } from './tanstack';
 import { vue } from './vue';
 
@@ -24,7 +23,6 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
-    { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
     {
       id: 'next.appRouter.withEmailCodes_persist_client',

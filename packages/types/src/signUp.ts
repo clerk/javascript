@@ -11,6 +11,7 @@ import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -100,6 +101,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  __internal_toSnapshot: () => SignUpJSONSnapshot;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -124,6 +126,8 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
       strategy: SamlStrategy;
@@ -168,6 +172,8 @@ export type SignUpCreateParams = Partial<
     ticket: string;
     token: string;
     legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
@@ -187,9 +193,11 @@ export interface SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
   web3Wallet: VerificationResource;
+  __internal_toSnapshot: () => SignUpVerificationsJSONSnapshot;
 }
 
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
+  __internal_toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

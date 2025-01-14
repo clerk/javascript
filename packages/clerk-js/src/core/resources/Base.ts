@@ -2,14 +2,16 @@ import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
-import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 
-export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
+export type BaseFetchOptions = ClerkResourceReloadParams & {
+  forceUpdateClient?: boolean;
+  fetchMaxTries?: number;
+};
 
 export type BaseMutateParams = {
   action?: string;
@@ -64,9 +66,7 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    return FraudProtection.getInstance(Client, CaptchaChallenge).execute(this.clerk, () =>
-      this._baseFetch<J>(requestInit, opts),
-    );
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
@@ -78,9 +78,10 @@ export abstract class BaseResource {
     }
 
     let fapiResponse: FapiResponse<J>;
+    const { fetchMaxTries } = opts;
 
     try {
-      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
+      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
@@ -144,7 +145,7 @@ export abstract class BaseResource {
     const client = responseJSON.client || responseJSON.meta?.client;
 
     if (client && BaseResource.clerk) {
-      BaseResource.clerk.updateClient(Client.getInstance().fromJSON(client));
+      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client));
     }
   }
 
@@ -194,16 +195,16 @@ export abstract class BaseResource {
     return this._baseMutate<J>({ ...params, method: 'POST' });
   }
 
+  protected async _basePostBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
+    return this._baseMutateBypass<J>({ ...params, method: 'POST' });
+  }
+
   protected async _basePut<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PUT' });
   }
 
   protected async _basePatch<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PATCH' });
-  }
-
-  protected async _basePatchBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
-    return this._baseMutateBypass<J>({ ...params, method: 'PATCH' });
   }
 
   protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {

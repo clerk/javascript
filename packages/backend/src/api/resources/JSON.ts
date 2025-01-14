@@ -54,6 +54,7 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
   publishable_key: string;
   secret_key: string;
   claim_url: string;
+  api_keys_url: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
@@ -228,13 +229,25 @@ export interface RedirectUrlJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface SessionActivityJSON extends ClerkResourceJSON {
+  id: string;
+  device_type?: string;
+  is_mobile: boolean;
+  browser_name?: string;
+  browser_version?: string;
+  ip_address?: string;
+  city?: string;
+  country?: string;
+}
+
 export interface SessionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Session;
   client_id: string;
   user_id: string;
   status: string;
   last_active_organization_id?: string;
-  actor?: Record<string, unknown>;
+  actor: Record<string, unknown> | null;
+  latest_activity?: SessionActivityJSON;
   last_active_at: number;
   expire_at: number;
   abandon_at: number;
@@ -359,6 +372,7 @@ export interface PaginatedResponseJSON {
 export interface SamlConnectionJSON extends ClerkResourceJSON {
   name: string;
   domain: string;
+  organization_id: string | null;
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;

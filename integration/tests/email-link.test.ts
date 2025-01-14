@@ -5,8 +5,8 @@ import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
-test.describe('sign up and sign in using email link', () => {
-  const configs = [];
+test.describe('sign up and sign in using email link @generic', () => {
+  const configs = [appConfigs.next.appRouter, appConfigs.react.vite];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
@@ -81,7 +81,7 @@ const performSignUpVerificationLinkSameDevice = async (
   searchParams?: URLSearchParams,
 ) => {
   const u = createTestUtils({ app, page, context });
-  const fakeUser = u.services.users.createFakeUser();
+  const fakeUser = u.services.users.createFakeUser({ fictionalEmail: false, withPassword: true });
   await u.po.signUp.goTo({ searchParams });
   await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
   await u.po.signUp.waitForEmailVerificationScreen();
@@ -103,7 +103,7 @@ const performSignUpVerificationLinkDifferentDevice = async (
   searchParams?: URLSearchParams,
 ) => {
   const u = createTestUtils({ app, page, context, browser });
-  const fakeUser = u.services.users.createFakeUser();
+  const fakeUser = u.services.users.createFakeUser({ fictionalEmail: false, withPassword: true });
   await u.po.signUp.goTo({ searchParams });
   await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
   await u.po.signUp.waitForEmailVerificationScreen();

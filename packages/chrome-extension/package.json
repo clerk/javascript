@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.1.0",
+  "version": "2.1.11",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -55,17 +55,12 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/chrome": "*",
-    "@types/node": "^18.19.33",
-    "@types/react": "catalog:react",
-    "@types/react-dom": "catalog:react",
     "@types/webextension-polyfill": "^0.10.7",
-    "tsup": "catalog:repo",
-    "type-fest": "^4.8.3",
-    "typescript": "catalog:repo"
+    "type-fest": "^4.8.3"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

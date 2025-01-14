@@ -1,20 +1,20 @@
-import type { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
-import type { Clerk, Client } from './resources/internal';
-import { isClerkAPIResponseError } from './resources/internal';
+import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
+import type { Clerk } from './resources/internal';
+import { Client, isClerkAPIResponseError } from './resources/internal';
 
 export class FraudProtection {
   private static instance: FraudProtection;
 
   private inflightException: Promise<unknown> | null = null;
 
-  public static getInstance(client: typeof Client, CaptchaChallengeImpl: typeof CaptchaChallenge): FraudProtection {
+  public static getInstance(): FraudProtection {
     if (!FraudProtection.instance) {
-      FraudProtection.instance = new FraudProtection(client, CaptchaChallengeImpl);
+      FraudProtection.instance = new FraudProtection(Client, CaptchaChallenge);
     }
     return FraudProtection.instance;
   }
 
-  constructor(
+  private constructor(
     private client: typeof Client,
     private CaptchaChallengeImpl: typeof CaptchaChallenge,
   ) {}
@@ -50,7 +50,7 @@ export class FraudProtection {
       const captchaParams = await this.managedChallenge(clerk);
 
       try {
-        await this.client.getInstance().sendCaptchaToken(captchaParams);
+        await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
       } finally {
         // Resolve the exception placeholder promise so that other exceptions can be handled
         resolve();

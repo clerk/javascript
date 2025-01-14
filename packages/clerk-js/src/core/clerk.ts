@@ -19,12 +19,14 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClientJSONSnapshot,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
   DomainOrProxyUrl,
   EnvironmentJSON,
+  EnvironmentJSONSnapshot,
   EnvironmentResource,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
@@ -122,6 +124,7 @@ import {
   EmailLinkError,
   EmailLinkErrorCode,
   Environment,
+  isClerkRuntimeError,
   Organization,
   Waitlist,
 } from './resources/internal';
@@ -194,6 +197,10 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+
+  public __internal_getCachedResources:
+    | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
+    | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -369,8 +376,21 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
-    const defaultCb = () => this.navigate(redirectUrl);
-    const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
+
+    const handleSetActive = () => {
+      const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+      if (signOutCallback) {
+        return this.setActive({
+          session: null,
+          beforeEmit: ignoreEventValue(signOutCallback),
+        });
+      }
+
+      return this.setActive({
+        session: null,
+        redirectUrl,
+      });
+    };
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
@@ -379,22 +399,14 @@ export class Clerk implements ClerkInterface {
         await this.client.destroy();
       }
 
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
-      return this.setActive({
-        session: null,
-        beforeEmit: ignoreEventValue(cb),
-        redirectUrl,
-      });
+      return handleSetActive();
     }
   };
 
@@ -906,12 +918,15 @@ export class Clerk implements ClerkInterface {
     if (beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
-      deprecated('beforeEmit', 'Use the `redirectUrl` property instead.');
+      deprecated(
+        'Clerk.setActive({beforeEmit})',
+        'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
+      );
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl) {
+    if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1488,7 +1503,7 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const newClient = await Client.getInstance().fetch();
+    const newClient = await Client.getOrCreateInstance().fetch();
     this.updateClient(newClient);
     if (this.session) {
       return;
@@ -1862,7 +1877,7 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = () => {
-          return Client.getInstance()
+          return Client.getOrCreateInstance()
             .fetch()
             .then(res => this.updateClient(res));
         };
@@ -1883,6 +1898,8 @@ export class Clerk implements ClerkInterface {
             await initEnvironmentPromise;
             initComponents();
             await initClient();
+          } else {
+            throw e;
           }
         });
 
@@ -1915,17 +1932,32 @@ export class Clerk implements ClerkInterface {
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
-    if (__BUILD_FLAG_KEYLESS_UI__) {
-      this.#handleKeylessPrompt();
-    }
+    this.#handleKeylessPrompt();
     return true;
   };
 
+  private shouldFallbackToCachedResources = (): boolean => {
+    return !!this.__internal_getCachedResources;
+  };
+
   #loadInNonStandardBrowser = async (): Promise<boolean> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false }),
-      Client.getInstance().fetch(),
-    ]);
+    let environment: Environment, client: Client;
+    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    try {
+      [environment, client] = await Promise.all([
+        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
+        Client.getOrCreateInstance().fetch({ fetchMaxTries }),
+      ]);
+    } catch (err) {
+      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+        const cachedResources = await this.__internal_getCachedResources?.();
+        environment = new Environment(cachedResources?.environment);
+        Client.clearInstance();
+        client = Client.getOrCreateInstance(cachedResources?.client);
+      } else {
+        throw err;
+      }
+    }
 
     this.updateClient(client);
     this.updateEnvironment(environment);
@@ -1937,6 +1969,19 @@ export class Clerk implements ClerkInterface {
     }
 
     return true;
+  };
+
+  // This is used by @clerk/clerk-expo
+  __internal_reloadInitialResources = async (): Promise<void> => {
+    const [environment, client] = await Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
+      Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
+    ]);
+
+    this.updateClient(client);
+    this.updateEnvironment(environment);
+
+    this.#emit();
   };
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
@@ -2048,13 +2093,14 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleKeylessPrompt = () => {
-    if (__BUILD_FLAG_KEYLESS_UI__) {
+    if (this.#options.__internal_claimKeylessApplicationUrl) {
       void this.#componentControls?.ensureMounted().then(controls => {
-        if (this.#options.__internal_claimKeylessApplicationUrl) {
-          controls.updateProps({
-            options: { __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl },
-          });
-        }
+        controls.updateProps({
+          options: {
+            __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
+            __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+          },
+        });
       });
     }
   };

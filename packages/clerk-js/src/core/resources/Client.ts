@@ -1,11 +1,18 @@
-import type { ActiveSessionResource, ClientJSON, ClientResource, SignInResource, SignUpResource } from '@clerk/types';
+import type {
+  ActiveSessionResource,
+  ClientJSON,
+  ClientJSONSnapshot,
+  ClientResource,
+  SignInResource,
+  SignUpResource,
+} from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export class Client extends BaseResource implements ClientResource {
-  private static instance: Client;
+  private static instance: Client | null | undefined;
 
   pathRoot = '/client';
 
@@ -17,18 +24,22 @@ export class Client extends BaseResource implements ClientResource {
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 
-  public static getInstance(): Client {
+  public static getOrCreateInstance(data: ClientJSON | ClientJSONSnapshot | null = null): Client {
     if (!Client.instance) {
-      Client.instance = new Client();
+      Client.instance = new Client(data);
     }
     return Client.instance;
+  }
+
+  static clearInstance() {
+    Client.instance = null;
   }
 
   static isClientResource(resource: unknown): resource is Client {
     return !!resource && resource instanceof Client;
   }
 
-  private constructor(data: ClientJSON | null = null) {
+  private constructor(data: ClientJSON | ClientJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -49,8 +60,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch(): Promise<this> {
-    return this._baseGet();
+  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries });
   }
 
   async destroy(): Promise<void> {
@@ -95,10 +106,10 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   public sendCaptchaToken(params: unknown): Promise<ClientResource> {
-    return this._basePatchBypass({ body: params });
+    return this._basePostBypass({ body: params, path: this.path() + '/verify' });
   }
 
-  fromJSON(data: ClientJSON | null): this {
+  fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
       this.sessions = (data.sessions || []).map(s => new Session(s));
@@ -106,11 +117,26 @@ export class Client extends BaseResource implements ClientResource {
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
-      this.createdAt = unixEpochToDate(data.created_at);
-      this.updatedAt = unixEpochToDate(data.updated_at);
+      this.createdAt = unixEpochToDate(data.created_at || undefined);
+      this.updatedAt = unixEpochToDate(data.updated_at || undefined);
     }
 
     return this;
+  }
+
+  public __internal_toSnapshot(): ClientJSONSnapshot {
+    return {
+      object: 'client',
+      status: null,
+      id: this.id || '',
+      sessions: this.sessions.map(s => s.__internal_toSnapshot()),
+      sign_up: this.signUp.__internal_toSnapshot(),
+      sign_in: this.signIn.__internal_toSnapshot(),
+      last_active_session_id: this.lastActiveSessionId,
+      cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
+      created_at: this.createdAt?.getTime() ?? null,
+      updated_at: this.updatedAt?.getTime() ?? null,
+    };
   }
 
   protected path(): string {
