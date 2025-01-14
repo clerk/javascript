@@ -639,14 +639,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls => {
+      controls.updateProps(props);
       controls.mountComponent({
         name: 'UserProfile',
         appearanceKey: 'userProfile',
         node,
         props,
-      }),
-    );
+      });
+    });
 
     this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
   };
@@ -1727,7 +1728,14 @@ export class Clerk implements ClerkInterface {
       ..._props,
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
-    return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
+    return this.#componentControls?.attemptMounted().then(controls => {
+      if (controls) {
+        controls.updateProps(props);
+        console.log('updating', props);
+        return;
+      }
+      console.log('attempting', props);
+    });
   };
 
   __internal_navigateWithError(to: string, err: ClerkAPIError) {

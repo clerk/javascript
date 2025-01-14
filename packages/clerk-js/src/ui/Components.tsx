@@ -157,6 +157,12 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
   let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
   return {
+    attemptMounted: async () => {
+      if (!componentsControlsResolver) {
+        return undefined;
+      }
+      return componentsControlsResolver.then(controls => controls);
+    },
     ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
       const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
@@ -481,7 +487,7 @@ const Components = (props: ComponentsProps) => {
   );
 
   return (
-    <Suspense fallback={''}>
+    <Suspense fallback={'helllo'}>
       <LazyProviders
         clerk={props.clerk}
         environment={props.environment}
