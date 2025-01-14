@@ -30,7 +30,7 @@ type _LocalizationResource = {
    * It is explicitly typed, in order to avoid contributions that use LLM tools to generate
    * translations that misinterpret the correct usage of this property.
    */
-  socialButtonsBlockButtonManyInView: `${string}{{provider|titleize}}${string}` | undefined;
+  socialButtonsBlockButtonManyInView: `${string}{{provider|titleize}}${string}`;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
