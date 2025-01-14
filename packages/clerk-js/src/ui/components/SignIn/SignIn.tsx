@@ -149,6 +149,8 @@ function SignInRoot() {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
+    fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
 

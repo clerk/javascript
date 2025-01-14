@@ -87,16 +87,14 @@ export const useSignInContext = (): SignInContextType => {
     baseUrl: signUpUrl,
     authQueryString: '',
     path: ctx.path,
-    endpoint: options.experimental?.combinedFlow
-      ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE
-      : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signUpUrl,
     authQueryString: '',
     path: ctx.path,
-    endpoint: options.experimental?.combinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+    endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
   });
 
   if (isCombinedFlow) {
