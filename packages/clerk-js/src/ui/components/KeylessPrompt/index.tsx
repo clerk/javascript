@@ -30,7 +30,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
     <Portal>
       <Flex
         data-expanded={isForcedExpanded}
-        align='center'
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
@@ -44,7 +43,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 130ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          transition: 'all 210ms cubic-bezier(0.2, 0.9, 0.25, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -60,9 +59,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             minWidth: '16.125rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
-
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 135ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            transition: 'all 215ms cubic-bezier(0.5, 0.8, 0.25, 1)',
           },
         })}
       >
@@ -272,7 +270,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               }
 
               animation: show-button 300ms ease;
-
               @keyframes show-button {
                 from {
                   transform: scaleX(0.9);
@@ -294,6 +291,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             />
           </svg>
         </button>
+
         <Flex
           sx={t => ({
             flexDirection: 'column',
@@ -313,13 +311,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 font-weight: 400;
                 line-height: 1rem;
                 max-width: 14.625rem;
-                animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
+                animation: ${isForcedExpanded && 'show-description 600ms ease-in forwards'};
                 @keyframes show-description {
                   0%,
-                  10% {
+                  7% {
                     opacity: 0;
                   }
-                  20%,
+                  22%,
                   100% {
                     opacity: 1;
                   }
@@ -384,13 +382,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                animation: ${isForcedExpanded && 'show-main-title 600ms ease-in forwards'};
-                @keyframes show-main-title {
+                animation: ${isForcedExpanded && 'show-button 520ms ease-in forwards'};
+                @keyframes show-button {
                   0%,
-                  10% {
+                  14% {
                     opacity: 0;
                   }
-                  29%,
+                  24%,
                   100% {
                     opacity: 1;
                   }
