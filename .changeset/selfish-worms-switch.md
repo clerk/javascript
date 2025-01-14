@@ -4,5 +4,5 @@
 
 Introduces support for SSO with SAML
 
-- Rename `useOAuth` to `useSso` to support a wider range of protocols
-- Update default redirect URI to from `oauth-native-callback` to `sso-native-callback`
+- Introduce `useSSO` hook to support a wider range of SSO flow types
+- Deprecated `useOAuth` in favor of new `useSSO` hook
