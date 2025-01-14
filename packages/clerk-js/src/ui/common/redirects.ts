@@ -4,10 +4,15 @@ import type { SignInContextType, SignUpContextType, UserProfileContextType } fro
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
-export function buildEmailLinkRedirectUrl(
-  ctx: SignInContextType | SignUpContextType | UserProfileContextType,
-  baseUrl: string | undefined = '',
-): string {
+export function buildEmailLinkRedirectUrl({
+  ctx,
+  baseUrl = '',
+  intent = 'sign-in',
+}: {
+  ctx: SignInContextType | SignUpContextType | UserProfileContextType;
+  baseUrl: string | undefined;
+  intent?: 'sign-in' | 'sign-up' | 'profile';
+}): string {
   const { routing, authQueryString, path } = ctx;
   const isCombinedFlow = 'isCombinedFlow' in ctx && ctx.isCombinedFlow;
   return buildRedirectUrl({
@@ -15,7 +20,8 @@ export function buildEmailLinkRedirectUrl(
     baseUrl,
     authQueryString,
     path,
-    endpoint: isCombinedFlow ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint:
+      isCombinedFlow && intent === 'sign-up' ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
 }
 
