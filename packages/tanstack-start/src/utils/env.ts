@@ -1,5 +1,5 @@
 import { isTruthy } from '@clerk/shared/underscore';
-import type { H3Event } from 'vinxi/http';
+import type { HTTPEvent } from 'vinxi/http';
 
 /**
  *
@@ -12,7 +12,7 @@ import type { H3Event } from 'vinxi/http';
  *
  * @internal
  */
-export const getEnvVariable = (name: string, defaultValue: string = '', event?: H3Event) => {
+export const getEnvVariable = (name: string, defaultValue: string = '', event?: HTTPEvent) => {
   // Cloudflare context check
   const cfValue = event?.context?.cloudflare?.env[name];
   if (cfValue) {
@@ -32,7 +32,7 @@ export const getEnvVariable = (name: string, defaultValue: string = '', event?: 
   return defaultValue;
 };
 
-export const getPublicEnvVariables = (event?: H3Event) => {
+export const getPublicEnvVariables = (event?: HTTPEvent) => {
   const getValue = (name: string): string => {
     return getEnvVariable(`VITE_${name}`, '', event) || getEnvVariable(name, '', event);
   };
