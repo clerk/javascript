@@ -45,23 +45,21 @@ export function useSSO(useSSOParams: UseSSOParams) {
 
     let createdSessionId = signIn.createdSessionId;
 
-    const redirectUrl =
-      startSSOFlowParams?.redirectUrl ||
-      useSSOParams.redirectUrl ||
-      AuthSession.makeRedirectUri({
-        path: 'sso-native-callback',
-      });
+    const redirectUrl = AuthSession.makeRedirectUri({
+      path: 'sso-native-callback',
+    });
 
     if (useSSOParams.strategy === 'enterprise_sso') {
-      await signIn.create({
+      let signInResource = await signIn.create({
         identifier: startSSOFlowParams?.identifier as string,
       });
-
-      await signIn.prepareFirstFactor({
+      console.log('POST:', signInResource);
+      signInResource = await signIn.prepareFirstFactor({
         strategy: useSSOParams.strategy,
         redirectUrl,
         actionCompleteRedirectUrl: redirectUrl,
       });
+      console.log('PREPARE:', signInResource);
     } else {
       await signIn.create({
         strategy: useSSOParams.strategy,
