@@ -2,16 +2,16 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
 
-// @ts-expect-error - TODO: Improve types
-export const commonEnvs = () =>
-  ({
+export const commonEnvs = () => {
+  const publishableKey = getPublicEnvVariables().publishableKey || '';
+  return {
     CLERK_JS_VERSION: getPublicEnvVariables().clerkJsVersion || '',
     CLERK_JS_URL: getPublicEnvVariables().clerkJsUrl || '',
     API_VERSION: getEnvVariable('CLERK_API_VERSION') || 'v1',
     SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY') || '',
     PUBLISHABLE_KEY: getPublicEnvVariables().publishableKey || '',
     ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY') || '',
-    API_URL: getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(commonEnvs().PUBLISHABLE_KEY),
+    API_URL: getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey),
     DOMAIN: getPublicEnvVariables().domain || '',
     PROXY_URL: getPublicEnvVariables().proxyUrl || '',
     CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY') || '',
@@ -25,4 +25,5 @@ export const commonEnvs = () =>
     },
     TELEMETRY_DISABLED: getPublicEnvVariables().telemetryDisabled,
     TELEMETRY_DEBUG: getPublicEnvVariables().telemetryDebug,
-  }) as const;
+  } as const;
+};
