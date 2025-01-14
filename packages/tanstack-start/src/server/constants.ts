@@ -1,42 +1,36 @@
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
-import { getContext } from 'vinxi/http';
+import { getEvent } from 'vinxi/http';
 
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
 
-const getResolvedEnvVariable = (name: string) => {
-  const value = getEnvVariable(name);
-
-  // Cloudflare workers envs
-  // Nitro injects CF envs into event.context.cloudflare.env property
-  if (getContext('cloudflare')) {
-    return getContext('cloudflare').env[name];
-  }
-
-  return value;
-};
-
 export const commonEnvs = () => {
-  const publishableKey = getPublicEnvVariables().publishableKey || '';
+  const event = getEvent();
+  const publicEnvs = getPublicEnvVariables(event);
+
   return {
-    CLERK_JS_VERSION: getPublicEnvVariables().clerkJsVersion || '',
-    CLERK_JS_URL: getPublicEnvVariables().clerkJsUrl || '',
-    API_VERSION: getResolvedEnvVariable('CLERK_API_VERSION') || 'v1',
-    SECRET_KEY: getResolvedEnvVariable('CLERK_SECRET_KEY') || '',
-    PUBLISHABLE_KEY: getPublicEnvVariables().publishableKey || '',
-    ENCRYPTION_KEY: getResolvedEnvVariable('CLERK_ENCRYPTION_KEY') || '',
-    API_URL: getResolvedEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey),
-    DOMAIN: getPublicEnvVariables().domain || '',
-    PROXY_URL: getPublicEnvVariables().proxyUrl || '',
-    CLERK_JWT_KEY: getResolvedEnvVariable('CLERK_JWT_KEY') || '',
-    IS_SATELLITE: getPublicEnvVariables().isSatellite || false,
-    SIGN_IN_URL: getPublicEnvVariables().signInUrl || '',
-    SIGN_UP_URL: getPublicEnvVariables().signUpUrl || '',
+    // Public environment variables
+    CLERK_JS_VERSION: publicEnvs.clerkJsVersion,
+    CLERK_JS_URL: publicEnvs.clerkJsUrl,
+    PUBLISHABLE_KEY: publicEnvs.publishableKey,
+    DOMAIN: publicEnvs.domain,
+    PROXY_URL: publicEnvs.proxyUrl,
+    IS_SATELLITE: publicEnvs.isSatellite,
+    SIGN_IN_URL: publicEnvs.signInUrl,
+    SIGN_UP_URL: publicEnvs.signUpUrl,
+    TELEMETRY_DISABLED: publicEnvs.telemetryDisabled,
+    TELEMETRY_DEBUG: publicEnvs.telemetryDebug,
+
+    // Server-only environment variables
+    API_VERSION: getEnvVariable('CLERK_API_VERSION', 'v1', event),
+    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY', '', event),
+    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY', '', event),
+    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY', '', event),
+    API_URL: getEnvVariable('CLERK_API_URL', '', event) || apiUrlFromPublishableKey(publicEnvs.publishableKey),
+
     SDK_METADATA: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
-      environment: getResolvedEnvVariable('NODE_ENV'),
+      environment: getEnvVariable('NODE_ENV', '', event),
     },
-    TELEMETRY_DISABLED: getPublicEnvVariables().telemetryDisabled,
-    TELEMETRY_DEBUG: getPublicEnvVariables().telemetryDebug,
   } as const;
 };
