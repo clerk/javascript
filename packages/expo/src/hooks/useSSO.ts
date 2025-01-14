@@ -7,18 +7,22 @@ import { errorThrower } from '../utils/errors';
 
 export type UseSSOParams = {
   strategy: OAuthStrategy | EnterpriseSSOStrategy;
-  redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  redirectUrl?: string;
 };
 
 export type StartSSOParams = {
-  redirectUrl?: string;
-  unsafeMetadata?: SignUpUnsafeMetadata;
   identifier?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  redirectUrl?: string;
 };
 
 export type StartSSOFlowReturnType = {
-  createdSessionId: string;
+  /**
+   * Session ID created upon sign-in completion, or null if incomplete.
+   * If incomplete, use signIn or signUp for next steps like MFA.
+   */
+  createdSessionId: string | null;
   setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
@@ -26,83 +30,70 @@ export type StartSSOFlowReturnType = {
 };
 
 export function useSSO(useSSOParams: UseSSOParams) {
-  const { strategy } = useSSOParams || {};
-  if (!strategy) {
-    return errorThrower.throw('Missing strategy');
-  }
-
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
   async function startFlow(startSSOFlowParams?: StartSSOParams): Promise<StartSSOFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
-        createdSessionId: '',
+        createdSessionId: null,
         signIn,
         signUp,
         setActive,
       };
     }
 
-    // Create a redirect url for the current platform and environment.
-    //
-    // This redirect URL needs to be whitelisted for your Clerk production instance via
-    // https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
-    //
-    // For more information go to:
-    // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
-    const oauthRedirectUrl =
+    let createdSessionId = signIn.createdSessionId;
+
+    const redirectUrl =
       startSSOFlowParams?.redirectUrl ||
       useSSOParams.redirectUrl ||
       AuthSession.makeRedirectUri({
         path: 'sso-native-callback',
       });
 
-    await signIn.create({ strategy, redirectUrl: oauthRedirectUrl, identifier: startSSOFlowParams?.identifier });
+    await signIn.create({
+      strategy: useSSOParams.strategy,
+      redirectUrl,
+      identifier: startSSOFlowParams?.identifier,
+    });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
-
     if (!externalVerificationRedirectURL) {
-      return errorThrower.throw('Missing external verification redirect URL for SSO flow');
+      return errorThrower.throw(
+        'Missing external verification redirect URL for SSO flow. This indicates an API issue - please contact support for assistance.',
+      );
     }
 
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
       externalVerificationRedirectURL.toString(),
-      oauthRedirectUrl,
+      redirectUrl,
     );
-
-    // @ts-expect-error
-    const { type, url } = authSessionResult || {};
-
-    // TODO: Check all the possible AuthSession results
-    // https://docs.expo.dev/versions/latest/sdk/auth-session/#returns-7
-    if (type !== 'success') {
+    if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         authSessionResult,
-        createdSessionId: '',
+        createdSessionId,
         setActive,
         signIn,
         signUp,
       };
     }
 
-    const params = new URL(url).searchParams;
+    const params = new URL(authSessionResult.url).searchParams;
+    const rotatingTokenNonce = params.get('rotating_token_nonce');
+    if (!rotatingTokenNonce) {
+      return errorThrower.throw(
+        'Missing rotating_token_nonce in SSO callback. This indicates an API issue - please contact support for assistance.',
+      );
+    }
 
-    const rotatingTokenNonce = params.get('rotating_token_nonce') || '';
     await signIn.reload({ rotatingTokenNonce });
-
-    const { status, firstFactorVerification } = signIn;
-
-    let createdSessionId = '';
-
-    if (status === 'complete') {
-      createdSessionId = signIn.createdSessionId!;
-    } else if (firstFactorVerification.status === 'transferable') {
+    if (signIn.firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
         unsafeMetadata: startSSOFlowParams?.unsafeMetadata || useSSOParams.unsafeMetadata,
       });
-      createdSessionId = signUp.createdSessionId || '';
+      createdSessionId = signUp.createdSessionId;
     }
 
     return {
