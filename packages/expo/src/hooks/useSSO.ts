@@ -52,11 +52,22 @@ export function useSSO(useSSOParams: UseSSOParams) {
         path: 'sso-native-callback',
       });
 
-    await signIn.create({
-      strategy: useSSOParams.strategy,
-      redirectUrl,
-      identifier: startSSOFlowParams?.identifier,
-    });
+    if (useSSOParams.strategy === 'enterprise_sso') {
+      await signIn.create({
+        identifier: startSSOFlowParams?.identifier as string,
+      });
+
+      await signIn.prepareFirstFactor({
+        strategy: useSSOParams.strategy,
+        redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
+      });
+    } else {
+      await signIn.create({
+        strategy: useSSOParams.strategy,
+        redirectUrl,
+      });
+    }
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
     if (!externalVerificationRedirectURL) {
