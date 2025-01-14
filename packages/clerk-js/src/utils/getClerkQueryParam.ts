@@ -1,4 +1,4 @@
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
+import { CLERK_REDIRECT_URL, CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
 
 const ClerkQueryParams = [
   '__clerk_status',
@@ -10,6 +10,7 @@ const ClerkQueryParams = [
   '__clerk_help',
   CLERK_SYNCED,
   CLERK_SATELLITE_URL,
+  CLERK_REDIRECT_URL,
   CLERK_SUFFIXED_COOKIES,
 ] as const;
 

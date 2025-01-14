@@ -104,7 +104,13 @@ import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
+import {
+  CLERK_REDIRECT_URL,
+  CLERK_SATELLITE_URL,
+  CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNCED,
+  ERROR_CODES,
+} from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -1778,7 +1784,7 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL) || getClerkQueryParam(CLERK_REDIRECT_URL);
     return !!satelliteUrl;
   };
 
