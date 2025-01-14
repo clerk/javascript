@@ -548,7 +548,7 @@ export const frFR: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     captcha_invalid:

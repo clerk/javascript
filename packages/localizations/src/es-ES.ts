@@ -549,7 +549,7 @@ export const esES: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
