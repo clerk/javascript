@@ -44,8 +44,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const isCombinedFlow =
     Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
-    context.withSignUp ||
-    false;
+    context.withSignUp
 
   const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(

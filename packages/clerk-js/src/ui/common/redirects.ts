@@ -10,7 +10,7 @@ export function buildEmailLinkRedirectUrl({
   intent = 'sign-in',
 }: {
   ctx: SignInContextType | SignUpContextType | UserProfileContextType;
-  baseUrl: string | undefined;
+  baseUrl?: string;
   intent?: 'sign-in' | 'sign-up' | 'profile';
 }): string {
   const { routing, authQueryString, path } = ctx;
