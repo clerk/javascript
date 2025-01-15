@@ -11,7 +11,7 @@ export type UseSSOParams = {
   redirectUrl?: string;
 };
 
-export type StartSSOParams = {
+export type StartSSOFlowParams = {
   identifier?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   redirectUrl?: string;
@@ -33,7 +33,7 @@ export function useSSO(useSSOParams: UseSSOParams) {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startFlow(startSSOFlowParams: StartSSOParams): Promise<StartSSOFlowReturnType> {
+  async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams = {}): Promise<StartSSOFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
@@ -60,15 +60,11 @@ export function useSSO(useSSOParams: UseSSOParams) {
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
     if (!externalVerificationRedirectURL) {
-      return errorThrower.throw(
-        'Missing external verification redirect URL for SSO flow. This indicates an API issue - please contact support for assistance.',
-      );
+      return errorThrower.throw('Missing external verification redirect URL for SSO flow');
     }
 
     const authSessionResult = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL.toString());
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
-      WebBrowser.dismissBrowser();
-
       return {
         authSessionResult,
         createdSessionId,
@@ -100,6 +96,6 @@ export function useSSO(useSSOParams: UseSSOParams) {
   }
 
   return {
-    startFlow,
+    startSSOFlow,
   };
 }
