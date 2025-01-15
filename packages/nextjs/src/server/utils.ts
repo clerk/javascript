@@ -124,10 +124,6 @@ export function decorateRequest(
   return res;
 }
 
-export const apiEndpointUnauthorizedNextResponse = () => {
-  return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
-};
-
 export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
 
