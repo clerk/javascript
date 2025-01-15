@@ -1,13 +1,14 @@
 import type { LoadedClerk, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
+import type { RouteContextValue } from '../../router/RouteContext';
 import { completeSignUpFlow } from '../SignUp/util';
 
 type HandleCombinedFlowTransferProps = {
   identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username';
   identifierValue: string;
   signUpMode: SignUpModes;
-  navigate: (to: string) => Promise<unknown>;
+  navigate: RouteContextValue['navigate'];
   organizationTicket?: string;
   afterSignUpUrl: string;
   clerk: LoadedClerk;
@@ -78,7 +79,7 @@ export function handleCombinedFlowTransfer({
       .catch(err => handleError(err));
   }
 
-  return navigate(`create?${paramsToForward.toString()}`);
+  return navigate(`create`, { searchParams: paramsToForward });
 }
 
 function hasOptionalFields(signUp: SignUpResource) {
