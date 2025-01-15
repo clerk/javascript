@@ -540,7 +540,7 @@ export const csCZ: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Máme více možností přihlášení.',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Již jste členem organizace.',
     captcha_invalid:

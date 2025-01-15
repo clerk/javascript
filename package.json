@@ -18,7 +18,7 @@
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
-    "nuke": "./scripts/nuke.sh",
+    "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
     "release:canary": "changeset publish --tag canary --no-git-tag",
@@ -34,7 +34,7 @@
     "test:integration:elements": "E2E_APP_ID=elements.* pnpm test:integration:base --grep @elements",
     "test:integration:expo-web": "E2E_APP_ID=expo.expo-web pnpm test:integration:base --grep @expo-web",
     "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
-    "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
+    "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.* pnpm test:integration:base --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
     "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
@@ -107,7 +107,7 @@
     "verdaccio": "^5.26.3",
     "vitest": "2.1.4",
     "yalc": "1.0.0-pre.53",
-    "zx": "^7.2.3"
+    "zx": "catalog:repo"
   },
   "packageManager": "pnpm@9.13.0+sha512.beb9e2a803db336c10c9af682b58ad7181ca0fbd0d4119f2b33d5f2582e96d6c0d93c85b23869295b765170fbdaa92890c0da6ada457415039769edf3c959efe",
   "engines": {

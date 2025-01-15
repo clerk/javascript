@@ -543,7 +543,7 @@ export const ptPT: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Escolha uma das opções abaixo',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
     captcha_invalid:

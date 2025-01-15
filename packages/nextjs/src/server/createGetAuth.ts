@@ -6,8 +6,9 @@ import { isTruthy } from '@clerk/shared/underscore';
 import { withLogger } from '../utils/debugLogger';
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
+import { getHeader } from './headers-utils';
 import type { RequestLike } from './types';
-import { assertAuthStatus, getCookie, getHeader } from './utils';
+import { assertAuthStatus, getCookie } from './utils';
 
 export const createGetAuth = ({
   noAuthStatusMessage,

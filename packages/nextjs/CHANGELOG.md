@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.9.10
+
+### Patch Changes
+
+- Fix typo for "keyless mode" messages ([#4862](https://github.com/clerk/javascript/pull/4862)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Avoid infinite redirect loop on Keyless mode by detecting if `clerkMiddleware()` is used in the application. ([#4879](https://github.com/clerk/javascript/pull/4879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`72d29538f587934309da96fc1c6d454bb9aad21e`](https://github.com/clerk/javascript/commit/72d29538f587934309da96fc1c6d454bb9aad21e), [`84867be0215d7f74d8be7b4f803e2c3a241e2f89`](https://github.com/clerk/javascript/commit/84867be0215d7f74d8be7b4f803e2c3a241e2f89), [`fa967ce79e1b5f2e8216eb09900879cb825fa528`](https://github.com/clerk/javascript/commit/fa967ce79e1b5f2e8216eb09900879cb825fa528)]:
+  - @clerk/backend@1.22.0
+
 ## 6.9.9
 
 ### Patch Changes
