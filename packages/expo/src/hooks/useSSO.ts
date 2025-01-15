@@ -65,11 +65,10 @@ export function useSSO(useSSOParams: UseSSOParams) {
       );
     }
 
-    const authSessionResult = await WebBrowser.openAuthSessionAsync(
-      externalVerificationRedirectURL.toString(),
-      redirectUrl,
-    );
+    const authSessionResult = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL.toString());
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
+      WebBrowser.dismissBrowser();
+
       return {
         authSessionResult,
         createdSessionId,
