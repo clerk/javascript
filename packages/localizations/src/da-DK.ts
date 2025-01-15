@@ -542,7 +542,7 @@ export const daDK: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Vælg en metode til at fortsætte',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
