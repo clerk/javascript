@@ -1,6 +1,8 @@
+import SignIn from './ui-components/SignIn.vue';
+
+export { SignIn };
 export {
   SignUp,
-  SignIn,
   UserProfile,
   UserButton,
   OrganizationSwitcher,

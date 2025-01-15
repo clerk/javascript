@@ -1,21 +1,23 @@
-import type { SignInProps } from '@clerk/types';
+import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
 
 import { useClerk } from '../composables/useClerk';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-type SignInButtonProps = Pick<
-  SignInProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl' | 'initialValues'
->;
-
-export const SignInButton = defineComponent(
-  (
-    props: SignInButtonProps & {
-      mode?: 'modal' | 'redirect';
+export const SignInButton = defineComponent({
+  props: {
+    fallbackRedirectUrl: String,
+    forceRedirectUrl: String,
+    signUpForceRedirectUrl: String,
+    signUpFallbackRedirectUrl: String,
+    initialValues: Object,
+    withSignUp: Boolean,
+    mode: {
+      type: String as PropType<'modal' | 'redirect'>,
+      required: false,
     },
-    { slots, attrs },
-  ) => {
+  },
+  setup(props, { slots, attrs }) {
     const clerk = useClerk();
 
     function clickHandler() {
@@ -41,14 +43,4 @@ export const SignInButton = defineComponent(
       });
     };
   },
-  {
-    props: [
-      'signUpForceRedirectUrl',
-      'signUpFallbackRedirectUrl',
-      'fallbackRedirectUrl',
-      'forceRedirectUrl',
-      'mode',
-      'initialValues',
-    ],
-  },
-);
+});

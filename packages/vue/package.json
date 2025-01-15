@@ -41,7 +41,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --onSuccess \"pnpm build:dts\"",
+    "build:dts": "vue-tsc --declaration --emitDeclarationOnly",
     "dev": "tsup --watch",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
@@ -57,7 +58,9 @@
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "vue": "3.5.12"
+    "unplugin-vue": "^5.2.1",
+    "vue": "3.5.12",
+    "vue-tsc": "^2.0.24"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
