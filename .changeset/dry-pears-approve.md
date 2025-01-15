@@ -1,5 +1,4 @@
 ---
-'@clerk/types': patch
 '@clerk/vue': patch
 ---
 
