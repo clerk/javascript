@@ -33,7 +33,7 @@ export function useSSO(useSSOParams: UseSSOParams) {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startFlow(startSSOFlowParams?: StartSSOParams): Promise<StartSSOFlowReturnType> {
+  async function startFlow(startSSOFlowParams: StartSSOParams): Promise<StartSSOFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
@@ -45,27 +45,18 @@ export function useSSO(useSSOParams: UseSSOParams) {
 
     let createdSessionId = signIn.createdSessionId;
 
-    const redirectUrl = AuthSession.makeRedirectUri({
-      path: 'sso-native-callback',
-    });
+    const redirectUrl =
+      startSSOFlowParams?.redirectUrl ||
+      useSSOParams.redirectUrl ||
+      AuthSession.makeRedirectUri({
+        path: 'sso-native-callback',
+      });
 
-    if (useSSOParams.strategy === 'enterprise_sso') {
-      let signInResource = await signIn.create({
-        identifier: startSSOFlowParams?.identifier as string,
-      });
-      console.log('POST:', signInResource);
-      signInResource = await signIn.prepareFirstFactor({
-        strategy: useSSOParams.strategy,
-        redirectUrl,
-        actionCompleteRedirectUrl: redirectUrl,
-      });
-      console.log('PREPARE:', signInResource);
-    } else {
-      await signIn.create({
-        strategy: useSSOParams.strategy,
-        redirectUrl,
-      });
-    }
+    await signIn.create({
+      strategy: useSSOParams.strategy,
+      redirectUrl,
+      identifier: startSSOFlowParams.identifier,
+    });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
     if (!externalVerificationRedirectURL) {
@@ -88,17 +79,10 @@ export function useSSO(useSSOParams: UseSSOParams) {
       };
     }
 
-    WebBrowser.maybeCompleteAuthSession();
-
     const params = new URL(authSessionResult.url).searchParams;
-    const rotatingTokenNonce = params.get('rotating_token_nonce');
-    if (!rotatingTokenNonce) {
-      return errorThrower.throw(
-        'Missing rotating_token_nonce in SSO callback. This indicates an API issue - please contact support for assistance.',
-      );
-    }
-
+    const rotatingTokenNonce = params.get('rotating_token_nonce') ?? '';
     await signIn.reload({ rotatingTokenNonce });
+
     if (signIn.firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
