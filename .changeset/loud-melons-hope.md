@@ -2,4 +2,4 @@
 "@clerk/tanstack-start": patch
 ---
 
-Fix environment variable resolution for runtime contexts
+Fix environment variable loading in runtime contexts
