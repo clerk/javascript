@@ -10,6 +10,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
   Client: 'client',
+  Cookies: 'cookies',
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
@@ -42,6 +43,11 @@ export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
 export interface ClerkResourceJSON {
   object: ObjectType;
   id: string;
+}
+
+export interface CookiesJSON {
+  object: typeof ObjectType.Cookies;
+  cookies: string[];
 }
 
 export interface TokenJSON {
