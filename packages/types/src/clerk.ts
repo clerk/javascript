@@ -990,7 +990,7 @@ export type SignInCombinedProps = RoutingOptions & {
   LegacyRedirectProps &
   AfterSignOutUrl;
 
-export interface TransferableOption {
+interface TransferableOption {
   /**
    * Indicates whether or not sign in attempts are transferable to the sign up flow.
    * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
