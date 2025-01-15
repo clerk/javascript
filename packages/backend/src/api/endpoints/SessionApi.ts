@@ -67,7 +67,7 @@ export class SessionAPI extends AbstractAPI {
     });
   }
 
-  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'token ' }): Promise<Token>;
+  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'token' }): Promise<Token>;
   public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'cookie' }): Promise<Cookies>;
   public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token>;
   public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token | Cookies> {
