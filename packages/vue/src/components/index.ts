@@ -1,6 +1,3 @@
-import SignIn from './ui-components/SignIn.vue';
-
-export { SignIn };
 export {
   SignUp,
   UserProfile,
@@ -12,6 +9,7 @@ export {
   GoogleOneTap,
   Waitlist,
 } from './uiComponents';
+export { default as SignIn } from './ui-components/SignIn.vue';
 
 export {
   ClerkLoaded,

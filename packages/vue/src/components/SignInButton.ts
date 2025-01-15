@@ -11,7 +11,7 @@ export const SignInButton = defineComponent({
     signUpForceRedirectUrl: String,
     signUpFallbackRedirectUrl: String,
     initialValues: Object,
-    withSignUp: Boolean,
+    // withSignUp: Boolean,
     mode: {
       type: String as PropType<'modal' | 'redirect'>,
       required: false,
