@@ -45,7 +45,7 @@
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly",
     "dev": "tsup --watch",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest",
