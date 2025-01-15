@@ -173,9 +173,13 @@ export function _SignInStart(): JSX.Element {
     }
 
     if (clerkStatus === 'sign_up') {
+      const paramsToForward = new URLSearchParams();
+      if (organizationTicket) {
+        paramsToForward.set('__clerk_ticket', organizationTicket);
+      }
       // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
       // signUpUrl triggers a full page reload when used with the hash router.
-      navigate(isCombinedFlow ? 'create' : signUpUrl);
+      void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
       return;
     }
 
@@ -374,10 +378,6 @@ export function _SignInStart(): JSX.Element {
       }
 
       clerk.client.signUp[attribute] = identifierField.value;
-      const paramsToForward = new URLSearchParams();
-      if (organizationTicket) {
-        paramsToForward.set('__clerk_ticket', organizationTicket);
-      }
 
       const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
       const redirectUrlComplete = ctx.afterSignUpUrl || '/';
