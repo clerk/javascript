@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.1.12
+
+### Patch Changes
+
+- Fix issue "Including remotely hosted code in a Manifest V3 item" that you might have seen during audit. The affected code is now bundled with the package and as such any offending code properly tree-shaken. ([#4899](https://github.com/clerk/javascript/pull/4899)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`f87733719f6961640c159a6ca82d4c3edfd087dd`](https://github.com/clerk/javascript/commit/f87733719f6961640c159a6ca82d4c3edfd087dd), [`43ba06329fb452cdbb3bb766b660dd2371dcf502`](https://github.com/clerk/javascript/commit/43ba06329fb452cdbb3bb766b660dd2371dcf502)]:
+  - @clerk/clerk-js@5.44.1
+  - @clerk/clerk-react@5.21.3
+  - @clerk/shared@2.20.7
+
 ## 2.1.11
 
 ### Patch Changes
