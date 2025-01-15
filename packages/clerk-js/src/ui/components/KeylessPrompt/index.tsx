@@ -26,6 +26,30 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
   const isForcedExpanded = claimed || isExpanded;
 
+  const baseElementStyles = css`
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    line-height: 1.5;
+    font-family:
+      -apple-system,
+      BlinkMacSystemFont,
+      avenir next,
+      avenir,
+      segoe ui,
+      helvetica neue,
+      helvetica,
+      Cantarell,
+      Ubuntu,
+      roboto,
+      noto,
+      arial,
+      sans-serif;
+    text-decoration: none;
+  `;
+
   return (
     <Portal>
       <Flex
@@ -60,7 +84,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 215ms cubic-bezier(0.5, 0.8, 0.25, 1)',
+            transition: 'all 220ms cubic-bezier(0.25, 0.8, 0.25, 1)',
           },
         })}
       >
@@ -71,6 +95,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
           css={css`
+            ${baseElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -167,12 +192,14 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               data-text='Clerk is in keyless mode'
               aria-label={claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
               css={css`
+                ${baseElementStyles};
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
                 position: relative;
                 isolation: isolate;
                 white-space: nowrap;
+                cursor: pointer;
 
                 ${!claimed &&
                 `&::after {
@@ -246,7 +273,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     background-position: -60% center;
                   }
                 }
-              `}
+              `};
               `}
             >
               {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
@@ -306,18 +333,19 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           >
             <p
               css={css`
+                ${baseElementStyles};
                 color: #b4b4b4;
                 font-size: 0.8125rem;
                 font-weight: 400;
                 line-height: 1rem;
                 max-width: 14.625rem;
-                animation: ${isForcedExpanded && 'show-description 600ms ease-in forwards'};
+                animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
                 @keyframes show-description {
                   0%,
-                  7% {
+                  5% {
                     opacity: 0;
                   }
-                  22%,
+                  12%,
                   100% {
                     opacity: 1;
                   }
@@ -359,6 +387,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               rel='noopener noreferrer'
               data-expanded={isForcedExpanded}
               css={css`
+                ${baseElementStyles};
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -382,13 +411,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                animation: ${isForcedExpanded && 'show-button 520ms ease-in forwards'};
+                animation: ${isForcedExpanded && 'show-button 590ms ease-in forwards'};
                 @keyframes show-button {
                   0%,
-                  14% {
+                  8% {
                     opacity: 0;
                   }
-                  24%,
+                  21%,
                   100% {
                     opacity: 1;
                   }
