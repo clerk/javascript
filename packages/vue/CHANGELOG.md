@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.0.3
+
+### Patch Changes
+
+- Add quickstart links to Vue and Nuxt SDK READMEs ([#4883](https://github.com/clerk/javascript/pull/4883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
 ## 1.0.2
 
 ### Patch Changes
