@@ -2,4 +2,5 @@
 '@clerk/clerk-js': patch
 ---
 
-Simplify animations and restructure flow by removing the “Claim Keys” button in the collapsed state
+Simplify animations on Keyless prompt.
+Bug fix: Add base element styles to override default styling of elements on Keyless prompt.
