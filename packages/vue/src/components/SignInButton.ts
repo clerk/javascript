@@ -6,7 +6,12 @@ import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type SignInButtonProps = Pick<
   SignInProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl' | 'initialValues'
+  | 'fallbackRedirectUrl'
+  | 'forceRedirectUrl'
+  | 'signUpForceRedirectUrl'
+  | 'signUpFallbackRedirectUrl'
+  | 'initialValues'
+  | 'withSignUp'
 >;
 
 export const SignInButton = defineComponent(
@@ -49,6 +54,7 @@ export const SignInButton = defineComponent(
       'forceRedirectUrl',
       'mode',
       'initialValues',
+      'withSignUp',
     ],
   },
 );
