@@ -6,7 +6,12 @@ import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type SignInButtonProps = Pick<
   SignInProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl' | 'initialValues'
+  | 'fallbackRedirectUrl'
+  | 'forceRedirectUrl'
+  | 'signUpForceRedirectUrl'
+  | 'signUpFallbackRedirectUrl'
+  | 'initialValues'
+  | 'withSignUp'
 > & {
   mode?: 'modal' | 'redirect';
 };
@@ -29,8 +34,10 @@ function clickHandler() {
     return clerk.value?.openSignIn(opts);
   }
 
+  const { withSignUp, ...redirectOpts } = opts;
+
   void clerk.value?.redirectToSignIn({
-    ...opts,
+    ...redirectOpts,
     signInFallbackRedirectUrl: props.fallbackRedirectUrl,
     signInForceRedirectUrl: props.forceRedirectUrl,
   });
