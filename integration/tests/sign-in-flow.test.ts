@@ -123,6 +123,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedOut();
   });
 
+  test('cannot sign in with email and wrong instant password', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: 'wrong-password' });
+    await expect(u.page.getByText(/password you entered is incorrect/i)).toBeVisible();
+
+    await u.po.expect.toBeSignedOut();
+  });
+
   test('cannot sign in with wrong password but can sign in with email', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
