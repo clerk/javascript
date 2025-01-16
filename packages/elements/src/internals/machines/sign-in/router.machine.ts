@@ -204,7 +204,7 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
-    'AUTHENTICATE.SAML': {
+    'AUTHENTICATE.ENTERPRISE_SSO': {
       actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
         type: 'REDIRECT',
         params: {

@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
@@ -18,12 +18,17 @@ export type SignUpStartSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 // TODO: Consolidate with SignInStartMachine
 export type SignUpStartRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type SignUpStartRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
+export type SignUpStartRedirectEnterpriseSSOEvent = {
+  type: 'AUTHENTICATE.ENTERPRISE_SSO';
+  strategy?: EnterpriseSSOStrategy;
+};
 export type SignUpStartRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
 
 export type SignUpStartRedirectEvent =
   | SignUpStartRedirectOauthEvent
   | SignUpStartRedirectSamlEvent
-  | SignUpStartRedirectWeb3Event;
+  | SignUpStartRedirectWeb3Event
+  | SignUpStartRedirectEnterpriseSSOEvent;
 
 export type SignUpStartEvents = ErrorActorEvent | SignUpStartSubmitEvent | SignUpStartRedirectEvent | SetFormEvent;
 
