@@ -1,6 +1,7 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AuthSession from 'expo-auth-session';
+import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
@@ -100,6 +101,8 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       });
       createdSessionId = signUp.createdSessionId || '';
     }
+
+    Linking.openURL(url);
 
     return {
       authSessionResult,

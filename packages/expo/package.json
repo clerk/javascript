@@ -79,6 +79,7 @@
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
     "expo-auth-session": "^5.4.0",
+    "expo-linking": "^7.0.4",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
@@ -87,6 +88,7 @@
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo-auth-session": ">=5",
+    "expo-linking": ">=7",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
