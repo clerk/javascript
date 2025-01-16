@@ -47,6 +47,12 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * @note You can use this to implement [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp)
    */
   nonce?: string;
+  /**
+   * This integrity value will be passed through to the `@clerk/clerk-js` script tag. Should only by used in conjunction with `clerkJSVersion.
+   * Hashes can be generated with tools such as [https://www.srihash.org/](https://www.srihash.org/)
+   * @note You can use this to implement [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
+   */
+  integrity?: string;
 } & MultiDomainAndOrProxy;
 
 export type ClerkProviderProps = IsomorphicClerkOptions & {
