@@ -6,7 +6,7 @@ import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcas
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
-import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
@@ -365,8 +365,8 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #isCombinedFlow(): boolean {
-    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  #isCombinedSignInOrUpFlow(): boolean {
+    return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -2114,13 +2114,17 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    if (this.#isCombinedSignInOrUpFlow()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      signInOrUpUrl = this.#options.signInUrl!;
+    }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
     const url = buildURL(
       {
         base: signInOrUpUrl,
-        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashPath: this.#isCombinedSignInOrUpFlow() && key === 'signUpUrl' ? '/create' : '',
         hashSearchParams: [initValues, redirectUrls],
       },
       { stringify: true },

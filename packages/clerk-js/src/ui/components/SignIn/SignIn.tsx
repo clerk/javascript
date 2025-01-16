@@ -8,7 +8,6 @@ import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
-  useOptions,
   useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
@@ -39,7 +38,6 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
-  const options = useOptions();
 
   return (
     <Flow.Root flow='signIn'>
@@ -78,7 +76,7 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
-        {options.experimental?.combinedFlow && (
+        {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
               path='verify-email-address'
@@ -149,9 +147,10 @@ function SignInRoot() {
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
     componentName: 'SignUp',
-    ...signInContext.__experimental?.combinedProps,
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
+    fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
 
