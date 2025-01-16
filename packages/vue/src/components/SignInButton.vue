@@ -34,8 +34,10 @@ function clickHandler() {
     return clerk.value?.openSignIn(opts);
   }
 
+  const { withSignUp, ...redirectOpts } = opts;
+
   void clerk.value?.redirectToSignIn({
-    ...opts,
+    ...redirectOpts,
     signInFallbackRedirectUrl: props.fallbackRedirectUrl,
     signInForceRedirectUrl: props.forceRedirectUrl,
   });
