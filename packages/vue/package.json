@@ -42,7 +42,7 @@
   ],
   "scripts": {
     "build": "tsup --onSuccess \"pnpm build:dts\"",
-    "build:dts": "vue-tsc --declaration --emitDeclarationOnly && rm -rf dist/components/__tests__",
+    "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "dev": "tsup --watch",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",

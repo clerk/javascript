@@ -7,8 +7,6 @@
     "strict": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
-    "declaration": true,
-    "declarationDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
     "skipLibCheck": true
