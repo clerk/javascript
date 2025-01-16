@@ -6,7 +6,12 @@ import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type SignInButtonProps = Pick<
   SignInProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl' | 'initialValues'
+  | 'fallbackRedirectUrl'
+  | 'forceRedirectUrl'
+  | 'signUpForceRedirectUrl'
+  | 'signUpFallbackRedirectUrl'
+  | 'initialValues'
+  | 'withSignUp'
 > & {
   mode?: 'modal' | 'redirect';
 };
