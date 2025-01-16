@@ -543,8 +543,7 @@ export const itIT: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Continua con uno dei seguenti provider',
-
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
     captcha_invalid:

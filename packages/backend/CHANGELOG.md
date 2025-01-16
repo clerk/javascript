@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.23.0
+
+### Minor Changes
+
+- `authenticateRequest()` will now set a refreshsed session cookie on the response when an expired session token is refreshed via the Clerk API. ([#4884](https://github.com/clerk/javascript/pull/4884)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Add property `query` to `GetInvitationListParams` to allow filtering based on `email_address` or `id`. ([#4804](https://github.com/clerk/javascript/pull/4804)) by [@effektsvk](https://github.com/effektsvk)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
 ## 1.22.0
 
 ### Minor Changes

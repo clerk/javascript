@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.44.1
+
+### Patch Changes
+
+- Simplify animations on Keyless prompt. ([#4868](https://github.com/clerk/javascript/pull/4868)) by [@kaftarmery](https://github.com/kaftarmery)
+
+  Bug fix: Add base element styles to override default styling of elements on Keyless prompt.
+
+- Fixes an issue that caused Clerk's UI code to load even before components were rendered. ([#4876](https://github.com/clerk/javascript/pull/4876)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/localizations@3.9.8
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
 ## 5.44.0
 
 ### Minor Changes
