@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Portal } from '../uiComponents';
 import { useClerk } from '../../composables';
-import { SignInProps } from '@clerk/types';
+import type { SignInProps } from '@clerk/types';
 
 const clerk = useClerk();
 
