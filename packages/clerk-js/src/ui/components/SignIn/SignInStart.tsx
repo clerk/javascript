@@ -308,6 +308,7 @@ export function _SignInStart(): JSX.Element {
             await authenticateWithEnterpriseSSO();
             break;
           }
+          console.log(res);
           return navigate('factor-one');
         case 'needs_second_factor':
           return navigate('factor-two');
@@ -355,7 +356,7 @@ export function _SignInStart(): JSX.Element {
     );
 
     if (instantPasswordError) {
-      await signInWithFields(identifierField);
+      handleError(e, [instantPasswordField], card.setError);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
