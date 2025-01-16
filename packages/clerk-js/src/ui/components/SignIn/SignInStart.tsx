@@ -308,7 +308,6 @@ export function _SignInStart(): JSX.Element {
             await authenticateWithEnterpriseSSO();
             break;
           }
-          console.log(res);
           return navigate('factor-one');
         case 'needs_second_factor':
           return navigate('factor-two');
