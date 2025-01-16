@@ -1,5 +1,6 @@
 import autoPropsPlugin from '@vue.ts/tsx-auto-props/esbuild';
 import { defineConfig, type Options } from 'tsup';
+import vuePlugin from 'unplugin-vue/esbuild';
 
 import { name, version } from './package.json';
 
@@ -13,8 +14,10 @@ export default defineConfig(() => {
     bundle: true,
     sourcemap: true,
     minify: false,
-    dts: true,
+    dts: false,
     esbuildPlugins: [
+      // Adds .vue files support
+      vuePlugin() as EsbuildPlugin,
       // Automatically generates runtime props from TypeScript types/interfaces for all
       // control and UI components, adding them to Vue components during build via
       // Object.defineProperty
