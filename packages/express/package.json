@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.3.35",
+  "version": "1.3.36",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
