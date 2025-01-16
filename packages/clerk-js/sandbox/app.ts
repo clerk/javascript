@@ -159,7 +159,7 @@ function addCurrentRouteIndicator(currentRoute: string) {
     '/waitlist': () => {
       Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
     },
-    '/accountless': () => {
+    '/keyless': () => {
       Clerk.__unstable__updateProps({
         options: {
           __internal_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
