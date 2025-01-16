@@ -17,6 +17,7 @@ export { default as ChevronDown } from './chevron-down.svg';
 export { default as Clipboard } from './clipboard.svg';
 export { default as Close } from './close.svg';
 export { default as CogFilled } from './cog-filled.svg';
+export { default as CreditCard } from './credit-card.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as DeviceMobile } from './device-mobile.svg';
 export { default as DotCircle } from './dot-circle-horizontal.svg';

@@ -5,6 +5,7 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
@@ -36,6 +37,7 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
+  | PricingTableProps
   | __internal_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
@@ -96,6 +98,11 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
+export type PricingTableCtx = PricingTableProps & {
+  componentName: 'PricingTable';
+  mode?: ComponentMode;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -107,6 +114,7 @@ export type AvailableComponentCtx =
   | OrganizationSwitcherCtx
   | OrganizationListCtx
   | GoogleOneTapCtx
-  | WaitlistCtx;
+  | WaitlistCtx
+  | PricingTableCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

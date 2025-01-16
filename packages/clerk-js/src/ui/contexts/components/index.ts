@@ -10,3 +10,4 @@ export * from './OrganizationProfile';
 export * from './CreateOrganization';
 export * from './GoogleOneTap';
 export * from './Waitlist';
+export * from './PricingTable';

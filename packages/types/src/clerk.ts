@@ -4,6 +4,7 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PricingTableTheme,
   SignInTheme,
   SignUpTheme,
   UserButtonTheme,
@@ -376,6 +377,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the Waitlist component from.
    */
   unmountWaitlist: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a pricing table component at the target element.
+   * @param targetNode Target node to mount the PricingTable component.
+   * @param props configuration parameters.
+   */
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
+
+  /**
+   * Unmount a pricing table component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the PricingTable component from.
+   */
+  unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1406,6 +1422,11 @@ export type WaitlistProps = {
 };
 
 export type WaitlistModalProps = WaitlistProps;
+
+export type PricingTableProps = {
+  currency: string;
+  appearance?: PricingTableTheme;
+};
 
 export interface HandleEmailLinkVerificationParams {
   /**

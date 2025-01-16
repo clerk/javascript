@@ -167,6 +167,11 @@ function addCurrentRouteIndicator(currentRoute: string) {
         },
       });
     },
+    '/pricing-table': () => {
+      Clerk.mountPricingTable(app, {
+        currency: '$',
+      });
+    },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
     },

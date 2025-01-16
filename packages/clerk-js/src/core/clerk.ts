@@ -40,6 +40,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -828,6 +829,29 @@ export class Clerk implements ClerkInterface {
   public unmountWaitlist = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
+      controls.mountComponent({
+        name: 'PricingTable',
+        appearanceKey: 'pricingTable',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+  };
+
+  public unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
   /**

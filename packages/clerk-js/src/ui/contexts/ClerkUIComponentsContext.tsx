@@ -1,4 +1,4 @@
-import type { UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
@@ -8,6 +8,7 @@ import {
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
+  PricingTableContext,
   SignInContext,
   SignUpContext,
   UserButtonContext,
@@ -77,6 +78,12 @@ export function ComponentContextProvider({
         <WaitlistContext.Provider value={{ componentName, ...(props as WaitlistProps) }}>
           {children}
         </WaitlistContext.Provider>
+      );
+    case 'PricingTable':
+      return (
+        <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
+          {children}
+        </PricingTableContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

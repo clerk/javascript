@@ -379,6 +379,7 @@ type _LocalizationResource = {
       description: LocalizationValue;
       account: LocalizationValue;
       security: LocalizationValue;
+      billing: LocalizationValue;
     };
     start: {
       headerTitle__account: LocalizationValue;
