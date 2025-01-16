@@ -13,6 +13,9 @@ export type UseOAuthFlowParams = {
 };
 
 export type StartOAuthFlowParams = {
+  /**
+   * Deep link URL where to navigate to on successful sign-in upon Identity Provider callback
+   */
   redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
@@ -94,6 +97,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
 
     if (status === 'complete') {
       createdSessionId = signIn.createdSessionId!;
+      await Linking.openURL(url);
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
@@ -101,8 +105,6 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       });
       createdSessionId = signUp.createdSessionId || '';
     }
-
-    Linking.openURL(url);
 
     return {
       authSessionResult,
