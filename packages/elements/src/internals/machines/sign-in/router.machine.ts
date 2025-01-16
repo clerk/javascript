@@ -204,11 +204,27 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
-    'AUTHENTICATE.ENTERPRISE_SSO': {
+    'AUTHENTICATE.SAML': {
       actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
         type: 'REDIRECT',
         params: {
           strategy: 'saml',
+          identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+        },
+      })),
+    },
+    'AUTHENTICATE.ENTERPRISE_SSO': {
+      actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
+        type: 'REDIRECT',
+        params: {
+          strategy: 'enterprise_sso',
           identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
           redirectUrl: `${
             context.router?.mode === ROUTING.virtual
