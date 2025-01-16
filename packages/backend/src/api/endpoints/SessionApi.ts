@@ -1,6 +1,7 @@
 import type { ClerkPaginationRequest, SessionStatus } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
+import type { Cookies } from '../resources/Cookies';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Session } from '../resources/Session';
 import type { Token } from '../resources/Token';
@@ -20,6 +21,8 @@ type RefreshTokenParams = {
   request_origin: string;
   request_originating_ip?: string;
   request_headers?: Record<string, string[]>;
+  suffixed_cookies?: boolean;
+  format?: 'token' | 'cookie';
 };
 
 export class SessionAPI extends AbstractAPI {
@@ -64,12 +67,17 @@ export class SessionAPI extends AbstractAPI {
     });
   }
 
-  public async refreshSession(sessionId: string, params: RefreshTokenParams) {
+  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'token' }): Promise<Token>;
+  public async refreshSession(sessionId: string, params: RefreshTokenParams & { format: 'cookie' }): Promise<Cookies>;
+  public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token>;
+  public async refreshSession(sessionId: string, params: RefreshTokenParams): Promise<Token | Cookies> {
     this.requireId(sessionId);
-    return this.request<Token>({
+    const { suffixed_cookies, ...restParams } = params;
+    return this.request({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'refresh'),
-      bodyParams: params,
+      bodyParams: restParams,
+      queryParams: { suffixed_cookies },
     });
   }
 }

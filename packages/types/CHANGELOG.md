@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.40.3
+
+### Patch Changes
+
+- Update `socialButtonsBlockButtonManyInView` to only accept `'${string}{{provider|titleize}}${string}'` or `undefined`. ([#4887](https://github.com/clerk/javascript/pull/4887)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.40.2
 
 ### Patch Changes
