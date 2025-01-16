@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.45.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Skip fraud protection if client has bypass enabled ([#4907](https://github.com/clerk/javascript/pull/4907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/localizations@3.9.9
+  - @clerk/shared@2.20.8
+
 ## 5.44.1
 
 ### Patch Changes
