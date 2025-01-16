@@ -34,7 +34,7 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
-import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
+import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
@@ -81,54 +81,25 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
-    const paramsWithCaptcha: Record<string, unknown> = params;
+  create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
+    let params: Record<string, unknown> = _params;
 
-    if (!__BUILD_DISABLE_RHC__) {
-      const {
-        captchaSiteKey,
-        canUseCaptcha,
-        captchaURL,
-        captchaWidgetType,
-        captchaProvider,
-        captchaPublicKeyInvisible,
-      } = retrieveCaptchaInfo(SignUp.clerk);
-
-      if (
-        !this.shouldBypassCaptchaForAttempt(params) &&
-        canUseCaptcha &&
-        captchaSiteKey &&
-        captchaURL &&
-        captchaPublicKeyInvisible
-      ) {
-        try {
-          const captchaParams = await getCaptchaToken({
-            siteKey: captchaSiteKey,
-            widgetType: captchaWidgetType,
-            invisibleSiteKey: captchaPublicKeyInvisible,
-            scriptUrl: captchaURL,
-            captchaProvider,
-          });
-
-          paramsWithCaptcha.captchaToken = captchaParams.captchaToken;
-          paramsWithCaptcha.captchaWidgetType = captchaParams.captchaWidgetType;
-        } catch (e) {
-          if (e.captchaError) {
-            paramsWithCaptcha.captchaError = e.captchaError;
-          } else {
-            throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
-          }
-        }
+    if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
+      const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+      const captchaParams = await captchaChallenge.managedOrInvisible();
+      if (!captchaParams) {
+        throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
+      params = { ...params, ...captchaParams };
     }
 
     if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
-      paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+      params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(paramsWithCaptcha),
+      body: normalizeUnsafeMetadata(params),
     });
   };
 
@@ -427,6 +398,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       external_account: this.externalAccount,
       external_account_strategy: this.externalAccount?.strategy,
     };
+  }
+
+  private clientBypass() {
+    return SignUp.clerk.client?.captchaBypass;
   }
 
   /**

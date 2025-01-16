@@ -22,7 +22,7 @@ export class CaptchaHeartbeat {
   }
 
   private async challengeAndSend() {
-    if (!this.clerk.client) {
+    if (!this.clerk.client || this.clientBypass()) {
       return;
     }
 
@@ -36,6 +36,10 @@ export class CaptchaHeartbeat {
 
   private isEnabled() {
     return !!this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
+  }
+
+  private clientBypass() {
+    return this.clerk.client?.captchaBypass;
   }
 
   private intervalInMs() {
