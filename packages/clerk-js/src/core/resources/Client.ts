@@ -20,6 +20,7 @@ export class Client extends BaseResource implements ClientResource {
   signUp: SignUpResource = new SignUp();
   signIn: SignInResource = new SignIn();
   lastActiveSessionId: string | null = null;
+  captchaBypass = false;
   cookieExpiresAt: Date | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
@@ -116,6 +117,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
+      this.captchaBypass = data.captcha_bypass || false;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
       this.createdAt = unixEpochToDate(data.created_at || undefined);
       this.updatedAt = unixEpochToDate(data.updated_at || undefined);
@@ -133,6 +135,7 @@ export class Client extends BaseResource implements ClientResource {
       sign_up: this.signUp.__internal_toSnapshot(),
       sign_in: this.signIn.__internal_toSnapshot(),
       last_active_session_id: this.lastActiveSessionId,
+      captcha_bypass: this.captchaBypass,
       cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
       created_at: this.createdAt?.getTime() ?? null,
       updated_at: this.updatedAt?.getTime() ?? null,

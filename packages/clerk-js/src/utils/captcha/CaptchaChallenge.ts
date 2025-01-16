@@ -1,6 +1,7 @@
 import type { Clerk } from '../../core/resources/internal';
 import { getCaptchaToken } from './getCaptchaToken';
 import { retrieveCaptchaInfo } from './retrieveCaptchaInfo';
+import type { CaptchaOptions } from './types';
 
 export class CaptchaChallenge {
   public constructor(private clerk: Clerk) {}
@@ -33,13 +34,13 @@ export class CaptchaChallenge {
 
   /**
    * Triggers a smart challenge if the user is required to solve a CAPTCHA.
-   * Depending on the environment settings, this will either trigger an
-   * invisible or smart (managed) CAPTCHA challenge.
+   * The type of the challenge depends on the dashboard configuration.
+   * By default, smart (managed) captcha is preferred. If the customer has selected invisible, this method
+   * will fall back to using the invisible captcha instead.
+   *
    * Managed challenged start as non-interactive and escalate to interactive if necessary.
-   * Important: For this to work at the moment, the instance needs to be using SMART protection
-   * as we need both keys (visible and invisible) to be present.
    */
-  public async managed() {
+  public async managedOrInvisible(opts?: Partial<CaptchaOptions>) {
     const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
       retrieveCaptchaInfo(this.clerk);
 
@@ -50,10 +51,7 @@ export class CaptchaChallenge {
         invisibleSiteKey: captchaPublicKeyInvisible,
         scriptUrl: captchaURL,
         captchaProvider,
-        modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
-        modalContainerQuerySelector: '#cl-modal-captcha-container',
-        openModal: () => this.clerk.__internal_openBlankCaptchaModal(),
-        closeModal: () => this.clerk.__internal_closeBlankCaptchaModal(),
+        ...opts,
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
@@ -63,5 +61,18 @@ export class CaptchaChallenge {
     }
 
     return {};
+  }
+
+  /**
+   * Similar to managed() but will render the CAPTCHA challenge in a modal
+   * managed by clerk-js itself.
+   */
+  public async managedInModal() {
+    return this.managedOrInvisible({
+      modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
+      modalContainerQuerySelector: '#cl-modal-captcha-container',
+      openModal: () => this.clerk.__internal_openBlankCaptchaModal(),
+      closeModal: () => this.clerk.__internal_closeBlankCaptchaModal(),
+    });
   }
 }
