@@ -279,8 +279,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.goTo({
         searchParams: new URLSearchParams({ __clerk_ticket: '123', __clerk_status: 'sign_up' }),
       });
-      await u.page.waitForAppUrl('/sign-in/create');
-      await expect(u.page.getByText(`Create your account`)).toBeVisible();
+      await u.page.waitForAppUrl('/sign-in/create?__clerk_ticket=123');
+      await expect(u.page.getByText(/Create your account/i)).toBeVisible();
     });
   });
 });
