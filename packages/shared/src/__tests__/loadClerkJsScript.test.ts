@@ -12,6 +12,9 @@ jest.mock('../loadScript');
 setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
 
+const fakeNonce = 'fakeNonce123';
+const fakeSRIHash = 'fakeSRIHash456';
+
 describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
@@ -69,6 +72,27 @@ describe('loadClerkJsScript(options)', () => {
 
     await expect(loadClerkJsScript({ publishableKey: mockPublishableKey })).rejects.toThrow(
       'Clerk: Failed to load Clerk',
+    );
+  });
+
+  test('loads script with nonce and integrity attributes', async () => {
+    await loadClerkJsScript({
+      publishableKey: mockPublishableKey,
+      nonce: fakeNonce,
+      integrity: fakeSRIHash,
+    });
+
+    expect(loadScript).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
+      ),
+      expect.objectContaining({
+        async: true,
+        crossOrigin: 'anonymous',
+        nonce: fakeNonce,
+        integrity: fakeSRIHash,
+        beforeLoad: expect.any(Function),
+      }),
     );
   });
 });
@@ -136,6 +160,15 @@ describe('buildClerkJsScriptAttributes()', () => {
       { 'data-clerk-publishable-key': mockPublishableKey, 'data-clerk-proxy-url': mockProxyUrl },
     ],
     ['no options', {}, {}],
+    [
+      'with nonce and integrity',
+      { publishableKey: mockPublishableKey, nonce: fakeNonce, integrity: fakeSRIHash },
+      {
+        'data-clerk-publishable-key': mockPublishableKey,
+        nonce: fakeNonce,
+        integrity: fakeSRIHash,
+      },
+    ],
   ])('returns correct attributes with %s', (_, input, expected) => {
     // @ts-ignore input loses correct type because of empty object
     expect(buildClerkJsScriptAttributes(input)).toEqual(expected);
