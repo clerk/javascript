@@ -5,13 +5,6 @@ type Message = {
   subject: string;
 };
 
-interface ErrorResponse {
-  message: string;
-  error: string;
-}
-
-type InboxFilterResponse = { messages: Message[] } | ErrorResponse;
-
 export const createEmailService = () => {
   const cleanEmail = (email: string) => {
     return email.replace(/\+.*@/, '@');
@@ -34,11 +27,7 @@ export const createEmailService = () => {
     return runWithExponentialBackOff(
       async () => {
         const res = await fetcher(url);
-        const json = (await res.json()) as InboxFilterResponse;
-        if ('message' in json) {
-          throw new Error(`Mailsac API Error: ${json.error} - ${json.message}`);
-        }
-
+        const json = (await res.json()) as unknown as { messages: Message[] };
         const message = json.messages[0];
         if (!message) {
           throw new Error('message not found');

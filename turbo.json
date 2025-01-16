@@ -146,7 +146,7 @@
     },
     "//#test:integration:generic": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/clerk-react#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "MAILSAC_API_KEY"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
@@ -163,7 +163,7 @@
     },
     "//#test:integration:nextjs": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "MAILSAC_API_KEY"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
