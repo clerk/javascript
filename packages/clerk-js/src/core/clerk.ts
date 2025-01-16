@@ -591,7 +591,12 @@ export class Clerk implements ClerkInterface {
         }),
       );
     }
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('SignIn', {
+        ...props,
+        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+      }),
+    );
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
