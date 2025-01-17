@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.20.10
+
+### Patch Changes
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 2.20.9
 
 ### Patch Changes
