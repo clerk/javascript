@@ -522,6 +522,7 @@ const Components = (props: ComponentsProps) => {
             <KeylessPrompt
               claimUrl={state.options.__internal_claimKeylessApplicationUrl}
               copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
+              onDismiss={state.options.__internal_keyless_dismissPrompt}
             />
           </LazyImpersonationFabProvider>
         )}

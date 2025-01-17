@@ -54,3 +54,12 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     apiKeysUrl,
   };
 }
+
+export async function deleteKeylessAction() {
+  if (!canUseKeyless) {
+    return;
+  }
+
+  await import('../server/keyless-node.js').then(m => m.removeKeyless());
+  return;
+}

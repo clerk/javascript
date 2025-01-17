@@ -778,6 +778,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     __internal_copyInstanceKeysUrl?: string;
 
     /**
+     * Pass a function that will trigger the unmounting of the Keyless Prompt.
+     * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     */
+    __internal_keyless_dismissPrompt?: () => Promise<void>;
+
+    /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
      */
     __experimental_router?: ClerkHostRouter;

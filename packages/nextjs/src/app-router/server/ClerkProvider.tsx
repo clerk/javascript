@@ -4,11 +4,13 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { safeParseClerkFile } from '../../server/keyless-node';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
+import { deleteKeylessAction } from '../keyless-actions';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -69,7 +71,8 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless;
+  const runningWithClaimedKeys = propsWithEnvs.publishableKey === safeParseClerkFile()?.publishableKey;
+  const shouldRunAsKeyless = (!propsWithEnvs.publishableKey || runningWithClaimedKeys) && canUseKeyless;
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
@@ -77,22 +80,27 @@ export async function ClerkProvider(
 
     if (newOrReadKeys) {
       const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
-      output = (
-        <KeylessCookieSync {...newOrReadKeys}>
-          <ClientClerkProvider
-            {...mergeNextClerkPropsWithEnv({
-              ...rest,
-              publishableKey: newOrReadKeys.publishableKey,
-              __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
-              __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-            })}
-            nonce={await generateNonce()}
-            initialState={await generateStatePromise()}
-          >
-            {children}
-          </ClientClerkProvider>
-        </KeylessCookieSync>
+      const clientProvider = (
+        <ClientClerkProvider
+          {...mergeNextClerkPropsWithEnv({
+            ...rest,
+            publishableKey: newOrReadKeys.publishableKey,
+            __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
+            __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
+            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
+          })}
+          nonce={await generateNonce()}
+          initialState={await generateStatePromise()}
+        >
+          {children}
+        </ClientClerkProvider>
       );
+
+      if (runningWithClaimedKeys) {
+        output = clientProvider;
+      } else {
+        output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
+      }
     }
   }
 
