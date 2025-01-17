@@ -71,7 +71,7 @@
     "@types/node": "^22.10.6",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitest/coverage-v8": "2.1.4",
+    "@vitest/coverage-v8": "3.0.2",
     "citty": "^0.1.4",
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "cpy-cli": "^5.0.0",
@@ -105,7 +105,7 @@
     "turbo-ignore": "^2.0.6",
     "typescript": "catalog:repo",
     "verdaccio": "^5.26.3",
-    "vitest": "2.1.4",
+    "vitest": "3.0.2",
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
