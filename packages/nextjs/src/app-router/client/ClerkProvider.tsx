@@ -11,7 +11,7 @@ import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEf
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
-import { canUseKeyless__client } from '../../utils/feature-flags';
+import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
@@ -127,7 +127,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { children, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePublishableKey || !canUseKeyless__client) {
+  if (safePublishableKey || !canUseKeyless) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
