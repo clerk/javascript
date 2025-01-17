@@ -1,4 +1,4 @@
-import { buildSSOCallbackURL, buildVerificationRedirectUrl } from '../redirects';
+import { buildSSOCallbackURL, buildVerificationRedirectUrl, buildVerificationRedirectUrl } from '../redirects';
 
 describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
   it('defaults to hash based routing strategy on empty routing', function () {
@@ -98,7 +98,7 @@ describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl({
+      buildVerificationRedirectUrl({
         ctx: {
           routing: 'hash',
           path: '/sign-in',
@@ -110,7 +110,7 @@ describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
-      buildEmailLinkRedirectUrl({
+      buildVerificationRedirectUrl({
         ctx: {
           routing: 'hash',
           path: '/sign-in',
@@ -147,7 +147,7 @@ describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
 
   it('returns the magic link redirect url for components using the combined flow based on intent', function () {
     expect(
-      buildEmailLinkRedirectUrl({
+      buildVerificationRedirectUrl({
         ctx: {
           routing: 'path',
           path: '/sign-up',
@@ -159,7 +159,7 @@ describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
     ).toBe('http://localhost/sign-up/create/verify');
 
     expect(
-      buildEmailLinkRedirectUrl({
+      buildVerificationRedirectUrl({
         ctx: {
           routing: 'path',
           path: '/sign-in',

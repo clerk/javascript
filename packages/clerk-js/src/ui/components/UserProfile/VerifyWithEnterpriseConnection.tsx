@@ -1,7 +1,8 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
-import { buildVerificationRedirectUrl } from '../../common/redirects';
+import { appendModalState } from '../../../utils';
+import { buildVerificationRedirectUrl } from '../../common';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
@@ -33,10 +34,15 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
      * that renders the <VerificationSuccessPage/>. So, we use the userProfileUrl that
      * defaults to Clerk Hosted Pages /user as a fallback.
      */
-    const { routing } = profileContext;
+    const { routing, mode, componentName } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
-    const redirectUrl = buildVerificationRedirectUrl(profileContext, baseUrl);
-    startEnterpriseSsoLinkFlow({ redirectUrl })
+
+    const verificationRedirectUrl = buildVerificationRedirectUrl({ ctx: profileContext, baseUrl, intent: 'profile' });
+
+    startEnterpriseSsoLinkFlow({
+      redirectUrl:
+        mode === 'modal' ? appendModalState({ url: verificationRedirectUrl, componentName }) : verificationRedirectUrl,
+    })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
   }
