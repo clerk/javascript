@@ -8,6 +8,6 @@
     "importHelpers": false,
     "sourceMap": true
   },
-  "include": ["src/globals.d.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
+  "include": ["src/global.d.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
   "exclude": []
 }
