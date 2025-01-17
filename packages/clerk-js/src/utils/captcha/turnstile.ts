@@ -78,13 +78,11 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha(fallbackUrl: string) {
+async function loadCaptcha() {
   if (!window.turnstile) {
-    await loadCaptchaFromCloudflareURL()
-      .catch(() => loadCaptchaFromFAPIProxiedURL(fallbackUrl))
-      .catch(() => {
-        throw { captchaError: 'captcha_script_failed_to_load' };
-      });
+    await loadCaptchaFromCloudflareURL().catch(() => {
+      throw { captchaError: 'captcha_script_failed_to_load' };
+    });
   }
   return window.turnstile;
 }
@@ -100,16 +98,6 @@ async function loadCaptchaFromCloudflareURL() {
   }
 }
 
-async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
-  try {
-    return await loadScript(fallbackUrl, { defer: true });
-  } catch (err) {
-    // Rethrow with specific message
-    console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', fallbackUrl);
-    throw err;
-  }
-}
-
 /*
  * How this function works:
  * The widgetType is either 'invisible' or 'smart'.
@@ -118,9 +106,9 @@ async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
 export const getTurnstileToken = async (opts: CaptchaOptions) => {
-  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = opts;
+  const { siteKey, widgetType, invisibleSiteKey } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha: Turnstile = await loadCaptcha(scriptUrl);
+  const captcha: Turnstile = await loadCaptcha();
   const errorCodes: (string | number)[] = [];
 
   let captchaToken = '';
