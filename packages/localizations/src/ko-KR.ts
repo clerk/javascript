@@ -456,7 +456,7 @@ export const koKR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       title: '{{applicationName}}에 로그인',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '인증 코드',
@@ -546,7 +546,6 @@ export const koKR: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -591,6 +590,7 @@ export const koKR: LocalizationResource = {
       sentencePrefix: '당신의 비밀번호는 반드시 포함해야합니다',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '비밀번호는 작동하지만 더 강력할 수 있습니다. 문자를 더 추가해 보세요.',
       goodPassword: '수고하셨습니다. 훌륭한 비밀번호입니다.',

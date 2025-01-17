@@ -450,7 +450,7 @@ export const zhCN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
       title: '登录',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '验证码',
@@ -538,7 +538,6 @@ export const zhCN: LocalizationResource = {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -582,6 +581,7 @@ export const zhCN: LocalizationResource = {
       sentencePrefix: '您的密码必须包含',
     },
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',

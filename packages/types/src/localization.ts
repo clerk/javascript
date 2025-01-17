@@ -173,7 +173,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
-      __experimental_titleCombined: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
