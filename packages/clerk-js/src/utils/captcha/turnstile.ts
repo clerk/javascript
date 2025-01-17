@@ -174,7 +174,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
               const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
               if (visibleWidget) {
                 visibleWidget.style.maxHeight = 'unset';
-                visibleWidget.style.minHeight = '68px';
+                visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
