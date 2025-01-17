@@ -2,8 +2,7 @@ import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { appendModalState } from '../../../utils';
-import { buildVerificationRedirectUrl } from '../../common';
-import { useEnvironment, useUserProfileContext } from '../../contexts';
+import { useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
 import { useEnterpriseSsoLink } from '../../hooks';
@@ -20,28 +19,17 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   const card = useCardState();
   const profileContext = useUserProfileContext();
   const { startEnterpriseSsoLinkFlow } = useEnterpriseSsoLink(email);
-  const { displayConfig } = useEnvironment();
 
   React.useEffect(() => {
     startVerification();
   }, []);
 
   function startVerification() {
-    /**
-     * The following workaround is used in order to make magic links work when the
-     * <UserProfile/> is used as a modal. In modals, the routing is virtual. For
-     * magic links the flow needs to end by invoking the /verify path of the <UserProfile/>
-     * that renders the <VerificationSuccessPage/>. So, we use the userProfileUrl that
-     * defaults to Clerk Hosted Pages /user as a fallback.
-     */
-    const { routing, mode, componentName } = profileContext;
-    const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
-
-    const verificationRedirectUrl = buildVerificationRedirectUrl({ ctx: profileContext, baseUrl, intent: 'profile' });
+    const { mode, componentName } = profileContext;
 
     startEnterpriseSsoLinkFlow({
       redirectUrl:
-        mode === 'modal' ? appendModalState({ url: verificationRedirectUrl, componentName }) : verificationRedirectUrl,
+        mode === 'modal' ? appendModalState({ url: window.location.href, componentName }) : window.location.href,
     })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));
