@@ -105,7 +105,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: success ? '7.75rem' : '8.75rem',
+            height: success ? 'fit-content' : '8.75rem',
             overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
