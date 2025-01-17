@@ -14,6 +14,7 @@ import { useRevalidateEnvironment } from './use-revalidate-environment';
 type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
+  success: boolean;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
@@ -25,6 +26,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
   const isForcedExpanded = claimed || isExpanded;
+
+  // Use this
+  // const showSuccessState = _props.success && claimed;
 
   const baseElementStyles = css`
     box-sizing: border-box;

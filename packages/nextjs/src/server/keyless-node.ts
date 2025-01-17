@@ -64,7 +64,7 @@ const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
 
 let isCreatingFile = false;
 
-function safeParseClerkFile(): AccountlessApplication | undefined {
+export function safeParseClerkFile(): AccountlessApplication | undefined {
   if (!nodeRuntime.fs) {
     throwMissingFsModule();
   }

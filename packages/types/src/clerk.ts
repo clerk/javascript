@@ -777,6 +777,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
     __internal_copyInstanceKeysUrl?: string;
 
     /**
+     * When `true` a success state should be shown on Keyless prompt. It means that the developer has successfully using the claimed keys.
+     */
+    __internal_keylessWithClaimedKeys?: boolean;
+
+    /**
      * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
      */
     __experimental_router?: ClerkHostRouter;
