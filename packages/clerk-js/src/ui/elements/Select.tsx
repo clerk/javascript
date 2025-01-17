@@ -425,6 +425,7 @@ export const SelectButton = (
         elementDescriptor={descriptors.selectButtonIcon}
         elementId={descriptors.selectButtonIcon.setId(elementId)}
         size='md'
+        /* @ts-expect-error FIXME: icon prop typing */
         icon={icon || ChevronDown}
         sx={iconSx}
       />
