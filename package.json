@@ -18,7 +18,7 @@
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
-    "nuke": "./scripts/nuke.sh",
+    "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
     "release:canary": "changeset publish --tag canary --no-git-tag",
@@ -68,10 +68,10 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.3",
     "@types/jest": "^29.3.1",
-    "@types/node": "^20.17.10",
+    "@types/node": "^22.10.6",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitest/coverage-v8": "2.1.4",
+    "@vitest/coverage-v8": "3.0.2",
     "citty": "^0.1.4",
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "cpy-cli": "^5.0.0",
@@ -105,11 +105,11 @@
     "turbo-ignore": "^2.0.6",
     "typescript": "catalog:repo",
     "verdaccio": "^5.26.3",
-    "vitest": "2.1.4",
+    "vitest": "3.0.2",
     "yalc": "1.0.0-pre.53",
-    "zx": "^7.2.3"
+    "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@9.13.0+sha512.beb9e2a803db336c10c9af682b58ad7181ca0fbd0d4119f2b33d5f2582e96d6c0d93c85b23869295b765170fbdaa92890c0da6ada457415039769edf3c959efe",
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
   "engines": {
     "node": ">=18.17.0",
     "pnpm": ">=9"

@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.41.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve runtime prop checking for single-file components ([#4902](https://github.com/clerk/javascript/pull/4902)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Skip fraud protection if client has bypass enabled ([#4907](https://github.com/clerk/javascript/pull/4907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.40.3
+
+### Patch Changes
+
+- Update `socialButtonsBlockButtonManyInView` to only accept `'${string}{{provider|titleize}}${string}'` or `undefined`. ([#4887](https://github.com/clerk/javascript/pull/4887)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.40.2
 
 ### Patch Changes
