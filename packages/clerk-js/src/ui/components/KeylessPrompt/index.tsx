@@ -30,9 +30,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
   const isForcedExpanded = claimed || success || isExpanded;
 
-  // Use this
-  // const showSuccessState = _props.success && claimed;
-
   const baseElementStyles = css`
     box-sizing: border-box;
     padding: 0;
@@ -471,7 +468,15 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               </button>
             ) : (
               <a
-                href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+                href={
+                  claimed
+                    ? _props.copyKeysUrl
+                    : (() => {
+                        const url = new URL(_props.claimUrl);
+                        url.searchParams.append('return_url', window.location.href);
+                        return url.href;
+                      })()
+                }
                 target='_blank'
                 rel='noopener noreferrer'
                 data-expanded={isForcedExpanded}
