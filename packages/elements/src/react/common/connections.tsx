@@ -1,4 +1,4 @@
-import type { OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import { createContext, useContext } from 'react';
 
@@ -29,7 +29,7 @@ export const useConnectionContext = () => {
 
 export interface ConnectionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  name: OAuthProvider | Web3Provider | SamlStrategy;
+  name: OAuthProvider | Web3Provider | SamlStrategy | EnterpriseSSOStrategy;
 }
 
 /**

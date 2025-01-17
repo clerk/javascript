@@ -7,7 +7,6 @@
     "strict": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
-    "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
     "skipLibCheck": true
