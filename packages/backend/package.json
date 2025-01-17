@@ -90,6 +90,7 @@
     "test:node": "vitest run --environment node",
     "test:edge-runtime": "vitest run --environment edge-runtime",
     "test:cloudflare-miniflare": "vitest run --environment miniflare",
+    "test:watch": "run-s test:watch:node test:watch:edge-runtime test:watch:cloudflare-miniflare",
     "test:watch:node": "vitest watch --environment node",
     "test:watch:edge-runtime": "vitest watch --environment edge-runtime",
     "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare"
