@@ -466,6 +466,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             (success ? (
               <button
                 type='button'
+                onClick={async () => {
+                  await _props.onDismiss?.();
+                  window.location.reload();
+                }}
                 css={css`
                   ${mainCTAStyles};
 
