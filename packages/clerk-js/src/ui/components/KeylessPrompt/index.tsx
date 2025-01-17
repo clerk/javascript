@@ -25,6 +25,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
   const success = true;
+  const appName = 'ThiIsAVeryLongNamee';
 
   const isForcedExpanded = claimed || success || isExpanded;
 
@@ -416,7 +417,22 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               `}
             >
               {success ? (
-                <>Your application Keyless-Test has been successfully claimed.</>
+                <>
+                  Your application{' '}
+                  <span
+                    css={css`
+                      display: inline-block;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      max-width: 130px;
+                      vertical-align: bottom;
+                    `}
+                  >
+                    {appName}
+                  </span>{' '}
+                  has been successfully claimed.
+                </>
               ) : claimed ? (
                 <>
                   You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
