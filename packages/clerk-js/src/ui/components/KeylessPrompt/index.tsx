@@ -26,7 +26,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
-  const success = true;
+  const success = _props.success;
 
   const isForcedExpanded = claimed || success || isExpanded;
 
@@ -454,6 +454,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             (success ? (
               <button
                 type='button'
+                onClick={async () => {
+                  await _props.onDismiss?.();
+                  window.location.reload();
+                }}
                 css={css`
                   ${mainCTAStyles};
 
