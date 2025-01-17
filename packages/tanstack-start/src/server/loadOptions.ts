@@ -3,36 +3,29 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+import { getEvent } from 'vinxi/http';
 
 import { errorThrower } from '../utils';
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
-import {
-  CLERK_JWT_KEY,
-  DOMAIN,
-  IS_SATELLITE,
-  PROXY_URL,
-  PUBLISHABLE_KEY,
-  SECRET_KEY,
-  SIGN_IN_URL,
-  SIGN_UP_URL,
-} from './constants';
+import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 import { patchRequest } from './utils';
 
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
   const clerkRequest = createClerkRequest(patchRequest(request));
-
-  const secretKey = overrides.secretKey || SECRET_KEY;
-  const publishableKey = overrides.publishableKey || PUBLISHABLE_KEY;
-  const jwtKey = overrides.jwtKey || CLERK_JWT_KEY;
-  const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
-  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || DOMAIN;
-  const isSatellite = handleValueOrFn(overrides.isSatellite, new URL(request.url)) || IS_SATELLITE;
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
-  const signInUrl = overrides.signInUrl || SIGN_IN_URL;
-  const signUpUrl = overrides.signUpUrl || SIGN_UP_URL;
-  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
-  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl;
+  const commonEnv = commonEnvs();
+  const event = getEvent();
+  const secretKey = overrides.secretKey || commonEnv.SECRET_KEY;
+  const publishableKey = overrides.publishableKey || commonEnv.PUBLISHABLE_KEY;
+  const jwtKey = overrides.jwtKey || commonEnv.CLERK_JWT_KEY;
+  const apiUrl = getEnvVariable('CLERK_API_URL', '', event) || apiUrlFromPublishableKey(publishableKey);
+  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || commonEnv.DOMAIN;
+  const isSatellite = handleValueOrFn(overrides.isSatellite, new URL(request.url)) || commonEnv.IS_SATELLITE;
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, clerkRequest.clerkUrl, commonEnv.PROXY_URL);
+  const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
+  const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
+  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables(event).afterSignInUrl;
+  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables(event).afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {

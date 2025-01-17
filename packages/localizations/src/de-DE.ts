@@ -547,8 +547,7 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView:
-    'Zu viele Buttons angezeigt. Reduzieren Sie die Anzahl der Buttons, um fortzufahren.',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:

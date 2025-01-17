@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.43.5",
+  "version": "5.45.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",

@@ -21,51 +21,81 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
+
+  const isForcedExpanded = claimed || isExpanded;
+
+  const baseElementStyles = css`
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    line-height: 1.5;
+    font-family:
+      -apple-system,
+      BlinkMacSystemFont,
+      avenir next,
+      avenir,
+      segoe ui,
+      helvetica neue,
+      helvetica,
+      Cantarell,
+      Ubuntu,
+      roboto,
+      noto,
+      arial,
+      sans-serif;
+    text-decoration: none;
+  `;
 
   return (
     <Portal>
       <Flex
-        data-expanded={isExpanded}
-        align='center'
+        data-expanded={isForcedExpanded}
         sx={t => ({
           position: 'fixed',
           bottom: '1.25rem',
           right: '1.25rem',
           zIndex: t.zIndices.$fab,
           height: `${t.sizes.$10}`,
-          minWidth: '18.5625rem',
-          maxWidth: 'fit-content',
-          padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
+          minWidth: '13.4rem',
+          paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
             '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 325ms cubic-bezier(0.18, 0.98, 0.1, 1)',
+          transition: 'all 210ms cubic-bezier(0.2, 0.9, 0.25, 1)',
+
+          '&[data-expanded="false"]:hover': {
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
+          },
 
           '&[data-expanded="true"]': {
             flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
-            height: 'fit-content',
+            alignItems: 'flex-center',
+            justifyContent: 'flex-center',
+            height: '8.75rem',
+            overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
             gap: `${t.space.$1x5}`,
-            padding: `${t.space.$2x5} ${t.space.$3} 3.25rem ${t.space.$3}`,
+            padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 205ms cubic-bezier(0.4, 1, 0.20, 0.9)',
+            transition: 'all 220ms cubic-bezier(0.25, 0.8, 0.25, 1)',
           },
         })}
       >
         <button
           type='button'
-          aria-expanded={isExpanded}
+          aria-expanded={isForcedExpanded}
           aria-controls={contentIdentifier}
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
           css={css`
+            ${baseElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -103,14 +133,14 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   width: 1rem;
                   height: 1rem;
                   transform-style: preserve-3d;
-                  animation: ${isExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
+                  animation: ${isForcedExpanded ? 'coinFlipAnimation 12s infinite linear' : ' none'};
 
                   @keyframes coinFlipAnimation {
                     0%,
-                    70% {
+                    55% {
                       transform: rotateY(0);
                     }
-                    75%,
+                    60%,
                     95% {
                       transform: rotateY(180deg);
                     }
@@ -160,15 +190,16 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
             <p
               data-text='Clerk is in keyless mode'
-              aria-label={claimed && isExpanded ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              aria-label={claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
               css={css`
+                ${baseElementStyles};
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
                 position: relative;
                 isolation: isolate;
                 white-space: nowrap;
-                animation: show-title 160ms ease-out forwards;
+                cursor: pointer;
 
                 ${!claimed &&
                 `&::after {
@@ -187,14 +218,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     transparent 60%,
                     transparent 100%
                   );
-                  background-size: 180% 100%;
+                  background-size: 260% 100%;
                   background-clip: text;
                   filter: blur(1.2px);
-                  animation: ${
-                    isExpanded
-                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                      : 'text-shimmer 3s infinite ease-out forwards'
-                  };
+                 animation: text-shimmer 12s 1s 1 ease-out forwards;
                   -webkit-user-select: none;
                   user-select: none;
                 }
@@ -217,13 +244,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     transparent 65%,
                     transparent 100%
                   );
-                  background-size: 180% 100%;
+                  background-size: 260% 100%;
                   background-clip: text;
-                  animation: ${
-                    isExpanded
-                      ? 'text-shimmer-expanded 3s infinite ease-out forwards'
-                      : 'text-shimmer 3s infinite ease-out forwards'
-                  };
+                 animation: text-shimmer 12s 1s 1 ease-out forwards;
                   -webkit-user-select: none;
                   user-select: none;
                 }
@@ -236,36 +259,21 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   }
                 }
 
-                @keyframes text-shimmer {
+				  @keyframes text-shimmer {
                   0% {
                     background-position: 120% center;
                   }
-                  30%,
+                  15% {
+                    background-position: -60% center;
+                  }
+                  85% {
+                    background-position: -60% center;
+                  }
                   100% {
                     background-position: -60% center;
                   }
                 }
-
-                @keyframes text-shimmer-expanded {
-                  0% {
-                    background-position: 120% center;
-                  }
-                  30%,
-                  100% {
-                    background-position: -60% center;
-                  }
-                }
-              `} @keyframes show-title {
-                  from {
-                    transform: translateY(-1.5px);
-                    opacity: 0;
-                  }
-
-                  to {
-                    transform: translateY(0);
-                    opacity: 1;
-                  }
-                }
+              `};
               `}
             >
               {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
@@ -282,14 +290,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             css={css`
               color: #8c8c8c;
               transition: color 130ms ease-out;
-              visibility: ${isExpanded && !claimed ? 'visible' : 'hidden'};
+              display: ${isExpanded && !claimed ? 'block' : 'none'};
 
               :hover {
                 color: #eeeeee;
               }
 
-              animation: show-button 285ms cubic-bezier(0.4, 0, 0, 1.1) forwards;
-
+              animation: show-button 300ms ease;
               @keyframes show-button {
                 from {
                   transform: scaleX(0.9);
@@ -312,157 +319,129 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           </svg>
         </button>
 
-        <div
-          role='region'
-          id={contentIdentifier}
-          aria-labelledby={buttonIdentifier}
-          hidden={!isExpanded}
+        <Flex
+          sx={t => ({
+            flexDirection: 'column',
+            gap: t.space.$3,
+          })}
         >
-          <p
-            css={css`
-              color: #b4b4b4;
-              font-size: 0.8125rem;
-              font-weight: 400;
-              line-height: 1rem;
-              max-width: 14.625rem;
-              min-height: 2rem;
-              animation: show-description 208ms ease forwards;
-
-              @keyframes show-description {
-                from {
-                  transform: translateY(-1.5px);
-                  opacity: 0;
-                }
-                to {
-                  transform: translateY(0);
-                  opacity: 1;
-                }
-              }
-            `}
+          <div
+            role='region'
+            id={contentIdentifier}
+            aria-labelledby={buttonIdentifier}
+            hidden={!isForcedExpanded}
           >
-            {claimed ? (
-              <>
-                You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
-                Dashboard.
-              </>
-            ) : (
-              <>
-                We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
-                <Link
-                  aria-label='Learn more about Clerk keyless mode'
-                  href='https://clerk.com/docs/keyless'
-                  sx={t => ({
-                    color: t.colors.$whiteAlpha600,
-                    textDecoration: 'underline solid',
-                    transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                    ':hover': {
-                      color: t.colors.$whiteAlpha800,
-                    },
-                  })}
-                >
-                  Learn more
-                </Link>
-              </>
-            )}
-          </p>
-        </div>
+            <p
+              css={css`
+                ${baseElementStyles};
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1rem;
+                max-width: 14.625rem;
+                animation: ${isForcedExpanded && 'show-description 500ms ease-in forwards'};
+                @keyframes show-description {
+                  0%,
+                  5% {
+                    opacity: 0;
+                  }
+                  12%,
+                  100% {
+                    opacity: 1;
+                  }
+                }
+              `}
+            >
+              {claimed ? (
+                <>
+                  You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
+                  Dashboard.
+                </>
+              ) : (
+                <>
+                  We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
+                  <Link
+                    isExternal
+                    aria-label='Learn more about Clerk keyless mode'
+                    href='https://clerk.com/docs/keyless'
+                    sx={t => ({
+                      color: t.colors.$whiteAlpha600,
+                      textDecoration: 'underline solid',
+                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                      ':hover': {
+                        color: t.colors.$whiteAlpha800,
+                      },
+                    })}
+                  >
+                    Learn more
+                  </Link>
+                </>
+              )}
+            </p>
+          </div>
 
-        <a
-          href={claimed ? _props.copyKeysUrl : _props.claimUrl}
-          rel='noopener noreferrer'
-          data-expanded={isExpanded}
-          css={css`
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            right: 0.375rem;
-            bottom: 0.375rem;
-            height: 1.75rem;
-            width: 5.125rem;
-            max-width: 14.625rem;
-            padding: 0.25rem 0.625rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.12px;
-            color: white;
-            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #636363;
-            box-shadow:
-              0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-              0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-              0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-              0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-              0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
+          {isForcedExpanded && (
+            <a
+              href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              data-expanded={isForcedExpanded}
+              css={css`
+                ${baseElementStyles};
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 1.75rem;
+                max-width: 14.625rem;
+                padding: 0.25rem 0.625rem;
+                border-radius: 0.375rem;
+                font-size: 0.75rem;
+                font-weight: 500;
+                letter-spacing: 0.12px;
+                color: ${claimed ? 'white' : '#fde047'};
+                text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
+                white-space: nowrap;
+                user-select: none;
+                background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+                box-shadow:
+                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-            transition: all 138ms cubic-bezier(0.09, 0.7, 0.1, 1);
-            animation: small-btn-glow 3s infinite 500ms;
+                animation: ${isForcedExpanded && 'show-button 590ms ease-in forwards'};
+                @keyframes show-button {
+                  0%,
+                  8% {
+                    opacity: 0;
+                  }
+                  21%,
+                  100% {
+                    opacity: 1;
+                  }
+                }
 
-            @media (prefers-reduced-motion: reduce) {
-              animation: none;
-            }
-
-            &[data-expanded='true'] {
-              right: 0.75rem;
-              bottom: 0.75rem;
-              width: calc(100% - 1.5rem);
-              color: ${claimed ? 'white' : '#fde047'};
-              border-radius: 0.375rem;
-              background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-              transition: all 190ms cubic-bezier(0.38, 0.8, 0.2, 1);
-              animation: none;
-
-              &:hover {
-                ${claimed
-                  ? `
+                &:hover {
+                  ${claimed
+                    ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
-                  : `
+                    : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
-              }
-
-              box-shadow:
-                0px 0px 3px 0px rgba(253, 224, 71, 0) inset,
-                0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-            }
-
-            @keyframes small-btn-glow {
-              0%,
-              5%,
-              95% {
-                box-shadow:
-                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              }
-
-              22% {
-                box-shadow:
-                  0px 0px 6px 0px #fde047 inset,
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-              }
-            }
-          `}
-        >
-          {claimed ? 'Get API keys' : 'Claim keys'}
-        </a>
+                }
+              `}
+            >
+              {claimed ? 'Get API keys' : 'Claim keys'}
+            </a>
+          )}
+        </Flex>
       </Flex>
       <BodyPortal>
         <a

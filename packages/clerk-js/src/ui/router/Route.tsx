@@ -58,8 +58,11 @@ export function Route(props: RouteProps): JSX.Element | null {
 
   const [indexPath, fullPath] = newPaths(router.indexPath, router.fullPath, props.path, props.index);
 
-  const resolve = (to: string) => {
+  const resolve = (to: string, { searchParams }: { searchParams?: URLSearchParams } = {}) => {
     const url = new URL(to, window.location.origin + fullPath + '/');
+    if (searchParams) {
+      url.search = searchParams.toString();
+    }
     url.pathname = trimTrailingSlash(url.pathname);
     return url;
   };
@@ -109,8 +112,8 @@ export function Route(props: RouteProps): JSX.Element | null {
           return newGetMatchData(path, index) ? true : false;
         },
         resolve: resolve,
-        navigate: (to: string) => {
-          const toURL = resolve(to);
+        navigate: (to: string, { searchParams } = {}) => {
+          const toURL = resolve(to, { searchParams });
           return router.baseNavigate(toURL);
         },
         refresh: router.refresh,

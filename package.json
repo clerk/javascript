@@ -18,7 +18,7 @@
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
-    "nuke": "./scripts/nuke.sh",
+    "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
     "release:canary": "changeset publish --tag canary --no-git-tag",
@@ -44,10 +44,10 @@
     "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start pnpm test:integration:base --grep @tanstack-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "turbo:clean": "turbo daemon clean",
+    "typedoc:generate": "typedoc --tsconfig tsconfig.typedoc.json",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
-    "typedoc:generate": "typedoc --tsconfig tsconfig.typedoc.json",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
@@ -69,7 +69,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.3",
     "@types/jest": "^29.3.1",
-    "@types/node": "^20.17.10",
+    "@types/node": "^22.10.6",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitest/coverage-v8": "2.1.4",
@@ -109,7 +109,7 @@
     "verdaccio": "^5.26.3",
     "vitest": "2.1.4",
     "yalc": "1.0.0-pre.53",
-    "zx": "^7.2.3"
+    "zx": "catalog:repo"
   },
   "packageManager": "pnpm@9.13.0+sha512.beb9e2a803db336c10c9af682b58ad7181ca0fbd0d4119f2b33d5f2582e96d6c0d93c85b23869295b765170fbdaa92890c0da6ada457415039769edf3c959efe",
   "engines": {
