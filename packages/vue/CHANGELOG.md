@@ -1,5 +1,12 @@
 # @clerk/vue
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+
 ## 1.1.1
 
 ### Patch Changes
