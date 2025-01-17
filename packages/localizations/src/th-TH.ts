@@ -457,7 +457,7 @@ export const thTH: LocalizationResource = {
       actionText__join_waitlist: 'ต้องการเข้าถึงก่อนใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับกลับ! โปรดเข้าสู่ระบบเพื่อดำเนินการต่อ',
       title: 'เข้าสู่ระบบ {{applicationName}}',
-      __experimental_titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
+      titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'รหัสการตรวจสอบ',
@@ -549,7 +549,6 @@ export const thTH: LocalizationResource = {
     captcha_unavailable:
       'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบบอทไม่ผ่าน โปรดรีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: 'รหัสไม่ถูกต้อง',
-    form_identifier_exists: 'ตัวระบุนี้ถูกใช้งานแล้ว โปรดลองอันอื่น',
     form_identifier_exists__email_address: 'ที่อยู่อีเมลนี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_exists__phone_number: 'หมายเลขโทรศัพท์นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_exists__username: 'ชื่อผู้ใช้นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
@@ -596,6 +595,7 @@ export const thTH: LocalizationResource = {
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
     phone_number_exists: 'หมายเลขโทรศัพท์นี้ถูกใช้แล้ว โปรดลองหมายเลขอื่น',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้งานได้ แต่ควรจะแข็งแกร่งกว่านี้ ลองเพิ่มอักขระเพิ่มเติม',
       goodPassword: 'รหัสผ่านของคุณตรงตามข้อกำหนดที่จำเป็นทั้งหมด',

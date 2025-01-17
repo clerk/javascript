@@ -456,7 +456,7 @@ export const zhTW: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
       title: '登錄',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',
@@ -545,7 +545,6 @@ export const zhTW: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -589,6 +588,7 @@ export const zhTW: LocalizationResource = {
       sentencePrefix: '您的密碼必須包含',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '您的密碼可以用，但可以更強。試著添加更多字元。',
       goodPassword: '做得好。這是一個優秀的密碼。',
