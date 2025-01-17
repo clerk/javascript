@@ -24,7 +24,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
-  const success = true;
+  const success = false;
   const appName = 'ThiIsAVeryLongNamee';
 
   const isForcedExpanded = claimed || success || isExpanded;
