@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fix Smart CAPTCHA on development instances
+Fix Smart Bot protection on development instances
