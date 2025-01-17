@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.12
+
+### Patch Changes
+
+- Fix Smart Bot protection on development instances ([#4926](https://github.com/clerk/javascript/pull/4926)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.73.11
 
 ### Patch Changes
