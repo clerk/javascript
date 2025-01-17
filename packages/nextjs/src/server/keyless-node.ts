@@ -175,4 +175,41 @@ This directory is auto-generated from \`@clerk/nextjs\` because you are running 
   return accountlessApplication;
 }
 
-export { createOrReadKeyless };
+function removeKeyless() {
+  if (!nodeRuntime.fs) {
+    // This should never happen.
+    throwMissingFsModule();
+  }
+  const { existsSync, writeFileSync, rmSync } = nodeRuntime.fs;
+
+  /**
+   * If another request is already in the process of acquiring keys return early.
+   * Using both an in-memory and file system lock seems to be the most effective solution.
+   */
+  if (isCreatingFile || existsSync(CLERK_LOCK)) {
+    return undefined;
+  }
+
+  isCreatingFile = true;
+
+  writeFileSync(
+    CLERK_LOCK,
+    // In the rare case, the file persists give the developer enough context.
+    'This file can be deleted. Please delete this file and refresh your application',
+    {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'w',
+    },
+  );
+
+  rmSync(generatePath(), { force: true, recursive: true });
+
+  /**
+   * Clean up locks.
+   */
+  rmSync(CLERK_LOCK, { force: true, recursive: true });
+  isCreatingFile = false;
+}
+
+export { createOrReadKeyless, removeKeyless };

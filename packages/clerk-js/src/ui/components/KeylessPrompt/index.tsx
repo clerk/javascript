@@ -15,6 +15,7 @@ type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
   success: boolean;
+  onDismiss?: () => Promise<unknown>;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
@@ -25,7 +26,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
-  const success = false;
+  const success = _props.success && claimed;
   const appName = useRevalidateEnvironment().displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
@@ -450,12 +451,24 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             </p>
           </div>
 
+          {_props.onDismiss && (
+            <button
+              onClick={async () => {
+                await _props.onDismiss?.();
+                window.location.reload();
+              }}
+            >
+              Delete
+            </button>
+          )}
+
           {isForcedExpanded &&
             (success ? (
               <button
                 type='button'
                 css={css`
                   ${mainCTAStyles};
+
                   &:hover {
                     background: #4b4b4b;
                     transition: all 120ms ease-in-out;
