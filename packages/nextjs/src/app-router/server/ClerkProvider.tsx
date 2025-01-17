@@ -10,6 +10,7 @@ import { canUseKeyless__server } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
+import { deleteKeylessAction } from '../keyless-actions';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -87,6 +88,7 @@ export async function ClerkProvider(
             __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
             __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             __internal_keylessWithClaimedKeys: runningWithClaimedKeys,
+            __internal_keylessFinalize: deleteKeylessAction,
           })}
           nonce={await generateNonce()}
           initialState={await generateStatePromise()}

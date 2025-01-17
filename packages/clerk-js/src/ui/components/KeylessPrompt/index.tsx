@@ -15,6 +15,7 @@ type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
   success: boolean;
+  onDismiss?: () => Promise<unknown>;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
@@ -383,6 +384,17 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               )}
             </p>
           </div>
+
+          {_props.onDismiss && (
+            <button
+              onClick={async () => {
+                await _props.onDismiss?.();
+                window.location.reload();
+              }}
+            >
+              Delete
+            </button>
+          )}
 
           {isForcedExpanded && (
             <a

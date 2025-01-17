@@ -523,6 +523,7 @@ const Components = (props: ComponentsProps) => {
               claimUrl={state.options.__internal_claimKeylessApplicationUrl}
               copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
               success={state.options.__internal_keylessWithClaimedKeys || false}
+              onDismiss={state.options.__internal_keylessFinalize}
             />
           </LazyImpersonationFabProvider>
         )}
