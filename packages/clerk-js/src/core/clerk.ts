@@ -2104,6 +2104,7 @@ export class Clerk implements ClerkInterface {
           options: {
             __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
             __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+            __internal_keylessWithClaimedKeys: this.#options.__internal_keylessWithClaimedKeys,
           },
         });
       });
