@@ -1,5 +1,17 @@
 # Change Log
 
+## 3.9.11
+
+### Patch Changes
+
+- - Add missing translations for backup codes ([#4866](https://github.com/clerk/javascript/pull/4866)) by [@ttwrpz](https://github.com/ttwrpz)
+
+  - Complete Thai translations for form field placeholders
+  - Add translations for sign in/up waitlist messages
+  - Add Thai translations for verification flows
+  - Add Thai error message translations
+  - Complete organization-related translations
+
 ## 3.9.10
 
 ### Patch Changes
