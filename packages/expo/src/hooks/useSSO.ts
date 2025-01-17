@@ -5,35 +5,30 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
 
-export type UseSSOParams = {
-  strategy: OAuthStrategy | EnterpriseSSOStrategy;
-  unsafeMetadata?: SignUpUnsafeMetadata;
-  redirectUrl?: string;
-};
-
 export type StartSSOFlowParams = {
-  identifier?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
-  redirectUrl?: string;
-};
+} & (
+  | {
+      strategy: OAuthStrategy;
+    }
+  | {
+      strategy: EnterpriseSSOStrategy;
+      identifier: string;
+    }
+);
 
 export type StartSSOFlowReturnType = {
-  /**
-   * Session ID created upon sign-in completion, or null if incomplete.
-   * If incomplete, use signIn or signUp for next steps like MFA.
-   */
   createdSessionId: string | null;
   setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
-  authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
-export function useSSO(useSSOParams: UseSSOParams) {
+export function useSSO() {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams = {}): Promise<StartSSOFlowReturnType> {
+  async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams): Promise<StartSSOFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
@@ -43,19 +38,20 @@ export function useSSO(useSSOParams: UseSSOParams) {
       };
     }
 
+    const { strategy, unsafeMetadata } = startSSOFlowParams ?? {};
     let createdSessionId = signIn.createdSessionId;
 
-    const redirectUrl =
-      startSSOFlowParams?.redirectUrl ||
-      useSSOParams.redirectUrl ||
-      AuthSession.makeRedirectUri({
-        path: 'sso-native-callback',
-      });
+    // Used to handle redirection back to the mobile application, however deep linking it not applied
+    // We only leverage it to extract the `rotating_token_nonce` query param
+    // It's up to the consumer to navigate once `createdSessionId` gets defined
+    const redirectUrl = AuthSession.makeRedirectUri({
+      path: 'sso-callback',
+    });
 
     await signIn.create({
-      strategy: useSSOParams.strategy,
+      strategy,
       redirectUrl,
-      identifier: startSSOFlowParams.identifier,
+      ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
     });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
@@ -66,7 +62,6 @@ export function useSSO(useSSOParams: UseSSOParams) {
     const authSessionResult = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL.toString());
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
-        authSessionResult,
         createdSessionId,
         setActive,
         signIn,
@@ -81,13 +76,12 @@ export function useSSO(useSSOParams: UseSSOParams) {
     if (signIn.firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
-        unsafeMetadata: startSSOFlowParams?.unsafeMetadata || useSSOParams.unsafeMetadata,
+        unsafeMetadata,
       });
       createdSessionId = signUp.createdSessionId;
     }
 
     return {
-      authSessionResult,
       createdSessionId,
       setActive,
       signIn,
