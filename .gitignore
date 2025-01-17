@@ -95,3 +95,4 @@ scripts/.env
 
 # typedoc
 typedoc-docs
+typedoc-docs.json
