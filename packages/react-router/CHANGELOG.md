@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.2.0
+
+### Minor Changes
+
+- Bump `react-router` peer dependency to `^7.1.2` as this version fixes [React context mismatches](https://github.com/remix-run/react-router/blob/main/CHANGELOG.md#v712) ([#4917](https://github.com/clerk/javascript/pull/4917)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/backend@1.23.2
+  - @clerk/clerk-react@5.22.1
+  - @clerk/shared@2.20.9
+
 ## 0.1.10
 
 ### Patch Changes
