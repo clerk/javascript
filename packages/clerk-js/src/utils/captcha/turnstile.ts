@@ -173,6 +173,8 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             } else {
               const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
               if (visibleWidget) {
+                visibleWidget.style.maxHeight = 'unset';
+                visibleWidget.style.minHeight = '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
@@ -226,6 +228,12 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
     if (invisibleWidget) {
       document.body.removeChild(invisibleWidget);
+    }
+    const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleWidget) {
+      visibleWidget.style.maxHeight = '0';
+      visibleWidget.style.minHeight = 'unset';
+      visibleWidget.style.marginBottom = 'unset';
     }
   }
 
