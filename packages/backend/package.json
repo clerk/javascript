@@ -87,9 +87,13 @@
     "lint:publint": "publint",
     "lint:attw": "attw --pack . --ignore-rules false-cjs",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
-    "test:node": "vitest --environment node",
-    "test:edge-runtime": "vitest --environment edge-runtime",
-    "test:cloudflare-miniflare": "vitest --environment miniflare"
+    "test:node": "vitest run --environment node",
+    "test:edge-runtime": "vitest run --environment edge-runtime",
+    "test:cloudflare-miniflare": "vitest run --environment miniflare",
+    "test:watch": "run-s test:watch:node test:watch:edge-runtime test:watch:cloudflare-miniflare",
+    "test:watch:node": "vitest watch --environment node",
+    "test:watch:edge-runtime": "vitest watch --environment edge-runtime",
+    "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
