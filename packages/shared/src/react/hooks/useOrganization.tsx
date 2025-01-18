@@ -163,6 +163,7 @@ export const useOrganization: UseOrganization = params => {
           initialPage: membersSafeValues.initialPage,
           pageSize: membersSafeValues.pageSize,
           role: membersSafeValues.role,
+          query: membersSafeValues.query,
         };
 
   const invitationsParams =
