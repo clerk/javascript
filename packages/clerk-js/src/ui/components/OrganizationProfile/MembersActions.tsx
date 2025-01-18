@@ -13,7 +13,7 @@ export const MembersActionsRow = () => {
         <Flex
           justify='end'
           sx={t => ({
-            width: '100%',
+            // TODO  - See if this would break the component in other places
             marginLeft: 'auto',
             padding: `${t.space.$none} ${t.space.$1}`,
           })}

@@ -20,6 +20,7 @@ import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
+import { MembersSearchRow } from './MembersSearch';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
@@ -123,7 +124,23 @@ export const OrganizationMembers = withCardStateProvider(() => {
                         width: '100%',
                       }}
                     >
-                      <MembersActionsRow />
+                      <Flex
+                        sx={{
+                          width: '100%',
+
+                          gap: 2,
+                        }}
+                      >
+                        <Flex
+                          sx={t => ({
+                            flex: 1,
+                            paddingLeft: t.space.$1,
+                          })}
+                        >
+                          <MembersSearchRow />
+                        </Flex>
+                        <MembersActionsRow />
+                      </Flex>
                       <ActiveMembersList />
                     </Flex>
                   </Flex>
