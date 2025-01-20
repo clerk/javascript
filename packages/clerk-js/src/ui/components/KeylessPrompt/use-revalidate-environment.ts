@@ -1,9 +1,11 @@
 import { useClerk } from '@clerk/shared/react';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 
 import type { Clerk } from '../../../core/clerk';
 import type { Environment } from '../../../core/resources';
 import { useEnvironment } from '../../contexts';
+
+const THROTTLE_DURATION_MS = 10 * 1000;
 
 /**
  * Revalidates environment on focus, highly optimized for Keyless mode.
@@ -11,6 +13,7 @@ import { useEnvironment } from '../../contexts';
  */
 function useRevalidateEnvironment() {
   const clerk = useClerk();
+  const lastTouchTimestamp = useRef(Date.now());
   const [, forceUpdate] = useReducer(v => v + 1, 0);
 
   useEffect(() => {
@@ -29,6 +32,11 @@ function useRevalidateEnvironment() {
           return controller.abort();
         }
 
+        // Re-fetch at most every 10 seconds
+        if (Date.now() < lastTouchTimestamp.current + THROTTLE_DURATION_MS) {
+          return;
+        }
+
         if (document.visibilityState !== 'visible') {
           return;
         }
@@ -39,6 +47,7 @@ function useRevalidateEnvironment() {
           const {
             authConfig: { claimedAt },
           } = await environment.fetch();
+          lastTouchTimestamp.current = Date.now();
 
           if (claimedAt !== null) {
             forceUpdate();
