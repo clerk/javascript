@@ -130,7 +130,7 @@ export const esES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
-      action__search: undefined,
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',

@@ -131,7 +131,7 @@ export const esMX: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
-      action__search: undefined,
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Eliminar miembro',
         tableHeader__actions: undefined,
