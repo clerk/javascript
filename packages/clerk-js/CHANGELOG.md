@@ -1,5 +1,34 @@
 # Change Log
 
+## 5.45.2
+
+### Patch Changes
+
+- Fixes an infinite loading state happening when successfully adding 2FA via the security tab within `<UserProfile />`. ([#4934](https://github.com/clerk/javascript/pull/4934)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix layout shift when Smart CAPTCHA is about to execute. ([#4924](https://github.com/clerk/javascript/pull/4924)) by [@anagstef](https://github.com/anagstef)
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`884e6db45573519695f0066f348a04dc519e7bec`](https://github.com/clerk/javascript/commit/884e6db45573519695f0066f348a04dc519e7bec), [`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/localizations@3.9.11
+  - @clerk/shared@2.20.10
+
+## 5.45.1
+
+### Patch Changes
+
+- Remove "Learn more" link from Keyless popover and improve copy ([#4923](https://github.com/clerk/javascript/pull/4923)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Adjusts `SignIn` telemetry event. ([#4914](https://github.com/clerk/javascript/pull/4914)) by [@brkalow](https://github.com/brkalow)
+
+- Stop falling back to the Clerk proxy worker if turnstile fails to load as it is not as accurate as challenges.cloudflare.com ([#4922](https://github.com/clerk/javascript/pull/4922)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/localizations@3.9.10
+  - @clerk/shared@2.20.9
+
 ## 5.45.0
 
 ### Minor Changes

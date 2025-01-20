@@ -459,7 +459,7 @@ export const viVN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Đăng nhập',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Mã xác minh',
@@ -549,7 +549,6 @@ export const viVN: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -595,6 +594,7 @@ export const viVN: LocalizationResource = {
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
     phone_number_exists: 'Số điện thoại này đã được sử dụng. Vui lòng thử số khác.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn đủ mạnh, nhưng có thể mạnh hơn. Hãy thêm nhiều ký tự hơn.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',

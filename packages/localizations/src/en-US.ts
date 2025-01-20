@@ -439,7 +439,6 @@ export const enUS: LocalizationResource = {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     start: {
-      __experimental_titleCombined: 'Continue to {{applicationName}}',
       actionLink: 'Sign up',
       actionLink__join_waitlist: 'Join waitlist',
       actionLink__use_email: 'Use email',
@@ -451,6 +450,7 @@ export const enUS: LocalizationResource = {
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
       title: 'Sign in to {{applicationName}}',
+      titleCombined: 'Continue to {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -582,7 +582,6 @@ export const enUS: LocalizationResource = {
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
     passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
-    web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -593,6 +592,7 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',

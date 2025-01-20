@@ -460,7 +460,7 @@ export const srRS: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
       title: 'Prijavi se na {{applicationName}}',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',
@@ -550,7 +550,6 @@ export const srRS: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     form_code_incorrect: 'Uneti kod je netačan.',
-    form_identifier_exists: 'Ovaj identifikator je već u upotrebi.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
@@ -597,6 +596,7 @@ export const srRS: LocalizationResource = {
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
       goodPassword: 'Tvoja lozinka ispunjava sve potrebne zahteve.',
