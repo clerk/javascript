@@ -1,4 +1,3 @@
-import { useOrganization } from '@clerk/shared/react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Flex, localizationKeys, useLocalizations } from '../../../ui/customizables';
@@ -6,19 +5,17 @@ import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 
-export const MembersSearch = () => {
+type MembersSearchProps = {
+  isLoading: boolean;
+  onChange: (query: string) => void;
+};
+
+export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
   const { t } = useLocalizations();
   const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | undefined>();
-
-  const { memberships } = useOrganization({
-    memberships: {
-      query,
-    },
-  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
@@ -38,7 +35,7 @@ export const MembersSearch = () => {
         clearTimeout(debounceTimer.current);
 
         debounceTimer.current = setTimeout(() => {
-          setQuery(search);
+          onChange(search);
         }, 500);
       },
       {
@@ -61,7 +58,7 @@ export const MembersSearch = () => {
           spellCheck={false}
           aria-label='Search'
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
-          leftIcon={memberships?.isFetching ? <Spinner /> : <MagnifyingGlass />}
+          leftIcon={isLoading ? <Spinner /> : <MagnifyingGlass />}
           onChange={handleChange}
           containerSx={{ width: '100%' }}
         />

@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import { useState } from 'react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
@@ -30,10 +31,18 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
+
+  const [membershipsQuery, setMembershipsQuery] = useState<string>();
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
-    memberships: canReadMemberships || undefined,
+    memberships: canReadMemberships
+      ? {
+          pageSize: 10,
+          keepPreviousData: true,
+          query: membershipsQuery || undefined,
+        }
+      : undefined,
   });
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
@@ -124,8 +133,15 @@ export const OrganizationMembers = withCardStateProvider(() => {
                         width: '100%',
                       }}
                     >
-                      <MembersActionsRow actionSlot={<MembersSearch />} />
-                      <ActiveMembersList />
+                      <MembersActionsRow
+                        actionSlot={
+                          <MembersSearch
+                            isLoading={!!memberships?.isLoading}
+                            onChange={query => setMembershipsQuery(query)}
+                          />
+                        }
+                      />
+                      <ActiveMembersList memberships={memberships} />
                     </Flex>
                   </Flex>
                 </TabPanel>
