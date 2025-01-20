@@ -1,6 +1,7 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { logger } from '@clerk/shared/logger';
+import { unstable_cache } from 'next/cache';
 
+// import { logger } from '@clerk/shared/logger';
 /**
  * Attention: Only import this module when the node runtime is used.
  * We are using conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
@@ -87,6 +88,15 @@ const createMessage = (keys: AccountlessApplication) => {
   return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 };
 
+const notifyOnce = unstable_cache(
+  (keys: AccountlessApplication) => {
+    console.log(createMessage(keys));
+    return Promise.resolve();
+  },
+  ['keyless-notification'],
+  { revalidate: 10 },
+);
+
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
   if (!nodeRuntime.fs) {
     // This should never happen.
@@ -132,7 +142,8 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
     /**
      * Notify developers.
      */
-    logger.logOnce(createMessage(envVarsMap));
+    // logger.logOnce(createMessage(envVarsMap));
+    await notifyOnce(envVarsMap);
 
     return envVarsMap;
   }
@@ -146,7 +157,8 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   /**
    * Notify developers.
    */
-  logger.logOnce(createMessage(accountlessApplication));
+  // logger.logOnce(createMessage(accountlessApplication));
+  await notifyOnce(accountlessApplication);
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
