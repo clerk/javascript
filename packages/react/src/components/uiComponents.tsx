@@ -78,7 +78,8 @@ type UserButtonPropsWithoutCustomPages = Without<
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * @experimental This API is experimental and may change at any moment.
+   * This API is experimental and may change at any moment.
+   * @experimental
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -107,7 +108,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * @experimental This API is experimental and may change at any moment.
+   * This API is experimental and may change at any moment.
+   * @experimental
    * @default undefined
    */
   __experimental_asProvider?: boolean;

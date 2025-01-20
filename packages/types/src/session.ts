@@ -98,7 +98,7 @@ export interface SessionResource extends ClerkResource {
    * Each item represents the minutes that have passed since the last time a first or second factor were verified.
    * [fistFactorAge, secondFactorAge]
    */
-  factorVerificationAge: [number, number] | null;
+  factorVerificationAge: [fistFactorAge: number, secondFactorAge: number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;

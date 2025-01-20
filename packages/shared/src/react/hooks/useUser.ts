@@ -10,8 +10,6 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * safely access `isSignedIn` state and `user`.
  *
  * @example
- * A simple example:
- *
  * import { useUser } from '@clerk/clerk-react'
  *
  * function Hello() {
