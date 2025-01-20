@@ -767,7 +767,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     >;
 
     /**
-     * The URL a developer should be redirected to in order to claim an instance created on Keyless mode.
+     * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
      */
     __internal_claimKeylessApplicationUrl?: string;
 
@@ -908,50 +908,6 @@ export type SignInProps = RoutingOptions & {
    */
   fallbackRedirectUrl?: string | null;
   /**
-   * Full URL or path to for the sign up process.
-   * Used to fill the "Sign up" link in the SignUp component.
-   */
-  signUpUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: SignInTheme;
-  /**
-   * Initial values that are used to prefill the sign in form.
-   */
-  initialValues?: SignInInitialValues;
-  /**
-   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
-   */
-  __experimental?: Record<string, any> & { newComponents?: boolean; combinedProps?: SignInCombinedProps };
-  /**
-   * Full URL or path to for the waitlist process.
-   * Used to fill the "Join waitlist" link in the SignUp component.
-   */
-  waitlistUrl?: string;
-} & TransferableOption &
-  SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps &
-  AfterSignOutUrl;
-
-export type SignInCombinedProps = RoutingOptions & {
-  /**
-   * Full URL or path to navigate after successful sign in.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   * @default undefined
-   */
-  forceRedirectUrl?: string | null;
-  /**
-   * Full URL or path to navigate after successful sign in.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   * @default undefined
-   */
-  fallbackRedirectUrl?: string | null;
-  /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
    */
@@ -984,13 +940,17 @@ export type SignInCombinedProps = RoutingOptions & {
    * Additional arbitrary metadata to be stored alongside the User object
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Enable sign-in-or-up flow for `<SignIn />` component instance.
+   */
+  withSignUp?: boolean;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl;
 
-interface TransferableOption {
+export interface TransferableOption {
   /**
    * Indicates whether or not sign in attempts are transferable to the sign up flow.
    * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.

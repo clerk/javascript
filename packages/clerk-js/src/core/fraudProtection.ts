@@ -62,6 +62,6 @@ export class FraudProtection {
   }
 
   public managedChallenge(clerk: Clerk) {
-    return new this.CaptchaChallengeImpl(clerk).managed();
+    return new this.CaptchaChallengeImpl(clerk).managedInModal();
   }
 }

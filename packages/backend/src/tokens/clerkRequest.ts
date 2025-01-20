@@ -1,4 +1,4 @@
-import { parse as parseCookies } from 'cookie';
+import { parse } from 'cookie';
 
 import { constants } from '../constants';
 import type { ClerkUrl } from './clerkUrl';
@@ -11,7 +11,7 @@ import { createClerkUrl } from './clerkUrl';
  */
 class ClerkRequest extends Request {
   readonly clerkUrl: ClerkUrl;
-  readonly cookies: Map<string, string>;
+  readonly cookies: Map<string, string | undefined>;
 
   public constructor(input: ClerkRequest | Request | RequestInfo, init?: RequestInit) {
     // The usual way to duplicate a request object is to
@@ -67,7 +67,7 @@ class ClerkRequest extends Request {
   }
 
   private parseCookies(req: Request) {
-    const cookiesRecord = parseCookies(this.decodeCookieValue(req.headers.get('cookie') || ''));
+    const cookiesRecord = parse(this.decodeCookieValue(req.headers.get('cookie') || ''));
     return new Map(Object.entries(cookiesRecord));
   }
 

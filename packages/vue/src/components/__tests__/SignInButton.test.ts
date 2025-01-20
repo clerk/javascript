@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/vue';
 import { vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 
-import { SignInButton } from '../SignInButton';
+import SignInButton from '../SignInButton.vue';
 
 const mockRedirectToSignIn = vi.fn();
 const originalError = console.error;

@@ -35,63 +35,13 @@
 
 ### Installation
 
-Add `@clerk/vue` as a dependency
+The fastest way to get started with Clerk is by following the [Vue Quickstart](https://clerk.com/docs/quickstarts/vue?utm_source=github&utm_medium=clerk_vue).
 
-```bash
-npm install @clerk/vue
-```
-
-### Build
-
-To build the package locally with the TypeScript compiler, run:
-
-```bash
-npm run build
-```
+You'll learn how to create a new Vue application, install `@clerk/vue`, set up your environment keys, add `clerkPlugin`, and use Clerk's prebuilt components.
 
 ## Usage
 
-Make sure the following environment variables are set in a `.env.local` file in your Vite project:
-
-```
-VITE_CLERK_PUBLISHABLE_KEY=[publishable-key]
-```
-
-Then, install the Clerk plugin in your main Vue application:
-
-```js
-import { createApp } from 'vue';
-import App from './App.vue';
-import { clerkPlugin } from '@clerk/vue';
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-const app = createApp(App);
-app.use(clerkPlugin, {
-  publishableKey: PUBLISHABLE_KEY,
-});
-app.mount('#app');
-```
-
-You can now start using Clerk's components. Here's a basic example showing a header component:
-
-```vue
-<script setup>
-import { SignedIn, SignedOut, UserButton } from '@clerk/vue';
-</script>
-
-<template>
-  <header>
-    <h1>My App</h1>
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
-    <SignedOut>
-      <a href="/sign-in">Sign in</a>
-    </SignedOut>
-  </header>
-</template>
-```
+For further information, guides, and examples visit the [Vue reference documentation](https://clerk.com/docs/references/vue/overview?utm_source=github&utm_medium=clerk_vue).
 
 ## Support
 

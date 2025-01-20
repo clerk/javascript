@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.6.9",
+  "version": "2.6.14",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -63,7 +63,8 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src/",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
