@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
@@ -25,6 +25,8 @@ import { MembersSearch } from './MembersSearch';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
+export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
+
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
@@ -38,12 +40,25 @@ export const OrganizationMembers = withCardStateProvider(() => {
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
       ? {
-          pageSize: 10,
+          pageSize: membershipsQuery ? undefined : ACTIVE_MEMBERS_PAGE_SIZE,
           keepPreviousData: true,
           query: membershipsQuery || undefined,
         }
       : undefined,
   });
+
+  // Resets pagination based on the number of items from a query term
+  useEffect(() => {
+    if (!membershipsQuery || !memberships?.data) {
+      return;
+    }
+
+    const hasOnePageLeft = (memberships?.count ?? 0) <= ACTIVE_MEMBERS_PAGE_SIZE;
+
+    if (hasOnePageLeft) {
+      memberships?.fetchPage?.(1);
+    }
+  }, [membershipsQuery, memberships]);
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
@@ -136,12 +151,15 @@ export const OrganizationMembers = withCardStateProvider(() => {
                       <MembersActionsRow
                         actionSlot={
                           <MembersSearch
-                            isLoading={!!memberships?.isLoading}
+                            isLoading={!!memberships?.isLoading && !!membershipsQuery}
                             onChange={query => setMembershipsQuery(query)}
                           />
                         }
                       />
-                      <ActiveMembersList memberships={memberships} />
+                      <ActiveMembersList
+                        pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
+                        memberships={memberships}
+                      />
                     </Flex>
                   </Flex>
                 </TabPanel>

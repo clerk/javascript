@@ -35,7 +35,7 @@ export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
         clearTimeout(debounceTimer.current);
 
         debounceTimer.current = setTimeout(() => {
-          onChange(search);
+          onChange(search.trim());
         }, 500);
       },
       {
