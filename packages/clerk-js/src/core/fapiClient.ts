@@ -61,7 +61,6 @@ export interface FapiClient {
 // List of paths that should not receive the session ID parameter in the URL
 const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
-// current session ID, frontendApi, proxyUrl, instanceType
 type FapiClientOptions = {
   frontendApi: string;
   domain?: string;
