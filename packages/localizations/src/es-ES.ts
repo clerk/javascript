@@ -130,6 +130,7 @@ export const esES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',
@@ -451,6 +452,7 @@ export const esES: LocalizationResource = {
       detailsLabel: 'Necesitamos verificar tu identidad antes de restablecer tu contraseña.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Regístrese',
       actionLink__join_waitlist: 'Únase a la lista de espera',
       actionLink__use_email: 'Usar correo electrónico',
@@ -462,7 +464,6 @@ export const esES: LocalizationResource = {
       actionText__join_waitlist: '¿Te gustaría unirte a la lista de espera?',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Entrar',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',

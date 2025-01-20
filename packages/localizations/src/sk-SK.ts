@@ -129,6 +129,7 @@ export const skSK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvať',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstrániť člena',
         tableHeader__actions: undefined,
@@ -448,6 +449,7 @@ export const skSK: LocalizationResource = {
       detailsLabel: 'Pred obnovením hesla je potrebné overiť vašu totožnosť.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Registrovať sa',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Použiť email',
@@ -459,7 +461,6 @@ export const skSK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Prihlásiť sa',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',

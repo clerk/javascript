@@ -1,13 +1,14 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { Flex } from '../../../ui/customizables';
+import { Flex, localizationKeys, useLocalizations } from '../../../ui/customizables';
 import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 
 export const MembersSearch = () => {
   const [query, setQuery] = useState<string>();
+  const { t } = useLocalizations();
 
   const { memberships } = useOrganization({
     memberships: {
@@ -16,23 +17,20 @@ export const MembersSearch = () => {
   });
 
   /* TODO - Only fire update once the user stops typing */
-  /* TODO - Consider how it'll overlap the invite input */
-  const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event?.target.value);
   };
 
-  // TODO - Add descriptors
   return (
     <Animated asChild>
       <Flex sx={{ width: '100%', '& div': { width: '100%' } }}>
         <InputWithIcon
-          // TODO - Add translation keys
-          placeholder='Search'
-          aria-label='Search'
-          leftIcon={memberships?.isFetching ? <Spinner /> : <MagnifyingGlass />}
+          type='search'
           autoCapitalize='none'
           spellCheck={false}
-          type='search'
+          aria-label='Search'
+          placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
+          leftIcon={memberships?.isFetching ? <Spinner /> : <MagnifyingGlass />}
           onChange={handleSearch}
         />
       </Flex>

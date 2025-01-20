@@ -130,6 +130,7 @@ export const csCZ: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvat',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstranit člena',
         tableHeader__actions: 'Akce',
@@ -448,6 +449,7 @@ export const csCZ: LocalizationResource = {
       detailsLabel: 'Před obnovením hesla je třeba ověřit vaši totožnost.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Registrovat se',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Použít email',
@@ -459,7 +461,6 @@ export const csCZ: LocalizationResource = {
       actionText__join_waitlist: 'Připojit se k čekací listině',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Přihlásit se',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Ověřovací kód',

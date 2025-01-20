@@ -129,6 +129,7 @@ export const koKR: LocalizationResource = {
     },
     membersPage: {
       action__invite: '초대',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '회원 제거',
         tableHeader__actions: undefined,
@@ -445,6 +446,7 @@ export const koKR: LocalizationResource = {
       detailsLabel: '비밀번호를 재설정하기 전에 신원을 확인해야 합니다.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: '회원가입',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: '이메일 사용하기',
@@ -456,7 +458,6 @@ export const koKR: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       title: '{{applicationName}}에 로그인',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '인증 코드',

@@ -128,6 +128,7 @@ export const ptPT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convidar',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
@@ -448,6 +449,7 @@ export const ptPT: LocalizationResource = {
       detailsLabel: 'Precisamos verificar a sua identidade antes de redefinir a palavra-passe.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Registre-se',
       actionLink__join_waitlist: 'Juntar-se à lista de espera',
       actionLink__use_email: 'Usar e-mail',
@@ -459,7 +461,6 @@ export const ptPT: LocalizationResource = {
       actionText__join_waitlist: 'Ainda não tem uma conta? Junte-se à lista de espera.',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',

@@ -129,6 +129,7 @@ export const plPL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Zaproś',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Usuń użytkownika',
         tableHeader__actions: undefined,

@@ -129,6 +129,7 @@ export const huHU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Meghívás',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Tag eltávolítása',
         tableHeader__actions: undefined,
@@ -450,6 +451,7 @@ export const huHU: LocalizationResource = {
       detailsLabel: 'Vissza kell igazolnod az identitásod, mielőtt visszaállítod a jelszavad',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Regisztráció',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Email használata',
@@ -461,7 +463,6 @@ export const huHU: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Visszaigazoló kód',

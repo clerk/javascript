@@ -129,6 +129,7 @@ export const bgBG: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Покани',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Премахване на член',
         tableHeader__actions: undefined,
@@ -449,6 +450,7 @@ export const bgBG: LocalizationResource = {
       detailsLabel: 'Трябва да потвърдим вашата самоличност, преди да нулираме паролата ви.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Регистрирайте се',
       actionLink__join_waitlist: 'Присъединете се към листата за изчакване',
       actionLink__use_email: 'Използвайте имейл',
@@ -460,7 +462,6 @@ export const bgBG: LocalizationResource = {
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
       title: 'Влезте в {{applicationName}}',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код за потвърждение',

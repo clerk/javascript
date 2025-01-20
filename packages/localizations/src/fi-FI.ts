@@ -130,6 +130,7 @@ export const fiFI: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Kutsu',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -451,6 +452,7 @@ export const fiFI: LocalizationResource = {
       detailsLabel: 'Ennen salasanan nollaamista on varmistettava henkilöllisyytesi.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Rekisteröidy',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Käytä sähköpostia',
@@ -462,7 +464,6 @@ export const fiFI: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Kirjaudu sisään',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',

@@ -126,6 +126,7 @@ export const zhCN: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀请',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成员',
         tableHeader__actions: undefined,
@@ -439,6 +440,7 @@ export const zhCN: LocalizationResource = {
       detailsLabel: '我们需要验证您的身份才能重置您的密码。',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: '注册',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: '使用电子邮件',
@@ -450,7 +452,6 @@ export const zhCN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
       title: '登录',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '验证码',

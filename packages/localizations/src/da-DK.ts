@@ -129,6 +129,7 @@ export const daDK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: 'Handlinger',
@@ -449,6 +450,7 @@ export const daDK: LocalizationResource = {
       detailsLabel: 'Vi skal bekræfte din identitet, før du nulstiller din adgangskode.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Tilmeld dig',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Brug email',
@@ -460,7 +462,6 @@ export const daDK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Log ind',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',

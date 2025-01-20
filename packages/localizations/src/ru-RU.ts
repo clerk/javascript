@@ -133,6 +133,7 @@ export const ruRU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить участника',
         tableHeader__actions: 'Действия',
@@ -459,6 +460,7 @@ export const ruRU: LocalizationResource = {
       detailsLabel: 'Необходимо верифицировать вашу личность перед восстановлением пароля',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Зарегистрироваться',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Использовать почту',
@@ -470,7 +472,6 @@ export const ruRU: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Войти',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верификационный код',

@@ -131,6 +131,7 @@ export const frFR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
@@ -454,6 +455,7 @@ export const frFR: LocalizationResource = {
       detailsLabel: 'Nous devons vérifier votre identité avant de réinitialiser votre mot de passe.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: "S'inscrire",
       actionLink__join_waitlist: "Rejoindre la liste d'attente",
       actionLink__use_email: 'Utiliser e-mail',
@@ -465,7 +467,6 @@ export const frFR: LocalizationResource = {
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
       title: "S'identifier",
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Le code de vérification',

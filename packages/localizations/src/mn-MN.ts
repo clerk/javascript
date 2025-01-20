@@ -130,6 +130,7 @@ export const mnMN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Урих',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Гишүүнийг хасах',
         tableHeader__actions: undefined,
@@ -451,6 +452,7 @@ export const mnMN: LocalizationResource = {
       detailsLabel: 'Нууц үгээ шинэчлэхээс өмнө бид таны хувийн мэдээллийг баталгаажуулах шаардлагатай.',
     },
     start: {
+      __experimental_titleCombined: undefined,
       actionLink: 'Бүртгүүлэх',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Имэйл ашиглах',
@@ -462,7 +464,6 @@ export const mnMN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       title: '{{applicationName}} руу нэвтрэх',
-      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Баталгаажуулах код',
