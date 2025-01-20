@@ -1,25 +1,30 @@
 import React from 'react';
 
 import { Flex, Input } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
-type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement };
+type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement } & {
+  containerSx?: ThemableCssProp;
+};
 
 export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((props, ref) => {
-  const { leftIcon, sx, ...rest } = props;
+  const { leftIcon, sx, containerSx, ...rest } = props;
   return (
     <Flex
       center
-      sx={theme => ({
-        width: '100%',
-        position: 'relative',
-        '& .cl-internal-icon': {
-          position: 'absolute',
-          left: theme.space.$4,
-          width: theme.sizes.$3x5,
-          height: theme.sizes.$3x5,
+      sx={theme => [
+        {
+          width: '100%',
+          position: 'relative',
+          '& .cl-internal-icon': {
+            position: 'absolute',
+            left: theme.space.$4,
+            width: theme.sizes.$3x5,
+            height: theme.sizes.$3x5,
+          },
         },
-      })}
+        containerSx,
+      ]}
     >
       {leftIcon && React.cloneElement(leftIcon, { className: 'cl-internal-icon' })}
       <Input

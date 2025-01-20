@@ -5,7 +5,7 @@ import { Action } from '../../elements/Action';
 import { InviteMembersScreen } from './InviteMembersScreen';
 
 type MembersActionsRowProps = {
-  actionSlot: React.ReactNode;
+  actionSlot?: React.ReactNode;
 };
 
 export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
@@ -15,8 +15,10 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
     <Action.Root animate={false}>
       <Animated asChild>
         <Flex
-          justify={actionSlot ? undefined : 'end'}
+          justify={actionSlot ? 'between' : 'end'}
           sx={t => ({
+            width: '100%',
+            marginLeft: 'auto',
             padding: `${t.space.$none} ${t.space.$1}`,
           })}
           gap={actionSlot ? 2 : undefined}

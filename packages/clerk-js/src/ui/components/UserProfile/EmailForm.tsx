@@ -56,9 +56,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      {/* Example of form */}
       <FormContainer
-        /* TODO - add translation keys -> organizationProfile.membersPage */
         headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
         headerSubtitle={localizationKeys('userProfile.emailAddressPage.formHint')}
       >
