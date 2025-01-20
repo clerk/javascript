@@ -114,7 +114,12 @@ const lockFileWriting = () => {
 const unlockFileWriting = () => {
   const { rmSync } = safeNodeRuntimeFs();
 
-  rmSync(CLERK_LOCK, { force: true, recursive: true });
+  try {
+    rmSync(CLERK_LOCK, { force: true, recursive: true });
+  } catch (e) {
+    // Simply ignore if the removal of the directory/file fails
+  }
+
   isCreatingFile = false;
 };
 
@@ -124,7 +129,7 @@ const isFileWritingLocked = () => {
 };
 
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
-  const { writeFileSync, mkdirSync, rmSync } = safeNodeRuntimeFs();
+  const { writeFileSync, mkdirSync } = safeNodeRuntimeFs();
 
   /**
    * If another request is already in the process of acquiring keys return early.
@@ -147,8 +152,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    */
   const envVarsMap = safeParseClerkFile();
   if (envVarsMap?.publishableKey && envVarsMap?.secretKey) {
-    isCreatingFile = false;
-    rmSync(CLERK_LOCK, { force: true, recursive: true });
+    unlockFileWriting();
 
     /**
      * Notify developers.
@@ -208,7 +212,11 @@ function removeKeyless() {
 
   lockFileWriting();
 
-  rmSync(generatePath(), { force: true, recursive: true });
+  try {
+    rmSync(generatePath(), { force: true, recursive: true });
+  } catch (e) {
+    // Simply ignore if the removal of the directory/file fails
+  }
 
   /**
    * Clean up locks.
