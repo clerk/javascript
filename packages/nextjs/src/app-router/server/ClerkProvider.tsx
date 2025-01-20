@@ -87,8 +87,7 @@ export async function ClerkProvider(
             publishableKey: newOrReadKeys.publishableKey,
             __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
             __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-            __internal_keylessWithClaimedKeys: runningWithClaimedKeys,
-            __internal_keylessFinalize: deleteKeylessAction,
+            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
           })}
           nonce={await generateNonce()}
           initialState={await generateStatePromise()}

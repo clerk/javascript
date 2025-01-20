@@ -14,8 +14,7 @@ import { useRevalidateEnvironment } from './use-revalidate-environment';
 type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
-  success: boolean;
-  onDismiss?: () => Promise<unknown>;
+  onDismiss: (() => Promise<unknown>) | undefined;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
@@ -24,10 +23,11 @@ const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
+  const environment = useRevalidateEnvironment();
+  const claimed = Boolean(environment.authConfig.claimedAt);
 
-  const success = _props.success && claimed;
-  const appName = useRevalidateEnvironment().displayConfig.applicationName;
+  const success = typeof _props.onDismiss === 'function' && claimed;
+  const appName = environment.displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
 
@@ -72,6 +72,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
     white-space: nowrap;
     user-select: none;
+    cursor: pointer;
     background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
     box-shadow:
       0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -357,6 +358,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               color: #8c8c8c;
               transition: color 130ms ease-out;
               display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
+              cursor: pointer;
 
               :hover {
                 color: #eeeeee;
@@ -448,16 +450,16 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             </p>
           </div>
 
-          {_props.onDismiss && (
-            <button
-              onClick={async () => {
-                await _props.onDismiss?.();
-                window.location.reload();
-              }}
-            >
-              Delete
-            </button>
-          )}
+          {/*{_props.onDismiss && (*/}
+          {/*  <button*/}
+          {/*    onClick={async () => {*/}
+          {/*      await _props.onDismiss?.();*/}
+          {/*      window.location.reload();*/}
+          {/*    }}*/}
+          {/*  >*/}
+          {/*    Delete*/}
+          {/*  </button>*/}
+          {/*)}*/}
 
           {isForcedExpanded &&
             (success ? (

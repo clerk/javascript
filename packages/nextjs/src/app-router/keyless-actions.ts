@@ -57,7 +57,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
 
 export async function deleteKeylessAction() {
   if (!canUseKeyless) {
-    return null;
+    return;
   }
 
   await import('../server/keyless-node.js').then(m => m.removeKeyless());
