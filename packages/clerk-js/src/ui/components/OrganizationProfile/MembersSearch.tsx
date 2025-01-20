@@ -1,11 +1,12 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { InputWithIcon } from '../../../ui/elements';
+import { Flex } from '../../../ui/customizables';
+import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 
-export const MembersSearchRow = () => {
+export const MembersSearch = () => {
   const [query, setQuery] = useState<string>();
 
   const { memberships } = useOrganization({
@@ -20,16 +21,21 @@ export const MembersSearchRow = () => {
     setQuery(event?.target.value);
   };
 
+  // TODO - Add descriptors
   return (
-    <InputWithIcon
-      // TODO - Add translation keys
-      placeholder='Search'
-      aria-label='Search'
-      leftIcon={memberships?.isFetching ? <MagnifyingGlass /> : <Spinner />}
-      autoCapitalize='none'
-      spellCheck={false}
-      type='search'
-      onChange={handleSearch}
-    />
+    <Animated asChild>
+      <Flex sx={{ width: '100%', '& div': { width: '100%' } }}>
+        <InputWithIcon
+          // TODO - Add translation keys
+          placeholder='Search'
+          aria-label='Search'
+          leftIcon={memberships?.isFetching ? <Spinner /> : <MagnifyingGlass />}
+          autoCapitalize='none'
+          spellCheck={false}
+          type='search'
+          onChange={handleSearch}
+        />
+      </Flex>
+    </Animated>
   );
 };
