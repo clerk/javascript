@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.41.2
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.41.1
 
 ### Patch Changes

@@ -30,8 +30,6 @@ export function PromisifiedAuthProvider({
  * simply by using the `ClerkProvider`.
  *
  * @example
- * A simple example:
- *
  * import { useAuth } from '@clerk/nextjs'
  *
  * function Hello() {
@@ -44,8 +42,9 @@ export function PromisifiedAuthProvider({
  * }
  *
  * @example
- * Basic example in a NextJs app. This page will be fully rendered during SSR:
+ * This page will be fully rendered during SSR.
  *
+ * ```tsx
  * import { useAuth } from '@clerk/nextjs'
  *
  * export HelloPage = () => {
@@ -53,6 +52,7 @@ export function PromisifiedAuthProvider({
  *   console.log(isSignedIn, sessionId, userId)
  *   return <div>...</div>
  * }
+ * ```
  */
 export function usePromisifiedAuth() {
   const isPagesRouter = useRouter();

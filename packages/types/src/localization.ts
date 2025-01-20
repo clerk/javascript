@@ -17,9 +17,8 @@ type _LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
+   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    * @experimental
-   * Add role keys and their localized value
-   * e.g. roles:{ 'org:teacher': 'Teacher'}
    */
   roles: {
     [r: string]: LocalizationValue;
@@ -173,7 +172,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
-      __experimental_titleCombined: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;

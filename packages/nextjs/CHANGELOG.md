@@ -1,5 +1,26 @@
 # Change Log
 
+## 6.9.15
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/clerk-react@5.22.3
+  - @clerk/backend@1.23.4
+  - @clerk/shared@2.20.11
+
+## 6.9.14
+
+### Patch Changes
+
+- Bug fix: Running `build` with on Keyless mode should not prevent `<ClerkProvider/>` throwing an error for missing publishable key. ([#4932](https://github.com/clerk/javascript/pull/4932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+  - @clerk/clerk-react@5.22.2
+  - @clerk/backend@1.23.3
+
 ## 6.9.13
 
 ### Patch Changes

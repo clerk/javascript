@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.46.0
+
+### Minor Changes
+
+- Add a confirmation state that the Application has been successfully claimed on the Keyless prompt. ([#4928](https://github.com/clerk/javascript/pull/4928)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix interactive bot protection widget not appearing on transfer flow ([#4941](https://github.com/clerk/javascript/pull/4941)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/localizations@3.9.12
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
+## 5.45.2
+
+### Patch Changes
+
+- Fixes an infinite loading state happening when successfully adding 2FA via the security tab within `<UserProfile />`. ([#4934](https://github.com/clerk/javascript/pull/4934)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix layout shift when Smart CAPTCHA is about to execute. ([#4924](https://github.com/clerk/javascript/pull/4924)) by [@anagstef](https://github.com/anagstef)
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`884e6db45573519695f0066f348a04dc519e7bec`](https://github.com/clerk/javascript/commit/884e6db45573519695f0066f348a04dc519e7bec), [`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/localizations@3.9.11
+  - @clerk/shared@2.20.10
+
 ## 5.45.1
 
 ### Patch Changes
