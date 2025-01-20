@@ -19,6 +19,7 @@ export const commonEnvs = () => {
     SIGN_UP_URL: publicEnvs.signUpUrl,
     TELEMETRY_DISABLED: publicEnvs.telemetryDisabled,
     TELEMETRY_DEBUG: publicEnvs.telemetryDebug,
+    DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING: publicEnvs.dangerouslyDisableDevelopmentModeWarning,
 
     // Server-only environment variables
     API_VERSION: getEnvVariable('CLERK_API_VERSION', 'v1', event),

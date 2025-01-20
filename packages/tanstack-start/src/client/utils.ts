@@ -65,5 +65,8 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     clerkJSVersion: restInitState.clerkJSVersion || getPublicEnvVariables().clerkJsVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     clerkJSVariant: restInitState.clerkJSVariant || getPublicEnvVariables().clerkJsVariant,
+    dangerouslyDisableDevelopmentModeWarning:
+      restInitState.dangerouslyDisableDevelopmentModeWarning ||
+      getPublicEnvVariables().dangerouslyDisableDevelopmentModeWarning,
   };
 };

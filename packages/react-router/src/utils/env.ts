@@ -91,5 +91,8 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
       getEnvVariable('VITE_CLERK_AFTER_SIGN_IN_URL', context) || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context),
     afterSignUpUrl:
       getEnvVariable('VITE_CLERK_AFTER_SIGN_UP_URL', context) || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context),
+    dangerouslyDisableDevelopmentModeWarning:
+      isTruthy(getEnvVariable('VITE_CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING', context)) ||
+      isTruthy(getEnvVariable('CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING', context)),
   };
 };

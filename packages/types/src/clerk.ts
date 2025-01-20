@@ -685,7 +685,8 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = ClerkOptionsNavigation &
+export type ClerkOptions = ClerkOptionsDangerous &
+  ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
@@ -782,6 +783,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     __experimental_router?: ClerkHostRouter;
   };
+
+export interface ClerkOptionsDangerous {
+  /**
+   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   *
+   * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production Clerk instance. If you're disabling it,
+   * please make sure you don't ship with a non-production Clerk instance! More information: https://clerk.com/docs/deployments/overview.
+   */
+  dangerouslyDisableDevelopmentModeWarning?: boolean;
+}
 
 export interface NavigateOptions {
   replace?: boolean;
