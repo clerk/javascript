@@ -88,9 +88,11 @@ test-results
 
 # Workflow Outputs
 /packages/*/*.tgz
+/packages/*/tsconfig.test.vitest-temp.json
 
 # Scripts
 scripts/.env
 !scripts/.env.example
 
-
+# typedoc
+.typedoc

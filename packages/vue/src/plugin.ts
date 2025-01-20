@@ -13,8 +13,6 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * Vue plugin for integrating Clerk.
  *
  * @example
- * Basic usage in main.ts:
- *
  * ```ts
  * import { createApp } from 'vue'
  * import { clerkPlugin } from '@clerk/vue'

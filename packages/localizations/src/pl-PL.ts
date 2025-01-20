@@ -451,7 +451,6 @@ export const plPL: LocalizationResource = {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     start: {
-      __experimental_titleCombined: 'Kontynuuj do {{applicationName}}',
       actionLink: 'Zarejestruj się',
       actionLink__join_waitlist: 'Dołącz do listy oczekujących',
       actionLink__use_email: 'Użyj adresu e-mail',
@@ -463,6 +462,7 @@ export const plPL: LocalizationResource = {
       actionText__join_waitlist: 'Chcesz otrzymać wczesny dostęp?',
       subtitle: 'aby przejść do {{applicationName}}',
       title: 'Zaloguj się',
+      titleCombined: 'Kontynuuj do {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Kod weryfikacyjny',
@@ -556,7 +556,6 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -601,6 +600,7 @@ export const plPL: LocalizationResource = {
       sentencePrefix: 'Twoje hasło musi zawierać',
     },
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
       goodPassword: 'Twoje hasło jest wystarczająco silne.',

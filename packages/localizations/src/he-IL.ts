@@ -454,7 +454,7 @@ export const heIL: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'התחבר',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'קוד אימות',
@@ -542,7 +542,6 @@ export const heIL: LocalizationResource = {
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'כתובת המייל הזאת כבר תפוסה. אנא נסה אחרת.',
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
@@ -588,6 +587,7 @@ export const heIL: LocalizationResource = {
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',

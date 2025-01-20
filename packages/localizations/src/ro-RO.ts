@@ -463,7 +463,7 @@ export const roRO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Conectați-vă',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Cod de verificare',
@@ -553,7 +553,6 @@ export const roRO: LocalizationResource = {
     captcha_unavailable:
       'Înscrierea a eșuat din cauza unei validări nereușite a robotului. Vă rugăm să reîmprospătați pagina pentru a încerca din nou sau contactați serviciul de asistență pentru mai multă asistență.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -599,6 +598,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
         'Parola dvs. funcționează, dar ar putea fi mai puternică. Încercați să adăugați mai multe caractere.',

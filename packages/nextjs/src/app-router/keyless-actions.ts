@@ -5,7 +5,7 @@ import { redirect, RedirectType } from 'next/navigation';
 
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName } from '../server/keyless';
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
@@ -31,7 +31,7 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
 }
 
 export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
-  if (!canUseKeyless__server) {
+  if (!canUseKeyless) {
     return null;
   }
 
