@@ -25,7 +25,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
   const success = false;
-  const appName = useRevalidateEnvironment().displayConfig. applicationName
+  const appName = useRevalidateEnvironment().displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
 
@@ -106,7 +106,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: success ? 'fit-content' : '8.75rem',
+            height: success ? 'fit-content' : '8.563rem',
             overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
@@ -278,7 +278,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     transparent 60%,
                     transparent 100%
                   );
-                  background-size: 260% 100%;
+                  background-size: 275% 100%;
                   background-clip: text;
                   filter: blur(1.2px);
                  animation: text-shimmer 12s 1s 1 ease-out forwards;
@@ -304,7 +304,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     transparent 65%,
                     transparent 100%
                   );
-                  background-size: 260% 100%;
+                  background-size: 275% 100%;
                   background-clip: text;
                  animation: text-shimmer 12s 1s 1 ease-out forwards;
                   -webkit-user-select: none;
@@ -425,7 +425,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       white-space: nowrap;
                       overflow: hidden;
                       text-overflow: ellipsis;
-                      max-width: 130px;
+                      max-width: 8.125rem;
                       vertical-align: bottom;
                     `}
                   >
@@ -452,7 +452,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 type='button'
                 css={css`
                   ${mainCTAStyles};
-
                   &:hover {
                     background: #4b4b4b;
                     transition: all 120ms ease-in-out;
@@ -470,36 +469,35 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 css={css`
                   ${mainCTAStyles};
                   animation: ${isForcedExpanded && 'show-button 600ms ease-in forwards'};
-                   @keyframes show-button {
-                  0%,
-                  5% {
-                    opacity: 0;
-                  }
-                  14%,
-                  100% {
-                    opacity: 1;
+                  @keyframes show-button {
+                    0%,
+                    5% {
+                      opacity: 0;
+                    }
+                    14%,
+                    100% {
+                      opacity: 1;
                     }
                   }
-                  
-                &:hover {
-                  ${claimed
-                    ? `
+
+                  &:hover {
+                    ${claimed
+                      ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
-                    : `
+                      : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
-                }
-              `}
-            >
-              {claimed ? 'Get API keys' : 'Claim application'}
-            </a>
-          )}
-          
+                  }
+                `}
+              >
+                {claimed ? 'Get API keys' : 'Claim application'}
+              </a>
+            ))}
         </Flex>
       </Flex>
       <BodyPortal>
