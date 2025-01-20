@@ -25,7 +25,10 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
         >
           {actionSlot}
           {canManageMemberships && (
-            <Action.Trigger value='invite'>
+            <Action.Trigger
+              value='invite'
+              hideOnActive={!actionSlot}
+            >
               <Button
                 elementDescriptor={descriptors.membersPageInviteButton}
                 aria-label='Invite'

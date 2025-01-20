@@ -12,6 +12,7 @@ export const MembersSearch = () => {
   const [search, setSearch] = useState('');
   const query = useDebounce(search, 500);
 
+  // TODO (perf) -> Only trigger query once user stops typing
   const { memberships } = useOrganization({
     memberships: {
       query,
