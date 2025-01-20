@@ -706,11 +706,11 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       enterpriseSsoLink: {
-        formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
+        formSubtitle: 'Ein neuer Tab hat sich geöffnet, schließe die Anmeldung mit {{identifier}} dort ab.',
+        resendButton: 'Anmeldung erneut versuchen',
+        successMessage: 'Die E-Mail {{identifier}} wurde zu Ihrem Account hinzugefügt.',
       },
-      formHint: undefined,
+      formHint: 'Diese E-Mail-Adresse wird durch Ihre primäre Verifizierungsmethode bestätigt.',
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',
