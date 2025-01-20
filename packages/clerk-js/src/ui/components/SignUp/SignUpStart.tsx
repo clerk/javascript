@@ -273,7 +273,7 @@ function _SignUpStart(): JSX.Element {
               />
             )}
           </SocialButtonsReversibleContainerWithDivider>
-          {!shouldShowForm && <CaptchaElement />}
+          {!shouldShowForm && <CaptchaElement maxHeight='0' />}
         </Flex>
         <Footer.Root>
           <Footer.Action elementId='signUp'>

@@ -1,9 +1,13 @@
 import { CAPTCHA_ELEMENT_ID } from '../../utils/captcha';
 import { Box } from '../customizables';
 
-export const CaptchaElement = () => (
+type CaptchaElementProps = {
+  maxHeight?: string;
+};
+
+export const CaptchaElement = ({ maxHeight }: CaptchaElementProps) => (
   <Box
     id={CAPTCHA_ELEMENT_ID}
-    sx={t => ({ display: 'none', marginBottom: t.space.$6, alignSelf: 'center' })}
+    sx={{ display: 'block', alignSelf: 'center', maxHeight }}
   />
 );

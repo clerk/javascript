@@ -101,7 +101,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       <Col center>
-        <CaptchaElement />
+        <CaptchaElement maxHeight='0' />
         <Form.SubmitButton>Continue</Form.SubmitButton>
       </Col>
     </Form.Root>
