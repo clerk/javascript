@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.46.0
+
+### Minor Changes
+
+- Add a confirmation state that the Application has been successfully claimed on the Keyless prompt. ([#4928](https://github.com/clerk/javascript/pull/4928)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix interactive bot protection widget not appearing on transfer flow ([#4941](https://github.com/clerk/javascript/pull/4941)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/localizations@3.9.12
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
 ## 5.45.2
 
 ### Patch Changes
