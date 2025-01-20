@@ -56,7 +56,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
 }
 
 export async function deleteKeylessAction() {
-  if (!canUseKeyless__server) {
+  if (!canUseKeyless) {
     return null;
   }
 
