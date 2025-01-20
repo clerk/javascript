@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.22.2
+
+### Patch Changes
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+
+## 5.22.1
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/shared@2.20.9
+
 ## 5.22.0
 
 ### Minor Changes

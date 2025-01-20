@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -224,7 +224,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     };
 
     const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (canUseKeyless__server) {
+      if (canUseKeyless) {
         return keylessMiddleware(request, event);
       }
 

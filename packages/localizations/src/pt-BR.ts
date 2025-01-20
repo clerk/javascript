@@ -283,6 +283,7 @@ export const ptBR: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Entrar em contato com o suporte',
         content: 'Se você não tem nenhum dos métodos listados, entre em contato com nosso suporte.',
+        title: undefined,
       },
       subtitle: 'Escolha um dos métodos alternativos para verificar sua identidade.',
       title: 'Métodos alternativos de verificação',
@@ -460,7 +461,7 @@ export const ptBR: LocalizationResource = {
       actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',
@@ -518,7 +519,6 @@ export const ptBR: LocalizationResource = {
         title: 'Continuar',
       },
     },
-
     phoneCode: {
       formSubtitle: 'Insira o código enviado para seu telefone',
       formTitle: 'Código de verificação',
@@ -537,7 +537,6 @@ export const ptBR: LocalizationResource = {
         'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançaremos, entre na lista de espera.',
       title: 'Acesso restrito',
     },
-
     start: {
       actionLink: 'Entrar',
       actionLink__use_email: 'Ou use e-mail',
@@ -556,7 +555,6 @@ export const ptBR: LocalizationResource = {
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
@@ -583,6 +581,7 @@ export const ptBR: LocalizationResource = {
     not_allowed_access: 'Acesso não permitido.',
     organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
     organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
     organization_minimum_permissions_needed:
@@ -602,6 +601,7 @@ export const ptBR: LocalizationResource = {
       sentencePrefix: 'Sua senha deve conter',
     },
     phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',

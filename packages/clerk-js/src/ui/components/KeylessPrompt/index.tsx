@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex, Link } from '../../customizables';
+import { Flex } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -66,8 +66,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
-            '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 210ms cubic-bezier(0.2, 0.9, 0.25, 1)',
+            '0px 0px 0px 0.5px #2F3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.20) inset, 0px 0px 0px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.20);',
+          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -84,7 +84,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 220ms cubic-bezier(0.25, 0.8, 0.25, 1)',
+            transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
           },
         })}
       >
@@ -359,22 +359,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 </>
               ) : (
                 <>
-                  We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
-                  <Link
-                    isExternal
-                    aria-label='Learn more about Clerk keyless mode'
-                    href='https://clerk.com/docs/keyless'
-                    sx={t => ({
-                      color: t.colors.$whiteAlpha600,
-                      textDecoration: 'underline solid',
-                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
-                      ':hover': {
-                        color: t.colors.$whiteAlpha800,
-                      },
-                    })}
-                  >
-                    Learn more
-                  </Link>
+                  We generated temporary API keys for you. Link this application to your Clerk account to configure it.
                 </>
               )}
             </p>
@@ -411,13 +396,13 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                animation: ${isForcedExpanded && 'show-button 590ms ease-in forwards'};
+                animation: ${isForcedExpanded && 'show-button 600ms ease-in forwards'};
                 @keyframes show-button {
                   0%,
-                  8% {
+                  5% {
                     opacity: 0;
                   }
-                  21%,
+                  14%,
                   100% {
                     opacity: 1;
                   }
@@ -438,7 +423,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 }
               `}
             >
-              {claimed ? 'Get API keys' : 'Claim keys'}
+              {claimed ? 'Get API keys' : 'Claim application'}
             </a>
           )}
         </Flex>

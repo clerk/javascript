@@ -449,6 +449,7 @@ export const csCZ: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrovat se',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Použít email',
       actionLink__use_email_username: 'Použít email nebo uživatelské jméno',
       actionLink__use_passkey: 'Použít Passkey',
@@ -458,7 +459,7 @@ export const csCZ: LocalizationResource = {
       actionText__join_waitlist: 'Připojit se k čekací listině',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Přihlásit se',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Ověřovací kód',
@@ -548,7 +549,6 @@ export const csCZ: LocalizationResource = {
     captcha_unavailable:
       'Registrace neúspěšná kvůli selhání ověření botu. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     form_code_incorrect: 'Kód je nesprávný.',
-    form_identifier_exists: 'Tento identifikátor již existuje.',
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
@@ -593,6 +593,7 @@ export const csCZ: LocalizationResource = {
       sentencePrefix: 'Vaše heslo musí obsahovat',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
       goodPassword: 'Dobrá práce. Toto je vynikající heslo.',

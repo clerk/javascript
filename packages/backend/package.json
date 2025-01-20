@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.23.1",
+  "version": "1.23.3",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -87,9 +87,13 @@
     "lint:publint": "publint",
     "lint:attw": "attw --pack . --ignore-rules false-cjs",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
-    "test:node": "vitest --environment node",
-    "test:edge-runtime": "vitest --environment edge-runtime",
-    "test:cloudflare-miniflare": "vitest --environment miniflare"
+    "test:node": "vitest run --environment node",
+    "test:edge-runtime": "vitest run --environment edge-runtime",
+    "test:cloudflare-miniflare": "vitest run --environment miniflare",
+    "test:watch": "run-s test:watch:node test:watch:edge-runtime test:watch:cloudflare-miniflare",
+    "test:watch:node": "vitest watch --environment node",
+    "test:watch:edge-runtime": "vitest watch --environment edge-runtime",
+    "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
@@ -101,7 +105,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@edge-runtime/vm": "5.0.0",
-    "msw": "2.6.4",
+    "msw": "2.7.0",
     "npm-run-all": "^4.1.5",
     "vitest-environment-miniflare": "2.14.4"
   },

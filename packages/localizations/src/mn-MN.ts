@@ -462,7 +462,7 @@ export const mnMN: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
       title: '{{applicationName}} руу нэвтрэх',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Баталгаажуулах код',
@@ -552,7 +552,6 @@ export const mnMN: LocalizationResource = {
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
-    form_identifier_exists: 'Тодорхойлогч аль хэдийн байна.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -598,6 +597,7 @@ export const mnMN: LocalizationResource = {
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',

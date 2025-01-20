@@ -136,7 +136,6 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      visibleDiv.style.display = 'block';
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -166,12 +165,18 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             closeModal?.();
             resolve([token, id]);
           },
-          'before-interactive-callback': async () => {
+          'before-interactive-callback': () => {
             if (modalWrapperQuerySelector) {
               const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
               el?.style.setProperty('visibility', 'visible');
               el?.style.setProperty('pointer-events', 'all');
-              return;
+            } else {
+              const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+              if (visibleWidget) {
+                visibleWidget.style.maxHeight = 'unset';
+                visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
+                visibleWidget.style.marginBottom = '1.5rem';
+              }
             }
           },
           'error-callback': function (errorCode) {
@@ -226,7 +231,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     }
     const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleWidget) {
-      visibleWidget.style.display = 'none';
+      visibleWidget.style.maxHeight = '0';
+      visibleWidget.style.minHeight = 'unset';
+      visibleWidget.style.marginBottom = 'unset';
     }
   }
 

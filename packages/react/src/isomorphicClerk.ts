@@ -61,7 +61,7 @@ import type {
 } from './types';
 import { isConstructor } from './utils';
 
-if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
 }
 
