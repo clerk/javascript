@@ -693,7 +693,7 @@ export const srRS: LocalizationResource = {
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

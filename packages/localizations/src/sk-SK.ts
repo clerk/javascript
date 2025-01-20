@@ -690,7 +690,7 @@ export const skSK: LocalizationResource = {
         resendButton: 'Znovu odoslať odkaz',
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

@@ -691,7 +691,7 @@ export const thTH: LocalizationResource = {
         resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

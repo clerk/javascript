@@ -695,7 +695,7 @@ export const mnMN: LocalizationResource = {
         resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

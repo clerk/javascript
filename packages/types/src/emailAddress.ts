@@ -4,9 +4,9 @@ import type { EmailAddressJSONSnapshot } from './snapshots';
 import type { EmailCodeStrategy, EmailLinkStrategy, EnterpriseSSOStrategy } from './strategies';
 import type {
   CreateEmailLinkFlowReturn,
-  CreateEnterpriseSsoLinkFlowReturn,
+  CreateEnterpriseSSOLinkFlowReturn,
   StartEmailLinkFlowParams,
-  StartEnterpriseSsoLinkFlowParams,
+  StartEnterpriseSSOLinkFlowParams,
   VerificationResource,
 } from './verification';
 
@@ -37,8 +37,8 @@ export interface EmailAddressResource extends ClerkResource {
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
-  createEnterpriseSsoLinkFlow: () => CreateEnterpriseSsoLinkFlowReturn<
-    StartEnterpriseSsoLinkFlowParams,
+  createEnterpriseSSOLinkFlow: () => CreateEnterpriseSSOLinkFlowReturn<
+    StartEnterpriseSSOLinkFlowParams,
     EmailAddressResource
   >;
   destroy: () => Promise<void>;

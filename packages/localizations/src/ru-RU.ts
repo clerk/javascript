@@ -708,7 +708,7 @@ export const ruRU: LocalizationResource = {
         resendButton: 'Отправить ссылку повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

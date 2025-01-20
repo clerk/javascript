@@ -692,7 +692,7 @@ export const jaJP: LocalizationResource = {
         resendButton: 'リンクを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

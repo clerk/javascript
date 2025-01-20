@@ -114,7 +114,7 @@ const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationPa
     case 'email_code':
       return 'userProfile.emailAddressPage.emailCode';
     case 'enterprise_sso':
-      return 'userProfile.emailAddressPage.enterpriseSsoLink';
+      return 'userProfile.emailAddressPage.enterpriseSSOLink';
     case 'email_link':
       return 'userProfile.emailAddressPage.emailLink';
     default:

@@ -700,7 +700,7 @@ export const elGR: LocalizationResource = {
         resendButton: 'Δεν λάβατε κάποιον σύνδεσμο; Επανάληψη αποστολής',
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

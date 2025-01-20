@@ -676,7 +676,7 @@ export const zhCN: LocalizationResource = {
         resendButton: '重发链接',
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

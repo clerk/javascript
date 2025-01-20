@@ -691,7 +691,7 @@ export const arSA: LocalizationResource = {
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

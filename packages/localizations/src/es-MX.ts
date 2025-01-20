@@ -697,7 +697,7 @@ export const esMX: LocalizationResource = {
         resendButton: 'Reenviar enlace',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

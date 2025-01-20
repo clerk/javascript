@@ -690,7 +690,7 @@ export const csCZ: LocalizationResource = {
         resendButton: 'Znovu odeslat odkaz',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

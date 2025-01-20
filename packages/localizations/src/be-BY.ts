@@ -700,7 +700,7 @@ export const beBY: LocalizationResource = {
         resendButton: 'Адправіць спасылку паўторна',
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

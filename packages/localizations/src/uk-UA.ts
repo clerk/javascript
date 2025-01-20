@@ -691,7 +691,7 @@ export const ukUA: LocalizationResource = {
         resendButton: 'Надіслати посилання повторно',
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

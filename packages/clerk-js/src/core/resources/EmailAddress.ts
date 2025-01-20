@@ -2,14 +2,14 @@ import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
-  CreateEnterpriseSsoLinkFlowReturn,
+  CreateEnterpriseSSOLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressJSONSnapshot,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
   StartEmailLinkFlowParams,
-  StartEnterpriseSsoLinkFlowParams,
+  StartEnterpriseSSOLinkFlowParams,
   VerificationResource,
 } from '@clerk/types';
 
@@ -81,15 +81,15 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
-  createEnterpriseSsoLinkFlow = (): CreateEnterpriseSsoLinkFlowReturn<
-    StartEnterpriseSsoLinkFlowParams,
+  createEnterpriseSSOLinkFlow = (): CreateEnterpriseSSOLinkFlowReturn<
+    StartEnterpriseSSOLinkFlowParams,
     EmailAddressResource
   > => {
     const { run, stop } = Poller();
 
-    const startEnterpriseSsoLinkFlow = async ({
+    const startEnterpriseSSOLinkFlow = async ({
       redirectUrl,
-    }: StartEnterpriseSsoLinkFlowParams): Promise<EmailAddressResource> => {
+    }: StartEnterpriseSSOLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
@@ -117,7 +117,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         });
       });
     };
-    return { startEnterpriseSsoLinkFlow, cancelEnterpriseSsoLinkFlow: stop };
+    return { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow: stop };
   };
 
   destroy = (): Promise<void> => this._baseDelete();

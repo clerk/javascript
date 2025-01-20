@@ -698,7 +698,7 @@ export const roRO: LocalizationResource = {
         resendButton: 'Nu ați primit un link? Trimiteți din nou',
         successMessage: 'E-mailul {{identifier}} a fost adăugat în contul dvs.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

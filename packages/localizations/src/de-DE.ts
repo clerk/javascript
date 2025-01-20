@@ -705,7 +705,7 @@ export const deDE: LocalizationResource = {
         resendButton: 'Link erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: 'Ein neuer Tab hat sich geöffnet, schließe die Anmeldung mit {{identifier}} dort ab.',
         resendButton: 'Anmeldung erneut versuchen',
         successMessage: 'Die E-Mail {{identifier}} wurde zu Ihrem Account hinzugefügt.',

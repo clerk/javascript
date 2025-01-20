@@ -690,7 +690,7 @@ export const enUS: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: 'Complete the sign-in with {{identifier}} in the new tab that has opened.',
         resendButton: 'Retry sign-in',
         successMessage: 'The email {{identifier}} has been added to your account.',

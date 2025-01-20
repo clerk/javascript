@@ -5,7 +5,7 @@ import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
-import { useEnterpriseSsoLink } from '../../hooks';
+import { useEnterpriseSSOLink } from '../../hooks';
 import { handleError } from '../../utils';
 
 type VerifyWithEnterpriseConnectionProps = {
@@ -18,7 +18,7 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   const { email, nextStep, onReset } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
-  const { startEnterpriseSsoLinkFlow } = useEnterpriseSsoLink(email);
+  const { startEnterpriseSSOLinkFlow } = useEnterpriseSSOLink(email);
 
   React.useEffect(() => {
     startVerification();
@@ -27,7 +27,7 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   function startVerification() {
     const { mode, componentName } = profileContext;
 
-    startEnterpriseSsoLinkFlow({
+    startEnterpriseSSOLinkFlow({
       redirectUrl:
         mode === 'modal' ? appendModalState({ url: window.location.href, componentName }) : window.location.href,
     })
@@ -38,7 +38,7 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   return (
     <>
       <VerificationLink
-        resendButton={localizationKeys('userProfile.emailAddressPage.enterpriseSsoLink.resendButton')}
+        resendButton={localizationKeys('userProfile.emailAddressPage.enterpriseSSOLink.resendButton')}
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>

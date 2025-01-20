@@ -692,7 +692,7 @@ export const daDK: LocalizationResource = {
         resendButton: 'Send link igen',
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

@@ -698,7 +698,7 @@ export const isIS: LocalizationResource = {
         resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

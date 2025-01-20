@@ -682,7 +682,7 @@ export const heIL: LocalizationResource = {
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

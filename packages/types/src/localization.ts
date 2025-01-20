@@ -502,7 +502,7 @@ type _LocalizationResource = {
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
       };
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: LocalizationValue;
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;

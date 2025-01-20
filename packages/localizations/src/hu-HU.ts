@@ -695,7 +695,7 @@ export const huHU: LocalizationResource = {
         resendButton: 'Nem kaptad meg a linket? Újraküldés',
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

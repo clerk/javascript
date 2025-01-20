@@ -695,7 +695,7 @@ export const itIT: LocalizationResource = {
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

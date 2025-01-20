@@ -693,7 +693,7 @@ export const nlNL: LocalizationResource = {
         resendButton: 'Verstuur link opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

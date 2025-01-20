@@ -692,7 +692,7 @@ export const viVN: LocalizationResource = {
         resendButton: 'Không nhận được liên kết? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

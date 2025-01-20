@@ -692,7 +692,7 @@ export const ptPT: LocalizationResource = {
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,

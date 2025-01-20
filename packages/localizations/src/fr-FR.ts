@@ -700,7 +700,7 @@ export const frFR: LocalizationResource = {
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
-      enterpriseSsoLink: {
+      enterpriseSSOLink: {
         formSubtitle: undefined,
         resendButton: undefined,
         successMessage: undefined,
