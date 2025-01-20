@@ -700,11 +700,11 @@ export const ptBR: LocalizationResource = {
         successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
       },
       enterpriseSsoLink: {
-        formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
+        formSubtitle: 'Complete a autenticação com {{identifier}} na nova janela do navegador que foi aberta.',
+        resendButton: 'Tentar novamente',
+        successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
       },
-      formHint: undefined,
+      formHint: 'Esse endereço de e-mail será verificado utilizando seu método principal de autenticação',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Você não conseguirá fazer login novamente com este endereço de e-mail.',
