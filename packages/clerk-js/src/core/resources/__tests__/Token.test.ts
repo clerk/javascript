@@ -30,7 +30,7 @@ describe('Token', () => {
       });
 
       expect(global.fetch).toHaveBeenCalledWith(
-        `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test-0.0.0`,
+        `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
         // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
         expect.objectContaining({
           method: 'POST',
