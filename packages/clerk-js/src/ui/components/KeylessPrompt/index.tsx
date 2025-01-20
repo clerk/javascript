@@ -471,7 +471,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 }}
                 css={css`
                   ${mainCTAStyles};
-
                   &:hover {
                     background: #4b4b4b;
                     transition: all 120ms ease-in-out;
