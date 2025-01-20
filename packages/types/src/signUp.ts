@@ -1,5 +1,3 @@
-import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from 'snapshots';
-
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
@@ -13,6 +11,7 @@ import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -127,9 +126,11 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+      oidcPrompt?: string;
+      oidcLoginHint?: string;
     }
   | {
-      strategy: SamlStrategy;
+      strategy: SamlStrategy | EnterpriseSSOStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
     };
@@ -171,6 +172,8 @@ export type SignUpCreateParams = Partial<
     ticket: string;
     token: string;
     legalAccepted: boolean;
+    oidcPrompt: string;
+    oidcLoginHint: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 

@@ -465,7 +465,7 @@ export const esMX: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Iniciar sesión',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -555,7 +555,6 @@ export const esMX: LocalizationResource = {
     captcha_unavailable:
       'El registro falló debido a fallos en la validación de bot. Por favor, recargue la página o contáctenos para obtener más asistencia.',
     form_code_incorrect: 'Código incorrecto.',
-    form_identifier_exists: 'Este identificador ya existe.',
     form_identifier_exists__email_address: 'La dirección de correo ya existe.',
     form_identifier_exists__phone_number: 'El número de teléfono ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
@@ -601,6 +600,7 @@ export const esMX: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, trata con otro.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero puede ser más segura. Prueba añadiendo más caracteres.',
       goodPassword: 'Tu contraseña cumple con todos los requisitos necesarios.',

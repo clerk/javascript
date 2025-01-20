@@ -1,19 +1,21 @@
-import type { LoadedClerk, SignUpModes } from '@clerk/types';
+import type { LoadedClerk, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
+import type { RouteContextValue } from '../../router/RouteContext';
 import { completeSignUpFlow } from '../SignUp/util';
 
 type HandleCombinedFlowTransferProps = {
   identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username';
   identifierValue: string;
   signUpMode: SignUpModes;
-  navigate: (to: string) => Promise<unknown>;
+  navigate: RouteContextValue['navigate'];
   organizationTicket?: string;
   afterSignUpUrl: string;
   clerk: LoadedClerk;
   handleError: (err: any) => void;
   redirectUrl?: string;
   redirectUrlComplete?: string;
+  passwordEnabled: boolean;
 };
 
 /**
@@ -31,6 +33,7 @@ export function handleCombinedFlowTransfer({
   handleError,
   redirectUrl,
   redirectUrlComplete,
+  passwordEnabled,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -51,9 +54,13 @@ export function handleCombinedFlowTransfer({
     paramsToForward.set('__clerk_ticket', organizationTicket);
   }
 
-  // Attempt to transfer directly to sign up verification if email or phone was used. The signUp.create() call will
+  // Attempt to transfer directly to sign up verification if email or phone was used, there are no optional fields, and password is not enabled. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
-  if (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber') {
+  if (
+    !passwordEnabled &&
+    !hasOptionalFields(clerk.client.signUp) &&
+    (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber')
+  ) {
     return clerk.client.signUp
       .create({
         [identifierAttribute]: identifierValue,
@@ -72,5 +79,17 @@ export function handleCombinedFlowTransfer({
       .catch(err => handleError(err));
   }
 
-  return navigate(`create?${paramsToForward.toString()}`);
+  return navigate(`create`, { searchParams: paramsToForward });
+}
+
+function hasOptionalFields(signUp: SignUpResource) {
+  const filteredFields = signUp.optionalFields.filter(
+    field =>
+      !field.startsWith('oauth_') &&
+      !field.startsWith('web3_') &&
+      field !== 'password' &&
+      field !== 'enterprise_sso' &&
+      field !== 'saml',
+  );
+  return filteredFields.length > 0;
 }

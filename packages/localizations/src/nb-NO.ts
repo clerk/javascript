@@ -52,7 +52,7 @@ export const nbNO: LocalizationResource = {
   formFieldHintText__optional: 'Valgfritt',
   formFieldHintText__slug: 'En slug er en menneskelesbar ID som må være unik. Den brukes ofte i URL-er.',
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett bruker',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slett konto',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
@@ -461,7 +461,7 @@ export const nbNO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',
@@ -551,7 +551,6 @@ export const nbNO: LocalizationResource = {
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -597,6 +596,7 @@ export const nbNO: LocalizationResource = {
       sentencePrefix: 'Passordet ditt må inneholde',
     },
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
       goodPassword: 'Godt jobbet. Dette er et utmerket passord.',
@@ -675,7 +675,7 @@ export const nbNO: LocalizationResource = {
       title: 'Legg til tilknyttet konto',
     },
     deletePage: {
-      actionDescription: 'Skriv inn "Delete account" under for å fortsette.',
+      actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
       messageLine1: 'Er du sikker på at du vil slette kontoen din?',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',

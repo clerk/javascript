@@ -2,11 +2,12 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
+import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
-  useOptions,
   useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
@@ -37,7 +38,6 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
-  const options = useOptions();
 
   return (
     <Flow.Root flow='signIn'>
@@ -76,7 +76,7 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
-        {options.experimental?.combinedFlow && (
+        {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
               path='verify-email-address'
@@ -145,14 +145,17 @@ function SignInRoutes(): JSX.Element {
 
 function SignInRoot() {
   const signInContext = useSignInContext();
+  const normalizedSignUpContext = {
+    componentName: 'SignUp',
+    emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
+    ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
+    fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
+    ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
+  } as SignUpContextType;
 
   return (
-    <SignUpContext.Provider
-      value={{
-        componentName: 'SignUp',
-        ...signInContext.__experimental?.combinedProps,
-      }}
-    >
+    <SignUpContext.Provider value={normalizedSignUpContext}>
       <SignInRoutes />
     </SignUpContext.Provider>
   );
@@ -176,6 +179,7 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
           componentName: 'SignIn',
           ...signInProps,
           routing: 'virtual',
+          mode: 'modal',
         }}
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}

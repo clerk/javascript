@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
 import React from 'react';
@@ -6,7 +5,7 @@ import React from 'react';
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
-import { canUseKeyless__server } from '../../utils/feature-flags';
+import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
@@ -27,21 +26,33 @@ export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
-  let statePromise: Promise<null | AuthObject> = Promise.resolve(null);
-  let nonce = Promise.resolve('');
 
-  if (dynamic) {
+  async function generateStatePromise() {
+    if (!dynamic) {
+      return Promise.resolve(null);
+    }
     if (isNext13) {
       /**
        * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
        * Without the await here, Next will throw a DynamicServerError during build.
        */
-      statePromise = Promise.resolve(await getDynamicClerkState());
-      nonce = Promise.resolve(await getNonceFromCSPHeader());
-    } else {
-      statePromise = getDynamicClerkState();
-      nonce = getNonceFromCSPHeader();
+      return Promise.resolve(await getDynamicClerkState());
     }
+    return getDynamicClerkState();
+  }
+
+  async function generateNonce() {
+    if (!dynamic) {
+      return Promise.resolve('');
+    }
+    if (isNext13) {
+      /**
+       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+       * Without the await here, Next will throw a DynamicServerError during build.
+       */
+      return Promise.resolve(await getNonceFromCSPHeader());
+    }
+    return getNonceFromCSPHeader();
   }
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
@@ -51,14 +62,14 @@ export async function ClerkProvider(
   let output = (
     <ClientClerkProvider
       {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={await nonce}
-      initialState={await statePromise}
+      nonce={await generateNonce()}
+      initialState={await generateStatePromise()}
     >
       {children}
     </ClientClerkProvider>
   );
 
-  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless__server;
+  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless;
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
@@ -75,8 +86,8 @@ export async function ClerkProvider(
               __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
               __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             })}
-            nonce={await nonce}
-            initialState={await statePromise}
+            nonce={await generateNonce()}
+            initialState={await generateStatePromise()}
           >
             {children}
           </ClientClerkProvider>
@@ -88,7 +99,7 @@ export async function ClerkProvider(
   if (dynamic) {
     return (
       // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
+      <PromisifiedAuthProvider authPromise={generateStatePromise() as unknown as Promise<InitialState>}>
         {output}
       </PromisifiedAuthProvider>
     );

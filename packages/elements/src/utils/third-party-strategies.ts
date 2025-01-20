@@ -4,6 +4,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import type {
+  EnterpriseSSOStrategy,
   EnvironmentResource,
   OAuthProvider,
   OAuthStrategy,
@@ -21,7 +22,7 @@ export type ThirdPartyStrategy =
       name: string;
     }
   | {
-      strategy: SamlStrategy;
+      strategy: SamlStrategy | EnterpriseSSOStrategy;
       iconUrl?: never;
       name: string;
     };
@@ -33,7 +34,7 @@ export type ThirdPartyProvider =
       name: string;
     }
   | {
-      strategy: SamlStrategy;
+      strategy: SamlStrategy | EnterpriseSSOStrategy;
       iconUrl?: never;
       name: string;
     };
@@ -70,6 +71,10 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
 
 export function isSamlStrategy(strategy: any): strategy is SamlStrategy {
   return strategy === 'saml';
+}
+
+export function isEnterpriseSSOStrategy(strategy: any): strategy is EnterpriseSSOStrategy {
+  return strategy === 'enterprise_sso';
 }
 
 export function isWeb3Strategy(

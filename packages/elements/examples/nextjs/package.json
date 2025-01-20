@@ -28,8 +28,8 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.3",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.6.3"
   }
 }

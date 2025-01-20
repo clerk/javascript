@@ -460,7 +460,7 @@ export const daDK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Log ind',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',
@@ -542,7 +542,7 @@ export const daDK: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Vælg en metode til at fortsætte',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -550,7 +550,6 @@ export const daDK: LocalizationResource = {
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
-    form_identifier_exists: 'Identifikatoren findes allerede.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
@@ -595,6 +594,7 @@ export const daDK: LocalizationResource = {
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',

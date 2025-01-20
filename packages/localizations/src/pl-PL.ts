@@ -51,20 +51,20 @@ export const plPL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Link weryfikacyjny wygasł. Spróbuj ponownie.',
   formFieldHintText__optional: 'Opcjonalne',
   formFieldHintText__slug: 'Jest to unikalne ID, które jest czytelne dla człowieka, często używane w adresach URL.',
-  formFieldInputPlaceholder__backupCode: undefined,
+  formFieldInputPlaceholder__backupCode: 'Wprowadź kod zapasowy',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Usuń konto',
-  formFieldInputPlaceholder__emailAddress: undefined,
-  formFieldInputPlaceholder__emailAddress_username: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Wprowadź adres email',
+  formFieldInputPlaceholder__emailAddress_username: 'Adres e-mail lub nazwa użytkownika',
   formFieldInputPlaceholder__emailAddresses:
     'Wprowadź lub wklej jeden lub więcej adresów e-mail, oddzielonych spacjami lub przecinkami',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
-  formFieldInputPlaceholder__organizationDomain: undefined,
-  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
-  formFieldInputPlaceholder__organizationName: undefined,
-  formFieldInputPlaceholder__organizationSlug: undefined,
-  formFieldInputPlaceholder__password: undefined,
-  formFieldInputPlaceholder__phoneNumber: undefined,
+  formFieldInputPlaceholder__firstName: 'Imię',
+  formFieldInputPlaceholder__lastName: 'Nazwisko',
+  formFieldInputPlaceholder__organizationDomain: 'example.com',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: 'jan.kowalski@example.com',
+  formFieldInputPlaceholder__organizationName: 'Nazwa organizacji',
+  formFieldInputPlaceholder__organizationSlug: 'moja-organizacja',
+  formFieldInputPlaceholder__password: 'Wprowadź swoje hasło',
+  formFieldInputPlaceholder__phoneNumber: 'Wprowadź numer telefonu',
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Włącz automatyczne zaproszenia dla tej domeny',
   formFieldLabel__backupCode: 'Kod zapasowy',
@@ -84,7 +84,7 @@ export const plPL: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Nazwa organizacji',
   formFieldLabel__organizationSlug: 'Slug URL',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'Nazwa klucza dostępu',
   formFieldLabel__password: 'Hasło',
   formFieldLabel__phoneNumber: 'Numer telefonu',
   formFieldLabel__role: 'Rola',
@@ -94,7 +94,7 @@ export const plPL: LocalizationResource = {
     action__signOut: 'Wyloguj',
     title: 'Zalogowano jako {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode: 'Aktualnie trwają prace konserwacyjne, ale nie powinno to zająć dłużej niż kilka minut.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Użytkownik',
   membershipRole__guestMember: 'Gość',
@@ -339,7 +339,7 @@ export const plPL: LocalizationResource = {
       blockButton__backupCode: 'Użyj kodu zapasowego',
       blockButton__emailCode: 'Wyślij kod do {{identifier}}',
       blockButton__emailLink: 'Wyślij link do {{identifier}}',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'Zaloguj się za pomocą klucza dostępowego',
       blockButton__password: 'Zaloguj się za pomocą hasła',
       blockButton__phoneCode: 'Wyślij kod do {{identifier}}',
       blockButton__totp: 'Użyj aplikacji uwierzytelniającej',
@@ -364,8 +364,9 @@ export const plPL: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'Aby kontynuować, otwórz link weryfikacyjny na urządzeniu i w przeglądarce, w której rozpocząłeś logowanie',
+        title: 'Link weryfikacyjny jest nieprawidłowy dla tego urządzenia',
       },
       expired: {
         subtitle: 'Powróć do oryginalnej karty, aby kontynuować.',
@@ -416,8 +417,9 @@ export const plPL: LocalizationResource = {
       title: 'Nie można się zalogować',
     },
     passkey: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle:
+        'Użycie klucza dostępu potwierdza, że to Ty. Urządzenie może poprosić o twój odcisk palca, twarz lub blokadę ekranu.',
+      title: 'Użyj swojego klucza dostępowego',
     },
     password: {
       actionLink: 'Użyj innego sposobu',
@@ -425,7 +427,7 @@ export const plPL: LocalizationResource = {
       title: 'Wprowadź swoje hasło',
     },
     passwordPwned: {
-      title: undefined,
+      title: 'Hasło skompromitowane',
     },
     phoneCode: {
       formTitle: 'Kod weryfikacyjny',
@@ -436,7 +438,7 @@ export const plPL: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Kod weryfikacyjny',
       resendButton: 'Wyślij kod ponownie',
-      subtitle: undefined,
+      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wysłany na Twój telefon',
       title: 'Sprawdź swój telefon',
     },
     resetPassword: {
@@ -450,21 +452,21 @@ export const plPL: LocalizationResource = {
     },
     start: {
       actionLink: 'Zarejestruj się',
-      actionLink__join_waitlist: undefined,
+      actionLink__join_waitlist: 'Dołącz do listy oczekujących',
       actionLink__use_email: 'Użyj adresu e-mail',
       actionLink__use_email_username: 'Użyj adresu e-mail lub nazwy użytkownika',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'Użyj klucza dostępowego',
       actionLink__use_phone: 'Użyj numeru telefonu',
       actionLink__use_username: 'Użyj nazwy użytkownika',
       actionText: 'Nie masz konta?',
-      actionText__join_waitlist: undefined,
+      actionText__join_waitlist: 'Chcesz otrzymać wczesny dostęp?',
       subtitle: 'aby przejść do {{applicationName}}',
       title: 'Zaloguj się',
-      __experimental_titleCombined: undefined,
+      titleCombined: 'Kontynuuj do {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Kod weryfikacyjny',
-      subtitle: undefined,
+      subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez aplikację uwierzytelniającą',
       title: 'Weryfikacja dwustopniowa',
     },
   },
@@ -485,8 +487,9 @@ export const plPL: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'Aby kontynuować, otwórz link weryfikacyjny na urządzeniu i w przeglądarce, w której rozpocząłeś rejestrację',
+        title: 'Link weryfikacyjny jest nieprawidłowy dla tego urządzenia',
       },
       formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój adres e-mail',
       formTitle: 'Link weryfikacyjny',
@@ -507,13 +510,14 @@ export const plPL: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Akceptuję {{ privacyPolicyLink || link("Polityką prywatności") }}',
+        label__onlyTermsOfService: 'Akceptuję {{ termsOfServiceLink || link("Warunki świadczenia usługi") }}"',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Akceptuję {{ termsOfServiceLink || link("Warunki świadczenia usługi") }} i {{ privacyPolicyLink || link("Politykę prywatności") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Przeczytaj i zaakceptuj warunki, aby kontynuować',
+        title: 'Zgadzam się',
       },
     },
     phoneCode: {
@@ -524,18 +528,20 @@ export const plPL: LocalizationResource = {
       title: 'Zweryfikuj swój numer telefonu',
     },
     restrictedAccess: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__emailSupport: undefined,
-      blockButton__joinWaitlist: undefined,
-      subtitle: undefined,
-      subtitleWaitlist: undefined,
-      title: undefined,
+      actionLink: 'Zaloguj się',
+      actionText: 'Masz już konto?',
+      blockButton__emailSupport: 'Skontaktuj się z pomocą',
+      blockButton__joinWaitlist: 'Dołącz do listy oczekujących',
+      subtitle:
+        'Rejestracja jest obecnie wyłączona. Jeśli uważasz, że powinieneś mieć dostęp, skontaktuj się z pomocą techniczną.',
+      subtitleWaitlist:
+        'Rejestracja jest obecnie wyłączona. Aby dowiedzieć się jako pierwszy o naszym starcie, dołącz do listy oczekujących.',
+      title: 'Access restricted',
     },
     start: {
       actionLink: 'Zaloguj się',
-      actionLink__use_email: undefined,
-      actionLink__use_phone: undefined,
+      actionLink__use_email: 'Użyj adresu e-mail',
+      actionLink__use_phone: 'Użyj numeru telefonu',
       actionText: 'Masz już konto?',
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Utwórz swoje konto',
@@ -550,7 +556,6 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -595,6 +600,7 @@ export const plPL: LocalizationResource = {
       sentencePrefix: 'Twoje hasło musi zawierać',
     },
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
       goodPassword: 'Twoje hasło jest wystarczająco silne.',
@@ -768,11 +774,11 @@ export const plPL: LocalizationResource = {
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} zostanie usunięty z tego konta.',
+        title: 'Usuń klucz dostępu',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'Możesz zmienić nazwę klucza dostępu aby go łatwiej znaleźć.',
+      title__rename: 'Zmień nazwę klucza dostępu',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -816,7 +822,7 @@ export const plPL: LocalizationResource = {
         actionLabel__reauthorize: 'Autoryzuj teraz',
         destructiveActionTitle: 'Odłącz',
         primaryButton: 'Połącz konto',
-        subtitle__disconnected: undefined,
+        subtitle__disconnected: 'To konto zostało odłączone',
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Połączone konta',
@@ -858,9 +864,9 @@ export const plPL: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'Usuń',
+        menuAction__rename: 'Zmień nazwę',
+        title: 'Klucze dostępu',
       },
       passwordSection: {
         primaryButton__setPassword: 'Ustaw hasło',
@@ -876,7 +882,7 @@ export const plPL: LocalizationResource = {
         title: 'Numery telefonów',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Zaaktualizuj profil',
         title: 'Profil',
       },
       usernameSection: {

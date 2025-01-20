@@ -22,7 +22,7 @@ function Page1() {
 export default function Page() {
   return (
     <PageContextProvider>
-      <UserButton>
+      <UserButton fallback={<>Loading user button</>}>
         <UserButton.UserProfilePage
           label={'Page 1'}
           labelIcon={<p data-label-icon={'page-1'}>🙃</p>}

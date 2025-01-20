@@ -11,33 +11,18 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
+import { canUseKeyless } from '../utils/feature-flags';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import {
+  authSignatureInvalid,
+  encryptionKeyInvalid,
+  encryptionKeyInvalidDev,
+  missingDomainAndProxy,
+  missingSignInUrlInDev,
+} from './errors';
 import { errorThrower } from './errorThrower';
+import { detectClerkMiddleware, isNextRequest } from './headers-utils';
 import type { RequestLike } from './types';
-
-export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
-  // @ts-expect-error - TS doesn't like indexing into RequestLike
-  return key in req ? req[key] : undefined;
-}
-
-export function getAuthKeyFromRequest(
-  req: RequestLike,
-  key: keyof typeof constants.Attributes,
-): string | null | undefined {
-  return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
-}
-
-export function getHeader(req: RequestLike, name: string): string | null | undefined {
-  if (isNextRequest(req)) {
-    return req.headers.get(name);
-  }
-
-  // If no header has been determined for IncomingMessage case, check if available within private `socket` headers
-  // When deployed to vercel, req.headers for API routes is a `IncomingHttpHeaders` key-val object which does not follow
-  // the Headers spec so the name is no longer case-insensitive.
-  return req.headers[name] || req.headers[name.toLowerCase()] || (req.socket as any)?._httpMessage?.getHeader(name);
-}
 
 export function getCookie(req: RequestLike, name: string): string | undefined {
   if (isNextRequest(req)) {
@@ -52,19 +37,6 @@ export function getCookie(req: RequestLike, name: string): string | undefined {
     return typeof reqCookieOrString === 'string' ? reqCookieOrString : reqCookieOrString.value;
   }
   return req.cookies[name];
-}
-
-function isNextRequest(val: unknown): val is NextRequest {
-  try {
-    const { headers, nextUrl, cookies } = (val || {}) as NextRequest;
-    return (
-      typeof headers?.get === 'function' &&
-      typeof nextUrl?.searchParams.get === 'function' &&
-      typeof cookies?.get === 'function'
-    );
-  } catch (e) {
-    return false;
-  }
 }
 
 const OVERRIDE_HEADERS = 'x-middleware-override-headers';
@@ -152,10 +124,6 @@ export function decorateRequest(
   return res;
 }
 
-export const apiEndpointUnauthorizedNextResponse = () => {
-  return NextResponse.json(null, { status: 401, statusText: 'Unauthorized' });
-};
-
 export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: AuthenticateRequestOptions) => {
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, clerkRequest.clerkUrl, PROXY_URL);
 
@@ -191,9 +159,7 @@ export const redirectAdapter = (url: string | URL) => {
 };
 
 export function assertAuthStatus(req: RequestLike, error: string) {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-
-  if (!authStatus) {
+  if (!detectClerkMiddleware(req)) {
     throw new Error(error);
   }
 }
@@ -280,10 +246,34 @@ export function decryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, maybeKeylessEncryptionKey);
-    const encoded = decryptedBytes.toString(encUtf8);
-    return JSON.parse(encoded);
+    return decryptData(encryptedRequestData, maybeKeylessEncryptionKey);
   } catch (err) {
+    /**
+     * There is a great chance when running in Keyless mode that the above fails,
+     * because the keys hot-swapped and the Next.js dev server has not yet fully rebuilt middleware and routes.
+     *
+     * Attempt one more time with the default dummy value.
+     */
+    if (canUseKeyless) {
+      try {
+        return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
+      } catch (e) {
+        throwInvalidEncryptionKey();
+      }
+    }
+    throwInvalidEncryptionKey();
+  }
+}
+
+function throwInvalidEncryptionKey(): never {
+  if (isProductionEnvironment()) {
     throw new Error(encryptionKeyInvalid);
   }
+  throw new Error(encryptionKeyInvalidDev);
+}
+
+function decryptData(data: string, key: string) {
+  const decryptedBytes = AES.decrypt(data, key);
+  const encoded = decryptedBytes.toString(encUtf8);
+  return JSON.parse(encoded);
 }

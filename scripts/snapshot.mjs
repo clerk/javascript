@@ -8,7 +8,6 @@ const snapshot = `---
 '@clerk/chrome-extension': patch
 '@clerk/localizations': patch
 '@clerk/clerk-js': patch
-'@clerk/clerk-sdk-node': patch
 '@clerk/backend': patch
 '@clerk/fastify': patch
 '@clerk/nextjs': patch

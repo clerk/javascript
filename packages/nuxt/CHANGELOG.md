@@ -1,5 +1,124 @@
 # @clerk/nuxt
 
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/backend@1.23.4
+  - @clerk/shared@2.20.11
+  - @clerk/vue@1.1.3
+
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+  - @clerk/backend@1.23.3
+  - @clerk/vue@1.1.2
+
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/backend@1.23.2
+  - @clerk/shared@2.20.9
+  - @clerk/vue@1.1.1
+
+## 1.0.5
+
+### Patch Changes
+
+- Support async middleware handler ([#4888](https://github.com/clerk/javascript/pull/4888)) by [@IceHugh](https://github.com/IceHugh)
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/vue@1.1.0
+  - @clerk/backend@1.23.1
+  - @clerk/shared@2.20.8
+
+## 1.0.4
+
+### Patch Changes
+
+- Add quickstart links to Vue and Nuxt SDK READMEs ([#4883](https://github.com/clerk/javascript/pull/4883)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`e9e8834f7bfc953c3ae66fedf65b6952689c49da`](https://github.com/clerk/javascript/commit/e9e8834f7bfc953c3ae66fedf65b6952689c49da), [`e45d455b78fde898720d67637cec52446f5ffc80`](https://github.com/clerk/javascript/commit/e45d455b78fde898720d67637cec52446f5ffc80), [`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6), [`7182b93101518a389cc13859f8a0fe8bd6f37a06`](https://github.com/clerk/javascript/commit/7182b93101518a389cc13859f8a0fe8bd6f37a06)]:
+  - @clerk/backend@1.23.0
+  - @clerk/vue@1.0.3
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`72d29538f587934309da96fc1c6d454bb9aad21e`](https://github.com/clerk/javascript/commit/72d29538f587934309da96fc1c6d454bb9aad21e), [`84867be0215d7f74d8be7b4f803e2c3a241e2f89`](https://github.com/clerk/javascript/commit/84867be0215d7f74d8be7b4f803e2c3a241e2f89), [`fa967ce79e1b5f2e8216eb09900879cb825fa528`](https://github.com/clerk/javascript/commit/fa967ce79e1b5f2e8216eb09900879cb825fa528)]:
+  - @clerk/backend@1.22.0
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/backend@1.21.6
+  - @clerk/types@4.40.2
+  - @clerk/shared@2.20.6
+  - @clerk/vue@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd), [`632bde1536753087902917a319a4a8d9fd043923`](https://github.com/clerk/javascript/commit/632bde1536753087902917a319a4a8d9fd043923)]:
+  - @clerk/types@4.40.1
+  - @clerk/vue@1.0.1
+  - @clerk/backend@1.21.5
+  - @clerk/shared@2.20.5
+
+## 1.0.0
+
+### Major Changes
+
+- Introduce the official Clerk SDK for Vue and Nuxt. ([#4791](https://github.com/clerk/javascript/pull/4791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix Vite optimization issue that caused duplicate versions of @clerk/vue to be created on first load, resulting in the Vue plugin losing context. ([#4820](https://github.com/clerk/javascript/pull/4820)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8ad1866264ce5cf60a125d3a270597e8044b04c7`](https://github.com/clerk/javascript/commit/8ad1866264ce5cf60a125d3a270597e8044b04c7)]:
+  - @clerk/vue@1.0.0
+
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`b3300c84a42276bd071a37addbd1ca6888ed9d7c`](https://github.com/clerk/javascript/commit/b3300c84a42276bd071a37addbd1ca6888ed9d7c), [`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2), [`aeb5855853e5e89a03a1d6ce3d421c3e9870c814`](https://github.com/clerk/javascript/commit/aeb5855853e5e89a03a1d6ce3d421c3e9870c814)]:
+  - @clerk/backend@1.21.4
+  - @clerk/types@4.40.0
+  - @clerk/vue@0.1.5
+  - @clerk/shared@2.20.4
+
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+  - @clerk/backend@1.21.3
+  - @clerk/vue@0.1.4
+
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`dfdf23bc9a25ebc13df98d553454a14c765423bb`](https://github.com/clerk/javascript/commit/dfdf23bc9a25ebc13df98d553454a14c765423bb)]:
+  - @clerk/vue@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

@@ -23,8 +23,6 @@ type UseAuth = (initialAuthState?: any) => UseAuthReturn;
  * simply by using the `ClerkProvider`.
  *
  * @example
- * A simple example:
- *
  * import { useAuth } from '@clerk/clerk-react'
  *
  * function Hello() {
@@ -33,17 +31,6 @@ type UseAuth = (initialAuthState?: any) => UseAuthReturn;
  *     return null;
  *   }
  *   console.log(sessionId, userId)
- *   return <div>...</div>
- * }
- *
- * @example
- * Basic example in a NextJs app. This page will be fully rendered during SSR:
- *
- * import { useAuth } from '@clerk/nextjs'
- *
- * export HelloPage = () => {
- *   const { isSignedIn, sessionId, userId } = useAuth();
- *   console.log(isSignedIn, sessionId, userId)
  *   return <div>...</div>
  * }
  */

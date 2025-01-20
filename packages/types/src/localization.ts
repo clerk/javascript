@@ -17,15 +17,19 @@ type _LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
+   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    * @experimental
-   * Add role keys and their localized value
-   * e.g. roles:{ 'org:teacher': 'Teacher'}
    */
   roles: {
     [r: string]: LocalizationValue;
   };
   socialButtonsBlockButton: LocalizationValue;
-  socialButtonsBlockButtonManyInView: LocalizationValue;
+  /**
+   * It should be used to provide a shorter variation of `socialButtonsBlockButton`.
+   * It is explicitly typed, in order to avoid contributions that use LLM tools to generate
+   * translations that misinterpret the correct usage of this property.
+   */
+  socialButtonsBlockButtonManyInView: `${string}{{provider|titleize}}${string}`;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
@@ -168,7 +172,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
-      __experimental_titleCombined: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
@@ -835,6 +839,7 @@ type UnstableErrors = WithParamName<{
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
+  web3_missing_identifier: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;

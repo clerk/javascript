@@ -21,18 +21,22 @@ const CLERK_HIDDEN = '.clerk';
  */
 const CLERK_LOCK = 'clerk.lock';
 
+const throwMissingFsModule = () => {
+  throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+};
+
 /**
  * The `.clerk/` is NOT safe to be commited as it may include sensitive information about a Clerk instance.
  * It may include an instance's secret key and the secret token for claiming that instance.
  */
 function updateGitignore() {
   if (!nodeRuntime.fs) {
-    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+    throwMissingFsModule();
   }
   const { existsSync, writeFileSync, readFileSync, appendFileSync } = nodeRuntime.fs;
 
   if (!nodeRuntime.path) {
-    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
+    throwMissingFsModule();
   }
   const gitignorePath = nodeRuntime.path.join(process.cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
@@ -41,14 +45,15 @@ function updateGitignore() {
 
   // Check if `.clerk/` entry exists in .gitignore
   const gitignoreContent = readFileSync(gitignorePath, 'utf-8');
+  const COMMENT = `# clerk configuration (can include secrets)`;
   if (!gitignoreContent.includes(CLERK_HIDDEN + '/')) {
-    appendFileSync(gitignorePath, `\n${CLERK_HIDDEN}/\n`);
+    appendFileSync(gitignorePath, `\n${COMMENT}\n/${CLERK_HIDDEN}/\n`);
   }
 }
 
 const generatePath = (...slugs: string[]) => {
   if (!nodeRuntime.path) {
-    throw "Clerk: fsModule.path is missing. This is an internal error. Please contact Clerk's support.";
+    throwMissingFsModule();
   }
   return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
 };
@@ -61,7 +66,7 @@ let isCreatingFile = false;
 
 function safeParseClerkFile(): AccountlessApplication | undefined {
   if (!nodeRuntime.fs) {
-    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+    throwMissingFsModule();
   }
   const { readFileSync } = nodeRuntime.fs;
   try {
@@ -79,13 +84,13 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
 }
 
 const createMessage = (keys: AccountlessApplication) => {
-  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running on keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
+  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 };
 
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
   if (!nodeRuntime.fs) {
     // This should never happen.
-    throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+    throwMissingFsModule();
   }
   const { existsSync, writeFileSync, mkdirSync, rmSync } = nodeRuntime.fs;
 
@@ -152,7 +157,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   // TODO-KEYLESS: Add link to official documentation.
   const README_NOTIFICATION = `
 ## DO NOT COMMIT
-This directory is auto-generated from \`@clerk/nextjs\` because you are running on Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
+This directory is auto-generated from \`@clerk/nextjs\` because you are running in Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
   `;
 
   writeFileSync(README_PATH, README_NOTIFICATION, {

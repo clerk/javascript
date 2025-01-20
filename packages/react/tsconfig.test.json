@@ -7,5 +7,7 @@
     "strict": false,
     "importHelpers": false,
     "sourceMap": true
-  }
+  },
+  "include": ["src/global.d.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": []
 }

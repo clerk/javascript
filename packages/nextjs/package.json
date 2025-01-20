@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.9.2",
+  "version": "6.9.15",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -62,7 +62,8 @@
     "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
@@ -76,9 +77,7 @@
   "devDependencies": {
     "@clerk/eslint-config-custom": "workspace:*",
     "@types/crypto-js": "4.2.2",
-    "@types/node": "^18.19.33",
-    "next": "^14.2.20",
-    "typescript": "catalog:repo"
+    "next": "^14.2.20"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15.0.0",

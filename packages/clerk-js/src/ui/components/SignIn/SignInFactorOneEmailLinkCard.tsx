@@ -45,7 +45,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const startEmailLinkVerification = () => {
     startEmailLinkFlow({
       emailAddressId: props.factor.emailAddressId,
-      redirectUrl: buildEmailLinkRedirectUrl(signInContext, signInUrl),
+      redirectUrl: buildEmailLinkRedirectUrl({ ctx: signInContext, baseUrl: signInUrl, intent: 'sign-in' }),
     })
       .then(res => handleVerificationResult(res))
       .catch(err => {

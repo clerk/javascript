@@ -1,5 +1,93 @@
 # Change Log
 
+## 5.22.3
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
+## 5.22.2
+
+### Patch Changes
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+
+## 5.22.1
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/shared@2.20.9
+
+## 5.22.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/shared@2.20.8
+
+## 5.21.3
+
+### Patch Changes
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
+## 5.21.2
+
+### Patch Changes
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/types@4.40.2
+  - @clerk/shared@2.20.6
+
+## 5.21.1
+
+### Patch Changes
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
+## 5.21.0
+
+### Minor Changes
+
+- Adds support for a `fallback` prop on Clerk's components. This allows rendering of a placeholder element while Clerk's components are mounting. Use this to help mitigate layout shift when using Clerk's components. Example usage: ([#4723](https://github.com/clerk/javascript/pull/4723)) by [@BRKalow](https://github.com/BRKalow)
+
+  ```tsx
+  <SignIn fallback={<LoadingSkeleton />} />
+  ```
+
+- Allow `<SignInButton />`, `<SignUpButton />`, `<SignOutButton />`, and `<SignInWithMetamaskButton />` to render while clerk-js is still loading. This reduces any layout shift that might be caused by these components not rendering immediately. ([#4810](https://github.com/clerk/javascript/pull/4810)) by [@BRKalow](https://github.com/BRKalow)
+
+## 5.20.4
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/shared@2.20.4
+
+## 5.20.3
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
 ## 5.20.2
 
 ### Patch Changes

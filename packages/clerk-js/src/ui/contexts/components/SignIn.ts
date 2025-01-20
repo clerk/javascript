@@ -1,9 +1,11 @@
 import { useClerk } from '@clerk/shared/react';
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
+import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -21,6 +23,9 @@ export type SignInContextType = SignInCtx & {
   afterSignInUrl: string;
   transferable: boolean;
   waitlistUrl: string;
+  emailLinkRedirectUrl: string;
+  ssoCallbackUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -37,9 +42,12 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, ..._ctx } = context;
-  const ctx = _ctx.__experimental?.combinedProps || _ctx;
+  const isCombinedFlow =
+    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
+    context.withSignUp ||
+    false;
 
+  const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
     [],
@@ -53,6 +61,7 @@ export const useSignInContext = (): SignInContextType => {
       signInForceRedirectUrl: ctx.forceRedirectUrl,
     },
     queryParams,
+    mode,
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
@@ -64,15 +73,31 @@ export const useSignInContext = (): SignInContextType => {
   // SignIn's own options won't have a `signInUrl` property, so we have to get the value
   // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
-  let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
+  let signUpUrl = isCombinedFlow
+    ? (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl
+    : ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
   let waitlistUrl = ctx.waitlistUrl || options.waitlistUrl || displayConfig.waitlistUrl;
 
   const preservedParams = redirectUrls.getPreservedSearchParams();
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  const emailLinkRedirectUrl = buildRedirectUrl({
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+    authQueryString: '',
+    path: ctx.path,
+    endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
+  });
+  const ssoCallbackUrl = buildRedirectUrl({
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+    authQueryString: '',
+    path: ctx.path,
+    endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+  });
 
-  if (options.experimental?.combinedFlow) {
+  if (isCombinedFlow) {
     signUpUrl = buildURL(
       { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
       { stringify: true },
@@ -82,7 +107,7 @@ export const useSignInContext = (): SignInContextType => {
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   return {
-    ...ctx,
+    ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
     componentName,
     signUpUrl,
@@ -90,10 +115,13 @@ export const useSignInContext = (): SignInContextType => {
     waitlistUrl,
     afterSignInUrl,
     afterSignUpUrl,
+    emailLinkRedirectUrl,
+    ssoCallbackUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString: redirectUrls.toSearchParams().toString(),
+    isCombinedFlow,
   };
 };

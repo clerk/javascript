@@ -4,7 +4,6 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
-  SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -61,7 +60,7 @@ const CustomPortalsRenderer = defineComponent((props: CustomPortalsRendererProps
  * The component only mounts when Clerk is fully loaded and automatically
  * handles cleanup on unmount.
  */
-const Portal = defineComponent((props: MountProps) => {
+export const Portal = defineComponent((props: MountProps) => {
   const portalRef = ref<HTMLDivElement | null>(null);
   const isPortalMounted = ref(false);
   // Make the props reactive so the watcher can react to changes
@@ -255,18 +254,6 @@ export const GoogleOneTap = defineComponent((props: GoogleOneTapProps) => {
     h(Portal, {
       mount: () => clerk.value?.openGoogleOneTap(props),
       unmount: clerk.value?.closeGoogleOneTap,
-    });
-});
-
-export const SignIn = defineComponent((props: SignInProps) => {
-  const clerk = useClerk();
-
-  return () =>
-    h(Portal, {
-      mount: clerk.value?.mountSignIn,
-      unmount: clerk.value?.unmountSignIn,
-      updateProps: (clerk.value as any)?.__unstable__updateProps,
-      props,
     });
 });
 

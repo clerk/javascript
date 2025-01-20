@@ -20,14 +20,26 @@ type GetInvitationListParams = ClerkPaginationRequest<{
    * Filters invitations based on their status(accepted, pending, revoked).
    *
    * @example
-   * get all revoked invitations
-   *
+   * Get all revoked invitations
+   * ```ts
    * import { createClerkClient } from '@clerk/backend';
    * const clerkClient = createClerkClient(...)
-   * await clerkClient.invitations.getInvitationList({ status: 'revoked })
-   *
+   * await clerkClient.invitations.getInvitationList({ status: 'revoked' })
+   * ```
    */
   status?: 'accepted' | 'pending' | 'revoked';
+  /**
+   * Filters invitations based on `email_address` or `id`.
+   *
+   * @example
+   * Get all invitations for a specific email address
+   * ```ts
+   * import { createClerkClient } from '@clerk/backend';
+   * const clerkClient = createClerkClient(...)
+   * await clerkClient.invitations.getInvitationList({ query: 'user@example.com' })
+   * ```
+   */
+  query?: string;
 }>;
 
 export class InvitationAPI extends AbstractAPI {

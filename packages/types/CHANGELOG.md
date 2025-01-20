@@ -1,5 +1,62 @@
 # Change Log
 
+## 4.41.2
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.41.1
+
+### Patch Changes
+
+- Support `enterprise_sso` strategy (SAML, OIDC, EASIE) on custom flows with `@clerk/elements` ([#4916](https://github.com/clerk/javascript/pull/4916)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.41.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve runtime prop checking for single-file components ([#4902](https://github.com/clerk/javascript/pull/4902)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Skip fraud protection if client has bypass enabled ([#4907](https://github.com/clerk/javascript/pull/4907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.40.3
+
+### Patch Changes
+
+- Update `socialButtonsBlockButtonManyInView` to only accept `'${string}{{provider|titleize}}${string}'` or `undefined`. ([#4887](https://github.com/clerk/javascript/pull/4887)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.40.2
+
+### Patch Changes
+
+- Add type-level validation to prevent server-side usage of system permissions ([#4816](https://github.com/clerk/javascript/pull/4816)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  System permissions (e.g., `org:sys_domains:manage`) are intentionally excluded from session claims to maintain reasonable JWT sizes. For more information, refer to our docs: https://clerk.com/docs/organizations/roles-permissions#system-permissions
+
+## 4.40.1
+
+### Patch Changes
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.40.0
+
+### Minor Changes
+
+- Adds `oidcLoginHint` & `oidcPrompt` parameters to following types: ([#4789](https://github.com/clerk/javascript/pull/4789)) by [@octoper](https://github.com/octoper)
+
+  - `ReauthorizeExternalAccountParams`
+  - `OAuthConfig`
+  - `SignInCreateParams`
+  - `PrepareVerificationParams`
+  - `SignUpCreateParams`
+  - `CreateExternalAccountParams`
+
 ## 4.39.4
 
 ### Patch Changes

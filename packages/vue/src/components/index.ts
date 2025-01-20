@@ -1,6 +1,5 @@
 export {
   SignUp,
-  SignIn,
   UserProfile,
   UserButton,
   OrganizationSwitcher,
@@ -10,6 +9,7 @@ export {
   GoogleOneTap,
   Waitlist,
 } from './uiComponents';
+export { default as SignIn } from './ui-components/SignIn.vue';
 
 export {
   ClerkLoaded,
@@ -25,7 +25,7 @@ export {
   RedirectToOrganizationProfile,
 } from './controlComponents';
 
-export { SignInButton } from './SignInButton';
+export { default as SignInButton } from './SignInButton.vue';
 export { SignUpButton } from './SignUpButton';
 export { SignOutButton } from './SignOutButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';

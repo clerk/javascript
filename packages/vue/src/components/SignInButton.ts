@@ -6,7 +6,12 @@ import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type SignInButtonProps = Pick<
   SignInProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+  | 'fallbackRedirectUrl'
+  | 'forceRedirectUrl'
+  | 'signUpForceRedirectUrl'
+  | 'signUpFallbackRedirectUrl'
+  | 'initialValues'
+  | 'withSignUp'
 >;
 
 export const SignInButton = defineComponent(
@@ -25,8 +30,10 @@ export const SignInButton = defineComponent(
         return clerk.value?.openSignIn(opts);
       }
 
+      const { withSignUp, ...redirectOpts } = opts;
+
       void clerk.value?.redirectToSignIn({
-        ...opts,
+        ...redirectOpts,
         signInFallbackRedirectUrl: props.fallbackRedirectUrl,
         signInForceRedirectUrl: props.forceRedirectUrl,
       });
@@ -42,6 +49,14 @@ export const SignInButton = defineComponent(
     };
   },
   {
-    props: ['signUpForceRedirectUrl', 'signUpFallbackRedirectUrl', 'fallbackRedirectUrl', 'forceRedirectUrl', 'mode'],
+    props: [
+      'signUpForceRedirectUrl',
+      'signUpFallbackRedirectUrl',
+      'fallbackRedirectUrl',
+      'forceRedirectUrl',
+      'mode',
+      'initialValues',
+      'withSignUp',
+    ],
   },
 );

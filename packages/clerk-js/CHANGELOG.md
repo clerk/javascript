@@ -1,5 +1,183 @@
 # Change Log
 
+## 5.46.0
+
+### Minor Changes
+
+- Add a confirmation state that the Application has been successfully claimed on the Keyless prompt. ([#4928](https://github.com/clerk/javascript/pull/4928)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix interactive bot protection widget not appearing on transfer flow ([#4941](https://github.com/clerk/javascript/pull/4941)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/localizations@3.9.12
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
+## 5.45.2
+
+### Patch Changes
+
+- Fixes an infinite loading state happening when successfully adding 2FA via the security tab within `<UserProfile />`. ([#4934](https://github.com/clerk/javascript/pull/4934)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix layout shift when Smart CAPTCHA is about to execute. ([#4924](https://github.com/clerk/javascript/pull/4924)) by [@anagstef](https://github.com/anagstef)
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`884e6db45573519695f0066f348a04dc519e7bec`](https://github.com/clerk/javascript/commit/884e6db45573519695f0066f348a04dc519e7bec), [`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/localizations@3.9.11
+  - @clerk/shared@2.20.10
+
+## 5.45.1
+
+### Patch Changes
+
+- Remove "Learn more" link from Keyless popover and improve copy ([#4923](https://github.com/clerk/javascript/pull/4923)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Adjusts `SignIn` telemetry event. ([#4914](https://github.com/clerk/javascript/pull/4914)) by [@brkalow](https://github.com/brkalow)
+
+- Stop falling back to the Clerk proxy worker if turnstile fails to load as it is not as accurate as challenges.cloudflare.com ([#4922](https://github.com/clerk/javascript/pull/4922)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/localizations@3.9.10
+  - @clerk/shared@2.20.9
+
+## 5.45.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Skip fraud protection if client has bypass enabled ([#4907](https://github.com/clerk/javascript/pull/4907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/localizations@3.9.9
+  - @clerk/shared@2.20.8
+
+## 5.44.1
+
+### Patch Changes
+
+- Simplify animations on Keyless prompt. ([#4868](https://github.com/clerk/javascript/pull/4868)) by [@kaftarmery](https://github.com/kaftarmery)
+
+  Bug fix: Add base element styles to override default styling of elements on Keyless prompt.
+
+- Fixes an issue that caused Clerk's UI code to load even before components were rendered. ([#4876](https://github.com/clerk/javascript/pull/4876)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/localizations@3.9.8
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
+## 5.44.0
+
+### Minor Changes
+
+- Improve UX when adding a new phone number as an MFA option ([#4860](https://github.com/clerk/javascript/pull/4860)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Redirect to sign-up based on clerk_status ([#4863](https://github.com/clerk/javascript/pull/4863)) by [@dstaley](https://github.com/dstaley)
+
+## 5.43.7
+
+### Patch Changes
+
+- Fixes username form field errors to display messages according to the respective code sent in the error response. ([#4858](https://github.com/clerk/javascript/pull/4858)) by [@panteliselef](https://github.com/panteliselef)
+
+## 5.43.6
+
+### Patch Changes
+
+- Opens new tab when claiming keys on Keyless mode. ([#4852](https://github.com/clerk/javascript/pull/4852)) by [@panteliselef](https://github.com/panteliselef)
+
+- Initially render Keyless UI as collapsed. ([#4857](https://github.com/clerk/javascript/pull/4857)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updates Keyless UI to automatically expand when the application has been claimed. ([#4855](https://github.com/clerk/javascript/pull/4855)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Post captcha tokens to /client/verify instead of PATCH /client ([#4850](https://github.com/clerk/javascript/pull/4850)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85), [`a3de23c85083fc061762e2533618a6c47d00c480`](https://github.com/clerk/javascript/commit/a3de23c85083fc061762e2533618a6c47d00c480)]:
+  - @clerk/types@4.40.2
+  - @clerk/localizations@3.9.7
+  - @clerk/shared@2.20.6
+
+## 5.43.5
+
+### Patch Changes
+
+- Fix combined flow routing. ([#4817](https://github.com/clerk/javascript/pull/4817)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve error handling when trying to sign-in/sign-up with web3 wallet and wallet is not installed in the browser ([#4845](https://github.com/clerk/javascript/pull/4845)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Fix username field error message rendering within sign-up continue flow. ([#4840](https://github.com/clerk/javascript/pull/4840)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve accessibility of the Keyless prompt. ([#4806](https://github.com/clerk/javascript/pull/4806)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/localizations@3.9.6
+  - @clerk/types@4.40.1
+  - @clerk/shared@2.20.5
+
+## 5.43.4
+
+### Patch Changes
+
+- Revalidate environment on window focus for Keyless. ([#4813](https://github.com/clerk/javascript/pull/4813)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix broken enterprise connection icon for custom SAML provider ([#4809](https://github.com/clerk/javascript/pull/4809)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- fix(clerk-js): Rethrow errors if not requires_captcha during init ([#4812](https://github.com/clerk/javascript/pull/4812)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`fa8be89155279f00b2a04da669e5ec3e22514d42`](https://github.com/clerk/javascript/commit/fa8be89155279f00b2a04da669e5ec3e22514d42)]:
+  - @clerk/localizations@3.9.5
+
+## 5.43.3
+
+### Patch Changes
+
+- Updated dependencies [[`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/types@4.40.0
+  - @clerk/localizations@3.9.4
+  - @clerk/shared@2.20.4
+
+## 5.43.2
+
+### Patch Changes
+
+- Redirect to sign up start step within combined flow when there are optional fields. ([#4795](https://github.com/clerk/javascript/pull/4795)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.43.1
+
+### Patch Changes
+
+- Revert #4776 to address new bug. ([#4797](https://github.com/clerk/javascript/pull/4797)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+
+## 5.43.0
+
+### Minor Changes
+
+- Redirect to the current page when within modal mode and no redirect URL is provided. ([#4768](https://github.com/clerk/javascript/pull/4768)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- fix: Properly detect and create devBrowser when the suffixed version is missing but an unsuffixed version exists ([#4776](https://github.com/clerk/javascript/pull/4776)) by [@panteliselef](https://github.com/panteliselef)
+
+  If the \_\_clerk_db_jwt referred to a different instance, we’d fetch `/environment` and `/client` with mismatched publishable keys and JWTs, breaking the app.
+
+- Updated dependencies [[`1677fa46862accd25d4837c9abd9a7a70c5b7858`](https://github.com/clerk/javascript/commit/1677fa46862accd25d4837c9abd9a7a70c5b7858), [`dcd2f3973ca90500fda9e52c4f81e631c49e87fc`](https://github.com/clerk/javascript/commit/dcd2f3973ca90500fda9e52c4f81e631c49e87fc)]:
+  - @clerk/localizations@3.9.3
+
 ## 5.42.1
 
 ### Patch Changes

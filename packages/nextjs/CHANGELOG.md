@@ -1,5 +1,136 @@
 # Change Log
 
+## 6.9.15
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/clerk-react@5.22.3
+  - @clerk/backend@1.23.4
+  - @clerk/shared@2.20.11
+
+## 6.9.14
+
+### Patch Changes
+
+- Bug fix: Running `build` with on Keyless mode should not prevent `<ClerkProvider/>` throwing an error for missing publishable key. ([#4932](https://github.com/clerk/javascript/pull/4932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+  - @clerk/clerk-react@5.22.2
+  - @clerk/backend@1.23.3
+
+## 6.9.13
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/backend@1.23.2
+  - @clerk/clerk-react@5.22.1
+  - @clerk/shared@2.20.9
+
+## 6.9.12
+
+### Patch Changes
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/clerk-react@5.22.0
+  - @clerk/backend@1.23.1
+  - @clerk/shared@2.20.8
+
+## 6.9.11
+
+### Patch Changes
+
+- Handle `dynamicIO` errors when request apis are accessed on prerender. This fixes issues with `ppr: true, dynamicIO: true` when using `<ClerkProvider dynamic/>`. ([#4836](https://github.com/clerk/javascript/pull/4836)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add descriptive comment when appending `.clerk/` to `.gitignore`. ([#4901](https://github.com/clerk/javascript/pull/4901)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e9e8834f7bfc953c3ae66fedf65b6952689c49da`](https://github.com/clerk/javascript/commit/e9e8834f7bfc953c3ae66fedf65b6952689c49da), [`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6), [`7182b93101518a389cc13859f8a0fe8bd6f37a06`](https://github.com/clerk/javascript/commit/7182b93101518a389cc13859f8a0fe8bd6f37a06)]:
+  - @clerk/backend@1.23.0
+  - @clerk/types@4.40.3
+  - @clerk/clerk-react@5.21.3
+  - @clerk/shared@2.20.7
+
+## 6.9.10
+
+### Patch Changes
+
+- Fix typo for "keyless mode" messages ([#4862](https://github.com/clerk/javascript/pull/4862)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Avoid infinite redirect loop on Keyless mode by detecting if `clerkMiddleware()` is used in the application. ([#4879](https://github.com/clerk/javascript/pull/4879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`72d29538f587934309da96fc1c6d454bb9aad21e`](https://github.com/clerk/javascript/commit/72d29538f587934309da96fc1c6d454bb9aad21e), [`84867be0215d7f74d8be7b4f803e2c3a241e2f89`](https://github.com/clerk/javascript/commit/84867be0215d7f74d8be7b4f803e2c3a241e2f89), [`fa967ce79e1b5f2e8216eb09900879cb825fa528`](https://github.com/clerk/javascript/commit/fa967ce79e1b5f2e8216eb09900879cb825fa528)]:
+  - @clerk/backend@1.22.0
+
+## 6.9.9
+
+### Patch Changes
+
+- Always use nextUrl to build rewritten URLs ([#4856](https://github.com/clerk/javascript/pull/4856)) by [@dstaley](https://github.com/dstaley)
+
+## 6.9.8
+
+### Patch Changes
+
+- Add type-level validation to prevent server-side usage of system permissions ([#4816](https://github.com/clerk/javascript/pull/4816)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  System permissions (e.g., `org:sys_domains:manage`) are intentionally excluded from session claims to maintain reasonable JWT sizes. For more information, refer to our docs: https://clerk.com/docs/organizations/roles-permissions#system-permissions
+
+- Updated dependencies [[`44cab6038af0a4d23869b3b292ece742fbbc4d85`](https://github.com/clerk/javascript/commit/44cab6038af0a4d23869b3b292ece742fbbc4d85)]:
+  - @clerk/backend@1.21.6
+  - @clerk/types@4.40.2
+  - @clerk/clerk-react@5.21.2
+  - @clerk/shared@2.20.6
+
+## 6.9.7
+
+### Patch Changes
+
+- Updated dependencies [[`80e1117631d35834705119a79cdcf9e0ed423fdd`](https://github.com/clerk/javascript/commit/80e1117631d35834705119a79cdcf9e0ed423fdd)]:
+  - @clerk/types@4.40.1
+  - @clerk/clerk-react@5.21.1
+  - @clerk/backend@1.21.5
+  - @clerk/shared@2.20.5
+
+## 6.9.6
+
+### Patch Changes
+
+- Updated dependencies [[`b5eb15bf81d94456309d6ca44ad423a4175d50b6`](https://github.com/clerk/javascript/commit/b5eb15bf81d94456309d6ca44ad423a4175d50b6), [`b933a2ba8112aefbabd7fe3313b89e083452d2dd`](https://github.com/clerk/javascript/commit/b933a2ba8112aefbabd7fe3313b89e083452d2dd)]:
+  - @clerk/clerk-react@5.21.0
+
+## 6.9.5
+
+### Patch Changes
+
+- Updated dependencies [[`b3300c84a42276bd071a37addbd1ca6888ed9d7c`](https://github.com/clerk/javascript/commit/b3300c84a42276bd071a37addbd1ca6888ed9d7c), [`c9da04636ffe1ba804a1ce5e5b79027d3a2344d2`](https://github.com/clerk/javascript/commit/c9da04636ffe1ba804a1ce5e5b79027d3a2344d2)]:
+  - @clerk/backend@1.21.4
+  - @clerk/types@4.40.0
+  - @clerk/clerk-react@5.20.4
+  - @clerk/shared@2.20.4
+
+## 6.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`84ccb0049041534f111be65f7c7d4d6120069446`](https://github.com/clerk/javascript/commit/84ccb0049041534f111be65f7c7d4d6120069446)]:
+  - @clerk/shared@2.20.3
+  - @clerk/backend@1.21.3
+  - @clerk/clerk-react@5.20.3
+
+## 6.9.3
+
+### Patch Changes
+
+- Improves the error message when changing keys in development causes a subsequent request to fail. ([#4787](https://github.com/clerk/javascript/pull/4787)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.20.2
+
 ## 6.9.2
 
 ### Patch Changes

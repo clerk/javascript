@@ -1,6 +1,7 @@
 import type { ClerkRouter } from '@clerk/shared/router';
 import type {
   ClerkResource,
+  EnterpriseSSOStrategy,
   LoadedClerk,
   OAuthStrategy,
   SamlStrategy,
@@ -46,13 +47,18 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
 
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
+export type BaseRouterRedirectEnterpriseSSOEvent = {
+  type: 'AUTHENTICATE.ENTERPRISE_SSO';
+  strategy?: EnterpriseSSOStrategy;
+};
 export type BaseRouterRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
 export type BaseRouterSetClerkEvent = { type: 'CLERK.SET'; clerk: LoadedClerk };
 
 export type BaseRouterRedirectEvent =
   | BaseRouterRedirectOauthEvent
   | BaseRouterRedirectSamlEvent
-  | BaseRouterRedirectWeb3Event;
+  | BaseRouterRedirectWeb3Event
+  | BaseRouterRedirectEnterpriseSSOEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

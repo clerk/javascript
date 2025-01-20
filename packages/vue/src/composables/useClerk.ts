@@ -5,7 +5,6 @@ import { useClerkContext } from './useClerkContext';
  * low-level access to Clerk's functionality, enabling custom authentication UI and flows.
  *
  * @example
- *
  * <script setup>
  * import { useClerk } from '@clerk/vue'
  *

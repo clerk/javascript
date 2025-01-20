@@ -1,7 +1,6 @@
-import type { DisplayConfigJSONSnapshot } from 'snapshots';
-
 import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { DisplayConfigJSONSnapshot } from './snapshots';
 import type { OAuthStrategy } from './strategies';
 
 export type PreferredSignInStrategy = 'password' | 'otp';

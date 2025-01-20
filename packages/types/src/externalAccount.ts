@@ -1,12 +1,13 @@
-import type { ExternalAccountJSONSnapshot } from 'snapshots';
-
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { ClerkResource } from './resource';
+import type { ExternalAccountJSONSnapshot } from './snapshots';
 import type { VerificationResource } from './verification';
 
 export type ReauthorizeExternalAccountParams = {
   additionalScopes?: OAuthScope[];
   redirectUrl?: string;
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
 };
 
 export interface ExternalAccountResource extends ClerkResource {

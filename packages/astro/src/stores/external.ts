@@ -8,8 +8,6 @@ import { $clerk, $csrState, $initialState } from './internal';
  * A client side store that returns the loaded state of clerk-js.
  *
  * @example
- * A simple example:
- *
  * $isLoadedStore.subscribe((authloaded => console.log(loaded))
  */
 export const $isLoadedStore = computed([$csrState], state => state.isLoaded);
@@ -19,8 +17,6 @@ export const $isLoadedStore = computed([$csrState], state => state.isLoaded);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $authStore.subscribe((auth) => console.log(auth.userId))
  */
 export const $authStore = batched([$csrState, $initialState], (state, initialState) => {
@@ -42,8 +38,6 @@ export const $authStore = batched([$csrState, $initialState], (state, initialSta
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $userStore.subscribe((user) => console.log(user.id))
  */
 export const $userStore = computed([$authStore], auth => auth.user);
@@ -54,8 +48,6 @@ export const $userStore = computed([$authStore], auth => auth.user);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $sessionStore.subscribe((session) => console.log(session.id))
  */
 export const $sessionStore = computed([$authStore], auth => auth.session);
@@ -66,8 +58,6 @@ export const $sessionStore = computed([$authStore], auth => auth.session);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $organizationStore.subscribe((org) => console.log(org.id))
  */
 export const $organizationStore = computed([$authStore], auth => auth.organization);
@@ -78,8 +68,6 @@ export const $organizationStore = computed([$authStore], auth => auth.organizati
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $clientStore.subscribe((client) => console.log(client.activeSessions))
  */
 export const $clientStore = computed([$csrState], csr => csr.client);
@@ -90,8 +78,6 @@ export const $clientStore = computed([$csrState], csr => csr.client);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $clerkStore.subscribe((clerk) => console.log(clerk.publishableKey))
  */
 export const $clerkStore = computed([$clerk], clerk => clerk);
@@ -102,8 +88,6 @@ export const $clerkStore = computed([$clerk], clerk => clerk);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $sessionListStore.subscribe((sessionList) => sessionList.map((session) => console.log('Session id:', sessino.id) ))
  */
 export const $sessionListStore = computed([$clientStore], client => client?.sessions);
@@ -114,8 +98,6 @@ export const $sessionListStore = computed([$clientStore], client => client?.sess
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $signInStore.subscribe((signIn) => console.log(signIn.status))
  */
 export const $signInStore = computed([$clientStore], client => client?.signIn);
@@ -126,8 +108,6 @@ export const $signInStore = computed([$clientStore], client => client?.signIn);
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * A simple example:
- *
  * $signUpStore.subscribe((signUp) => console.log(signUp.status))
  */
 export const $signUpStore = computed([$clientStore], client => client?.signUp);
