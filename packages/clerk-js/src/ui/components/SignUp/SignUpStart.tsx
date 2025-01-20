@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToAfterSignUp } from '../../common';
-import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -39,10 +39,9 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const options = useOptions();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
-  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
+  const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -311,7 +310,7 @@ function _SignUpStart(): JSX.Element {
                 />
               </Form.ControlRow>
             )}
-            {!shouldShowForm && <CaptchaElement />}
+            {!shouldShowForm && <CaptchaElement maxHeight='0' />}
           </Flex>
         </Card.Content>
 

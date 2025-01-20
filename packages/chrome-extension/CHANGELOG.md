@@ -1,5 +1,61 @@
 # Change Log
 
+## 2.1.16
+
+### Patch Changes
+
+- Updated dependencies [[`2a3cb5b3b35adfd618a3df2f490b0a8988523ded`](https://github.com/clerk/javascript/commit/2a3cb5b3b35adfd618a3df2f490b0a8988523ded), [`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3), [`96168706ac285381928786840a5d72655a739f7a`](https://github.com/clerk/javascript/commit/96168706ac285381928786840a5d72655a739f7a)]:
+  - @clerk/clerk-js@5.46.0
+  - @clerk/clerk-react@5.22.3
+  - @clerk/shared@2.20.11
+
+## 2.1.15
+
+### Patch Changes
+
+- Standardizing ambient declaration files for all SDKs ([#4919](https://github.com/clerk/javascript/pull/4919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`3e19492608e9ee2b3b58e9ba220ea93d1b3a6cf1`](https://github.com/clerk/javascript/commit/3e19492608e9ee2b3b58e9ba220ea93d1b3a6cf1), [`fdbcfd64590251402c0c490f68345e46e46e2ad4`](https://github.com/clerk/javascript/commit/fdbcfd64590251402c0c490f68345e46e46e2ad4), [`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/clerk-js@5.45.2
+  - @clerk/shared@2.20.10
+  - @clerk/clerk-react@5.22.2
+
+## 2.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`b9936782a97319afba4922761c798d1f6faab8e8`](https://github.com/clerk/javascript/commit/b9936782a97319afba4922761c798d1f6faab8e8), [`93e30cef512ebc91aa9d61926584948d15632304`](https://github.com/clerk/javascript/commit/93e30cef512ebc91aa9d61926584948d15632304), [`27fb70a2534ecfc6d2573ba65fb32be2786b9d30`](https://github.com/clerk/javascript/commit/27fb70a2534ecfc6d2573ba65fb32be2786b9d30)]:
+  - @clerk/clerk-js@5.45.1
+  - @clerk/clerk-react@5.22.1
+  - @clerk/shared@2.20.9
+
+## 2.1.13
+
+### Patch Changes
+
+- Updated dependencies [[`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/clerk-js@5.45.0
+  - @clerk/clerk-react@5.22.0
+  - @clerk/shared@2.20.8
+
+## 2.1.12
+
+### Patch Changes
+
+- Fix issue "Including remotely hosted code in a Manifest V3 item" that you might have seen during audit. The affected code is now bundled with the package and as such any offending code properly tree-shaken. ([#4899](https://github.com/clerk/javascript/pull/4899)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`f87733719f6961640c159a6ca82d4c3edfd087dd`](https://github.com/clerk/javascript/commit/f87733719f6961640c159a6ca82d4c3edfd087dd), [`43ba06329fb452cdbb3bb766b660dd2371dcf502`](https://github.com/clerk/javascript/commit/43ba06329fb452cdbb3bb766b660dd2371dcf502)]:
+  - @clerk/clerk-js@5.44.1
+  - @clerk/clerk-react@5.21.3
+  - @clerk/shared@2.20.7
+
+## 2.1.11
+
+### Patch Changes
+
+- Updated dependencies [[`7cc1b3ab472d9ed55ab0e7fa2195354c77482de9`](https://github.com/clerk/javascript/commit/7cc1b3ab472d9ed55ab0e7fa2195354c77482de9), [`d5c48412d0bef75c79dedecb20cee75b7d476eb7`](https://github.com/clerk/javascript/commit/d5c48412d0bef75c79dedecb20cee75b7d476eb7)]:
+  - @clerk/clerk-js@5.44.0
+
 ## 2.1.10
 
 ### Patch Changes

@@ -1,5 +1,66 @@
 # Change Log
 
+## 1.23.4
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
+## 1.23.3
+
+### Patch Changes
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+
+## 1.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/shared@2.20.9
+
+## 1.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/shared@2.20.8
+
+## 1.23.0
+
+### Minor Changes
+
+- `authenticateRequest()` will now set a refreshsed session cookie on the response when an expired session token is refreshed via the Clerk API. ([#4884](https://github.com/clerk/javascript/pull/4884)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Add property `query` to `GetInvitationListParams` to allow filtering based on `email_address` or `id`. ([#4804](https://github.com/clerk/javascript/pull/4804)) by [@effektsvk](https://github.com/effektsvk)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
+## 1.22.0
+
+### Minor Changes
+
+- Update Session resource with new properties to align with OpenAPI spec ([#4869](https://github.com/clerk/javascript/pull/4869)) by [@octoper](https://github.com/octoper)
+
+  - `lastActiveOrganizationId`
+  - `latestActivity`
+  - `actor`
+
+### Patch Changes
+
+- Fixes an issue with the satellite sync flow for development instances. ([#4864](https://github.com/clerk/javascript/pull/4864)) by [@BRKalow](https://github.com/BRKalow)
+
+- Upgrading cookies@1.0.2 and snakecase-keys@8.0.1 ([#4881](https://github.com/clerk/javascript/pull/4881)) by [@renovate](https://github.com/apps/renovate)
+
 ## 1.21.6
 
 ### Patch Changes

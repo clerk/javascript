@@ -220,6 +220,22 @@ export const SignUpRouterMachine = setup({
         },
       })),
     },
+    'AUTHENTICATE.ENTERPRISE_SSO': {
+      actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
+        type: 'REDIRECT',
+        params: {
+          strategy: 'enterprise_sso',
+          emailAddress: context.formRef.getSnapshot().context.fields.get('emailAddress')?.value,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+        },
+      })),
+    },
     'AUTHENTICATE.WEB3': {
       actions: sendTo('start', ({ event }) => event),
     },

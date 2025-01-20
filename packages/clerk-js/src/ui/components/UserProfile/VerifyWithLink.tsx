@@ -37,7 +37,7 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
     const { routing } = profileContext;
     const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
 
-    const redirectUrl = buildEmailLinkRedirectUrl(profileContext, baseUrl);
+    const redirectUrl = buildEmailLinkRedirectUrl({ ctx: profileContext, baseUrl, intent: 'profile' });
     startEmailLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));

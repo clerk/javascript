@@ -130,7 +130,7 @@ export type PrepareVerificationParams =
       oidcLoginHint?: string;
     }
   | {
-      strategy: SamlStrategy;
+      strategy: SamlStrategy | EnterpriseSSOStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
     };

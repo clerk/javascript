@@ -1,5 +1,71 @@
 # Change Log
 
+## 6.9.15
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/clerk-react@5.22.3
+  - @clerk/backend@1.23.4
+  - @clerk/shared@2.20.11
+
+## 6.9.14
+
+### Patch Changes
+
+- Bug fix: Running `build` with on Keyless mode should not prevent `<ClerkProvider/>` throwing an error for missing publishable key. ([#4932](https://github.com/clerk/javascript/pull/4932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+  - @clerk/clerk-react@5.22.2
+  - @clerk/backend@1.23.3
+
+## 6.9.13
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/backend@1.23.2
+  - @clerk/clerk-react@5.22.1
+  - @clerk/shared@2.20.9
+
+## 6.9.12
+
+### Patch Changes
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/clerk-react@5.22.0
+  - @clerk/backend@1.23.1
+  - @clerk/shared@2.20.8
+
+## 6.9.11
+
+### Patch Changes
+
+- Handle `dynamicIO` errors when request apis are accessed on prerender. This fixes issues with `ppr: true, dynamicIO: true` when using `<ClerkProvider dynamic/>`. ([#4836](https://github.com/clerk/javascript/pull/4836)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add descriptive comment when appending `.clerk/` to `.gitignore`. ([#4901](https://github.com/clerk/javascript/pull/4901)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`e9e8834f7bfc953c3ae66fedf65b6952689c49da`](https://github.com/clerk/javascript/commit/e9e8834f7bfc953c3ae66fedf65b6952689c49da), [`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6), [`7182b93101518a389cc13859f8a0fe8bd6f37a06`](https://github.com/clerk/javascript/commit/7182b93101518a389cc13859f8a0fe8bd6f37a06)]:
+  - @clerk/backend@1.23.0
+  - @clerk/types@4.40.3
+  - @clerk/clerk-react@5.21.3
+  - @clerk/shared@2.20.7
+
+## 6.9.10
+
+### Patch Changes
+
+- Fix typo for "keyless mode" messages ([#4862](https://github.com/clerk/javascript/pull/4862)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Avoid infinite redirect loop on Keyless mode by detecting if `clerkMiddleware()` is used in the application. ([#4879](https://github.com/clerk/javascript/pull/4879)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`72d29538f587934309da96fc1c6d454bb9aad21e`](https://github.com/clerk/javascript/commit/72d29538f587934309da96fc1c6d454bb9aad21e), [`84867be0215d7f74d8be7b4f803e2c3a241e2f89`](https://github.com/clerk/javascript/commit/84867be0215d7f74d8be7b4f803e2c3a241e2f89), [`fa967ce79e1b5f2e8216eb09900879cb825fa528`](https://github.com/clerk/javascript/commit/fa967ce79e1b5f2e8216eb09900879cb825fa528)]:
+  - @clerk/backend@1.22.0
+
 ## 6.9.9
 
 ### Patch Changes

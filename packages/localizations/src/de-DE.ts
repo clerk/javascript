@@ -54,13 +54,16 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
+  formFieldInputPlaceholder__emailAddresses: undefined,
   formFieldInputPlaceholder__firstName: 'Vorname eingeben',
   formFieldInputPlaceholder__lastName: 'Nachname eingeben',
   formFieldInputPlaceholder__organizationDomain: 'Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'E-Mail-Adresse der Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationName: 'Name der Organisation eingeben',
+  formFieldInputPlaceholder__organizationSlug: undefined,
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
@@ -462,7 +465,7 @@ export const deDE: LocalizationResource = {
       actionText__join_waitlist: 'Warteliste beitreten',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Einloggen',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
@@ -536,7 +539,6 @@ export const deDE: LocalizationResource = {
       subtitleWaitlist: 'Treten Sie der Warteliste bei, um Benachrichtigungen zu erhalten.',
       title: 'Zugang verweigert',
     },
-
     start: {
       actionLink: 'Einloggen',
       actionLink__use_email: 'Mit E-Mail einloggen',
@@ -547,8 +549,7 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView:
-    'Zu viele Buttons angezeigt. Reduzieren Sie die Anzahl der Buttons, um fortzufahren.',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:
@@ -556,7 +557,6 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
-    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
@@ -606,6 +606,7 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',

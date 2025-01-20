@@ -25,6 +25,7 @@ export const AddBlockButton = (props: BlockButtonProps) => {
       sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}
       leftIcon={
         <Icon
+          /* @ts-expect-error FIXME: icon prop typing */
           icon={leftIcon || Plus}
           sx={theme => ({
             width: theme.sizes.$2x5,

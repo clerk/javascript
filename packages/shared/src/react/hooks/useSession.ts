@@ -12,8 +12,6 @@ type UseSession = () => UseSessionReturn;
  * safely access `isSignedIn` state and `session`.
  *
  * @example
- * A simple example:
- *
  * import { useSession } from '@clerk/clerk-react'
  *
  * function Hello() {
