@@ -40,7 +40,7 @@ const safeNodeRuntimePath = () => {
 };
 
 /**
- * The `.clerk/` is NOT safe to be commited as it may include sensitive information about a Clerk instance.
+ * The `.clerk/` directory is NOT safe to be committed as it may include sensitive information about a Clerk instance.
  * It may include an instance's secret key and the secret token for claiming that instance.
  */
 function updateGitignore() {
