@@ -453,7 +453,6 @@ export const roRO: LocalizationResource = {
       detailsLabel: 'Trebuie să vă verificăm identitatea înainte de a vă reseta parola.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Înscrieți-vă',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilizați e-mailul',
@@ -465,6 +464,7 @@ export const roRO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Conectați-vă',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Cod de verificare',

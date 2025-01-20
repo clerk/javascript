@@ -449,7 +449,6 @@ export const ukUA: LocalizationResource = {
       detailsLabel: 'Необхідно верифікувати вашу особу перед відновленням пароля',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Зареєструватися',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Використовувати пошту',
@@ -461,6 +460,7 @@ export const ukUA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Увійти',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верифікаційний код',

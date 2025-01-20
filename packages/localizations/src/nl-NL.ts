@@ -451,7 +451,6 @@ export const nlNL: LocalizationResource = {
       detailsLabel: 'Voor veiligheidsredenen is het vereist om je wachtwoord te resetten.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Registreren',
       actionLink__join_waitlist: 'Meld je aan voor de wachtlijst',
       actionLink__use_email: 'Gebruik e-mail',
@@ -463,6 +462,7 @@ export const nlNL: LocalizationResource = {
       actionText__join_waitlist: 'Nog geen account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',

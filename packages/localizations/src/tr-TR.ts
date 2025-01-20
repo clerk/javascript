@@ -452,7 +452,6 @@ export const trTR: LocalizationResource = {
       detailsLabel: 'Şifrenizi sıfırlamadan önce kimliğinizi doğrulamamız gerekiyor.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Kayıt ol',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'E-posta kullan',
@@ -464,6 +463,7 @@ export const trTR: LocalizationResource = {
       actionText__join_waitlist: 'Bekleme listesine katılın',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Giriş yap',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Doğrulama kodu',

@@ -450,7 +450,6 @@ export const srRS: LocalizationResource = {
       detailsLabel: 'Potrebno je da potvrdimo tvoj identitet pre resetovanja lozinke.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Registruj se',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Koristi e-mail',
@@ -462,6 +461,7 @@ export const srRS: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
       title: 'Prijavi se na {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',

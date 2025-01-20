@@ -451,7 +451,6 @@ export const itIT: LocalizationResource = {
       detailsLabel: 'Dobbiamo verificare la tua identità prima di resettare la tua password.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Registrati',
       actionLink__join_waitlist: "Unisciti alla lista d'attesa",
       actionLink__use_email: 'Usa email',
@@ -463,6 +462,7 @@ export const itIT: LocalizationResource = {
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Accedi',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Codice di verifica',

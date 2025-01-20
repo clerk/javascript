@@ -446,7 +446,6 @@ export const zhTW: LocalizationResource = {
       detailsLabel: '我們需要驗證您的身份才能重設您的密碼。',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: '註冊',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: '使用電子郵件',
@@ -458,6 +457,7 @@ export const zhTW: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
       title: '登錄',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',

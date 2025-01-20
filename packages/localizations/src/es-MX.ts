@@ -455,7 +455,6 @@ export const esMX: LocalizationResource = {
       detailsLabel: 'Es necesario verificar su identidad para restablecer su contraseña.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Registrarse',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilizar correo electrónico',
@@ -467,6 +466,7 @@ export const esMX: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Iniciar sesión',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',

@@ -451,7 +451,6 @@ export const jaJP: LocalizationResource = {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'サインアップ',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'メールアドレスを使用',
@@ -463,6 +462,7 @@ export const jaJP: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'サインイン',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '検証コード',

@@ -447,7 +447,6 @@ export const thTH: LocalizationResource = {
       detailsLabel: 'เราต้องตรวจสอบตัวตนของคุณก่อนที่จะรีเซ็ตรหัสผ่าน',
     },
     start: {
-      __experimental_titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
       actionLink: 'สมัครสมาชิก',
       actionLink__join_waitlist: 'เข้าร่วมรายชื่อผู้รอ',
       actionLink__use_email: 'ใช้อีเมล',
@@ -459,6 +458,7 @@ export const thTH: LocalizationResource = {
       actionText__join_waitlist: 'ต้องการเข้าถึงก่อนใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับกลับ! โปรดเข้าสู่ระบบเพื่อดำเนินการต่อ',
       title: 'เข้าสู่ระบบ {{applicationName}}',
+      titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'รหัสการตรวจสอบ',

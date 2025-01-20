@@ -453,7 +453,6 @@ export const elGR: LocalizationResource = {
       detailsLabel: 'Πρέπει να επαληθεύσουμε την ταυτότητά σας πριν επαναφέρουμε τον κωδικό πρόσβασής σας.',
     },
     start: {
-      __experimental_titleCombined: 'Συνέχεια στο {{applicationName}}',
       actionLink: 'Εγγραφή',
       actionLink__join_waitlist: 'Εγγραφή στη λίστα αναμονής',
       actionLink__use_email: 'Χρήση email',
@@ -465,6 +464,7 @@ export const elGR: LocalizationResource = {
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Σύνδεση',
+      titleCombined: 'Συνέχεια στο {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Κωδικός επαλήθευσης',

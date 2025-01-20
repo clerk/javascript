@@ -7,19 +7,21 @@ import { animations } from '../styledSystem';
 type NotificationCountBadgeProps = PropsOfComponent<typeof NotificationBadge> & {
   notificationCount: number;
   containerSx?: ThemableCssProp;
+  shouldAnimate?: boolean;
 };
 
 export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
-  const { notificationCount, containerSx, ...restProps } = props;
+  const { notificationCount, containerSx, shouldAnimate = true, ...restProps } = props;
   const prefersReducedMotion = usePrefersReducedMotion();
   const { t } = useLocalizations();
   const localeKey = t(localizationKeys('locale'));
   const formattedNotificationCount = formatToCompactNumber(notificationCount, localeKey);
 
   const enterExitAnimation: ThemableCssProp = t => ({
-    animation: prefersReducedMotion
-      ? 'none'
-      : `${animations.notificationAnimation} ${t.transitionDuration.$textField} ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
+    animation:
+      !shouldAnimate || prefersReducedMotion
+        ? 'none'
+        : `${animations.notificationAnimation} ${t.transitionDuration.$textField} ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
   });
 
   return (

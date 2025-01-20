@@ -8,9 +8,10 @@ import { Spinner } from '../../../ui/primitives';
 type MembersSearchProps = {
   isLoading: boolean;
   onChange: (query: string) => void;
+  debounceMs?: number;
 };
 
-export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
+export const MembersSearch = ({ isLoading, onChange, debounceMs = 500 }: MembersSearchProps) => {
   const { t } = useLocalizations();
   const [search, setSearch] = useState('');
 
@@ -21,7 +22,7 @@ export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
     setSearch(event.target.value);
   };
 
-  // Updates query state to trigger query only once user stops typing
+  // Updates query state to trigger change handler only once user stops typing
   useEffect(() => {
     if (!inputRef.current) {
       return;
@@ -36,7 +37,7 @@ export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
 
         debounceTimer.current = setTimeout(() => {
           onChange(search.trim());
-        }, 500);
+        }, debounceMs);
       },
       {
         signal: controller.signal,
@@ -46,7 +47,7 @@ export const MembersSearch = ({ isLoading, onChange }: MembersSearchProps) => {
     return () => {
       controller.abort();
     };
-  }, [search]);
+  }, [search, debounceMs, onChange]);
 
   return (
     <Animated asChild>

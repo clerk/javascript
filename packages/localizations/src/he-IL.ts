@@ -444,7 +444,6 @@ export const heIL: LocalizationResource = {
       detailsLabel: 'אנחנו צריכים לאמת את זהותך לפני שנאפס את הסיסמה שלך.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'הרשמה',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'השתמש בדוא"ל',
@@ -456,6 +455,7 @@ export const heIL: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'התחבר',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'קוד אימות',

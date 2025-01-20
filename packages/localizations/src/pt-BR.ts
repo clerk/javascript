@@ -451,7 +451,6 @@ export const ptBR: LocalizationResource = {
       detailsLabel: 'Precisamos verificar sua identidade antes de redefinir sua senha.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Registre-se',
       actionLink__join_waitlist: 'Entrar na lista de espera',
       actionLink__use_email: 'Usar e-mail',
@@ -463,6 +462,7 @@ export const ptBR: LocalizationResource = {
       actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Entrar',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',

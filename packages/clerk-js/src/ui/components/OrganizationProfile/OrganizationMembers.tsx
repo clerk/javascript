@@ -40,6 +40,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
       ? {
+          // Resets pagination offset when searching
           pageSize: membershipsQuery ? undefined : ACTIVE_MEMBERS_PAGE_SIZE,
           keepPreviousData: true,
           query: membershipsQuery || undefined,
@@ -47,7 +48,8 @@ export const OrganizationMembers = withCardStateProvider(() => {
       : undefined,
   });
 
-  // Resets pagination based on the number of items from a query term
+  // If searching does not happen on a initial page, resets pagination offset
+  // based on the response count
   useEffect(() => {
     if (!membershipsQuery || !memberships?.data) {
       return;
@@ -99,8 +101,9 @@ export const OrganizationMembers = withCardStateProvider(() => {
             <TabsList sx={t => ({ gap: t.space.$2 })}>
               {canReadMemberships && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
-                  {memberships?.data && !memberships.isLoading && (
+                  {!!memberships?.count && (
                     <NotificationCountBadge
+                      shouldAnimate={!membershipsQuery}
                       notificationCount={memberships.count}
                       colorScheme='outline'
                     />

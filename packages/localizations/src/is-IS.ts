@@ -453,7 +453,6 @@ export const isIS: LocalizationResource = {
       detailsLabel: 'Við þurfum að staðfesta auðkenni þitt áður en við endurstillum lykilorðið þitt.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Skrá sig',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Nota netfang',
@@ -465,6 +464,7 @@ export const isIS: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
       title: 'Skrá inn í {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Staðfestingarkóði',

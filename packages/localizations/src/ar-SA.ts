@@ -450,7 +450,6 @@ export const arSA: LocalizationResource = {
       detailsLabel: 'نريد التحقق من هويتك قبل أعادة تعيين كلمة المرور',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'إنشاء حساب جديد',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'استخدم البريد الإلكتروني',
@@ -462,6 +461,7 @@ export const arSA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',

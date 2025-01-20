@@ -455,7 +455,6 @@ export const beBY: LocalizationResource = {
       detailsLabel: 'Неабходна верыфікаваць вашу асобу перад аднаўленнем пароля',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Зарэгістравацца',
       actionLink__join_waitlist: 'Далучыцца да чаргі',
       actionLink__use_email: 'Выкарыстаць пошту',
@@ -467,6 +466,7 @@ export const beBY: LocalizationResource = {
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увайсці',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код верыфікацыі',

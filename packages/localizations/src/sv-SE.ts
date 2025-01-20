@@ -453,7 +453,6 @@ export const svSE: LocalizationResource = {
       detailsLabel: 'Vi behöver verifiera din identitet innan vi återställer ditt lösenord.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Skapa konto',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Use email',
@@ -465,6 +464,7 @@ export const svSE: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Logga in',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifieringskod',

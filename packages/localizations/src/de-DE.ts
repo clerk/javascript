@@ -455,7 +455,6 @@ export const deDE: LocalizationResource = {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Anmelden',
       actionLink__join_waitlist: 'Warteliste beitreten',
       actionLink__use_email: 'E-mail nutzen',
@@ -467,6 +466,7 @@ export const deDE: LocalizationResource = {
       actionText__join_waitlist: 'Warteliste beitreten',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Einloggen',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',

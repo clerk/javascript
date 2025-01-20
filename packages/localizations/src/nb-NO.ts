@@ -451,7 +451,6 @@ export const nbNO: LocalizationResource = {
       detailsLabel: 'Vi må bekrefte identiteten din før vi tilbakestiller passordet ditt.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Opprett konto',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Bruk e-post',
@@ -463,6 +462,7 @@ export const nbNO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',

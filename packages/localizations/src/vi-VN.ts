@@ -449,7 +449,6 @@ export const viVN: LocalizationResource = {
       detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.',
     },
     start: {
-      __experimental_titleCombined: undefined,
       actionLink: 'Đăng ký',
       actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Sử dụng email',
