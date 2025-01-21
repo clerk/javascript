@@ -12,14 +12,13 @@ export class CaptchaChallenge {
    * always use the fallback key.
    */
   public async invisible() {
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
+    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
 
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
+    if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       return getCaptchaToken({
         siteKey: captchaPublicKeyInvisible,
         invisibleSiteKey: captchaPublicKeyInvisible,
         widgetType: 'invisible',
-        scriptUrl: captchaURL,
         captchaProvider: 'turnstile',
       }).catch(e => {
         if (e.captchaError) {
@@ -41,15 +40,14 @@ export class CaptchaChallenge {
    * Managed challenged start as non-interactive and escalate to interactive if necessary.
    */
   public async managedOrInvisible(opts?: Partial<CaptchaOptions>) {
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
+    const { captchaSiteKey, canUseCaptcha, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
       retrieveCaptchaInfo(this.clerk);
 
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
+    if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       return getCaptchaToken({
         siteKey: captchaSiteKey,
         widgetType: captchaWidgetType,
         invisibleSiteKey: captchaPublicKeyInvisible,
-        scriptUrl: captchaURL,
         captchaProvider,
         ...opts,
       }).catch(e => {

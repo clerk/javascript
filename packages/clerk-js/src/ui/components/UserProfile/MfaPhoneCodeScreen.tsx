@@ -41,7 +41,7 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
       <MFAVerifyPhone
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
-        onSuccess={() => (isInstanceWithBackupCodes ? wizard.goToStep(3) : onSuccess)}
+        onSuccess={() => (isInstanceWithBackupCodes ? wizard.goToStep(3) : onSuccess())}
         onReset={() => wizard.goToStep(2)}
       />
       <AddMfa

@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.9.12
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+
+## 3.9.11
+
+### Patch Changes
+
+- - Add missing translations for backup codes ([#4866](https://github.com/clerk/javascript/pull/4866)) by [@ttwrpz](https://github.com/ttwrpz)
+
+  - Complete Thai translations for form field placeholders
+  - Add translations for sign in/up waitlist messages
+  - Add Thai translations for verification flows
+  - Add Thai error message translations
+  - Complete organization-related translations
+
+## 3.9.10
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+
 ## 3.9.9
 
 ### Patch Changes

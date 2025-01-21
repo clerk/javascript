@@ -1,6 +1,6 @@
-import type { OAuthProvider, SamlStrategy, SignInStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, SignInStrategy, Web3Provider } from '@clerk/types';
 
-type Strategy = OAuthProvider | SamlStrategy | Web3Provider;
+type Strategy = OAuthProvider | SamlStrategy | EnterpriseSSOStrategy | Web3Provider;
 
 export function isProviderStrategyScope(value: string): value is Strategy {
   return value.startsWith('provider:');
@@ -19,6 +19,10 @@ export function mapScopeToStrategy<T extends `provider:${Strategy}`>(scope: T): 
 
   if (scope === 'provider:saml') {
     return 'saml';
+  }
+
+  if (scope === 'provider:enterprise_sso') {
+    return 'enterprise_sso';
   }
 
   const scopeWithoutPrefix = scope.replace('provider:', '') as OAuthProvider;

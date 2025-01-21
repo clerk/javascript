@@ -460,7 +460,7 @@ export const arSA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',
@@ -550,7 +550,6 @@ export const arSA: LocalizationResource = {
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
@@ -595,6 +594,7 @@ export const arSA: LocalizationResource = {
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',

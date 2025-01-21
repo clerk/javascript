@@ -2,7 +2,7 @@ import type { AccountlessApplication } from '@clerk/backend';
 import hex from 'crypto-js/enc-hex';
 import sha256 from 'crypto-js/sha256';
 
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 
 const keylessCookiePrefix = `__clerk_keys_`;
 
@@ -28,7 +28,7 @@ function hashString(str: string) {
 }
 
 function getKeylessCookieValue(getter: (cookieName: string) => string | undefined): AccountlessApplication | undefined {
-  if (!canUseKeyless__server) {
+  if (!canUseKeyless) {
     return undefined;
   }
 

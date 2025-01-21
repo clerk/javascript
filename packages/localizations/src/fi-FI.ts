@@ -462,7 +462,7 @@ export const fiFI: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Kirjaudu sisään',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',
@@ -552,7 +552,6 @@ export const fiFI: LocalizationResource = {
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
@@ -597,6 +596,7 @@ export const fiFI: LocalizationResource = {
       sentencePrefix: 'Salasanan on sisällettävä',
     },
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',

@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
 import { useSelector } from '@xstate/react';
 import * as React from 'react';
 
@@ -15,7 +15,7 @@ import type { TSignUpStep } from '~/react/sign-up/step';
 import { SIGN_UP_STEPS } from '~/react/sign-up/step';
 import { isProviderStrategyScope, mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 
-type Strategy = OAuthProvider | SamlStrategy | Web3Provider;
+type Strategy = OAuthProvider | SamlStrategy | EnterpriseSSOStrategy | Web3Provider;
 type LoadingScope<T extends TSignInStep | TSignUpStep> =
   | 'global'
   | `step:${T}`

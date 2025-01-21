@@ -461,7 +461,7 @@ export const nbNO: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Logg inn',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',
@@ -551,7 +551,6 @@ export const nbNO: LocalizationResource = {
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -597,6 +596,7 @@ export const nbNO: LocalizationResource = {
       sentencePrefix: 'Passordet ditt må inneholde',
     },
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
       goodPassword: 'Godt jobbet. Dette er et utmerket passord.',

@@ -294,10 +294,10 @@ export const hasUrlInFragment = (_url: URL | string) => {
  * and also includes all search params from both places.
  *
  * @example
- * Input
- * https://accounts.clerk.com/sign-in?user_param=hello#/verify/factor-one?redirect_url=/protected
- * Return value:
- * https://accounts.clerk.com/sign-in/verify/factor-one?user_param=hello&redirect_url=/protected
+ * ```ts
+ * mergeFragmentIntoUrl('https://accounts.clerk.com/sign-in?user_param=hello#/verify/factor-one?redirect_url=/protected')
+ * // Returns: 'https://accounts.clerk.com/sign-in/verify/factor-one?user_param=hello&redirect_url=/protected'
+ * ```
  */
 export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
   const url = new URL(_url);

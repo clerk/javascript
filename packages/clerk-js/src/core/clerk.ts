@@ -34,7 +34,6 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
-  LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -68,7 +67,6 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { UI } from '../ui/new';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -155,12 +153,7 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
-function clerkIsLoaded(clerk: ClerkInterface): clerk is LoadedClerk {
-  return !!clerk.client;
-}
-
 export class Clerk implements ClerkInterface {
-  public __experimental_ui?: UI;
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -352,16 +345,6 @@ export class Clerk implements ClerkInterface {
       this.#loaded = await this.#loadInStandardBrowser();
     } else {
       this.#loaded = await this.#loadInNonStandardBrowser();
-    }
-
-    if (BUILD_ENABLE_NEW_COMPONENTS) {
-      if (clerkIsLoaded(this)) {
-        this.__experimental_ui = new UI({
-          router: this.#options.__experimental_router,
-          clerk: this,
-          options: this.#options,
-        });
-      }
     }
   };
 
@@ -578,20 +561,21 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    if (props?.__experimental?.newComponents && this.__experimental_ui) {
-      this.__experimental_ui.mount('SignIn', node, props);
-    } else {
-      this.assertComponentsReady(this.#componentControls);
-      void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
-        controls.mountComponent({
-          name: 'SignIn',
-          appearanceKey: 'signIn',
-          node,
-          props,
-        }),
-      );
-    }
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+      controls.mountComponent({
+        name: 'SignIn',
+        appearanceKey: 'signIn',
+        node,
+        props,
+      }),
+    );
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('SignIn', {
+        ...props,
+        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+      }),
+    );
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -604,19 +588,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    if (props?.__experimental?.newComponents && this.__experimental_ui) {
-      this.__experimental_ui.mount('SignUp', node, props);
-    } else {
-      this.assertComponentsReady(this.#componentControls);
-      void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
-        controls.mountComponent({
-          name: 'SignUp',
-          appearanceKey: 'signUp',
-          node,
-          props,
-        }),
-      );
-    }
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+      controls.mountComponent({
+        name: 'SignUp',
+        appearanceKey: 'signUp',
+        node,
+        props,
+      }),
+    );
     this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 

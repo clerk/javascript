@@ -5,7 +5,7 @@ import React from 'react';
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
-import { canUseKeyless__server } from '../../utils/feature-flags';
+import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
@@ -69,7 +69,7 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless__server;
+  const shouldRunAsKeyless = !propsWithEnvs.publishableKey && canUseKeyless;
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
