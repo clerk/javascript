@@ -256,85 +256,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
-                position: relative;
-                isolation: isolate;
                 white-space: nowrap;
                 cursor: pointer;
-
-                ${!claimed &&
-                !success &&
-                `&::after {
-                  content: attr(data-text);
-                  z-index: 1;
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  color: transparent;
-                  background: linear-gradient(
-                    -100deg,
-                    transparent 0%,
-                    transparent 45%,
-                    rgb(198, 179, 86) 51%,
-                    rgb(198, 179, 86) 55%,
-                    transparent 60%,
-                    transparent 100%
-                  );
-                  background-size: 275% 100%;
-                  background-clip: text;
-                  filter: blur(1.2px);
-                 animation: text-shimmer 12s 1s 1 ease-out forwards;
-                  -webkit-user-select: none;
-                  user-select: none;
-                }
-
-                &::before {
-                  z-index: 2;
-                  content: attr(data-text);
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  color: transparent;
-                  background: linear-gradient(
-                    -100deg,
-                    transparent 0%,
-                    transparent 45%,
-                    rgba(240, 214, 83, 0.7) 50%,
-                    rgb(240, 214, 83) 51%,
-                    rgb(240, 214, 83) 55%,
-                    rgba(240, 214, 83, 0.7) 60%,
-                    transparent 65%,
-                    transparent 100%
-                  );
-                  background-size: 275% 100%;
-                  background-clip: text;
-                 animation: text-shimmer 12s 1s 1 ease-out forwards;
-                  -webkit-user-select: none;
-                  user-select: none;
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                  &::after,
-                  &::before {
-                    animation: none;
-                    background: transparent;
-                  }
-                }
-
-				  @keyframes text-shimmer {
-                  0% {
-                    background-position: 120% center;
-                  }
-                  15% {
-                    background-position: -60% center;
-                  }
-                  85% {
-                    background-position: -60% center;
-                  }
-                  100% {
-                    background-position: -60% center;
-                  }
-                }
-              `};
               `}
             >
               {success

@@ -31,7 +31,6 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
@@ -776,11 +775,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
      */
     __internal_copyInstanceKeysUrl?: string;
-
-    /**
-     * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
-     */
-    __experimental_router?: ClerkHostRouter;
   };
 
 export interface NavigateOptions {
