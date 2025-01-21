@@ -31,7 +31,6 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ClerkHostRouter } from './router';
 import type { ActiveSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
@@ -782,11 +781,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
      */
     __internal_keyless_dismissPrompt?: () => Promise<void>;
-
-    /**
-     * [EXPERIMENTAL] Provide the underlying host router, required for the new experimental UI components.
-     */
-    __experimental_router?: ClerkHostRouter;
   };
 
 export interface NavigateOptions {
