@@ -461,7 +461,7 @@ export const nlNL: LocalizationResource = {
       actionText__join_waitlist: 'Nog geen account? Meld je aan voor de wachtlijst.',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',
@@ -517,7 +517,6 @@ export const nlNL: LocalizationResource = {
         title: 'Doorgaan',
       },
     },
-
     phoneCode: {
       formSubtitle: 'Voer de verificatiecode in die verzonden is naar je telefoonnummer',
       formTitle: 'Verificatiecode',
@@ -552,7 +551,6 @@ export const nlNL: LocalizationResource = {
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     form_code_incorrect: 'De ingevoerde code is incorrect.',
-    form_identifier_exists: 'Dit identificerende gegeven bestaat al.',
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
@@ -579,9 +577,9 @@ export const nlNL: LocalizationResource = {
     not_allowed_access: 'Toegang niet toegestaan.',
     organization_domain_blocked: 'Het domein van de organisatie is geblokkeerd.',
     organization_domain_common: 'Het domein van de organisatie is te algemeen.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Het lidmaatschapsquotum van de organisatie is overschreden.',
     organization_minimum_permissions_needed: 'Minimale machtigingen vereist voor de organisatie.',
-
     passkey_already_exists: 'Deze passkey bestaat al.',
     passkey_not_supported: 'Passkeys worden niet ondersteund door deze browser.',
     passkey_pa_not_supported: 'Passkeys worden niet ondersteund door deze browser.',
@@ -597,6 +595,7 @@ export const nlNL: LocalizationResource = {
       sentencePrefix: 'Wachtwoord moet minstens 1 speciaal teken bevatten.',
     },
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',

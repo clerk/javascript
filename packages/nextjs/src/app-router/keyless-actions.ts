@@ -5,7 +5,7 @@ import { redirect, RedirectType } from 'next/navigation';
 
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName } from '../server/keyless';
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
@@ -31,7 +31,7 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
 }
 
 export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
-  if (!canUseKeyless__server) {
+  if (!canUseKeyless) {
     return null;
   }
 
@@ -40,6 +40,16 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
   if (!result) {
     return null;
   }
+
+  const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
+
+  /**
+   * Notify developers.
+   */
+  keylessLogger?.log({
+    cacheKey: result.publishableKey,
+    msg: createKeylessModeMessage(result),
+  });
 
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
@@ -53,4 +63,13 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     publishableKey,
     apiKeysUrl,
   };
+}
+
+export async function deleteKeylessAction() {
+  if (!canUseKeyless) {
+    return;
+  }
+
+  await import('../server/keyless-node.js').then(m => m.removeKeyless());
+  return;
 }

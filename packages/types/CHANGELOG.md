@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.41.2
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.41.1
+
+### Patch Changes
+
+- Support `enterprise_sso` strategy (SAML, OIDC, EASIE) on custom flows with `@clerk/elements` ([#4916](https://github.com/clerk/javascript/pull/4916)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.41.0
 
 ### Minor Changes

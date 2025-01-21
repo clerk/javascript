@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.22.0",
+  "version": "5.22.3",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -71,7 +71,8 @@
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",

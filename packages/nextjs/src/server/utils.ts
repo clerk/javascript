@@ -11,7 +11,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,
@@ -254,7 +254,7 @@ export function decryptClerkRequestData(
      *
      * Attempt one more time with the default dummy value.
      */
-    if (canUseKeyless__server) {
+    if (canUseKeyless) {
       try {
         return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
       } catch (e) {

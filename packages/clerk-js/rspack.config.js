@@ -50,7 +50,6 @@ const common = ({ mode, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        BUILD_ENABLE_NEW_COMPONENTS: JSON.stringify(process.env.BUILD_ENABLE_NEW_COMPONENTS),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
