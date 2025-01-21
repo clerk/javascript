@@ -1,28 +1,50 @@
-import { useEffect, useRef, useState } from 'react';
+import type { useOrganization } from '@clerk/shared/react';
+import type { GetMembersParams } from '@clerk/types';
+import { useEffect, useRef } from 'react';
 
 import { Flex, localizationKeys, useLocalizations } from '../../../ui/customizables';
 import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
+import { ACTIVE_MEMBERS_PAGE_SIZE } from './OrganizationMembers';
 
 type MembersSearchProps = {
-  isLoading: boolean;
-  onChange: (query: string) => void;
-  debounceMs?: number;
+  /**
+   * Controlled query param state by parent component
+   */
+  query: GetMembersParams['query'];
+  /**
+   * Controlled input field value by parent component
+   */
+  value: string;
+  /**
+   * Paginated organization memberships
+   */
+  memberships: ReturnType<typeof useOrganization>['memberships'];
+  /**
+   * Handler for change event on input field
+   */
+  onSearchChange: (value: string) => void;
+  /**
+   * Handler for `query` value changes
+   */
+  onQueryTrigger: (query: string) => void;
 };
 
-export const MembersSearch = ({ isLoading, onChange, debounceMs = 500 }: MembersSearchProps) => {
+const membersSearchDebounceMs = 500;
+
+export const MembersSearch = ({ query, value, memberships, onSearchChange, onQueryTrigger }: MembersSearchProps) => {
   const { t } = useLocalizations();
-  const [search, setSearch] = useState('');
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | undefined>();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+    onSearchChange(event.target.value);
   };
 
-  // Updates query state to trigger change handler only once user stops typing
+  // Trigger the `query` change on a parent component in order to
+  // refetch organization memberships once the user stops typing
   useEffect(() => {
     if (!inputRef.current) {
       return;
@@ -36,8 +58,8 @@ export const MembersSearch = ({ isLoading, onChange, debounceMs = 500 }: Members
         clearTimeout(debounceTimer.current);
 
         debounceTimer.current = setTimeout(() => {
-          onChange(search.trim());
-        }, debounceMs);
+          onQueryTrigger(value.trim());
+        }, membersSearchDebounceMs);
       },
       {
         signal: controller.signal,
@@ -47,7 +69,23 @@ export const MembersSearch = ({ isLoading, onChange, debounceMs = 500 }: Members
     return () => {
       controller.abort();
     };
-  }, [search, debounceMs, onChange]);
+  }, [value, onQueryTrigger]);
+
+  // If search is not performed on a initial page, resets pagination offset
+  // based on the response count
+  useEffect(() => {
+    if (!query || !memberships?.data) {
+      return;
+    }
+
+    const hasOnePageLeft = (memberships?.count ?? 0) <= ACTIVE_MEMBERS_PAGE_SIZE;
+
+    if (hasOnePageLeft) {
+      memberships?.fetchPage?.(1);
+    }
+  }, [query, memberships]);
+
+  const isFetchingNewData = !!memberships?.isLoading && !!memberships.data?.length;
 
   return (
     <Animated asChild>
@@ -59,7 +97,7 @@ export const MembersSearch = ({ isLoading, onChange, debounceMs = 500 }: Members
           spellCheck={false}
           aria-label='Search'
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
-          leftIcon={isLoading ? <Spinner /> : <MagnifyingGlass />}
+          leftIcon={isFetchingNewData ? <Spinner /> : <MagnifyingGlass />}
           onChange={handleChange}
           containerSx={{ width: '100%' }}
         />

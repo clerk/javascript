@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
@@ -34,33 +34,21 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
 
-  const [membershipsQuery, setMembershipsQuery] = useState<string>();
+  const [query, setQuery] = useState<string>();
+  const [search, setSearch] = useState<string>();
+
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
       ? {
           // Resets pagination offset when searching
-          pageSize: membershipsQuery ? undefined : ACTIVE_MEMBERS_PAGE_SIZE,
+          pageSize: query ? undefined : ACTIVE_MEMBERS_PAGE_SIZE,
           keepPreviousData: true,
-          query: membershipsQuery || undefined,
+          query: query || undefined,
         }
       : undefined,
   });
-
-  // If searching does not happen on a initial page, resets pagination offset
-  // based on the response count
-  useEffect(() => {
-    if (!membershipsQuery || !memberships?.data) {
-      return;
-    }
-
-    const hasOnePageLeft = (memberships?.count ?? 0) <= ACTIVE_MEMBERS_PAGE_SIZE;
-
-    if (hasOnePageLeft) {
-      memberships?.fetchPage?.(1);
-    }
-  }, [membershipsQuery, memberships]);
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
@@ -103,7 +91,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
                   {!!memberships?.count && (
                     <NotificationCountBadge
-                      shouldAnimate={!membershipsQuery}
+                      shouldAnimate={!query}
                       notificationCount={memberships.count}
                       colorScheme='outline'
                     />
@@ -154,8 +142,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                       <MembersActionsRow
                         actionSlot={
                           <MembersSearch
-                            isLoading={!!memberships?.isLoading && !!membershipsQuery}
-                            onChange={query => setMembershipsQuery(query)}
+                            query={query}
+                            value={search ?? ''}
+                            memberships={memberships}
+                            onSearchChange={query => setSearch(query)}
+                            onQueryTrigger={query => setQuery(query)}
                           />
                         }
                       />

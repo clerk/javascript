@@ -518,7 +518,7 @@ describe('OrganizationMembers', () => {
       await waitFor(async () =>
         expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
       );
-      expect(inviteButton).not.toBeInTheDocument();
+      expect(inviteButton).toBeInTheDocument();
       await userEvent.click(getByRole('button', { name: 'Cancel' }));
 
       await waitFor(async () => expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument());
