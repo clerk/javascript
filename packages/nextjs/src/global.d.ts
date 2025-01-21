@@ -21,3 +21,12 @@ interface Window {
 
 declare const PACKAGE_NAME: string;
 declare const PACKAGE_VERSION: string;
+
+// declare module global {
+//   // eslint-disable-next-line no-var
+//   var logger: {
+//     loggedMessages: Set<string>;
+//     logOnce: (msg: string) => void;
+//     warnOnce: (msg: string) => void;
+//   };
+// }

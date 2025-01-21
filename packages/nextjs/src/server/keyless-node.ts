@@ -1,7 +1,33 @@
 import type { AccountlessApplication } from '@clerk/backend';
 import { unstable_cache } from 'next/cache';
 
-// import { logger } from '@clerk/shared/logger';
+// if (!global.logger) {
+//   global.logger = {
+//     loggedMessages: new Set<string>(),
+//     /**
+//      * A custom logger that ensures messages are logged only once.
+//      * Reduces noise and duplicated messages when logs are in a hot codepath.
+//      */
+//     warnOnce: function (msg: string) {
+//       if (this.loggedMessages.has(msg)) {
+//         return;
+//       }
+//
+//       this.loggedMessages.add(msg);
+//       console.warn(msg);
+//     },
+//     logOnce: function (msg: string) {
+//       console.log([...this.loggedMessages.entries()]);
+//       if (this.loggedMessages.has(msg)) {
+//         return;
+//       }
+//
+//       console.log(msg);
+//       this.loggedMessages.add(msg);
+//       console.log('--------- Adding to cache');
+//     },
+//   };
+// }
 /**
  * Attention: Only import this module when the node runtime is used.
  * We are using conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
@@ -94,7 +120,8 @@ const notifyOnce = unstable_cache(
     return Promise.resolve();
   },
   ['keyless-notification'],
-  { revalidate: 10 },
+  // 10 minutes in seconds
+  { revalidate: 10 * 60 },
 );
 
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
@@ -142,7 +169,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
     /**
      * Notify developers.
      */
-    // logger.logOnce(createMessage(envVarsMap));
+    // global.logger.logOnce(createMessage(envVarsMap));
     await notifyOnce(envVarsMap);
 
     return envVarsMap;
@@ -157,7 +184,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   /**
    * Notify developers.
    */
-  // logger.logOnce(createMessage(accountlessApplication));
+  // global.logger.logOnce(createMessage(accountlessApplication));
   await notifyOnce(accountlessApplication);
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
