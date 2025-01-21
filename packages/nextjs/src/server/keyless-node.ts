@@ -1,5 +1,4 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 
 /**
  * Attention: Only import this module when the node runtime is used.
@@ -9,35 +8,7 @@ import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import nodeRuntime from '#safe-node-apis';
 
 import { createClerkClientWithOptions } from './createClerkClient';
-
-// 10 minutes in milliseconds
-const THROTTLE_DURATION_MS = 10 * 60 * 1000;
-
-function createClerkDevLogger() {
-  if (!isDevelopmentEnvironment()) {
-    return;
-  }
-
-  if (!global.__clerk_internal_keyless_logger) {
-    global.__clerk_internal_keyless_logger = {
-      __cache: new Map<string, { expiresAt: number }>(),
-
-      log: function ({ cacheKey, msg }: { cacheKey: string; msg: string }) {
-        if (this.__cache.has(cacheKey) && Date.now() < (this.__cache.get(cacheKey)?.expiresAt || 0)) {
-          return;
-        }
-
-        console.log(msg);
-
-        this.__cache.set(cacheKey, {
-          expiresAt: Date.now() + THROTTLE_DURATION_MS,
-        });
-      },
-    };
-  }
-}
-
-createClerkDevLogger();
+import { keylessLogger } from './keyless-log-cache';
 
 /**
  * The Clerk-specific directory name.
@@ -161,7 +132,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
     /**
      * Notify developers.
      */
-    global.__clerk_internal_keyless_logger?.log({
+    keylessLogger?.log({
       cacheKey: envVarsMap.publishableKey,
       msg: createMessage(envVarsMap),
     });
@@ -176,9 +147,9 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
 
   /**
-   * Notify developers.
+   * Notify developers
    */
-  global.__clerk_internal_keyless_logger?.log({
+  keylessLogger?.log({
     cacheKey: accountlessApplication.publishableKey,
     msg: createMessage(accountlessApplication),
   });
