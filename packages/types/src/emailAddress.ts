@@ -15,11 +15,7 @@ export type PrepareEmailAddressVerificationParams =
       strategy: EmailCodeStrategy;
     }
   | {
-      strategy: EmailLinkStrategy;
-      redirectUrl: string;
-    }
-  | {
-      strategy: EnterpriseSSOStrategy;
+      strategy: EmailLinkStrategy | EnterpriseSSOStrategy;
       redirectUrl: string;
     };
 

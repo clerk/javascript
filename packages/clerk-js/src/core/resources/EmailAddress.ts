@@ -13,7 +13,6 @@ import type {
   VerificationResource,
 } from '@clerk/types';
 
-import { clerkVerifyEmailAddressCalledBeforeCreate } from '../errors';
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
@@ -55,9 +54,6 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     const { run, stop } = Poller();
 
     const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('EmailAddress');
-      }
       await this.prepareVerification({
         strategy: 'email_link',
         redirectUrl: redirectUrl,
@@ -90,9 +86,6 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     const startEnterpriseSSOLinkFlow = async ({
       redirectUrl,
     }: StartEnterpriseSSOLinkFlowParams): Promise<EmailAddressResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('EmailAddress');
-      }
       const response = await this.prepareVerification({
         strategy: 'enterprise_sso',
         redirectUrl,
