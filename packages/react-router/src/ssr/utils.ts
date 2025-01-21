@@ -85,7 +85,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __clerkJSVersion: getPublicEnvVariables(context).clerkJsVersion,
     __telemetryDisabled: getPublicEnvVariables(context).telemetryDisabled,
     __telemetryDebug: getPublicEnvVariables(context).telemetryDebug,
-    __dangerouslyDisabledDevelopmentModeWarning:
+    __dangerouslyDisableDevelopmentModeWarning:
       getPublicEnvVariables(context).dangerouslyDisableDevelopmentModeWarning,
   });
 
