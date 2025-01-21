@@ -769,12 +769,18 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
      */
-    __internal_claimKeylessApplicationUrl?: string;
+    __internal_keyless_claimKeylessApplicationUrl?: string;
 
     /**
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
      */
-    __internal_copyInstanceKeysUrl?: string;
+    __internal_keyless_copyInstanceKeysUrl?: string;
+
+    /**
+     * Pass a function that will trigger the unmounting of the Keyless Prompt.
+     * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     */
+    __internal_keyless_dismissPrompt?: () => Promise<void>;
   };
 
 export interface NavigateOptions {
