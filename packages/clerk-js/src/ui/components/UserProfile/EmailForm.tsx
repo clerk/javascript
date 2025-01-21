@@ -128,6 +128,15 @@ function isEmailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   return email_address.enabled && email_address.verifications.includes('email_link');
 }
 
+/**
+ * Determines the email verification strategy based on the email address resource
+ * and instance
+ *
+ * @returns The verification strategy to use:
+ *  - 'enterprise_sso' - If the email domain matches an enterprise SSO connection
+ *  - 'email_link' - If email link verification is enabled for the instance
+ *  - 'email_code' - Fallback strategy when email links are disabled
+ */
 const getEmailAddressVerificationStrategy = (
   emailAddress: EmailAddressResource | undefined,
   env: EnvironmentResource,
