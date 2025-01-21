@@ -41,6 +41,10 @@ interface RenderOptions {
    */
   'error-callback'?: (errorCode: string) => void;
   /**
+   * A JavaScript callback invoked before the challenge enters interactive mode.
+   */
+  'before-interactive-callback'?: () => void;
+  /**
    * A JavaScript callback invoked when a given client/browser is not supported by the widget.
    */
   'unsupported-callback'?: () => boolean;
@@ -145,7 +149,6 @@ export const getTunstileToken = async (captchaOptions: {
         } else {
           const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
           if (visibleDiv) {
-            visibleDiv.style.display = 'block';
             widgetDiv = visibleDiv;
           } else {
             console.error('Captcha DOM element not found. Using invisible captcha widget.');
@@ -162,6 +165,14 @@ export const getTunstileToken = async (captchaOptions: {
           'refresh-expired': 'auto',
           callback: function (token: string) {
             resolve([token, id]);
+          },
+          'before-interactive-callback': () => {
+            const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+            if (visibleWidget) {
+              visibleWidget.style.maxHeight = 'unset';
+              visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
+              visibleWidget.style.marginBottom = '1.5rem';
+            }
           },
           'error-callback': function (errorCode) {
             errorCodes.push(errorCode);
@@ -211,7 +222,9 @@ export const getTunstileToken = async (captchaOptions: {
       if (isInvisibleWidget) {
         document.body.removeChild(widgetDiv as HTMLElement);
       } else {
-        (widgetDiv as HTMLElement).style.display = 'none';
+        (widgetDiv as HTMLElement).style.maxHeight = '0';
+        (widgetDiv as HTMLElement).style.minHeight = 'unset';
+        (widgetDiv as HTMLElement).style.marginBottom = 'unset';
       }
     }
   }
