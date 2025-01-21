@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex } from '../../customizables';
+import { Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -245,11 +245,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             <p
               data-text='Clerk is in keyless mode'
               aria-label={
-                success
-                  ? 'Application claim completed'
-                  : claimed
-                    ? 'Missing environment keys'
-                    : 'Clerk is in keyless mode'
+                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
               }
               css={css`
                 ${baseElementStyles};
@@ -260,11 +256,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 cursor: pointer;
               `}
             >
-              {success
-                ? 'Application claim completed'
-                : claimed
-                  ? 'Missing environment keys'
-                  : 'Clerk is in keyless mode'}
+              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
 
@@ -355,7 +347,23 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   >
                     {appName}
                   </span>{' '}
-                  has been successfully claimed.
+                  has been claimed. Configure settings from the{' '}
+                  <Link
+                    isExternal
+                    aria-label='Go to Dashboard to configure settings'
+                    href='https://dashboard.clerk.com/'
+                    sx={t => ({
+                      color: t.colors.$whiteAlpha600,
+
+                      textDecoration: 'underline solid',
+                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                      ':hover': {
+                        color: t.colors.$whiteAlpha800,
+                      },
+                    })}
+                  >
+                    Clerk Dashboard
+                  </Link>
                 </>
               ) : claimed ? (
                 <>
