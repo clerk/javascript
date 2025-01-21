@@ -4,6 +4,11 @@ const { name } = require('./package.json');
 const config = {
   displayName: name.replace('@clerk', ''),
   injectGlobals: true,
+  globals: {
+    __PKG_NAME__: '@clerk/clerk-js',
+    __PKG_VERSION__: 'test',
+    BUILD_ENABLE_NEW_COMPONENTS: '',
+  },
 
   testEnvironment: '<rootDir>/jest.jsdom-with-timezone.ts',
   roots: ['<rootDir>/src'],
