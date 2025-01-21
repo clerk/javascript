@@ -33,9 +33,6 @@ if (typeof window !== 'undefined') {
     })),
   });
 
-  global.__PKG_NAME__ = '';
-  global.__PKG_VERSION__ = '';
-
   //@ts-expect-error
   global.IntersectionObserver = class IntersectionObserver {
     constructor() {}
