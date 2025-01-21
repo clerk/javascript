@@ -56,7 +56,7 @@ export function clerkOAuthCallbackDidNotCompleteSignInSignUp(type: 'sign in' | '
   );
 }
 
-export function clerkVerifyEmailAddressCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
+export function clerkVerifyEmailAddressCalledBeforeCreate(type: 'SignIn' | 'SignUp' | 'EmailAddress'): never {
   throw new Error(`${errorPrefix} You need to start a ${type} flow by calling ${type}.create() first.`);
 }
 

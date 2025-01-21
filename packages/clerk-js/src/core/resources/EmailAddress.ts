@@ -56,7 +56,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
     const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+        clerkVerifyEmailAddressCalledBeforeCreate('EmailAddress');
       }
       await this.prepareVerification({
         strategy: 'email_link',
@@ -91,7 +91,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       redirectUrl,
     }: StartEnterpriseSSOLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+        clerkVerifyEmailAddressCalledBeforeCreate('EmailAddress');
       }
       const response = await this.prepareVerification({
         strategy: 'enterprise_sso',
