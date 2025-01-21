@@ -708,11 +708,10 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       enterpriseSSOLink: {
-        formSubtitle: 'Ein neuer Tab hat sich geöffnet, schließe die Anmeldung mit {{identifier}} dort ab.',
-        resendButton: 'Anmeldung erneut versuchen',
-        successMessage: 'Die E-Mail {{identifier}} wurde zu Ihrem Account hinzugefügt.',
+        formButton: undefined,
+        formSubtitle: undefined,
       },
-      formHint: 'Diese E-Mail-Adresse wird durch Ihre primäre Verifizierungsmethode bestätigt.',
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',

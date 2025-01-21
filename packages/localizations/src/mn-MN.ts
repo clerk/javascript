@@ -698,9 +698,8 @@ export const mnMN: LocalizationResource = {
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

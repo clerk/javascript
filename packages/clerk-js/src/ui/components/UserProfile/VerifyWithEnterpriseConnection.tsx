@@ -1,10 +1,11 @@
 import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
+import { useRouter } from '../../../ui/router';
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
-import { Button, descriptors, localizationKeys } from '../../customizables';
-import { FormButtonContainer, useCardState, VerificationLink } from '../../elements';
+import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
+import { FormButtonContainer, useCardState } from '../../elements';
 import { useEnterpriseSSOLink } from '../../hooks';
 import { handleError } from '../../utils';
 
@@ -15,6 +16,7 @@ type VerifyWithEnterpriseConnectionProps = {
 };
 
 export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnectionProps) => {
+  const { navigate } = useRouter();
   const { email, nextStep, onReset } = props;
   const card = useCardState();
   const profileContext = useUserProfileContext();
@@ -35,12 +37,19 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
       .catch(err => handleError(err, [], card.setError));
   }
 
+  async function handleClick() {
+    await navigate(email.verification.externalVerificationRedirectURL?.href || '');
+  }
+
   return (
     <>
-      <VerificationLink
-        resendButton={localizationKeys('userProfile.emailAddressPage.enterpriseSSOLink.resendButton')}
-        onResendCodeClicked={startVerification}
-      />
+      <Flex justify='center'>
+        <Button
+          variant='link'
+          onClick={handleClick}
+          localizationKey={localizationKeys('userProfile.emailAddressPage.enterpriseSSOLink.formButton')}
+        />
+      </Flex>
       <FormButtonContainer>
         <Button
           variant='ghost'

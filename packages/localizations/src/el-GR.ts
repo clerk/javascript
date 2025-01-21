@@ -703,9 +703,8 @@ export const elGR: LocalizationResource = {
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

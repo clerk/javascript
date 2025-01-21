@@ -694,9 +694,8 @@ export const bgBG: LocalizationResource = {
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

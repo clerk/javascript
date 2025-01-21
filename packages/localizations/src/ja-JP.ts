@@ -695,9 +695,8 @@ export const jaJP: LocalizationResource = {
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

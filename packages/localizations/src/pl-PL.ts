@@ -701,9 +701,8 @@ export const plPL: LocalizationResource = {
         successMessage: 'Adres e-mail {{identifier}} został dodany do twojego konta.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

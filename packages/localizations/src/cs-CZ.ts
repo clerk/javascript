@@ -693,9 +693,8 @@ export const csCZ: LocalizationResource = {
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

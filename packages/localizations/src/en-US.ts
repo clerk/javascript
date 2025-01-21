@@ -693,9 +693,8 @@ export const enUS: LocalizationResource = {
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       enterpriseSSOLink: {
-        formSubtitle: 'Complete the sign-in with {{identifier}} in the new tab that has opened.',
-        resendButton: 'Retry sign-in',
-        successMessage: 'The email {{identifier}} has been added to your account.',
+        formButton: 'Click to sign-in',
+        formSubtitle: 'Complete the sign-in with {{identifier}}',
       },
       formHint: 'This email address will be verified using your primary authentication method.',
       removeResource: {

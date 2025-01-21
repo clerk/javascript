@@ -699,9 +699,8 @@ export const trTR: LocalizationResource = {
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

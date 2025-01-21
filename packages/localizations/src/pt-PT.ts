@@ -680,6 +680,7 @@ export const ptPT: LocalizationResource = {
       title: 'Excluir conta',
     },
     emailAddressPage: {
+      formHint: 'Esse endereço de e-mail será verificado utilizando seu método principal de autenticação',
       emailCode: {
         formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
@@ -695,11 +696,9 @@ export const ptPT: LocalizationResource = {
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
       enterpriseSSOLink: {
-        formSubtitle: 'Complete a autenticação com {{identifier}} na nova janela do navegador que foi aberta.',
-        resendButton: 'Tentar novamente',
-        successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
+        formSubtitle: 'Complete a autenticação com {{identifier}}',
+        formButton: 'Clique para autenticar',
       },
-      formHint: 'Esse endereço de e-mail será verificado utilizando seu método principal de autenticação',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',

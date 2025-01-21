@@ -689,9 +689,8 @@ export const koKR: LocalizationResource = {
         successMessage: '{{identifier}} 이메일이 당신의 계정에 추가되었습니다.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

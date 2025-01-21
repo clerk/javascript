@@ -696,9 +696,8 @@ export const srRS: LocalizationResource = {
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

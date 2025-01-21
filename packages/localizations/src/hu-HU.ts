@@ -698,9 +698,8 @@ export const huHU: LocalizationResource = {
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {

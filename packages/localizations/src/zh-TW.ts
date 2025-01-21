@@ -686,9 +686,8 @@ export const zhTW: LocalizationResource = {
         successMessage: '電子郵件 {{identifier}} 已被添加到您的帳戶。',
       },
       enterpriseSSOLink: {
+        formButton: undefined,
         formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
       },
       formHint: undefined,
       removeResource: {
