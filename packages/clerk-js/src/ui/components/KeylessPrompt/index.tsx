@@ -343,6 +343,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       text-overflow: ellipsis;
                       max-width: 8.125rem;
                       vertical-align: bottom;
+                      font-weight: 500;
+                      color: #d5d5d5;
                     `}
                   >
                     {appName}
