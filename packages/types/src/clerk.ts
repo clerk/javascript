@@ -155,7 +155,7 @@ export interface Clerk {
    * Opens the Clerk SignIn component in a modal.
    * @param props Optional sign in configuration parameters.
    */
-  openSignIn: (props?: SignInProps) => void;
+  openSignIn: (props?: SignInModalProps) => void;
 
   /**
    * Closes the Clerk SignIn modal.
@@ -189,7 +189,7 @@ export interface Clerk {
    * Opens the Clerk SignUp component in a modal.
    * @param props Optional props that will be passed to the SignUp component.
    */
-  openSignUp: (props?: SignUpProps) => void;
+  openSignUp: (props?: SignUpModalProps) => void;
 
   /**
    * Closes the Clerk SignUp modal.
@@ -200,7 +200,7 @@ export interface Clerk {
    * Opens the Clerk UserProfile modal.
    * @param props Optional props that will be passed to the UserProfile component.
    */
-  openUserProfile: (props?: UserProfileProps) => void;
+  openUserProfile: (props?: UserProfileModalProps) => void;
 
   /**
    * Closes the Clerk UserProfile modal.
@@ -211,7 +211,7 @@ export interface Clerk {
    * Opens the Clerk OrganizationProfile modal.
    * @param props Optional props that will be passed to the OrganizationProfile component.
    */
-  openOrganizationProfile: (props?: OrganizationProfileProps) => void;
+  openOrganizationProfile: (props?: OrganizationProfileModalProps) => void;
 
   /**
    * Closes the Clerk OrganizationProfile modal.
@@ -222,7 +222,7 @@ export interface Clerk {
    * Opens the Clerk CreateOrganization modal.
    * @param props Optional props that will be passed to the CreateOrganization component.
    */
-  openCreateOrganization: (props?: CreateOrganizationProps) => void;
+  openCreateOrganization: (props?: CreateOrganizationModalProps) => void;
 
   /**
    * Closes the Clerk CreateOrganization modal.
@@ -233,7 +233,7 @@ export interface Clerk {
    * Opens the Clerk Waitlist modal.
    * @param props Optional props that will be passed to the Waitlist component.
    */
-  openWaitlist: (props?: WaitlistProps) => void;
+  openWaitlist: (props?: WaitlistModalProps) => void;
 
   /**
    * Closes the Clerk Waitlist modal.
