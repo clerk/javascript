@@ -6,6 +6,7 @@ import browser from 'webextension-polyfill';
 import { SCOPE, type Scope } from '../types';
 import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
 import { assertPublishableKey } from './utils/errors';
+import type { JWTHandlerParams } from './utils/jwt-handler';
 import { JWTHandler } from './utils/jwt-handler';
 import { validateManifest } from './utils/manifest';
 import { requestHandler } from './utils/request-handler';
@@ -20,6 +21,7 @@ Clerk.sdkMetadata = {
 };
 
 export type CreateClerkClientOptions = {
+  ___experimentalSyncHostListener?: boolean;
   publishableKey: string;
   scope?: Scope;
   storageCache?: StorageCache;
@@ -27,6 +29,7 @@ export type CreateClerkClientOptions = {
 };
 
 export async function createClerkClient({
+  ___experimentalSyncHostListener = false,
   publishableKey,
   scope,
   storageCache = BrowserStorageCache,
@@ -60,17 +63,35 @@ export async function createClerkClient({
   // Set up JWT handler and attempt to get JWT from storage on initialization
   const url = syncHost ? syncHost : DEFAULT_LOCAL_HOST_PERMISSION;
 
-  const jwtOptions = {
+  // Create Clerk instance
+  clerk = new Clerk(publishableKey);
+
+  // @ts-expect-error - TODO: sync is evaluating to true vs boolean
+  const jwtOptions: JWTHandlerParams = {
     frontendApi: key.frontendApi,
     name: isProd ? CLIENT_JWT_KEY : DEV_BROWSER_JWT_KEY,
-    sync,
     url,
+    sync: sync,
   };
+
+  if (jwtOptions.sync && ___experimentalSyncHostListener) {
+    jwtOptions.onListenerCallback = () => {
+      if (clerk.user) {
+        clerk.user.reload();
+      } else {
+        window.location.reload();
+      }
+    };
+  }
 
   const jwt = JWTHandler(storageCache, jwtOptions);
 
-  // Create Clerk instance
-  clerk = new Clerk(publishableKey);
+  // Add listener to sync host cookies if enabled
+  if (jwtOptions.sync && ___experimentalSyncHostListener) {
+    const listener = jwt.listener();
+    listener?.add();
+  }
+
   clerk.__unstable__onAfterResponse(responseHandler(jwt, { isProd }));
   clerk.__unstable__onBeforeRequest(requestHandler(jwt, { isProd }));
 
