@@ -1,33 +1,6 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { unstable_cache } from 'next/cache';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 
-// if (!global.logger) {
-//   global.logger = {
-//     loggedMessages: new Set<string>(),
-//     /**
-//      * A custom logger that ensures messages are logged only once.
-//      * Reduces noise and duplicated messages when logs are in a hot codepath.
-//      */
-//     warnOnce: function (msg: string) {
-//       if (this.loggedMessages.has(msg)) {
-//         return;
-//       }
-//
-//       this.loggedMessages.add(msg);
-//       console.warn(msg);
-//     },
-//     logOnce: function (msg: string) {
-//       console.log([...this.loggedMessages.entries()]);
-//       if (this.loggedMessages.has(msg)) {
-//         return;
-//       }
-//
-//       console.log(msg);
-//       this.loggedMessages.add(msg);
-//       console.log('--------- Adding to cache');
-//     },
-//   };
-// }
 /**
  * Attention: Only import this module when the node runtime is used.
  * We are using conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
@@ -36,6 +9,35 @@ import { unstable_cache } from 'next/cache';
 import nodeRuntime from '#safe-node-apis';
 
 import { createClerkClientWithOptions } from './createClerkClient';
+
+// 10 minutes in milliseconds
+const THROTTLE_DURATION_MS = 10 * 60 * 1000;
+
+function createClerkDevLogger() {
+  if (!isDevelopmentEnvironment()) {
+    return;
+  }
+
+  if (!global.__clerk_internal_keyless_logger) {
+    global.__clerk_internal_keyless_logger = {
+      __cache: new Map<string, { expiresAt: number }>(),
+
+      log: function ({ cacheKey, msg }: { cacheKey: string; msg: string }) {
+        if (this.__cache.has(cacheKey) && Date.now() < (this.__cache.get(cacheKey)?.expiresAt || 0)) {
+          return;
+        }
+
+        console.log(msg);
+
+        this.__cache.set(cacheKey, {
+          expiresAt: Date.now() + THROTTLE_DURATION_MS,
+        });
+      },
+    };
+  }
+}
+
+createClerkDevLogger();
 
 /**
  * The Clerk-specific directory name.
@@ -114,16 +116,6 @@ const createMessage = (keys: AccountlessApplication) => {
   return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
 };
 
-const notifyOnce = unstable_cache(
-  (keys: AccountlessApplication) => {
-    console.log(createMessage(keys));
-    return Promise.resolve();
-  },
-  ['keyless-notification'],
-  // 10 minutes in seconds
-  { revalidate: 10 * 60 },
-);
-
 async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
   if (!nodeRuntime.fs) {
     // This should never happen.
@@ -169,8 +161,10 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
     /**
      * Notify developers.
      */
-    // global.logger.logOnce(createMessage(envVarsMap));
-    await notifyOnce(envVarsMap);
+    global.__clerk_internal_keyless_logger?.log({
+      cacheKey: envVarsMap.publishableKey,
+      msg: createMessage(envVarsMap),
+    });
 
     return envVarsMap;
   }
@@ -184,8 +178,10 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   /**
    * Notify developers.
    */
-  // global.logger.logOnce(createMessage(accountlessApplication));
-  await notifyOnce(accountlessApplication);
+  global.__clerk_internal_keyless_logger?.log({
+    cacheKey: accountlessApplication.publishableKey,
+    msg: createMessage(accountlessApplication),
+  });
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
