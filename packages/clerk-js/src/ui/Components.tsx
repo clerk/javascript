@@ -517,14 +517,16 @@ const Components = (props: ComponentsProps) => {
           </LazyImpersonationFabProvider>
         )}
 
-        {state.options?.__internal_claimKeylessApplicationUrl && state.options?.__internal_copyInstanceKeysUrl && (
-          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-            <KeylessPrompt
-              claimUrl={state.options.__internal_claimKeylessApplicationUrl}
-              copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
-            />
-          </LazyImpersonationFabProvider>
-        )}
+        {state.options?.__internal_keyless_claimKeylessApplicationUrl &&
+          state.options?.__internal_keyless_copyInstanceKeysUrl && (
+            <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+              <KeylessPrompt
+                claimUrl={state.options.__internal_keyless_claimKeylessApplicationUrl}
+                copyKeysUrl={state.options.__internal_keyless_copyInstanceKeysUrl}
+                onDismiss={state.options.__internal_keyless_dismissPrompt}
+              />
+            </LazyImpersonationFabProvider>
+          )}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>

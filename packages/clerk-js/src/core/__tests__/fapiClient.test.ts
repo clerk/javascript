@@ -1,22 +1,22 @@
-import type { Clerk } from '@clerk/types';
+import type { InstanceType } from '@clerk/types';
 
 import { SUPPORTED_FAPI_VERSION } from '../constants';
 import { createFapiClient } from '../fapiClient';
 
-const mockedClerkInstance = {
+const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
-  version: '42.0.0',
-  session: {
-    id: 'deadbeef',
+  getSessionId() {
+    return 'sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX';
   },
-} as Clerk;
+  instanceType: 'production' as InstanceType,
+};
 
-const fapiClient = createFapiClient(mockedClerkInstance);
+const fapiClient = createFapiClient(baseFapiClientOptions);
 
 const proxyUrl = 'https://clerk.com/api/__clerk';
 
 const fapiClientWithProxy = createFapiClient({
-  ...mockedClerkInstance,
+  ...baseFapiClientOptions,
   proxyUrl,
 });
 
@@ -24,7 +24,7 @@ type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;
 };
 
-// @ts-ignore
+// @ts-ignore -- We don't need to fully satisfy the fetch types for the sake of this mock
 global.fetch = jest.fn(() =>
   Promise.resolve<RecursivePartial<Response>>({
     headers: {
@@ -37,10 +37,9 @@ global.fetch = jest.fn(() =>
 const oldWindowLocation = window.location;
 
 beforeAll(() => {
-  // @ts-ignore
+  // @ts-expect-error -- "The operand of a delete operator must be optional"
   delete window?.location;
 
-  // @ts-ignore
   window.location = Object.defineProperties(
     {},
     {
@@ -51,19 +50,11 @@ beforeAll(() => {
         value: 'http://test.host',
       },
     },
-  );
-
-  window.Clerk = {
-    // @ts-ignore
-    session: {
-      id: 'sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX',
-    },
-  };
+  ) as Location;
 });
 
 beforeEach(() => {
-  // @ts-ignore
-  global.fetch.mockClear();
+  (global.fetch as jest.Mock).mockClear();
 });
 
 afterAll(() => {
@@ -74,43 +65,43 @@ afterAll(() => {
 describe('buildUrl(options)', () => {
   it('returns the full frontend API URL', () => {
     expect(fapiClient.buildUrl({ path: '/foo' }).href).toBe(
-      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
   it('returns the full frontend API URL using proxy url', () => {
     expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(
-      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
   it('adds _clerk_session_id as a query parameter if provided and path does not start with client or waitlist', () => {
     expect(fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href).toBe(
-      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=sess_42`,
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_42`,
     );
     expect(fapiClient.buildUrl({ path: '/client/foo', sessionId: 'sess_42' }).href).toBe(
-      `https://clerk.example.com/v1/client/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/client/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
     expect(fapiClient.buildUrl({ path: '/waitlist', sessionId: 'sess_42' }).href).toBe(
-      `https://clerk.example.com/v1/waitlist?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/waitlist?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
   it('parses search params is an object with string values', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: { test: '1' } }).href).toBe(
-      `https://clerk.example.com/v1/foo?test=1&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/foo?test=1&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
   it('parses string search params ', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: 'test=2' }).href).toBe(
-      `https://clerk.example.com/v1/foo?test=2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/foo?test=2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
   it('parses search params when value contains invalid url symbols', () => {
     expect(fapiClient.buildUrl({ path: '/foo', search: { bar: 'test=2' } }).href).toBe(
-      `https://clerk.example.com/v1/foo?bar=test%3D2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/foo?bar=test%3D2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
@@ -123,7 +114,7 @@ describe('buildUrl(options)', () => {
         },
       }).href,
     ).toBe(
-      `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0`,
+      `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
     );
   });
 
@@ -139,7 +130,7 @@ describe('buildUrl(options)', () => {
           test: undefined,
         },
       }).href,
-    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=42.0.0');
+    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=test');
   });
 
   const cases = [
@@ -160,7 +151,7 @@ describe('request', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
+      `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
       expect.objectContaining({
         credentials: 'include',
         method: 'GET',
@@ -175,7 +166,7 @@ describe('request', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
+      `${proxyUrl}/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX`,
       expect.objectContaining({
         credentials: 'include',
         method: 'GET',
@@ -185,8 +176,7 @@ describe('request', () => {
   });
 
   it('returns array response as array', async () => {
-    // @ts-ignore
-    global.fetch.mockResolvedValueOnce(
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
       Promise.resolve<RecursivePartial<Response>>({
         headers: {
           get: jest.fn(() => 'sess_43'),
