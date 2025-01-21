@@ -114,7 +114,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
-    // if (clerkInstance.instanceType === 'development' && clerkInstance.isSatellite) {
     if (options.domain) {
       searchParams.append('__domain', options.domain);
     }
