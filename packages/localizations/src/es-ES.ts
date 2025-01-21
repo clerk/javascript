@@ -685,12 +685,16 @@ export const esES: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint:
+          'A esta dirección de correo electrónico se le enviará un correo electrónico con un Código de verificación.',
         formSubtitle: 'Introduzca el código de verificación enviado a {{identifier}}',
         formTitle: 'Código de verificación',
         resendButton: 'Re-enviar código',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
       emailLink: {
+        formHint:
+          'Se enviará un correo electrónico con un enlace de verificación a esta dirección de correo electrónico.',
         formSubtitle: 'Haga clic en el enlace de verificación en el correo electrónico enviado a {{identifier}}',
         formTitle: 'Enlace de verificación',
         resendButton: 'Reenviar enlace',

@@ -679,12 +679,14 @@ export const enUS: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'An email containing a verification code will be sent to this email address.',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
         formTitle: 'Verification code',
         resendButton: "Didn't receive a code? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
       emailLink: {
+        formHint: 'An email containing a verification link will be sent to this email address.',
         formSubtitle: 'Click on the verification link in the email sent to {{identifier}}',
         formTitle: 'Verification link',
         resendButton: "Didn't receive a link? Resend",

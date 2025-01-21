@@ -675,12 +675,14 @@ export const koKR: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: '이 이메일 주소로 인증 코드가 포함된 이메일이 전송됩니다.',
         formSubtitle: '{{identifier}}에게 전송된 인증 코드를 입력합니다',
         formTitle: '인증 코드',
         resendButton: '코드 재전송',
         successMessage: '{{identifier}} 이메일이 당신의 계정에 추가되었습니다.',
       },
       emailLink: {
+        formHint: '인증 링크가 포함된 이메일이 이 이메일 주소로 전송됩니다.',
         formSubtitle: '{{identifier}}에게 전송된 이메일의 링크를 클릭합니다.',
         formTitle: '인증 링크',
         resendButton: '링크 재전송',

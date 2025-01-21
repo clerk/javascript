@@ -684,12 +684,14 @@ export const mnMN: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Баталгаажуулах код агуулсан имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}} руу илгээсэн баталгаажуулах кодыг илгээх',
         formTitle: 'Verification code',
         resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       emailLink: {
+        formHint: 'Баталгаажуулах холбоос бүхий имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}}руу илгээсэн имэйл дэх баталгаажуулах холбоос дээр дарна уу.',
         formTitle: 'Баталгаажуулах холбоос',
         resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',

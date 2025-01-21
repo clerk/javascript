@@ -680,12 +680,14 @@ export const arSA: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'سيتم إرسال بريد إلكتروني يحتوي على رمز التحقق لهذا البريد الإلكتروني',
         formSubtitle: 'أرسل رمز التحقق المرسل إلى {{identifier}}',
         formTitle: 'رمز التحقق',
         resendButton: 'لم يصلك الرمز؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
       emailLink: {
+        formHint: 'سيتم إرسال بريد إلكتروني يحتوي على رمز التحقق لهذا البريد الإلكتروني',
         formSubtitle: 'أنقر على رابط التحقق المرسل إلى البريد الألكتروني {{identifier}}',
         formTitle: 'رابط التحقق',
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',

@@ -682,12 +682,14 @@ export const srRS: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'E-mail sadrži verifikacioni kod koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Unesi verifikacioni kod poslat na {{identifier}}',
         formTitle: 'Verifikacioni kod',
         resendButton: 'Nisi primio kod? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       emailLink: {
+        formHint: 'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',
         formTitle: 'Verifikacioni link',
         resendButton: 'Nisi primio link? Pošalji ponovo',

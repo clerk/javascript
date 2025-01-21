@@ -688,12 +688,14 @@ export const ptBR: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
         formTitle: 'Código de verificação',
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
       },
       emailLink: {
+        formHint: 'Um e-mail contendo um link de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Clique no link de verificação enviado para {{identifier}}',
         formTitle: 'Link de verificação',
         resendButton: 'Não recebeu um código? Reenviar',

@@ -681,12 +681,14 @@ export const viVN: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Một email chứa mã xác minh sẽ được gửi đến địa chỉ email này.',
         formSubtitle: 'Nhập mã xác minh được gửi đến {{identifier}}',
         formTitle: 'Mã xác minh',
         resendButton: 'Không nhận được mã? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
       emailLink: {
+        formHint: 'Một email chứa liên kết xác minh sẽ được gửi đến địa chỉ email này.',
         formSubtitle: 'Nhấp vào liên kết xác minh trong email được gửi đến {{identifier}}',
         formTitle: 'Liên kết xác minh',
         resendButton: 'Không nhận được liên kết? Gửi lại',

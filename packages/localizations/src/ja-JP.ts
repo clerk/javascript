@@ -681,12 +681,14 @@ export const jaJP: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'このメールアドレスには検証コードが含まれたメールが送信されます。',
         formSubtitle: '{{identifier}}に送信された検証コードを入力してください。',
         formTitle: '検証コード',
         resendButton: 'コードを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
       emailLink: {
+        formHint: 'このメールアドレスには検証リンクが含まれたメールが送信されます。',
         formSubtitle: '{{identifier}}に送信されたメールの検証リンクをクリックしてください。',
         formTitle: '検証リンク',
         resendButton: 'リンクを再送信',

@@ -683,12 +683,14 @@ export const nbNO: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'En e-post med en verifiseringskode vil bli sendt til denne e-postadressen.',
         formSubtitle: 'Skriv inn verifiseringskoden som er sendt til {{identifier}}',
         formTitle: 'Verifiseringskode',
         resendButton: 'Send kode på nytt',
         successMessage: 'E-posten {{identifier}} har blitt lagt til kontoen din.',
       },
       emailLink: {
+        formHint: 'En e-post med en verifiseringslenke vil bli sendt til denne e-postadressen.',
         formSubtitle: 'Klikk på verifiseringslenken i e-posten sendt til {{identifier}}',
         formTitle: 'Verifiseringslenke',
         resendButton: 'Send lenke på nytt',

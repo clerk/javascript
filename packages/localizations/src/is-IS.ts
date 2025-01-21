@@ -687,12 +687,14 @@ export const isIS: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Tölvupóstur sem inniheldur staðfestingarkóða verður sendur á þetta netfang.',
         formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á {{identifier}}',
         formTitle: 'Staðfestingarkóði',
         resendButton: 'Fékkstu ekki kóða? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
       emailLink: {
+        formHint: 'Tölvupóstur sem inniheldur staðfestingartengil verður sendur á þetta netfang.',
         formSubtitle: 'Smelltu á staðfestingartengilinn í tölvupóstinum sem sendur var á {{identifier}}',
         formTitle: 'Staðfestingartengill',
         resendButton: 'Fékkstu ekki tengil? Senda aftur',

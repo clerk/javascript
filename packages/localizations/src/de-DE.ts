@@ -694,12 +694,14 @@ export const deDE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungscode gesendet.',
         formSubtitle: 'Geben Sie den Bestätigungscode ein, der an {{identifier}} gesendet wird',
         formTitle: 'Verifizierungs-Schlüssel',
         resendButton: 'Code erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       emailLink: {
+        formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungslink gesendet.',
         formSubtitle: 'Klicken Sie auf den Bestätigungslink in der an {{identifier}} gesendeten E-Mail',
         formTitle: 'Bestätigungslink',
         resendButton: 'Link erneut senden',

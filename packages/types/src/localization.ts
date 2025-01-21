@@ -496,7 +496,10 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
       emailLink: {
-        formHint?: LocalizationValue;
+        /**
+         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         */
+        formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
         resendButton: LocalizationValue;

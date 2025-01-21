@@ -682,12 +682,14 @@ export const nlNL: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Een mail met daarin een verificatiecode is verstuurd naar dit adres.',
         formSubtitle: 'Voer de verificatiecode in die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatiecode',
         resendButton: 'Verstuur code opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
       emailLink: {
+        formHint: 'Een mail met daarin een verificatielink is verstuurd naar dit adres.',
         formSubtitle: 'Klik op de verificatielink die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatielink',
         resendButton: 'Verstuur link opnieuw',

@@ -683,12 +683,14 @@ export const fiFI: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Vahvistuskoodin sisältävä sähköposti lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Syötä sähköpostiisi {{identifier}} lähetetty koodi',
         formTitle: 'Vahvistuskoodi',
         resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
       emailLink: {
+        formHint: 'Vahvistuslinkki lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
         formTitle: 'Vahvistuslinkki',
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',

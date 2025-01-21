@@ -681,23 +681,25 @@ export const ptPT: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
         formTitle: 'Código de verificação',
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
       emailLink: {
+        formHint: 'Um e-mail contendo um link de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Clique no link de verificação enviado para {{identifier}}',
         formTitle: 'Link de verificação',
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
       enterpriseSSOLink: {
-        formSubtitle: undefined,
-        resendButton: undefined,
-        successMessage: undefined,
+        formSubtitle: 'Complete a autenticação com {{identifier}} na nova janela do navegador que foi aberta.',
+        resendButton: 'Tentar novamente',
+        successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
       },
-      formHint: undefined,
+      formHint: 'Esse endereço de e-mail será verificado utilizando seu método principal de autenticação',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',

@@ -689,12 +689,14 @@ export const elGR: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
+        formHint: 'Θα σταλεί ένα email που περιέχει έναν κωδικό επαλήθευσης σε αυτήν τη διεύθυνση email.',
         formSubtitle: 'Εισαγάγετε τον κωδικό επαλήθευσης που εστάλη στην {{identifier}}',
         formTitle: 'Κωδικός επαλήθευσης',
         resendButton: 'Δεν λάβατε κωδικό; Επανάληψη αποστολής',
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
       emailLink: {
+        formHint: 'Θα σταλεί ένα email που περιέχει έναν σύνδεσμο επαλήθευσης σε αυτήν τη διεύθυνση email.',
         formSubtitle: 'Κάντε κλικ στον σύνδεσμο επαλήθευσης στο email που εστάλη στην {{identifier}}',
         formTitle: 'Σύνδεσμος επαλήθευσης',
         resendButton: 'Δεν λάβατε κάποιον σύνδεσμο; Επανάληψη αποστολής',
