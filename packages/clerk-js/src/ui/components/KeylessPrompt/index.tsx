@@ -353,7 +353,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   <Link
                     isExternal
                     aria-label='Go to Dashboard to configure settings'
-                    href='https://dashboard.clerk.com/'
+                    href='https://dashboard.clerk.com/last-active?path=user-authentication/email-phone-username'
                     sx={t => ({
                       color: t.colors.$whiteAlpha600,
 
