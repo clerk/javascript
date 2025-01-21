@@ -42,8 +42,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
       ? {
-          // Resets pagination offset when searching
-          pageSize: query ? undefined : ACTIVE_MEMBERS_PAGE_SIZE,
           keepPreviousData: true,
           query: query || undefined,
         }

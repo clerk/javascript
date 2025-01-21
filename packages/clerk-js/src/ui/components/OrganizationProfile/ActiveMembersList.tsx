@@ -44,7 +44,6 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
       pageCount={memberships?.pageCount || 0}
       itemsPerPage={pageSize}
       isLoading={(memberships?.isLoading && !memberships?.data) || loadingRoles}
-      // TODO -> Add new localization key with search query - eg: "No members to display for 'foo'"
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),

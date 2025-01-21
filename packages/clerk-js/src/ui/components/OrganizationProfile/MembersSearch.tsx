@@ -40,11 +40,17 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
   const debounceTimer = useRef<NodeJS.Timeout | undefined>();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(event.target.value);
+    const value = event.target.value;
+    onSearchChange(value);
+
+    const shouldClearQuery = value === '';
+    if (shouldClearQuery) {
+      onQueryTrigger(value);
+    }
   };
 
   // Debounce the input value changes until the user stops typing
-  // and trigger the `query` param setter
+  // to trigger the `query` param setter
   useEffect(() => {
     if (!inputRef.current) {
       return;
@@ -79,13 +85,12 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
     }
 
     const hasOnePageLeft = (memberships?.count ?? 0) <= ACTIVE_MEMBERS_PAGE_SIZE;
-
     if (hasOnePageLeft) {
       memberships?.fetchPage?.(1);
     }
   }, [query, memberships]);
 
-  const isFetchingNewData = !!memberships?.isLoading && !!memberships.data?.length;
+  const isFetchingNewData = value && !!memberships?.isLoading && !!memberships.data?.length;
 
   return (
     <Animated asChild>
