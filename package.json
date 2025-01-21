@@ -38,8 +38,8 @@
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
     "version": "changeset version && ./scripts/version-info.sh",
+    "version-packages:snapshot": "./scripts/snapshot.mjs",
     "version:canary": "./scripts/canary.mjs",
-    "version:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace --sig; cd '../../'; done"
   },
   "devDependencies": {
