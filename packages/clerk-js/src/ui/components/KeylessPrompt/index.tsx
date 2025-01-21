@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { Flex } from '../../customizables';
@@ -14,6 +14,7 @@ import { useRevalidateEnvironment } from './use-revalidate-environment';
 type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
+  onDismiss: (() => Promise<unknown>) | undefined;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
@@ -25,10 +26,21 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
 
-  const success = false;
+  const success = typeof _props.onDismiss === 'function' && claimed;
   const appName = environment.displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
+
+  const urlToDashboard = useMemo(() => {
+    if (claimed) {
+      return _props.copyKeysUrl;
+    }
+
+    const url = new URL(_props.claimUrl);
+    // Clerk Dashboard accepts a `return_url` query param when visiting `/apps/claim`.
+    url.searchParams.append('return_url', window.location.href);
+    return url.href;
+  }, [claimed, _props.copyKeysUrl, _props.claimUrl]);
 
   const baseElementStyles = css`
     box-sizing: border-box;
@@ -71,6 +83,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
     text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
     white-space: nowrap;
     user-select: none;
+    cursor: pointer;
     background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
     box-shadow:
       0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
@@ -279,6 +292,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               color: #8c8c8c;
               transition: color 130ms ease-out;
               display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
+              cursor: pointer;
 
               :hover {
                 color: #eeeeee;
@@ -374,6 +388,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             (success ? (
               <button
                 type='button'
+                onClick={async () => {
+                  await _props.onDismiss?.();
+                  window.location.reload();
+                }}
                 css={css`
                   ${mainCTAStyles};
                   &:hover {
@@ -386,7 +404,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               </button>
             ) : (
               <a
-                href={claimed ? _props.copyKeysUrl : _props.claimUrl}
+                href={urlToDashboard}
                 target='_blank'
                 rel='noopener noreferrer'
                 data-expanded={isForcedExpanded}

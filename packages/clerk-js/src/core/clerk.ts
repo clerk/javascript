@@ -2081,12 +2081,14 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleKeylessPrompt = () => {
-    if (this.#options.__internal_claimKeylessApplicationUrl) {
+    if (this.#options.__internal_keyless_claimKeylessApplicationUrl) {
       void this.#componentControls?.ensureMounted().then(controls => {
+        // TODO(@pantelis): Investigate if this resets existing props
         controls.updateProps({
           options: {
-            __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
-            __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+            __internal_keyless_claimKeylessApplicationUrl: this.#options.__internal_keyless_claimKeylessApplicationUrl,
+            __internal_keyless_copyInstanceKeysUrl: this.#options.__internal_keyless_copyInstanceKeysUrl,
+            __internal_keyless_dismissPrompt: this.#options.__internal_keyless_dismissPrompt,
           },
         });
       });
