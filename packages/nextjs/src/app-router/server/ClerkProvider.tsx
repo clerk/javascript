@@ -77,9 +77,11 @@ export async function ClerkProvider(
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
     const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
+    const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
+      '../../server/keyless-log-cache.js'
+    );
 
     if (newOrReadKeys) {
-      const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
       const clientProvider = (
         <ClientClerkProvider
           {...mergeNextClerkPropsWithEnv({
@@ -97,8 +99,26 @@ export async function ClerkProvider(
       );
 
       if (runningWithClaimedKeys) {
+        /**
+         * Notify developers.
+         */
+        keylessLogger?.log({
+          cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
+          msg: createConfirmationMessage(),
+        });
+
         output = clientProvider;
       } else {
+        const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
+
+        /**
+         * Notify developers.
+         */
+        keylessLogger?.log({
+          cacheKey: newOrReadKeys.publishableKey,
+          msg: createKeylessModeMessage(newOrReadKeys),
+        });
+
         output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
       }
     }
