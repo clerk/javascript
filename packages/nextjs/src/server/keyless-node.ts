@@ -1,5 +1,4 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { logger } from '@clerk/shared/logger';
 
 /**
  * Attention: Only import this module when the node runtime is used.
@@ -87,10 +86,6 @@ export function safeParseClerkFile(): AccountlessApplication | undefined {
   }
 }
 
-const createMessage = (keys: AccountlessApplication) => {
-  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
-};
-
 /**
  * Using both an in-memory and file system lock seems to be the most effective solution.
  */
@@ -154,11 +149,6 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
   if (envVarsMap?.publishableKey && envVarsMap?.secretKey) {
     unlockFileWriting();
 
-    /**
-     * Notify developers.
-     */
-    logger.logOnce(createMessage(envVarsMap));
-
     return envVarsMap;
   }
 
@@ -167,11 +157,6 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    */
   const client = createClerkClientWithOptions({});
   const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
-
-  /**
-   * Notify developers.
-   */
-  logger.logOnce(createMessage(accountlessApplication));
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
