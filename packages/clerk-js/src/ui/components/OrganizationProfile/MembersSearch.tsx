@@ -43,8 +43,8 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
     onSearchChange(event.target.value);
   };
 
-  // Trigger the `query` change on a parent component in order to
-  // refetch organization memberships once the user stops typing
+  // Debounce the input value changes until the user stops typing
+  // and trigger the `query` param setter
   useEffect(() => {
     if (!inputRef.current) {
       return;
@@ -91,6 +91,7 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
     <Animated asChild>
       <Flex sx={{ width: '100%' }}>
         <InputWithIcon
+          value={value}
           ref={inputRef}
           type='search'
           autoCapitalize='none'

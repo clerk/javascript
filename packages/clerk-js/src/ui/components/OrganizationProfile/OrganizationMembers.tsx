@@ -35,7 +35,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
 
   const [query, setQuery] = useState<string>();
-  const [search, setSearch] = useState<string>();
+  const [search, setSearch] = useState('');
 
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
@@ -143,7 +143,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                         actionSlot={
                           <MembersSearch
                             query={query}
-                            value={search ?? ''}
+                            value={search}
                             memberships={memberships}
                             onSearchChange={query => setSearch(query)}
                             onQueryTrigger={query => setQuery(query)}
