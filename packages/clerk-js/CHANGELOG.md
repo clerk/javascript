@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.73.13
+
+### Patch Changes
+
+- Improvements on Smart bot protection ([#4943](https://github.com/clerk/javascript/pull/4943)) by [@anagstef](https://github.com/anagstef)
+
+  - Fix bot protection layout shift on the sign-up form.
+  - Fix the transfer flow when captcha is interactive.
+
 ## 4.73.12
 
 ### Patch Changes
