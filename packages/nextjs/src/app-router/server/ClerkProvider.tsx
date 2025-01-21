@@ -85,8 +85,8 @@ export async function ClerkProvider(
           {...mergeNextClerkPropsWithEnv({
             ...rest,
             publishableKey: newOrReadKeys.publishableKey,
-            __internal_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
-            __internal_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
+            __internal_keyless_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
+            __internal_keyless_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
             __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
           })}
           nonce={await generateNonce()}
