@@ -112,11 +112,20 @@ export async function ClerkProvider(
         const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
 
         /**
+         * Allow developer to return to local application after claiming
+         */
+        const referer = (await headers()).get('referer');
+        const claimUrl = new URL(newOrReadKeys.claimUrl);
+        if (referer) {
+          claimUrl.searchParams.set('return_url', referer);
+        }
+
+        /**
          * Notify developers.
          */
         keylessLogger?.log({
           cacheKey: newOrReadKeys.publishableKey,
-          msg: createKeylessModeMessage(newOrReadKeys),
+          msg: createKeylessModeMessage({ ...newOrReadKeys, claimUrl: claimUrl.href }),
         });
 
         output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
