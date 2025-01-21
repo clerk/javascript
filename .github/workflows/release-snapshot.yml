@@ -91,7 +91,7 @@ jobs:
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
-        run: npm run turbo build $TURBO_ARGS
+        run: npx turbo build $TURBO_ARGS
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
