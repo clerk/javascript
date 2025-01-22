@@ -18,9 +18,10 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
           position: 'relative',
           '& .cl-internal-icon': {
             position: 'absolute',
-            left: theme.space.$4,
+            left: theme.space.$3x5,
             width: theme.sizes.$3x5,
             height: theme.sizes.$3x5,
+            pointerEvents: 'none',
           },
         },
         containerSx,
