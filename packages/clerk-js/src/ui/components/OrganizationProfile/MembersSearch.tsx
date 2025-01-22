@@ -37,45 +37,29 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
   const { t } = useLocalizations();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout | undefined>();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    onSearchChange(value);
+    const eventValue = event.target.value;
+    onSearchChange(eventValue);
 
-    const shouldClearQuery = value === '';
+    const shouldClearQuery = eventValue === '';
     if (shouldClearQuery) {
-      onQueryTrigger(value);
+      onQueryTrigger(eventValue);
     }
   };
 
   // Debounce the input value changes until the user stops typing
   // to trigger the `query` param setter
-  useEffect(() => {
-    if (!inputRef.current) {
-      return;
+  function handleKeyUp() {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
     }
 
-    const controller = new AbortController();
-
-    inputRef.current.addEventListener(
-      'keyup',
-      () => {
-        clearTimeout(debounceTimer.current);
-
-        debounceTimer.current = setTimeout(() => {
-          onQueryTrigger(value.trim());
-        }, membersSearchDebounceMs);
-      },
-      {
-        signal: controller.signal,
-      },
-    );
-
-    return () => {
-      controller.abort();
-    };
-  }, [value, onQueryTrigger]);
+    debounceTimer.current = setTimeout(() => {
+      onQueryTrigger(value.trim());
+    }, membersSearchDebounceMs);
+  }
 
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
@@ -98,6 +82,7 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
         <InputWithIcon
           value={value}
           ref={inputRef}
+          onKeyUp={handleKeyUp}
           type='search'
           autoCapitalize='none'
           spellCheck={false}

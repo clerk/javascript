@@ -34,7 +34,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
 
-  const [query, setQuery] = useState<string>();
+  const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
 
   const { membershipRequests, memberships, invitations } = useOrganization({
