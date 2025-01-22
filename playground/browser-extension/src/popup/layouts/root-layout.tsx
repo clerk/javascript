@@ -22,7 +22,7 @@ export const RootLayout = () => {
       publishableKey={PUBLISHABLE_KEY}
       afterSignOutUrl='/'
       syncHost={SYNC_HOST}
-      ___experimentalSyncHostListener
+      __experimental_syncHostListener
     >
       <div className='plasmo-w-[785px] plasmo-h-[600px] plasmo-flex plasmo-flex-col'>
         <main className='plasmo-grow plasmo-border-2 plasmo-border-red-500'>

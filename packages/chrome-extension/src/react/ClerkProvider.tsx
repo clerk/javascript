@@ -11,13 +11,13 @@ type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
    * @experimental
    * @description Enables the listener to sync host cookies on changes.
    */
-  ___experimentalSyncHostListener?: boolean;
+  __experimental_syncHostListener?: boolean;
   storageCache?: StorageCache;
   syncHost?: string;
 };
 
 export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { children, storageCache, syncHost, ___experimentalSyncHostListener, ...rest } = props;
+  const { children, storageCache, syncHost, __experimental_syncHostListener, ...rest } = props;
   const { publishableKey = '' } = props;
 
   const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
@@ -25,10 +25,10 @@ export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Ele
   React.useEffect(() => {
     void (async () => {
       setClerkInstance(
-        await createClerkClient({ publishableKey, storageCache, syncHost, ___experimentalSyncHostListener }),
+        await createClerkClient({ publishableKey, storageCache, syncHost, __experimental_syncHostListener }),
       );
     })();
-  }, [publishableKey, storageCache, syncHost, ___experimentalSyncHostListener]);
+  }, [publishableKey, storageCache, syncHost, __experimental_syncHostListener]);
 
   if (!clerkInstance) {
     return null;

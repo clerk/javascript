@@ -21,7 +21,7 @@ Clerk.sdkMetadata = {
 };
 
 export type CreateClerkClientOptions = {
-  ___experimentalSyncHostListener?: boolean;
+  __experimental_syncHostListener?: boolean;
   publishableKey: string;
   scope?: Scope;
   storageCache?: StorageCache;
@@ -29,7 +29,7 @@ export type CreateClerkClientOptions = {
 };
 
 export async function createClerkClient({
-  ___experimentalSyncHostListener = false,
+  __experimental_syncHostListener = false,
   publishableKey,
   scope,
   storageCache = BrowserStorageCache,
@@ -74,7 +74,7 @@ export async function createClerkClient({
     sync: sync,
   };
 
-  if (jwtOptions.sync && ___experimentalSyncHostListener) {
+  if (jwtOptions.sync && __experimental_syncHostListener) {
     jwtOptions.onListenerCallback = () => {
       if (clerk.user) {
         clerk.user.reload();
@@ -87,7 +87,7 @@ export async function createClerkClient({
   const jwt = JWTHandler(storageCache, jwtOptions);
 
   // Add listener to sync host cookies if enabled
-  if (jwtOptions.sync && ___experimentalSyncHostListener) {
+  if (jwtOptions.sync && __experimental_syncHostListener) {
     const listener = jwt.listener();
     listener?.add();
   }
