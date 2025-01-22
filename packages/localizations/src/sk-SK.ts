@@ -459,7 +459,7 @@ export const skSK: LocalizationResource = {
       actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Prihlásiť sa',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',
@@ -549,7 +549,6 @@ export const skSK: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -594,6 +593,7 @@ export const skSK: LocalizationResource = {
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',

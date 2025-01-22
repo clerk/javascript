@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.3.8",
+  "version": "0.3.13",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -49,7 +49,8 @@
     "bundlewatch": "pnpm dlx bundlewatch --config bundlewatch.config.json",
     "dev": "tsup --watch",
     "dev:theme-builder": "concurrently \"pnpm dev\" \"cd theme-builder && pnpm dev\"",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/elements": "workspace:^",

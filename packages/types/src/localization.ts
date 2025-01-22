@@ -17,15 +17,19 @@ type _LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
+   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    * @experimental
-   * Add role keys and their localized value
-   * e.g. roles:{ 'org:teacher': 'Teacher'}
    */
   roles: {
     [r: string]: LocalizationValue;
   };
   socialButtonsBlockButton: LocalizationValue;
-  socialButtonsBlockButtonManyInView: LocalizationValue;
+  /**
+   * It should be used to provide a shorter variation of `socialButtonsBlockButton`.
+   * It is explicitly typed, in order to avoid contributions that use LLM tools to generate
+   * translations that misinterpret the correct usage of this property.
+   */
+  socialButtonsBlockButtonManyInView: `${string}{{provider|titleize}}${string}`;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
@@ -168,7 +172,7 @@ type _LocalizationResource = {
   signIn: {
     start: {
       title: LocalizationValue;
-      __experimental_titleCombined: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;

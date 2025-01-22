@@ -368,9 +368,9 @@ export const beBY: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        title: 'Несумяшчальнасць з кліентам',
         subtitle:
           'Гэтая сесія не адпавядае вашаму кліенту або прыладзе. Калі ласка, пераканайцеся, што вы выкарыстоўваеце правільны запіс.',
+        title: 'Несумяшчальнасць з кліентам',
       },
       expired: {
         subtitle: 'Верніцеся на пачатковую ўкладку, каб працягнуць.',
@@ -465,7 +465,7 @@ export const beBY: LocalizationResource = {
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увайсці',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Код верыфікацыі',
@@ -473,6 +473,7 @@ export const beBY: LocalizationResource = {
       title: 'Двухфактарная верыфікацыя',
     },
   },
+  signInEnterPasswordTitle: undefined,
   signUp: {
     continue: {
       actionLink: 'Увайсці',
@@ -489,8 +490,8 @@ export const beBY: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        title: 'Падключэнне passkey',
         subtitle: 'Каб працягнуць, выкарыстоўвайце passkey для ўваходу або рэгістрацыі.',
+        title: 'Падключэнне passkey',
       },
       formSubtitle: 'Выкарыстоўвайце верыфікацыйную спасылку, адпраўленую вам на пошту',
       formTitle: 'Верыфікацыйная спасылка',
@@ -547,8 +548,7 @@ export const beBY: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Увядзіце дадатковыя спосабы ўваходу',
-
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
     captcha_invalid:
@@ -556,11 +556,11 @@ export const beBY: LocalizationResource = {
     captcha_unavailable:
       'Рэгістрацыя не ўдалася з-за памылак праверкі ботаў. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     form_code_incorrect: 'Невядомы код. Пераканайцеся, што вы ўвялі правільны код.',
-    form_identifier_exists: 'Гэты ідэнтыфікатар ужо існуе.',
     form_identifier_exists__email_address: 'Гэты адрас электроннай пошты ўжо выкарыстоўваецца.',
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
     form_identifier_not_found: 'Ідэнтыфікатар не знойдзены.',
+    form_param_format_invalid: undefined,
     form_param_format_invalid__email_address:
       'Адрас электроннай пошты павінен быць сапраўдным адрасам электроннай пошты.',
     form_param_format_invalid__phone_number: 'Нумар тэлефона павінен быць у сапраўдным міжнародным фармаце',
@@ -583,6 +583,7 @@ export const beBY: LocalizationResource = {
     not_allowed_access: 'Вы не маеце правоў доступу.',
     organization_domain_blocked: 'Дамен арганізацыі заблакаван.',
     organization_domain_common: 'Дамен арганізацыі звычайны і не можа быць выкарыстаны.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'Квота ўдзельнікаў арганізацыі перавышана.',
     organization_minimum_permissions_needed: 'Патрабуюцца мінімальныя правы доступу.',
     passkey_already_exists: 'Passkey ужо існуе. Калі ласка, выкарыстоўвайце іншы.',
@@ -600,7 +601,7 @@ export const beBY: LocalizationResource = {
       sentencePrefix: 'Ваш пароль павінен утрымліваць',
     },
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
-
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль падыходзіць, але мог бы быць надзейнейшым. Паспрабуйце дадаць больш сімвалаў.',
       goodPassword: 'Добрая праца. Гэта выдатны пароль.',
@@ -917,7 +918,6 @@ export const beBY: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Падключыць web3 кашалёк',
     },
   },
-
   waitlist: {
     start: {
       actionLink: 'Зарэгістравацца ў чакальным спісе',

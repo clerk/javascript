@@ -21,7 +21,6 @@ const DISPLAY_NAME = 'ClerkElementsFieldState';
  * @param {Function} children - A function that receives `state`, `message`, and `codes` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `codes` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
  *
  * @example
- *
  * <Clerk.Field name="email">
  *  <Clerk.Label>Email</Clerk.Label>
  *  <Clerk.FieldState>

@@ -21,7 +21,8 @@
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
     "lint": "eslint src/",
     "lint:publint": "publint",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "babel": {
     "presets": [
