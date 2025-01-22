@@ -24,6 +24,7 @@ const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader()
   return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
 });
 
+/** Discards errors thrown by attempted code */
 const onlyTry = (cb: () => unknown) => {
   try {
     cb();
