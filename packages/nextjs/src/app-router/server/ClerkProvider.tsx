@@ -24,6 +24,14 @@ const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader()
   return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
 });
 
+const onlyTry = (cb: () => unknown) => {
+  try {
+    cb();
+  } catch (e) {
+    // ingore
+  }
+};
+
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
@@ -111,13 +119,16 @@ export async function ClerkProvider(
       } else {
         const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
 
+        const headerStore = await headers();
         /**
          * Allow developer to return to local application after claiming
          */
-        const referer = (await headers()).get('referer');
+        const host = headerStore.get('x-forwarded-host');
+        const proto = headerStore.get('x-forwarded-proto');
+
         const claimUrl = new URL(newOrReadKeys.claimUrl);
-        if (referer) {
-          claimUrl.searchParams.set('return_url', referer);
+        if (host && proto) {
+          onlyTry(() => claimUrl.searchParams.set('return_url', new URL(`${proto}://${host}`).href));
         }
 
         /**
