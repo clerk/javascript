@@ -89,7 +89,6 @@
     "error",
     "file",
     "globs",
-    "handleValueOrFn",
     "isomorphicAtob",
     "isomorphicBtoa",
     "keys",
