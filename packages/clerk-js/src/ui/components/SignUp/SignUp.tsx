@@ -1,7 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpModalProps, SignUpProps } from '@clerk/types';
+import type { SignUpModalProps, SignUpProps, WithInternalRouting } from '@clerk/types';
 import React from 'react';
-import type { WithInternalRouting } from 'ui/types';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';

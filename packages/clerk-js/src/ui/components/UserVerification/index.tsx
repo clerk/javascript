@@ -1,6 +1,9 @@
-import type { __internal_UserVerificationModalProps, __internal_UserVerificationProps } from '@clerk/types';
+import type {
+  __internal_UserVerificationModalProps,
+  __internal_UserVerificationProps,
+  WithInternalRouting,
+} from '@clerk/types';
 import React, { useEffect } from 'react';
-import type { WithInternalRouting } from 'ui/types';
 
 import { UserVerificationContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';

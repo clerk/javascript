@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationProfileModalProps, OrganizationProfileProps, WithInternalRouting } from '@clerk/types';
 import React from 'react';
-import type { OrganizationProfileCtx, WithInternalRouting } from 'ui/types';
+import type { OrganizationProfileCtx } from 'ui/types';
 
 import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';

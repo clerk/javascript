@@ -5,12 +5,12 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
-  RoutingStrategy,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
+  WithInternalRouting,
 } from '@clerk/types';
 
 export type {
@@ -41,48 +41,42 @@ export type AvailableComponentProps =
 
 type ComponentMode = 'modal' | 'mounted';
 
-export type SignInCtx = Omit<SignInProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'SignIn';
-    mode?: ComponentMode;
-  };
+export type SignInCtx = WithInternalRouting<SignInProps> & {
+  componentName: 'SignIn';
+  mode?: ComponentMode;
+};
 
-export type UserVerificationCtx = Omit<__internal_UserVerificationProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'UserVerification';
-    mode?: ComponentMode;
-  };
+export type UserVerificationCtx = WithInternalRouting<__internal_UserVerificationProps> & {
+  componentName: 'UserVerification';
+  mode?: ComponentMode;
+};
 
-export type UserProfileCtx = Omit<UserProfileProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'UserProfile';
-    mode?: ComponentMode;
-  };
+export type UserProfileCtx = WithInternalRouting<UserProfileProps> & {
+  componentName: 'UserProfile';
+  mode?: ComponentMode;
+};
 
-export type SignUpCtx = Omit<SignUpProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'SignUp';
-    mode?: ComponentMode;
-    emailLinkRedirectUrl?: string;
-    ssoCallbackUrl?: string;
-  };
+export type SignUpCtx = WithInternalRouting<SignUpProps> & {
+  componentName: 'SignUp';
+  mode?: ComponentMode;
+  emailLinkRedirectUrl?: string;
+  ssoCallbackUrl?: string;
+};
 
 export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
   mode?: ComponentMode;
 };
 
-export type OrganizationProfileCtx = Omit<OrganizationProfileProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'OrganizationProfile';
-    mode?: ComponentMode;
-  };
+export type OrganizationProfileCtx = WithInternalRouting<OrganizationProfileProps> & {
+  componentName: 'OrganizationProfile';
+  mode?: ComponentMode;
+};
 
-export type CreateOrganizationCtx = Omit<CreateOrganizationProps, 'routing'> &
-  __internal_RoutingOptions & {
-    componentName: 'CreateOrganization';
-    mode?: ComponentMode;
-  };
+export type CreateOrganizationCtx = WithInternalRouting<CreateOrganizationProps> & {
+  componentName: 'CreateOrganization';
+  mode?: ComponentMode;
+};
 
 export type OrganizationSwitcherCtx = OrganizationSwitcherProps & {
   componentName: 'OrganizationSwitcher';
@@ -117,7 +111,3 @@ export type AvailableComponentCtx =
   | WaitlistCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
-
-export type WithInternalRouting<T> = Omit<T, 'routing'> & {
-  routing?: RoutingStrategy;
-};

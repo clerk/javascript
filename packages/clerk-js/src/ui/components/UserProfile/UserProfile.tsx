@@ -1,11 +1,11 @@
-import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
+import type { UserProfileModalProps, UserProfileProps, WithInternalRouting } from '@clerk/types';
 import React from 'react';
 
 import { UserProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import type { UserProfileCtx, WithInternalRouting } from '../../types';
+import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';
