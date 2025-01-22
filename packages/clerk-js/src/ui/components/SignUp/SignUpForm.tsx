@@ -113,7 +113,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Col>
       )}
       <Col center>
-        <CaptchaElement />
+        <CaptchaElement maxHeight='0' />
         <Col
           gap={6}
           sx={{

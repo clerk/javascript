@@ -94,4 +94,5 @@ test-results
 scripts/.env
 !scripts/.env.example
 
-
+# typedoc
+.typedoc

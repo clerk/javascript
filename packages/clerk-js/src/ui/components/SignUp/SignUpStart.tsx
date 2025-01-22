@@ -177,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          case ERROR_CODES.CAPTCHA_INVALID:
             card.setError(error);
             break;
           default:
@@ -310,7 +311,7 @@ function _SignUpStart(): JSX.Element {
                 />
               </Form.ControlRow>
             )}
-            {!shouldShowForm && <CaptchaElement />}
+            {!shouldShowForm && <CaptchaElement maxHeight='0' />}
           </Flex>
         </Card.Content>
 

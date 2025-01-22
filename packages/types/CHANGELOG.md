@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.42.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update modal methods to use the correct types. ([#4931](https://github.com/clerk/javascript/pull/4931)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.41.2
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.41.1
 
 ### Patch Changes
