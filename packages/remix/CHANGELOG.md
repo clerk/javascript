@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.4.15
+
+### Patch Changes
+
+- Fix incorrect type for `authorizedParties` option ([#4964](https://github.com/clerk/javascript/pull/4964)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/backend@1.23.5
+  - @clerk/clerk-react@5.22.4
+  - @clerk/shared@2.20.12
+
 ## 4.4.14
 
 ### Patch Changes
