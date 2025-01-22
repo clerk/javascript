@@ -48,7 +48,14 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+/**
+ * The `clerkMiddleware()` function accepts an optional object. The following options are available.
+ * @interface
+ */
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  /**
+   * If true, additional debug information will be logged to the console.
+   */
   debug?: boolean;
 };
 

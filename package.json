@@ -105,6 +105,7 @@
     "turbo": "^2.0.14",
     "turbo-ignore": "^2.0.6",
     "typedoc": "0.27.6",
+    "typedoc-plugin-missing-exports": "3.1.0",
     "typescript": "catalog:repo",
     "verdaccio": "^5.26.3",
     "vitest": "3.0.2",

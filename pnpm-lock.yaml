@@ -214,6 +214,9 @@ importers:
       typedoc:
         specifier: 0.27.6
         version: 0.27.6(typescript@5.6.3)
+      typedoc-plugin-missing-exports:
+        specifier: 3.1.0
+        version: 3.1.0(typedoc@0.27.6(typescript@5.6.3))
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -2839,7 +2842,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -14061,6 +14064,11 @@ packages:
   typedarray.prototype.slice@1.0.5:
     resolution: {integrity: sha512-q7QNVDGTdl702bVFiI5eY4l/HkgCM6at9KhcFbgUAzezHFbOVy4+0O/lCjsABEQwbZPravVfBIiBVGo89yzHFg==}
     engines: {node: '>= 0.4'}
+
+  typedoc-plugin-missing-exports@3.1.0:
+    resolution: {integrity: sha512-Sogbaj+qDa21NjB3SlIw4JXSwmcl/WOjwiPNaVEcPhpNG/MiRTtpwV81cT7h1cbu9StpONFPbddYWR0KV/fTWA==}
+    peerDependencies:
+      typedoc: 0.26.x || 0.27.x
 
   typedoc@0.27.6:
     resolution: {integrity: sha512-oBFRoh2Px6jFx366db0lLlihcalq/JzyCVp7Vaq1yphL/tbgx2e+bkpkCgJPunaPvPwoTOXSwasfklWHm7GfAw==}
@@ -31740,6 +31748,10 @@ snapshots:
       math-intrinsics: 1.1.0
       typed-array-buffer: 1.0.3
       typed-array-byte-offset: 1.0.4
+
+  typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.6.3)):
+    dependencies:
+      typedoc: 0.27.6(typescript@5.6.3)
 
   typedoc@0.27.6(typescript@5.6.3):
     dependencies:

@@ -8,7 +8,12 @@ import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 
 export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
-  Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & { jwtKey?: string };
+  Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
+    /**
+     * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](/docs/deployments/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](/docs/backend-requests/handling/manual-jwt).
+     */
+    jwtKey?: string;
+  };
 
 export async function verifyToken(
   token: string,

@@ -32,6 +32,8 @@ const config = {
   excludePrivate: true,
   blockTags: ['@param', '@returns'],
   modifierTags: ['@alpha', '@beta', '@experimental', '@deprecated'],
+  exclude: ['**/*+(.spec|.test).ts'],
+  plugin: ['typedoc-plugin-missing-exports'],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -40,7 +42,7 @@ const config = {
     excludeExternals: true,
     gitRevision: 'main',
   },
-  entryPoints: getPackages(),
+  entryPoints: ['packages/nextjs'], //getPackages(),
 };
 
 export default config;
