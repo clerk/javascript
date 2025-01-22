@@ -28,7 +28,7 @@ const onlyTry = (cb: () => unknown) => {
   try {
     cb();
   } catch (e) {
-    // ingore
+    // ignore
   }
 };
 
