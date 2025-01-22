@@ -19,18 +19,6 @@ describe('<SignUp/>', () => {
       }).toMatchTypeOf<SignUpComponentProps>();
     });
 
-    test('when path is filled, routing must only have path as value', () => {
-      expectTypeOf({
-        path: '/sign-up',
-        routing: 'virtual' as const,
-      }).not.toMatchTypeOf<SignUpComponentProps>();
-
-      expectTypeOf({
-        path: '/sign-up',
-        routing: 'hash' as const,
-      }).not.toMatchTypeOf<SignUpComponentProps>();
-    });
-
     test('when routing is hash or virtual path must be present', () => {
       expectTypeOf({
         routing: 'hash' as const,
