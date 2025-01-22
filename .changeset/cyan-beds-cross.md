@@ -2,4 +2,4 @@
 '@clerk/shared': patch
 ---
 
-Remove `handleValueOrFn` from subpaths
+Re-add `handleValueOrFn` to subpaths with a deprecation warning.
