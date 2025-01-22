@@ -43,7 +43,7 @@ export const ActiveMembersList = ({ memberships, pageSize }: ActiveMembersListPr
       itemCount={memberships?.count || 0}
       pageCount={memberships?.pageCount || 0}
       itemsPerPage={pageSize}
-      isLoading={(memberships?.isLoading && !memberships?.data) || loadingRoles}
+      isLoading={(memberships?.isLoading && !memberships?.data.length) || loadingRoles}
       emptyStateLocalizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
       headers={[
         localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),

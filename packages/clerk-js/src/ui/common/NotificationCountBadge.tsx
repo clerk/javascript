@@ -19,9 +19,9 @@ export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
 
   const enterExitAnimation: ThemableCssProp = t => ({
     animation:
-      !shouldAnimate || prefersReducedMotion
-        ? 'none'
-        : `${animations.notificationAnimation} ${t.transitionDuration.$textField} ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
+      shouldAnimate && !prefersReducedMotion
+        ? `${animations.notificationAnimation} ${t.transitionDuration.$textField} ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`
+        : 'none',
   });
 
   return (
