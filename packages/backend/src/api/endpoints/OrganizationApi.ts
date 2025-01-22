@@ -206,13 +206,13 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
-    const { organizationId, limit, offset } = params;
+    const { organizationId, limit, offset, orderBy } = params;
     this.requireId(organizationId);
 
     return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'memberships'),
-      queryParams: { limit, offset },
+      queryParams: { limit, offset, orderBy },
     });
   }
 
