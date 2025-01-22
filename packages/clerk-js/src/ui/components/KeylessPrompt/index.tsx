@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
