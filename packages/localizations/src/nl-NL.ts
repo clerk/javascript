@@ -458,7 +458,7 @@ export const nlNL: LocalizationResource = {
       actionLink__use_phone: 'Gebruik telefoon',
       actionLink__use_username: 'Gebruik gebruikersnaam',
       actionText: 'Geen account?',
-      actionText__join_waitlist: 'Nog geen account? Meld je aan voor de wachtlijst.',
+      actionText__join_waitlist: 'Nog geen account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
       titleCombined: undefined,
@@ -910,9 +910,9 @@ export const nlNL: LocalizationResource = {
   waitlist: {
     start: {
       actionLink: 'Neem deel aan de wachtlijst',
-      actionText: 'Nog geen account? Maak er een aan en voeg je bij de wachtlijst.',
+      actionText: 'Nog geen account?',
       formButton: 'Verstuur',
-      subtitle: 'Je wordt toegevoegd aan de wachtlijst en wordt op de hoogte gehouden.',
+      subtitle: 'Je wordt toegevoegd aan de wachtlijst en op de hoogte gehouden.',
       title: 'Wachtlijst aanmelding',
     },
     success: {
