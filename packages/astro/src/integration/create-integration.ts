@@ -64,8 +64,8 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
                 ...buildEnvVarFromOption(
-                  'dangerouslyDisableDevelopmentModeWarning',
-                  'PUBLIC_CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING',
+                  'disableDevelopmentModeWarning',
+                  'PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING',
                 ),
               },
 

@@ -51,6 +51,6 @@ export const getPublicEnvVariables = (event?: HTTPEvent) => {
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
-    dangerouslyDisableDevelopmentModeWarning: getValue('CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING'),
+    disableDevelopmentModeWarning: getValue('CLERK_DISABLE_DEVELOPMENT_MODE_WARNING'),
   } as const;
 };

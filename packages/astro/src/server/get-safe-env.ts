@@ -36,9 +36,7 @@ function getSafeEnv(context: ContextOrLocals) {
     apiUrl: getContextEnvVar('CLERK_API_URL', context),
     telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
     telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
-    dangerouslyDisableDevelopmentModeWarning: isTruthy(
-      getContextEnvVar('PUBLIC_CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING', context),
-    ),
+    disableDevelopmentModeWarning: isTruthy(getContextEnvVar('PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING', context)),
   };
 }
 

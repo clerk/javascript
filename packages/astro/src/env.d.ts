@@ -18,7 +18,7 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_SIGN_UP_URL?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DISABLED?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DEBUG?: string;
-  readonly PUBLIC_CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING?: string;
+  readonly PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING?: string;
 }
 
 interface ImportMeta {

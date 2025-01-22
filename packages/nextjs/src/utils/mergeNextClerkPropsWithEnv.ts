@@ -29,10 +29,8 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
       disabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
-    dangerouslyDisableDevelopmentModeWarning:
-      props.dangerouslyDisableDevelopmentModeWarning ||
-      process.env.NEXT_PUBLIC_CLERK_DANGEROUSLY_DISABLE_DEVELOPMENT_MODE_WARNING ||
-      '',
+    disableDevelopmentModeWarning:
+      props.disableDevelopmentModeWarning || process.env.NEXT_PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING || '',
     sdkMetadata: SDK_METADATA,
   };
 };

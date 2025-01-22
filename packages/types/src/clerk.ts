@@ -791,7 +791,7 @@ export interface ClerkOptionsDangerous {
    * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production Clerk instance. If you're disabling it,
    * please make sure you don't ship with a non-production Clerk instance! More information: https://clerk.com/docs/deployments/overview.
    */
-  dangerouslyDisableDevelopmentModeWarning?: boolean;
+  disableDevelopmentModeWarning?: boolean;
 }
 
 export interface NavigateOptions {
