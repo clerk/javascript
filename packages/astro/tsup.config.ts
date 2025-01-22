@@ -3,7 +3,9 @@ import { defineConfig } from 'tsup';
 // @ts-ignore
 import { name, version } from './package.json';
 
-export default defineConfig(() => {
+export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+
   return {
     clean: true,
     entry: [
@@ -22,7 +24,7 @@ export default defineConfig(() => {
       PACKAGE_VERSION: `"${version}"`,
     },
     bundle: true,
-    sourcemap: false,
+    sourcemap: isProd,
     format: ['esm'],
     external: ['astro', 'react', 'react-dom', 'node:async_hooks', '#async-local-storage', 'astro:transitions/client'],
   };

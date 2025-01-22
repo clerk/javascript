@@ -7,6 +7,7 @@ import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const isWatch = !!overrideOptions.watch;
 
   return {
@@ -22,7 +23,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: false,
+    sourcemap: !isProd,
     dts: true,
     external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],

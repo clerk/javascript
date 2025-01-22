@@ -50,7 +50,7 @@ export default defineConfig(overrideOptions => {
     external: ['react', 'react-dom', '@clerk/shared'],
     format: ['cjs', 'esm'],
     minify: false,
-    sourcemap: false,
+    sourcemap: !isProd,
     esbuildPlugins: [tailwindcssTransformerCode],
     treeshake: true,
   };

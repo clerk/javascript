@@ -5,6 +5,7 @@ import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const isWatch = !!overrideOptions.watch;
 
   return {
@@ -15,7 +16,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     dts: true,
     minify: false,
-    sourcemap: false,
+    sourcemap: !isProd,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

@@ -5,6 +5,7 @@ import { runAfterLast } from '../../scripts/utils';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
 
@@ -13,7 +14,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: false,
+    sourcemap: !isProd,
     legacyOutput: true,
     treeshake: true,
     noExternal: ['@clerk/clerk-react', '@clerk/shared'],

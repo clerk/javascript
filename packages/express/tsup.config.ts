@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const isWatch = !!overrideOptions.watch;
 
   return {
@@ -11,7 +12,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: false,
+    sourcemap: !isProd,
     dts: true,
     define: {
       PACKAGE_NAME: `"${name}"`,

@@ -23,7 +23,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     external: ['#safe-node-apis'],
-    sourcemap: false,
+    sourcemap: !isProd,
     legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
@@ -46,13 +46,13 @@ export default defineConfig(overrideOptions => {
   const serverActionsEsm: Options = {
     ...esm,
     entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
-    sourcemap: false,
+    sourcemap: !isProd,
   };
 
   const serverActionsCjs: Options = {
     ...cjs,
     entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
-    sourcemap: false,
+    sourcemap: !isProd,
   };
 
   const copyPackageJson = (format: 'esm' | 'cjs') => `cp ./package.${format}.json ./dist/${format}/package.json`;

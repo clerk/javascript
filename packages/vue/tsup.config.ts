@@ -6,13 +6,15 @@ import { name, version } from './package.json';
 
 type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
 
-export default defineConfig(() => {
+export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+
   return {
     clean: true,
     entry: ['./src/index.ts', './src/internal.ts'],
     format: ['esm'],
     bundle: true,
-    sourcemap: false,
+    sourcemap: !isProd,
     minify: false,
     dts: false,
     esbuildPlugins: [

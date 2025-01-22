@@ -6,13 +6,14 @@ import { runAfterLast } from '../../scripts/utils';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const isWatch = !!overrideOptions.watch;
   const shouldPublish = !!overrideOptions.env?.publish;
 
   const common: Options = {
     entry: ['src/index.ts', 'src/errors.ts', 'src/internal.ts', 'src/jwt/index.ts'],
     onSuccess: `cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime`,
-    sourcemap: false,
+    sourcemap: !isProd,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
