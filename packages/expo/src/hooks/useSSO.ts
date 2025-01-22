@@ -19,6 +19,7 @@ export type StartSSOFlowParams = {
 
 export type StartSSOFlowReturnType = {
   createdSessionId: string | null;
+  authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
   setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
@@ -39,7 +40,6 @@ export function useSSO() {
     }
 
     const { strategy, unsafeMetadata } = startSSOFlowParams ?? {};
-    let createdSessionId = signIn.createdSessionId;
 
     // Used to handle redirection back to the mobile application, however deep linking it not applied
     // We only leverage it to extract the `rotating_token_nonce` query param
@@ -62,7 +62,7 @@ export function useSSO() {
     const authSessionResult = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL.toString());
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
-        createdSessionId,
+        createdSessionId: null,
         setActive,
         signIn,
         signUp,
@@ -73,16 +73,16 @@ export function useSSO() {
     const rotatingTokenNonce = params.get('rotating_token_nonce') ?? '';
     await signIn.reload({ rotatingTokenNonce });
 
-    if (signIn.firstFactorVerification.status === 'transferable') {
+    const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
+    if (userNeedsToBeCreated) {
       await signUp.create({
         transfer: true,
         unsafeMetadata,
       });
-      createdSessionId = signUp.createdSessionId;
     }
 
     return {
-      createdSessionId,
+      createdSessionId: signUp.createdSessionId ?? signIn.createdSessionId,
       setActive,
       signIn,
       signUp,
