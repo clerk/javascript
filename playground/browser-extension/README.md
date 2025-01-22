@@ -26,6 +26,22 @@ After following the quickstart you'll have learned how to:
 - Load your Chrome Extension into your Chromium-based browser
 - Test your Chrome Extension
 
+
+## Connect with developement package
+
+Run the development server:
+```bash
+> cd playground/browser-extension
+> npm i
+> npm dev
+```
+
+In a separate terminal, build and publish the development package to your local registry:
+```bash
+> cd packages/chrome-extension
+> pnpm build && pnpm publish:local
+```
+
 ## Running the template
 
 ```bash
