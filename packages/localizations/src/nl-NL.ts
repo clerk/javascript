@@ -40,9 +40,9 @@ export const nlNL: LocalizationResource = {
   },
   dividerText: 'of',
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
-  footerPageLink__help: 'Helppagina: ',
-  footerPageLink__privacy: 'Privacybeleid: ',
-  footerPageLink__terms: 'Algemene voorwaarden: ',
+  footerPageLink__help: 'Helppagina',
+  footerPageLink__privacy: 'Privacybeleid',
+  footerPageLink__terms: 'Algemene voorwaarden',
   formButtonPrimary: 'Doorgaan',
   formButtonPrimary__verify: 'Verifieer',
   formFieldAction__forgotPassword: 'Wachtwoord vergeten?',
@@ -65,7 +65,7 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
-  formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor deze domein',
+  formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
   formFieldLabel__confirmPassword: 'Wachtwoord bevestigen',
@@ -80,7 +80,7 @@ export const nlNL: LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: 'Verwijder uitnodigingen en suggesties',
   formFieldLabel__organizationDomainEmailAddress: 'Verificatie-e-mailadres',
   formFieldLabel__organizationDomainEmailAddressDescription:
-    'Voer een e-mailadres onder deze domein in om een code te ontvangen en deze domein te verifiëren.',
+    'Voer een e-mailadres onder dit domein in om een code te ontvangen en dit domein te verifiëren.',
   formFieldLabel__organizationName: 'Organisatienaam',
   formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__passkeyName: 'Naam',
@@ -109,8 +109,8 @@ export const nlNL: LocalizationResource = {
     titleWithoutPersonal: 'Kies een organisatie',
   },
   organizationProfile: {
-    badge__automaticInvitation: 'Automatic invitations',
-    badge__automaticSuggestion: 'Automatic suggestions',
+    badge__automaticInvitation: 'Automatische Uitnodiging',
+    badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
     createDomainPage: {
@@ -346,8 +346,8 @@ export const nlNL: LocalizationResource = {
       blockButton__phoneCode: 'Verzend code naar {{identifier}}',
       blockButton__totp: 'Gebruik je authenticator app',
       getHelp: {
-        blockButton__emailSupport: 'E-mail klantenservice',
-        content: 'Als je geen toegang hebt neem dan contact op met de klantenservice en we helpen je verder.',
+        blockButton__emailSupport: 'E-mail {{applicationName}}',
+        content: 'Als je geen toegang hebt neem dan contact op met {{applicationName}} en we helpen je verder.',
         title: 'Help',
       },
       subtitle: 'Problemen? Je kan een van deze methoden gebruiken om in te loggen.',
@@ -408,7 +408,7 @@ export const nlNL: LocalizationResource = {
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Wachtwoord resetten',
-      label__alternativeMethods: 'Of, inloggen met een andere methode',
+      label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
     noAvailableMethods: {
