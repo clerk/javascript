@@ -1113,7 +1113,7 @@ export class Clerk implements ClerkInterface {
       [CLERK_SYNCED]: 'true',
     });
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL) || getClerkQueryParam(CLERK_REDIRECT_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_REDIRECT_URL) || getClerkQueryParam(CLERK_SATELLITE_URL);
     if (!satelliteUrl || !isHttpOrHttps(satelliteUrl)) {
       clerkRedirectUrlIsMissingScheme();
     }
@@ -1728,7 +1728,7 @@ export class Clerk implements ClerkInterface {
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
-      [CLERK_SATELLITE_URL]: window.location.href,
+      [CLERK_REDIRECT_URL]: window.location.href,
     });
     return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
   };
@@ -1769,7 +1769,7 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL) || getClerkQueryParam(CLERK_REDIRECT_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_REDIRECT_URL) || getClerkQueryParam(CLERK_SATELLITE_URL);
     return !!satelliteUrl;
   };
 
