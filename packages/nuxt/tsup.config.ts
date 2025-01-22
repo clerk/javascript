@@ -16,7 +16,7 @@ export default defineConfig(() => {
     // Make sure to not bundle the imports
     // or else the Nuxt module will not be able to resolve them
     bundle: false,
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     dts: true,
     define: {

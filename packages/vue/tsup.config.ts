@@ -12,7 +12,7 @@ export default defineConfig(() => {
     entry: ['./src/index.ts', './src/internal.ts'],
     format: ['esm'],
     bundle: true,
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     dts: false,
     esbuildPlugins: [
