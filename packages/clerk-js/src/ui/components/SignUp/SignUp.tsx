@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
-import type { __internal_RoutingOptions } from 'ui/types';
+import type { WithInternalRouting } from 'ui/types';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -90,8 +90,7 @@ SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
-const InternalSignUp: React.ComponentType<Omit<SignUpProps, 'routing'> & __internal_RoutingOptions> =
-  withCoreSessionSwitchGuard(SignUpRoutes);
+const InternalSignUp: React.ComponentType<WithInternalRouting<SignUpProps>> = withCoreSessionSwitchGuard(SignUpRoutes);
 
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {

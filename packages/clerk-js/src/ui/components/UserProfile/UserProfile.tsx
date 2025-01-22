@@ -5,7 +5,7 @@ import { UserProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import type { __internal_RoutingOptions, UserProfileCtx } from '../../types';
+import type { UserProfileCtx, WithInternalRouting } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';
@@ -44,7 +44,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const UserProfile: React.ComponentType<UserProfileProps> = withCardStateProvider(_UserProfile);
 
-const InternalUserProfile: React.ComponentType<Omit<UserProfileProps, 'routing'> & __internal_RoutingOptions> =
+const InternalUserProfile: React.ComponentType<WithInternalRouting<UserProfileProps>> =
   withCardStateProvider(_UserProfile);
 
 export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {

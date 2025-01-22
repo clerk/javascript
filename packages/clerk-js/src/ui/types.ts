@@ -118,6 +118,6 @@ export type AvailableComponentCtx =
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
 
-export type __internal_RoutingOptions = {
+export type WithInternalRouting<T> = Omit<T, 'routing'> & {
   routing?: RoutingStrategy;
 };

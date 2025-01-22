@@ -1,6 +1,6 @@
 import type { __internal_UserVerificationModalProps, __internal_UserVerificationProps } from '@clerk/types';
 import React, { useEffect } from 'react';
-import type { __internal_RoutingOptions } from 'ui/types';
+import type { WithInternalRouting } from 'ui/types';
 
 import { UserVerificationContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -32,9 +32,8 @@ function UserVerificationRoutes(): JSX.Element {
 
 UserVerificationRoutes.displayName = 'UserVerification';
 
-const UserVerification: React.ComponentType<
-  Omit<__internal_UserVerificationProps, 'routing'> & __internal_RoutingOptions
-> = withCoreSessionSwitchGuard(UserVerificationRoutes);
+const UserVerification: React.ComponentType<WithInternalRouting<__internal_UserVerificationProps>> =
+  withCoreSessionSwitchGuard(UserVerificationRoutes);
 
 const UserVerificationModal = (props: __internal_UserVerificationModalProps): JSX.Element => {
   return (

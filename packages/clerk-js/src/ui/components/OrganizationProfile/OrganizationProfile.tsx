@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
-import type { __internal_RoutingOptions, OrganizationProfileCtx } from 'ui/types';
+import type { OrganizationProfileCtx, WithInternalRouting } from 'ui/types';
 
 import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
@@ -48,9 +48,8 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
-const InternalOrganizationProfile: React.ComponentType<
-  Omit<OrganizationProfileProps, 'routing'> & __internal_RoutingOptions
-> = withCardStateProvider(_OrganizationProfile);
+const InternalOrganizationProfile: React.ComponentType<WithInternalRouting<OrganizationProfileProps>> =
+  withCardStateProvider(_OrganizationProfile);
 
 export const OrganizationProfileModal = (props: OrganizationProfileModalProps): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {
