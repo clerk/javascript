@@ -1,7 +1,6 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { decodeJwt } from '@clerk/backend/jwt';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
@@ -107,12 +106,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
+      const entity = 'any' as const;
 
       const options = {
         publishableKey,
         secretKey,
         signInUrl,
         signUpUrl,
+        entity,
         ...resolvedParams,
       };
 
@@ -132,13 +133,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         logger.enable();
       }
       const clerkRequest = createClerkRequest(request);
-      const headers = JSON.parse(clerkRequest.toJSON().headers);
-      const authorization = headers.authorization;
-      if (authorization) {
-        const bearerToken = decodeJwt(authorization.split(' ')[1]);
-        const { payload } = bearerToken;
-        payload.sub.startsWith('mch_') ? (options.entity = 'machine') : null;
-      }
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 

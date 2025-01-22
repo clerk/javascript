@@ -105,12 +105,7 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState =
-  | SignedInState
-  | SignedOutState
-  | HandshakeState
-  | MachineAuthenticatedState
-  | MachineUnauthenticatedState;
+export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
 export function signedIn(
   authenticateContext: AuthenticateContext,
@@ -241,7 +236,9 @@ export function machineUnauthenticated(
   });
 }
 
-const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>(
+  requestState: T,
+): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {

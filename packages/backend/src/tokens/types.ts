@@ -12,7 +12,7 @@ export type AuthenticateRequestOptions = {
   afterSignUpUrl?: string;
   organizationSyncOptions?: OrganizationSyncOptions;
   apiClient?: ApiClient;
-  entity?: 'user' | 'machine';
+  entity?: 'user' | 'machine' | 'any';
 } & VerifyTokenOptions;
 
 /**

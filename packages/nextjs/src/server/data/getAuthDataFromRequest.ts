@@ -1,10 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type {
-  AuthenticatedMachineObject,
-  SignedInAuthObject,
-  SignedOutAuthObject,
-  UnauthenticatedMachineObject,
-} from '@clerk/backend/internal';
+import type { AuthenticatedMachineObject, UnauthenticatedMachineObject } from '@clerk/backend/internal';
 import {
   authenticatedMachineObject,
   AuthStatus,
@@ -32,11 +27,11 @@ export type GetAuthDataFromRequestOptions = {
 export function getAuthDataFromRequest(
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions & { entity: 'machine' },
-): Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject>;
+): AuthenticatedMachineObject | UnauthenticatedMachineObject;
 export function getAuthDataFromRequest(
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions & { entity: 'user' },
-): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
+): AuthObject;
 export function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
 export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');

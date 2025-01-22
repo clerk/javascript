@@ -112,6 +112,10 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions & { entity: 'user' },
 ): Promise<RequestState>;
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions & { entity: 'any' },
+): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>;
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
@@ -647,9 +651,6 @@ ${error.getFullMessage()}`,
     tokenCarrier: TokenCarrier,
   ): Promise<SignedInState | SignedOutState | HandshakeState | MachineUnauthenticatedState> {
     if (!(err instanceof TokenVerificationError)) {
-      if (options.entity === 'machine') {
-        return machineUnauthenticated(authenticateContext, 'unexpected error', 'unexpected error');
-      }
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
@@ -686,7 +687,7 @@ ${error.getFullMessage()}`,
       TokenVerificationErrorReason.TokenIatInTheFuture,
     ].includes(err.reason);
 
-    if (reasonToHandshake && options.entity !== 'machine') {
+    if (reasonToHandshake) {
       return handleMaybeHandshakeStatus(
         authenticateContext,
         convertTokenVerificationErrorReasonToAuthErrorReason({ tokenError: err.reason, refreshError }),
@@ -694,23 +695,28 @@ ${error.getFullMessage()}`,
       );
     }
 
-    if (options.entity === 'machine') {
-      return machineUnauthenticated(authenticateContext, err.reason, err.getFullMessage());
+    return signedOut(authenticateContext, err.reason, err.getFullMessage());
+  }
+
+  // Separated machine error and normal error so it's easier to read and the flow fow for 'any' is better too
+  function handleMachineError(err: unknown): MachineUnauthenticatedState {
+    if (!(err instanceof TokenVerificationError)) {
+      return machineUnauthenticated(authenticateContext, AuthErrorReason.UnexpectedError);
     }
 
-    return signedOut(authenticateContext, err.reason, err.getFullMessage());
+    return machineUnauthenticated(authenticateContext, err.reason, err.getFullMessage());
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
 
     if (!sessionTokenInHeader) {
-      return handleError(new Error('No Session token in header, this should not happen in machine requests'), 'header');
+      return handleError(new Error('No token in header'), 'header');
     }
 
     const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
-      return handleError(errors[0], 'header');
+      return handleMachineError(errors[0]);
     }
     if (data.sub.startsWith('user_')) {
       return machineUnauthenticated(
@@ -721,8 +727,31 @@ ${error.getFullMessage()}`,
     return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data);
   }
 
+  async function authenticateAnyRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
+    if (!sessionTokenInHeader) {
+      return handleError(new Error('No token in header'), 'header');
+    }
+
+    const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
+    if (errors) {
+      const { data: decodedData } = decodeJwt(sessionTokenInHeader);
+      if (decodedData?.payload.sub.startsWith('mch_')) {
+        return handleMachineError(errors[0]);
+      }
+      return handleError(errors[0], 'header');
+    }
+    if (data.sub.startsWith('mch_')) {
+      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data);
+    }
+    return signedIn(authenticateContext, data, undefined, sessionTokenInHeader);
+  }
+
   if (authenticateContext.sessionTokenInHeader) {
-    if (options.entity === 'machine') {
+    if (options.entity === 'any') {
+      return authenticateAnyRequestWithTokenInHeader();
+    } else if (options.entity === 'machine') {
       return authenticateMachineRequestWithTokenInHeader();
     }
     return authenticateRequestWithTokenInHeader();
@@ -730,7 +759,7 @@ ${error.getFullMessage()}`,
 
   // machine requests cannot have the token in the cookie, it must be in header
   if (options.entity === 'machine') {
-    return machineUnauthenticated(authenticateContext, 'no machine token in header');
+    return machineUnauthenticated(authenticateContext, 'no token in header');
   }
   return authenticateRequestWithTokenInCookie();
 }

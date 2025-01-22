@@ -758,9 +758,42 @@ describe('tokens.authenticateRequest(options)', () => {
     );
 
     expect(requestState).toBeMachineUnAuthenticated({
-      reason: 'no machine token in header',
+      reason: 'no token in header',
     });
     expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing a machine token to entity: `any` [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({
+        authorization: mockMachineJwt,
+      }),
+      mockOptions({
+        entity: 'any',
+      }),
+    );
+
+    expect(requestState).toBeMachineAuthenticated();
+    expect(requestState.toAuth()).toBeMachineAuthenticatedToAuth();
+  });
+
+  test('headerToken: returns signed in state when a valid user token to entity: `any` [1y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'any' }));
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
   });
 
   test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async () => {

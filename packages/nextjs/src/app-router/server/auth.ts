@@ -11,16 +11,19 @@ import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
+type EntityTypes = 'user' | 'machine';
+
+type EntityTypeToAuth<T extends EntityTypes> = T extends 'user' ? Auth : T extends 'machine' ? MachineAuth : Auth;
+
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
 type MachineAuth = Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject> & {
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 };
-
-type AuthOptions = { entity?: 'user' | 'machine' };
+type AuthOptions = { entity?: EntityTypes };
 
 export interface AuthFn {
-  (): Promise<Auth>;
+  (options?: AuthOptions): Promise<Auth>;
   protect: AuthProtect;
 }
 
@@ -29,10 +32,18 @@ export interface MachineAuthFn {
   protect: AuthProtect;
 }
 
-export function auth(options?: AuthOptions & { entity: 'user' }): Promise<Auth>;
-export function auth(options?: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
-export async function auth(options?: AuthOptions): Promise<Auth>;
-export async function auth(options?: AuthOptions) {
+// export function auth(options: AuthOptions & { entity: 'user' }): Promise<Auth>;
+// export function auth(options: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
+// export async function auth(options?: AuthOptions): Promise<Auth>;
+// export async function auth(options?: AuthOptions) {
+
+// No options case
+export function auth(): Promise<Auth>;
+// With options case
+export function auth<T extends EntityTypes>(options: AuthOptions & { entity: T }): Promise<EntityTypeToAuth<T>>;
+// With options but no entity case
+export function auth(options: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions): Promise<Auth | MachineAuth> {
   require('server-only');
 
   const request = await buildRequestLike();

@@ -43,8 +43,8 @@ export const createGetAuth = ({
         req: RequestLike,
         opts: GetAuthDataFromRequestOptions & { entity: 'user' },
       ): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
-      function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions): AuthObject;
-      function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions) {
+      function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
+      function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
         // Ensure you spread and pass the correct options, including the logger
         return getAuthDataFromRequestOriginal(req, { ...opts, logger, entity: options?.entity });
       }
