@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
+import type { __internal_RoutingOptions } from 'ui/types';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -89,6 +90,9 @@ SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
+const InternalSignUp: React.ComponentType<Omit<SignUpProps, 'routing'> & __internal_RoutingOptions> =
+  withCoreSessionSwitchGuard(SignUpRoutes);
+
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
@@ -108,7 +112,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <SignUp
+          <InternalSignUp
             {...signUpProps}
             routing='virtual'
           />
