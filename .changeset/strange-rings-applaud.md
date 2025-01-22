@@ -2,4 +2,4 @@
 '@clerk/clerk-js': minor
 ---
 
-Expand Keyless popover on initial render if user signs-in.
+Expand Keyless popover when a user signs-in.
