@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.47.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add a "Go to dashboard" link to the success state on the Keyless popover. ([#4959](https://github.com/clerk/javascript/pull/4959)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Remove text-shimmer animation from the Keyless prompt UI. ([#4949](https://github.com/clerk/javascript/pull/4949)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Fixes an issue where certain query parameters were not preserved during the SSO callback. ([#4961](https://github.com/clerk/javascript/pull/4961)) by [@dstaley](https://github.com/dstaley)
+
+- Remove unused, experimental code for a new UI component rendering path. ([#4950](https://github.com/clerk/javascript/pull/4950)) by [@brkalow](https://github.com/brkalow)
+
+- Keyless prompt revalidate environment on focus at most every 10 seconds. ([#4944](https://github.com/clerk/javascript/pull/4944)) by [@panteliselef](https://github.com/panteliselef)
+
+- Internal refactoring of `createFapiClient()` to remove reliance on `Clerk` instance. ([#4947](https://github.com/clerk/javascript/pull/4947)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/localizations@3.9.13
+  - @clerk/shared@2.20.12
+
 ## 5.46.0
 
 ### Minor Changes

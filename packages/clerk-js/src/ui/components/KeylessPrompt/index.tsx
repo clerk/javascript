@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
@@ -22,7 +23,15 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
+  const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      setIsExpanded(true);
+    }
+  }, [isSignedIn]);
+
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
 
@@ -387,9 +396,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   Dashboard.
                 </>
               ) : (
-                <>
-                  We generated temporary API keys for you. Link this application to your Clerk account to configure it.
-                </>
+                <p>
+                  {isSignedIn
+                    ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
+                    : 'We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
+                </p>
               )}
             </p>
           </div>
@@ -420,7 +431,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 data-expanded={isForcedExpanded}
                 css={css`
                   ${mainCTAStyles};
-                  animation: ${isForcedExpanded && 'show-button 600ms ease-in forwards'};
+                  animation: ${isForcedExpanded && isSignedIn
+                    ? 'show-button 800ms ease forwards'
+                    : 'show-button 650ms ease-in forwards'};
+
                   @keyframes show-button {
                     0%,
                     5% {
