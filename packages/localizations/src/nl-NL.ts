@@ -458,7 +458,7 @@ export const nlNL: LocalizationResource = {
       actionLink__use_phone: 'Gebruik telefoon',
       actionLink__use_username: 'Gebruik gebruikersnaam',
       actionText: 'Geen account?',
-      actionText__join_waitlist: 'Nog geen account?',
+      actionText__join_waitlist: 'Nog geen account? Meld je aan voor de wachtlijst.',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Inloggen',
       titleCombined: undefined,
