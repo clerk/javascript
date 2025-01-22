@@ -1,5 +1,4 @@
 import type { AccountlessApplication } from '@clerk/backend';
-import { logger } from '@clerk/shared/logger';
 
 /**
  * Attention: Only import this module when the node runtime is used.
@@ -25,20 +24,29 @@ const throwMissingFsModule = () => {
   throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
 };
 
-/**
- * The `.clerk/` is NOT safe to be commited as it may include sensitive information about a Clerk instance.
- * It may include an instance's secret key and the secret token for claiming that instance.
- */
-function updateGitignore() {
+const safeNodeRuntimeFs = () => {
   if (!nodeRuntime.fs) {
     throwMissingFsModule();
   }
-  const { existsSync, writeFileSync, readFileSync, appendFileSync } = nodeRuntime.fs;
+  return nodeRuntime.fs;
+};
 
+const safeNodeRuntimePath = () => {
   if (!nodeRuntime.path) {
     throwMissingFsModule();
   }
-  const gitignorePath = nodeRuntime.path.join(process.cwd(), '.gitignore');
+  return nodeRuntime.path;
+};
+
+/**
+ * The `.clerk/` directory is NOT safe to be committed as it may include sensitive information about a Clerk instance.
+ * It may include an instance's secret key and the secret token for claiming that instance.
+ */
+function updateGitignore() {
+  const { existsSync, writeFileSync, readFileSync, appendFileSync } = safeNodeRuntimeFs();
+
+  const path = safeNodeRuntimePath();
+  const gitignorePath = path.join(process.cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
   }
@@ -52,10 +60,8 @@ function updateGitignore() {
 }
 
 const generatePath = (...slugs: string[]) => {
-  if (!nodeRuntime.path) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
+  const path = safeNodeRuntimePath();
+  return path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
 };
 
 const _TEMP_DIR_NAME = '.tmp';
@@ -64,11 +70,8 @@ const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
 
 let isCreatingFile = false;
 
-function safeParseClerkFile(): AccountlessApplication | undefined {
-  if (!nodeRuntime.fs) {
-    throwMissingFsModule();
-  }
-  const { readFileSync } = nodeRuntime.fs;
+export function safeParseClerkFile(): AccountlessApplication | undefined {
+  const { readFileSync } = safeNodeRuntimeFs();
   try {
     const CONFIG_PATH = getKeylessConfigurationPath();
     let fileAsString;
@@ -83,24 +86,11 @@ function safeParseClerkFile(): AccountlessApplication | undefined {
   }
 }
 
-const createMessage = (keys: AccountlessApplication) => {
-  return `\n\x1b[35m\n[Clerk]:\x1b[0m You are running in keyless mode.\nYou can \x1b[35mclaim your keys\x1b[0m by visiting ${keys.claimUrl}\n`;
-};
-
-async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
-  if (!nodeRuntime.fs) {
-    // This should never happen.
-    throwMissingFsModule();
-  }
-  const { existsSync, writeFileSync, mkdirSync, rmSync } = nodeRuntime.fs;
-
-  /**
-   * If another request is already in the process of acquiring keys return early.
-   * Using both an in-memory and file system lock seems to be the most effective solution.
-   */
-  if (isCreatingFile || existsSync(CLERK_LOCK)) {
-    return undefined;
-  }
+/**
+ * Using both an in-memory and file system lock seems to be the most effective solution.
+ */
+const lockFileWriting = () => {
+  const { writeFileSync } = safeNodeRuntimeFs();
 
   isCreatingFile = true;
 
@@ -114,6 +104,37 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
       flag: 'w',
     },
   );
+};
+
+const unlockFileWriting = () => {
+  const { rmSync } = safeNodeRuntimeFs();
+
+  try {
+    rmSync(CLERK_LOCK, { force: true, recursive: true });
+  } catch (e) {
+    // Simply ignore if the removal of the directory/file fails
+  }
+
+  isCreatingFile = false;
+};
+
+const isFileWritingLocked = () => {
+  const { existsSync } = safeNodeRuntimeFs();
+  return isCreatingFile || existsSync(CLERK_LOCK);
+};
+
+async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
+  const { writeFileSync, mkdirSync } = safeNodeRuntimeFs();
+
+  /**
+   * If another request is already in the process of acquiring keys return early.
+   * Using both an in-memory and file system lock seems to be the most effective solution.
+   */
+  if (isFileWritingLocked()) {
+    return undefined;
+  }
+
+  lockFileWriting();
 
   const CONFIG_PATH = getKeylessConfigurationPath();
   const README_PATH = getKeylessReadMePath();
@@ -126,13 +147,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    */
   const envVarsMap = safeParseClerkFile();
   if (envVarsMap?.publishableKey && envVarsMap?.secretKey) {
-    isCreatingFile = false;
-    rmSync(CLERK_LOCK, { force: true, recursive: true });
-
-    /**
-     * Notify developers.
-     */
-    logger.logOnce(createMessage(envVarsMap));
+    unlockFileWriting();
 
     return envVarsMap;
   }
@@ -142,11 +157,6 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    */
   const client = createClerkClientWithOptions({});
   const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
-
-  /**
-   * Notify developers.
-   */
-  logger.logOnce(createMessage(accountlessApplication));
 
   writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
     encoding: 'utf8',
@@ -169,10 +179,34 @@ This directory is auto-generated from \`@clerk/nextjs\` because you are running 
   /**
    * Clean up locks.
    */
-  rmSync(CLERK_LOCK, { force: true, recursive: true });
-  isCreatingFile = false;
+  unlockFileWriting();
 
   return accountlessApplication;
 }
 
-export { createOrReadKeyless };
+function removeKeyless() {
+  const { rmSync } = safeNodeRuntimeFs();
+
+  /**
+   * If another request is already in the process of acquiring keys return early.
+   * Using both an in-memory and file system lock seems to be the most effective solution.
+   */
+  if (isFileWritingLocked()) {
+    return undefined;
+  }
+
+  lockFileWriting();
+
+  try {
+    rmSync(generatePath(), { force: true, recursive: true });
+  } catch (e) {
+    // Simply ignore if the removal of the directory/file fails
+  }
+
+  /**
+   * Clean up locks.
+   */
+  unlockFileWriting();
+}
+
+export { createOrReadKeyless, removeKeyless };

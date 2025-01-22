@@ -8,7 +8,6 @@ declare module '*.svg' {
   export default value;
 }
 
-declare const BUILD_ENABLE_NEW_COMPONENTS: string;
 declare const __PKG_NAME__: string;
 declare const __PKG_VERSION__: string;
 declare const __DEV__: boolean;

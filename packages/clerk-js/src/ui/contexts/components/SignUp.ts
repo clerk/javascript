@@ -77,12 +77,14 @@ export const useSignUpContext = (): SignUpContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
+  const authQueryString = redirectUrls.toSearchParams().toString();
+
   const emailLinkRedirectUrl =
     ctx.emailLinkRedirectUrl ??
     buildRedirectUrl({
       routing: ctx.routing,
       baseUrl: signUpUrl,
-      authQueryString: '',
+      authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
     });
@@ -91,7 +93,7 @@ export const useSignUpContext = (): SignUpContextType => {
     buildRedirectUrl({
       routing: ctx.routing,
       baseUrl: signUpUrl,
-      authQueryString: '',
+      authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
     });
@@ -113,7 +115,7 @@ export const useSignUpContext = (): SignUpContextType => {
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: redirectUrls.toSearchParams().toString(),
+    authQueryString,
     isCombinedFlow,
   };
 };

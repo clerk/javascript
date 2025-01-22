@@ -1,7 +1,7 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
 import { camelToSnake } from '@clerk/shared/underscore';
 import { runWithExponentialBackOff } from '@clerk/shared/utils';
-import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
+import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
@@ -33,10 +33,7 @@ export type FapiResponse<T> = Response & {
   payload: FapiResponseJSON<T> | null;
 };
 
-export type FapiRequestCallback<T> = (
-  request: FapiRequestInit,
-  response?: FapiResponse<T>,
-) => Promise<unknown | false> | unknown | false;
+export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => unknown;
 
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
@@ -64,7 +61,15 @@ export interface FapiClient {
 // List of paths that should not receive the session ID parameter in the URL
 const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
-export function createFapiClient(clerkInstance: Clerk): FapiClient {
+type FapiClientOptions = {
+  frontendApi: string;
+  domain?: string;
+  proxyUrl?: string;
+  instanceType: InstanceType;
+  getSessionId: () => string | undefined;
+};
+
+export function createFapiClient(options: FapiClientOptions): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
 
@@ -77,8 +82,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
-    //@ts-expect-error
-    const windowCallback = typeof window !== 'undefined' && (window as never).__unstable__onBeforeRequest;
+    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
       if ((await callback(requestInit)) === false) {
         return false;
@@ -104,16 +108,14 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // Append supported FAPI version to the query string
     searchParams.append('__clerk_api_version', SUPPORTED_FAPI_VERSION);
 
-    if (clerkInstance.version) {
-      searchParams.append('_clerk_js_version', clerkInstance.version);
-    }
+    searchParams.append('_clerk_js_version', __PKG_VERSION__);
 
     if (rotatingTokenNonce) {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
-    if (clerkInstance.instanceType === 'development' && clerkInstance.isSatellite) {
-      searchParams.append('__domain', clerkInstance.domain);
+    if (options.domain) {
+      searchParams.append('__domain', options.domain);
     }
 
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
@@ -142,12 +144,10 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path, pathPrefix = 'v1' } = requestInit;
 
-    const { proxyUrl, domain, frontendApi, instanceType } = clerkInstance;
+    const domainOnlyInProd = options.instanceType === 'production' ? options.domain : '';
 
-    const domainOnlyInProd = instanceType === 'production' ? domain : '';
-
-    if (proxyUrl) {
-      const proxyBase = new URL(proxyUrl);
+    if (options.proxyUrl) {
+      const proxyBase = new URL(options.proxyUrl);
       const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
       return buildUrlUtil(
         {
@@ -159,9 +159,11 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       );
     }
 
+    const baseUrl = `https://${domainOnlyInProd || options.frontendApi}`;
+
     return buildUrlUtil(
       {
-        base: `https://${domainOnlyInProd || frontendApi}`,
+        base: baseUrl,
         pathname: `${pathPrefix}${path}`,
         search: buildQueryString(requestInit),
       },
@@ -172,38 +174,36 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
   function buildEmailAddress(localPart: string): string {
     return buildEmailAddressUtil({
       localPart,
-      frontendApi: clerkInstance.frontendApi,
+      frontendApi: options.frontendApi,
     });
   }
 
-  async function request<T>(_requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>> {
+  async function request<T>(
+    _requestInit: FapiRequestInit,
+    requestOptions?: FapiRequestOptions,
+  ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
     const { method = 'GET', body } = requestInit;
 
     requestInit.url = buildUrl({
       ...requestInit,
       // TODO: Pass these values to the FAPI client instead of calculating them on the spot
-      sessionId: clerkInstance.session?.id,
+      sessionId: options.getSessionId(),
     });
 
-    // Initialize the headers if they're not provided.
-    if (!requestInit.headers) {
-      requestInit.headers = new Headers();
-    }
+    // Normalize requestInit.headers
+    requestInit.headers = new Headers(requestInit.headers);
 
     // Set the default content type for non-GET requests.
     // Skip for FormData, because the browser knows how to construct it later on.
     // Skip if the content-type header has already been set, somebody intends to override it.
-    // @ts-ignore
     if (method !== 'GET' && !(body instanceof FormData) && !requestInit.headers.has('content-type')) {
-      // @ts-ignore
       requestInit.headers.set('content-type', 'application/x-www-form-urlencoded');
     }
 
     // Massage the body depending on the content type if needed.
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
-    // @ts-ignore
 
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
       // The native BodyInit type is too wide for our use case,
@@ -229,7 +229,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
-        const maxTries = options?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
+        const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'

@@ -1,10 +1,18 @@
-import type { OrganizationJSON, SessionJSON } from '@clerk/types';
+import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
-import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
+import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
 import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Organization, Session } from '../internal';
+
+const baseFapiClientOptions = {
+  frontendApi: 'clerk.example.com',
+  getSessionId() {
+    return 'sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX';
+  },
+  instanceType: 'development' as InstanceType,
+};
 
 describe('Session', () => {
   afterEach(() => {
@@ -183,7 +191,7 @@ describe('Session', () => {
         } as SessionJSON);
 
         mockNetworkFailedFetch();
-        BaseResource.clerk = { getFapiClient: () => createFapiClient(mockDevClerkInstance) } as any;
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
         const token = await session.getToken();
 

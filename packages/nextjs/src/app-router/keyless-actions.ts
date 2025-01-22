@@ -41,6 +41,16 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
+  const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
+
+  /**
+   * Notify developers.
+   */
+  keylessLogger?.log({
+    cacheKey: result.publishableKey,
+    msg: createKeylessModeMessage(result),
+  });
+
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
   void (await cookies()).set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
@@ -53,4 +63,13 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     publishableKey,
     apiKeysUrl,
   };
+}
+
+export async function deleteKeylessAction() {
+  if (!canUseKeyless) {
+    return;
+  }
+
+  await import('../server/keyless-node.js').then(m => m.removeKeyless());
+  return;
 }
