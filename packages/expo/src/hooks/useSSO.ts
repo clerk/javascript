@@ -41,9 +41,12 @@ export function useSSO() {
 
     const { strategy, unsafeMetadata } = startSSOFlowParams ?? {};
 
-    // Used to handle redirection back to the mobile application, however deep linking it not applied
-    // We only leverage it to extract the `rotating_token_nonce` query param
-    // It's up to the consumer to navigate once `createdSessionId` gets defined
+    /**
+     * Creates a redirect URL based on the application platform
+     * It must be whitelisted, either via Clerk Dashboard, or BAPI, in order
+     * to include the `rotating_token_nonce` on SSO callback
+     * @ref https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
+     */
     const redirectUrl = AuthSession.makeRedirectUri({
       path: 'sso-callback',
     });
