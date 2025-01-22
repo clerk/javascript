@@ -36,7 +36,6 @@ const membersSearchDebounceMs = 500;
 export const MembersSearch = ({ query, value, memberships, onSearchChange, onQueryTrigger }: MembersSearchProps) => {
   const { t } = useLocalizations();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +80,6 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
       <Flex sx={{ width: '100%' }}>
         <InputWithIcon
           value={value}
-          ref={inputRef}
           type='search'
           autoCapitalize='none'
           spellCheck={false}
