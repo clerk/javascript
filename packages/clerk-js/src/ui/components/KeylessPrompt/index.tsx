@@ -1,10 +1,11 @@
+import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex } from '../../customizables';
+import { Flex, Link } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { InternalThemeProvider } from '../../styledSystem';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
@@ -22,7 +23,15 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
+  const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      setIsExpanded(true);
+    }
+  }, [isSignedIn]);
+
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
 
@@ -258,11 +267,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             <p
               data-text='Clerk is in keyless mode'
               aria-label={
-                success
-                  ? 'Application claim completed'
-                  : claimed
-                    ? 'Missing environment keys'
-                    : 'Clerk is in keyless mode'
+                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
               }
               css={css`
                 ${baseElementStyles};
@@ -273,11 +278,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 cursor: pointer;
               `}
             >
-              {success
-                ? 'Application claim completed'
-                : claimed
-                  ? 'Missing environment keys'
-                  : 'Clerk is in keyless mode'}
+              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
 
@@ -365,11 +366,29 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       text-overflow: ellipsis;
                       max-width: 8.125rem;
                       vertical-align: bottom;
+                      font-weight: 500;
+                      color: #d5d5d5;
                     `}
                   >
                     {appName}
                   </span>{' '}
-                  has been successfully claimed.
+                  has been claimed. Configure settings from the{' '}
+                  <Link
+                    isExternal
+                    aria-label='Go to Dashboard to configure settings'
+                    href='https://dashboard.clerk.com/last-active?path=user-authentication/email-phone-username'
+                    sx={t => ({
+                      color: t.colors.$whiteAlpha600,
+
+                      textDecoration: 'underline solid',
+                      transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
+                      ':hover': {
+                        color: t.colors.$whiteAlpha800,
+                      },
+                    })}
+                  >
+                    Clerk Dashboard
+                  </Link>
                 </>
               ) : claimed ? (
                 <>
@@ -377,9 +396,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   Dashboard.
                 </>
               ) : (
-                <>
-                  We generated temporary API keys for you. Link this application to your Clerk account to configure it.
-                </>
+                <p>
+                  {isSignedIn
+                    ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
+                    : 'We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
+                </p>
               )}
             </p>
           </div>
@@ -410,7 +431,10 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 data-expanded={isForcedExpanded}
                 css={css`
                   ${mainCTAStyles};
-                  animation: ${isForcedExpanded && 'show-button 600ms ease-in forwards'};
+                  animation: ${isForcedExpanded && isSignedIn
+                    ? 'show-button 800ms ease forwards'
+                    : 'show-button 650ms ease-in forwards'};
+
                   @keyframes show-button {
                     0%,
                     5% {

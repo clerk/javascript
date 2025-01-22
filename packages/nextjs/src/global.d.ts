@@ -21,3 +21,13 @@ interface Window {
 
 declare const PACKAGE_NAME: string;
 declare const PACKAGE_VERSION: string;
+
+declare module globalThis {
+  // eslint-disable-next-line no-var
+  var __clerk_internal_keyless_logger:
+    | {
+        __cache: Map<string, { expiresAt: number }>;
+        log: (param: { cacheKey: string; msg: string }) => void;
+      }
+    | undefined;
+}
