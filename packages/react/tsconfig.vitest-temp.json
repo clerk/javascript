@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "declaration": true,
+    "declarationMap": false,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": false,
+    "importHelpers": false,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": false,
+    "target": "ES2019",
+    "incremental": true,
+    "tsBuildInfoFile": "/Users/jakob/work/fix-clerk-javascript/javascript/node_modules/.pnpm/vitest@2.1.4_@edge-runtime+vm@4.0.4_@types+node@20.17.10_jsdom@24.1.3_msw@2.6.4_@types+node@2_ke6o7dbvh7zcd6mtlkfycv22oe/node_modules/vitest/dist/chunks/tsconfig.tmp.tsbuildinfo"
+  },
+  "include": ["src/globals.d.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": ["dist"]
+}

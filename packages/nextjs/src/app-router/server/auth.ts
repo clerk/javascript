@@ -32,11 +32,6 @@ export interface MachineAuthFn {
   protect: AuthProtect;
 }
 
-// export function auth(options: AuthOptions & { entity: 'user' }): Promise<Auth>;
-// export function auth(options: AuthOptions & { entity: 'machine' }): Promise<MachineAuth>;
-// export async function auth(options?: AuthOptions): Promise<Auth>;
-// export async function auth(options?: AuthOptions) {
-
 // No options case
 export function auth(): Promise<Auth>;
 // With options case
