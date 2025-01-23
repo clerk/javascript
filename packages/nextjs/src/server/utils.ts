@@ -7,7 +7,6 @@ import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
@@ -21,23 +20,23 @@ import {
   missingSignInUrlInDev,
 } from './errors';
 import { errorThrower } from './errorThrower';
-import { detectClerkMiddleware, isNextRequest } from './headers-utils';
+import { detectClerkMiddleware } from './headers-utils';
 import type { RequestLike } from './types';
 
-export function getCookie(req: RequestLike, name: string): string | undefined {
-  if (isNextRequest(req)) {
-    // Nextjs broke semver in the 13.0.0 -> 13.0.1 release, so even though
-    // this should be RequestCookie in all updated apps. In order to support apps
-    // using v13.0.0 still, we explicitly add the string type
-    // https://github.com/vercel/next.js/pull/41526
-    const reqCookieOrString = req.cookies.get(name) as ReturnType<NextRequest['cookies']['get']> | string | undefined;
-    if (!reqCookieOrString) {
-      return undefined;
-    }
-    return typeof reqCookieOrString === 'string' ? reqCookieOrString : reqCookieOrString.value;
-  }
-  return req.cookies[name];
-}
+// export function getCookie(req: RequestLike, name: string): string | undefined {
+//   if (isNextRequest(req)) {
+//     // Nextjs broke semver in the 13.0.0 -> 13.0.1 release, so even though
+//     // this should be RequestCookie in all updated apps. In order to support apps
+//     // using v13.0.0 still, we explicitly add the string type
+//     // https://github.com/vercel/next.js/pull/41526
+//     const reqCookieOrString = req.cookies.get(name) as ReturnType<NextRequest['cookies']['get']> | string | undefined;
+//     if (!reqCookieOrString) {
+//       return undefined;
+//     }
+//     return typeof reqCookieOrString === 'string' ? reqCookieOrString : reqCookieOrString.value;
+//   }
+//   return req.cookies[name];
+// }
 
 const OVERRIDE_HEADERS = 'x-middleware-override-headers';
 const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
