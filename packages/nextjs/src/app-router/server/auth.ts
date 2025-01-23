@@ -10,7 +10,6 @@ import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
 import { buildRequestLike } from './utils';
-// import { canUseKeyless } from '../../utils/feature-flags';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
@@ -23,21 +22,9 @@ export const auth: AuthFn = async () => {
   require('server-only');
 
   const request = await buildRequestLike();
-
-  // const isSrcAppDir = async () => {
-  //   if (!canUseKeyless) {
-  //     return '';
-  //   }
-  //
-  //   const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.isSrcAppDir()).catch(() => false);
-  //   return `- Your Middleware exists at <root>/${isSrcAppDir ? 'src/' : ''}middleware.ts\n`;
-  // };
-  const authObject = await createGetAuth({
+  const authObject = createGetAuth({
     debugLoggerName: 'auth()',
-    noAuthStatusMessage: authAuthHeaderMissing(
-      'auth',
-      // , await isSrcAppDir()
-    ),
+    noAuthStatusMessage: authAuthHeaderMissing(),
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
