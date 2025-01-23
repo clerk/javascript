@@ -99,16 +99,14 @@ function sortObject(obj: any) {
     return obj;
   }
 
-  const sortedObj = {};
+  const sortedObj: Record<string, any> = {};
   if (Object.prototype.hasOwnProperty.call(obj, 'locale')) {
-    // @ts-ignore
     sortedObj['locale'] = obj['locale'];
   }
   Object.keys(obj)
     .sort()
     .forEach(key => {
       if (key !== 'locale') {
-        // @ts-ignore
         sortedObj[key] = sortObject(obj[key]);
       }
     });
