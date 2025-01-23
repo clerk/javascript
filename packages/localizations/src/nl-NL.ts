@@ -540,6 +540,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Heb je al een account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
+      titleCombined: 'Maak je account aan',
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -695,6 +696,11 @@ export const nlNL: LocalizationResource = {
         resendButton: 'Verstuur link opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} zal verwijderd worden uit dit account.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit e-mailadres.',

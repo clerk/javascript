@@ -545,6 +545,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Masz już konto?',
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Utwórz swoje konto',
+      titleCombined: 'Utwórz swoje konto',
     },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
@@ -700,6 +701,11 @@ export const plPL: LocalizationResource = {
         resendButton: 'Wyślij ponownie link',
         successMessage: 'Adres e-mail {{identifier}} został dodany do twojego konta.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} zostanie usunięty z tego konta.',
         messageLine2: 'Nie będzie już możliwe zalogowanie się za pomocą tego adresu e-mail.',

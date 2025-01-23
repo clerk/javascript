@@ -531,6 +531,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
+      titleCombined: 'Create your account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -678,6 +679,7 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
     },
     emailAddressPage: {
+      formHint: "You'll need to verify this email address before it can be added to your account.",
       emailCode: {
         formHint: 'An email containing a verification code will be sent to this email address.',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
@@ -691,6 +693,10 @@ export const enUS: LocalizationResource = {
         formTitle: 'Verification link',
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
+      },
+      enterpriseSSOLink: {
+        formButton: 'Click to sign-in',
+        formSubtitle: 'Complete the sign-in with {{identifier}}',
       },
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',

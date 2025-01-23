@@ -540,6 +540,7 @@ export const jaJP: LocalizationResource = {
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
+      titleCombined: 'アカウントを作成',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
@@ -694,6 +695,11 @@ export const jaJP: LocalizationResource = {
         resendButton: 'リンクを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
         messageLine2: 'このメールアドレスを使用してのサインインはできなくなります。',

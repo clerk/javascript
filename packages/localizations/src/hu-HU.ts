@@ -540,6 +540,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
+      titleCombined: 'Fiók létrehozása',
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
@@ -697,6 +698,11 @@ export const huHU: LocalizationResource = {
         resendButton: 'Nem kaptad meg a linket? Újraküldés',
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} el lesz távolítva ebből a fiókból.',
         messageLine2: 'Nem fogsz tudni többet bejelentkezni ezzel az email címmel.',

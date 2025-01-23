@@ -538,6 +538,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
+      titleCombined: 'Criar a sua conta',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -680,6 +681,7 @@ export const ptPT: LocalizationResource = {
       title: 'Excluir conta',
     },
     emailAddressPage: {
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       emailCode: {
         formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
@@ -693,6 +695,10 @@ export const ptPT: LocalizationResource = {
         formTitle: 'Link de verificação',
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
+      },
+      enterpriseSSOLink: {
+        formButton: 'Clique para autenticar',
+        formSubtitle: 'Complete a autenticação com {{identifier}}',
       },
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
