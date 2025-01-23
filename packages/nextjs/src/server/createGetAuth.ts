@@ -18,17 +18,30 @@ export const createGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
+    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
 
-      assertAuthStatus(req, noAuthStatusMessage);
+      // if (!detectClerkMiddleware(req)) {
+      //   if (canUseKeyless) {
+      //     const errorMessage = await import('./keyless-node.js').then(m => m.suggestMiddlewareLocation());
+      //     if (errorMessage) {
+      //       throw new Error(errorMessage);
+      //     } else {
+      //       assertAuthStatus(req, noAuthStatusMessage);
+      //     }
+      //   } else {
+      //     assertAuthStatus(req, noAuthStatusMessage);
+      //   }
+      // }
 
+      assertAuthStatus(req, noAuthStatusMessage);
       return getAuthDataFromRequest(req, { ...opts, logger });
     };
   });
 
+// Did this break ?
 export const getAuth = createGetAuth({
   debugLoggerName: 'getAuth()',
   noAuthStatusMessage: getAuthAuthHeaderMissing(),
