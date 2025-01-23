@@ -1,5 +1,33 @@
 # Change Log
 
+## 1.0.0
+
+### Major Changes
+
+- No changes have been made to the SDK in this update. There are **no breaking changes**. ([#4966](https://github.com/clerk/javascript/pull/4966)) by [@LekoArts](https://github.com/LekoArts)
+
+  This merely bumps the version to a non-zero range and moves the SDK out of beta to a stable release.
+
+### Patch Changes
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`e0cea9a9bf8b90858067154cba9c149d1634dc91`](https://github.com/clerk/javascript/commit/e0cea9a9bf8b90858067154cba9c149d1634dc91), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/shared@2.20.13
+  - @clerk/backend@1.23.6
+  - @clerk/types@4.43.0
+  - @clerk/clerk-react@5.22.5
+
+## 0.2.3
+
+### Patch Changes
+
+- Fix incorrect type for `authorizedParties` option ([#4964](https://github.com/clerk/javascript/pull/4964)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/backend@1.23.5
+  - @clerk/clerk-react@5.22.4
+  - @clerk/shared@2.20.12
+
 ## 0.2.2
 
 ### Patch Changes

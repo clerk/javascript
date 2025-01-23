@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.43.0
+
+### Minor Changes
+
+- - Introduced an `upsert` method to the `SignUp` resource, which reuses the existing sign-up attempt ID if it exists. ([#4720](https://github.com/clerk/javascript/pull/4720)) by [@kostaspt](https://github.com/kostaspt)
+
+  - Fix a ticket flow issue on `<SignUp />` component, where in some rare cases the initial ticket/context is lost, because of creating a new sign-up attempt ID.
+
+## 4.42.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update modal methods to use the correct types. ([#4931](https://github.com/clerk/javascript/pull/4931)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.41.2
 
 ### Patch Changes

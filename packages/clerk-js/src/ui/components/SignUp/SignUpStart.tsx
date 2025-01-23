@@ -177,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          case ERROR_CODES.CAPTCHA_INVALID:
             card.setError(error);
             break;
           default:
@@ -217,7 +218,14 @@ function _SignUpStart(): JSX.Element {
     if (fields.ticket) {
       const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'ticket',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -237,7 +245,7 @@ function _SignUpStart(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     return signUp
-      .create(buildRequest(fieldsToSubmit))
+      .upsert(buildRequest(fieldsToSubmit))
       .then(res =>
         completeSignUpFlow({
           signUp: res,

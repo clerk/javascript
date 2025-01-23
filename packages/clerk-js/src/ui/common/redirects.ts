@@ -4,7 +4,7 @@ import type { SignInContextType, SignUpContextType, UserProfileContextType } fro
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
-export function buildEmailLinkRedirectUrl({
+export function buildVerificationRedirectUrl({
   ctx,
   baseUrl = '',
   intent = 'sign-in',

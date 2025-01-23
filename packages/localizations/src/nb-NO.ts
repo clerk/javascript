@@ -696,6 +696,11 @@ export const nbNO: LocalizationResource = {
         resendButton: 'Send lenke på nytt',
         successMessage: 'E-posten {{identifier}} har blitt lagt til kontoen din.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} vil bli fjernet fra denne kontoen.',
         messageLine2: 'Du vil ikke lenger kunne logge inn med denne e-postadressen.',

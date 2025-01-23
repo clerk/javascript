@@ -1,5 +1,5 @@
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from '@clerk/chrome-extension';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 const PUBLISHABLE_KEY = process.env.PLASMO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const SYNC_HOST = process.env.PLASMO_PUBLIC_CLERK_SYNC_HOST;
@@ -14,9 +14,7 @@ if (!SYNC_HOST) {
 
 export const RootLayout = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  console.log('location', location);
   return (
     <ClerkProvider
       routerPush={to => navigate(to)}
@@ -24,6 +22,7 @@ export const RootLayout = () => {
       publishableKey={PUBLISHABLE_KEY}
       afterSignOutUrl='/'
       syncHost={SYNC_HOST}
+      __experimental_syncHostListener
     >
       <div className='plasmo-w-[785px] plasmo-h-[600px] plasmo-flex plasmo-flex-col'>
         <main className='plasmo-grow plasmo-border-2 plasmo-border-red-500'>

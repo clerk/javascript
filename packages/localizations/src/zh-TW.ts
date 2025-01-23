@@ -685,6 +685,11 @@ export const zhTW: LocalizationResource = {
         resendButton: '重發連結',
         successMessage: '電子郵件 {{identifier}} 已被添加到您的帳戶。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
         messageLine2: '您將無法使用這個電子郵件地址登錄。',

@@ -695,6 +695,11 @@ export const srRS: LocalizationResource = {
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
         messageLine2: 'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',

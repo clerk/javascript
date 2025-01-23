@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.9.14
+
+### Patch Changes
+
+- Additional changes to waitlist component translations `nl-NL` ([#4975](https://github.com/clerk/javascript/pull/4975)) by [@FiremanPete](https://github.com/FiremanPete)
+
+- Update `nl-NL` localization strings ([#4970](https://github.com/clerk/javascript/pull/4970)) by [@FiremanPete](https://github.com/FiremanPete)
+
+- Updated dependencies [[`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/types@4.43.0
+
+## 3.9.13
+
+### Patch Changes
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+
 ## 3.9.12
 
 ### Patch Changes
