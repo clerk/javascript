@@ -1,63 +1,19 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Zatražite pomoć',
-      actionText: 'Nemate ništa od ovoga?',
-      blockButton__backupCode: 'Koristite rezervni kod',
-      blockButton__emailCode: 'Pošalji kod e-poštom na {{identifier}}',
-      blockButton__password: 'Nastavite s vašom lozinkom',
-      blockButton__phoneCode: 'Pošalji SMS kod na {{identifier}}',
-      blockButton__totp: 'Koristite vašu aplikaciju za autentifikaciju',
-      getHelp: {
-        blockButton__emailSupport: 'Pošalji e-poštu podršci',
-        content:
-          'Ako imate problema s verifikacijom vašeg računa, pošaljite nam e-poštu i radit ćemo s vama na vraćanju pristupa što je prije moguće.',
-        title: 'Zatražite pomoć',
-      },
-      subtitle: 'Imate problema? Možete koristiti bilo koju od ovih metoda za verifikaciju.',
-      title: 'Koristite drugu metodu',
-    },
-    backupCodeMfa: {
-      subtitle: 'Vaš rezervni kod je onaj koji ste dobili prilikom postavljanja dvostupanjske autentifikacije.',
-      title: 'Unesite rezervni kod',
-    },
-    emailCode: {
-      formTitle: 'Verifikacijski kod',
-      resendButton: 'Niste primili kod? Pošalji ponovno',
-      subtitle: 'za nastavak na {{applicationName}}',
-      title: 'Provjerite svoju e-poštu',
-    },
-    noAvailableMethods: {
-      message: 'Ne može se nastaviti s verifikacijom. Nema dostupnog faktora autentifikacije.',
-      subtitle: 'Došlo je do pogreške',
-      title: 'Ne može se verificirati vaš račun',
-    },
-    password: {
-      actionLink: 'Koristite drugu metodu',
-      subtitle: 'Unesite lozinku povezanu s vašim računom',
-      title: 'Unesite vašu lozinku',
-    },
-    phoneCode: {
-      formTitle: 'Verifikacijski kod',
-      resendButton: 'Niste primili kod? Pošalji ponovno',
-      subtitle: 'za nastavak na {{applicationName}}',
-      title: 'Provjerite svoj telefon',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Verifikacijski kod',
-      resendButton: 'Niste primili kod? Pošalji ponovno',
-      subtitle: 'Za nastavak, molimo unesite verifikacijski kod poslan na vaš telefon',
-      title: 'Provjerite svoj telefon',
-    },
-    totpMfa: {
-      formTitle: 'Verifikacijski kod',
-      subtitle: 'Za nastavak, molimo unesite verifikacijski kod generiran vašom aplikacijom za autentifikaciju',
-      title: 'Dvostupanjska verifikacija',
-    },
-  },
   backButton: 'Natrag',
   badge__default: 'Zadano',
   badge__otherImpersonatorDevice: 'Drugi uređaj za oponašanje',
@@ -314,6 +270,62 @@ export const hrHR: LocalizationResource = {
   paginationButton__previous: 'Prethodno',
   paginationRowText__displaying: 'Prikazuje se',
   paginationRowText__of: 'od',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Zatražite pomoć',
+      actionText: 'Nemate ništa od ovoga?',
+      blockButton__backupCode: 'Koristite rezervni kod',
+      blockButton__emailCode: 'Pošalji kod e-poštom na {{identifier}}',
+      blockButton__password: 'Nastavite s vašom lozinkom',
+      blockButton__phoneCode: 'Pošalji SMS kod na {{identifier}}',
+      blockButton__totp: 'Koristite vašu aplikaciju za autentifikaciju',
+      getHelp: {
+        blockButton__emailSupport: 'Pošalji e-poštu podršci',
+        content:
+          'Ako imate problema s verifikacijom vašeg računa, pošaljite nam e-poštu i radit ćemo s vama na vraćanju pristupa što je prije moguće.',
+        title: 'Zatražite pomoć',
+      },
+      subtitle: 'Imate problema? Možete koristiti bilo koju od ovih metoda za verifikaciju.',
+      title: 'Koristite drugu metodu',
+    },
+    backupCodeMfa: {
+      subtitle: 'Vaš rezervni kod je onaj koji ste dobili prilikom postavljanja dvostupanjske autentifikacije.',
+      title: 'Unesite rezervni kod',
+    },
+    emailCode: {
+      formTitle: 'Verifikacijski kod',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
+    noAvailableMethods: {
+      message: 'Ne može se nastaviti s verifikacijom. Nema dostupnog faktora autentifikacije.',
+      subtitle: 'Došlo je do pogreške',
+      title: 'Ne može se verificirati vaš račun',
+    },
+    password: {
+      actionLink: 'Koristite drugu metodu',
+      subtitle: 'Unesite lozinku povezanu s vašim računom',
+      title: 'Unesite vašu lozinku',
+    },
+    phoneCode: {
+      formTitle: 'Verifikacijski kod',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoj telefon',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Verifikacijski kod',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'Za nastavak, molimo unesite verifikacijski kod poslan na vaš telefon',
+      title: 'Provjerite svoj telefon',
+    },
+    totpMfa: {
+      formTitle: 'Verifikacijski kod',
+      subtitle: 'Za nastavak, molimo unesite verifikacijski kod generiran vašom aplikacijom za autentifikaciju',
+      title: 'Dvostupanjska verifikacija',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Dodaj račun',
@@ -440,14 +452,18 @@ export const hrHR: LocalizationResource = {
     },
     start: {
       actionLink: 'Registrirajte se',
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Koristite e-poštu',
       actionLink__use_email_username: 'Koristite e-poštu ili korisničko ime',
       actionLink__use_passkey: 'Koristite pristupni ključ umjesto toga',
       actionLink__use_phone: 'Koristite telefon',
       actionLink__use_username: 'Koristite korisničko ime',
       actionText: 'Nemate račun?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Dobrodošli natrag! Molimo prijavite se za nastavak',
+      subtitleCombined: undefined,
       title: 'Prijavite se na {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacijski kod',
@@ -493,12 +509,32 @@ export const hrHR: LocalizationResource = {
         title: 'Uspješno potvrđena e-pošta',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Unesite verifikacijski kod poslan na vaš broj telefona',
       formTitle: 'Verifikacijski kod',
       resendButton: 'Niste primili kod? Pošalji ponovno',
       subtitle: 'Unesite verifikacijski kod poslan na vaš telefon',
       title: 'Potvrdite svoj telefon',
+    },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
     },
     start: {
       actionLink: 'Prijavi se',
@@ -520,7 +556,6 @@ export const hrHR: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
@@ -549,6 +584,7 @@ export const hrHR: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Dostigli ste ograničenje članstava u organizacijama, uključujući otvorene pozivnice.',
     organization_minimum_permissions_needed:
@@ -568,6 +604,7 @@ export const hrHR: LocalizationResource = {
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
       goodPassword: 'Vaša lozinka zadovoljava sve potrebne zahtjeve.',
@@ -666,6 +703,11 @@ export const hrHR: LocalizationResource = {
         resendButton: 'Niste primili poveznicu? Pošalji ponovno',
         successMessage: 'E-pošta {{identifier}} je dodana vašem računu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen s ovog računa.',
         messageLine2: 'Više se nećete moći prijaviti koristeći ovu adresu e-pošte.',
@@ -878,6 +920,20 @@ export const hrHR: LocalizationResource = {
       successMessage: 'Novčanik je dodan vašem računu.',
       title: 'Dodaj web3 novčanik',
       web3WalletButtonsBlockButton: '{{provider|titleize}}',
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

@@ -272,6 +272,62 @@ export const idID: LocalizationResource = {
   paginationButton__previous: 'Sebelumnya',
   paginationRowText__displaying: 'Menampilkan',
   paginationRowText__of: 'dari',
+  reverification: {
+    alternativeMethods: {
+      actionLink: 'Dapatkan bantuan',
+      actionText: 'Tidak memiliki salah satu dari ini?',
+      blockButton__backupCode: 'Gunakan kode cadangan',
+      blockButton__emailCode: 'Kirim kode ke {{identifier}}',
+      blockButton__password: 'Lanjutkan dengan kata sandi Anda',
+      blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
+      blockButton__totp: 'Gunakan aplikasi autentikator Anda',
+      getHelp: {
+        blockButton__emailSupport: 'Email dukungan',
+        content:
+          'Jika Anda kesulitan memverifikasi akun, email kami dan kami akan membantu memulihkan akses secepat mungkin.',
+        title: 'Dapatkan bantuan',
+      },
+      subtitle: 'Mengalami masalah? Anda dapat menggunakan salah satu metode ini untuk verifikasi.',
+      title: 'Gunakan metode lain',
+    },
+    backupCodeMfa: {
+      subtitle: 'Masukkan kode cadangan yang Anda terima saat menyiapkan autentikasi dua langkah',
+      title: 'Masukkan kode cadangan',
+    },
+    emailCode: {
+      formTitle: 'Kode verifikasi',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'Masukkan kode yang dikirim ke email Anda untuk melanjutkan',
+      title: 'Verifikasi diperlukan',
+    },
+    noAvailableMethods: {
+      message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',
+      subtitle: 'Terjadi kesalahan',
+      title: 'Tidak dapat memverifikasi akun Anda',
+    },
+    password: {
+      actionLink: 'Gunakan metode lain',
+      subtitle: 'Masukkan kata sandi Anda untuk melanjutkan',
+      title: 'Verifikasi diperlukan',
+    },
+    phoneCode: {
+      formTitle: 'Kode verifikasi',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
+      title: 'Verifikasi diperlukan',
+    },
+    phoneCodeMfa: {
+      formTitle: 'Kode verifikasi',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
+      title: 'Verifikasi diperlukan',
+    },
+    totpMfa: {
+      formTitle: 'Kode verifikasi',
+      subtitle: 'Masukkan kode yang dihasilkan oleh aplikasi autentikator Anda untuk melanjutkan',
+      title: 'Verifikasi diperlukan',
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Tambah akun',
@@ -407,7 +463,9 @@ export const idID: LocalizationResource = {
       actionText: 'Belum punya akun?',
       actionText__join_waitlist: 'Ingin akses awal?',
       subtitle: 'Selamat datang kembali! Silakan masuk untuk melanjutkan',
+      subtitleCombined: undefined,
       title: 'Masuk ke {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Kode verifikasi',
@@ -503,7 +561,6 @@ export const idID: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran gagal karena validasi bot gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
@@ -532,6 +589,7 @@ export const idID: LocalizationResource = {
     not_allowed_access: undefined,
     organization_domain_blocked: 'Ini adalah domain penyedia email yang diblokir. Silakan gunakan yang lain.',
     organization_domain_common: 'Ini adalah domain penyedia email umum. Silakan gunakan yang lain.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded:
       'Anda telah mencapai batas keanggotaan organisasi, termasuk undangan yang belum selesai.',
     organization_minimum_permissions_needed:
@@ -551,6 +609,7 @@ export const idID: LocalizationResource = {
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -650,6 +709,11 @@ export const idID: LocalizationResource = {
         resendButton: 'Tidak menerima tautan? Kirim ulang',
         successMessage: 'Email {{identifier}} telah ditambahkan ke akun Anda.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} akan dihapus dari akun ini.',
         messageLine2: 'Anda tidak akan dapat masuk menggunakan alamat email ini.',
@@ -669,11 +733,56 @@ export const idID: LocalizationResource = {
       formHint: 'Pilih metode untuk ditambahkan.',
       title: 'Tambah verifikasi dua langkah',
     },
+    mfaPhoneCodePage: {
+      backButton: undefined,
+      primaryButton__addPhoneNumber: undefined,
+      removeResource: {
+        messageLine1: undefined,
+        messageLine2: undefined,
+        successMessage: undefined,
+        title: undefined,
+      },
+      subtitle__availablePhoneNumbers: undefined,
+      subtitle__unavailablePhoneNumbers: undefined,
+      successMessage1: undefined,
+      successMessage2: undefined,
+      successTitle: undefined,
+      title: undefined,
+    },
+    mfaTOTPPage: {
+      authenticatorApp: {
+        buttonAbleToScan__nonPrimary: undefined,
+        buttonUnableToScan__nonPrimary: undefined,
+        infoText__ableToScan: undefined,
+        infoText__unableToScan: undefined,
+        inputLabel__unableToScan1: undefined,
+        inputLabel__unableToScan2: undefined,
+      },
+      removeResource: {
+        messageLine1: undefined,
+        messageLine2: undefined,
+        successMessage: undefined,
+        title: undefined,
+      },
+      successMessage: undefined,
+      title: undefined,
+      verifySubtitle: undefined,
+      verifyTitle: undefined,
+    },
+    mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',
       title: 'Akun',
+    },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -708,61 +817,105 @@ export const idID: LocalizationResource = {
       successMessage: 'Profil Anda telah diperbarui.',
       title: 'Perbarui profil',
     },
-  },
-  reverification: {
-    alternativeMethods: {
-      actionLink: 'Dapatkan bantuan',
-      actionText: 'Tidak memiliki salah satu dari ini?',
-      blockButton__backupCode: 'Gunakan kode cadangan',
-      blockButton__emailCode: 'Kirim kode ke {{identifier}}',
-      blockButton__password: 'Lanjutkan dengan kata sandi Anda',
-      blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
-      blockButton__totp: 'Gunakan aplikasi autentikator Anda',
-      getHelp: {
-        blockButton__emailSupport: 'Email dukungan',
-        content:
-          'Jika Anda kesulitan memverifikasi akun, email kami dan kami akan membantu memulihkan akses secepat mungkin.',
-        title: 'Dapatkan bantuan',
+    start: {
+      activeDevicesSection: {
+        destructiveAction: undefined,
+        title: undefined,
       },
-      subtitle: 'Mengalami masalah? Anda dapat menggunakan salah satu metode ini untuk verifikasi.',
-      title: 'Gunakan metode lain',
+      connectedAccountsSection: {
+        actionLabel__connectionFailed: undefined,
+        actionLabel__reauthorize: undefined,
+        destructiveActionTitle: undefined,
+        primaryButton: undefined,
+        subtitle__disconnected: undefined,
+        subtitle__reauthorize: undefined,
+        title: undefined,
+      },
+      dangerSection: {
+        deleteAccountButton: undefined,
+        title: undefined,
+      },
+      emailAddressesSection: {
+        destructiveAction: undefined,
+        detailsAction__nonPrimary: undefined,
+        detailsAction__primary: undefined,
+        detailsAction__unverified: undefined,
+        primaryButton: undefined,
+        title: undefined,
+      },
+      enterpriseAccountsSection: {
+        title: undefined,
+      },
+      headerTitle__account: undefined,
+      headerTitle__security: undefined,
+      mfaSection: {
+        backupCodes: {
+          actionLabel__regenerate: undefined,
+          headerTitle: undefined,
+          subtitle__regenerate: undefined,
+          title__regenerate: undefined,
+        },
+        phoneCode: {
+          actionLabel__setDefault: undefined,
+          destructiveActionLabel: undefined,
+        },
+        primaryButton: undefined,
+        title: undefined,
+        totp: {
+          destructiveActionTitle: undefined,
+          headerTitle: undefined,
+        },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
+      passwordSection: {
+        primaryButton__setPassword: undefined,
+        primaryButton__updatePassword: undefined,
+        title: undefined,
+      },
+      phoneNumbersSection: {
+        destructiveAction: undefined,
+        detailsAction__nonPrimary: undefined,
+        detailsAction__primary: undefined,
+        detailsAction__unverified: undefined,
+        primaryButton: undefined,
+        title: undefined,
+      },
+      profileSection: {
+        primaryButton: undefined,
+        title: undefined,
+      },
+      usernameSection: {
+        primaryButton__setUsername: undefined,
+        primaryButton__updateUsername: undefined,
+        title: undefined,
+      },
+      web3WalletsSection: {
+        destructiveAction: undefined,
+        primaryButton: undefined,
+        title: undefined,
+      },
     },
-    backupCodeMfa: {
-      subtitle: 'Masukkan kode cadangan yang Anda terima saat menyiapkan autentikasi dua langkah',
-      title: 'Masukkan kode cadangan',
+    usernamePage: {
+      successMessage: undefined,
+      title__set: undefined,
+      title__update: undefined,
     },
-    emailCode: {
-      formTitle: 'Kode verifikasi',
-      resendButton: 'Tidak menerima kode? Kirim ulang',
-      subtitle: 'Masukkan kode yang dikirim ke email Anda untuk melanjutkan',
-      title: 'Verifikasi diperlukan',
-    },
-    noAvailableMethods: {
-      message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',
-      subtitle: 'Terjadi kesalahan',
-      title: 'Tidak dapat memverifikasi akun Anda',
-    },
-    password: {
-      actionLink: 'Gunakan metode lain',
-      subtitle: 'Masukkan kata sandi Anda untuk melanjutkan',
-      title: 'Verifikasi diperlukan',
-    },
-    phoneCode: {
-      formTitle: 'Kode verifikasi',
-      resendButton: 'Tidak menerima kode? Kirim ulang',
-      subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
-      title: 'Verifikasi diperlukan',
-    },
-    phoneCodeMfa: {
-      formTitle: 'Kode verifikasi',
-      resendButton: 'Tidak menerima kode? Kirim ulang',
-      subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
-      title: 'Verifikasi diperlukan',
-    },
-    totpMfa: {
-      formTitle: 'Kode verifikasi',
-      subtitle: 'Masukkan kode yang dihasilkan oleh aplikasi autentikator Anda untuk melanjutkan',
-      title: 'Verifikasi diperlukan',
+    web3WalletPage: {
+      removeResource: {
+        messageLine1: undefined,
+        messageLine2: undefined,
+        successMessage: undefined,
+        title: undefined,
+      },
+      subtitle__availableWallets: undefined,
+      subtitle__unavailableWallets: undefined,
+      successMessage: undefined,
+      title: undefined,
+      web3WalletButtonsBlockButton: undefined,
     },
   },
   waitlist: {
