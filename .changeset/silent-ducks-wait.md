@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Remove `virtual` routing option from components.
+Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API.
