@@ -81,6 +81,7 @@ export async function ClerkProvider(
 
   let [shouldRunAsKeyless, runningWithClaimedKeys] = [false, false];
   if (canUseKeyless) {
+    // eslint-disable-next-line import/no-unresolved
     const locallyStorePublishableKey = await import('../../server/keyless-node.js')
       .then(mod => mod.safeParseClerkFile()?.publishableKey)
       .catch(() => undefined);
