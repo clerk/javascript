@@ -1,8 +1,8 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { debugRequestState } from '@clerk/backend/internal';
+import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import { getEnvVariable } from '../../utils/env';
 import type { AdditionalStateOptions } from '../types';
 
 /**

@@ -1,10 +1,5 @@
 type CloudflareEnv = { env: Record<string, string> };
 
-interface Context {
-  [key: string]: unknown;
-  cloudflare?: CloudflareEnv;
-}
-
 const hasCloudflareProxyContext = (context: any): context is { cloudflare: CloudflareEnv } => {
   return !!context?.cloudflare?.env;
 };
@@ -19,7 +14,7 @@ const hasCloudflareContext = (context: any): context is CloudflareEnv => {
  * @param context - Optional context object that may contain environment values
  * @returns The environment variable value or empty string if not found
  */
-export const getEnvVariable = (name: string, context: Context | undefined): string => {
+export const getEnvVariable = <T = unknown>(name: string, context?: T): string => {
   // Node envs
   if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
     return process.env[name];
@@ -41,8 +36,8 @@ export const getEnvVariable = (name: string, context: Context | undefined): stri
   }
 
   // Check whether the value exists in the context object directly
-  if (context && typeof context[name] === 'string') {
-    return context[name];
+  if (context && typeof context[name as keyof typeof context] === 'string') {
+    return context[name as keyof typeof context] as string;
   }
 
   // Cloudflare workers

@@ -1,8 +1,8 @@
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
-// eslint-disable-next-line import/no-unresolved
+import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { getEvent } from 'vinxi/http';
 
-import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
+import { getPublicEnvVariables } from '../utils/env';
 
 export const commonEnvs = () => {
   const event = getEvent();
@@ -22,16 +22,16 @@ export const commonEnvs = () => {
     TELEMETRY_DEBUG: publicEnvs.telemetryDebug,
 
     // Server-only environment variables
-    API_VERSION: getEnvVariable('CLERK_API_VERSION', 'v1', event),
-    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY', '', event),
-    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY', '', event),
-    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY', '', event),
-    API_URL: getEnvVariable('CLERK_API_URL', '', event) || apiUrlFromPublishableKey(publicEnvs.publishableKey),
+    API_VERSION: getEnvVariable('CLERK_API_VERSION', event) || 'v1',
+    SECRET_KEY: getEnvVariable('CLERK_SECRET_KEY', event),
+    ENCRYPTION_KEY: getEnvVariable('CLERK_ENCRYPTION_KEY', event),
+    CLERK_JWT_KEY: getEnvVariable('CLERK_JWT_KEY', event),
+    API_URL: getEnvVariable('CLERK_API_URL', event) || apiUrlFromPublishableKey(publicEnvs.publishableKey),
 
     SDK_METADATA: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
-      environment: getEnvVariable('NODE_ENV', '', event),
+      environment: getEnvVariable('NODE_ENV', event),
     },
   } as const;
 };
