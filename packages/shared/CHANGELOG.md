@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.20.13
+
+### Patch Changes
+
+- Re-add `handleValueOrFn` to subpaths with a deprecation warning. ([#4972](https://github.com/clerk/javascript/pull/4972)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates error handling check within isEmailLinkError to fix issue where email link errors were not properly returning true. ([#4963](https://github.com/clerk/javascript/pull/4963)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/types@4.43.0
+
 ## 2.20.12
 
 ### Patch Changes
