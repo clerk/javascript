@@ -484,7 +484,11 @@ type _LocalizationResource = {
     emailAddressPage: {
       title: LocalizationValue;
       verifyTitle: LocalizationValue;
+      formHint: LocalizationValue;
       emailCode: {
+        /**
+         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
@@ -492,11 +496,18 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
       emailLink: {
+        /**
+         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
+      };
+      enterpriseSSOLink: {
+        formSubtitle: LocalizationValue;
+        formButton: LocalizationValue;
       };
       removeResource: {
         title: LocalizationValue;

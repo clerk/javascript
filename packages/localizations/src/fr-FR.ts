@@ -702,6 +702,11 @@ export const frFR: LocalizationResource = {
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec cette adresse e-mail.',

@@ -694,6 +694,11 @@ export const daDK: LocalizationResource = {
         resendButton: 'Send link igen',
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med denne e-mailadresse.',

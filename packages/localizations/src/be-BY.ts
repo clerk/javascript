@@ -702,6 +702,11 @@ export const beBY: LocalizationResource = {
         resendButton: 'Адправіць спасылку паўторна',
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будзе выдалены з гэтага ўліковага запісу.',
         messageLine2: 'Вы больш не зможаце ўваходзіць, выкарыстоўваючы гэты адрас электроннай пошты.',

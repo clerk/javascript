@@ -688,6 +688,11 @@ export const koKR: LocalizationResource = {
         resendButton: '링크 재전송',
         successMessage: '{{identifier}} 이메일이 당신의 계정에 추가되었습니다.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 이메일이 이 계정에서 제거 될 에정입니다.',
         messageLine2: '더 이상 이 이메일 주소로 로그인할 수 없습니다.',
