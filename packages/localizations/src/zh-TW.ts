@@ -535,6 +535,7 @@ export const zhTW: LocalizationResource = {
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
       title: '創建您的帳戶',
+      titleCombined: '創建您的帳戶',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登錄',

@@ -539,6 +539,7 @@ export const srRS: LocalizationResource = {
       actionText: 'Već imaš nalog?',
       subtitle: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',
+      titleCombined: 'Kreiraj svoj nalog',
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',

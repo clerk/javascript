@@ -543,6 +543,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
+      titleCombined: 'Skapa ditt konto',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
