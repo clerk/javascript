@@ -19,6 +19,18 @@ describe('<OrganizationProfile/>', () => {
       }).toMatchTypeOf<OrganizationProfileComponentProps>();
     });
 
+    test('when path is filled, routing must only have path as value', () => {
+      expectTypeOf({
+        path: '/org',
+        routing: 'virtual' as const,
+      }).not.toMatchTypeOf<OrganizationProfileComponentProps>();
+
+      expectTypeOf({
+        path: '/org',
+        routing: 'hash' as const,
+      }).not.toMatchTypeOf<OrganizationProfileComponentProps>();
+    });
+
     test('when routing is hash or virtual path must be present', () => {
       expectTypeOf({
         routing: 'hash' as const,

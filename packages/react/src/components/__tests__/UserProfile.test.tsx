@@ -19,6 +19,18 @@ describe('<UserProfile/>', () => {
       }).toMatchTypeOf<UserProfileComponentProps>();
     });
 
+    test('when path is filled, routing must only have path as value', () => {
+      expectTypeOf({
+        path: '/profile',
+        routing: 'virtual' as const,
+      }).not.toMatchTypeOf<UserProfileComponentProps>();
+
+      expectTypeOf({
+        path: '/profile',
+        routing: 'hash' as const,
+      }).not.toMatchTypeOf<UserProfileComponentProps>();
+    });
+
     test('when routing is hash or virtual path must be present', () => {
       expectTypeOf({
         routing: 'hash' as const,
