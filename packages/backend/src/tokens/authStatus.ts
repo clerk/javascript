@@ -3,13 +3,25 @@ import type { JwtPayload } from '@clerk/types';
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
-import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
-import { signedInAuthObject, signedOutAuthObject } from './authObjects';
+import type {
+  AuthenticatedMachineObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from './authObjects';
+import {
+  authenticatedMachineObject,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from './authObjects';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
   SignedOut: 'signed-out',
   Handshake: 'handshake',
+  MachineAuthenticated: 'machine-authenticated',
+  MachineUnauthenticated: 'machine-unauthenticated',
 } as const;
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
@@ -54,6 +66,22 @@ export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
   status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
+};
+
+export type MachineAuthenticatedState = Omit<SignedOutState, 'status' | 'toAuth' | 'token' | 'reason' | 'message'> & {
+  status: typeof AuthStatus.MachineAuthenticated;
+  reason: null;
+  message: null;
+  isMachineAuthenticated: true;
+  toAuth: () => AuthenticatedMachineObject;
+  token: string;
+};
+
+export type MachineUnauthenticatedState = Omit<SignedOutState, 'status' | 'toAuth'> & {
+  status: typeof AuthStatus.MachineUnauthenticated;
+  message: string;
+  isMachineAuthenticated: false;
+  toAuth: () => UnauthenticatedMachineObject;
 };
 
 export const AuthErrorReason = {
@@ -155,7 +183,62 @@ export function handshake(
   });
 }
 
-const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+export function machineAuthenticated(
+  authenticateContext: AuthenticateContext,
+  headers: Headers = new Headers(),
+  token: string,
+  claims: JwtPayload,
+): MachineAuthenticatedState {
+  const machineAuthObject = authenticatedMachineObject(token, claims);
+  return {
+    status: AuthStatus.MachineAuthenticated,
+    reason: null,
+    message: null,
+    proxyUrl: authenticateContext.proxyUrl || '',
+    publishableKey: authenticateContext.publishableKey || '',
+    isSatellite: authenticateContext.isSatellite || false,
+    domain: authenticateContext.domain || '',
+    signInUrl: authenticateContext.signInUrl || '',
+    signUpUrl: authenticateContext.signUpUrl || '',
+    afterSignInUrl: authenticateContext.afterSignInUrl || '',
+    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
+    isSignedIn: false,
+    isMachineAuthenticated: true,
+    toAuth: () => machineAuthObject,
+    headers,
+    token,
+  };
+}
+
+export function machineUnauthenticated(
+  authenticateContext: AuthenticateContext,
+  reason: AuthReason,
+  message = '',
+  headers: Headers = new Headers(),
+): MachineUnauthenticatedState {
+  return withDebugHeaders({
+    status: AuthStatus.MachineUnauthenticated,
+    reason,
+    message,
+    proxyUrl: authenticateContext.proxyUrl || '',
+    publishableKey: authenticateContext.publishableKey || '',
+    isSatellite: authenticateContext.isSatellite || false,
+    domain: authenticateContext.domain || '',
+    signInUrl: authenticateContext.signInUrl || '',
+    signUpUrl: authenticateContext.signUpUrl || '',
+    afterSignInUrl: authenticateContext.afterSignInUrl || '',
+    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
+    isSignedIn: false,
+    isMachineAuthenticated: false,
+    toAuth: () => unauthenticatedMachineObject(),
+    headers,
+    token: null,
+  });
+}
+
+const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>(
+  requestState: T,
+): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {

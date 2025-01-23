@@ -1,5 +1,13 @@
 import type { AuthObject } from '@clerk/backend';
-import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
+import type { AuthenticatedMachineObject, UnauthenticatedMachineObject } from '@clerk/backend/internal';
+import {
+  authenticatedMachineObject,
+  AuthStatus,
+  constants,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
@@ -12,10 +20,21 @@ import { assertTokenSignature, decryptClerkRequestData } from '../utils';
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
+export type GetAuthDataFromRequestOptions = {
+  secretKey?: string;
+  logger?: LoggerNoCommit;
+  entity?: 'user' | 'machine';
+};
 export function getAuthDataFromRequest(
   req: RequestLike,
-  opts: { secretKey?: string; logger?: LoggerNoCommit } = {},
-): AuthObject {
+  opts: GetAuthDataFromRequestOptions & { entity: 'machine' },
+): AuthenticatedMachineObject | UnauthenticatedMachineObject;
+export function getAuthDataFromRequest(
+  req: RequestLike,
+  opts: GetAuthDataFromRequestOptions & { entity: 'user' },
+): AuthObject;
+export function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
+export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
@@ -40,7 +59,16 @@ export function getAuthDataFromRequest(
   opts.logger?.debug('auth options', options);
 
   let authObject;
-  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+  if (opts.entity === 'machine' && (!authStatus || authStatus !== AuthStatus.MachineAuthenticated)) {
+    authObject = unauthenticatedMachineObject(options);
+  } else if (opts.entity === 'machine' && authStatus === AuthStatus.MachineAuthenticated) {
+    assertTokenSignature(authToken as string, options.secretKey, authSignature);
+
+    const jwt = decodeJwt(authToken as string);
+
+    opts.logger?.debug('jwt', jwt.raw);
+    authObject = authenticatedMachineObject(jwt.raw.text, jwt.payload);
+  } else if (!authStatus || authStatus !== AuthStatus.SignedIn) {
     authObject = signedOutAuthObject(options);
   } else {
     assertTokenSignature(authToken as string, options.secretKey, authSignature);

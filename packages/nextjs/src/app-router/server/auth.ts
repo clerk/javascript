@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -11,20 +12,41 @@ import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
+type EntityTypes = 'user' | 'machine';
+
+type EntityTypeToAuth<T extends EntityTypes> = T extends 'user' ? Auth : T extends 'machine' ? MachineAuth : Auth;
+
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
+type MachineAuth = Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject> & {
+  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+};
+type AuthOptions = { entity?: EntityTypes };
+
 export interface AuthFn {
-  (): Promise<Auth>;
+  (options?: AuthOptions): Promise<Auth>;
   protect: AuthProtect;
 }
 
-export const auth: AuthFn = async () => {
+export interface MachineAuthFn {
+  (options?: AuthOptions): Promise<MachineAuth>;
+  protect: AuthProtect;
+}
+
+// No options case
+export function auth(): Promise<Auth>;
+// With options case
+export function auth<T extends EntityTypes>(options: AuthOptions & { entity: T }): Promise<EntityTypeToAuth<T>>;
+// With options but no entity case
+export function auth(options: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions): Promise<Auth | MachineAuth> {
   require('server-only');
 
   const request = await buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
+    options,
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -51,7 +73,7 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn });
-};
+}
 
 auth.protect = async (...args: any[]) => {
   require('server-only');

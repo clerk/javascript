@@ -106,12 +106,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
+      const entity = 'any' as const;
 
       const options = {
         publishableKey,
         secretKey,
         signInUrl,
         signUpUrl,
+        entity,
         ...resolvedParams,
       };
 

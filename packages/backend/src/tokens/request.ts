@@ -11,8 +11,22 @@ import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
-import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
-import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
+import type {
+  HandshakeState,
+  MachineAuthenticatedState,
+  MachineUnauthenticatedState,
+  RequestState,
+  SignedInState,
+  SignedOutState,
+} from './authStatus';
+import {
+  AuthErrorReason,
+  handshake,
+  machineAuthenticated,
+  machineUnauthenticated,
+  signedIn,
+  signedOut,
+} from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
@@ -92,8 +106,18 @@ function isRequestEligibleForRefresh(
 
 export async function authenticateRequest(
   request: Request,
-  options: AuthenticateRequestOptions,
-): Promise<RequestState> {
+  options: AuthenticateRequestOptions & { entity: 'machine' },
+): Promise<MachineUnauthenticatedState | MachineAuthenticatedState>;
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions & { entity: 'user' },
+): Promise<RequestState>;
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions & { entity: 'any' },
+): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>;
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -443,6 +467,10 @@ ${error.getFullMessage()}`,
 
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
+    const { data: decodeResult } = decodeJwt(sessionTokenInHeader!);
+    if (decodeResult?.payload.sub.startsWith('mch_')) {
+      return signedOut(authenticateContext, 'Machine tokens cannot be used to authenticate user requests');
+    }
 
     try {
       const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
@@ -635,7 +663,7 @@ ${error.getFullMessage()}`,
   async function handleError(
     err: unknown,
     tokenCarrier: TokenCarrier,
-  ): Promise<SignedInState | SignedOutState | HandshakeState> {
+  ): Promise<SignedInState | SignedOutState | HandshakeState | MachineUnauthenticatedState> {
     if (!(err instanceof TokenVerificationError)) {
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
@@ -684,10 +712,69 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, err.reason, err.getFullMessage());
   }
 
+  // Separated machine error and normal error so it's easier to read and the flow fow for 'any' is better too
+  function handleMachineError(err: unknown): MachineUnauthenticatedState {
+    if (!(err instanceof TokenVerificationError)) {
+      return machineUnauthenticated(authenticateContext, AuthErrorReason.UnexpectedError);
+    }
+
+    return machineUnauthenticated(authenticateContext, err.reason, err.getFullMessage());
+  }
+
+  async function authenticateMachineRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
+    if (!sessionTokenInHeader) {
+      return handleError(new Error('No token in header'), 'header');
+    }
+
+    const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
+    if (errors) {
+      return handleMachineError(errors[0]);
+    }
+    if (data.sub.startsWith('user_')) {
+      return machineUnauthenticated(
+        authenticateContext,
+        'Expected a machine token but received a user token. Please verify the token type and ensure you are passing a machine token to the machine authentication function',
+      );
+    }
+    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data);
+  }
+
+  async function authenticateAnyRequestWithTokenInHeader() {
+    const { sessionTokenInHeader } = authenticateContext;
+
+    if (!sessionTokenInHeader) {
+      return handleError(new Error('No token in header'), 'header');
+    }
+
+    const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
+    if (errors) {
+      const { data: decodedData } = decodeJwt(sessionTokenInHeader);
+      if (decodedData?.payload.sub.startsWith('mch_')) {
+        return handleMachineError(errors[0]);
+      }
+      return handleError(errors[0], 'header');
+    }
+    if (data.sub.startsWith('mch_')) {
+      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data);
+    }
+    return signedIn(authenticateContext, data, undefined, sessionTokenInHeader);
+  }
+
   if (authenticateContext.sessionTokenInHeader) {
+    if (options.entity === 'any') {
+      return authenticateAnyRequestWithTokenInHeader();
+    } else if (options.entity === 'machine') {
+      return authenticateMachineRequestWithTokenInHeader();
+    }
     return authenticateRequestWithTokenInHeader();
   }
 
+  // machine requests cannot have the token in the cookie, it must be in header
+  if (options.entity === 'machine') {
+    return machineUnauthenticated(authenticateContext, 'no token in header');
+  }
   return authenticateRequestWithTokenInCookie();
 }
 
