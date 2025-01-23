@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 
-import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts/index';
+import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
 
