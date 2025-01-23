@@ -533,6 +533,7 @@ export const heIL: LocalizationResource = {
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',

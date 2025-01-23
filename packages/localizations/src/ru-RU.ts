@@ -552,6 +552,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',

@@ -538,6 +538,7 @@ export const viVN: LocalizationResource = {
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',

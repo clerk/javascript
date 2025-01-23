@@ -546,6 +546,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',

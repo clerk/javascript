@@ -540,6 +540,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Heb je al een account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',

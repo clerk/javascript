@@ -541,6 +541,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Hai già un account?',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',

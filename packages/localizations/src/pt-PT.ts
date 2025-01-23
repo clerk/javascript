@@ -538,6 +538,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',

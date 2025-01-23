@@ -529,6 +529,7 @@ export const zhCN: LocalizationResource = {
       actionText: '已经有账户了？',
       subtitle: '继续使用 {{applicationName}}',
       title: '创建您的账户',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',

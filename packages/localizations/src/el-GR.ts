@@ -543,6 +543,7 @@ export const elGR: LocalizationResource = {
       actionText: 'Έχετε ήδη λογαριασμό;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',

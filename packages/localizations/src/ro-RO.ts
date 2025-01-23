@@ -542,6 +542,7 @@ export const roRO: LocalizationResource = {
       actionText: 'Aveți un cont?',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Creați-vă un cont',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuați cu {{provider|titleize}}',

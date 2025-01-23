@@ -541,6 +541,7 @@ export const mnMN: LocalizationResource = {
       actionText: 'Бүртгэлтэй юу?',
       subtitle: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',

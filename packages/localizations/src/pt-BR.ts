@@ -544,6 +544,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
+      titleCombined: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
