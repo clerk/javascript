@@ -18,6 +18,7 @@
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",
     "lint:inspect": "pnpx @eslint/config-inspector@latest",
+    "lint:packages": "FORCE_COLOR=1 turbo lint",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
     "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
