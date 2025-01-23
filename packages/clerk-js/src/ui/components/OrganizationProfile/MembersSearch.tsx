@@ -2,7 +2,7 @@ import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/types';
 import { useEffect, useRef } from 'react';
 
-import { Flex, localizationKeys, useLocalizations } from '../../../ui/customizables';
+import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
 import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
@@ -85,9 +85,19 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
           spellCheck={false}
           aria-label='Search'
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
-          leftIcon={isFetchingNewData ? <Spinner size='xs' /> : <MagnifyingGlass />}
+          leftIcon={
+            isFetchingNewData ? (
+              <Spinner size='xs' />
+            ) : (
+              <Icon
+                icon={MagnifyingGlass}
+                elementDescriptor={descriptors.organizationProfileMembersSearchInputIcon}
+              />
+            )
+          }
           onKeyUp={handleKeyUp}
           onChange={handleChange}
+          elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />
       </Flex>
     </Animated>
