@@ -535,6 +535,7 @@ export const koKR: LocalizationResource = {
       actionText: '계정이 있으신가요?',
       subtitle: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
+      titleCombined: '계정 만들기',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',

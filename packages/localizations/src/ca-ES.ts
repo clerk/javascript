@@ -441,6 +441,7 @@ export const caES: LocalizationResource = {
       actionText: 'Ja tens un compte?',
       subtitle: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
+      titleCombined: 'Crea el teu compte',
     },
   },
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',

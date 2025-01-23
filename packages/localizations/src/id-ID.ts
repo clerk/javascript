@@ -490,6 +490,7 @@ export const idID: LocalizationResource = {
       actionText: 'Sudah punya akun?',
       subtitle: 'Selamat datang! Silakan isi detail untuk memulai.',
       title: 'Buat akun Anda',
+      titleCombined: 'Buat akun Anda',
     },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
