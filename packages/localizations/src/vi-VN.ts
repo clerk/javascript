@@ -694,6 +694,11 @@ export const viVN: LocalizationResource = {
         resendButton: 'Không nhận được liên kết? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không thể đăng nhập bằng địa chỉ email này nữa.',

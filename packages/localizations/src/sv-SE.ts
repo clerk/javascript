@@ -698,6 +698,11 @@ export const svSE: LocalizationResource = {
         resendButton: 'Skicka länken igen',
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2: 'Du kommer inte längre att kunna logga in med denna e-postadress.',

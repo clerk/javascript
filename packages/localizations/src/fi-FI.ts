@@ -696,6 +696,11 @@ export const fiFI: LocalizationResource = {
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
         messageLine2:
