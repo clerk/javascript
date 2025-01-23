@@ -1,33 +1,61 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
-import { decodeJwt } from '@clerk/backend/jwt';
 import { isTruthy } from '@clerk/shared/underscore';
 
-import { withLogger } from '../utils/debugLogger';
+import { type LoggerNoCommit, withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
-import { assertAuthStatus, getCookie } from './utils';
+import { assertAuthStatus } from './utils';
 
-export const createGetAuth = ({
-  noAuthStatusMessage,
+// Utility type to determine if a type is a Promise
+type IsPromise<T> = T extends Promise<any> ? true : false;
+
+const createGetAuth = <
+  TTransformer extends (param: {
+    options: { secretKey?: string };
+    logger: LoggerNoCommit;
+    request: RequestLike;
+  }) => AuthObject | Promise<AuthObject>,
+>({
   debugLoggerName,
+  transformer,
 }: {
   debugLoggerName: string;
-  noAuthStatusMessage: string;
+  transformer: TTransformer;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
+    return (req: RequestLike, opts?: { secretKey?: string }) => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
 
-      if (!detectClerkMiddleware(req)) {
+      return transformer({
+        request: req,
+        options: { ...opts },
+        logger,
+      }) as unknown as IsPromise<ReturnType<TTransformer>> extends true
+        ? Promise<Awaited<ReturnType<TTransformer>>>
+        : ReturnType<TTransformer>;
+    };
+  });
+
+export const createGetAuthAsync = ({
+  debugLoggerName,
+  noAuthStatusMessage,
+}: {
+  debugLoggerName: string;
+  noAuthStatusMessage: string;
+}) =>
+  createGetAuth({
+    debugLoggerName: debugLoggerName,
+    transformer: async ({ request, options, logger }) => {
+      if (!detectClerkMiddleware(request)) {
         // Keep the same behaviour for versions that may have issues with bundling `node:fs`
         if (isNextWithUnstableServerActions) {
-          assertAuthStatus(req, noAuthStatusMessage);
+          assertAuthStatus(request, noAuthStatusMessage);
         }
 
         const missConfiguredMiddlewareLocation = await import('./keyless-node.js')
@@ -38,21 +66,29 @@ export const createGetAuth = ({
           throw new Error(missConfiguredMiddlewareLocation);
         }
 
-        assertAuthStatus(req, noAuthStatusMessage);
+        assertAuthStatus(request, noAuthStatusMessage);
       }
 
-      return getAuthDataFromRequest(req, { ...opts, logger });
-    };
+      return getAuthDataFromRequest(request, { ...options, logger });
+    },
   });
 
-// Did this break ?
-export const getAuth = createGetAuth({
+export const createGetAuthSync = ({
+  debugLoggerName,
+  noAuthStatusMessage,
+}: {
+  debugLoggerName: string;
+  noAuthStatusMessage: string;
+}) =>
+  createGetAuth({
+    debugLoggerName: debugLoggerName,
+    transformer: ({ request, options, logger }) => {
+      assertAuthStatus(request, noAuthStatusMessage);
+      return getAuthDataFromRequest(request, { ...options, logger });
+    },
+  });
+
+export const getAuth = createGetAuthSync({
   debugLoggerName: 'getAuth()',
   noAuthStatusMessage: getAuthAuthHeaderMissing(),
 });
-
-export const parseJwt = (req: RequestLike) => {
-  const cookieToken = getCookie(req, constants.Cookies.Session);
-  const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
-  return decodeJwt(cookieToken || headerToken || '');
-};
