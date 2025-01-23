@@ -540,7 +540,7 @@ export const bgBG: LocalizationResource = {
       actionText: 'Вече имате акаунт?',
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
-      titleCombined: undefined,
+      titleCombined: 'Създайте своя акаунт',
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',

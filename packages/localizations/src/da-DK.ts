@@ -539,7 +539,7 @@ export const daDK: LocalizationResource = {
       actionText: 'Har du en konto?',
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
-      titleCombined: undefined,
+      titleCombined: 'Opret din konto',
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',

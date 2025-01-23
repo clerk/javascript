@@ -540,7 +540,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
-      titleCombined: undefined,
+      titleCombined: 'Fiók létrehozása',
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',

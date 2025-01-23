@@ -541,7 +541,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
-      titleCombined: undefined,
+      titleCombined: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',

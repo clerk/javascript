@@ -539,7 +539,7 @@ export const arSA: LocalizationResource = {
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'أنشاء حساب جديد',
-      titleCombined: undefined,
+      titleCombined: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',

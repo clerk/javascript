@@ -538,7 +538,7 @@ export const csCZ: LocalizationResource = {
       actionText: 'Máte účet?',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Vytvořte si účet',
-      titleCombined: undefined,
+      titleCombined: 'Vytvořte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',

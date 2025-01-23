@@ -541,7 +541,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
-      titleCombined: undefined,
+      titleCombined: 'Hesap oluştur',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',

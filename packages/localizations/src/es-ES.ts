@@ -541,7 +541,7 @@ export const esES: LocalizationResource = {
       actionText: '¿Ya tienes una cuenta?',
       subtitle: 'para continuar en {{applicationName}}',
       title: 'Crea tu cuenta',
-      titleCombined: undefined,
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',

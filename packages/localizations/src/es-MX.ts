@@ -544,7 +544,7 @@ export const esMX: LocalizationResource = {
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Crea tu cuenta',
-      titleCombined: undefined,
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',

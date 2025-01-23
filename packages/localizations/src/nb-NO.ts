@@ -540,7 +540,7 @@ export const nbNO: LocalizationResource = {
       actionText: 'Har du allerede en konto?',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Opprett kontoen din',
-      titleCombined: undefined,
+      titleCombined: 'Opprett kontoen din',
     },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',

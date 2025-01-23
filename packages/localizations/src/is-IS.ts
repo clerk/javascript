@@ -543,7 +543,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu með reikning?',
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
-      titleCombined: undefined,
+      titleCombined: 'Stofna reikning',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',

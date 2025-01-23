@@ -538,7 +538,7 @@ export const thTH: LocalizationResource = {
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
-      titleCombined: undefined,
+      titleCombined: 'สร้างบัญชีของคุณ',
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
