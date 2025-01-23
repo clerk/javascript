@@ -75,9 +75,13 @@ export async function generateSignatureWithOKXWallet(params: GenerateSignaturePa
 
 async function getEthereumProvider(provider: Web3Provider) {
   if (provider === 'coinbase_wallet') {
-    const CoinbaseWalletSDK = await import('@coinbase/wallet-sdk').then(mod => mod.CoinbaseWalletSDK);
-    const sdk = new CoinbaseWalletSDK({});
-    return sdk.makeWeb3Provider({ options: 'all' });
+    const createCoinbaseWalletSDK = await import('@coinbase/wallet-sdk').then(mod => mod.createCoinbaseWalletSDK);
+    const sdk = createCoinbaseWalletSDK({
+      preference: {
+        options: 'all',
+      },
+    });
+    return sdk.getProvider();
   }
 
   const injectedWeb3Providers = getInjectedWeb3Providers();
