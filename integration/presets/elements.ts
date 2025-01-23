@@ -1,6 +1,6 @@
 import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
-import { templates } from '../templates/index';
+import { templates } from '../templates';
 import { linkPackage } from './utils';
 
 const nextAppRouter = applicationConfig()
