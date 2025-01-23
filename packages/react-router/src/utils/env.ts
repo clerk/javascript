@@ -47,7 +47,7 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
   // Cloudflare workers
   try {
     return globalThis[name as keyof typeof globalThis];
-  } catch (_) {
+  } catch {
     // This will raise an error in Cloudflare Pages
   }
 

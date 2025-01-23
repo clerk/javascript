@@ -21,7 +21,7 @@ const CLERK_HIDDEN = '.clerk';
 const CLERK_LOCK = 'clerk.lock';
 
 const throwMissingFsModule = () => {
-  throw "Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.";
+  throw new Error("Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.");
 };
 
 const safeNodeRuntimeFs = () => {
@@ -111,7 +111,7 @@ const unlockFileWriting = () => {
 
   try {
     rmSync(CLERK_LOCK, { force: true, recursive: true });
-  } catch (e) {
+  } catch {
     // Simply ignore if the removal of the directory/file fails
   }
 
@@ -199,7 +199,7 @@ function removeKeyless() {
 
   try {
     rmSync(generatePath(), { force: true, recursive: true });
-  } catch (e) {
+  } catch {
     // Simply ignore if the removal of the directory/file fails
   }
 

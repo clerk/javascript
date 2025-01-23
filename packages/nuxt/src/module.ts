@@ -7,6 +7,7 @@ import {
   createResolver,
   defineNuxtModule,
   updateRuntimeConfig,
+  // eslint-disable-next-line import/no-unresolved -- FIXME: eslint@9
 } from '@nuxt/kit';
 
 export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace'> & {

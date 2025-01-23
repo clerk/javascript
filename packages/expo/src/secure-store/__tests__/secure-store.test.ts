@@ -126,7 +126,7 @@ describe('SecureStore', () => {
 
     test('sets a value async', async () => {
       const secureStore = createSecureStore();
-      secureStore.set(KEY, 'value');
+      void secureStore.set(KEY, 'value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
       await vi.runAllTimersAsync();
@@ -135,12 +135,12 @@ describe('SecureStore', () => {
 
     test('sets the correct last value when many sets happen almost at the same time', async () => {
       const secureStore = createSecureStore();
-      secureStore.set(KEY, 'value');
-      secureStore.set(KEY, 'value2');
-      secureStore.set(KEY, 'value3');
-      secureStore.set(KEY, 'value4');
-      secureStore.set(KEY, 'value5');
-      secureStore.set(KEY, 'value6');
+      void secureStore.set(KEY, 'value');
+      void secureStore.set(KEY, 'value2');
+      void secureStore.set(KEY, 'value3');
+      void secureStore.set(KEY, 'value4');
+      void secureStore.set(KEY, 'value5');
+      void secureStore.set(KEY, 'value6');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
       await vi.runAllTimersAsync();
@@ -178,7 +178,7 @@ describe('SecureStore', () => {
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
       const secureStore = createSecureStore();
-      secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
+      void secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
       await vi.runAllTimersAsync();
 
       const value = secureStore.get(KEY);
@@ -226,9 +226,9 @@ describe('SecureStore', () => {
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
       const secureStore = createSecureStore();
-      secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
+      void secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
       await vi.runAllTimersAsync();
-      secureStore.set(KEY, 'new value');
+      void secureStore.set(KEY, 'new value');
       await vi.runAllTimersAsync();
 
       const value = secureStore.get(KEY);
@@ -289,7 +289,7 @@ describe('SecureStore', () => {
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
       const secureStore = createSecureStore();
-      secureStore.set(KEY, 'new value');
+      void secureStore.set(KEY, 'new value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
       await vi.runAllTimersAsync();
@@ -334,7 +334,7 @@ describe('SecureStore', () => {
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
       const secureStore = createSecureStore();
-      secureStore.set(KEY, 'new value');
+      void secureStore.set(KEY, 'new value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
       await vi.runAllTimersAsync();

@@ -191,7 +191,9 @@ export const MenuItem = (props: MenuItemProps) => {
       focusRing={false}
       onClick={e => {
         onClick?.(e);
-        closeAfterClick && toggle();
+        if (closeAfterClick) {
+          toggle();
+        }
       }}
       sx={[
         theme => ({
