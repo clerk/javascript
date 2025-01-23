@@ -326,6 +326,7 @@ Client {
     "unsafeMetadata": {},
     "unverifiedFields": [],
     "update": [Function],
+    "upsert": [Function],
     "username": null,
     "validatePassword": [Function],
     "verifications": SignUpVerifications {
