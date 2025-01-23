@@ -21,7 +21,7 @@ const CLERK_HIDDEN = '.clerk';
 const CLERK_LOCK = 'clerk.lock';
 
 const throwMissingFsModule = () => {
-  throw Error("Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.");
+  throw new Error("Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.");
 };
 
 const safeNodeRuntimeFs = () => {
