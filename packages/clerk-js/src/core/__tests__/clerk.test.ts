@@ -2051,6 +2051,35 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('Clerk multi-domain', () => {
+    describe('when development satellite', () => {
+      it('fapiClient should not use Clerk.domain as its baseUrl', async () => {
+        const sut = new Clerk(developmentPublishableKey, {
+          domain: 'satellite.dev',
+        });
+        await sut.load({
+          isSatellite: true,
+          signInUrl: 'https://primary.dev/sign-in',
+        });
+
+        expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain(`https://${sut.frontendApi}/v1/me`);
+      });
+    });
+
+    describe('when production satellite', () => {
+      test('fapiClient should use Clerk.domain as its baseUrl', async () => {
+        const sut = new Clerk(productionPublishableKey, {
+          domain: 'satellite.com',
+        });
+        await sut.load({
+          isSatellite: true,
+        });
+
+        expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://clerk.satellite.com/v1/me');
+      });
+    });
+  });
+
   describe('buildUrlWithAuth', () => {
     it('builds an absolute url from a relative url in development', async () => {
       const sut = new Clerk(developmentPublishableKey);

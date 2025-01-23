@@ -697,6 +697,11 @@ export const itIT: LocalizationResource = {
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',

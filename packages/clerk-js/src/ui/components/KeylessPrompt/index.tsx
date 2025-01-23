@@ -396,11 +396,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   Dashboard.
                 </>
               ) : (
-                <p>
+                <span>
                   {isSignedIn
                     ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
                     : 'We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
-                </p>
+                </span>
               )}
             </p>
           </div>
