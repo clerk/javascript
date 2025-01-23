@@ -417,7 +417,7 @@ export const Footer = React.forwardRef(function CardFooter(
                 aria-label='Clerk logo'
                 href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
                 target='_blank'
-                rel='noopener'
+                rel='noopener noreferrer'
                 className='-m-0.5 inline-flex items-center rounded-sm p-0.5 outline-none focus-visible:ring'
               >
                 <ClerkLogo />

@@ -231,7 +231,7 @@ export function decryptClerkRequestData(
 
   try {
     return decryptData(encryptedRequestData, maybeKeylessEncryptionKey);
-  } catch (err) {
+  } catch {
     /**
      * There is a great chance when running in Keyless mode that the above fails,
      * because the keys hot-swapped and the Next.js dev server has not yet fully rebuilt middleware and routes.
@@ -241,7 +241,7 @@ export function decryptClerkRequestData(
     if (canUseKeyless) {
       try {
         return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
-      } catch (e) {
+      } catch {
         throwInvalidEncryptionKey();
       }
     }

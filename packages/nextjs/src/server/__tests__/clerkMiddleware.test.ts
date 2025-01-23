@@ -47,6 +47,7 @@ afterAll(() => {
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
+// eslint-disable-next-line import/no-unresolved
 vi.mock(import('../constants.js'), async importOriginal => {
   const actual = await importOriginal();
   return {
@@ -84,27 +85,25 @@ describe('ClerkMiddleware type tests', () => {
 
   it('fails for unknown props', () => {
     // @ts-expect-error - unknown prop
-    clerkMiddlewareMock({ hello: '' });
+    void clerkMiddlewareMock({ hello: '' });
   });
 
   it('can be used with a handler and an optional options object', () => {
     clerkMiddlewareMock(
-      async (auth, request, event) => {
+      async (auth, request) => {
         const { getToken } = await auth();
         await getToken();
         request.cookies.clear();
-        event.sourcePage;
       },
       { secretKey: '', publishableKey: '' },
     );
   });
 
   it('can be used with just a handler and an optional options object', () => {
-    clerkMiddlewareMock(async (auth, request, event) => {
+    clerkMiddlewareMock(async (auth, request) => {
       const { getToken } = await auth();
       await getToken();
       request.cookies.clear();
-      event.sourcePage;
     });
   });
 

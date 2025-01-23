@@ -35,12 +35,14 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
+  // eslint-disable-next-line import/no-unresolved
   const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless());
 
   if (!result) {
     return null;
   }
 
+  // eslint-disable-next-line import/no-unresolved
   const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
   /**
@@ -70,6 +72,7 @@ export async function deleteKeylessAction() {
     return;
   }
 
+  // eslint-disable-next-line import/no-unresolved
   await import('../server/keyless-node.js').then(m => m.removeKeyless());
   return;
 }

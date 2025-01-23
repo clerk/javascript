@@ -22,7 +22,7 @@ interface Window {
 declare const PACKAGE_NAME: string;
 declare const PACKAGE_VERSION: string;
 
-declare module globalThis {
+declare namespace globalThis {
   // eslint-disable-next-line no-var
   var __clerk_internal_keyless_logger:
     | {

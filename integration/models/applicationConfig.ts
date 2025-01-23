@@ -2,10 +2,10 @@ import * as path from 'node:path';
 
 import { constants } from '../constants';
 import { createLogger, fs } from '../scripts';
-import { application } from './application.js';
+import { application } from './application';
 import type { EnvironmentConfig } from './environment';
-import type { Helpers } from './helpers.js';
-import { hash, helpers } from './helpers.js';
+import type { Helpers } from './helpers';
+import { hash, helpers } from './helpers';
 
 export type ApplicationConfig = ReturnType<typeof applicationConfig>;
 type Scripts = { dev: string; build: string; setup: string; serve: string };
