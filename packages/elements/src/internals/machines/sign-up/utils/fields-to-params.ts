@@ -33,7 +33,7 @@ export function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdate
 
     if (isSignUpParam(key) && checked !== undefined && type === 'checkbox') {
       // @ts-expect-error - Type is not narrowed to boolean
-      params[key] = checked as boolean;
+      params[key] = checked;
     }
   });
 

@@ -28,7 +28,7 @@ const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader()
 const onlyTry = (cb: () => unknown) => {
   try {
     cb();
-  } catch (e) {
+  } catch {
     // ignore
   }
 };
@@ -85,8 +85,10 @@ export async function ClerkProvider(
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
+    // eslint-disable-next-line import/no-unresolved
     const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
     const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
+      // eslint-disable-next-line import/no-unresolved
       '../../server/keyless-log-cache.js'
     );
 
@@ -118,6 +120,7 @@ export async function ClerkProvider(
 
         output = clientProvider;
       } else {
+        // eslint-disable-next-line import/no-unresolved
         const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
 
         const headerStore = await headers();

@@ -83,7 +83,7 @@ export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment
 
   fragments.forEach(fragment => {
     for (const k in fragment) {
-      const key = k as keyof ParsedElementsFragment;
+      const key = k;
       if (key in acc) {
         acc[key]!.className = [acc[key]?.className, fragment[key]?.className].join(' ');
         acc[key]!.style = {
@@ -170,9 +170,8 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     result.elements = { ...b.elements };
   } else if (result.elements && b.elements) {
     Object.entries(b.elements).forEach(([element, config]) => {
-      const el = element as DescriptorIdentifier;
+      const el = element;
       if (el in result.elements!) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config!);
       } else {
         result.elements![el] = config;
@@ -199,12 +198,11 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 
   if (appearance.elements) {
     Object.entries(appearance.elements).forEach(([element, config]) => {
-      const el = element as DescriptorIdentifier;
+      const el = element;
       if (el in appearance.elements!) {
         if (typeof config === 'string') {
           result.elements[el].className = [result.elements[el].className, config].join(' ');
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
           const { className, ...style } = config!;
           if (className) {
             result.elements[el].className = [result.elements[el].className, className].join(' ');

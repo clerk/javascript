@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import type Clerk from '../../../core/clerk';
+import type { Clerk } from '../../../core/clerk';
 import { HashRouter, Route, useRouter } from '..';
 
 const mockNavigate = jest.fn();
@@ -54,7 +54,6 @@ describe('HashRouter', () => {
   const oldWindowLocation = window.location;
 
   beforeAll(() => {
-    // @ts-ignore
     delete window.location;
   });
 

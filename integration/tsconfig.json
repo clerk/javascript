@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "module": "NodeNext",
+    "target": "ESNext"
   },
-  "include": ["./tests", "types.d.ts"],
   "exclude": ["templates"]
 }

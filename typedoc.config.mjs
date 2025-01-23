@@ -4,7 +4,6 @@ import fs from 'node:fs';
 const IGNORE_LIST = [
   '.DS_Store',
   'dev-cli',
-  'eslint-config-custom',
   'expo-passkeys',
   'tailwind-css-transformer',
   'testing',

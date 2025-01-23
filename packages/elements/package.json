@@ -83,7 +83,6 @@
     "xstate": "^5.15.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@statelyai/inspect": "^0.4.0",
     "concurrently": "^8.2.2",
     "next": "^14.2.22",

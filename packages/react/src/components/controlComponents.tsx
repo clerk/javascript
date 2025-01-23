@@ -140,7 +140,6 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
    */
   return authorized;
 };
-/* eslint-enable react-hooks/rules-of-hooks */
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;

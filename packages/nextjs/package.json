@@ -75,7 +75,6 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@types/crypto-js": "4.2.2",
     "next": "^14.2.20"
   },

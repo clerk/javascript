@@ -148,7 +148,7 @@ async function importPackageLock() {
 
     child.on('close', code => {
       if (code !== 0) {
-        reject();
+        reject(new Error());
         return;
       }
       resolve();
@@ -183,7 +183,7 @@ async function linkDependencies() {
 
     child.on('close', code => {
       if (code !== 0) {
-        reject();
+        reject(new Error());
         return;
       }
       resolve();

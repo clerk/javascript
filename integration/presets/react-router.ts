@@ -1,6 +1,6 @@
 import { constants } from '../constants';
-import { applicationConfig } from '../models/applicationConfig.js';
-import { templates } from '../templates/index.js';
+import { applicationConfig } from '../models/applicationConfig';
+import { templates } from '../templates/index';
 import { linkPackage } from './utils';
 
 const reactRouterNode = applicationConfig()

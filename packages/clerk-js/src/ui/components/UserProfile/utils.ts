@@ -26,7 +26,9 @@ export function getSecondFactors(attributes: Attributes): string[] {
   const secondFactors: string[] = [];
 
   Object.entries(attributes).forEach(([, attr]) => {
-    attr.used_for_second_factor ? secondFactors.push(...attr.second_factors) : null;
+    if (attr.used_for_second_factor) {
+      secondFactors.push(...attr.second_factors);
+    }
   });
 
   return secondFactors;
