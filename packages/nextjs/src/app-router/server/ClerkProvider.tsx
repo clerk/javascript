@@ -109,8 +109,14 @@ export async function ClerkProvider(
 
       if (runningWithClaimedKeys) {
         try {
+          const secretKey = await import('../../server/keyless-node.js').then(
+            mod => mod.safeParseClerkFile()?.secretKey,
+          );
+          if (!secretKey) {
+            throw secretKey;
+          }
           const client = createClerkClientWithOptions({
-            secretKey: safeParseClerkFile()?.secretKey,
+            secretKey,
           });
           // Add caching here
           await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
