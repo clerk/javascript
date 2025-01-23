@@ -13,7 +13,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    console.log(Array.from(instanceKeys.keys()));
     // Create a clerkClient for the OAuth provider instance.
     const client = createClerkClient({
       secretKey: instanceKeys.get('oauth-provider').sk,
