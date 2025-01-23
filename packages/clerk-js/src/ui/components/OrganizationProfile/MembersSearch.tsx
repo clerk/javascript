@@ -85,10 +85,9 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
           spellCheck={false}
           aria-label='Search'
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
-          leftIcon={isFetchingNewData ? <Spinner /> : <MagnifyingGlass />}
+          leftIcon={isFetchingNewData ? <Spinner size='xs' /> : <MagnifyingGlass />}
           onKeyUp={handleKeyUp}
           onChange={handleChange}
-          containerSx={{ width: '100%' }}
         />
       </Flex>
     </Animated>

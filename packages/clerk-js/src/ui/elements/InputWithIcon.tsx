@@ -1,33 +1,42 @@
 import React from 'react';
 
-import { Flex, Input } from '../customizables';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import { Box, Flex, Input } from '../customizables';
+import type { PropsOfComponent } from '../styledSystem';
 
-type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement } & {
-  containerSx?: ThemableCssProp;
-};
+type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement };
 
 export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((props, ref) => {
-  const { leftIcon, sx, containerSx, ...rest } = props;
+  const { leftIcon, sx, ...rest } = props;
   return (
     <Flex
       center
-      sx={theme => [
-        {
-          width: '100%',
-          position: 'relative',
-          '& .cl-internal-icon': {
-            position: 'absolute',
-            left: theme.space.$3x5,
-            width: theme.sizes.$3x5,
-            height: theme.sizes.$3x5,
-            pointerEvents: 'none',
-          },
-        },
-        containerSx,
-      ]}
+      sx={{
+        width: '100%',
+        position: 'relative',
+      }}
     >
-      {leftIcon && React.cloneElement(leftIcon, { className: 'cl-internal-icon' })}
+      {leftIcon ? (
+        <Box
+          sx={theme => [
+            {
+              position: 'absolute',
+              left: theme.space.$3x5,
+              width: theme.sizes.$3x5,
+              height: theme.sizes.$3x5,
+              pointerEvents: 'none',
+              display: 'grid',
+              placeContent: 'center',
+              '& svg': {
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+              },
+            },
+          ]}
+        >
+          {leftIcon}
+        </Box>
+      ) : null}
       <Input
         {...rest}
         sx={[
