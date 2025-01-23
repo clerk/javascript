@@ -209,7 +209,7 @@ function removeKeyless() {
   unlockFileWriting();
 }
 
-function isSrcAppDir() {
+function hasSrcAppDir() {
   const { existsSync } = safeNodeRuntimeFs();
   const path = safeNodeRuntimePath();
 
@@ -249,4 +249,4 @@ function suggestMiddlewareLocation() {
   return undefined;
 }
 
-export { createOrReadKeyless, removeKeyless, suggestMiddlewareLocation, isSrcAppDir };
+export { createOrReadKeyless, removeKeyless, suggestMiddlewareLocation, hasSrcAppDir };

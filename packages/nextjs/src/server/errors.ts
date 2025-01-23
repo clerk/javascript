@@ -20,9 +20,9 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 
 export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
 
-export const authAuthHeaderMissing = (helperName = 'auth', firstStep = '') =>
+export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[]) =>
   `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
-${firstStep}- clerkMiddleware() is used in your Next.js Middleware.
+- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js Middleware.
 - Your Middleware matcher is configured to match this route or page.
 - If you are using the src directory, make sure the Middleware file is inside of it.
 

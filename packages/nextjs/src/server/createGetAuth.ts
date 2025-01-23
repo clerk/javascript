@@ -4,9 +4,10 @@ import { decodeJwt } from '@clerk/backend/jwt';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
+import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
-import { getHeader } from './headers-utils';
+import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus, getCookie } from './utils';
 
@@ -23,20 +24,23 @@ export const createGetAuth = ({
         logger.enable();
       }
 
-      // if (!detectClerkMiddleware(req)) {
-      //   if (canUseKeyless) {
-      //     const errorMessage = await import('./keyless-node.js').then(m => m.suggestMiddlewareLocation());
-      //     if (errorMessage) {
-      //       throw new Error(errorMessage);
-      //     } else {
-      //       assertAuthStatus(req, noAuthStatusMessage);
-      //     }
-      //   } else {
-      //     assertAuthStatus(req, noAuthStatusMessage);
-      //   }
-      // }
+      if (!detectClerkMiddleware(req)) {
+        // Keep the same behaviour for versions that may have issues with bundling `node:fs`
+        if (isNextWithUnstableServerActions) {
+          assertAuthStatus(req, noAuthStatusMessage);
+        }
 
-      assertAuthStatus(req, noAuthStatusMessage);
+        const missConfiguredMiddlewareLocation = await import('./keyless-node.js')
+          .then(m => m.suggestMiddlewareLocation())
+          .catch(() => undefined);
+
+        if (missConfiguredMiddlewareLocation) {
+          throw new Error(missConfiguredMiddlewareLocation);
+        }
+
+        assertAuthStatus(req, noAuthStatusMessage);
+      }
+
       return getAuthDataFromRequest(req, { ...opts, logger });
     };
   });

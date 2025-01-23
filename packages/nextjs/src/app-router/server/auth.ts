@@ -9,8 +9,8 @@ import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
+import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
-// import { canUseKeyless } from '../../utils/feature-flags';
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
@@ -24,20 +24,21 @@ export const auth: AuthFn = async () => {
 
   const request = await buildRequestLike();
 
-  // const isSrcAppDir = async () => {
-  //   if (!canUseKeyless) {
-  //     return '';
-  //   }
-  //
-  //   const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.isSrcAppDir()).catch(() => false);
-  //   return `- Your Middleware exists at <root>/${isSrcAppDir ? 'src/' : ''}middleware.ts\n`;
-  // };
+  const stepsBasedOnSrcDirectory = async () => {
+    if (isNextWithUnstableServerActions) {
+      return [];
+    }
+
+    try {
+      const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.hasSrcAppDir());
+      return [`Your Middleware exists at <root>/${isSrcAppDir ? 'src/' : ''}middleware.ts`];
+    } catch {
+      return [];
+    }
+  };
   const authObject = await createGetAuth({
     debugLoggerName: 'auth()',
-    noAuthStatusMessage: authAuthHeaderMissing(
-      'auth',
-      // , await isSrcAppDir()
-    ),
+    noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
