@@ -693,6 +693,11 @@ export const thTH: LocalizationResource = {
         resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} จะถูกนำออกจากบัญชีนี้',
         messageLine2: 'คุณจะไม่สามารถเข้าสู่ระบบโดยใช้อีเมลที่อยู่นี้ได้อีกต่อไป',

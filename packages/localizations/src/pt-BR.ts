@@ -687,6 +687,7 @@ export const ptBR: LocalizationResource = {
       title: 'Excluir conta',
     },
     emailAddressPage: {
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       emailCode: {
         formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
@@ -700,6 +701,10 @@ export const ptBR: LocalizationResource = {
         formTitle: 'Link de verificação',
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado na sua conta.',
+      },
+      enterpriseSSOLink: {
+        formButton: 'Clique para autenticar',
+        formSubtitle: 'Complete a autenticação com {{identifier}}',
       },
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',

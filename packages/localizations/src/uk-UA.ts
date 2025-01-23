@@ -693,6 +693,11 @@ export const ukUA: LocalizationResource = {
         resendButton: 'Надіслати посилання повторно',
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} буде видалено з цього акаунта.',
         messageLine2: 'Ви більше не зможете увійти з використанням цієї адреси електронної пошти.',

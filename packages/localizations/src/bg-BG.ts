@@ -693,6 +693,11 @@ export const bgBG: LocalizationResource = {
         resendButton: 'Не сте получили линк? Изпрати отново',
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} ще бъде премахнат от този профил.',
         messageLine2: 'Няма да можете да влезете в профила си, използвайки този имейл адрес.',

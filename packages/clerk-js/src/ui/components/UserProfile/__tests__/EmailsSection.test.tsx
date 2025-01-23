@@ -48,7 +48,7 @@ describe('EmailSection', () => {
       await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
       getByLabelText(/email address/i);
-      getByText('An email containing a verification code will be sent to this email address.');
+      getByText("You'll need to verify this email address before it can be added to your account.");
     });
 
     it('create a new email number', async () => {
