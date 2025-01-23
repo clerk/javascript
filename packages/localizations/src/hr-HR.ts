@@ -506,6 +506,7 @@ export const hrHR: LocalizationResource = {
       actionLink__use_phone: 'Koristite telefon',
       actionText: 'Već imate račun?',
       subtitle: 'Dobrodošli! Molimo ispunite detalje za početak.',
+      subtitleCombined: 'Dobrodošli! Molimo ispunite detalje za početak.',
       title: 'Kreirajte svoj račun',
       titleCombined: 'Kreirajte svoj račun',
     },

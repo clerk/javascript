@@ -529,6 +529,7 @@ export const enGB: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
       titleCombined: 'Create your account',
     },

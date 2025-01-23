@@ -440,6 +440,7 @@ export const caES: LocalizationResource = {
       actionLink: 'Inicia sessió',
       actionText: 'Ja tens un compte?',
       subtitle: 'Benvingut! Si us plau, completa els detalls per començar.',
+      subtitleCombined: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
       titleCombined: 'Crea el teu compte',
     },

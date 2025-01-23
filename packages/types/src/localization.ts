@@ -102,6 +102,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleCombined: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
       actionLink__use_phone: LocalizationValue;
@@ -175,6 +176,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleCombined: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
       actionLink__use_email: LocalizationValue;

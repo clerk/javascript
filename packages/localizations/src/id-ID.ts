@@ -489,6 +489,7 @@ export const idID: LocalizationResource = {
       actionLink__use_phone: 'Gunakan telepon sebagai gantinya',
       actionText: 'Sudah punya akun?',
       subtitle: 'Selamat datang! Silakan isi detail untuk memulai.',
+      subtitleCombined: 'Selamat datang! Silakan isi detail untuk memulai.',
       title: 'Buat akun Anda',
       titleCombined: 'Buat akun Anda',
     },
