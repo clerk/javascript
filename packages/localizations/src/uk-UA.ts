@@ -538,6 +538,7 @@ export const ukUA: LocalizationResource = {
       actionText: 'Уже є акаунт?',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
+      titleCombined: 'Створіть Ваш акаунт',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',

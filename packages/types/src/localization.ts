@@ -100,6 +100,7 @@ type _LocalizationResource = {
   signUp: {
     start: {
       title: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;

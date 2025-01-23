@@ -545,6 +545,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Ужо ёсць акаўнт?',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Стварыце Ваш акаўнт',
+      titleCombined: 'Стварыце Ваш акаўнт',
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',

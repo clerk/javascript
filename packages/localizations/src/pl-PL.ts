@@ -545,6 +545,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Masz już konto?',
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Utwórz swoje konto',
+      titleCombined: 'Utwórz swoje konto',
     },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',

@@ -507,6 +507,7 @@ export const hrHR: LocalizationResource = {
       actionText: 'Već imate račun?',
       subtitle: 'Dobrodošli! Molimo ispunite detalje za početak.',
       title: 'Kreirajte svoj račun',
+      titleCombined: 'Kreirajte svoj račun',
     },
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',

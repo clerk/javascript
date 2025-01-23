@@ -540,6 +540,7 @@ export const jaJP: LocalizationResource = {
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
+      titleCombined: 'アカウントを作成',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
