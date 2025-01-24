@@ -219,6 +219,11 @@ function hasSrcAppDir() {
 }
 
 function suggestMiddlewareLocation() {
+  const suggestionMessage = (to?: 'src/', from?: 'src/app/' | 'app/') => {
+    const _to = to || '';
+    const _from = from || '';
+    return `Clerk: Move your middleware file to ./${_to}middleware.ts. Currently located at ./${_from}middleware.ts`;
+  };
   const { existsSync } = safeNodeRuntimeFs();
   const path = safeNodeRuntimePath();
 
@@ -227,11 +232,11 @@ function suggestMiddlewareLocation() {
 
   if (existsSync(projectWithAppSrc)) {
     if (existsSync(path.join(projectWithAppSrc, 'middleware.ts'))) {
-      return `Clerk: Move your middleware file to <root>/src/middleware.ts. Currently located at <root>/src/app/middleware.ts`;
+      return suggestionMessage('src/', 'src/app/');
     }
 
     if (existsSync(path.join(process.cwd(), 'middleware.ts'))) {
-      return `Clerk: Move your middleware file to <root>/src/middleware.ts. Currently located at <root>/middleware.ts`;
+      return suggestionMessage('src/');
     }
 
     // default error
@@ -240,7 +245,7 @@ function suggestMiddlewareLocation() {
 
   if (existsSync(projectWithApp)) {
     if (existsSync(path.join(projectWithApp, 'middleware.ts'))) {
-      return `Clerk: Move your middleware file to <root>/middleware.ts. Currently located at <root>/app/middleware.ts`;
+      return suggestionMessage(undefined, 'app/');
     }
     // default error
     return undefined;
