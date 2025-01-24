@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.49.0
+
+### Minor Changes
+
+- Enable email verification in `UserProfile` via enterprise SSO ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Fix an issue where Clerk's `proxyUrl` was not being respected. ([#4990](https://github.com/clerk/javascript/pull/4990)) by [@brkalow](https://github.com/brkalow)
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/localizations@3.10.0
+  - @clerk/shared@2.20.14
+
 ## 5.48.0
 
 ### Minor Changes
