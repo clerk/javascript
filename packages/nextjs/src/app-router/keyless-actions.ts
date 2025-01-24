@@ -35,14 +35,12 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-   
   const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless());
 
   if (!result) {
     return null;
   }
 
-   
   const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
   /**
@@ -72,7 +70,6 @@ export async function deleteKeylessAction() {
     return;
   }
 
-   
   await import('../server/keyless-node.js').then(m => m.removeKeyless());
   return;
 }

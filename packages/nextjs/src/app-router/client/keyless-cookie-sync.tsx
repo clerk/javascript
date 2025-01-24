@@ -9,7 +9,6 @@ import { canUseKeyless } from '../../utils/feature-flags';
 export function KeylessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   useEffect(() => {
     if (canUseKeyless) {
-       
       void import('../keyless-actions.js').then(m =>
         m.syncKeylessConfigAction({
           ...props,
