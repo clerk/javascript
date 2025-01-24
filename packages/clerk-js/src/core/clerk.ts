@@ -102,7 +102,13 @@ import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
+import {
+  CLERK_REDIRECT_URL,
+  CLERK_SATELLITE_URL,
+  CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNCED,
+  ERROR_CODES,
+} from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -1109,15 +1115,12 @@ export class Clerk implements ClerkInterface {
       [CLERK_SYNCED]: 'true',
     });
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_REDIRECT_URL) || getClerkQueryParam(CLERK_SATELLITE_URL);
     if (!satelliteUrl || !isHttpOrHttps(satelliteUrl)) {
       clerkRedirectUrlIsMissingScheme();
     }
 
-    const backToSatelliteUrl = buildURL(
-      { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
-      { stringify: true },
-    );
+    const backToSatelliteUrl = buildURL({ base: satelliteUrl, searchParams }, { stringify: true });
     return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
@@ -1727,7 +1730,7 @@ export class Clerk implements ClerkInterface {
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
-      [CLERK_SATELLITE_URL]: window.location.href,
+      [CLERK_REDIRECT_URL]: window.location.href,
     });
     return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
   };
@@ -1768,7 +1771,7 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    const satelliteUrl = getClerkQueryParam(CLERK_REDIRECT_URL) || getClerkQueryParam(CLERK_SATELLITE_URL);
     return !!satelliteUrl;
   };
 
