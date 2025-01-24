@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "./src/server/clerkMiddleware.ts",
+    "./src/app-router/server/currentUser.ts",
+    "./src/app-router/server/auth.ts",
+    "./src/server/buildClerkProps.ts",
+    "./src/server/createGetAuth.ts"
+  ]
+}
