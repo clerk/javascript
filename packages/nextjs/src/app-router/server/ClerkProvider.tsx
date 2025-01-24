@@ -120,12 +120,20 @@ export async function ClerkProvider(
 
       if (runningWithClaimedKeys) {
         try {
+          // eslint-disable-next-line import/no-unresolved
+          const secretKey = await import('../../server/keyless-node.js').then(
+            mod => mod.safeParseClerkFile()?.secretKey,
+          );
+          if (!secretKey) {
+            // we will ignore it later
+            throw new Error(secretKey);
+          }
           const client = createClerkClientWithOptions({
-            secretKey: safeParseClerkFile()?.secretKey,
+            secretKey,
           });
           // Add caching here
           await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
-        } catch (e) {
+        } catch {
           // ignore
         }
 
