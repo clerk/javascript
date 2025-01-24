@@ -1,4 +1,4 @@
-import type { InstanceType } from 'instance';
+import type { InstanceType } from './instance';
 
 /**
  * @internal
