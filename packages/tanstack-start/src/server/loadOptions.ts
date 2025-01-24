@@ -3,7 +3,6 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
-// eslint-disable-next-line import/no-unresolved
 import { getEvent } from 'vinxi/http';
 
 import { errorThrower } from '../utils';
