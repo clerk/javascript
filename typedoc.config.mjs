@@ -1,5 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import { OptionDefaults } from 'typedoc';
 
 const IGNORE_LIST = [
   '.DS_Store',
@@ -30,8 +31,8 @@ const config = {
   json: './.typedoc/output.json',
   entryPointStrategy: 'packages',
   excludePrivate: true,
-  blockTags: ['@param', '@returns'],
-  modifierTags: ['@alpha', '@beta', '@experimental', '@deprecated'],
+  blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important'],
+  modifierTags: [...OptionDefaults.modifierTags],
   exclude: ['**/*+(.spec|.test).ts'],
   plugin: ['typedoc-plugin-missing-exports'],
   packageOptions: {
@@ -40,9 +41,11 @@ const config = {
     sortEntryPoints: true,
     sort: 'alphabetical',
     excludeExternals: true,
+    excludeInternal: true,
+    excludeNotDocumented: true,
     gitRevision: 'main',
   },
-  entryPoints: ['packages/nextjs'], //getPackages(),
+  entryPoints: getPackages(),
 };
 
 export default config;
