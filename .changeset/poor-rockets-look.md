@@ -1,7 +1,8 @@
 ---
 '@clerk/localizations': patch
 '@clerk/clerk-js': patch
+'@clerk/shared': patch
 '@clerk/types': patch
 ---
 
-Add sign up title localization for use in sign-in-or-up flow.
+Introduced searching for members list on `OrganizationProfile`

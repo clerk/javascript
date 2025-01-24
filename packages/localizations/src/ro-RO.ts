@@ -131,6 +131,7 @@ export const roRO: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitați',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Îndepărtați membrul',
         tableHeader__actions: undefined,
@@ -462,6 +463,7 @@ export const roRO: LocalizationResource = {
       actionText: 'Nu aveți cont?',
       actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Conectați-vă',
       titleCombined: undefined,
     },
@@ -541,6 +543,7 @@ export const roRO: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Aveți un cont?',
       subtitle: 'pentru a continua la {{applicationName}}',
+      subtitleCombined: 'pentru a continua la {{applicationName}}',
       title: 'Creați-vă un cont',
       titleCombined: 'Creați-vă un cont',
     },

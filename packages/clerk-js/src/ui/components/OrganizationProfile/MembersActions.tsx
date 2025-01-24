@@ -4,22 +4,31 @@ import { Animated } from '../../elements';
 import { Action } from '../../elements/Action';
 import { InviteMembersScreen } from './InviteMembersScreen';
 
-export const MembersActionsRow = () => {
+type MembersActionsRowProps = {
+  actionSlot?: React.ReactNode;
+};
+
+export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
 
   return (
     <Action.Root animate={false}>
       <Animated asChild>
         <Flex
-          justify='end'
+          justify={actionSlot ? 'between' : 'end'}
           sx={t => ({
             width: '100%',
             marginLeft: 'auto',
             padding: `${t.space.$none} ${t.space.$1}`,
           })}
+          gap={actionSlot ? 2 : undefined}
         >
+          {actionSlot}
           {canManageMemberships && (
-            <Action.Trigger value='invite'>
+            <Action.Trigger
+              value='invite'
+              hideOnActive={!actionSlot}
+            >
               <Button
                 elementDescriptor={descriptors.membersPageInviteButton}
                 aria-label='Invite'

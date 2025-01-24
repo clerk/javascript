@@ -129,6 +129,7 @@ export const plPL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Zaproś',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Usuń użytkownika',
         tableHeader__actions: undefined,
@@ -461,6 +462,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Nie masz konta?',
       actionText__join_waitlist: 'Chcesz otrzymać wczesny dostęp?',
       subtitle: 'aby przejść do {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Zaloguj się',
       titleCombined: 'Kontynuuj do {{applicationName}}',
     },
@@ -544,6 +546,7 @@ export const plPL: LocalizationResource = {
       actionLink__use_phone: 'Użyj numeru telefonu',
       actionText: 'Masz już konto?',
       subtitle: 'aby kontynuować w {{applicationName}}',
+      subtitleCombined: 'aby kontynuować w {{applicationName}}',
       title: 'Utwórz swoje konto',
       titleCombined: 'Utwórz swoje konto',
     },

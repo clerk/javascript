@@ -130,6 +130,7 @@ export const elGR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Πρόσκληση',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Αφαίρεση μέλους',
         tableHeader__actions: 'Ενέργειες',
@@ -462,6 +463,7 @@ export const elGR: LocalizationResource = {
       actionText: 'Δεν έχετε λογαριασμό;',
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Σύνδεση',
       titleCombined: 'Συνέχεια στο {{applicationName}}',
     },
@@ -542,6 +544,7 @@ export const elGR: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Έχετε ήδη λογαριασμό;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
       titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
     },
