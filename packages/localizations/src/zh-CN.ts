@@ -126,6 +126,7 @@ export const zhCN: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀请',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成员',
         tableHeader__actions: undefined,

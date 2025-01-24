@@ -129,6 +129,7 @@ export const svSE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjud in',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
         tableHeader__actions: 'Åtgärder',

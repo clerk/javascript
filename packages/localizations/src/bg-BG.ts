@@ -129,6 +129,7 @@ export const bgBG: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Покани',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Премахване на член',
         tableHeader__actions: undefined,

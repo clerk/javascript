@@ -130,6 +130,7 @@ export const beBY: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить удзельніка',
         tableHeader__actions: 'Дзеянні',

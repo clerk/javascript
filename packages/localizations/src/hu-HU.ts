@@ -129,6 +129,7 @@ export const huHU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Meghívás',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Tag eltávolítása',
         tableHeader__actions: undefined,

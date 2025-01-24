@@ -131,6 +131,7 @@ export const roRO: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitați',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Îndepărtați membrul',
         tableHeader__actions: undefined,

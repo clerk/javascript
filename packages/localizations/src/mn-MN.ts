@@ -130,6 +130,7 @@ export const mnMN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Урих',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Гишүүнийг хасах',
         tableHeader__actions: undefined,

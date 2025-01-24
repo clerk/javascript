@@ -130,6 +130,7 @@ export const itIT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invita',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Rimuovi membro',
         tableHeader__actions: 'Azioni',

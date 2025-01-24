@@ -129,6 +129,7 @@ export const ukUA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Запросити',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Видалити учасника',
         tableHeader__actions: undefined,

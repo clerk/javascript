@@ -757,6 +757,7 @@ type _LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
+      action__search: LocalizationValue;
       start: {
         headerTitle__members: LocalizationValue;
         headerTitle__invitations: LocalizationValue;

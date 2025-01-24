@@ -129,6 +129,7 @@ export const skSK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvať',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstrániť člena',
         tableHeader__actions: undefined,

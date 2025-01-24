@@ -129,6 +129,7 @@ export const koKR: LocalizationResource = {
     },
     membersPage: {
       action__invite: '초대',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '회원 제거',
         tableHeader__actions: undefined,
