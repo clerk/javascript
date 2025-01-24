@@ -4,7 +4,7 @@
 const onlyTry = (cb: () => unknown) => {
   try {
     cb();
-  } catch (e) {
+  } catch {
     // ignore
   }
 };

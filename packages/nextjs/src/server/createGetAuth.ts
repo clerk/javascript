@@ -58,6 +58,7 @@ export const createGetAuthAsync = ({
           assertAuthStatus(request, noAuthStatusMessage);
         }
 
+        // eslint-disable-next-line import/no-unresolved
         const missConfiguredMiddlewareLocation = await import('./keyless-node.js')
           .then(m => m.suggestMiddlewareLocation())
           .catch(() => undefined);

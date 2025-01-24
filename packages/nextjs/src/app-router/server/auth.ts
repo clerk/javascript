@@ -31,6 +31,7 @@ export const auth: AuthFn = async () => {
     }
 
     try {
+      // eslint-disable-next-line import/no-unresolved
       const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.hasSrcAppDir());
       return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.ts`];
     } catch {
