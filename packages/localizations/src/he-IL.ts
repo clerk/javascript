@@ -128,6 +128,7 @@ export const heIL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'הזמן',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'הסר חבר',
         tableHeader__actions: undefined,

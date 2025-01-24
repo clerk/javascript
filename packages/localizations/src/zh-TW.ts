@@ -128,6 +128,7 @@ export const zhTW: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀請',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成員',
         tableHeader__actions: undefined,

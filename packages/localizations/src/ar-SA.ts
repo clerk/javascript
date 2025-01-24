@@ -129,6 +129,7 @@ export const arSA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'دعوة',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: undefined,

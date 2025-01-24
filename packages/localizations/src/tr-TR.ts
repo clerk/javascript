@@ -129,6 +129,7 @@ export const trTR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Davet et',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Üyeyi kaldır',
         tableHeader__actions: undefined,

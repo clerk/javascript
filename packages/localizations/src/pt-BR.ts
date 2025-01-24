@@ -129,6 +129,7 @@ export const ptBR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convidar',
+      action__search: 'Pesquisar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',

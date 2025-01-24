@@ -130,6 +130,7 @@ export const csCZ: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvat',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstranit člena',
         tableHeader__actions: 'Akce',

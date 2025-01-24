@@ -124,6 +124,7 @@ export const useOrganization: UseOrganization = params => {
     role: undefined,
     keepPreviousData: false,
     infinite: false,
+    query: undefined,
   });
 
   const invitationsSafeValues = useWithSafeValues(invitationsListParams, {
@@ -163,6 +164,7 @@ export const useOrganization: UseOrganization = params => {
           initialPage: membersSafeValues.initialPage,
           pageSize: membersSafeValues.pageSize,
           role: membersSafeValues.role,
+          query: membersSafeValues.query,
         };
 
   const invitationsParams =

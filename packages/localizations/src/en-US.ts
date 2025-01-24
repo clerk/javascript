@@ -118,6 +118,7 @@ export const enUS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: 'Search',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',

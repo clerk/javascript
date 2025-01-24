@@ -130,6 +130,7 @@ export const isIS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjóða',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjarlægja meðlim',
         tableHeader__actions: undefined,

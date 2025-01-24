@@ -129,6 +129,7 @@ export const viVN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Mời',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Gỡ bỏ thành viên',
         tableHeader__actions: undefined,

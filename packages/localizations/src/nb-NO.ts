@@ -129,6 +129,7 @@ export const nbNO: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: undefined,

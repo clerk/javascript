@@ -129,6 +129,7 @@ export const jaJP: LocalizationResource = {
     },
     membersPage: {
       action__invite: '招待',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
         tableHeader__actions: undefined,

@@ -130,6 +130,7 @@ export const elGR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Πρόσκληση',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Αφαίρεση μέλους',
         tableHeader__actions: 'Ενέργειες',

@@ -129,6 +129,7 @@ export const thTH: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'เชิญ',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'ลบสมาชิก',
         tableHeader__actions: 'การดำเนินการ',

@@ -132,6 +132,7 @@ export const deDE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Einladen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
