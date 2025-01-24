@@ -67,6 +67,7 @@ type FapiClientOptions = {
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  isSatellite?: boolean;
 };
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
@@ -114,7 +115,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
-    if (options.domain) {
+    if (options.domain && options.instanceType === 'development' && options.isSatellite) {
       searchParams.append('__domain', options.domain);
     }
 
@@ -144,8 +145,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path, pathPrefix = 'v1' } = requestInit;
 
-    const domainOnlyInProd = options.instanceType === 'production' ? options.domain : '';
-
     if (options.proxyUrl) {
       const proxyBase = new URL(options.proxyUrl);
       const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
@@ -158,6 +157,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         { stringify: false },
       );
     }
+
+    // We only use the domain option in production, in development it should always match the frontendApi
+    const domainOnlyInProd = options.instanceType === 'production' ? options.domain : '';
 
     const baseUrl = `https://${domainOnlyInProd || options.frontendApi}`;
 

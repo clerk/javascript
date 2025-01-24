@@ -52,7 +52,7 @@ export const assertSingleChild =
   (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
     try {
       return React.Children.only(children);
-    } catch (e) {
+    } catch {
       return `You've passed multiple children components to <${name}/>. You can only pass a single child component or text.`;
     }
   };

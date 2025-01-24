@@ -538,6 +538,7 @@ export const csCZ: LocalizationResource = {
       actionText: 'Máte účet?',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Vytvořte si účet',
+      titleCombined: 'Vytvořte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
@@ -692,6 +693,11 @@ export const csCZ: LocalizationResource = {
         resendButton: 'Znovu odeslat odkaz',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstraněna z tohoto účtu.',
         messageLine2: 'Nebudete se moci přihlásit pomocí této e-mailové adresy.',

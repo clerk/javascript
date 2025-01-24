@@ -546,6 +546,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',
+      titleCombined: 'Erstelle deinen Account',
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
@@ -707,6 +708,11 @@ export const deDE: LocalizationResource = {
         resendButton: 'Link erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',

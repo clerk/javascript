@@ -2,11 +2,14 @@
   "compilerOptions": {
     "allowJs": false,
     "baseUrl": "src",
+    "declaration": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "module": "esnext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
     "lib": ["dom", "dom.iterable", "es2021.intl"],
+    "module": "esnext",
     "moduleResolution": "Bundler",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
@@ -17,17 +20,7 @@
     "sourceMap": false,
     "strict": true,
     "target": "ES2019",
-    "useUnknownInCatchVariables": false,
-    "declaration": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react"
+    "useUnknownInCatchVariables": false
   },
-  "include": [
-    "src/index.ts",
-    "src/index.browser.ts",
-    "src/index.headless.ts",
-    "src/index.headless.browser.ts",
-    "src/**/*.d.ts"
-  ],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
+  "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts"]
 }

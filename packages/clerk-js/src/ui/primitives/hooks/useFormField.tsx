@@ -138,7 +138,6 @@ export const sanitizeInputProps = (
     transformer,
     ...inputProps
   } = obj;
-  /* eslint-enable */
 
   keep?.forEach(key => {
     /**

@@ -538,6 +538,7 @@ export const viVN: LocalizationResource = {
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
+      titleCombined: 'Tạo tài khoản của bạn',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -694,6 +695,11 @@ export const viVN: LocalizationResource = {
         resendButton: 'Không nhận được liên kết? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không thể đăng nhập bằng địa chỉ email này nữa.',

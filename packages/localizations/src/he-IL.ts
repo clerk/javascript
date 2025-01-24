@@ -533,6 +533,7 @@ export const heIL: LocalizationResource = {
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
+      titleCombined: 'צור את החשבון שלך',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -684,6 +685,11 @@ export const heIL: LocalizationResource = {
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות כתובת אימייל זו.',

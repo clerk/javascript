@@ -552,6 +552,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
+      titleCombined: 'Создайте Вашу учетную запись',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -710,6 +711,11 @@ export const ruRU: LocalizationResource = {
         resendButton: 'Отправить ссылку повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти с использованием этого адреса электронной почты.',

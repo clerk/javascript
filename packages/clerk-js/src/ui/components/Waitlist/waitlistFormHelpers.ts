@@ -1,6 +1,6 @@
-const FieldKeys = ['emailAddress'];
+const _FieldKeys = ['emailAddress'];
 
-export type FieldKey = (typeof FieldKeys)[number];
+export type FieldKey = (typeof _FieldKeys)[number];
 
 export type Field = {
   required: boolean;

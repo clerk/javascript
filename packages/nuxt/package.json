@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",

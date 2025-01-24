@@ -543,6 +543,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu með reikning?',
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
+      titleCombined: 'Stofna reikning',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
@@ -700,6 +701,11 @@ export const isIS: LocalizationResource = {
         resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
         messageLine2: 'Þú munt ekki lengur geta skráð þig inn með þessu netfangi.',

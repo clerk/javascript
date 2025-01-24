@@ -539,6 +539,7 @@ export const arSA: LocalizationResource = {
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'أنشاء حساب جديد',
+      titleCombined: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -693,6 +694,11 @@ export const arSA: LocalizationResource = {
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'سيتم حذف هذا الإيميل من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول باستخدام عنوان البريد الإلكتروني هذا.',

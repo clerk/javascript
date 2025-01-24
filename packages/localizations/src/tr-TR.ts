@@ -541,6 +541,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
+      titleCombined: 'Hesap oluştur',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
@@ -698,6 +699,11 @@ export const trTR: LocalizationResource = {
         resendButton: 'Yeniden gönder',
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} adresi hesabınızdan kaldırılacaktır.',
         messageLine2: 'Artık bu e-posta adresini kullanarak oturum açmanız mümkün olmayacaktır.',

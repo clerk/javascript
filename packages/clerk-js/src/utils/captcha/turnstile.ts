@@ -81,6 +81,7 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
 async function loadCaptcha() {
   if (!window.turnstile) {
     await loadCaptchaFromCloudflareURL().catch(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw { captchaError: 'captcha_script_failed_to_load' };
     });
   }
@@ -219,6 +220,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
     };

@@ -60,7 +60,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
     }
 
     const modulus = localKey
-      .replace(/(\r\n|\n|\r)/gm, '')
+      .replace(/\r\n|\n|\r/g, '')
       .replace(PEM_HEADER, '')
       .replace(PEM_TRAILER, '')
       .replace(RSA_PREFIX, '')

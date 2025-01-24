@@ -7,17 +7,13 @@
 
 import { $, argv } from 'zx';
 
-async function run() {
-  const buildFolder = argv._[0];
-  console.log(`🔍 Inspecting folder: ${buildFolder}`);
-  const flags = ['--recursive', '--quiet', '--include=*.js', '--include=*.mjs'];
+const buildFolder = argv._[0];
+console.log(`🔍 Inspecting folder: ${buildFolder}`);
+const flags = ['--recursive', '--quiet', '--include=*.js', '--include=*.mjs'];
 
-  // Leveraging https://google.github.io/zx/process-promise#nothrow to avoid throwing an error if the command fails
-  if ((await $`grep ${flags} 'https://\${scriptHost}/npm/@clerk/clerk-js' ${buildFolder}`.exitCode) === 0) {
-    throw new Error('Found RHC in build output');
-  } else {
-    console.log('✅ No RHC found in build output');
-  }
+// Leveraging https://google.github.io/zx/process-promise#nothrow to avoid throwing an error if the command fails
+if ((await $`grep ${flags} 'https://\${scriptHost}/npm/@clerk/clerk-js' ${buildFolder}`.exitCode) === 0) {
+  throw new Error('Found RHC in build output');
+} else {
+  console.log('✅ No RHC found in build output');
 }
-
-run();

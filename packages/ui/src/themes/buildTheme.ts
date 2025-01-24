@@ -17,7 +17,7 @@ export function buildTheme(p: PartialTheme): ParsedElements {
   });
 
   for (const descriptor in p) {
-    const key = descriptor as keyof ParsedElements;
+    const key = descriptor;
 
     if (p[key]) {
       if (!(key in theme)) {
@@ -26,7 +26,7 @@ export function buildTheme(p: PartialTheme): ParsedElements {
       }
 
       // These non-null assertions are okay since we confirmed that theme contains the descriptor above.
-      const { className, style } = p[key]!;
+      const { className, style } = p[key];
       if (className) {
         theme[key]!.className = className;
       }
@@ -37,7 +37,6 @@ export function buildTheme(p: PartialTheme): ParsedElements {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   return theme as ParsedElements;
 }
 
@@ -48,7 +47,7 @@ export function mergeTheme(a: ParsedElements, b: ParsedElements): ParsedElements
   const mergedTheme = { ...a };
 
   for (const d in mergedTheme) {
-    const descriptor = d as keyof ParsedElements;
+    const descriptor = d;
     mergedTheme[descriptor].className = [mergedTheme[descriptor].className, b[descriptor].className].join(' ');
     mergedTheme[descriptor].style = { ...mergedTheme[descriptor].style, ...b[descriptor].style };
   }

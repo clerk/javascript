@@ -123,7 +123,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
         kid: 'ins_whatever',
         skipJwksCache: true,
       });
-      vi.advanceTimersByTimeAsync(10000);
+      void vi.advanceTimersByTimeAsync(10000);
       await promise;
     }).rejects.toThrowError('Error loading Clerk JWKS from https://api.clerk.com/v1/jwks with code=503');
   });

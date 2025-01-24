@@ -6,7 +6,7 @@
  * @param {Object} _options - Additional options (unused)
  * @returns {string|undefined} - The transformed source code if modifications were made, otherwise undefined
  */
-module.exports = function transformClerkProviderDynamic({ _path, source }, { jscodeshift: j }, _options) {
+module.exports = function transformClerkProviderDynamic({ source }, { jscodeshift: j }) {
   const root = j(source);
   let dirtyFlag = false;
 

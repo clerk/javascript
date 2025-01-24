@@ -541,6 +541,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Hai già un account?',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
+      titleCombined: 'Crea il tuo account',
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
@@ -697,6 +698,11 @@ export const itIT: LocalizationResource = {
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',

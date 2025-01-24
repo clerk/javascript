@@ -99,7 +99,6 @@ export function SignUpVerifications() {
                         <SignUp.Action
                           asChild
                           resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => (
                             <LinkButton
                               type='button'
@@ -171,7 +170,6 @@ export function SignUpVerifications() {
                         <SignUp.Action
                           asChild
                           resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => (
                             <LinkButton
                               type='button'
@@ -243,7 +241,6 @@ export function SignUpVerifications() {
                     <SignUp.Action
                       resend
                       asChild
-                      // eslint-disable-next-line react/no-unstable-nested-components
                       fallback={({ resendableAfter }) => {
                         return (
                           <LinkButton

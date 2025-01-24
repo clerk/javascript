@@ -1,6 +1,6 @@
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
 
-const ClerkQueryParams = [
+const _ClerkQueryParams = [
   '__clerk_status',
   '__clerk_created_session',
   '__clerk_invitation_token',
@@ -13,11 +13,11 @@ const ClerkQueryParams = [
   CLERK_SUFFIXED_COOKIES,
 ] as const;
 
-type ClerkQueryParam = (typeof ClerkQueryParams)[number];
+type ClerkQueryParam = (typeof _ClerkQueryParams)[number];
 
 type ClerkQueryParamsToValuesMap = {
   __clerk_status: VerificationStatus | TicketStatus;
-} & Record<(typeof ClerkQueryParams)[number], string>;
+} & Record<(typeof _ClerkQueryParams)[number], string>;
 
 export type VerificationStatus =
   | 'expired'

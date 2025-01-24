@@ -3,6 +3,7 @@ import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+// eslint-disable-next-line import/no-unresolved
 import { getEvent } from 'vinxi/http';
 
 import { errorThrower } from '../utils';
@@ -35,14 +36,17 @@ export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => 
   }
 
   if (!secretKey) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: no secret key provided');
   }
 
   if (isSatellite && !proxyUrl && !domain) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: satellite mode requires a proxy URL or domain');
   }
 
   if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: satellite mode requires a sign-in URL in production');
   }
 
