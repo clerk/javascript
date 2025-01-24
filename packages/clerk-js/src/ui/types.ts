@@ -10,6 +10,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
+  WithInternalRouting,
 } from '@clerk/types';
 
 export type {
@@ -40,22 +41,22 @@ export type AvailableComponentProps =
 
 type ComponentMode = 'modal' | 'mounted';
 
-export type SignInCtx = SignInProps & {
+export type SignInCtx = WithInternalRouting<SignInProps> & {
   componentName: 'SignIn';
   mode?: ComponentMode;
 };
 
-export type UserVerificationCtx = __internal_UserVerificationProps & {
+export type UserVerificationCtx = WithInternalRouting<__internal_UserVerificationProps> & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
-export type UserProfileCtx = UserProfileProps & {
+export type UserProfileCtx = WithInternalRouting<UserProfileProps> & {
   componentName: 'UserProfile';
   mode?: ComponentMode;
 };
 
-export type SignUpCtx = SignUpProps & {
+export type SignUpCtx = WithInternalRouting<SignUpProps> & {
   componentName: 'SignUp';
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
@@ -67,12 +68,12 @@ export type UserButtonCtx = UserButtonProps & {
   mode?: ComponentMode;
 };
 
-export type OrganizationProfileCtx = OrganizationProfileProps & {
+export type OrganizationProfileCtx = WithInternalRouting<OrganizationProfileProps> & {
   componentName: 'OrganizationProfile';
   mode?: ComponentMode;
 };
 
-export type CreateOrganizationCtx = CreateOrganizationProps & {
+export type CreateOrganizationCtx = WithInternalRouting<CreateOrganizationProps> & {
   componentName: 'CreateOrganization';
   mode?: ComponentMode;
 };
