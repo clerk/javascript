@@ -2,6 +2,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import { debugRequestState } from '@clerk/backend/internal';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
+import { getEvent } from 'vinxi/http';
 
 import type { AdditionalStateOptions } from '../types';
 
@@ -22,6 +23,7 @@ export const wrapWithClerkState = (data: any) => {
  */
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
+  const event = getEvent();
 
   const clerkInitialState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
@@ -34,18 +36,26 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
     __afterSignInUrl: requestState.afterSignInUrl,
     __afterSignUpUrl: requestState.afterSignUpUrl,
     __clerk_debug: debugRequestState(requestState),
-    __clerkJSUrl: getEnvVariable('CLERK_JS'),
-    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
-    __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
-    __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),
+    __clerkJSUrl: getEnvVariable('CLERK_JS', event.context),
+    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', event.context),
+    __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED', event.context)),
+    __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', event.context)),
     __signInForceRedirectUrl:
-      additionalStateOptions.signInForceRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL') || '',
+      additionalStateOptions.signInForceRedirectUrl ||
+      getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL', event.context) ||
+      '',
     __signUpForceRedirectUrl:
-      additionalStateOptions.signUpForceRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FORCE_REDIRECT_URL') || '',
+      additionalStateOptions.signUpForceRedirectUrl ||
+      getEnvVariable('CLERK_SIGN_UP_FORCE_REDIRECT_URL', event.context) ||
+      '',
     __signInFallbackRedirectUrl:
-      additionalStateOptions.signInFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL') || '',
+      additionalStateOptions.signInFallbackRedirectUrl ||
+      getEnvVariable('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL', event.context) ||
+      '',
     __signUpFallbackRedirectUrl:
-      additionalStateOptions.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL') || '',
+      additionalStateOptions.signUpFallbackRedirectUrl ||
+      getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', event.context) ||
+      '',
   });
 
   return {

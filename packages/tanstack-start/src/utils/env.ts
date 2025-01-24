@@ -1,10 +1,10 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { HTTPEvent } from 'vinxi/http';
+import type { H3EventContext } from 'vinxi/http';
 
-export const getPublicEnvVariables = (event?: HTTPEvent) => {
+export const getPublicEnvVariables = (context?: H3EventContext) => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`, event) || getEnvVariable(name, event);
+    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
   };
 
   return {
