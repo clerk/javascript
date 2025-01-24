@@ -129,6 +129,7 @@ export const jaJP: LocalizationResource = {
     },
     membersPage: {
       action__invite: '招待',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
         tableHeader__actions: undefined,
@@ -460,6 +461,7 @@ export const jaJP: LocalizationResource = {
       actionText: 'アカウントをお持ちでないですか？',
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: undefined,
       title: 'サインイン',
       titleCombined: undefined,
     },
@@ -539,6 +541,7 @@ export const jaJP: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
       titleCombined: 'アカウントを作成',
     },
