@@ -12,7 +12,16 @@ import type {
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
 
-type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
+type AuthProtectOptions = {
+  /**
+   * The URL to redirect the user to if they are not authorized.
+   */
+  unauthorizedUrl?: string;
+  /**
+   * The URL to redirect the user to if they are not authenticated.
+   */
+  unauthenticatedUrl?: string;
+};
 
 /**
  * Throws a Nextjs notFound error if user is not authenticated or authorized.

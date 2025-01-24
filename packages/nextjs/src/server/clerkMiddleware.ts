@@ -91,6 +91,9 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
+/**
+ * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
+ */
 // @ts-expect-error TS is not happy here. Will dig into it
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
