@@ -450,6 +450,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
+      subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
     },
@@ -531,6 +532,7 @@ export const enUS: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
       titleCombined: 'Create your account',
     },
@@ -680,7 +682,6 @@ export const enUS: LocalizationResource = {
       title: 'Delete account',
     },
     emailAddressPage: {
-      formHint: "You'll need to verify this email address before it can be added to your account.",
       emailCode: {
         formHint: 'An email containing a verification code will be sent to this email address.',
         formSubtitle: 'Enter the verification code sent to {{identifier}}',
@@ -699,6 +700,7 @@ export const enUS: LocalizationResource = {
         formButton: 'Click to sign-in',
         formSubtitle: 'Complete the sign-in with {{identifier}}',
       },
+      formHint: "You'll need to verify this email address before it can be added to your account.",
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',
