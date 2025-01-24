@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import fs from 'fs-extra';
 
 import { constants } from '../constants';
-import { environmentConfig } from '../models/environment.js';
+import { environmentConfig } from '../models/environment';
 
 const getInstanceKeys = () => {
   let keys: Record<string, { pk: string; sk: string }>;

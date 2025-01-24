@@ -252,7 +252,6 @@ export function SignInVerifications() {
                         <SignIn.Action
                           asChild
                           resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => (
                             <LinkButton
                               type='button'
@@ -331,7 +330,6 @@ export function SignInVerifications() {
                         <SignIn.Action
                           asChild
                           resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => (
                             <LinkButton
                               type='button'
@@ -407,7 +405,6 @@ export function SignInVerifications() {
                     <SignIn.Action
                       asChild
                       resend
-                      // eslint-disable-next-line react/no-unstable-nested-components
                       fallback={({ resendableAfter }) => (
                         <LinkButton
                           type='button'
@@ -449,7 +446,6 @@ export function SignInVerifications() {
                         <SignIn.Action
                           asChild
                           resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => (
                             <LinkButton
                               type='button'

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.20.13",
+  "version": "2.20.14",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -123,7 +123,7 @@
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "postinstall": "node ./scripts/postinstall.mjs",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
@@ -141,7 +141,6 @@
     "swr": "^2.2.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.0.0",

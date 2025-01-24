@@ -19,6 +19,5 @@
     "declarationMap": true,
     "emitDeclarationOnly": true
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.tsx", "src/**/*.test.ts"]
+  "include": ["src"]
 }

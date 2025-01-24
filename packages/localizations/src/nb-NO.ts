@@ -129,6 +129,7 @@ export const nbNO: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: undefined,
@@ -460,6 +461,7 @@ export const nbNO: LocalizationResource = {
       actionText: 'Ingen konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'for å fortsette til {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Logg inn',
       titleCombined: undefined,
     },
@@ -539,7 +541,9 @@ export const nbNO: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Har du allerede en konto?',
       subtitle: 'for å fortsette til {{applicationName}}',
+      subtitleCombined: 'for å fortsette til {{applicationName}}',
       title: 'Opprett kontoen din',
+      titleCombined: 'Opprett kontoen din',
     },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',

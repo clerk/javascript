@@ -130,6 +130,7 @@ export const mnMN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Урих',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Гишүүнийг хасах',
         tableHeader__actions: undefined,
@@ -461,6 +462,7 @@ export const mnMN: LocalizationResource = {
       actionText: 'Бүртгэлгүй юу?',
       actionText__join_waitlist: undefined,
       subtitle: 'Тавтай морил! Үргэлжлүүлэхийн тулд нэвтэрнэ үү',
+      subtitleCombined: undefined,
       title: '{{applicationName}} руу нэвтрэх',
       titleCombined: undefined,
     },
@@ -540,7 +542,9 @@ export const mnMN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Бүртгэлтэй юу?',
       subtitle: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
+      subtitleCombined: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
+      titleCombined: 'Бүртгэл үүсгэх',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',

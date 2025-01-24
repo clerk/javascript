@@ -133,6 +133,7 @@ export const ruRU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить участника',
         tableHeader__actions: 'Действия',
@@ -469,6 +470,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'Нет учетной записи?',
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Войти',
       titleCombined: undefined,
     },
@@ -551,7 +553,9 @@ export const ruRU: LocalizationResource = {
       actionLink__use_phone: 'Использовать телефон вместо этого',
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
+      titleCombined: 'Создайте Вашу учетную запись',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',

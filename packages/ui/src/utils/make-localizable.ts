@@ -1,10 +1,10 @@
 // This file contains code originally found in packages/clerk-js/src/ui/localization and modified for use within UI.
 
-import { enUS } from '@clerk/localizations';
-import { normalizeDate, titleize } from '@clerk/shared';
-import type { DeepRequired, LocalizationResource, PasswordSettingsData, PathValue, RecordToPath } from '@clerk/types';
+import { normalizeDate } from '@clerk/shared/date';
+import { titleize } from '@clerk/shared/underscore';
+import type { LocalizationResource, PasswordSettingsData, PathValue, RecordToPath } from '@clerk/types';
 
-const defaultResource = enUS as DeepRequired<typeof enUS>;
+// const defaultResource = enUS as DeepRequired<typeof enUS>;
 
 type Value = string | number | boolean | Date;
 type Whitespace = ' ' | '\t' | '\n' | '\r';

@@ -132,6 +132,7 @@ export const deDE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Einladen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
@@ -464,6 +465,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Kein Account?',
       actionText__join_waitlist: 'Warteliste beitreten',
       subtitle: 'weiter zu {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Einloggen',
       titleCombined: undefined,
     },
@@ -545,7 +547,9 @@ export const deDE: LocalizationResource = {
       actionLink__use_phone: 'Mit Telefonnummer einloggen',
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
+      subtitleCombined: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',
+      titleCombined: 'Erstelle deinen Account',
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',

@@ -68,6 +68,7 @@ export const accordionForCategory = partial((categories, options, { data }) => {
     items.push(...[].concat(options.additionalItems));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
   return `<Accordion titles={[${items.map(i => `"${parseInline(i.title)}"`).join(', ')}]}>
 ${items.map(i => `  <AccordionPanel>${indent('\n' + i.content.trim(), 4)}\n  </AccordionPanel>`).join('\n')}
 </Accordion>`;

@@ -130,6 +130,7 @@ export const fiFI: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Kutsu',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -461,6 +462,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Eikö sinulla ole tiliä?',
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
       titleCombined: undefined,
     },
@@ -540,7 +542,9 @@ export const fiFI: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
+      subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
+      titleCombined: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',

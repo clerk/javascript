@@ -170,7 +170,7 @@ describe('useDerivedAuth', () => {
     };
     renderHook(() => useDerivedAuth(authObject));
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+    // eslint-disable-next-line jest/unbound-method
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
 
@@ -186,7 +186,7 @@ describe('useDerivedAuth', () => {
     } = renderHook(() => useDerivedAuth(authObject));
 
     if (!current.userId) {
-      throw 'Invalid state';
+      throw new Error('Invalid state');
     }
 
     const result = current.has({ permission: 'test' });

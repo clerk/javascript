@@ -24,8 +24,8 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
     await u.po.signIn.continue();
     await u.page.waitForAppUrl('/sign-in/create');
 
-    const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
-    expect(prefilledEmail).toBe(fakeUser.email);
+    const prefilledEmail = u.po.signUp.getEmailAddressInput();
+    await expect(prefilledEmail).toHaveValue(fakeUser.email);
 
     await u.po.signUp.setPassword(fakeUser.password);
     await u.po.signUp.continue();

@@ -4,10 +4,11 @@ import { useActionContext } from './ActionRoot';
 
 type ActionTriggerProps = PropsWithChildren<{
   value: string;
+  hideOnActive?: boolean;
 }>;
 
 export const ActionTrigger = (props: ActionTriggerProps) => {
-  const { children, value } = props;
+  const { children, value, hideOnActive = true } = props;
   const { active, open } = useActionContext();
 
   const validChildren = Children.only(children);
@@ -15,7 +16,7 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
     throw new Error('Children of ActionTrigger must be a valid element');
   }
 
-  if (active === value) {
+  if (hideOnActive && active === value) {
     return null;
   }
 

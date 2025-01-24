@@ -131,6 +131,7 @@ export const esMX: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Eliminar miembro',
         tableHeader__actions: undefined,
@@ -464,6 +465,7 @@ export const esMX: LocalizationResource = {
       actionText: '¿No tiene cuenta?',
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Iniciar sesión',
       titleCombined: undefined,
     },
@@ -543,7 +545,9 @@ export const esMX: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar con {{applicationName}}',
+      subtitleCombined: 'para continuar con {{applicationName}}',
       title: 'Crea tu cuenta',
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',

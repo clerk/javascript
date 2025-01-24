@@ -1,5 +1,5 @@
-import { applicationConfig } from '../models/applicationConfig.js';
-import { templates } from '../templates/index.js';
+import { applicationConfig } from '../models/applicationConfig';
+import { templates } from '../templates';
 import { linkPackage } from './utils';
 
 const router = applicationConfig()

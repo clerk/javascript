@@ -129,6 +129,7 @@ export const bgBG: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Покани',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Премахване на член',
         tableHeader__actions: undefined,
@@ -459,6 +460,7 @@ export const bgBG: LocalizationResource = {
       actionText: 'Нямате акаунт?',
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
+      subtitleCombined: undefined,
       title: 'Влезте в {{applicationName}}',
       titleCombined: undefined,
     },
@@ -539,7 +541,9 @@ export const bgBG: LocalizationResource = {
       actionLink__use_phone: 'Използвайте телефон',
       actionText: 'Вече имате акаунт?',
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
+      subtitleCombined: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
+      titleCombined: 'Създайте своя акаунт',
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',

@@ -128,6 +128,7 @@ export const zhTW: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀請',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成員',
         tableHeader__actions: undefined,
@@ -455,6 +456,7 @@ export const zhTW: LocalizationResource = {
       actionText: '還沒有帳戶？',
       actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
+      subtitleCombined: undefined,
       title: '登錄',
       titleCombined: undefined,
     },
@@ -534,7 +536,9 @@ export const zhTW: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
+      subtitleCombined: '繼續使用 {{applicationName}}',
       title: '創建您的帳戶',
+      titleCombined: '創建您的帳戶',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登錄',

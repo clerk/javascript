@@ -130,6 +130,7 @@ export const isIS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjóða',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjarlægja meðlim',
         tableHeader__actions: undefined,
@@ -462,6 +463,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu ekki með reikning?',
       actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
+      subtitleCombined: undefined,
       title: 'Skrá inn í {{applicationName}}',
       titleCombined: undefined,
     },
@@ -542,7 +544,9 @@ export const isIS: LocalizationResource = {
       actionLink__use_phone: 'Nota síma í staðinn',
       actionText: 'Ertu með reikning?',
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
+      subtitleCombined: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
+      titleCombined: 'Stofna reikning',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',

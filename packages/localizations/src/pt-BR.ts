@@ -129,6 +129,7 @@ export const ptBR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convidar',
+      action__search: 'Pesquisar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
@@ -460,6 +461,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Não possui uma conta?',
       actionText__join_waitlist: 'Quer ser notificado quando estivermos prontos?',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
       titleCombined: undefined,
     },
@@ -543,7 +545,9 @@ export const ptBR: LocalizationResource = {
       actionLink__use_phone: 'Ou use telefone',
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
+      titleCombined: 'Criar sua conta',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -687,7 +691,6 @@ export const ptBR: LocalizationResource = {
       title: 'Excluir conta',
     },
     emailAddressPage: {
-      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       emailCode: {
         formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
@@ -706,6 +709,7 @@ export const ptBR: LocalizationResource = {
         formButton: 'Clique para autenticar',
         formSubtitle: 'Complete a autenticação com {{identifier}}',
       },
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Você não conseguirá fazer login novamente com este endereço de e-mail.',

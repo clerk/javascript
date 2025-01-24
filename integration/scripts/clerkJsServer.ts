@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { constants } from '../constants';
 import { stateFile } from '../models/stateFile';
-import { awaitableTreekill, fs, waitForServer } from './index';
+import { awaitableTreekill, fs, waitForServer } from '.';
 import { run } from './run';
 
 export const startClerkJsHttpServer = async () => {

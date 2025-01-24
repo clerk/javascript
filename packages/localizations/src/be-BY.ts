@@ -130,6 +130,7 @@ export const beBY: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить удзельніка',
         tableHeader__actions: 'Дзеянні',
@@ -464,6 +465,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Няма ўліковага запісу?',
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Увайсці',
       titleCombined: undefined,
     },
@@ -544,7 +546,9 @@ export const beBY: LocalizationResource = {
       actionLink__use_phone: 'Увайсці з дапамогай тэлефона',
       actionText: 'Ужо ёсць акаўнт?',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Стварыце Ваш акаўнт',
+      titleCombined: 'Стварыце Ваш акаўнт',
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
