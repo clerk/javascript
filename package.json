@@ -88,6 +88,7 @@
     "eslint": "9.18.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-config-turbo": "2.3.3",
+    "eslint-import-resolver-typescript": "3.7.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-jsx-a11y": "6.10.2",

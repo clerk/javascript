@@ -1,5 +1,4 @@
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
-// eslint-disable-next-line import/no-unresolved
 import { getEvent } from 'vinxi/http';
 
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
