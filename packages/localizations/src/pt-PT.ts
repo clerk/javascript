@@ -459,6 +459,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Não possui uma conta?',
       actionText__join_waitlist: 'Ainda não tem uma conta? Junte-se à lista de espera.',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
       titleCombined: undefined,
     },
@@ -538,6 +539,7 @@ export const ptPT: LocalizationResource = {
       actionLink__use_phone: 'Usar telemóvel',
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
       titleCombined: 'Criar a sua conta',
     },
@@ -682,7 +684,6 @@ export const ptPT: LocalizationResource = {
       title: 'Excluir conta',
     },
     emailAddressPage: {
-      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       emailCode: {
         formHint: 'Um e-mail contendo um código de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Insira o código de verificação enviado para {{identifier}}',
@@ -701,6 +702,7 @@ export const ptPT: LocalizationResource = {
         formButton: 'Clique para autenticar',
         formSubtitle: 'Complete a autenticação com {{identifier}}',
       },
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',
