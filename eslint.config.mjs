@@ -94,6 +94,13 @@ export default tseslint.config([
     },
     settings: {
       'import/ignore': ['node_modules/react-native/index\\.js$'],
+      'import/resolver': {
+        node: true,
+        typescript: {
+          alwaysTryTypes: true,
+          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+        },
+      },
     },
     rules: {
       curly: ['error', 'all'],

@@ -9,7 +9,6 @@ import type {
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 
-// @ts-expect-error - TS2307: Cannot find module '#async-local-storage'.
 import { authAsyncStorage } from '#async-local-storage';
 
 import { $authStore } from '../stores/external';
