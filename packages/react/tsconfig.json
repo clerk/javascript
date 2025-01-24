@@ -21,6 +21,5 @@
     "strict": true,
     "target": "ES2019"
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+  "include": ["src"]
 }

@@ -130,6 +130,7 @@ export const esES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',
@@ -461,6 +462,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes cuenta?',
       actionText__join_waitlist: '¿Te gustaría unirte a la lista de espera?',
       subtitle: 'para continuar a {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
       titleCombined: undefined,
     },
@@ -540,6 +542,7 @@ export const esES: LocalizationResource = {
       actionLink__use_phone: 'Usar teléfono',
       actionText: '¿Ya tienes una cuenta?',
       subtitle: 'para continuar en {{applicationName}}',
+      subtitleCombined: 'para continuar en {{applicationName}}',
       title: 'Crea tu cuenta',
       titleCombined: 'Crea tu cuenta',
     },

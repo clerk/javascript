@@ -21,7 +21,7 @@ export default function guessFrameworks(dir, disableTelemetry) {
   let pkg;
   try {
     pkg = readPackageSync({ cwd: dir });
-  } catch (err) {
+  } catch {
     const tmpPath = path.join(tempDir, 'clerk-upgrade-uuid');
     let uuid;
 

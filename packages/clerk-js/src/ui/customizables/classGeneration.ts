@@ -129,9 +129,13 @@ const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'strin
 
 const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0) => {
   if (specificity) {
-    val && typeof val === 'object' && css.push({ ['&'.repeat(specificity)]: val });
+    if (val && typeof val === 'object') {
+      css.push({ ['&'.repeat(specificity)]: val });
+    }
   } else {
-    val && typeof val === 'object' && css.push(val);
+    if (val && typeof val === 'object') {
+      css.push(val);
+    }
   }
 };
 

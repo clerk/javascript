@@ -2080,6 +2080,19 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('proxyUrl', () => {
+    describe('when proxyUrl is set', () => {
+      test('fapiClient should use Clerk.proxyUrl as its baseUrl', async () => {
+        const sut = new Clerk(productionPublishableKey, {
+          proxyUrl: 'https://proxy.com/api/__clerk',
+        });
+        await sut.load({});
+
+        expect(sut.getFapiClient().buildUrl({ path: '/me' }).href).toContain('https://proxy.com/api/__clerk/v1/me');
+      });
+    });
+  });
+
   describe('buildUrlWithAuth', () => {
     it('builds an absolute url from a relative url in development', async () => {
       const sut = new Clerk(developmentPublishableKey);

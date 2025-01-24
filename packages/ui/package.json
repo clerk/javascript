@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -49,6 +49,7 @@
     "bundlewatch": "pnpm dlx bundlewatch --config bundlewatch.config.json",
     "dev": "tsup --watch",
     "dev:theme-builder": "concurrently \"pnpm dev\" \"cd theme-builder && pnpm dev\"",
+    "lint": "eslint src",
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
@@ -67,11 +68,11 @@
     "react-aria-components": "^1.2.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/tailwindcss-transformer": "workspace:*",
     "@testing-library/react": "^16.0.0",
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^8.2.2",
-    "jsdom": "^24.1.1"
+    "jsdom": "^24.1.1",
+    "tailwindcss": "^3.4.3"
   }
 }

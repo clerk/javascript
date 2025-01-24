@@ -16,8 +16,8 @@ setup('cleanup instances ', async () => {
     .filter(Boolean);
 
   for (const entry of entries) {
-    console.log(`Cleanup for ${entry!.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
-    const clerkClient = createClerkClient({ secretKey: entry!.secretKey });
+    console.log(`Cleanup for ${entry.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
+    const clerkClient = createClerkClient({ secretKey: entry.secretKey });
     const { data: users } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',

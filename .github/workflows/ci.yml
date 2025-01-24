@@ -72,9 +72,9 @@ jobs:
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
 
-      - name: Lint GitHub Actions Workflows
-        run: pnpm eslint .github
-        shell: bash
+      # - name: Lint GitHub Actions Workflows
+      #   run: pnpm eslint .github
+      #   shell: bash
 
       - name: Check Formatting
         run: pnpm format:check

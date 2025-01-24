@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.4.14",
+  "version": "1.4.15",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -59,7 +59,7 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint src/"
+    "lint": "eslint src"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
@@ -68,7 +68,6 @@
     "dotenv": "16.4.5"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@playwright/test": "^1.44.0",
     "cypress": "^13.9.0"
   },
