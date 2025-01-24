@@ -287,7 +287,13 @@ function _SignUpStart(): JSX.Element {
                 isCombinedFlow ? localizationKeys('signUp.start.titleCombined') : localizationKeys('signUp.start.title')
               }
             />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signUp.start.subtitleCombined')
+                  : localizationKeys('signUp.start.subtitle')
+              }
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex

@@ -24,6 +24,9 @@ export type StartOAuthFlowReturnType = {
   authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
+/**
+ * @deprecated Use `useSSO` instead
+ */
 export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { strategy } = useOAuthParams || {};
   if (!strategy) {

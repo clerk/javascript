@@ -129,6 +129,7 @@ export const trTR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Davet et',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Üyeyi kaldır',
         tableHeader__actions: undefined,
@@ -461,6 +462,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Hesabınız yok mu?',
       actionText__join_waitlist: 'Bekleme listesine katılın',
       subtitle: '{{applicationName}} ile devam etmek için',
+      subtitleCombined: undefined,
       title: 'Giriş yap',
       titleCombined: undefined,
     },
@@ -540,6 +542,7 @@ export const trTR: LocalizationResource = {
       actionLink__use_phone: 'Bunun yerine telefon kullanın',
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
+      subtitleCombined: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
     },

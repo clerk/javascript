@@ -126,6 +126,7 @@ export const zhCN: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀请',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成员',
         tableHeader__actions: undefined,
@@ -449,6 +450,7 @@ export const zhCN: LocalizationResource = {
       actionText: '还没有账户？',
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: undefined,
       title: '登录',
       titleCombined: undefined,
     },
@@ -528,6 +530,7 @@ export const zhCN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '已经有账户了？',
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: '继续使用 {{applicationName}}',
       title: '创建您的账户',
       titleCombined: '创建您的账户',
     },
