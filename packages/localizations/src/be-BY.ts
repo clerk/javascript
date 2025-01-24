@@ -130,6 +130,7 @@ export const beBY: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить удзельніка',
         tableHeader__actions: 'Дзеянні',
@@ -464,6 +465,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Няма ўліковага запісу?',
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Увайсці',
       titleCombined: undefined,
     },
@@ -544,7 +546,9 @@ export const beBY: LocalizationResource = {
       actionLink__use_phone: 'Увайсці з дапамогай тэлефона',
       actionText: 'Ужо ёсць акаўнт?',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Стварыце Ваш акаўнт',
+      titleCombined: 'Стварыце Ваш акаўнт',
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
@@ -702,6 +706,11 @@ export const beBY: LocalizationResource = {
         resendButton: 'Адправіць спасылку паўторна',
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будзе выдалены з гэтага ўліковага запісу.',
         messageLine2: 'Вы больш не зможаце ўваходзіць, выкарыстоўваючы гэты адрас электроннай пошты.',

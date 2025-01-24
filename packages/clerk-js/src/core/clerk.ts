@@ -306,13 +306,15 @@ export class Clerk implements ClerkInterface {
     this.#instanceType = publishableKey.instanceType;
 
     this.#fapiClient = createFapiClient({
-      domain: (this.instanceType === 'development' && this.isSatellite && this.domain) || undefined,
+      domain: this.domain,
       frontendApi: this.frontendApi,
       // this.instanceType is assigned above
       instanceType: this.instanceType as InstanceType,
+      isSatellite: this.isSatellite,
       getSessionId: () => {
         return this.session?.id;
       },
+      proxyUrl: this.proxyUrl,
     });
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -2175,7 +2177,7 @@ export class Clerk implements ClerkInterface {
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
       removeClerkQueryParam('__clerk_help');
-    } catch (_) {
+    } catch {
       // ignore
     }
   };

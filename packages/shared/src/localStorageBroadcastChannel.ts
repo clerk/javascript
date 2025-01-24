@@ -20,7 +20,7 @@ export class LocalStorageBroadcastChannel<E> {
     try {
       window.localStorage.setItem(this.channelKey, JSON.stringify(data));
       window.localStorage.removeItem(this.channelKey);
-    } catch (e) {
+    } catch {
       // Silently do nothing
     }
   };
@@ -43,7 +43,7 @@ export class LocalStorageBroadcastChannel<E> {
           data,
         });
         this.eventTarget.dispatchEvent(event);
-      } catch (e) {
+      } catch {
         //
       }
     };

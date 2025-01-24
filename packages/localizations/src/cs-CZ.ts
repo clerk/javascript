@@ -130,6 +130,7 @@ export const csCZ: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvat',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstranit člena',
         tableHeader__actions: 'Akce',
@@ -458,6 +459,7 @@ export const csCZ: LocalizationResource = {
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: 'Připojit se k čekací listině',
       subtitle: 'pro pokračování do {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Přihlásit se',
       titleCombined: undefined,
     },
@@ -537,7 +539,9 @@ export const csCZ: LocalizationResource = {
       actionLink__use_phone: 'Použít telefon',
       actionText: 'Máte účet?',
       subtitle: 'pro pokračování do {{applicationName}}',
+      subtitleCombined: 'pro pokračování do {{applicationName}}',
       title: 'Vytvořte si účet',
+      titleCombined: 'Vytvořte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
@@ -692,6 +696,11 @@ export const csCZ: LocalizationResource = {
         resendButton: 'Znovu odeslat odkaz',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstraněna z tohoto účtu.',
         messageLine2: 'Nebudete se moci přihlásit pomocí této e-mailové adresy.',

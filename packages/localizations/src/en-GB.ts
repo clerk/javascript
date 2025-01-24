@@ -1,3 +1,15 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const enGB: LocalizationResource = {
@@ -50,9 +62,9 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
   formFieldInputPlaceholder__organizationName: 'Organisation name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
-  formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -449,7 +461,9 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
+      subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -529,7 +543,9 @@ export const enGB: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
+      titleCombined: 'Create your account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -591,6 +607,7 @@ export const enGB: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
@@ -690,6 +707,11 @@ export const enGB: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',

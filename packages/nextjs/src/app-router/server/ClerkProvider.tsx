@@ -5,7 +5,6 @@ import React from 'react';
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import { createClerkClientWithOptions } from '../../server/createClerkClient';
-import { safeParseClerkFile } from '../../server/keyless-node';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -24,6 +23,15 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
   return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
 });
+
+/** Discards errors thrown by attempted code */
+const onlyTry = (cb: () => unknown) => {
+  try {
+    cb();
+  } catch {
+    // ignore
+  }
+};
 
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
@@ -72,13 +80,24 @@ export async function ClerkProvider(
     </ClientClerkProvider>
   );
 
-  const runningWithClaimedKeys = propsWithEnvs.publishableKey === safeParseClerkFile()?.publishableKey;
-  const shouldRunAsKeyless = (!propsWithEnvs.publishableKey || runningWithClaimedKeys) && canUseKeyless;
+  let [shouldRunAsKeyless, runningWithClaimedKeys] = [false, false];
+  if (canUseKeyless) {
+    // eslint-disable-next-line import/no-unresolved
+    const locallyStorePublishableKey = await import('../../server/keyless-node.js')
+      .then(mod => mod.safeParseClerkFile()?.publishableKey)
+      .catch(() => undefined);
+
+    runningWithClaimedKeys =
+      Boolean(propsWithEnvs.publishableKey) && propsWithEnvs.publishableKey === locallyStorePublishableKey;
+    shouldRunAsKeyless = !propsWithEnvs.publishableKey || runningWithClaimedKeys;
+  }
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
+    // eslint-disable-next-line import/no-unresolved
     const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
     const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
+      // eslint-disable-next-line import/no-unresolved
       '../../server/keyless-log-cache.js'
     );
 
@@ -120,14 +139,27 @@ export async function ClerkProvider(
 
         output = clientProvider;
       } else {
+        // eslint-disable-next-line import/no-unresolved
         const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
+
+        const headerStore = await headers();
+        /**
+         * Allow developer to return to local application after claiming
+         */
+        const host = headerStore.get('x-forwarded-host');
+        const proto = headerStore.get('x-forwarded-proto');
+
+        const claimUrl = new URL(newOrReadKeys.claimUrl);
+        if (host && proto) {
+          onlyTry(() => claimUrl.searchParams.set('return_url', new URL(`${proto}://${host}`).href));
+        }
 
         /**
          * Notify developers.
          */
         keylessLogger?.log({
           cacheKey: newOrReadKeys.publishableKey,
-          msg: createKeylessModeMessage(newOrReadKeys),
+          msg: createKeylessModeMessage({ ...newOrReadKeys, claimUrl: claimUrl.href }),
         });
 
         output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;

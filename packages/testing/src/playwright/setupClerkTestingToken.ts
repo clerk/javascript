@@ -39,7 +39,7 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
       originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
     }
 
-    route.continue({
+    void route.continue({
       url: originalUrl.toString(),
     });
   });

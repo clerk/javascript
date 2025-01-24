@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 const rspack = require('@rspack/core');
 const packageJSON = require('./package.json');
 const path = require('path');

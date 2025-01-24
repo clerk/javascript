@@ -568,6 +568,10 @@ export type CodeToCountryIsoMapType = ReadonlyMap<DialingCode, CountryEntry[]>;
 export const CodeToCountriesMap: CodeToCountryIsoMapType = data.reduce((acc, cur) => {
   const code = cur[2];
   const country = createEntry(cur);
-  acc.get(code) ? acc.get(code)!.push(country) : acc.set(code, [country]);
+  if (acc.has(code)) {
+    acc.get(code)?.push(country);
+  } else {
+    acc.set(code, [country]);
+  }
   return acc;
 }, new Map<DialingCode, CountryEntry[]>());

@@ -7,7 +7,6 @@ import { $ } from 'zx';
 
 const $$ = $({
   env: { NODE_ENV: 'production' },
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   verbose: !!process.env.VERBOSE,
 });
 

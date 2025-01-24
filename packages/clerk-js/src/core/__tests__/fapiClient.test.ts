@@ -75,6 +75,14 @@ describe('buildUrl(options)', () => {
     );
   });
 
+  it('uses domain from options if production', () => {
+    expect(
+      createFapiClient({ ...baseFapiClientOptions, domain: 'clerk.other.com', instanceType: 'production' }).buildUrl({
+        path: '/foo',
+      }).href,
+    ).toBe(`https://clerk.other.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`);
+  });
+
   it('adds _clerk_session_id as a query parameter if provided and path does not start with client or waitlist', () => {
     expect(fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href).toBe(
       `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test&_clerk_session_id=sess_42`,

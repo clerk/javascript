@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
@@ -22,10 +23,17 @@ const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
+  const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      setIsExpanded(true);
+    }
+  }, [isSignedIn]);
+
   const environment = useRevalidateEnvironment();
   const claimed = Boolean(environment.authConfig.claimedAt);
-
   const success = typeof _props.onDismiss === 'function' && claimed;
   const appName = environment.displayConfig.applicationName;
 
@@ -120,7 +128,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: success ? 'fit-content' : '8.563rem',
+            height: claimed || success ? 'fit-content' : isSignedIn ? '11rem' : '12rem',
             overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
@@ -282,7 +290,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             xmlns='http://www.w3.org/2000/svg'
             css={css`
               color: #8c8c8c;
-              transition: color 130ms ease-out;
+              transition: color 120ms ease-out;
               display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
               cursor: pointer;
 
@@ -370,7 +378,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     href='https://dashboard.clerk.com/last-active?path=user-authentication/email-phone-username'
                     sx={t => ({
                       color: t.colors.$whiteAlpha600,
-
                       textDecoration: 'underline solid',
                       transition: `${t.transitionTiming.$common} ${t.transitionDuration.$fast}`,
                       ':hover': {
@@ -387,9 +394,11 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   Dashboard.
                 </>
               ) : (
-                <>
-                  We generated temporary API keys for you. Link this application to your Clerk account to configure it.
-                </>
+                <span>
+                  {isSignedIn
+                    ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
+                    : 'This app uses Clerk for authentication. We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
+                </span>
               )}
             </p>
           </div>
@@ -413,42 +422,99 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 Dismiss
               </button>
             ) : (
-              <a
-                href={urlToDashboard}
-                target='_blank'
-                rel='noopener noreferrer'
+              <Flex
                 data-expanded={isForcedExpanded}
-                css={css`
-                  ${mainCTAStyles};
-                  animation: ${isForcedExpanded && 'show-button 600ms ease-in forwards'};
-                  @keyframes show-button {
-                    0%,
-                    5% {
-                      opacity: 0;
-                    }
-                    14%,
-                    100% {
-                      opacity: 1;
-                    }
-                  }
+                sx={t => ({
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: t.space.$2x5,
+                })}
+              >
+                <a
+                  href={urlToDashboard}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  css={css`
+                    ${mainCTAStyles};
+                    animation: ${isForcedExpanded && isSignedIn
+                      ? 'show-main-CTA 800ms ease forwards'
+                      : 'show-main-CTA 650ms ease-in forwards'};
 
-                  &:hover {
-                    ${claimed
-                      ? `
+                    @keyframes show-main-CTA {
+                      0%,
+                      5% {
+                        opacity: 0;
+                      }
+                      14%,
+                      100% {
+                        opacity: 1;
+                      }
+                    }
+
+                    &:hover {
+                      ${claimed
+                        ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
-                      : `
+                        : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
-                  }
-                `}
-              >
-                {claimed ? 'Get API keys' : 'Claim application'}
-              </a>
+                    }
+                  `}
+                >
+                  {claimed ? 'Get API keys' : 'Claim application'}
+                </a>
+
+                {!claimed && (
+                  <>
+                    <span
+                      css={css`
+                        height: 1px;
+                        background-color: #151515;
+                        width: 100%;
+                        box-shadow: 0px 1px 0px 0px #424242;
+                      `}
+                    />
+
+                    <a
+                      href='https://dashboard.clerk.com/last-active?path=api-keys'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      css={css`
+                        ${baseElementStyles};
+                        color: #ffffff9e;
+                        font-size: 0.75rem;
+                        transition: color 120ms ease-out;
+                        :hover {
+                          color: #ffffffcf;
+                          text-decoration: none;
+                        }
+
+                        animation: ${isForcedExpanded && isSignedIn
+                          ? 'show-secondary-CTA 800ms ease forwards'
+                          : 'show-secondary-CTA 650ms ease-in forwards'};
+
+                        @keyframes show-secondary-CTA {
+                          0%,
+                          9% {
+                            opacity: 0;
+                          }
+                          19%,
+                          100% {
+                            opacity: 1;
+                          }
+                        }
+                      `}
+                    >
+                      Already have a Clerk app? Get keys
+                    </a>
+                  </>
+                )}
+              </Flex>
             ))}
         </Flex>
       </Flex>

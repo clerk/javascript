@@ -201,12 +201,13 @@ export class EmailLinkError extends Error {
   constructor(code: string) {
     super(code);
     this.code = code;
+    this.name = 'EmailLinkError' as const;
     Object.setPrototypeOf(this, EmailLinkError.prototype);
   }
 }
 
 export function isEmailLinkError(err: Error): err is EmailLinkError {
-  return err instanceof EmailLinkError;
+  return err.name === 'EmailLinkError';
 }
 
 export const EmailLinkErrorCode = {

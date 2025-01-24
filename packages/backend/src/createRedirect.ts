@@ -62,8 +62,8 @@ const buildAccountsBaseUrl = (frontendApi?: string) => {
   // convert url from FAPI to accounts for Kima and legacy (prod & dev) instances
   const accountsBaseUrl = frontendApi
     // staging accounts
-    .replace(/(clerk\.accountsstage\.)/, 'accountsstage.')
-    .replace(/(clerk\.accounts\.|clerk\.)/, 'accounts.');
+    .replace(/clerk\.accountsstage\./, 'accountsstage.')
+    .replace(/clerk\.accounts\.|clerk\./, 'accounts.');
   return `https://${accountsBaseUrl}`;
 };
 
