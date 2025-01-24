@@ -4,6 +4,7 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { createClerkClientWithOptions } from '../../server/createClerkClient';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -116,6 +117,24 @@ export async function ClerkProvider(
       );
 
       if (runningWithClaimedKeys) {
+        try {
+          // eslint-disable-next-line import/no-unresolved
+          const secretKey = await import('../../server/keyless-node.js').then(
+            mod => mod.safeParseClerkFile()?.secretKey,
+          );
+          if (!secretKey) {
+            // we will ignore it later
+            throw new Error(secretKey);
+          }
+          const client = createClerkClientWithOptions({
+            secretKey,
+          });
+          // Add caching here
+          await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
+        } catch {
+          // ignore
+        }
+
         /**
          * Notify developers.
          */
