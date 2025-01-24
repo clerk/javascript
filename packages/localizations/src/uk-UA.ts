@@ -129,6 +129,7 @@ export const ukUA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Запросити',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Видалити учасника',
         tableHeader__actions: undefined,
@@ -458,6 +459,7 @@ export const ukUA: LocalizationResource = {
       actionText: 'Немає акаунта?',
       actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Увійти',
       titleCombined: undefined,
     },
@@ -537,7 +539,9 @@ export const ukUA: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Уже є акаунт?',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
+      subtitleCombined: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
+      titleCombined: 'Створіть Ваш акаунт',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
@@ -693,6 +697,11 @@ export const ukUA: LocalizationResource = {
         resendButton: 'Надіслати посилання повторно',
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} буде видалено з цього акаунта.',
         messageLine2: 'Ви більше не зможете увійти з використанням цієї адреси електронної пошти.',

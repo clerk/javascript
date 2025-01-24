@@ -1,5 +1,29 @@
 # Change Log
 
+## 3.10.0
+
+### Minor Changes
+
+- Unified `formHint` under `userProfile.emailAddressPage` for all first factor auth methods ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+
+## 3.9.14
+
+### Patch Changes
+
+- Additional changes to waitlist component translations `nl-NL` ([#4975](https://github.com/clerk/javascript/pull/4975)) by [@FiremanPete](https://github.com/FiremanPete)
+
+- Update `nl-NL` localization strings ([#4970](https://github.com/clerk/javascript/pull/4970)) by [@FiremanPete](https://github.com/FiremanPete)
+
+- Updated dependencies [[`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/types@4.43.0
+
 ## 3.9.13
 
 ### Patch Changes

@@ -117,9 +117,7 @@ export interface SignInRouterContext extends BaseRouterContext {
 
 // ---------------------------------- Input ---------------------------------- //
 
-export interface SignInRouterInput {
-  // NOTE: Set in INIT event
-}
+export type SignInRouterInput = object;
 
 // ---------------------------------- Schema ---------------------------------- //
 

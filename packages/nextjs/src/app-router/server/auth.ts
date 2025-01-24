@@ -20,6 +20,7 @@ export interface AuthFn {
 }
 
 export const auth: AuthFn = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
   const request = await buildRequestLike();
@@ -68,6 +69,7 @@ export const auth: AuthFn = async () => {
 };
 
 auth.protect = async (...args: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
   const request = await buildRequestLike();

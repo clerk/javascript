@@ -129,6 +129,7 @@ export const koKR: LocalizationResource = {
     },
     membersPage: {
       action__invite: '초대',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '회원 제거',
         tableHeader__actions: undefined,
@@ -455,6 +456,7 @@ export const koKR: LocalizationResource = {
       actionText: '계정이 없으신가요?',
       actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
+      subtitleCombined: undefined,
       title: '{{applicationName}}에 로그인',
       titleCombined: undefined,
     },
@@ -534,7 +536,9 @@ export const koKR: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '계정이 있으신가요?',
       subtitle: '환영합니다! 아래 정보를 입력해주세요.',
+      subtitleCombined: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
+      titleCombined: '계정 만들기',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
@@ -688,6 +692,11 @@ export const koKR: LocalizationResource = {
         resendButton: '링크 재전송',
         successMessage: '{{identifier}} 이메일이 당신의 계정에 추가되었습니다.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 이메일이 이 계정에서 제거 될 에정입니다.',
         messageLine2: '더 이상 이 이메일 주소로 로그인할 수 없습니다.',

@@ -1,5 +1,45 @@
 # Change Log
 
+## 5.49.0
+
+### Minor Changes
+
+- Enable email verification in `UserProfile` via enterprise SSO ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Fix an issue where Clerk's `proxyUrl` was not being respected. ([#4990](https://github.com/clerk/javascript/pull/4990)) by [@brkalow](https://github.com/brkalow)
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/localizations@3.10.0
+  - @clerk/shared@2.20.14
+
+## 5.48.0
+
+### Minor Changes
+
+- - Introduced an `upsert` method to the `SignUp` resource, which reuses the existing sign-up attempt ID if it exists. ([#4720](https://github.com/clerk/javascript/pull/4720)) by [@kostaspt](https://github.com/kostaspt)
+
+  - Fix a ticket flow issue on `<SignUp />` component, where in some rare cases the initial ticket/context is lost, because of creating a new sign-up attempt ID.
+
+- Expand Keyless popover when a user signs-in. ([#4969](https://github.com/clerk/javascript/pull/4969)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Fix error message for invalid captcha on sign-up ([#4967](https://github.com/clerk/javascript/pull/4967)) by [@anagstef](https://github.com/anagstef)
+
+- Fixes an issue where Clerk's internal API client was using the incorrect domain for satellite apps. ([#4974](https://github.com/clerk/javascript/pull/4974)) by [@brkalow](https://github.com/brkalow)
+
+- Remove nested <p> tag from the Keyless popover. ([#4978](https://github.com/clerk/javascript/pull/4978)) by [@kaftarmery](https://github.com/kaftarmery)
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84), [`b3023eb4b7ae06cd0e6f8bf593f96cace2a7a8a1`](https://github.com/clerk/javascript/commit/b3023eb4b7ae06cd0e6f8bf593f96cace2a7a8a1), [`b72ce8692629cd61445542bf94ed3540a3859378`](https://github.com/clerk/javascript/commit/b72ce8692629cd61445542bf94ed3540a3859378)]:
+  - @clerk/shared@2.20.13
+  - @clerk/types@4.43.0
+  - @clerk/localizations@3.9.14
+
 ## 5.47.0
 
 ### Minor Changes

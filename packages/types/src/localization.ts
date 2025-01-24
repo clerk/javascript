@@ -100,7 +100,9 @@ type _LocalizationResource = {
   signUp: {
     start: {
       title: LocalizationValue;
+      titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleCombined: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
       actionLink__use_phone: LocalizationValue;
@@ -174,6 +176,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       titleCombined: LocalizationValue;
       subtitle: LocalizationValue;
+      subtitleCombined: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
       actionLink__use_email: LocalizationValue;
@@ -484,7 +487,11 @@ type _LocalizationResource = {
     emailAddressPage: {
       title: LocalizationValue;
       verifyTitle: LocalizationValue;
+      formHint: LocalizationValue;
       emailCode: {
+        /**
+         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
@@ -492,11 +499,18 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
       emailLink: {
+        /**
+         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
+      };
+      enterpriseSSOLink: {
+        formSubtitle: LocalizationValue;
+        formButton: LocalizationValue;
       };
       removeResource: {
         title: LocalizationValue;
@@ -745,6 +759,7 @@ type _LocalizationResource = {
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
+      action__search: LocalizationValue;
       start: {
         headerTitle__members: LocalizationValue;
         headerTitle__invitations: LocalizationValue;

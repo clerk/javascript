@@ -24,7 +24,7 @@ export function isResetPasswordStrategy(strategy: TSignInStrategy | null | undef
   if (!strategy) {
     return false;
   }
-  return resetPasswordStrategies.has(strategy as TSignInStrategy);
+  return resetPasswordStrategies.has(strategy);
 }
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {

@@ -44,7 +44,6 @@ export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOpt
  */
 export type {
   OrganizationMembershipRole,
-  // Webhook event types
   // Resources
   AllowlistIdentifier,
   Client,

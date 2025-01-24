@@ -131,6 +131,7 @@ export const frFR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
@@ -464,6 +465,7 @@ export const frFR: LocalizationResource = {
       actionText: "Vous n'avez pas encore de compte ?",
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: undefined,
       title: "S'identifier",
       titleCombined: undefined,
     },
@@ -544,7 +546,9 @@ export const frFR: LocalizationResource = {
       actionLink__use_phone: 'Utiliser votre téléphone',
       actionText: 'Vous avez déjà un compte ?',
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: 'pour continuer vers {{applicationName}}',
       title: 'Créez votre compte',
+      titleCombined: 'Créez votre compte',
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
@@ -702,6 +706,11 @@ export const frFR: LocalizationResource = {
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec cette adresse e-mail.',

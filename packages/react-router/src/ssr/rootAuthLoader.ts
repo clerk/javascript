@@ -71,7 +71,7 @@ export const rootAuthLoader: RootAuthLoader = async (
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
       return injectRequestStateIntoResponse(handlerResult, requestState, args.context);
-    } catch (e) {
+    } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
   }
@@ -85,7 +85,7 @@ export const rootAuthLoader: RootAuthLoader = async (
         requestState,
         args.context,
       );
-    } catch (e) {
+    } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
   }

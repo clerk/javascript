@@ -129,6 +129,7 @@ export const nlNL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Uitnodigen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Verwijder lid',
         tableHeader__actions: 'Acties',
@@ -460,6 +461,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Geen account?',
       actionText__join_waitlist: 'Nog geen account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Inloggen',
       titleCombined: undefined,
     },
@@ -539,7 +541,9 @@ export const nlNL: LocalizationResource = {
       actionLink__use_phone: 'Gebruik telefoon',
       actionText: 'Heb je al een account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
+      subtitleCombined: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
+      titleCombined: 'Maak je account aan',
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -695,6 +699,11 @@ export const nlNL: LocalizationResource = {
         resendButton: 'Verstuur link opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} zal verwijderd worden uit dit account.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit e-mailadres.',
