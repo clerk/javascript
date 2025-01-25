@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.44.0
+
+### Minor Changes
+
+- Deprecated `userProfile.emailAddressPage.emailLink.formHint` and `userProfile.emailAddressPage.emailCode.formHint` in favor of `userProfile.emailAddressPage.formHint` ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.43.0
 
 ### Minor Changes

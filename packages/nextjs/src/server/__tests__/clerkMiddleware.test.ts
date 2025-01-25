@@ -47,7 +47,6 @@ afterAll(() => {
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-// eslint-disable-next-line import/no-unresolved
 vi.mock(import('../constants.js'), async importOriginal => {
   const actual = await importOriginal();
   return {
