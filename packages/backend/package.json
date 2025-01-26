@@ -17,6 +17,7 @@
       "edge-light": "./dist/runtime/browser/crypto.mjs",
       "worker": "./dist/runtime/browser/crypto.mjs",
       "browser": "./dist/runtime/browser/crypto.mjs",
+      "bun": "./dist/runtime/browser/crypto.mjs",
       "node": {
         "require": "./dist/runtime/node/crypto.js",
         "import": "./dist/runtime/node/crypto.mjs"
