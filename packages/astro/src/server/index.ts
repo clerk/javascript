@@ -35,6 +35,10 @@ export { clerkMiddleware } from './clerk-middleware';
 export { createRouteMatcher } from './route-matcher';
 export { clerkClient } from './clerk-client';
 
+export { buildClerkHotloadScript } from './build-clerk-hotload-script';
+
+export { getClientSafeEnv } from './get-safe-env';
+
 /**
  * This will be used to define types of Astro.Locals inside `env.d.ts`
  */
