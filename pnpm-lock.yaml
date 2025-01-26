@@ -835,8 +835,8 @@ importers:
         specifier: workspace:^
         version: link:../types
       cookie:
-        specifier: 0.7.0
-        version: 0.7.0
+        specifier: 0.7.2
+        version: 0.7.2
       react:
         specifier: catalog:peer-react
         version: 18.3.1
@@ -26852,7 +26852,7 @@ snapshots:
 
   light-my-request@6.1.0:
     dependencies:
-      cookie: 0.7.0
+      cookie: 0.7.2
       process-warning: 4.0.0
       set-cookie-parser: 2.6.0
 
