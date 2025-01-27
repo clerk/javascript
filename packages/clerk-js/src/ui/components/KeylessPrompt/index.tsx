@@ -22,6 +22,30 @@ const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
+const baseElementStyles = css`
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  line-height: 1.5;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    segoe ui,
+    helvetica neue,
+    helvetica,
+    Cantarell,
+    Ubuntu,
+    roboto,
+    noto,
+    arial,
+    sans-serif;
+  text-decoration: none;
+`;
+
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -92,30 +116,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
       return '';
     }
   }, [redirectUrlParts]);
-
-  const baseElementStyles = css`
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-    background: none;
-    border: none;
-    line-height: 1.5;
-    font-family:
-      -apple-system,
-      BlinkMacSystemFont,
-      avenir next,
-      avenir,
-      segoe ui,
-      helvetica neue,
-      helvetica,
-      Cantarell,
-      Ubuntu,
-      roboto,
-      noto,
-      arial,
-      sans-serif;
-    text-decoration: none;
-  `;
 
   const mainCTAStyles = css`
     ${baseElementStyles};
