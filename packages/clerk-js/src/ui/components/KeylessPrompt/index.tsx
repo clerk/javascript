@@ -39,7 +39,30 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
   const isForcedExpanded = claimed || success || isExpanded;
 
-  const urlToDashboard = useMemo(() => {
+  const redirectUrlParts = useMemo(() => {
+    try {
+      new URL(_props.copyKeysUrl);
+    } catch {
+      return {};
+    }
+
+    const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
+
+    const match = _props.copyKeysUrl.match(regex);
+
+    if (!match) {
+      return {};
+    }
+
+    // Extracting base domain, app ID with prefix, and instanceId with prefix
+    return {
+      baseDomain: `https://${match[1]}`,
+      appId: `app_${match[2]}`,
+      instanceId: `ins_${match[3]}`,
+    };
+  }, []);
+
+  const claimUrlToDashboard = useMemo(() => {
     if (claimed) {
       return _props.copyKeysUrl;
     }
@@ -49,6 +72,26 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
     url.searchParams.append('return_url', window.location.href);
     return url.href;
   }, [claimed, _props.copyKeysUrl, _props.claimUrl]);
+
+  const instanceUrlToDashboard = useMemo(() => {
+    try {
+      const url = new URL(
+        `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/user-authentication/email-phone-username`,
+      );
+      return url.href;
+    } catch {
+      return '';
+    }
+  }, [redirectUrlParts]);
+
+  const getKeysUrlFromLastActive = useMemo(() => {
+    try {
+      const url = new URL(`${redirectUrlParts.baseDomain}/last-active?path=api-keys`);
+      return url.href;
+    } catch {
+      return '';
+    }
+  }, [redirectUrlParts]);
 
   const baseElementStyles = css`
     box-sizing: border-box;
@@ -375,7 +418,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                   <Link
                     isExternal
                     aria-label='Go to Dashboard to configure settings'
-                    href='https://dashboard.clerk.com/last-active?path=user-authentication/email-phone-username'
+                    href={instanceUrlToDashboard}
                     sx={t => ({
                       color: t.colors.$whiteAlpha600,
                       textDecoration: 'underline solid',
@@ -413,6 +456,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 }}
                 css={css`
                   ${mainCTAStyles};
+
                   &:hover {
                     background: #4b4b4b;
                     transition: all 120ms ease-in-out;
@@ -431,7 +475,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 })}
               >
                 <a
-                  href={urlToDashboard}
+                  href={claimUrlToDashboard}
                   target='_blank'
                   rel='noopener noreferrer'
                   css={css`
@@ -481,7 +525,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                     />
 
                     <a
-                      href='https://dashboard.clerk.com/last-active?path=api-keys'
+                      href={getKeysUrlFromLastActive}
                       target='_blank'
                       rel='noopener noreferrer'
                       css={css`
@@ -489,6 +533,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                         color: #ffffff9e;
                         font-size: 0.75rem;
                         transition: color 120ms ease-out;
+
                         :hover {
                           color: #ffffffcf;
                           text-decoration: none;
