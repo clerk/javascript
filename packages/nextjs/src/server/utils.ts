@@ -4,13 +4,11 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
-import AES from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { canUseKeyless } from '../utils/feature-flags';
+import { AES, encUtf8, hmacSHA1 } from '../vendor/crypto-js';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,
@@ -34,7 +32,7 @@ export const setRequestHeadersOnNextResponse = (
   if (!res.headers.get(OVERRIDE_HEADERS)) {
     // Emulate a user setting overrides by explicitly adding the required nextjs headers
     // https://github.com/vercel/next.js/pull/41380
-    // @ts-expect-error
+    // @ts-expect-error -- property keys does not exist on type Headers
     res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
     req.headers.forEach((val, key) => {
       res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);

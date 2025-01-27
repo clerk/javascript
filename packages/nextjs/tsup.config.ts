@@ -15,6 +15,7 @@ export default defineConfig(overrideOptions => {
       '!./src/**/*.test.{ts,tsx}',
       '!./src/**/server-actions.ts',
       '!./src/**/keyless-actions.ts',
+      '!./src/vendor/**',
     ],
     // We want to preserve original file structure
     // so that the "use client" directives are not lost
@@ -22,6 +23,7 @@ export default defineConfig(overrideOptions => {
     bundle: false,
     clean: true,
     minify: false,
+    noExternal: ['crypto-js'],
     external: ['#safe-node-apis'],
     sourcemap: true,
     legacyOutput: true,
@@ -43,6 +45,9 @@ export default defineConfig(overrideOptions => {
     outDir: './dist/cjs',
   };
 
+  /**
+   * When server actions are built with sourcemaps, Next.js does not resolve the sourcemap URLs during build and so browser dev tools attempt to load source maps for these files from incorrect locations
+   */
   const serverActionsEsm: Options = {
     ...esm,
     entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
@@ -52,6 +57,31 @@ export default defineConfig(overrideOptions => {
   const serverActionsCjs: Options = {
     ...cjs,
     entry: ['./src/**/server-actions.ts', './src/**/keyless-actions.ts'],
+    sourcemap: false,
+  };
+
+  /**
+   * We vendor certain dependencies to control the output and minimize transitive dependency surface area.
+   */
+  const vendorsEsm: Options = {
+    ...esm,
+    bundle: true,
+    minify: true,
+    entry: ['./src/vendor/**'],
+    outDir: './dist/esm/vendor',
+    legacyOutput: false,
+    outExtension: () => ({
+      js: '.js',
+    }),
+    sourcemap: false,
+  };
+
+  const vendorsCjs: Options = {
+    ...cjs,
+    bundle: true,
+    minify: true,
+    entry: ['./src/vendor/**'],
+    outDir: './dist/cjs/vendor',
     sourcemap: false,
   };
 
@@ -73,5 +103,5 @@ export default defineConfig(overrideOptions => {
     moveKeylessActions('esm'),
     moveKeylessActions('cjs'),
     shouldPublish && 'pnpm publish:local',
-  ])(esm, cjs, serverActionsEsm, serverActionsCjs);
+  ])(esm, cjs, serverActionsEsm, serverActionsCjs, vendorsEsm, vendorsCjs);
 });
