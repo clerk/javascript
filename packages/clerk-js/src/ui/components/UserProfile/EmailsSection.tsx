@@ -119,7 +119,7 @@ const EmailRow = ({
         </Flex>
         <EmailMenu
           email={email}
-          resetActionRootValue={() => {
+          removeOnClick={() => {
             setActionRootValue(null);
           }}
         />
@@ -140,13 +140,7 @@ const EmailRow = ({
   );
 };
 
-const EmailMenu = ({
-  email,
-  resetActionRootValue,
-}: {
-  email: EmailAddressResource;
-  resetActionRootValue?: () => void;
-}) => {
+const EmailMenu = ({ email, removeOnClick }: { email: EmailAddressResource; removeOnClick?: () => void }) => {
   const card = useCardState();
   const { user } = useUser();
   const { open } = useActionContext();
@@ -181,7 +175,7 @@ const EmailMenu = ({
         isDestructive: true,
         onClick: () => {
           open('remove');
-          resetActionRootValue?.();
+          removeOnClick?.();
         },
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
