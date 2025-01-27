@@ -48,9 +48,7 @@
   },
   "types": "./dist/types/index.d.ts",
   "files": [
-    "dist",
-    "server",
-    "errors"
+    "dist"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
