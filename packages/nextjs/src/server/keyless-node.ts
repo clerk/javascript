@@ -209,4 +209,47 @@ function removeKeyless() {
   unlockFileWriting();
 }
 
-export { createOrReadKeyless, removeKeyless };
+function hasSrcAppDir() {
+  const { existsSync } = safeNodeRuntimeFs();
+  const path = safeNodeRuntimePath();
+
+  const projectWithAppSrc = path.join(process.cwd(), 'src', 'app');
+
+  return !!existsSync(projectWithAppSrc);
+}
+
+function suggestMiddlewareLocation() {
+  const suggestionMessage = (to?: 'src/', from?: 'src/app/' | 'app/') =>
+    `Clerk: Move your middleware file to ./${to || ''}middleware.ts. Currently located at ./${from || ''}middleware.ts`;
+
+  const { existsSync } = safeNodeRuntimeFs();
+  const path = safeNodeRuntimePath();
+
+  const projectWithAppSrcPath = path.join(process.cwd(), 'src', 'app');
+  const projectWithAppPath = path.join(process.cwd(), 'app');
+
+  if (existsSync(projectWithAppSrcPath)) {
+    if (existsSync(path.join(projectWithAppSrcPath, 'middleware.ts'))) {
+      return suggestionMessage('src/', 'src/app/');
+    }
+
+    if (existsSync(path.join(process.cwd(), 'middleware.ts'))) {
+      return suggestionMessage('src/');
+    }
+
+    // default error
+    return undefined;
+  }
+
+  if (existsSync(projectWithAppPath)) {
+    if (existsSync(path.join(projectWithAppPath, 'middleware.ts'))) {
+      return suggestionMessage(undefined, 'app/');
+    }
+    // default error
+    return undefined;
+  }
+
+  return undefined;
+}
+
+export { createOrReadKeyless, removeKeyless, suggestMiddlewareLocation, hasSrcAppDir };
