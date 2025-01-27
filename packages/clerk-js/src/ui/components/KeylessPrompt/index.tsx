@@ -46,6 +46,36 @@ const baseElementStyles = css`
   text-decoration: none;
 `;
 
+/**
+ * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
+ */
+function withLastActiveFallback(cb: () => string): string {
+  try {
+    return cb();
+  } catch {
+    return 'https://dashboard.clerk.com/last-active';
+  }
+}
+
+function handleDashboardUrlParsing(url: string) {
+  // make sure this is a valid url
+  const __url = new URL(url);
+  const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
+
+  const match = __url.href.match(regex);
+
+  if (!match) {
+    throw new Error('invalid value dashboard url structure');
+  }
+
+  // Extracting base domain, app ID with prefix, and instanceId with prefix
+  return {
+    baseDomain: `https://${match[1]}`,
+    appId: `app_${match[2]}`,
+    instanceId: `ins_${match[3]}`,
+  };
+}
+
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,30 +92,6 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   const appName = environment.displayConfig.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
-
-  const redirectUrlParts = useMemo(() => {
-    try {
-      new URL(_props.copyKeysUrl);
-    } catch {
-      return {};
-    }
-
-    const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
-
-    const match = _props.copyKeysUrl.match(regex);
-
-    if (!match) {
-      return {};
-    }
-
-    // Extracting base domain, app ID with prefix, and instanceId with prefix
-    return {
-      baseDomain: `https://${match[1]}`,
-      appId: `app_${match[2]}`,
-      instanceId: `ins_${match[3]}`,
-    };
-  }, []);
-
   const claimUrlToDashboard = useMemo(() => {
     if (claimed) {
       return _props.copyKeysUrl;
@@ -98,24 +104,22 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   }, [claimed, _props.copyKeysUrl, _props.claimUrl]);
 
   const instanceUrlToDashboard = useMemo(() => {
-    try {
+    return withLastActiveFallback(() => {
+      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
       const url = new URL(
         `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/user-authentication/email-phone-username`,
       );
       return url.href;
-    } catch {
-      return '';
-    }
-  }, [redirectUrlParts]);
+    });
+  }, [_props.copyKeysUrl]);
 
   const getKeysUrlFromLastActive = useMemo(() => {
-    try {
+    return withLastActiveFallback(() => {
+      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
       const url = new URL(`${redirectUrlParts.baseDomain}/last-active?path=api-keys`);
       return url.href;
-    } catch {
-      return '';
-    }
-  }, [redirectUrlParts]);
+    });
+  }, [_props.copyKeysUrl]);
 
   const mainCTAStyles = css`
     ${baseElementStyles};
