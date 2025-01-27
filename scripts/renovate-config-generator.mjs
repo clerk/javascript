@@ -30,7 +30,7 @@ const rules = new Map();
  */
 const defaultRules = [
   {
-    matchManagers: ['npm'],
+    matchManagers: ['pnpm'],
     matchDepTypes: ['engines'],
     matchPackageNames: ['node'],
     enabled: false,
@@ -199,7 +199,7 @@ const renovateConfig = {
   rangeStrategy: 'bump',
   prHourlyLimit: 4,
   prConcurrentLimit: 16,
-  postUpdateOptions: ['npmDedupe'],
+  postUpdateOptions: ['pnpmDedupe'],
   semanticCommitScope: 'repo',
   commitMessageLowerCase: 'never',
   packageRules: Array.from(rules.values()).flat().concat(defaultRules),
