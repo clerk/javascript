@@ -5,8 +5,8 @@ import { useClerk } from '../composables/useClerk';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
 type Props = RedirectUrlProp & {
-mode?: 'modal' | 'redirect';
-}
+  mode?: 'modal' | 'redirect';
+};
 
 const props = defineProps<Props>();
 
@@ -20,7 +20,7 @@ function getChildComponent() {
 }
 
 function clickHandler() {
-    void clerk.value?.authenticateWithMetamask({ redirectUrl: props.redirectUrl || undefined });
+  void clerk.value?.authenticateWithMetamask({ redirectUrl: props.redirectUrl || undefined });
 }
 </script>
 
