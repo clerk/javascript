@@ -1,5 +1,6 @@
 {
-  "name": "chrome-extension",
+  "name": "browser-extension",
+  "private": true,
   "displayName": "Clerk Chrome Extension Demo",
   "version": "0.0.1",
   "description": "A feature rich implementation of Clerk with a Plasmo-based Chrome Extension.",
@@ -11,10 +12,11 @@
     "debug:firefox": "plasmo dev --target=firefox-mv2 --verbose",
     "dev": "plasmo dev",
     "dev:firefox": "plasmo dev --target=firefox-mv2",
-    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev"
+    "start:firefox": "web-ext run --source-dir ./build/firefox-mv2-dev",
+    "yalc:add": "pnpm yalc add @clerk/chrome-extension"
   },
   "dependencies": {
-    "@clerk/chrome-extension": "file:../../packages/chrome-extension",
+    "@clerk/chrome-extension": "file:.yalc/@clerk/chrome-extension",
     "plasmo": "0.89.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -41,6 +43,7 @@
     ],
     "host_permissions": [
       "$CLERK_FRONTEND_API/*",
+      "$PLASMO_PUBLIC_CLERK_SYNC_HOST/*",
       "http://localhost/*"
     ],
     "key": "$CRX_PUBLIC_KEY"

@@ -211,15 +211,15 @@ ${error.getFullMessage()}`,
         return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
-      throw retryError;
+      throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
     }
 
-    throw error;
+    throw new Error(error?.message || 'Clerk: Handshake failed.');
   }
 
   async function refreshToken(
     authenticateContext: AuthenticateContext,
-  ): Promise<{ data: string; error: null } | { data: null; error: any }> {
+  ): Promise<{ data: string[]; error: null } | { data: null; error: any }> {
     // To perform a token refresh, apiClient must be defined.
     if (!options.apiClient) {
       return {
@@ -273,14 +273,16 @@ ${error.getFullMessage()}`,
 
     try {
       // Perform the actual token refresh.
-      const tokenResponse = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
+      const response = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
+        format: 'cookie',
+        suffixed_cookies: authenticateContext.usesSuffixedCookies(),
         expired_token: expiredSessionToken || '',
         refresh_token: refreshToken || '',
         request_origin: authenticateContext.clerkUrl.origin,
         // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
         request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
       });
-      return { data: tokenResponse.jwt, error: null };
+      return { data: response.cookies, error: null };
     } catch (err: any) {
       if (err?.errors?.length) {
         if (err.errors[0].code === 'unexpected_error') {
@@ -313,11 +315,23 @@ ${error.getFullMessage()}`,
 
   async function attemptRefresh(
     authenticateContext: AuthenticateContext,
-  ): Promise<{ data: { jwtPayload: JwtPayload; sessionToken: string }; error: null } | { data: null; error: any }> {
-    const { data: sessionToken, error } = await refreshToken(authenticateContext);
-    if (!sessionToken) {
+  ): Promise<
+    | { data: { jwtPayload: JwtPayload; sessionToken: string; headers: Headers }; error: null }
+    | { data: null; error: any }
+  > {
+    const { data: cookiesToSet, error } = await refreshToken(authenticateContext);
+    if (!cookiesToSet || cookiesToSet.length === 0) {
       return { data: null, error };
     }
+
+    const headers = new Headers();
+    let sessionToken = '';
+    cookiesToSet.forEach((x: string) => {
+      headers.append('Set-Cookie', x);
+      if (getCookieName(x).startsWith(constants.Cookies.Session)) {
+        sessionToken = getCookieValue(x);
+      }
+    });
 
     // Since we're going to return a signedIn response, we need to decode the data from the new sessionToken.
     const { data: jwtPayload, errors } = await verifyToken(sessionToken, authenticateContext);
@@ -330,7 +344,7 @@ ${error.getFullMessage()}`,
         },
       };
     }
-    return { data: { jwtPayload, sessionToken }, error: null };
+    return { data: { jwtPayload, sessionToken, headers }, error: null };
   }
 
   function handleMaybeHandshakeStatus(
@@ -521,7 +535,11 @@ ${error.getFullMessage()}`,
     }
 
     // Multi-domain development sync flow
-    if (authenticateContext.instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
+    if (
+      authenticateContext.instanceType === 'development' &&
+      isRequestEligibleForMultiDomainSync &&
+      !authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.ClerkSynced)
+    ) {
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
@@ -529,10 +547,6 @@ ${error.getFullMessage()}`,
       redirectURL.searchParams.append(
         constants.QueryParameters.ClerkRedirectUrl,
         authenticateContext.clerkUrl.toString(),
-      );
-      redirectURL.searchParams.append(
-        constants.QueryParameters.HandshakeReason,
-        AuthErrorReason.SatelliteCookieNeedsSyncing,
       );
       const headers = new Headers({ [constants.Headers.Location]: redirectURL.toString() });
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
@@ -554,11 +568,9 @@ ${error.getFullMessage()}`,
         );
       }
       redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.ClerkSynced, 'true');
-      const authErrReason = AuthErrorReason.PrimaryRespondsToSyncing;
-      redirectBackToSatelliteUrl.searchParams.append(constants.QueryParameters.HandshakeReason, authErrReason);
 
       const headers = new Headers({ [constants.Headers.Location]: redirectBackToSatelliteUrl.toString() });
-      return handleMaybeHandshakeStatus(authenticateContext, authErrReason, '', headers);
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.PrimaryRespondsToSyncing, '', headers);
     }
     /**
      * End multi-domain sync flows
@@ -633,7 +645,7 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
-        return signedIn(authenticateContext, data.jwtPayload, undefined, data.sessionToken);
+        return signedIn(authenticateContext, data.jwtPayload, data.headers, data.sessionToken);
       }
 
       // If there's any error, simply fallback to the handshake flow including the reason as a query parameter.

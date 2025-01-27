@@ -1,9 +1,11 @@
 import { useClerk } from '@clerk/shared/react';
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
+import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -20,6 +22,9 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
+  isCombinedFlow: boolean;
+  emailLinkRedirectUrl: string;
+  ssoCallbackUrl: string;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -31,6 +36,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
+  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -71,6 +77,27 @@ export const useSignUpContext = (): SignUpContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
+  const authQueryString = redirectUrls.toSearchParams().toString();
+
+  const emailLinkRedirectUrl =
+    ctx.emailLinkRedirectUrl ??
+    buildRedirectUrl({
+      routing: ctx.routing,
+      baseUrl: signUpUrl,
+      authQueryString,
+      path: ctx.path,
+      endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    });
+  const ssoCallbackUrl =
+    ctx.ssoCallbackUrl ??
+    buildRedirectUrl({
+      routing: ctx.routing,
+      baseUrl: signUpUrl,
+      authQueryString,
+      path: ctx.path,
+      endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+    });
+
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
@@ -83,9 +110,12 @@ export const useSignUpContext = (): SignUpContextType => {
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
+    emailLinkRedirectUrl,
+    ssoCallbackUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: redirectUrls.toSearchParams().toString(),
+    authQueryString,
+    isCombinedFlow,
   };
 };

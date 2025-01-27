@@ -4,11 +4,11 @@ import type { AccountlessApplication } from '@clerk/backend';
 import type { PropsWithChildren } from 'react';
 import { useEffect } from 'react';
 
-import { canUseKeyless__client } from '../../utils/feature-flags';
+import { canUseKeyless } from '../../utils/feature-flags';
 
 export function KeylessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   useEffect(() => {
-    if (canUseKeyless__client) {
+    if (canUseKeyless) {
       void import('../keyless-actions.js').then(m =>
         m.syncKeylessConfigAction({
           ...props,

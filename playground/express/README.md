@@ -13,7 +13,7 @@ Execute in current folder:
 touch .env # set PUBLISHABLE_KEY, SECRET_KEY and JWT_KEY from Clerk Dashboard API keys
 npm i
 rm -rf node_modules/@clerk
-yalc add @clerk/clerk-sdk-node # also add the packages you made changes to, e.g. @clerk/backend @clerk/types.
+yalc add @clerk/express # also add the packages you made changes to, e.g. @clerk/backend @clerk/types.
 ```
 
 ## Getting Started

@@ -2,23 +2,38 @@ import type { AuthObject } from '@clerk/backend';
 import type { RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
+  CheckAuthorizationFromSessionClaims,
+  CheckAuthorizationParamsFromSessionClaims,
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
+  OrganizationCustomPermissionKey,
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
 
-type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
+type AuthProtectOptions = {
+  /**
+   * The URL to redirect the user to if they are not authorized.
+   */
+  unauthorizedUrl?: string;
+  /**
+   * The URL to redirect the user to if they are not authenticated.
+   */
+  unauthenticatedUrl?: string;
+};
 
 /**
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
-  (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): Promise<SignedInAuthObject>;
+  <P extends OrganizationCustomPermissionKey>(
+    params?: CheckAuthorizationParamsFromSessionClaims<P>,
+    options?: AuthProtectOptions,
+  ): Promise<SignedInAuthObject>;
 
   (
-    params?: (has: CheckAuthorizationWithCustomPermissions) => boolean,
+    params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
     options?: AuthProtectOptions,
   ): Promise<SignedInAuthObject>;
 

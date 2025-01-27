@@ -12,10 +12,9 @@ export type LoaderOptions = {
   publishableKey?: string;
   jwtKey?: string;
   secretKey?: string;
-  authorizedParties?: [];
   signInUrl?: string;
   signUpUrl?: string;
-} & Pick<VerifyTokenOptions, 'audience'> &
+} & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
   MultiDomainAndOrProxy &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &

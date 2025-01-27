@@ -1,8 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect, useMemo } from 'react';
 
-import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
+import { descriptors, Flex, Flow, localizationKeys, useLocalizations } from '../../customizables';
 import {
   Card,
   Header,
@@ -13,7 +13,7 @@ import {
 import { useCardState } from '../../elements/contexts';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
-import { buildRequest, handleError, useFormControl } from '../../utils';
+import { buildRequest, createUsernameError, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import {
@@ -30,12 +30,18 @@ function _SignUpContinue() {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { attributes } = userSettings;
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
+  const { attributes, usernameSettings } = userSettings;
+  const { t, locale } = useLocalizations();
+  const {
+    afterSignUpUrl,
+    signInUrl,
+    unsafeMetadata,
+    initialValues = {},
+    isCombinedFlow: _isCombinedFlow,
+  } = useSignUpContext();
   const signUp = useCoreSignUp();
-  const options = useOptions();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
+  const isCombinedFlow = !!(_isCombinedFlow && !!isWithinSignInContext);
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -62,6 +68,8 @@ function _SignUpContinue() {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+      transformer: value => value.trim(),
+      buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
     }),
     phoneNumber: useFormControl('phoneNumber', initialValues.phoneNumber || '', {
       type: 'tel',

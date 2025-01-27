@@ -19,7 +19,7 @@
     "clerk-dev": "bin/cli.js"
   },
   "scripts": {
-    "lint": "eslint src/"
+    "lint": "eslint src"
   },
   "dependencies": {
     "commander": "^12.1.0",
@@ -28,11 +28,7 @@
     "globby": "^14.0.2",
     "jscodeshift": "^0.16.1"
   },
-  "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
-    "@types/node": "^20.14.8",
-    "typescript": "catalog:repo"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
   },

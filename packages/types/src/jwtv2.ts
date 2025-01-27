@@ -97,17 +97,16 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_role?: OrganizationCustomRoleKey;
 
   /**
-   * Active organization role
+   * Active organization permissions
    */
   org_permissions?: OrganizationCustomPermissionKey[];
 
   /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   * @experimental This API is experimental and may change at any moment.
+   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
    */
-  fva?: [number, number];
+  fva?: [fistFactorAge: number, secondFactorAge: number];
 
   /**
    * Any other JWT Claim Set member.

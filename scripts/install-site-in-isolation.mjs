@@ -1,6 +1,5 @@
 #!/usr/bin/env zx
 
-/* eslint-disable turbo/no-undeclared-env-vars */
 import { cp, mkdir, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

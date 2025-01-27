@@ -84,33 +84,42 @@ describe('ClerkMiddleware type tests', () => {
 
   it('fails for unknown props', () => {
     // @ts-expect-error - unknown prop
-    clerkMiddlewareMock({ hello: '' });
+    void clerkMiddlewareMock({ hello: '' });
   });
 
   it('can be used with a handler and an optional options object', () => {
     clerkMiddlewareMock(
-      async (auth, request, event) => {
+      async (auth, request) => {
         const { getToken } = await auth();
         await getToken();
         request.cookies.clear();
-        event.sourcePage;
       },
       { secretKey: '', publishableKey: '' },
     );
   });
 
   it('can be used with just a handler and an optional options object', () => {
-    clerkMiddlewareMock(async (auth, request, event) => {
+    clerkMiddlewareMock(async (auth, request) => {
       const { getToken } = await auth();
       await getToken();
       request.cookies.clear();
-      event.sourcePage;
     });
   });
 
   it('can be used with just an optional options object', () => {
     clerkMiddlewareMock({ secretKey: '', publishableKey: '' });
     clerkMiddlewareMock();
+  });
+
+  it('prevents usage of system permissions with auth.has()', () => {
+    clerkMiddlewareMock(async (auth, _event, _request) => {
+      // @ts-expect-error - system permissions are not allowed
+      (await auth()).has({ permission: 'org:sys_foo' });
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect(has => has({ permission: 'org:sys_foo' }));
+      // @ts-expect-error - system permissions are not allowed
+      await auth.protect({ permission: 'org:sys_foo' });
+    });
   });
 
   describe('Multi domain', () => {
@@ -591,7 +600,7 @@ describe('clerkMiddleware(params)', () => {
 
   describe('debug', () => {
     beforeEach(() => {
-      global.console.log.mockClear();
+      (global.console.log as ReturnType<typeof vi.fn>).mockClear();
     });
 
     it('outputs debug logs when used with only params', async () => {

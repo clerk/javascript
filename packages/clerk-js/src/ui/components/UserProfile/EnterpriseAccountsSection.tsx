@@ -1,4 +1,3 @@
-import { iconImageUrl } from '@clerk/shared/constants';
 import { useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/types';
 
@@ -52,7 +51,7 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
       <EnterpriseAccountProviderIcon account={account} />
       <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
         <Flex
-          gap={2}
+          gap={1}
           center
         >
           <Text
@@ -83,7 +82,6 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
   const { provider, enterpriseConnection } = account;
 
-  const isCustomOAuthProvider = provider.startsWith('oauth_custom_');
   const providerWithoutPrefix = provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
   const connectionName = enterpriseConnection?.name ?? providerWithoutPrefix;
 
@@ -93,15 +91,6 @@ const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccount
     sx: (theme: any) => ({ width: theme.sizes.$4 }),
     elementId: descriptors.enterpriseButtonsProviderIcon.setId(account.provider),
   };
-
-  if (!isCustomOAuthProvider) {
-    return (
-      <Image
-        {...commonImageProps}
-        src={iconImageUrl(providerWithoutPrefix)}
-      />
-    );
-  }
 
   return enterpriseConnection?.logoPublicUrl ? (
     <Image

@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import fs from 'fs-extra';
 
 import { constants } from '../constants';
-import { environmentConfig } from '../models/environment.js';
+import { environmentConfig } from '../models/environment';
 
 const getInstanceKeys = () => {
   let keys: Record<string, { pk: string; sk: string }>;
@@ -113,14 +113,15 @@ const withWaitlistdMode = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-waitlist-mode').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-waitlist-mode').pk);
 
-const withCombinedFlow = withEmailCodes
+const withSignInOrUpFlow = withEmailCodes
   .clone()
-  .setId('withCombinedFlow')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
-  .setEnvVariable('public', 'EXPERIMENTAL_COMBINED_FLOW', 'true')
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-in');
+  .setId('withSignInOrUpFlow')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
+
+const withSignInOrUpEmailLinksFlow = withEmailLinks
+  .clone()
+  .setId('withSignInOrUpEmailLinksFlow')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
 export const envs = {
   base,
@@ -138,5 +139,6 @@ export const envs = {
   withRestrictedMode,
   withLegalConsent,
   withWaitlistdMode,
-  withCombinedFlow,
+  withSignInOrUpFlow,
+  withSignInOrUpEmailLinksFlow,
 } as const;

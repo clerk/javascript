@@ -2,8 +2,9 @@ import { constants } from '@clerk/backend/internal';
 
 import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
 import { createClerkClientWithOptions } from './createClerkClient';
+import { getHeader } from './headers-utils';
 import { clerkMiddlewareRequestDataStorage } from './middleware-storage';
-import { decryptClerkRequestData, getHeader } from './utils';
+import { decryptClerkRequestData } from './utils';
 
 /**
  * Constructs a BAPI client that accesses request data within the runtime.
@@ -18,6 +19,7 @@ const clerkClient = async () => {
     requestData = decryptClerkRequestData(encryptedRequestData);
   } catch (err) {
     if (err && isPrerenderingBailout(err)) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw err;
     }
   }

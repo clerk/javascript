@@ -22,20 +22,24 @@ export class CaptchaHeartbeat {
   }
 
   private async challengeAndSend() {
-    if (!this.clerk.client) {
+    if (!this.clerk.client || this.clientBypass()) {
       return;
     }
 
     try {
       const params = await this.captchaChallenge.invisible();
       await this.clerk.client.sendCaptchaToken(params);
-    } catch (e) {
+    } catch {
       // Ignore unhandled errors
     }
   }
 
   private isEnabled() {
     return !!this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
+  }
+
+  private clientBypass() {
+    return this.clerk.client?.captchaBypass;
   }
 
   private intervalInMs() {

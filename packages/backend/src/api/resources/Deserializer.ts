@@ -1,6 +1,7 @@
 import {
   AllowlistIdentifier,
   Client,
+  Cookies,
   DeletedObject,
   Email,
   EmailAddress,
@@ -72,6 +73,8 @@ function jsonToObject(item: any): any {
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
+    case ObjectType.Cookies:
+      return Cookies.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:

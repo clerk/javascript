@@ -131,6 +131,7 @@ export const frFR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
@@ -464,8 +465,9 @@ export const frFR: LocalizationResource = {
       actionText: "Vous n'avez pas encore de compte ?",
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: undefined,
       title: "S'identifier",
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Le code de vérification',
@@ -544,11 +546,13 @@ export const frFR: LocalizationResource = {
       actionLink__use_phone: 'Utiliser votre téléphone',
       actionText: 'Vous avez déjà un compte ?',
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: 'pour continuer vers {{applicationName}}',
       title: 'Créez votre compte',
+      titleCombined: 'Créez votre compte',
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Afficher plus de boutons sociaux',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     captcha_invalid:
@@ -556,7 +560,6 @@ export const frFR: LocalizationResource = {
     captcha_unavailable:
       "Inscription échouée en raison d'une validation de captcha non réussie. Veuillez actualiser la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     form_code_incorrect: 'Code incorrect',
-    form_identifier_exists: 'Cet identifiant existe déjà. Veuillez en renseigner un différent.',
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
@@ -584,6 +587,7 @@ export const frFR: LocalizationResource = {
     not_allowed_access: 'Accès non autorisé',
     organization_domain_blocked: "Ce domaine d'organisation est bloqué.",
     organization_domain_common: 'Ce domaine est trop courant pour une organisation.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: "Le quota de membres de l'organisation a été dépassé.",
     organization_minimum_permissions_needed: 'Permissions minimales nécessaires pour accéder à cette organisation.',
     passkey_already_exists: 'Cette clé de sécurité existe déjà.',
@@ -601,6 +605,7 @@ export const frFR: LocalizationResource = {
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -642,7 +647,6 @@ export const frFR: LocalizationResource = {
       },
     },
   },
-
   userButton: {
     action__addAccount: 'Ajouter un compte',
     action__manageAccount: 'Gérer son compte',
@@ -702,6 +706,11 @@ export const frFR: LocalizationResource = {
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec cette adresse e-mail.',
@@ -918,7 +927,6 @@ export const frFR: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Utiliser un portefeuille Web3',
     },
   },
-
   waitlist: {
     start: {
       actionLink: "Rejoindre la liste d'attente",

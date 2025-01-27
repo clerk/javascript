@@ -14,10 +14,38 @@ declare namespace NodeJS {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type NextClerkProviderProps = import('./types').NextClerkProviderProps;
+
 interface Window {
+  __clerk_internal_navigations: Record<
+    string,
+    {
+      fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
+      promisesBuffer: Array<() => void> | undefined;
+    }
+  >;
+  __clerk_internal_invalidateCachePromise: () => void | undefined;
+  __clerk_nav_await: Array<(value: void) => void>;
+  __clerk_nav: (to: string) => Promise<void>;
+
   __unstable__onBeforeSetActive: () => void | Promise<void>;
   __unstable__onAfterSetActive: () => void | Promise<void>;
+
+  next?: {
+    version: string;
+  };
 }
 
 declare const PACKAGE_NAME: string;
 declare const PACKAGE_VERSION: string;
+
+declare namespace globalThis {
+  // eslint-disable-next-line no-var
+  var __clerk_internal_keyless_logger:
+    | {
+        __cache: Map<string, { expiresAt: number }>;
+        log: (param: { cacheKey: string; msg: string }) => void;
+      }
+    | undefined;
+}

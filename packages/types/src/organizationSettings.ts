@@ -1,8 +1,7 @@
-import type { OrganizationSettingsJSONSnapshot } from 'snapshots';
-
 import type { ClerkResourceJSON } from './json';
 import type { OrganizationEnrollmentMode } from './organizationDomain';
 import type { ClerkResource } from './resource';
+import type { OrganizationSettingsJSONSnapshot } from './snapshots';
 
 export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   id: never;

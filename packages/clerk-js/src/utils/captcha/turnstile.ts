@@ -78,13 +78,12 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha(fallbackUrl: string) {
+async function loadCaptcha() {
   if (!window.turnstile) {
-    await loadCaptchaFromCloudflareURL()
-      .catch(() => loadCaptchaFromFAPIProxiedURL(fallbackUrl))
-      .catch(() => {
-        throw { captchaError: 'captcha_script_failed_to_load' };
-      });
+    await loadCaptchaFromCloudflareURL().catch(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw { captchaError: 'captcha_script_failed_to_load' };
+    });
   }
   return window.turnstile;
 }
@@ -100,16 +99,6 @@ async function loadCaptchaFromCloudflareURL() {
   }
 }
 
-async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
-  try {
-    return await loadScript(fallbackUrl, { defer: true });
-  } catch (err) {
-    // Rethrow with specific message
-    console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', fallbackUrl);
-    throw err;
-  }
-}
-
 /*
  * How this function works:
  * The widgetType is either 'invisible' or 'smart'.
@@ -118,9 +107,9 @@ async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
 export const getTurnstileToken = async (opts: CaptchaOptions) => {
-  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = opts;
+  const { siteKey, widgetType, invisibleSiteKey } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha: Turnstile = await loadCaptcha(scriptUrl);
+  const captcha: Turnstile = await loadCaptcha();
   const errorCodes: (string | number)[] = [];
 
   let captchaToken = '';
@@ -148,7 +137,6 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      visibleDiv.style.display = 'block';
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -178,12 +166,18 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             closeModal?.();
             resolve([token, id]);
           },
-          'before-interactive-callback': async () => {
+          'before-interactive-callback': () => {
             if (modalWrapperQuerySelector) {
               const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
               el?.style.setProperty('visibility', 'visible');
               el?.style.setProperty('pointer-events', 'all');
-              return;
+            } else {
+              const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+              if (visibleWidget) {
+                visibleWidget.style.maxHeight = 'unset';
+                visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
+                visibleWidget.style.marginBottom = '1.5rem';
+              }
             }
           },
           'error-callback': function (errorCode) {
@@ -226,6 +220,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
     };
@@ -238,7 +233,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     }
     const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleWidget) {
-      visibleWidget.style.display = 'none';
+      visibleWidget.style.maxHeight = '0';
+      visibleWidget.style.minHeight = 'unset';
+      visibleWidget.style.marginBottom = 'unset';
     }
   }
 

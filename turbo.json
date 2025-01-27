@@ -7,6 +7,7 @@
   "globalDependencies": [
     ".github/.cache-version",
     ".npmrc",
+    "eslint.config.mjs",
     "jest.*.ts",
     "package.json",
     "pnpm-lock.yaml",
@@ -17,18 +18,19 @@
   ],
   "globalEnv": [
     "CLERK_*",
+    "EXPO_PUBLIC_CLERK_*",
+    "NEXT_PHASE",
     "NEXT_PUBLIC_CLERK_*",
-    "PLASMO_PUBLIC_CLERK_*",
-    "PUBLIC_CLERK_*",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
+    "PLASMO_PUBLIC_CLERK_*",
+    "PUBLIC_CLERK_*",
+    "REACT_APP_CLERK_*",
+    "RSDOCTOR",
     "TZ",
     "VERCEL",
-    "VITE_CLERK_*",
-    "EXPO_PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*",
-    "NEXT_PHASE"
+    "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
   "tasks": {
@@ -154,7 +156,6 @@
       "dependsOn": [
         "@clerk/clerk-js#build",
         "@clerk/backend#build",
-        "@clerk/clerk-sdk-node#build",
         "@clerk/express#build",
         "@clerk/clerk-react#build"
       ],

@@ -47,7 +47,6 @@ export const runWithExponentialBackOff = async <T>(
   };
   const delay = createExponentialDelayAsyncFn({ firstDelay, maxDelay, timeMultiple });
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       return await callback();

@@ -129,6 +129,7 @@ export const arSA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'دعوة',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: undefined,
@@ -459,8 +460,9 @@ export const arSA: LocalizationResource = {
       actionText: 'ليس لديك حساب؟',
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'رمز التحقق',
@@ -538,7 +540,9 @@ export const arSA: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'أنشاء حساب جديد',
+      titleCombined: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -550,7 +554,6 @@ export const arSA: LocalizationResource = {
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
@@ -595,6 +598,7 @@ export const arSA: LocalizationResource = {
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -693,6 +697,11 @@ export const arSA: LocalizationResource = {
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'سيتم حذف هذا الإيميل من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول باستخدام عنوان البريد الإلكتروني هذا.',

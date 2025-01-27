@@ -129,6 +129,7 @@ export const trTR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Davet et',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Üyeyi kaldır',
         tableHeader__actions: undefined,
@@ -460,10 +461,10 @@ export const trTR: LocalizationResource = {
       actionLink__use_username: 'Kullanıcı adı kullan',
       actionText: 'Hesabınız yok mu?',
       actionText__join_waitlist: 'Bekleme listesine katılın',
-
       subtitle: '{{applicationName}} ile devam etmek için',
+      subtitleCombined: undefined,
       title: 'Giriş yap',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Doğrulama kodu',
@@ -541,7 +542,9 @@ export const trTR: LocalizationResource = {
       actionLink__use_phone: 'Bunun yerine telefon kullanın',
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
+      subtitleCombined: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
+      titleCombined: 'Hesap oluştur',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
@@ -553,7 +556,6 @@ export const trTR: LocalizationResource = {
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
-    form_identifier_exists: 'O identificador já existe.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
@@ -582,6 +584,7 @@ export const trTR: LocalizationResource = {
     not_allowed_access: 'Acesso não permitido.',
     organization_domain_blocked: 'O domínio da organização está bloqueado.',
     organization_domain_common: 'O domínio da organização é muito comum.',
+    organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: 'A quota de membros da organização foi excedida.',
     organization_minimum_permissions_needed: 'São necessárias permissões mínimas para executar esta ação.',
     passkey_already_exists: 'Já existe uma chave de acesso associada a esta conta.',
@@ -599,6 +602,7 @@ export const trTR: LocalizationResource = {
       sentencePrefix: 'Şifreniz;',
     },
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Şifreniz kriterleri sağlıyor, birkaç karakter daha eklerseniz daha güçlü olacaktır.',
       goodPassword: 'Harika! Parolanız gerekli tüm gereksinimleri karşılıyor.',
@@ -698,6 +702,11 @@ export const trTR: LocalizationResource = {
         resendButton: 'Yeniden gönder',
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} adresi hesabınızdan kaldırılacaktır.',
         messageLine2: 'Artık bu e-posta adresini kullanarak oturum açmanız mümkün olmayacaktır.',
@@ -911,7 +920,6 @@ export const trTR: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Web3 cüzdanınızı bağlamak için tıklayın',
     },
   },
-
   waitlist: {
     start: {
       actionLink: 'Bekleme listesine katıl',

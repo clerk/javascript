@@ -21,9 +21,9 @@ export const usePathnameWithoutCatchAll = () => {
   // require is used to avoid importing next/navigation when the pages router is used,
   // as it will throw an error. We cannot use dynamic import as it is async
   // and we need the hook to be sync
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const usePathname = require('next/navigation').usePathname;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const useParams = require('next/navigation').useParams;
 
   // Get the pathname that includes any named or catch all params

@@ -8,7 +8,6 @@ const snapshot = `---
 '@clerk/chrome-extension': patch
 '@clerk/localizations': patch
 '@clerk/clerk-js': patch
-'@clerk/clerk-sdk-node': patch
 '@clerk/backend': patch
 '@clerk/fastify': patch
 '@clerk/nextjs': patch
@@ -38,7 +37,7 @@ try {
   // generate a temp .md file that indicates that all packages have changes
   // in order to force a snapshot release
   await $`touch .changeset/snap.md && echo ${snapshot} > .changeset/snap.md`;
-} catch (e) {
+} catch {
   // otherwise, do nothing
 }
 

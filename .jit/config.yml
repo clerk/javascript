@@ -6,7 +6,6 @@ folders:
     exclude:
       - ./**/*.test.ts
       - ./**/test/fixtureHelpers.ts
-  - path: /packages/eslint-config-custom
   - path: /packages/expo
   - path: /packages/fastify
     exclude:
@@ -19,9 +18,6 @@ folders:
     exclude:
       - ./**/*.test.ts
   - path: /packages/remix
-    exclude:
-      - ./**/*.test.ts
-  - path: /packages/sdk-node
     exclude:
       - ./**/*.test.ts
   - path: /packages/shared

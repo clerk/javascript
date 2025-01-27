@@ -7,9 +7,7 @@ export default function Page() {
         routing={'path'}
         path={'/sign-in'}
         signUpUrl={'/sign-up'}
-        __experimental={{
-          combinedProps: {},
-        }}
+        fallback={<>Loading sign in</>}
       />
     </div>
   );

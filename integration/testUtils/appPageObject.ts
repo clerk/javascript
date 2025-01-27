@@ -9,11 +9,11 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     goToAppHome: async () => {
       try {
         await page.goto(app.serverUrl);
-      } catch (e) {
+      } catch {
         // do not fail the test if interstitial is returned (401)
       }
     },
-    goToRelative: (path: string, opts: { searchParams?: URLSearchParams; timeout?: number } = {}) => {
+    goToRelative: (path: string, opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {}) => {
       let url: URL;
 
       try {
@@ -24,7 +24,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         } else {
           url = new URL(path, page.url());
         }
-      } catch (e) {
+      } catch {
         // However, in most tests we don't need to manually navigate to the domain
         // as the test is using a localhost app directly
         // This handles the case where the page is at about:blank
@@ -35,7 +35,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       if (opts.searchParams) {
         url.search = opts.searchParams.toString();
       }
-      return page.goto(url.toString(), { timeout: opts.timeout ?? 20000 });
+      return page.goto(url.toString(), { timeout: opts.timeout ?? 20000, waitUntil: opts.waitUntil });
     },
     waitForClerkJsLoaded: async () => {
       return page.waitForFunction(() => {

@@ -9,7 +9,7 @@ import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
-import { useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -66,10 +66,8 @@ export function _SignInStart(): JSX.Element {
   const { displayConfig, userSettings } = useEnvironment();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
-  const options = useOptions();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl } = ctx;
-  const isCombinedFlow = !!options?.experimental?.combinedFlow;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -94,6 +92,7 @@ export function _SignInStart(): JSX.Element {
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
+  const clerkStatus = getClerkQueryParam('__clerk_status') || '';
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -170,6 +169,17 @@ export function _SignInStart(): JSX.Element {
 
   useEffect(() => {
     if (!organizationTicket) {
+      return;
+    }
+
+    if (clerkStatus === 'sign_up') {
+      const paramsToForward = new URLSearchParams();
+      if (organizationTicket) {
+        paramsToForward.set('__clerk_ticket', organizationTicket);
+      }
+      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
+      // signUpUrl triggers a full page reload when used with the hash router.
+      void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
       return;
     }
 
@@ -368,10 +378,6 @@ export function _SignInStart(): JSX.Element {
       }
 
       clerk.client.signUp[attribute] = identifierField.value;
-      const paramsToForward = new URLSearchParams();
-      if (organizationTicket) {
-        paramsToForward.set('__clerk_ticket', organizationTicket);
-      }
 
       const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
       const redirectUrlComplete = ctx.afterSignUpUrl || '/';
@@ -387,6 +393,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        passwordEnabled: userSettings.attributes.password.required,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -409,7 +416,9 @@ export function _SignInStart(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading) {
+  if (status.isLoading || clerkStatus === 'sign_up') {
+    // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
+    // rendering the sign in flow.
     return <LoadingCard />;
   }
 
@@ -420,14 +429,23 @@ export function _SignInStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            {isCombinedFlow ? (
-              <Header.Title localizationKey={localizationKeys('signIn.start.__experimental_titleCombined')} />
-            ) : (
-              <>
-                <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-                <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
-              </>
-            )}
+            <Header.Title
+              localizationKey={
+                isCombinedFlow ? localizationKeys('signIn.start.titleCombined') : localizationKeys('signIn.start.title')
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signIn.start.subtitleCombined')
+                  : localizationKeys('signIn.start.subtitle')
+              }
+              sx={{
+                '&:empty': {
+                  display: 'none',
+                },
+              }}
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}

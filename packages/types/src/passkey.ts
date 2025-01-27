@@ -1,8 +1,7 @@
-import type { PasskeyJSONSnapshot } from 'snapshots';
-
 import type { DeletedObjectResource } from './deletedObject';
 import type { PasskeyJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { PasskeyJSONSnapshot } from './snapshots';
 import type { SnakeToCamel } from './utils';
 import type { PasskeyVerificationResource } from './verification';
 

@@ -65,7 +65,6 @@ export const ptPT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Insira a sua palavra-passe',
   formFieldInputPlaceholder__phoneNumber: 'Insira o seu número de telefone',
   formFieldInputPlaceholder__username: 'Insira o seu nome de utilizador',
-
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -129,6 +128,7 @@ export const ptPT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convidar',
+      action__search: 'Pesquisar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
@@ -459,8 +459,9 @@ export const ptPT: LocalizationResource = {
       actionText: 'Não possui uma conta?',
       actionText__join_waitlist: 'Ainda não tem uma conta? Junte-se à lista de espera.',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',
@@ -488,7 +489,6 @@ export const ptPT: LocalizationResource = {
         subtitle: 'Parece que houve um erro com a sua sessão. Tente novamente.',
         title: 'Erro de sessão',
       },
-
       formSubtitle: 'Utilize o link enviado no seu e-mail',
       formTitle: 'Link de verificação',
       loading: {
@@ -539,11 +539,13 @@ export const ptPT: LocalizationResource = {
       actionLink__use_phone: 'Usar telemóvel',
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
+      titleCombined: 'Criar a sua conta',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Escolha uma das opções abaixo',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
     captcha_invalid:
@@ -551,7 +553,6 @@ export const ptPT: LocalizationResource = {
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
-    form_identifier_exists: 'O identificador já existe.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
@@ -598,6 +599,7 @@ export const ptPT: LocalizationResource = {
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'A sua palavra-passe atende a todos os requisitos necessários.',
@@ -696,6 +698,11 @@ export const ptPT: LocalizationResource = {
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
+      enterpriseSSOLink: {
+        formButton: 'Clique para autenticar',
+        formSubtitle: 'Complete a autenticação com {{identifier}}',
+      },
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',
@@ -858,13 +865,16 @@ export const ptPT: LocalizationResource = {
           headerTitle: 'Autenticador',
         },
       },
-
       passkeysSection: {
         menuAction__destructive: 'Remover chave de acesso',
         menuAction__rename: 'Renomear chave de acesso',
         title: 'Chaves de Acesso',
       },
-
+      passwordSection: {
+        primaryButton__setPassword: undefined,
+        primaryButton__updatePassword: undefined,
+        title: undefined,
+      },
       phoneNumbersSection: {
         destructiveAction: 'Remover telemóvel',
         detailsAction__nonPrimary: 'Definir como principal',

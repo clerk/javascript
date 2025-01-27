@@ -6,6 +6,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
     },
+    fakeTimers: {
+      toFake: ['setTimeout', 'clearTimeout', 'Date'],
+    },
     includeSource: ['**/*.{js,ts,jsx,tsx}'],
     setupFiles: './vitest.setup.mts',
   },
