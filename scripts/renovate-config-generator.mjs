@@ -30,7 +30,7 @@ const rules = new Map();
  */
 const defaultRules = [
   {
-    matchManagers: ['pnpm'],
+    matchManagers: ['npm'],
     matchDepTypes: ['engines'],
     matchPackageNames: ['node'],
     enabled: false,
