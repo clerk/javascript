@@ -15,13 +15,13 @@ declare namespace NodeJS {
 }
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type T = import('./types').NextClerkProviderProps;
+type NextClerkProviderProps = import('./types').NextClerkProviderProps;
 
 interface Window {
   __clerk_internal_navigations: Record<
     string,
     {
-      fun: NonNullable<T['routerPush'] | T['routerReplace']>;
+      fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
       promisesBuffer: Array<() => void> | undefined;
     }
   >;
