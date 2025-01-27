@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react';
-import type { EmailAddressResource } from '@clerk/types';
+import type { EmailAddressResource, UserResource } from '@clerk/types';
+import { useEffect, useState } from 'react';
 
 import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
 import { Badge, Flex, localizationKeys, Text } from '../../customizables';
@@ -37,47 +38,26 @@ const EmailScreen = (props: EmailScreenProps) => {
 
 export const EmailsSection = ({ shouldAllowCreation = true }) => {
   const { user } = useUser();
-
+  const [actionRootValue, setActionRootValue] = useState<string | null>(null);
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
       centered={false}
       id='emailAddresses'
     >
-      <Action.Root>
+      <Action.Root
+        value={actionRootValue}
+        onChange={setActionRootValue}
+      >
         <ProfileSection.ItemList id='emailAddresses'>
           {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
-            <Action.Root key={email.emailAddress}>
-              <ProfileSection.Item id='emailAddresses'>
-                <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
-                  <Text
-                    sx={t => ({ color: t.colors.$colorText })}
-                    truncate
-                  >
-                    {email.emailAddress}
-                  </Text>
-                  {user?.primaryEmailAddressId === email.id && (
-                    <Badge localizationKey={localizationKeys('badge__primary')} />
-                  )}
-                  {email.verification.status !== 'verified' && (
-                    <Badge localizationKey={localizationKeys('badge__unverified')} />
-                  )}
-                </Flex>
-                <EmailMenu email={email} />
-              </ProfileSection.Item>
-
-              <Action.Open value='remove'>
-                <Action.Card variant='destructive'>
-                  <RemoveEmailScreen emailId={email.id} />
-                </Action.Card>
-              </Action.Open>
-
-              <Action.Open value='verify'>
-                <Action.Card>
-                  <EmailScreen emailId={email.id} />
-                </Action.Card>
-              </Action.Open>
-            </Action.Root>
+            <EmailRow
+              key={email.emailAddress}
+              email={email}
+              user={user}
+              actionRootValue={actionRootValue}
+              setActionRootValue={setActionRootValue}
+            />
           ))}
           {shouldAllowCreation && (
             <>
@@ -100,7 +80,65 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
   );
 };
 
-const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
+const EmailRow = ({
+  user,
+  email,
+  actionRootValue,
+  setActionRootValue,
+}: {
+  user: UserResource | null | undefined;
+  email: EmailAddressResource;
+  actionRootValue?: string | null;
+  setActionRootValue: (value: string | null) => void;
+}) => {
+  const [internalValue, setInternalValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (actionRootValue === 'add') {
+      setInternalValue(null);
+    }
+  }, [actionRootValue]);
+
+  return (
+    <Action.Root
+      value={internalValue}
+      onChange={setInternalValue}
+    >
+      <ProfileSection.Item id='emailAddresses'>
+        <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
+          <Text
+            sx={t => ({ color: t.colors.$colorText })}
+            truncate
+          >
+            {email.emailAddress}
+          </Text>
+          {user?.primaryEmailAddressId === email.id && <Badge localizationKey={localizationKeys('badge__primary')} />}
+          {email.verification.status !== 'verified' && (
+            <Badge localizationKey={localizationKeys('badge__unverified')} />
+          )}
+        </Flex>
+        <EmailMenu
+          email={email}
+          onClick={() => setActionRootValue(null)}
+        />
+      </ProfileSection.Item>
+
+      <Action.Open value='remove'>
+        <Action.Card variant='destructive'>
+          <RemoveEmailScreen emailId={email.id} />
+        </Action.Card>
+      </Action.Open>
+
+      <Action.Open value='verify'>
+        <Action.Card>
+          <EmailScreen emailId={email.id} />
+        </Action.Card>
+      </Action.Open>
+    </Action.Root>
+  );
+};
+
+const EmailMenu = ({ email, onClick }: { email: EmailAddressResource; onClick?: () => void }) => {
   const card = useCardState();
   const { user } = useUser();
   const { open } = useActionContext();
@@ -133,7 +171,10 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       {
         label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => {
+          open('remove');
+          onClick?.();
+        },
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
