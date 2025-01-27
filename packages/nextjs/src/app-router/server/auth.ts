@@ -3,7 +3,7 @@ import { constants, createClerkRequest, createRedirect, type RedirectFun } from 
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
-import { createGetAuthAsync } from '../../server/createGetAuth';
+import { createAsyncGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import type { AuthProtect } from '../../server/protect';
@@ -38,7 +38,7 @@ export const auth: AuthFn = async () => {
       return [];
     }
   };
-  const authObject = await createGetAuthAsync({
+  const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
   })(request);
