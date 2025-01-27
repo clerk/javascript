@@ -26,8 +26,10 @@ type Auth = AuthObject & {
    */
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 };
+
 export interface AuthFn {
   (): Promise<Auth>;
+
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
    * - to check if a user is authenticated (signed in)
@@ -68,7 +70,6 @@ export const auth: AuthFn = async () => {
     }
 
     try {
-      // eslint-disable-next-line import/no-unresolved
       const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.hasSrcAppDir());
       return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.ts`];
     } catch {
