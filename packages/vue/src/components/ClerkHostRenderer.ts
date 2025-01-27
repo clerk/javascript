@@ -1,5 +1,5 @@
 import type { PropType } from 'vue';
-import { computed, defineComponent, h, onScopeDispose, ref, watchEffect } from 'vue';
+import { defineComponent, h, onScopeDispose, ref, toRef, watchEffect } from 'vue';
 
 import type { CustomPortalsRendererProps } from '../types';
 import { ClerkLoaded } from './controlComponents';
@@ -39,13 +39,14 @@ export const ClerkHostRenderer = defineComponent({
     props: {
       type: Object,
       required: false,
+      default: () => ({}),
     },
   },
   setup(props) {
     const portalRef = ref<HTMLDivElement | null>(null);
     const isPortalMounted = ref(false);
     // Make the props reactive so the watcher can react to changes
-    const componentProps = computed(() => ({ ...props.props }));
+    const componentProps = toRef(props, 'props');
 
     watchEffect(() => {
       if (!portalRef.value) {
