@@ -10,7 +10,8 @@ const props = defineProps<GoogleOneTapProps>();
 
 <template>
   <ClerkHostRenderer
-    :mount="() => clerk?.openGoogleOneTap(props)"
-    :unmount="clerk?.closeGoogleOneTap"
+    :open="clerk?.openGoogleOneTap"
+    :close="clerk?.closeGoogleOneTap"
+    :props="props"
   />
 </template>

@@ -11,9 +11,8 @@ export const CustomPortalsRenderer = defineComponent((props: CustomPortalsRender
 });
 
 /**
- * A utility component that handles mounting and unmounting of Clerk UI components.
- * The component only mounts when Clerk is fully loaded and automatically
- * handles cleanup on unmount.
+ * Used to orchestrate mounting of Clerk components in a host Vue application.
+ * Components are rendered into a specific DOM node using mount/unmount methods provided by the Clerk class.
  */
 export const ClerkHostRenderer = defineComponent({
   props: {
@@ -23,6 +22,14 @@ export const ClerkHostRenderer = defineComponent({
     },
     unmount: {
       type: Function as PropType<(node: HTMLDivElement) => void>,
+      required: false,
+    },
+    open: {
+      type: Function as PropType<(props: AnyObject) => void>,
+      required: false,
+    },
+    close: {
+      type: Function as PropType<() => void>,
       required: false,
     },
     updateProps: {
@@ -48,14 +55,24 @@ export const ClerkHostRenderer = defineComponent({
       if (isPortalMounted.value) {
         props.updateProps?.({ node: portalRef.value, props: componentProps.value });
       } else {
-        props.mount?.(portalRef.value, componentProps.value);
+        if (props.mount) {
+          props.mount(portalRef.value, componentProps.value);
+        }
+        if (props.open) {
+          props.open(componentProps.value);
+        }
         isPortalMounted.value = true;
       }
     });
 
     onScopeDispose(() => {
       if (isPortalMounted.value && portalRef.value) {
-        props.unmount?.(portalRef.value);
+        if (props.unmount) {
+          props.unmount(portalRef.value);
+        }
+        if (props.close) {
+          props.close();
+        }
       }
     });
 
