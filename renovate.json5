@@ -42,7 +42,7 @@
   prHourlyLimit: 4,
   prConcurrentLimit: 16,
   postUpdateOptions: [
-    "npmDedupe",
+    "pnpmDedupe",
   ],
   semanticCommitScope: "repo",
   commitMessageLowerCase: "never",
