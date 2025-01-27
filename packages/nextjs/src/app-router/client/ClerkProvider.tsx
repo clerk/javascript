@@ -112,11 +112,11 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  const { children, ...rest } = props;
+export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
+  const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePublishableKey || !canUseKeyless) {
+  if (safePublishableKey || !canUseKeyless || disableKeyless) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
