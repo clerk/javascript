@@ -222,7 +222,7 @@ function suggestMiddlewareLocation() {
   const suggestionMessage = (to?: 'src/', from?: 'src/app/' | 'app/') => {
     const _to = to || '';
     const _from = from || '';
-    return `Clerk: Move your middleware file to ./${_to}middleware.ts. Currently located at ./${_from}middleware.ts`;
+    return `Clerk: Move your middleware file to ./${to || ''}middleware.ts. Currently located at ./${from  || ''}middleware.ts`;
   };
   const { existsSync } = safeNodeRuntimeFs();
   const path = safeNodeRuntimePath();
