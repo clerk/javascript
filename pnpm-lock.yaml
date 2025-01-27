@@ -277,6 +277,9 @@ importers:
       typedoc:
         specifier: 0.27.6
         version: 0.27.6(typescript@5.6.3)
+      typedoc-plugin-missing-exports:
+        specifier: 3.1.0
+        version: 3.1.0(typedoc@0.27.6(typescript@5.6.3))
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -721,7 +724,7 @@ importers:
         specifier: 4.2.2
         version: 4.2.2
       next:
-        specifier: ^14.2.20
+        specifier: ^14.2.23
         version: 14.2.23(@babel/core@7.26.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/nuxt:
@@ -835,8 +838,8 @@ importers:
         specifier: workspace:^
         version: link:../types
       cookie:
-        specifier: 0.7.0
-        version: 0.7.0
+        specifier: 0.7.2
+        version: 0.7.2
       react:
         specifier: catalog:peer-react
         version: 18.3.1
@@ -13886,6 +13889,11 @@ packages:
     resolution: {integrity: sha512-q7QNVDGTdl702bVFiI5eY4l/HkgCM6at9KhcFbgUAzezHFbOVy4+0O/lCjsABEQwbZPravVfBIiBVGo89yzHFg==}
     engines: {node: '>= 0.4'}
 
+  typedoc-plugin-missing-exports@3.1.0:
+    resolution: {integrity: sha512-Sogbaj+qDa21NjB3SlIw4JXSwmcl/WOjwiPNaVEcPhpNG/MiRTtpwV81cT7h1cbu9StpONFPbddYWR0KV/fTWA==}
+    peerDependencies:
+      typedoc: 0.26.x || 0.27.x
+
   typedoc@0.27.6:
     resolution: {integrity: sha512-oBFRoh2Px6jFx366db0lLlihcalq/JzyCVp7Vaq1yphL/tbgx2e+bkpkCgJPunaPvPwoTOXSwasfklWHm7GfAw==}
     engines: {node: '>= 18'}
@@ -26852,7 +26860,7 @@ snapshots:
 
   light-my-request@6.1.0:
     dependencies:
-      cookie: 0.7.0
+      cookie: 0.7.2
       process-warning: 4.0.0
       set-cookie-parser: 2.6.0
 
@@ -31375,6 +31383,10 @@ snapshots:
       math-intrinsics: 1.1.0
       typed-array-buffer: 1.0.3
       typed-array-byte-offset: 1.0.4
+
+  typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.6.3)):
+    dependencies:
+      typedoc: 0.27.6(typescript@5.6.3)
 
   typedoc@0.27.6(typescript@5.6.3):
     dependencies:
