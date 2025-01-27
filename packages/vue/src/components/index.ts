@@ -24,6 +24,6 @@ export {
 } from './controlComponents';
 
 export { default as SignInButton } from './SignInButton.vue';
-export { SignUpButton } from './SignUpButton';
-export { SignOutButton } from './SignOutButton';
-export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
+export { default as SignUpButton } from './SignUpButton.vue';
+export { default as SignOutButton } from './SignOutButton.vue';
+export { default as SignInWithMetamaskButton } from './SignInWithMetamaskButton.vue';
