@@ -7,7 +7,6 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { APIContext } from 'astro';
 
-// @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
 import { NETLIFY_CACHE_BUST_PARAM } from '../internal';

@@ -129,6 +129,7 @@ export const svSE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjud in',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
         tableHeader__actions: 'Åtgärder',
@@ -462,6 +463,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Logga in',
       titleCombined: undefined,
     },
@@ -542,6 +544,7 @@ export const svSE: LocalizationResource = {
       actionLink__use_phone: 'Använd telefon istället',
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
       titleCombined: 'Skapa ditt konto',
     },

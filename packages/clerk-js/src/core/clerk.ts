@@ -314,6 +314,7 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      proxyUrl: this.proxyUrl,
     });
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
