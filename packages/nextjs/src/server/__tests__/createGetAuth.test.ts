@@ -3,7 +3,7 @@ import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 
-import { createGetAuth, getAuth } from '../createGetAuth';
+import { createGetAuthSync, getAuth } from '../createGetAuth';
 
 const mockSecretKey = 'sk_test_mock';
 
@@ -16,7 +16,7 @@ const mockTokenSignature = hmacSHA1(mockToken, 'sk_test_mock').toString();
 
 describe('createGetAuth(opts)', () => {
   it('returns a getAuth function', () => {
-    expect(createGetAuth({ debugLoggerName: 'test', noAuthStatusMessage: 'test' })).toBeInstanceOf(Function);
+    expect(createGetAuthSync({ debugLoggerName: 'test', noAuthStatusMessage: 'test' })).toBeInstanceOf(Function);
   });
 });
 

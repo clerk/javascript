@@ -4,9 +4,11 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { createClerkClientWithOptions } from '../../server/createClerkClient';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { onlyTry } from '../../utils/only-try';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
@@ -22,15 +24,6 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
   return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
 });
-
-/** Discards errors thrown by attempted code */
-const onlyTry = (cb: () => unknown) => {
-  try {
-    cb();
-  } catch {
-    // ignore
-  }
-};
 
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
@@ -116,6 +109,22 @@ export async function ClerkProvider(
       );
 
       if (runningWithClaimedKeys) {
+        try {
+          const secretKey = await import('../../server/keyless-node.js').then(
+            mod => mod.safeParseClerkFile()?.secretKey,
+          );
+          if (!secretKey) {
+            throw secretKey;
+          }
+          const client = createClerkClientWithOptions({
+            secretKey,
+          });
+          // Add caching here
+          await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
+        } catch (e) {
+          // ignore
+        }
+
         /**
          * Notify developers.
          */
