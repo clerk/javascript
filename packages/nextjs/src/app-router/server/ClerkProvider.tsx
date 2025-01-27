@@ -85,7 +85,9 @@ export async function ClerkProvider(
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
 
-    const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
+    const newOrReadKeys = await import('../../server/keyless-node.js')
+      .then(mod => mod.createOrReadKeyless())
+      .catch(() => null);
     const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
       '../../server/keyless-log-cache.js'
     );
@@ -142,6 +144,18 @@ export async function ClerkProvider(
 
         output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
       }
+    } else {
+      // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
+      output = (
+        <ClientClerkProvider
+          {...mergeNextClerkPropsWithEnv(rest)}
+          nonce={await generateNonce()}
+          initialState={await generateStatePromise()}
+          disableKeyless
+        >
+          {children}
+        </ClientClerkProvider>
+      );
     }
   }
 

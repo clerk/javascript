@@ -123,7 +123,7 @@ const isFileWritingLocked = () => {
   return isCreatingFile || existsSync(CLERK_LOCK);
 };
 
-async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
+async function createOrReadKeyless(): Promise<AccountlessApplication | null> {
   const { writeFileSync, mkdirSync } = safeNodeRuntimeFs();
 
   /**
@@ -131,7 +131,7 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    * Using both an in-memory and file system lock seems to be the most effective solution.
    */
   if (isFileWritingLocked()) {
-    return undefined;
+    return null;
   }
 
   lockFileWriting();
@@ -156,26 +156,29 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    * At this step, it is safe to create new keys and store them.
    */
   const client = createClerkClientWithOptions({});
-  const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
+  const accountlessApplication = await client.__experimental_accountlessApplications
+    .createAccountlessApplication()
+    .catch(() => null);
 
-  writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
-    encoding: 'utf8',
-    mode: '0777',
-    flag: 'w',
-  });
+  if (accountlessApplication) {
+    writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'w',
+    });
 
-  // TODO-KEYLESS: Add link to official documentation.
-  const README_NOTIFICATION = `
+    // TODO-KEYLESS: Add link to official documentation.
+    const README_NOTIFICATION = `
 ## DO NOT COMMIT
 This directory is auto-generated from \`@clerk/nextjs\` because you are running in Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
   `;
 
-  writeFileSync(README_PATH, README_NOTIFICATION, {
-    encoding: 'utf8',
-    mode: '0777',
-    flag: 'w',
-  });
-
+    writeFileSync(README_PATH, README_NOTIFICATION, {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'w',
+    });
+  }
   /**
    * Clean up locks.
    */
