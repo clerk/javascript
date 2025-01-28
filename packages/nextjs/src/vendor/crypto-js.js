@@ -1,5 +1,5 @@
-import AES from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
+import { AES } from 'crypto-es/lib/aes';
+import { Utf8 } from 'crypto-es/lib/core';
+import { HmacSHA1 } from 'crypto-es/lib/sha1';
 
-export { AES, encUtf8, hmacSHA1 };
+export { AES, HmacSHA1, Utf8 };

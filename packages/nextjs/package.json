@@ -74,8 +74,7 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@types/crypto-js": "4.2.2",
-    "crypto-js": "4.2.0",
+    "crypto-es": "^2.1.0",
     "next": "^14.2.23"
   },
   "peerDependencies": {

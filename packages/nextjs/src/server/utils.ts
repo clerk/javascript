@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { canUseKeyless } from '../utils/feature-flags';
-import { AES, encUtf8, hmacSHA1 } from '../vendor/crypto-js';
+import { AES, HmacSHA1, Utf8 } from '../vendor/crypto-js';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,
@@ -158,7 +158,7 @@ export function assertKey(key: string | undefined, onError: () => never): string
  * Compute a cryptographic signature from a session token and provided secret key. Used to validate that the token has not been modified when transferring between middleware and the Next.js origin.
  */
 function createTokenSignature(token: string, key: string): string {
-  return hmacSHA1(token, key).toString();
+  return HmacSHA1(token, key).toString();
 }
 
 /**
@@ -256,6 +256,6 @@ function throwInvalidEncryptionKey(): never {
 
 function decryptData(data: string, key: string) {
   const decryptedBytes = AES.decrypt(data, key);
-  const encoded = decryptedBytes.toString(encUtf8);
+  const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }
