@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -77,7 +77,7 @@
     "@clerk/clerk-react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "cookie": "0.7.0",
+    "cookie": "0.7.2",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
