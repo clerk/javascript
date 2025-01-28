@@ -39,6 +39,8 @@ const EmailScreen = (props: EmailScreenProps) => {
 export const EmailsSection = ({ shouldAllowCreation = true }) => {
   const { user } = useUser();
   const [actionRootValue, setActionRootValue] = useState<string | null>(null);
+
+  if (!user) return null;
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
@@ -50,7 +52,7 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
         onChange={setActionRootValue}
       >
         <ProfileSection.ItemList id='emailAddresses'>
-          {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
+          {sortIdentificationBasedOnVerification(user.emailAddresses, user.primaryEmailAddressId).map(email => (
             <EmailRow
               key={email.emailAddress}
               email={email}
@@ -86,7 +88,7 @@ const EmailRow = ({
   actionRootValue,
   setActionRootValue,
 }: {
-  user?: UserResource | undefined;
+  user: UserResource;
   email: EmailAddressResource;
   actionRootValue?: string | null;
   setActionRootValue: (value: string | null) => void;
