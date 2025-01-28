@@ -199,7 +199,7 @@ const renovateConfig = {
   rangeStrategy: 'bump',
   prHourlyLimit: 4,
   prConcurrentLimit: 16,
-  postUpdateOptions: ['npmDedupe'],
+  postUpdateOptions: ['pnpmDedupe'],
   semanticCommitScope: 'repo',
   commitMessageLowerCase: 'never',
   packageRules: Array.from(rules.values()).flat().concat(defaultRules),
