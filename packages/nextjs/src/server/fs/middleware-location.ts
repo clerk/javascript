@@ -12,8 +12,12 @@ function hasSrcAppDir() {
 
 function suggestMiddlewareLocation() {
   const fileExtensions = ['ts', 'js'] as const;
-  const suggestionMessage = (extension: (typeof fileExtensions)[number], to?: 'src/', from?: 'src/app/' | 'app/') =>
-    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to || ''}middleware.${extension}. Currently located at ./${from || ''}middleware.${extension}`;
+  const suggestionMessage = (
+    extension: (typeof fileExtensions)[number],
+    to: 'src/' | '',
+    from: 'src/app/' | 'app/' | '',
+  ) =>
+    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to}middleware.${extension}. Currently located at ./${from}middleware.${extension}`;
 
   const { existsSync } = nodeFsOrThrow();
   const path = nodePathOrThrow();
@@ -22,29 +26,27 @@ function suggestMiddlewareLocation() {
   const projectWithAppSrcPath = path.join(cwd(), 'src', 'app');
   const projectWithAppPath = path.join(cwd(), 'app');
 
-  if (existsSync(projectWithAppSrcPath)) {
+  const checkMiddlewareLocation = (
+    basePath: string,
+    to: 'src/' | '',
+    from: 'src/app/' | 'app/' | '',
+  ): string | undefined => {
     for (const fileExtension of fileExtensions) {
-      if (existsSync(path.join(projectWithAppSrcPath, `middleware.${fileExtension}`))) {
-        return suggestionMessage(fileExtension, 'src/', 'src/app/');
-      }
-
-      if (existsSync(path.join(cwd(), `middleware.${fileExtension}`))) {
-        return suggestionMessage(fileExtension, 'src/');
+      if (existsSync(path.join(basePath, `middleware.${fileExtension}`))) {
+        return suggestionMessage(fileExtension, to, from);
       }
     }
-
-    // default error
     return undefined;
+  };
+
+  if (existsSync(projectWithAppSrcPath)) {
+    return (
+      checkMiddlewareLocation(projectWithAppSrcPath, 'src/', 'src/app/') || checkMiddlewareLocation(cwd(), 'src/', '')
+    );
   }
 
   if (existsSync(projectWithAppPath)) {
-    for (const fileExtension of fileExtensions) {
-      if (existsSync(path.join(projectWithAppPath, `middleware.${fileExtension}`))) {
-        return suggestionMessage(fileExtension, undefined, 'app/');
-      }
-    }
-    // default error
-    return undefined;
+    return checkMiddlewareLocation(projectWithAppPath, '', 'app/');
   }
 
   return undefined;
