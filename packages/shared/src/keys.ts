@@ -70,13 +70,17 @@ export function parsePublishableKey(
 }
 
 export function isPublishableKey(key: string) {
-  key = key || '';
+  try {
+    key = key || '';
 
-  const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
+    const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
 
-  const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
+    const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
 
-  return hasValidPrefix && hasValidFrontendApiPostfix;
+    return hasValidPrefix && hasValidFrontendApiPostfix;
+  } catch {
+    return false;
+  }
 }
 
 export function createDevOrStagingUrlCache() {
