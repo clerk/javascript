@@ -3,13 +3,12 @@ import { constants, createClerkRequest, createRedirect, type RedirectFun } from 
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
-import { createAsyncGetAuth } from '../../server/createGetAuth';
+import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
-import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
 
 /**
@@ -26,10 +25,8 @@ type Auth = AuthObject & {
    */
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 };
-
 export interface AuthFn {
   (): Promise<Auth>;
-
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
    * - to check if a user is authenticated (signed in)
@@ -63,22 +60,9 @@ export const auth: AuthFn = async () => {
   require('server-only');
 
   const request = await buildRequestLike();
-
-  const stepsBasedOnSrcDirectory = async () => {
-    if (isNextWithUnstableServerActions) {
-      return [];
-    }
-
-    try {
-      const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.hasSrcAppDir());
-      return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.ts`];
-    } catch {
-      return [];
-    }
-  };
-  const authObject = await createAsyncGetAuth({
+  const authObject = createGetAuth({
     debugLoggerName: 'auth()',
-    noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    noAuthStatusMessage: authAuthHeaderMissing(),
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
