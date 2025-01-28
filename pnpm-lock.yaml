@@ -817,11 +817,11 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       esbuild-plugin-file-path-extensions:
-        specifier: ^2.1.3
-        version: 2.1.3
+        specifier: ^2.1.4
+        version: 2.1.4
       react-router:
-        specifier: 7.1.2
-        version: 7.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 7.1.3
+        version: 7.1.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/remix:
     dependencies:
@@ -962,7 +962,7 @@ importers:
         version: 1.81.9(@types/node@22.10.10)(ioredis@5.4.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(terser@5.37.0)(typescript@5.6.3)(vite@6.0.7(@types/node@22.10.10)(jiti@2.4.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0))(webpack@5.94.0(esbuild@0.24.2))
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.2
-        version: 2.1.3
+        version: 2.1.4
 
   packages/testing:
     dependencies:
@@ -7924,8 +7924,8 @@ packages:
     resolution: {integrity: sha512-w+5mJ3GuFL+NjVtJlvydShqE1eN3h3PbI7/5LAsYJP/2qtuMXjfL2LpHSRqo4b4eSF5K/DH1JXKUAHSB2UW50g==}
     engines: {node: '>= 0.4'}
 
-  esbuild-plugin-file-path-extensions@2.1.3:
-    resolution: {integrity: sha512-yLriKqLz32F0zGDqrfuTx8aENTVnf0l0HZ6qAgPhQpxFIcrZRNc4DfXjZs8pq0VPeBazzpb3WJ05B0S6s3ucSQ==}
+  esbuild-plugin-file-path-extensions@2.1.4:
+    resolution: {integrity: sha512-lNjylaAsJMprYg28zjUyBivP3y0ms9b7RJZ5tdhDUFLa3sCbqZw4wDnbFUSmnyZYWhCYDPxxp7KkXM2TXGw3PQ==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
   esbuild@0.20.2:
@@ -12331,8 +12331,8 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react-router@7.1.2:
-    resolution: {integrity: sha512-KeallSO30KLpIe/ZZqfk6pCJ1c+5JhMxl3SCS3Zx1LgaGuQbgLDmjuNi6KZ5LnAV9sWjbmBWGRw8Um/Pw6BExg==}
+  react-router@7.1.3:
+    resolution: {integrity: sha512-EezYymLY6Guk/zLQ2vRA8WvdUhWFEj5fcE3RfWihhxXBW7+cd1LsIiA3lmx+KCmneAGQuyBv820o44L2+TtkSA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -23911,7 +23911,7 @@ snapshots:
       is-date-object: 1.1.0
       is-symbol: 1.1.1
 
-  esbuild-plugin-file-path-extensions@2.1.3: {}
+  esbuild-plugin-file-path-extensions@2.1.4: {}
 
   esbuild@0.20.2:
     optionalDependencies:
@@ -29553,7 +29553,7 @@ snapshots:
       '@remix-run/router': 1.9.0
       react: 18.3.1
 
-  react-router@7.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.1.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@types/cookie': 0.6.0
       cookie: 1.0.2
