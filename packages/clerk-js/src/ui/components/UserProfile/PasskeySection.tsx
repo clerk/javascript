@@ -1,6 +1,6 @@
 import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import {
@@ -89,6 +89,7 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
 export const PasskeySection = () => {
   const { user } = useUser();
+  const [actionValue, setActionValue] = useState<string | null>(null);
 
   if (!user) {
     return null;
@@ -100,7 +101,10 @@ export const PasskeySection = () => {
       centered={false}
       id='passkeys'
     >
-      <Action.Root>
+      <Action.Root
+        value={actionValue}
+        onChange={setActionValue}
+      >
         <ProfileSection.ItemList id='passkeys'>
           {user.passkeys.map(passkey => {
             const passkeyId = passkey.id;
@@ -126,7 +130,7 @@ export const PasskeySection = () => {
             );
           })}
 
-          <AddPasskeyButton />
+          <AddPasskeyButton onClick={() => setActionValue(null)} />
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
@@ -193,13 +197,14 @@ const ActiveDeviceMenu = ({ passkey }: { passkey: PasskeyResource }) => {
 };
 
 // TODO-PASSKEYS: Should the error be scope to the section ?
-const AddPasskeyButton = () => {
+const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
   const [createPasskey] = useReverification(() => user?.createPasskey());
 
   const handleCreatePasskey = async () => {
+    onClick?.();
     if (!user) {
       return;
     }

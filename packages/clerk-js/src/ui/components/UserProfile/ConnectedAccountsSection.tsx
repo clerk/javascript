@@ -1,6 +1,6 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
@@ -52,6 +52,7 @@ export const ConnectedAccountsSection = withCardStateProvider(
     const { user } = useUser();
     const card = useCardState();
     const hasExternalAccounts = Boolean(user?.externalAccounts?.length);
+    const [actionValue, setActionValue] = useState<string | null>(null);
 
     if (!user || (!shouldAllowCreation && !hasExternalAccounts)) {
       return null;
@@ -69,7 +70,10 @@ export const ConnectedAccountsSection = withCardStateProvider(
         id='connectedAccounts'
       >
         <Card.Alert>{card.error}</Card.Alert>
-        <Action.Root>
+        <Action.Root
+          value={actionValue}
+          onChange={setActionValue}
+        >
           <ProfileSection.ItemList id='connectedAccounts'>
             {accounts.map(account => (
               <ConnectedAccount
@@ -78,7 +82,7 @@ export const ConnectedAccountsSection = withCardStateProvider(
               />
             ))}
           </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddConnectedAccount />}
+          {shouldAllowCreation && <AddConnectedAccount onClick={() => setActionValue(null)} />}
         </Action.Root>
       </ProfileSection.Root>
     );
