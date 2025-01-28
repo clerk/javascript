@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import { CreateOrganizationProps } from '@clerk/types';
+import type { CreateOrganizationProps } from '@clerk/types';
 
 const clerk = useClerk();
 const props = defineProps<CreateOrganizationProps>();
