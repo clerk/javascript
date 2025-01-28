@@ -3,6 +3,7 @@ import type { AccountlessApplication } from '@clerk/backend';
 import { cookies, headers } from 'next/headers';
 import { redirect, RedirectType } from 'next/navigation';
 
+import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
@@ -35,18 +36,19 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless());
+  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless()).catch(() => null);
 
   if (!result) {
+    errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
-  const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
+  const { clerkDevelopmentCache, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
   /**
    * Notify developers.
    */
-  keylessLogger?.log({
+  clerkDevelopmentCache?.log({
     cacheKey: result.publishableKey,
     msg: createKeylessModeMessage(result),
   });

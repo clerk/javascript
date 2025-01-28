@@ -44,8 +44,20 @@ declare namespace globalThis {
   // eslint-disable-next-line no-var
   var __clerk_internal_keyless_logger:
     | {
-        __cache: Map<string, { expiresAt: number }>;
+        __cache: Map<string, { expiresAt: number; data?: unknown }>;
         log: (param: { cacheKey: string; msg: string }) => void;
+        run: (
+          callback: () => Promise<unknown>,
+          {
+            cacheKey,
+            onSuccessStale,
+            onErrorStale,
+          }: {
+            cacheKey: string;
+            onSuccessStale?: number;
+            onErrorStale?: number;
+          },
+        ) => Promise<unknown>;
       }
     | undefined;
 }

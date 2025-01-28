@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.10.3
+
+### Patch Changes
+
+- Improve error messages when `clerkMiddleware` is missing by suggesting the correct path to place the `middleware.ts` file. ([#4979](https://github.com/clerk/javascript/pull/4979)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve JSDoc comments to provide you with better IntelliSense information in your IDE ([#4994](https://github.com/clerk/javascript/pull/4994)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5), [`dd58c2507f8a7af4ebfc1241e2672a5678a83eaa`](https://github.com/clerk/javascript/commit/dd58c2507f8a7af4ebfc1241e2672a5678a83eaa)]:
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+  - @clerk/backend@1.23.8
+  - @clerk/clerk-react@5.22.7
+
 ## 6.10.2
 
 ### Patch Changes

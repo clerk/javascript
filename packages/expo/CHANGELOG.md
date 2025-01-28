@@ -1,5 +1,22 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+- Introduce support for SSO with SAML ([#4880](https://github.com/clerk/javascript/pull/4880)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  - Introduce `useSSO` hook to support a wider range of SSO flow types
+  - Deprecate `useOAuth` in favor of new `useSSO` hook
+
+### Patch Changes
+
+- Updated dependencies [[`11c6458763be12646bf21c5def6269edd3dcaacb`](https://github.com/clerk/javascript/commit/11c6458763be12646bf21c5def6269edd3dcaacb), [`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5), [`93ae27c2925e2ab09b6806409a53e6a132013c69`](https://github.com/clerk/javascript/commit/93ae27c2925e2ab09b6806409a53e6a132013c69)]:
+  - @clerk/clerk-js@5.50.0
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+  - @clerk/clerk-react@5.22.7
+
 ## 2.6.18
 
 ### Patch Changes
