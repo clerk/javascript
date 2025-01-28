@@ -23,7 +23,6 @@ export default defineConfig(overrideOptions => {
     bundle: false,
     clean: true,
     minify: false,
-    noExternal: ['crypto-js'],
     external: ['#safe-node-apis'],
     sourcemap: true,
     legacyOutput: true,
