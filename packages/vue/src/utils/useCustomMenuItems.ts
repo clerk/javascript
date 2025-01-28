@@ -2,7 +2,7 @@ import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { CustomMenuItem } from '@clerk/types';
 import { ref } from 'vue';
 
-import { MenuAction, MenuLink } from '../components/uiComponents';
+import { MenuAction, MenuLink } from '../components/ui-components/UserButton';
 import { userButtonMenuItemActionWrongProps, userButtonMenuItemLinkWrongProps } from '../errors/messages';
 import type { AddCustomMenuItemParams, UserButtonActionProps, UserButtonLinkProps } from '../types';
 import { isThatComponent } from './componentValidation';

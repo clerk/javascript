@@ -33,8 +33,9 @@ export const SignInContext = createContext<SignInCtx | null>(null);
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
 
@@ -43,7 +44,8 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const isCombinedFlow =
-    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
+    (signUpMode !== 'restricted' &&
+      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
     context.withSignUp ||
     false;
 

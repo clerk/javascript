@@ -123,6 +123,13 @@ const withSignInOrUpEmailLinksFlow = withEmailLinks
   .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
+const withSignInOrUpwithRestrictedModeFlow = withEmailCodes
+  .clone()
+  .setId('withSignInOrUpwithRestrictedModeFlow')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-restricted-mode').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk)
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
+
 export const envs = {
   base,
   withEmailCodes,
@@ -141,4 +148,5 @@ export const envs = {
   withWaitlistdMode,
   withSignInOrUpFlow,
   withSignInOrUpEmailLinksFlow,
+  withSignInOrUpwithRestrictedModeFlow,
 } as const;

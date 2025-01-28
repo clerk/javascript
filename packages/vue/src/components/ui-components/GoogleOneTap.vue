@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { SignInProps } from '@clerk/types';
+import type { GoogleOneTapProps } from '@clerk/types';
 
 const clerk = useClerk();
 
-const props = defineProps<SignInProps>();
+const props = defineProps<GoogleOneTapProps>();
 </script>
 
 <template>
   <ClerkHostRenderer
-    :mount="clerk?.mountSignIn"
-    :unmount="clerk?.unmountSignIn"
+    :open="clerk?.openGoogleOneTap"
+    :close="clerk?.closeGoogleOneTap"
     :props="props"
-    :update-props="(clerk as any)?.__unstable__updateProps"
   />
 </template>

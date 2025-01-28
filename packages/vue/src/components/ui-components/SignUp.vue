@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { SignInProps } from '@clerk/types';
+import type { SignUpProps } from '@clerk/types';
 
 const clerk = useClerk();
 
-const props = defineProps<SignInProps>();
+const props = defineProps<SignUpProps>();
 </script>
 
 <template>
   <ClerkHostRenderer
-    :mount="clerk?.mountSignIn"
-    :unmount="clerk?.unmountSignIn"
+    :mount="clerk?.mountSignUp"
+    :unmount="clerk?.unmountSignUp"
     :props="props"
     :update-props="(clerk as any)?.__unstable__updateProps"
   />
