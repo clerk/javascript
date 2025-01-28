@@ -519,6 +519,12 @@ const devConfig = ({ mode, env }) => {
             }
           : {}),
       },
+      cache: true,
+      experiments: {
+        cache: {
+          type: 'persistent',
+        },
+      },
     };
   };
 
