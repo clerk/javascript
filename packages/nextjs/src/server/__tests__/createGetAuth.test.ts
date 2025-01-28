@@ -1,8 +1,8 @@
 import { AuthStatus, constants } from '@clerk/backend/internal';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 
+import { HmacSHA1 } from '../../vendor/crypto-js';
 import { createSyncGetAuth, getAuth } from '../createGetAuth';
 
 const mockSecretKey = 'sk_test_mock';
@@ -12,7 +12,7 @@ const mockToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLWlkIn0.0u5CllULtDVD9DUU
 // { alg: 'HS256' }.{ sub: 'user-id-2' }.sig
 const mockToken2 = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLWlkLTIifQ.K-mhz0Ber1Hfh2xCwmvsLwhZO_IKLtKt78KTHsecEas';
 
-const mockTokenSignature = hmacSHA1(mockToken, 'sk_test_mock').toString();
+const mockTokenSignature = HmacSHA1(mockToken, 'sk_test_mock').toString();
 
 describe('createGetAuth(opts)', () => {
   it('returns a getAuth function', () => {
