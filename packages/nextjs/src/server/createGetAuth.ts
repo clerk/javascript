@@ -1,3 +1,4 @@
+import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
@@ -9,6 +10,10 @@ import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
 
+/**
+ * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
+ * Should be used with function like `auth()` that are already asynchronous.
+ */
 export const createAsyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
@@ -17,7 +22,7 @@ export const createAsyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string }) => {
+    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
@@ -44,6 +49,11 @@ export const createAsyncGetAuth = ({
     };
   });
 
+/**
+ * Previous known as `createGetAuth`. We needed to create a sync and async variant in order to allow for improvements
+ * that required dynamic imports (using `require` would not work).
+ * It powers the synchronous top-level api `getAuh()`.
+ */
 export const createSyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
@@ -52,7 +62,7 @@ export const createSyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }) => {
+    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
