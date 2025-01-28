@@ -1,6 +1,6 @@
 import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import {
@@ -100,30 +100,35 @@ export const PasskeySection = () => {
       centered={false}
       id='passkeys'
     >
-      <ProfileSection.ItemList id='passkeys'>
-        {user.passkeys.map(passkey => (
-          <Action.Root key={passkey.id}>
-            <PasskeyItem
-              key={passkey.id}
-              {...passkey}
-            />
+      <Action.Root>
+        <ProfileSection.ItemList id='passkeys'>
+          {user.passkeys.map(passkey => {
+            const passkeyId = passkey.id;
+            return (
+              <Fragment key={passkeyId}>
+                <PasskeyItem
+                  key={passkeyId}
+                  {...passkey}
+                />
 
-            <Action.Open value='remove'>
-              <Action.Card variant='destructive'>
-                <RemovePasskeyScreen passkey={passkey} />
-              </Action.Card>
-            </Action.Open>
+                <Action.Open value={`remove-${passkeyId}`}>
+                  <Action.Card variant='destructive'>
+                    <RemovePasskeyScreen passkey={passkey} />
+                  </Action.Card>
+                </Action.Open>
 
-            <Action.Open value='rename'>
-              <Action.Card>
-                <PasskeyScreen passkey={passkey} />
-              </Action.Card>
-            </Action.Open>
-          </Action.Root>
-        ))}
+                <Action.Open value={`rename-${passkeyId}`}>
+                  <Action.Card>
+                    <PasskeyScreen passkey={passkey} />
+                  </Action.Card>
+                </Action.Open>
+              </Fragment>
+            );
+          })}
 
-        <AddPasskeyButton />
-      </ProfileSection.ItemList>
+          <AddPasskeyButton />
+        </ProfileSection.ItemList>
+      </Action.Root>
     </ProfileSection.Root>
   );
 };
@@ -138,7 +143,7 @@ const PasskeyItem = (props: PasskeyResource) => {
       }}
     >
       <PasskeyInfo {...props} />
-      <ActiveDeviceMenu />
+      <ActiveDeviceMenu passkey={props} />
     </ProfileSection.Item>
   );
 };
@@ -168,18 +173,19 @@ const PasskeyInfo = (props: PasskeyResource) => {
   );
 };
 
-const ActiveDeviceMenu = () => {
+const ActiveDeviceMenu = ({ passkey }: { passkey: PasskeyResource }) => {
   const { open } = useActionContext();
+  const passkeyId = passkey.id;
 
   const actions = [
     {
       label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
-      onClick: () => open('rename'),
+      onClick: () => open(`rename-${passkeyId}`),
     },
     {
       label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
       isDestructive: true,
-      onClick: () => open('remove'),
+      onClick: () => open(`remove-${passkeyId}`),
     },
   ] satisfies PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
