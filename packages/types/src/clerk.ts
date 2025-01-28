@@ -780,7 +780,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
      */
-    __internal_keyless_dismissPrompt?: () => Promise<void>;
+    __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
   };
 
 export interface NavigateOptions {
