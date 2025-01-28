@@ -97,7 +97,7 @@ export async function ClerkProvider(
     const newOrReadKeys = await import('../../server/keyless-node.js')
       .then(mod => mod.createOrReadKeyless())
       .catch(() => null);
-    const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
+    const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
       '../../server/keyless-log-cache.js'
     );
 
@@ -109,7 +109,8 @@ export async function ClerkProvider(
             publishableKey: newOrReadKeys.publishableKey,
             __internal_keyless_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
             __internal_keyless_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
+            // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
+            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
           })}
           nonce={await generateNonce()}
           initialState={await generateStatePromise()}
@@ -119,8 +120,8 @@ export async function ClerkProvider(
       );
 
       if (runningWithClaimedKeys) {
+        console.log('runningWithClaimedKeys');
         try {
-          // eslint-disable-next-line import/no-unresolved
           const secretKey = await import('../../server/keyless-node.js').then(
             mod => mod.safeParseClerkFile()?.secretKey,
           );
@@ -131,8 +132,18 @@ export async function ClerkProvider(
           const client = createClerkClientWithOptions({
             secretKey,
           });
-          // Add caching here
-          await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
+
+          /**
+           * Notifying the dashboard the should runs once. We are controlling this behaviour by caching the result of the request.
+           * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
+           */
+          await clerkDevelopmentCache?.run(
+            () => client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding(),
+            {
+              cacheKey: `${newOrReadKeys.publishableKey}_complete`,
+              onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+            },
+          );
         } catch {
           // ignore
         }
@@ -140,7 +151,7 @@ export async function ClerkProvider(
         /**
          * Notify developers.
          */
-        keylessLogger?.log({
+        clerkDevelopmentCache?.log({
           cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
           msg: createConfirmationMessage(),
         });
@@ -164,7 +175,7 @@ export async function ClerkProvider(
         /**
          * Notify developers.
          */
-        keylessLogger?.log({
+        clerkDevelopmentCache?.log({
           cacheKey: newOrReadKeys.publishableKey,
           msg: createKeylessModeMessage({ ...newOrReadKeys, claimUrl: claimUrl.href }),
         });
