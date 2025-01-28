@@ -15,7 +15,7 @@ import { useRevalidateEnvironment } from './use-revalidate-environment';
 type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
-  onDismiss: (() => Promise<unknown>) | undefined;
+  onDismiss: (() => Promise<unknown>) | undefined | null;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
