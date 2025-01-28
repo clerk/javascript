@@ -120,7 +120,6 @@ export async function ClerkProvider(
       );
 
       if (runningWithClaimedKeys) {
-        console.log('runningWithClaimedKeys');
         try {
           const secretKey = await import('../../server/keyless-node.js').then(
             mod => mod.safeParseClerkFile()?.secretKey,
