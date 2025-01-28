@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.1.8
+
+### Patch Changes
+
+- Improve runtime prop checking of all Vue Clerk components ([#5022](https://github.com/clerk/javascript/pull/5022)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/types@4.44.2
+  - @clerk/shared@2.20.16
+
 ## 1.1.7
 
 ### Patch Changes
