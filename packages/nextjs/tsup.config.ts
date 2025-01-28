@@ -67,7 +67,7 @@ export default defineConfig(overrideOptions => {
     ...esm,
     bundle: true,
     minify: true,
-    entry: ['./src/vendor/**'],
+    entry: ['./src/vendor/*.js'],
     outDir: './dist/esm/vendor',
     legacyOutput: false,
     outExtension: () => ({
@@ -80,7 +80,7 @@ export default defineConfig(overrideOptions => {
     ...cjs,
     bundle: true,
     minify: true,
-    entry: ['./src/vendor/**'],
+    entry: ['./src/vendor/*.js'],
     outDir: './dist/cjs/vendor',
     sourcemap: false,
   };
