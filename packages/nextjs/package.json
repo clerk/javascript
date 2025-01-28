@@ -70,12 +70,12 @@
     "@clerk/clerk-react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "crypto-js": "4.2.0",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
+    "crypto-js": "4.2.0",
     "next": "^14.2.23"
   },
   "peerDependencies": {
