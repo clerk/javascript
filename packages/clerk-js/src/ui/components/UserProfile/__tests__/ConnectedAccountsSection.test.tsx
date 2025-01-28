@@ -279,10 +279,10 @@ describe('ConnectedAccountsSection ', () => {
 
   describe('Handles opening/closing actions', () => {
     it('closes remove account form when connect account action is clicked', async () => {
-      const { wrapper } = await createFixtures(withConnections);
+      const { wrapper } = await createFixtures(withSomeConnections);
       const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
-      const item = getByText(/github/i);
+      const item = getByText(/google/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
         await userEvent.click(menuButton!);
@@ -293,12 +293,11 @@ describe('ConnectedAccountsSection ', () => {
 
       await expect(queryByRole('heading', { name: /remove connected account/i })).toBeInTheDocument();
 
-      // TODO: Figure out why this is not working as expected
-      // await userEvent.click(getByRole('button', { name: /connect account/i }));
+      await userEvent.click(getByRole('button', { name: /connect account/i }));
 
-      // await waitFor(() =>
-      //   expect(queryByRole('heading', { name: /remove connected account/i })).not.toBeInTheDocument(),
-      // );
+      await waitFor(() =>
+        expect(queryByRole('heading', { name: /remove connected account/i })).not.toBeInTheDocument(),
+      );
     });
   });
 });
