@@ -86,7 +86,7 @@ const EmailRow = ({
   actionRootValue,
   setActionRootValue,
 }: {
-  user: UserResource | null | undefined;
+  user?: UserResource | undefined;
   email: EmailAddressResource;
   actionRootValue?: string | null;
   setActionRootValue: (value: string | null) => void;
