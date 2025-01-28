@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.50.1
+
+### Patch Changes
+
+- Opt out of combined flow when sign up mode is restricted. ([#5020](https://github.com/clerk/javascript/pull/5020)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a cookie instead of localStorage for the active org ID to avoid issues when localStorage is disabled at the browser level. ([#4394](https://github.com/clerk/javascript/pull/4394)) by [@brkalow](https://github.com/brkalow)
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/types@4.44.2
+  - @clerk/localizations@3.10.2
+  - @clerk/shared@2.20.16
+
 ## 5.50.0
 
 ### Minor Changes

@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.10.4
+
+### Patch Changes
+
+- Mark keyless onboarding as complete when stored keys match explicit keys ([#4971](https://github.com/clerk/javascript/pull/4971)) by [@panteliselef](https://github.com/panteliselef)
+
+- Gracefully handle failure to create keyless. ([#5015](https://github.com/clerk/javascript/pull/5015)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revert: Improve error messages when clerkMiddleware is missing by suggesting the correct path to place the middleware.ts file (#4979). ([#5026](https://github.com/clerk/javascript/pull/5026)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`4773d0ad4ed27928fa53357906c0f3a349b9f871`](https://github.com/clerk/javascript/commit/4773d0ad4ed27928fa53357906c0f3a349b9f871), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/backend@1.23.9
+  - @clerk/types@4.44.2
+  - @clerk/clerk-react@5.22.8
+  - @clerk/shared@2.20.16
+
 ## 6.10.3
 
 ### Patch Changes
