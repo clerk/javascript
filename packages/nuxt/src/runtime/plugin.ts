@@ -1,8 +1,6 @@
 import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import { clerkPlugin } from '@clerk/vue';
-// eslint-disable-next-line import/no-unresolved -- FIXME: eslint@9
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
-// eslint-disable-next-line import/no-unresolved -- FIXME: eslint@9
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });

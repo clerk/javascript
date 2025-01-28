@@ -129,6 +129,7 @@ export const huHU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Meghívás',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Tag eltávolítása',
         tableHeader__actions: undefined,
@@ -460,6 +461,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Nincs fiókod?',
       actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
+      subtitleCombined: undefined,
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
       titleCombined: undefined,
     },
@@ -539,6 +541,7 @@ export const huHU: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
+      subtitleCombined: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
       titleCombined: 'Fiók létrehozása',
     },

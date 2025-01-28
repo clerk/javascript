@@ -23,20 +23,8 @@ import { useAwaitableReplace } from './useAwaitableReplace';
  * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
  */
 const LazyCreateKeylessApplication = dynamic(() =>
-  // eslint-disable-next-line import/no-unresolved
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
-
-declare global {
-  export interface Window {
-    __clerk_nav_await: Array<(value: void) => void>;
-    __clerk_nav: (to: string) => Promise<void>;
-    __clerk_internal_invalidateCachePromise: () => void | undefined;
-    next?: {
-      version: string;
-    };
-  }
-}
 
 const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   if (isNextWithUnstableServerActions) {
@@ -124,11 +112,11 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  const { children, ...rest } = props;
+export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
+  const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePublishableKey || !canUseKeyless) {
+  if (safePublishableKey || !canUseKeyless || disableKeyless) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 

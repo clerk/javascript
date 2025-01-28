@@ -12,23 +12,28 @@ import * as fs from 'fs';
 import { arSA } from '../ar-SA';
 import { beBY } from '../be-BY';
 import { bgBG } from '../bg-BG';
+import { caES } from '../ca-ES';
 import { csCZ } from '../cs-CZ';
 import { daDK } from '../da-DK';
 import { deDE } from '../de-DE';
 import { elGR } from '../el-GR';
+import { enGB } from '../en-GB';
 import { enUS } from '../en-US';
 import { esES } from '../es-ES';
 import { esMX } from '../es-MX';
 import { fiFI } from '../fi-FI';
 import { frFR } from '../fr-FR';
 import { heIL } from '../he-IL';
+import { hrHR } from '../hr-HR';
 import { huHU } from '../hu-HU';
+import { idID } from '../id-ID';
 import { isIS } from '../is-IS';
 import { itIT } from '../it-IT';
 import { jaJP } from '../ja-JP';
 import { koKR } from '../ko-KR';
 import { mnMN } from '../mn-MN';
 import { nbNO } from '../nb-NO';
+import { nlBE } from '../nl-BE';
 import { nlNL } from '../nl-NL';
 import { plPL } from '../pl-PL';
 import { ptBR } from '../pt-BR';
@@ -94,16 +99,14 @@ function sortObject(obj: any) {
     return obj;
   }
 
-  const sortedObj = {};
+  const sortedObj: Record<string, any> = {};
   if (Object.prototype.hasOwnProperty.call(obj, 'locale')) {
-    // @ts-expect-error - TS7053
     sortedObj['locale'] = obj['locale'];
   }
   Object.keys(obj)
     .sort()
     .forEach(key => {
       if (key !== 'locale') {
-        // @ts-expect-error - TS7053
         sortedObj[key] = sortObject(obj[key]);
       }
     });
@@ -161,19 +164,24 @@ run(enUS, 'en-US');
 run(elGR, 'el-GR');
 run(arSA, 'ar-SA');
 run(beBY, 'be-BY');
+run(caES, 'ca-ES');
 run(csCZ, 'cs-CZ');
 run(daDK, 'da-DK');
 run(deDE, 'de-DE');
+run(enGB, 'en-GB');
 run(esES, 'es-ES');
 run(esMX, 'es-MX');
 run(frFR, 'fr-FR');
 run(fiFI, 'fi-FI');
 run(heIL, 'he-IL');
+run(hrHR, 'hr-HR');
+run(idID, 'id-ID');
 run(isIS, 'is-IS');
 run(itIT, 'it-IT');
 run(jaJP, 'ja-JP');
 run(koKR, 'ko-KR');
 run(mnMN, 'mn-MN');
+run(nlBE, 'nl-BE');
 run(nbNO, 'nb-NO');
 run(nlNL, 'nl-NL');
 run(plPL, 'pl-PL');
