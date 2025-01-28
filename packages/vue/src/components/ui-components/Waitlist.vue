@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
+import type { WaitlistProps } from '@clerk/types';
 import { useClerk } from '../../composables';
-import type { SignInProps } from '@clerk/types';
 
 const clerk = useClerk();
-
-const props = defineProps<SignInProps>();
+const props = defineProps<WaitlistProps>();
 </script>
 
 <template>
   <ClerkHostRenderer
-    :mount="clerk?.mountSignIn"
-    :unmount="clerk?.unmountSignIn"
-    :props="props"
+    :mount="clerk?.mountWaitlist"
+    :unmount="clerk?.unmountWaitlist"
     :update-props="(clerk as any)?.__unstable__updateProps"
+    :props="props"
   />
 </template>

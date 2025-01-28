@@ -32,11 +32,17 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
+  const isCombinedFlow =
+    (signUpMode !== 'restricted' &&
+      Boolean(
+        !options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl) && signUpMode === 'public',
+      )) ||
+    false;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),

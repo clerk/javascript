@@ -3,12 +3,8 @@ import type { CustomPage } from '@clerk/types';
 import type { Component } from 'vue';
 import { ref } from 'vue';
 
-import {
-  OrganizationProfileLink,
-  OrganizationProfilePage,
-  UserProfileLink,
-  UserProfilePage,
-} from '../components/uiComponents';
+import { OrganizationProfileLink, OrganizationProfilePage } from '../components/ui-components/OrganizationProfile';
+import { UserProfileLink, UserProfilePage } from '../components/ui-components/UserProfile';
 import { customLinkWrongProps, customPageWrongProps } from '../errors/messages';
 import type { AddCustomPagesParams } from '../types';
 import { isThatComponent } from './componentValidation';
