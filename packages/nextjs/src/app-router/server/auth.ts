@@ -70,7 +70,7 @@ export const auth: AuthFn = async () => {
     }
 
     try {
-      const isSrcAppDir = await import('../../server/keyless-node.js').then(m => m.hasSrcAppDir());
+      const isSrcAppDir = await import('../../server/fs/middleware-location.js').then(m => m.hasSrcAppDir());
       return [`Your Middleware exists at ./${isSrcAppDir ? 'src/' : ''}middleware.ts`];
     } catch {
       return [];

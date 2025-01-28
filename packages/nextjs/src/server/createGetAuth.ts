@@ -28,7 +28,7 @@ export const createAsyncGetAuth = ({
           assertAuthStatus(req, noAuthStatusMessage);
         }
 
-        const missConfiguredMiddlewareLocation = await import('./keyless-node.js')
+        const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
           .then(m => m.suggestMiddlewareLocation())
           .catch(() => undefined);
 

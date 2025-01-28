@@ -1,13 +1,7 @@
 import type { AccountlessApplication } from '@clerk/backend';
 
-/**
- * Attention: Only import this module when the node runtime is used.
- * We are using conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
- */
-// @ts-ignore
-import nodeRuntime from '#safe-node-apis';
-
 import { createClerkClientWithOptions } from './createClerkClient';
+import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
 
 /**
  * The Clerk-specific directory name.
@@ -20,40 +14,15 @@ const CLERK_HIDDEN = '.clerk';
  */
 const CLERK_LOCK = 'clerk.lock';
 
-const throwMissingFsModule = () => {
-  throw new Error("Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.");
-};
-
-const safeNodeRuntimeFs = () => {
-  if (!nodeRuntime.fs) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.fs;
-};
-
-const safeNodeRuntimePath = () => {
-  if (!nodeRuntime.path) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.path;
-};
-
-const safeNodeCwd = () => {
-  if (!nodeRuntime.cwd) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.cwd;
-};
-
 /**
  * The `.clerk/` directory is NOT safe to be committed as it may include sensitive information about a Clerk instance.
  * It may include an instance's secret key and the secret token for claiming that instance.
  */
 function updateGitignore() {
-  const { existsSync, writeFileSync, readFileSync, appendFileSync } = safeNodeRuntimeFs();
+  const { existsSync, writeFileSync, readFileSync, appendFileSync } = nodeFsOrThrow();
 
-  const path = safeNodeRuntimePath();
-  const cwd = safeNodeCwd();
+  const path = nodePathOrThrow();
+  const cwd = nodeCwdOrThrow();
   const gitignorePath = path.join(cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
@@ -68,8 +37,8 @@ function updateGitignore() {
 }
 
 const generatePath = (...slugs: string[]) => {
-  const path = safeNodeRuntimePath();
-  const cwd = safeNodeCwd();
+  const path = nodePathOrThrow();
+  const cwd = nodeCwdOrThrow();
   return path.join(cwd(), CLERK_HIDDEN, ...slugs);
 };
 
@@ -80,7 +49,7 @@ const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
 let isCreatingFile = false;
 
 export function safeParseClerkFile(): AccountlessApplication | undefined {
-  const { readFileSync } = safeNodeRuntimeFs();
+  const { readFileSync } = nodeFsOrThrow();
   try {
     const CONFIG_PATH = getKeylessConfigurationPath();
     let fileAsString;
@@ -99,7 +68,7 @@ export function safeParseClerkFile(): AccountlessApplication | undefined {
  * Using both an in-memory and file system lock seems to be the most effective solution.
  */
 const lockFileWriting = () => {
-  const { writeFileSync } = safeNodeRuntimeFs();
+  const { writeFileSync } = nodeFsOrThrow();
 
   isCreatingFile = true;
 
@@ -116,7 +85,7 @@ const lockFileWriting = () => {
 };
 
 const unlockFileWriting = () => {
-  const { rmSync } = safeNodeRuntimeFs();
+  const { rmSync } = nodeFsOrThrow();
 
   try {
     rmSync(CLERK_LOCK, { force: true, recursive: true });
@@ -128,12 +97,12 @@ const unlockFileWriting = () => {
 };
 
 const isFileWritingLocked = () => {
-  const { existsSync } = safeNodeRuntimeFs();
+  const { existsSync } = nodeFsOrThrow();
   return isCreatingFile || existsSync(CLERK_LOCK);
 };
 
 async function createOrReadKeyless(): Promise<AccountlessApplication | null> {
-  const { writeFileSync, mkdirSync } = safeNodeRuntimeFs();
+  const { writeFileSync, mkdirSync } = nodeFsOrThrow();
 
   /**
    * If another request is already in the process of acquiring keys return early.
@@ -197,7 +166,7 @@ This directory is auto-generated from \`@clerk/nextjs\` because you are running 
 }
 
 function removeKeyless() {
-  const { rmSync } = safeNodeRuntimeFs();
+  const { rmSync } = nodeFsOrThrow();
 
   /**
    * If another request is already in the process of acquiring keys return early.
@@ -221,49 +190,4 @@ function removeKeyless() {
   unlockFileWriting();
 }
 
-function hasSrcAppDir() {
-  const { existsSync } = safeNodeRuntimeFs();
-  const path = safeNodeRuntimePath();
-  const cwd = safeNodeCwd();
-
-  const projectWithAppSrc = path.join(cwd(), 'src', 'app');
-
-  return !!existsSync(projectWithAppSrc);
-}
-
-function suggestMiddlewareLocation() {
-  const suggestionMessage = (to?: 'src/', from?: 'src/app/' | 'app/') =>
-    `Clerk: Move your middleware file to ./${to || ''}middleware.ts. Currently located at ./${from || ''}middleware.ts`;
-
-  const { existsSync } = safeNodeRuntimeFs();
-  const path = safeNodeRuntimePath();
-  const cwd = safeNodeCwd();
-
-  const projectWithAppSrcPath = path.join(cwd(), 'src', 'app');
-  const projectWithAppPath = path.join(cwd(), 'app');
-
-  if (existsSync(projectWithAppSrcPath)) {
-    if (existsSync(path.join(projectWithAppSrcPath, 'middleware.ts'))) {
-      return suggestionMessage('src/', 'src/app/');
-    }
-
-    if (existsSync(path.join(cwd(), 'middleware.ts'))) {
-      return suggestionMessage('src/');
-    }
-
-    // default error
-    return undefined;
-  }
-
-  if (existsSync(projectWithAppPath)) {
-    if (existsSync(path.join(projectWithAppPath, 'middleware.ts'))) {
-      return suggestionMessage(undefined, 'app/');
-    }
-    // default error
-    return undefined;
-  }
-
-  return undefined;
-}
-
-export { createOrReadKeyless, removeKeyless, suggestMiddlewareLocation, hasSrcAppDir };
+export { createOrReadKeyless, removeKeyless };
