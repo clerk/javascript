@@ -11,8 +11,9 @@ function hasSrcAppDir() {
 }
 
 function suggestMiddlewareLocation() {
-  const suggestionMessage = (to?: 'src/', from?: 'src/app/' | 'app/') =>
-    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to || ''}middleware.ts. Currently located at ./${from || ''}middleware.ts`;
+  const fileExtensions = ['ts', 'js'] as const;
+  const suggestionMessage = (extension: (typeof fileExtensions)[number], to?: 'src/', from?: 'src/app/' | 'app/') =>
+    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to || ''}middleware.${extension}. Currently located at ./${from || ''}middleware.${extension}`;
 
   const { existsSync } = nodeFsOrThrow();
   const path = nodePathOrThrow();
@@ -22,12 +23,14 @@ function suggestMiddlewareLocation() {
   const projectWithAppPath = path.join(cwd(), 'app');
 
   if (existsSync(projectWithAppSrcPath)) {
-    if (existsSync(path.join(projectWithAppSrcPath, 'middleware.ts'))) {
-      return suggestionMessage('src/', 'src/app/');
-    }
+    for (const fileExtension of fileExtensions) {
+      if (existsSync(path.join(projectWithAppSrcPath, `middleware.${fileExtension}`))) {
+        return suggestionMessage(fileExtension, 'src/', 'src/app/');
+      }
 
-    if (existsSync(path.join(cwd(), 'middleware.ts'))) {
-      return suggestionMessage('src/');
+      if (existsSync(path.join(cwd(), `middleware.${fileExtension}`))) {
+        return suggestionMessage(fileExtension, 'src/');
+      }
     }
 
     // default error
@@ -35,8 +38,10 @@ function suggestMiddlewareLocation() {
   }
 
   if (existsSync(projectWithAppPath)) {
-    if (existsSync(path.join(projectWithAppPath, 'middleware.ts'))) {
-      return suggestionMessage(undefined, 'app/');
+    for (const fileExtension of fileExtensions) {
+      if (existsSync(path.join(projectWithAppPath, `middleware.${fileExtension}`))) {
+        return suggestionMessage(fileExtension, undefined, 'app/');
+      }
     }
     // default error
     return undefined;
