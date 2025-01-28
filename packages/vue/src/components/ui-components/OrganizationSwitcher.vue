@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useClerk } from '../../composables';
-import { OrganizationSwitcherProps } from '@clerk/types';
+import type { OrganizationSwitcherProps } from '@clerk/types';
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 
 const clerk = useClerk();
