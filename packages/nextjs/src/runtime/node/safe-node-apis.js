@@ -14,4 +14,6 @@ const fs = {
   rmSync,
 };
 
-module.exports = { fs, path };
+const cwd = () => process.cwd();
+
+module.exports = { fs, path, cwd };

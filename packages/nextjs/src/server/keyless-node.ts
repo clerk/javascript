@@ -38,6 +38,13 @@ const safeNodeRuntimePath = () => {
   return nodeRuntime.path;
 };
 
+const safeNodeCwd = () => {
+  if (!nodeRuntime.cwd) {
+    throwMissingFsModule();
+  }
+  return nodeRuntime.cwd;
+};
+
 /**
  * The `.clerk/` directory is NOT safe to be committed as it may include sensitive information about a Clerk instance.
  * It may include an instance's secret key and the secret token for claiming that instance.
@@ -46,7 +53,8 @@ function updateGitignore() {
   const { existsSync, writeFileSync, readFileSync, appendFileSync } = safeNodeRuntimeFs();
 
   const path = safeNodeRuntimePath();
-  const gitignorePath = path.join(process.cwd(), '.gitignore');
+  const cwd = safeNodeCwd();
+  const gitignorePath = path.join(cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
   }
@@ -61,7 +69,8 @@ function updateGitignore() {
 
 const generatePath = (...slugs: string[]) => {
   const path = safeNodeRuntimePath();
-  return path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
+  const cwd = safeNodeCwd();
+  return path.join(cwd(), CLERK_HIDDEN, ...slugs);
 };
 
 const _TEMP_DIR_NAME = '.tmp';
@@ -215,8 +224,9 @@ function removeKeyless() {
 function hasSrcAppDir() {
   const { existsSync } = safeNodeRuntimeFs();
   const path = safeNodeRuntimePath();
+  const cwd = safeNodeCwd();
 
-  const projectWithAppSrc = path.join(process.cwd(), 'src', 'app');
+  const projectWithAppSrc = path.join(cwd(), 'src', 'app');
 
   return !!existsSync(projectWithAppSrc);
 }
@@ -227,16 +237,17 @@ function suggestMiddlewareLocation() {
 
   const { existsSync } = safeNodeRuntimeFs();
   const path = safeNodeRuntimePath();
+  const cwd = safeNodeCwd();
 
-  const projectWithAppSrcPath = path.join(process.cwd(), 'src', 'app');
-  const projectWithAppPath = path.join(process.cwd(), 'app');
+  const projectWithAppSrcPath = path.join(cwd(), 'src', 'app');
+  const projectWithAppPath = path.join(cwd(), 'app');
 
   if (existsSync(projectWithAppSrcPath)) {
     if (existsSync(path.join(projectWithAppSrcPath, 'middleware.ts'))) {
       return suggestionMessage('src/', 'src/app/');
     }
 
-    if (existsSync(path.join(process.cwd(), 'middleware.ts'))) {
+    if (existsSync(path.join(cwd(), 'middleware.ts'))) {
       return suggestionMessage('src/');
     }
 
