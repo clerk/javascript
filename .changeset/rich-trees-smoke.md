@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Vendor `crypto-js` dependency to avoid bundling issues.
+Switch to `crypto-es` and bundle the dependency to avoid downstream build issues
