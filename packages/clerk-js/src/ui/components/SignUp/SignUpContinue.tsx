@@ -109,7 +109,6 @@ function _SignUpContinue() {
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
-  const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
 
   const fields = determineActiveFields({
     attributes,
@@ -122,7 +121,6 @@ function _SignUpContinue() {
   minimizeFieldsForExistingSignup(fields, signUp);
 
   const oauthOptions = userSettings.authenticatableSocialStrategies;
-  const web3Options = userSettings.web3FirstFactors;
 
   const handleChangeActive = (type: ActiveIdentifier) => {
     if (!emailOrPhone(attributes, isProgressiveSignUp)) {
@@ -184,7 +182,6 @@ function _SignUpContinue() {
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
-  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   const headerTitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.title')
@@ -209,10 +206,10 @@ function _SignUpContinue() {
             gap={8}
           >
             <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && !onlyLegalConsentMissing && (
+              {showOauthProviders && !onlyLegalConsentMissing && (
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
-                  enableWeb3Providers={showWeb3Providers}
+                  enableWeb3Providers={false}
                   continueSignUp
                 />
               )}
