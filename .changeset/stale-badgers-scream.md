@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Make sure to catch all CaptchaHeartbeat errors
+Do not throw error on `captchaHeartbeat` if `displayConfig` is `null`.
