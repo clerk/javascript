@@ -3,15 +3,60 @@ import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
+import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
-import { getHeader } from './headers-utils';
+import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
 
-export const createGetAuth = ({
-  noAuthStatusMessage,
+/**
+ * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
+ * Should be used with function like `auth()` that are already asynchronous.
+ */
+export const createAsyncGetAuth = ({
   debugLoggerName,
+  noAuthStatusMessage,
+}: {
+  debugLoggerName: string;
+  noAuthStatusMessage: string;
+}) =>
+  withLogger(debugLoggerName, logger => {
+    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
+      if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
+        logger.enable();
+      }
+
+      if (!detectClerkMiddleware(req)) {
+        // Keep the same behaviour for versions that may have issues with bundling `node:fs`
+        if (isNextWithUnstableServerActions) {
+          assertAuthStatus(req, noAuthStatusMessage);
+        }
+
+        const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
+          .then(m => m.suggestMiddlewareLocation())
+          .catch(() => undefined);
+
+        if (missConfiguredMiddlewareLocation) {
+          throw new Error(missConfiguredMiddlewareLocation);
+        }
+
+        // still throw there is no suggested move location
+        assertAuthStatus(req, noAuthStatusMessage);
+      }
+
+      return getAuthDataFromRequest(req, { ...opts, logger });
+    };
+  });
+
+/**
+ * Previous known as `createGetAuth`. We needed to create a sync and async variant in order to allow for improvements
+ * that required dynamic imports (using `require` would not work).
+ * It powers the synchronous top-level api `getAuh()`.
+ */
+export const createSyncGetAuth = ({
+  debugLoggerName,
+  noAuthStatusMessage,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
@@ -23,7 +68,6 @@ export const createGetAuth = ({
       }
 
       assertAuthStatus(req, noAuthStatusMessage);
-
       return getAuthDataFromRequest(req, { ...opts, logger });
     };
   });
@@ -107,7 +151,7 @@ export const createGetAuth = ({
  * }
  * ```
  */
-export const getAuth = createGetAuth({
+export const getAuth = createSyncGetAuth({
   debugLoggerName: 'getAuth()',
   noAuthStatusMessage: getAuthAuthHeaderMissing(),
 });
