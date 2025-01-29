@@ -15,14 +15,10 @@ export class CaptchaHeartbeat {
       return;
     }
 
-    try {
-      await this.challengeAndSend();
-      this.timers.setInterval(() => {
-        void this.challengeAndSend();
-      }, this.intervalInMs());
-    } catch (error) {
-      console.error('Error starting CaptchaHeartbeat:', error);
-    }
+    await this.challengeAndSend();
+    this.timers.setInterval(() => {
+      void this.challengeAndSend();
+    }, this.intervalInMs());
   }
 
   private async challengeAndSend() {
