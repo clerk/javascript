@@ -16,7 +16,7 @@ import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { assertAuthStatus, getCookie, getHeader } from './utils';
 
-type GetAuthOptions = { entity?: 'user' | 'machine' };
+type GetAuthOptions = { entity?: 'user' | 'machine' | 'any' };
 export const createGetAuth = ({
   noAuthStatusMessage,
   debugLoggerName,
@@ -43,6 +43,10 @@ export const createGetAuth = ({
         req: RequestLike,
         opts: GetAuthDataFromRequestOptions & { entity: 'user' },
       ): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'any' },
+      ): AuthObject | AuthenticatedMachineObject | UnauthenticatedMachineObject;
       function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
       function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
         // Ensure you spread and pass the correct options, including the logger

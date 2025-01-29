@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import type { EntityTypes, RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
@@ -11,9 +11,13 @@ import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
-type EntityTypes = 'user' | 'machine';
-
-type EntityTypeToAuth<T extends EntityTypes> = T extends 'user' ? Auth : T extends 'machine' ? MachineAuth : Auth;
+type EntityTypeToAuth<T extends EntityTypes> = T extends 'user'
+  ? Auth
+  : T extends 'machine'
+    ? MachineAuth
+    : T extends 'any'
+      ? MachineAuth | Auth
+      : Auth;
 
 type Auth = AuthObject & { redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 

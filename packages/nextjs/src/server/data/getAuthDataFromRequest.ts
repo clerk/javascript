@@ -22,7 +22,7 @@ import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, g
 export type GetAuthDataFromRequestOptions = {
   secretKey?: string;
   logger?: LoggerNoCommit;
-  entity?: 'user' | 'machine';
+  entity?: 'user' | 'machine' | 'any';
 };
 export function getAuthDataFromRequest(
   req: RequestLike,
@@ -32,6 +32,10 @@ export function getAuthDataFromRequest(
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions & { entity: 'user' },
 ): AuthObject;
+export function getAuthDataFromRequest(
+  req: RequestLike,
+  opts: GetAuthDataFromRequestOptions & { entity: 'any' },
+): AuthObject | AuthenticatedMachineObject | UnauthenticatedMachineObject;
 export function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
 export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
@@ -57,28 +61,54 @@ export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRe
 
   opts.logger?.debug('auth options', options);
 
+  // assertTokenSignature(authToken as string, options.secretKey, authSignature);
+  // const jwt = decodeJwt(authToken as string);
+
+  // opts.logger?.debug('jwt', jwt.raw);
+
   let authObject;
-  if (opts.entity === 'machine' && (!authStatus || authStatus !== AuthStatus.MachineAuthenticated)) {
-    authObject = unauthenticatedMachineObject(options);
-  } else if (opts.entity === 'machine' && authStatus === AuthStatus.MachineAuthenticated) {
-    assertTokenSignature(authToken as string, options.secretKey, authSignature);
+  // If entity is `any`, automatically derive the property entity type so we can return the proper auth object
+  const realEntity = opts.entity === 'any' ? getEntityFromSubClaim(authToken) : opts.entity;
 
-    const jwt = decodeJwt(authToken as string);
+  switch (realEntity) {
+    case 'machine':
+      if (!authStatus || authStatus !== AuthStatus.MachineAuthenticated) {
+        authObject = unauthenticatedMachineObject(options);
+      } else {
+        assertTokenSignature(authToken as string, options.secretKey, authSignature);
+        const jwt = decodeJwt(authToken as string);
+        opts.logger?.debug('jwt', jwt.raw);
+        authObject = authenticatedMachineObject(jwt.raw.text, jwt.payload);
+      }
+      break;
+    default:
+      if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+        authObject = signedOutAuthObject(options);
+      } else {
+        assertTokenSignature(authToken as string, options.secretKey, authSignature);
+        const jwt = decodeJwt(authToken as string);
+        opts.logger?.debug('jwt', jwt.raw);
+        // @ts-expect-error -- Restrict parameter type of options to only list what's needed
+        authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+      }
+      // // fallback to signed out, shouldn't ever happen
 
-    opts.logger?.debug('jwt', jwt.raw);
-    authObject = authenticatedMachineObject(jwt.raw.text, jwt.payload);
-  } else if (!authStatus || authStatus !== AuthStatus.SignedIn) {
-    authObject = signedOutAuthObject(options);
-  } else {
-    assertTokenSignature(authToken as string, options.secretKey, authSignature);
-
-    const jwt = decodeJwt(authToken as string);
-
-    opts.logger?.debug('jwt', jwt.raw);
-
-    // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+      // // @ts-expect-error -- Restrict parameter type of options to only list what's needed
+      // authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+      break;
   }
 
   return authObject;
+}
+
+function getEntityFromSubClaim(authToken: string | null | undefined) {
+  if (!authToken) {
+    return 'user';
+  }
+  const jwt = decodeJwt(authToken);
+  if (jwt.payload.sub.startsWith('mch_')) {
+    return 'machine';
+  }
+
+  return 'user';
 }
