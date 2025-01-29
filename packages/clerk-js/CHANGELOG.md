@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.50.1
+
+### Patch Changes
+
+- Removes Turnstile remotely-hosted code from builds for unsupported environments ([#5039](https://github.com/clerk/javascript/pull/5039)) by [@tmilewski](https://github.com/tmilewski)
+
+- Opt out of combined flow when sign up mode is restricted. ([#5020](https://github.com/clerk/javascript/pull/5020)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a cookie instead of localStorage for the active org ID to avoid issues when localStorage is disabled at the browser level. ([#4394](https://github.com/clerk/javascript/pull/4394)) by [@brkalow](https://github.com/brkalow)
+
+- Removes web3 provider options from progressive sign up step. web3 providers don't have the ability to fill in missing fields. ([#5036](https://github.com/clerk/javascript/pull/5036)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Do not throw error on `captchaHeartbeat` if `displayConfig` is `null`. ([#5032](https://github.com/clerk/javascript/pull/5032)) by [@jacekradko](https://github.com/jacekradko)
+
+- Pass the `signInUrl` throught to the sign up context when within the combined flow. ([#5042](https://github.com/clerk/javascript/pull/5042)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+  - @clerk/localizations@3.10.2
+
 ## 5.50.0
 
 ### Minor Changes
