@@ -61,7 +61,7 @@ export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRe
 
   opts.logger?.debug('auth options', options);
 
-  if (!authStatus) {
+  if (!authStatus || !authToken) {
     switch (opts.entity) {
       case 'machine':
         return unauthenticatedMachineObject(options);
@@ -71,8 +71,8 @@ export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRe
     }
   }
 
-  assertTokenSignature(authToken as string, options.secretKey, authSignature);
-  const jwt = decodeJwt(authToken as string);
+  assertTokenSignature(authToken, options.secretKey, authSignature);
+  const jwt = decodeJwt(authToken);
   opts.logger?.debug('jwt', jwt.raw);
 
   let authObject;
