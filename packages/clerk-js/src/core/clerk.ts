@@ -21,6 +21,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  CommerceNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -119,6 +120,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -170,6 +172,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
+  public static _commerce: CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: ActiveSessionResource | null | undefined;
@@ -288,6 +291,13 @@ export class Clerk implements ClerkInterface {
 
   get isStandardBrowser(): boolean {
     return this.#options.standardBrowser || false;
+  }
+
+  get commerce(): CommerceNamespace {
+    if (!Clerk._commerce) {
+      Clerk._commerce = new Commerce();
+    }
+    return Clerk._commerce;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {

@@ -13,6 +13,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { CommerceNamespace } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -140,6 +141,9 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /** Commerce Object */
+  commerce: CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -1424,7 +1428,6 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 export type PricingTableProps = {
-  currency: string;
   appearance?: PricingTableTheme;
 };
 

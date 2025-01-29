@@ -3,6 +3,7 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
+import { BillingPage } from './BillingPage';
 import { SecurityPage } from './SecurityPage';
 
 export const UserProfileRoutes = () => {
@@ -48,7 +49,7 @@ export const UserProfileRoutes = () => {
         <Route path={isBillingPageRoot ? undefined : 'billing'}>
           <Switch>
             <Route index>
-              <div>Here</div>
+              <BillingPage />
             </Route>
           </Switch>
         </Route>

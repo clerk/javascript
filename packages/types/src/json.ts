@@ -593,3 +593,38 @@ export interface WaitlistJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface CommerceFeatureJSON extends ClerkResourceJSON {
+  object: 'commerce_feature';
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  avatar_url: string;
+}
+
+export interface CommercePlanJSON extends ClerkResourceJSON {
+  object: 'commerce_plan';
+  id: string;
+  name: string;
+  amount: number;
+  amount_formatted: string;
+  currency_symbol: string;
+  currency: string;
+  description: string;
+  is_recurring: boolean;
+  has_base_fee: boolean;
+  payer_type: string[];
+  slug: string;
+  avatar_url: string;
+  features: CommerceFeatureJSON[];
+}
+
+export interface CommerceProductJSON extends ClerkResourceJSON {
+  object: 'commerce_product';
+  id: string;
+  slug: string;
+  currency: string;
+  is_default: boolean;
+  plans: CommercePlanJSON[];
+}

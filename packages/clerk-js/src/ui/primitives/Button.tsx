@@ -61,6 +61,13 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accentContrast]: theme.colors.$white,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
+          light: {
+            [vars.accent]: theme.colors.$white,
+            [vars.accentHover]: theme.colors.$whiteAlpha700,
+            [vars.border]: theme.colors.$neutralAlpha200,
+            [vars.accentContrast]: theme.colors.$primary500,
+            [vars.alpha]: theme.colors.$neutralAlpha50,
+          },
           danger: {
             [vars.accent]: theme.colors.$danger500,
             [vars.accentHover]: theme.colors.$danger600,
