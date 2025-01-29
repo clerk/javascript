@@ -108,6 +108,17 @@ describe('SignUpContinue', () => {
     screen.getByText(`Continue with ${name}`);
   });
 
+  it('does not render web3 providers', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withPassword({ required: true });
+      f.withWeb3Wallet();
+    });
+
+    const { queryByAltText } = render(<SignUpContinue />, { wrapper });
+    expect(queryByAltText(/sign in with metamask/i)).not.toBeInTheDocument();
+  });
+
   it('renders error for invalid username length', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
