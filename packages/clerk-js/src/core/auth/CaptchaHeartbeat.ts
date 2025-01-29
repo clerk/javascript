@@ -15,10 +15,14 @@ export class CaptchaHeartbeat {
       return;
     }
 
-    await this.challengeAndSend();
-    this.timers.setInterval(() => {
-      void this.challengeAndSend();
-    }, this.intervalInMs());
+    try {
+      await this.challengeAndSend();
+      this.timers.setInterval(() => {
+        void this.challengeAndSend();
+      }, this.intervalInMs());
+    } catch (error) {
+      console.error('Error starting CaptchaHeartbeat:', error);
+    }
   }
 
   private async challengeAndSend() {
@@ -35,7 +39,7 @@ export class CaptchaHeartbeat {
   }
 
   private isEnabled() {
-    return !!this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
+    return !!this.clerk.__unstable__environment?.displayConfig?.captchaHeartbeat;
   }
 
   private clientBypass() {
