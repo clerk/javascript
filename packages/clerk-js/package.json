@@ -32,6 +32,7 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
