@@ -61,10 +61,19 @@ export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRe
 
   opts.logger?.debug('auth options', options);
 
-  // assertTokenSignature(authToken as string, options.secretKey, authSignature);
-  // const jwt = decodeJwt(authToken as string);
+  if (!authStatus) {
+    switch (opts.entity) {
+      case 'machine':
+        return unauthenticatedMachineObject(options);
+      case 'user':
+      default:
+        return signedOutAuthObject(options);
+    }
+  }
 
-  // opts.logger?.debug('jwt', jwt.raw);
+  assertTokenSignature(authToken as string, options.secretKey, authSignature);
+  const jwt = decodeJwt(authToken as string);
+  opts.logger?.debug('jwt', jwt.raw);
 
   let authObject;
   // If entity is `any`, automatically derive the property entity type so we can return the proper auth object
@@ -72,29 +81,25 @@ export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRe
 
   switch (realEntity) {
     case 'machine':
-      if (!authStatus || authStatus !== AuthStatus.MachineAuthenticated) {
+      if (authStatus !== AuthStatus.MachineAuthenticated) {
         authObject = unauthenticatedMachineObject(options);
       } else {
-        assertTokenSignature(authToken as string, options.secretKey, authSignature);
-        const jwt = decodeJwt(authToken as string);
-        opts.logger?.debug('jwt', jwt.raw);
         authObject = authenticatedMachineObject(jwt.raw.text, jwt.payload);
       }
       break;
-    default:
-      if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+    case 'user':
+      if (authStatus !== AuthStatus.SignedIn) {
         authObject = signedOutAuthObject(options);
       } else {
-        assertTokenSignature(authToken as string, options.secretKey, authSignature);
-        const jwt = decodeJwt(authToken as string);
-        opts.logger?.debug('jwt', jwt.raw);
         // @ts-expect-error -- Restrict parameter type of options to only list what's needed
         authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
       }
-      // // fallback to signed out, shouldn't ever happen
+      break;
+    default:
+      // fallback to signed out, shouldn't ever happen
 
-      // // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-      // authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+      // @ts-expect-error -- Restrict parameter type of options to only list what's needed
+      authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
       break;
   }
 
