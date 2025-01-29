@@ -110,8 +110,9 @@ describe('SignUpContinue', () => {
 
   it('does not render web3 providers', async () => {
     const { wrapper } = await createFixtures(f => {
-      f.withEmailAddress({ required: true });
-      f.withPassword({ required: true });
+      f.withUsername({ required: true });
+      f.startSignUpWithEmailAddress();
+      f.withSocialProvider({ provider: 'google' });
       f.withWeb3Wallet();
     });
 
