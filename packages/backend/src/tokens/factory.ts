@@ -2,7 +2,7 @@ import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import type { MachineAuthenticatedState, MachineUnauthenticatedState, RequestState } from './authStatus';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, EntityTypes } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
 type BuildTimeOptions = Partial<
@@ -42,8 +42,6 @@ export type CreateAuthenticateRequestOptions = {
 
 // This generic allows the types to show up in autocomplete
 // We also need to redefine the types here because they don't show up outside the factory and should match the function signature from request.ts
-type EntityTypes = 'machine' | 'user' | 'any';
-
 type EntityTypeToState<T extends EntityTypes> = T extends 'machine'
   ? MachineUnauthenticatedState | MachineAuthenticatedState
   : T extends 'user'

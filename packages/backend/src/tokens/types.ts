@@ -1,6 +1,10 @@
 import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
+// This generic allows the types to show up in autocomplete
+// We also need to redefine the types here because they don't show up outside the factory and should match the function signature from request.ts
+export type EntityTypes = 'machine' | 'user' | 'any';
+
 export type AuthenticateRequestOptions = {
   publishableKey?: string;
   domain?: string;
