@@ -90,6 +90,10 @@ async function loadCaptcha() {
 
 async function loadCaptchaFromCloudflareURL() {
   try {
+    if (__BUILD_DISABLE_RHC__) {
+      return Promise.reject(new Error('Captcha not supported in this environment'));
+    }
+
     return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
   } catch (err) {
     console.warn(
