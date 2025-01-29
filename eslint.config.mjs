@@ -178,6 +178,9 @@ export default tseslint.config([
   {
     name: 'repo/global-temporary',
     rules: {
+      // Making this rule an error to see if we can catch any issues
+      '@typescript-eslint/no-non-null-assertion': 'error',
+
       // TODO: All rules below should be set to their defaults
       // when we're able to make the appropriate changes.
       '@typescript-eslint/await-thenable': 'warn',
@@ -205,7 +208,6 @@ export default tseslint.config([
         },
       ],
       '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/no-redundant-type-constituents': 'warn',
       '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
       '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
