@@ -43,6 +43,6 @@ export class CaptchaHeartbeat {
   }
 
   private intervalInMs() {
-    return this.clerk.__unstable__environment?.displayConfig.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
+    return this.clerk.__unstable__environment?.displayConfig.?captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
   }
 }
