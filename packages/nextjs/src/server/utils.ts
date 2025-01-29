@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { canUseKeyless } from '../utils/feature-flags';
-import { AES, HmacSHA1, Utf8 } from '../vendor/crypto-js';
+import { AES, HmacSHA1, Utf8 } from '../vendor/crypto-es';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,

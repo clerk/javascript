@@ -2,7 +2,7 @@ import { AuthStatus, constants } from '@clerk/backend/internal';
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 
-import { HmacSHA1 } from '../../vendor/crypto-js';
+import { HmacSHA1 } from '../../vendor/crypto-es';
 import { createGetAuth, getAuth } from '../createGetAuth';
 
 const mockSecretKey = 'sk_test_mock';
