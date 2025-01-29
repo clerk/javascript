@@ -72,6 +72,6 @@ export async function deleteKeylessAction() {
     return;
   }
 
-  await import('../server/keyless-node.js').then(m => m.removeKeyless());
+  await import('../server/keyless-node.js').then(m => m.removeKeyless()).catch(() => {});
   return;
 }
