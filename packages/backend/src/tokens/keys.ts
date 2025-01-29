@@ -47,10 +47,11 @@ const RSA_SUFFIX = 'IDAQAB';
  * The result is also cached on the module level to avoid unnecessary computations in subsequent invocations.
  *
  * @param {string} localKey
+ * @param {string} kid
  * @returns {JsonWebKey} key
  */
-export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
-  if (!getFromCache(LocalJwkKid)) {
+export function loadClerkJWKFromLocal(localKey?: string, kid = LocalJwkKid): JsonWebKey {
+  if (!getFromCache(kid)) {
     if (!localKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.SetClerkJWTKey,
@@ -71,7 +72,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
     // JWK https://datatracker.ietf.org/doc/html/rfc7517
     setInCache(
       {
-        kid: 'local',
+        kid,
         kty: 'RSA',
         alg: 'RS256',
         n: modulus,
@@ -81,7 +82,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
     );
   }
 
-  return getFromCache(LocalJwkKid);
+  return getFromCache(kid);
 }
 
 export type LoadClerkJWKFromRemoteOptions = {

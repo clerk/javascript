@@ -31,7 +31,7 @@ export async function verifyToken(
     let key;
 
     if (options.jwtKey) {
-      key = loadClerkJWKFromLocal(options.jwtKey);
+      key = loadClerkJWKFromLocal(options.jwtKey, kid);
     } else if (options.secretKey) {
       // Fetch JWKS from Backend API using the key
       key = await loadClerkJWKFromRemote({ ...options, kid });

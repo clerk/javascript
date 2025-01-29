@@ -57,7 +57,7 @@ export async function verifyHandshakeToken(
   let key;
 
   if (jwtKey) {
-    key = loadClerkJWKFromLocal(jwtKey);
+    key = loadClerkJWKFromLocal(jwtKey, kid);
   } else if (secretKey) {
     // Fetch JWKS from Backend API using the key
     key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });

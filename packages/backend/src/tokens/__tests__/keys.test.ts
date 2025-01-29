@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../../errors';
 import {
+  getMockPEMJwkWithKid,
   mockJwks,
   mockJwtPayload,
   mockPEMJwk,
@@ -30,9 +31,26 @@ describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
     expect(jwk).toMatchObject(mockPEMJwk);
   });
 
-  it('loads the local key in PEM format', () => {
-    const jwk = loadClerkJWKFromLocal(mockPEMJwtKey);
+  it('loads the local key from default cache', () => {
+    const jwk = loadClerkJWKFromLocal(mockPEMKey);
+    const cachedJwk = loadClerkJWKFromLocal(undefined);
     expect(jwk).toMatchObject(mockPEMJwk);
+    expect(cachedJwk).toMatchObject(mockPEMJwk);
+  });
+
+  it('loads the local key from cache with custom kid', () => {
+    const kid = 'custom';
+    const jwk = loadClerkJWKFromLocal(mockPEMKey, kid);
+    const cachedJwk = loadClerkJWKFromLocal(undefined, kid);
+    const expectedJwk = getMockPEMJwkWithKid(kid);
+    expect(jwk).toMatchObject(expectedJwk);
+    expect(cachedJwk).toMatchObject(expectedJwk);
+  });
+
+  it('loads the local key in PEM format', () => {
+    const kid = 'pem_test';
+    const jwk = loadClerkJWKFromLocal(mockPEMJwtKey, kid);
+    expect(jwk).toMatchObject(getMockPEMJwkWithKid(kid));
   });
 });
 
@@ -155,7 +173,7 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
         kid,
       }),
     ).rejects.toThrowError(
-      "Unable to find a signing key in JWKS that matches the kid='ins_whatever' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ins_2GIoQhbUpy0hX7B2cVkuTMinXoD",
+      /Unable to find a signing key in JWKS that matches the kid='ins_whatever' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: .*/,
     );
   });
 
