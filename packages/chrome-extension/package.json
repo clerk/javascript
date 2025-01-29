@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/search-for-rhc.mjs dist",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs directory dist",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
