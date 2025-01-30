@@ -25,6 +25,7 @@ describe('createPathMatcher', () => {
     expect(matcher('/bar')).toBe(true);
     expect(matcher('/bar/baz')).toBe(true);
     expect(matcher('/baz')).toBe(false);
+    expect(matcher('/foo/bar')).toBe(false);
   });
 
   test('matches RegExp patterns', () => {
