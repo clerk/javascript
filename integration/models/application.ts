@@ -12,7 +12,7 @@ export const application = (
   appDirName: string,
   serverUrl: string | undefined,
 ) => {
-  const { name, scripts, envWriter } = config;
+  const { name, scripts, envWriter, moveTmpKeysToEnv } = config;
   const logger = createLogger({ prefix: `${appDirName}` });
   const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
   const cleanupFns: { (): unknown }[] = [];
@@ -33,7 +33,11 @@ export const application = (
     },
     withEnv: async (env: EnvironmentConfig) => {
       state.env = env;
+      console.log('envWriter', env.publicVariables);
       return envWriter(appDirPath, env);
+    },
+    keylessToEnv: async () => {
+      return moveTmpKeysToEnv(appDirPath);
     },
     setup: async (opts?: { strategy?: 'ci' | 'i' | 'copy'; force?: boolean }) => {
       const { force } = opts || {};

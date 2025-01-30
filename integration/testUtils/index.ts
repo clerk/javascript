@@ -6,6 +6,7 @@ import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
+import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
@@ -88,6 +89,7 @@ export const createTestUtils = <
   const testArgs = { page, context, browser };
 
   const pageObjects = {
+    keylessPopover: createKeylessPopoverPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),

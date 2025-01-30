@@ -112,6 +112,33 @@ export const applicationConfig = () => {
     get scripts() {
       return scripts;
     },
+    get moveTmpKeysToEnv() {
+      const defaultWriter = async (appDir: string) => {
+        const CONFIG_PATH = path.join(appDir, '.clerk', '.tmp', 'keyless.json');
+        try {
+          let fileAsString;
+          try {
+            fileAsString = (await fs.readFile(CONFIG_PATH, { encoding: 'utf-8' })) || '{}';
+          } catch {
+            fileAsString = '{}';
+          }
+          const nice = JSON.parse(fileAsString);
+          console.log('pantelis', nice);
+
+          await fs.writeFile(
+            path.join(appDir, '.env'),
+            `${envFormatters.public('CLERK_PUBLISHABLE_KEY')}=${nice.publishableKey}\n` +
+              `${envFormatters.private('CLERK_SECRET_KEY')}=${nice.secretKey}`,
+            {
+              flag: 'a',
+            },
+          );
+        } catch (e) {
+          console.log('sad-pantelis', e);
+        }
+      };
+      return defaultWriter;
+    },
     get envWriter() {
       const defaultWriter = async (appDir: string, env: EnvironmentConfig) => {
         // Create env files
