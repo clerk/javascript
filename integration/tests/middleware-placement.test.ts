@@ -4,6 +4,15 @@ import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
+const middlewareFileContents = `
+import { clerkMiddleware } from '@clerk/nextjs/server';
+export default clerkMiddleware();
+
+export const config = {
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+};
+`;
+
 const commonSetup = appConfigs.next.appRouterQuickstart.clone().removeFile('src/middleware.ts');
 
 test.describe('next start - missing middleware @quickstart', () => {
@@ -35,19 +44,7 @@ test.describe('next start - invalid middleware at root on src/ @quickstart', () 
   let app: Application;
 
   test.beforeAll(async () => {
-    app = await commonSetup
-      .addFile(
-        'middleware.ts',
-        () => `
-import { clerkMiddleware } from '@clerk/nextjs/server';
-export default clerkMiddleware();
-
-export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
-};
-      `,
-      )
-      .commit();
+    app = await commonSetup.addFile('middleware.ts', () => middlewareFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
     await app.build();
@@ -77,22 +74,9 @@ test.describe('next start - invalid middleware inside app on src/ @quickstart', 
   let app: Application;
 
   test.beforeAll(async () => {
-    app = await commonSetup
-      .addFile(
-        'src/app/middleware.ts',
-        () => `
-import { clerkMiddleware } from '@clerk/nextjs/server';
-export default clerkMiddleware();
-
-export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
-};
-      `,
-      )
-      .commit();
+    app = await commonSetup.addFile('src/app/middleware.ts', () => middlewareFileContents).commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodesQuickstart);
-    // await app.dev({ allowFailures: true });
     await app.build();
     await app.serve();
   });
