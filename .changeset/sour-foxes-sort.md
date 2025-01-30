@@ -2,7 +2,7 @@
 '@clerk/nuxt': minor
 ---
 
-Add `createRouteMatcher()`, a helper function that allows you to protect multiple pages or API routes.
+Add `createRouteMatcher()` helper function that allows you to protect multiple pages or API routes.
 
 For protecting pages (in a global route middleware):
 
