@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.23.9
+
+### Patch Changes
+
+- Mark keyless onboarding as complete when stored keys match explicit keys ([#4971](https://github.com/clerk/javascript/pull/4971)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+
 ## 1.23.8
 
 ### Patch Changes
