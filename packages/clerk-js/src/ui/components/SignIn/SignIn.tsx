@@ -151,6 +151,7 @@ function SignInRoot() {
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
     forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
+    signInUrl: signInContext.signInUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
 
