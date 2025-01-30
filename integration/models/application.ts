@@ -33,7 +33,6 @@ export const application = (
     },
     withEnv: async (env: EnvironmentConfig) => {
       state.env = env;
-      console.log('envWriter', env.publicVariables);
       return envWriter(appDirPath, env);
     },
     keylessToEnv: async () => {
