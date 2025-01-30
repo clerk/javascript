@@ -1,5 +1,5 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { EventHandler } from 'vinxi/http';
+import type { eventHandler } from 'h3';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
@@ -11,6 +11,9 @@ export type HandlerCallback<TRouter extends AnyRouter> = (ctx: {
   router: TRouter;
   responseHeaders: Headers;
 }) => Response | Promise<Response>;
+
+type EventHandler = ReturnType<typeof eventHandler>;
+
 export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => EventHandler;
 
 export function createClerkHandler<TRouter extends AnyRouter>(
