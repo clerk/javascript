@@ -29,7 +29,7 @@ export interface ClerkResourceJSON {
 
 export interface DisplayThemeJSON {
   general: {
-    appearance: 'light' | 'dark' | 'auto';
+    appearance?: 'light' | 'dark' | 'auto';
     color: HexColor;
     background_color: Color;
     font_family: string;
