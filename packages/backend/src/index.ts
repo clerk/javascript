@@ -65,6 +65,8 @@ export type {
   InvitationJSON,
   OauthAccessTokenJSON,
   OrganizationJSON,
+  OrganizationDomainJSON,
+  OrganizationDomainVerificationJSON,
   OrganizationInvitationJSON,
   PublicOrganizationDataJSON,
   OrganizationMembershipJSON,
@@ -96,6 +98,8 @@ export type {
   Invitation,
   OauthAccessToken,
   Organization,
+  OrganizationDomain,
+  OrganizationDomainVerification,
   OrganizationInvitation,
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
@@ -112,13 +116,16 @@ export type {
  * Webhooks event types
  */
 export type {
-  UserWebhookEvent,
   EmailWebhookEvent,
-  SMSWebhookEvent,
-  SessionWebhookEvent,
   OrganizationWebhookEvent,
-  OrganizationMembershipWebhookEvent,
+  OrganizationDomainWebhookEvent,
   OrganizationInvitationWebhookEvent,
+  OrganizationMembershipWebhookEvent,
+  RoleWebhookEvent,
+  PermissionWebhookEvent,
+  SessionWebhookEvent,
+  SMSWebhookEvent,
+  UserWebhookEvent,
   WebhookEvent,
   WebhookEventType,
 } from './api/resources/Webhooks';
