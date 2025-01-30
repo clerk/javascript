@@ -19,8 +19,8 @@ export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
   return React.cloneElement(children, {
     key: state?.publishableKey,
     publishableKey: state?.publishableKey,
-    __internal_claimKeylessApplicationUrl: state?.claimUrl,
-    __internal_copyInstanceKeysUrl: state?.apiKeysUrl,
+    __internal_keyless_claimKeylessApplicationUrl: state?.claimUrl,
+    __internal_keyless_copyInstanceKeysUrl: state?.apiKeysUrl,
     __internal_bypassMissingPublishableKey: true,
   } as any);
 };

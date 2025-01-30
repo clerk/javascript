@@ -42,11 +42,13 @@ export default tseslint.config([
       'packages/*/examples',
       'playground/*',
       'pnpm-lock.json',
+      'eslint.config.mjs',
       'typedoc.config.mjs',
       'vitest.workspace.mjs',
       // package specific ignores
       'packages/astro/src/astro-components/**/*.ts',
       'packages/backend/src/runtime/**/*',
+      'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
     ],
   },
@@ -94,6 +96,13 @@ export default tseslint.config([
     },
     settings: {
       'import/ignore': ['node_modules/react-native/index\\.js$'],
+      'import/resolver': {
+        node: true,
+        typescript: {
+          alwaysTryTypes: true,
+          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+        },
+      },
     },
     rules: {
       curly: ['error', 'all'],

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.49.0",
+  "version": "5.50.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -32,6 +32,7 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
@@ -75,10 +76,10 @@
   },
   "devDependencies": {
     "@clerk/ui": "workspace:*",
-    "@rsdoctor/rspack-plugin": "^0.4.7",
-    "@rspack/cli": "^1.0.14",
-    "@rspack/core": "^1.0.14",
-    "@rspack/plugin-react-refresh": "^1.0.0",
+    "@rsdoctor/rspack-plugin": "^0.4.13",
+    "@rspack/cli": "^1.2.2",
+    "@rspack/core": "^1.2.2",
+    "@rspack/plugin-react-refresh": "^1.0.1",
     "@svgr/webpack": "^6.2.1",
     "@types/webpack-dev-server": "^4.7.2",
     "@types/webpack-env": "^1.16.4",

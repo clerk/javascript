@@ -1,5 +1,47 @@
 # Change Log
 
+## 5.50.1
+
+### Patch Changes
+
+- Removes Turnstile remotely-hosted code from builds for unsupported environments ([#5039](https://github.com/clerk/javascript/pull/5039)) by [@tmilewski](https://github.com/tmilewski)
+
+- Opt out of combined flow when sign up mode is restricted. ([#5020](https://github.com/clerk/javascript/pull/5020)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a cookie instead of localStorage for the active org ID to avoid issues when localStorage is disabled at the browser level. ([#4394](https://github.com/clerk/javascript/pull/4394)) by [@brkalow](https://github.com/brkalow)
+
+- Removes web3 provider options from progressive sign up step. web3 providers don't have the ability to fill in missing fields. ([#5036](https://github.com/clerk/javascript/pull/5036)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Do not throw error on `captchaHeartbeat` if `displayConfig` is `null`. ([#5032](https://github.com/clerk/javascript/pull/5032)) by [@jacekradko](https://github.com/jacekradko)
+
+- Pass the `signInUrl` throught to the sign up context when within the combined flow. ([#5042](https://github.com/clerk/javascript/pull/5042)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+  - @clerk/localizations@3.10.2
+
+## 5.50.0
+
+### Minor Changes
+
+- Improve Keyless prompt's copy and add secondary CTA button for navigating to API keys page in the Dashboard. ([#4993](https://github.com/clerk/javascript/pull/4993)) by [@kaftarmery](https://github.com/kaftarmery)
+
+### Patch Changes
+
+- Add `subtitleCombined` localizations to sign-in-or-up flow. ([#4988](https://github.com/clerk/javascript/pull/4988)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduced searching for members list on `OrganizationProfile` ([#4942](https://github.com/clerk/javascript/pull/4942)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Navigate to specific instance instead of /last-active for configuration after keyless. ([#5013](https://github.com/clerk/javascript/pull/5013)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5)]:
+  - @clerk/localizations@3.10.1
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+
 ## 5.49.0
 
 ### Minor Changes

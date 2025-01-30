@@ -780,7 +780,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
      */
-    __internal_keyless_dismissPrompt?: () => Promise<void>;
+    __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
   };
 
 export interface NavigateOptions {
@@ -830,6 +830,10 @@ type RouterFn = (
 ) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
+
+export type WithInternalRouting<T> =
+  | (Omit<T, 'routing' | 'path'> & { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> })
+  | (Omit<T, 'routing' | 'path'> & { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> });
 
 export type SignInInitialValues = {
   emailAddress?: string;
@@ -892,7 +896,7 @@ export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
 export type SignInProps = RoutingOptions & {
   /**

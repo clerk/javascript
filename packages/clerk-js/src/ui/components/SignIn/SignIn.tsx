@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignInModalProps, SignInProps } from '@clerk/types';
+import type { SignInModalProps, SignInProps, WithInternalRouting } from '@clerk/types';
 import React from 'react';
 
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
@@ -151,6 +151,7 @@ function SignInRoot() {
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
     forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
+    signInUrl: signInContext.signInUrl,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
 
@@ -164,6 +165,8 @@ function SignInRoot() {
 SignInRoutes.displayName = 'SignIn';
 
 export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGuard(SignInRoot);
+
+const InternalSignIn: React.ComponentType<WithInternalRouting<SignInProps>> = withCoreSessionSwitchGuard(SignInRoot);
 
 export const SignInModal = (props: SignInModalProps): JSX.Element => {
   const signInProps = {
@@ -184,7 +187,7 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <SignIn
+          <InternalSignIn
             {...signInProps}
             routing='virtual'
           />

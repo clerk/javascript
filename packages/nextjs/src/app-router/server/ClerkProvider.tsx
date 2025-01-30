@@ -74,7 +74,6 @@ export async function ClerkProvider(
 
   let [shouldRunAsKeyless, runningWithClaimedKeys] = [false, false];
   if (canUseKeyless) {
-    // eslint-disable-next-line import/no-unresolved
     const locallyStorePublishableKey = await import('../../server/keyless-node.js')
       .then(mod => mod.safeParseClerkFile()?.publishableKey)
       .catch(() => undefined);
@@ -86,10 +85,11 @@ export async function ClerkProvider(
 
   if (shouldRunAsKeyless) {
     // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
-    // eslint-disable-next-line import/no-unresolved
-    const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
-    const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
-      // eslint-disable-next-line import/no-unresolved
+
+    const newOrReadKeys = await import('../../server/keyless-node.js')
+      .then(mod => mod.createOrReadKeyless())
+      .catch(() => null);
+    const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
       '../../server/keyless-log-cache.js'
     );
 
@@ -101,7 +101,8 @@ export async function ClerkProvider(
             publishableKey: newOrReadKeys.publishableKey,
             __internal_keyless_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
             __internal_keyless_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
+            // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
+            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
           })}
           nonce={await generateNonce()}
           initialState={await generateStatePromise()}
@@ -116,28 +117,38 @@ export async function ClerkProvider(
             mod => mod.safeParseClerkFile()?.secretKey,
           );
           if (!secretKey) {
-            throw secretKey;
+            // we will ignore it later
+            throw new Error(secretKey);
           }
           const client = createClerkClientWithOptions({
             secretKey,
           });
-          // Add caching here
-          await client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding();
-        } catch (e) {
+
+          /**
+           * Notifying the dashboard the should runs once. We are controlling this behaviour by caching the result of the request.
+           * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
+           */
+          await clerkDevelopmentCache?.run(
+            () => client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding(),
+            {
+              cacheKey: `${newOrReadKeys.publishableKey}_complete`,
+              onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+            },
+          );
+        } catch {
           // ignore
         }
 
         /**
          * Notify developers.
          */
-        keylessLogger?.log({
+        clerkDevelopmentCache?.log({
           cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
           msg: createConfirmationMessage(),
         });
 
         output = clientProvider;
       } else {
-        // eslint-disable-next-line import/no-unresolved
         const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
 
         const headerStore = await headers();
@@ -155,13 +166,25 @@ export async function ClerkProvider(
         /**
          * Notify developers.
          */
-        keylessLogger?.log({
+        clerkDevelopmentCache?.log({
           cacheKey: newOrReadKeys.publishableKey,
           msg: createKeylessModeMessage({ ...newOrReadKeys, claimUrl: claimUrl.href }),
         });
 
         output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
       }
+    } else {
+      // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
+      output = (
+        <ClientClerkProvider
+          {...mergeNextClerkPropsWithEnv(rest)}
+          nonce={await generateNonce()}
+          initialState={await generateStatePromise()}
+          disableKeyless
+        >
+          {children}
+        </ClientClerkProvider>
+      );
     }
   }
 

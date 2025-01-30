@@ -1,13 +1,7 @@
 import type { AccountlessApplication } from '@clerk/backend';
 
-/**
- * Attention: Only import this module when the node runtime is used.
- * We are using conditional imports to mitigate bundling issues with Next.js server actions on version prior to 14.1.0.
- */
-// @ts-ignore
-import nodeRuntime from '#safe-node-apis';
-
 import { createClerkClientWithOptions } from './createClerkClient';
+import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
 
 /**
  * The Clerk-specific directory name.
@@ -20,33 +14,16 @@ const CLERK_HIDDEN = '.clerk';
  */
 const CLERK_LOCK = 'clerk.lock';
 
-const throwMissingFsModule = () => {
-  throw new Error("Clerk: fsModule.fs is missing. This is an internal error. Please contact Clerk's support.");
-};
-
-const safeNodeRuntimeFs = () => {
-  if (!nodeRuntime.fs) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.fs;
-};
-
-const safeNodeRuntimePath = () => {
-  if (!nodeRuntime.path) {
-    throwMissingFsModule();
-  }
-  return nodeRuntime.path;
-};
-
 /**
  * The `.clerk/` directory is NOT safe to be committed as it may include sensitive information about a Clerk instance.
  * It may include an instance's secret key and the secret token for claiming that instance.
  */
 function updateGitignore() {
-  const { existsSync, writeFileSync, readFileSync, appendFileSync } = safeNodeRuntimeFs();
+  const { existsSync, writeFileSync, readFileSync, appendFileSync } = nodeFsOrThrow();
 
-  const path = safeNodeRuntimePath();
-  const gitignorePath = path.join(process.cwd(), '.gitignore');
+  const path = nodePathOrThrow();
+  const cwd = nodeCwdOrThrow();
+  const gitignorePath = path.join(cwd(), '.gitignore');
   if (!existsSync(gitignorePath)) {
     writeFileSync(gitignorePath, '');
   }
@@ -60,8 +37,9 @@ function updateGitignore() {
 }
 
 const generatePath = (...slugs: string[]) => {
-  const path = safeNodeRuntimePath();
-  return path.join(process.cwd(), CLERK_HIDDEN, ...slugs);
+  const path = nodePathOrThrow();
+  const cwd = nodeCwdOrThrow();
+  return path.join(cwd(), CLERK_HIDDEN, ...slugs);
 };
 
 const _TEMP_DIR_NAME = '.tmp';
@@ -71,7 +49,7 @@ const getKeylessReadMePath = () => generatePath(_TEMP_DIR_NAME, 'README.md');
 let isCreatingFile = false;
 
 export function safeParseClerkFile(): AccountlessApplication | undefined {
-  const { readFileSync } = safeNodeRuntimeFs();
+  const { readFileSync } = nodeFsOrThrow();
   try {
     const CONFIG_PATH = getKeylessConfigurationPath();
     let fileAsString;
@@ -90,7 +68,7 @@ export function safeParseClerkFile(): AccountlessApplication | undefined {
  * Using both an in-memory and file system lock seems to be the most effective solution.
  */
 const lockFileWriting = () => {
-  const { writeFileSync } = safeNodeRuntimeFs();
+  const { writeFileSync } = nodeFsOrThrow();
 
   isCreatingFile = true;
 
@@ -107,7 +85,7 @@ const lockFileWriting = () => {
 };
 
 const unlockFileWriting = () => {
-  const { rmSync } = safeNodeRuntimeFs();
+  const { rmSync } = nodeFsOrThrow();
 
   try {
     rmSync(CLERK_LOCK, { force: true, recursive: true });
@@ -119,19 +97,19 @@ const unlockFileWriting = () => {
 };
 
 const isFileWritingLocked = () => {
-  const { existsSync } = safeNodeRuntimeFs();
+  const { existsSync } = nodeFsOrThrow();
   return isCreatingFile || existsSync(CLERK_LOCK);
 };
 
-async function createOrReadKeyless(): Promise<AccountlessApplication | undefined> {
-  const { writeFileSync, mkdirSync } = safeNodeRuntimeFs();
+async function createOrReadKeyless(): Promise<AccountlessApplication | null> {
+  const { writeFileSync, mkdirSync } = nodeFsOrThrow();
 
   /**
    * If another request is already in the process of acquiring keys return early.
    * Using both an in-memory and file system lock seems to be the most effective solution.
    */
   if (isFileWritingLocked()) {
-    return undefined;
+    return null;
   }
 
   lockFileWriting();
@@ -156,26 +134,29 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | undefined
    * At this step, it is safe to create new keys and store them.
    */
   const client = createClerkClientWithOptions({});
-  const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
+  const accountlessApplication = await client.__experimental_accountlessApplications
+    .createAccountlessApplication()
+    .catch(() => null);
 
-  writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
-    encoding: 'utf8',
-    mode: '0777',
-    flag: 'w',
-  });
+  if (accountlessApplication) {
+    writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'w',
+    });
 
-  // TODO-KEYLESS: Add link to official documentation.
-  const README_NOTIFICATION = `
+    // TODO-KEYLESS: Add link to official documentation.
+    const README_NOTIFICATION = `
 ## DO NOT COMMIT
 This directory is auto-generated from \`@clerk/nextjs\` because you are running in Keyless mode. Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
   `;
 
-  writeFileSync(README_PATH, README_NOTIFICATION, {
-    encoding: 'utf8',
-    mode: '0777',
-    flag: 'w',
-  });
-
+    writeFileSync(README_PATH, README_NOTIFICATION, {
+      encoding: 'utf8',
+      mode: '0777',
+      flag: 'w',
+    });
+  }
   /**
    * Clean up locks.
    */
@@ -185,7 +166,7 @@ This directory is auto-generated from \`@clerk/nextjs\` because you are running 
 }
 
 function removeKeyless() {
-  const { rmSync } = safeNodeRuntimeFs();
+  const { rmSync } = nodeFsOrThrow();
 
   /**
    * If another request is already in the process of acquiring keys return early.

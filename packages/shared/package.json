@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.20.14",
+  "version": "2.20.16",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -114,7 +114,8 @@
     "devBrowser",
     "object",
     "oauth",
-    "web3"
+    "web3",
+    "pathMatcher"
   ],
   "scripts": {
     "build": "tsup",
