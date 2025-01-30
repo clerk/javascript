@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.44.2
+
+### Patch Changes
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.44.1
 
 ### Patch Changes
