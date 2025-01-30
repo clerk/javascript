@@ -98,6 +98,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Add auto-imports for Clerk components and composables
     addImportsDir(resolver.resolve('./runtime/composables'));
+    addImportsDir(resolver.resolve('./runtime/utils'));
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const components: Array<keyof typeof import('@clerk/vue')> = [
