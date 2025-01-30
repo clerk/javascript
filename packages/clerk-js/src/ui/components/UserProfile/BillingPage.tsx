@@ -43,7 +43,7 @@ export const BillingPage = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
-              <PricingTableContext.Provider value={{ componentName: 'PricingTable' }}>
+              <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                 <PricingTable />
               </PricingTableContext.Provider>
             </TabPanel>

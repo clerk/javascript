@@ -1,14 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CommercePlanResource } from '@clerk/types';
+import type { CommercePlanResource, PricingTableProps } from '@clerk/types';
 
-import { Badge, Box, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
+import { usePricingTableContext } from '../../contexts';
+import { Badge, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { Avatar } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 
-export const PricingTable = () => {
+export const PricingTable = (props: PricingTableProps) => {
   const { commerce } = useClerk();
-  // const { currency } = usePricingTableContext();
 
   const { data: plans } = useFetch(commerce?.getPlans, 'commerce-plans');
 
@@ -22,20 +22,27 @@ export const PricingTable = () => {
         <PlanCard
           key={plan.id}
           plan={plan}
+          props={props}
         />
       ))}
     </Flex>
   );
 };
 
-const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
+const PlanCard = ({ plan, props }: { plan: CommercePlanResource; props: PricingTableProps }) => {
+  const { ctaPosition = 'bottom' } = props;
+  const { mode = 'mounted' } = usePricingTableContext();
+  const compact = mode === 'modal';
+  const isActivePlan = !plan.hasBaseFee;
+
   return (
-    <Box
+    <Col
       sx={t => ({
         flex: 1,
         borderRadius: t.radii.$md,
         backgroundColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$tableBodyShadow,
+        maxWidth: 320,
       })}
     >
       <Col
@@ -43,7 +50,7 @@ const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
         align='start'
         gap={3}
         sx={t => ({
-          padding: t.space.$3,
+          padding: compact ? t.space.$3 : t.space.$4,
           borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
           borderBottomColor: t.colors.$neutralAlpha50,
@@ -61,7 +68,7 @@ const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
             rounded={false}
             imageUrl={plan.avatarUrl}
           />
-          {!plan.hasBaseFee && (
+          {isActivePlan && (
             <Badge
               localizationKey={localizationKeys('badge__currentPlan')}
               sx={t => ({
@@ -75,13 +82,24 @@ const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
           align='start'
           gap={2}
         >
-          <Heading textVariant='h3'>{plan.name}</Heading>
+          <Col>
+            <Heading textVariant={compact ? 'h3' : 'h2'}>{plan.name}</Heading>
+            {!compact && (
+              <Text
+                variant='subtitle'
+                colorScheme='secondary'
+              >
+                {plan.description}
+              </Text>
+            )}
+          </Col>
+
           {plan.hasBaseFee ? (
             <Flex
               gap={2}
               align='baseline'
             >
-              <Heading textVariant='h2'>
+              <Heading textVariant={compact ? 'h2' : 'h1'}>
                 {plan.currencySymbol}
                 {plan.amountFormatted}
               </Heading>
@@ -105,18 +123,19 @@ const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
             </Flex>
           ) : (
             <Heading
-              textVariant='h2'
+              textVariant={compact ? 'h2' : 'h1'}
               localizationKey={localizationKeys('commerce_free')}
             />
           )}
         </Col>
       </Col>
       <Col
-        gap={2}
+        gap={compact ? 2 : 3}
         align='start'
         sx={t => ({
+          order: ctaPosition === 'top' ? 2 : 1,
           backgroundColor: t.colors.$white,
-          padding: t.space.$3,
+          padding: compact ? t.space.$3 : t.space.$4,
         })}
       >
         {plan.features.map(feature => (
@@ -137,21 +156,25 @@ const PlanCard = ({ plan }: { plan: CommercePlanResource }) => {
       <Flex
         align='center'
         sx={t => ({
-          padding: t.space.$3,
+          order: ctaPosition === 'top' ? 1 : 2,
+          padding: compact ? t.space.$3 : t.space.$4,
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
           borderTopColor: t.colors.$neutralAlpha50,
         })}
       >
         <Button
-          colorScheme='light'
+          colorScheme={isActivePlan ? 'light' : 'primary'}
+          size='sm'
+          textVariant={compact ? 'buttonSmall' : 'buttonLarge'}
           sx={{
             width: '100%',
           }}
-        >
-          Get started
-        </Button>
+          localizationKey={
+            isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
+          }
+        />
       </Flex>
-    </Box>
+    </Col>
   );
 };

@@ -1429,6 +1429,8 @@ export type WaitlistModalProps = WaitlistProps;
 
 export type PricingTableProps = {
   appearance?: PricingTableTheme;
+  ctaPosition?: 'top' | 'bottom';
+  collapseFeatures?: boolean;
 };
 
 export interface HandleEmailLinkVerificationParams {
