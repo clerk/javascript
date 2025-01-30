@@ -6,7 +6,7 @@ import { createTestUtils } from '../testUtils';
 
 const commonSetup = appConfigs.next.appRouterQuickstart.clone();
 
-test.describe('next dev - missing middleware @quickstart', () => {
+test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
 
@@ -21,7 +21,7 @@ test.describe('next dev - missing middleware @quickstart', () => {
     await app.teardown();
   });
 
-  test('Display error for missing middleware', async ({ page, context }) => {
+  test('Toggle collapse popover and claim.', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
@@ -46,7 +46,10 @@ test.describe('next dev - missing middleware @quickstart', () => {
     );
   });
 
-  test('dwadwdadaw error for missing middleware', async ({ page, context }) => {
+  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+    page,
+    context,
+  }) => {
     await page.route('*/**/v1/environment*', async route => {
       const response = await route.fetch();
       const json = await response.json();
@@ -80,7 +83,10 @@ test.describe('next dev - missing middleware @quickstart', () => {
     );
   });
 
-  test('dismiss state', async ({ page, context }) => {
+  test('Claimed application with keys inside .env, on dismiss, keyless prompt is removed.', async ({
+    page,
+    context,
+  }) => {
     await page.route('*/**/v1/environment*', async route => {
       const response = await route.fetch();
       const json = await response.json();

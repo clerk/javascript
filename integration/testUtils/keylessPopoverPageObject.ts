@@ -18,11 +18,10 @@ export const createKeylessPopoverPageObject = (testArgs: TestArgs) => {
         .getAttribute('aria-expanded')
         .then(val => val === 'true'),
     toggle: () => page.locator(elementId).click(),
-    claim: () => page.getByRole('link', { name: /Claim application/i }),
+
     promptsToClaim: () => {
       return page.getByRole('link', { name: /^claim application$/i });
     },
-
     promptToUseClaimedKeys: () => {
       return page.getByRole('link', { name: /^get api keys$/i });
     },
