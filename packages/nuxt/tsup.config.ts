@@ -10,7 +10,7 @@ export default defineConfig(() => {
       './src/runtime/plugin.ts',
       './src/runtime/components/index.ts',
       './src/runtime/composables/index.ts',
-      './src/runtime/utils/index.ts',
+      './src/runtime/client/*.ts',
       './src/runtime/server/*.ts',
     ],
     format: ['esm'],
