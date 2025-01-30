@@ -44,7 +44,8 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
+  const { sessionId, sessionClaims, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
+    authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -52,6 +53,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 
   return useDerivedAuth({
     sessionId,
+    sessionClaims,
     userId,
     actor,
     orgId,
@@ -93,6 +95,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
 export function useDerivedAuth(authObject: any): UseAuthReturn {
   const {
     sessionId,
+    sessionClaims,
     userId,
     actor,
     orgId,
@@ -126,6 +129,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       isLoaded: false,
       isSignedIn: undefined,
       sessionId,
+      sessionClaims: undefined,
       userId,
       actor: undefined,
       orgId: undefined,
@@ -142,6 +146,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       isLoaded: true,
       isSignedIn: false,
       sessionId,
+      sessionClaims: null,
       userId,
       actor: null,
       orgId: null,
@@ -153,11 +158,12 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
     };
   }
 
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+  if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId,
@@ -169,11 +175,12 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
     };
   }
 
-  if (!!sessionId && !!userId && !orgId) {
+  if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId: null,
