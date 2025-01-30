@@ -14,6 +14,7 @@ export default defineNuxtRouteMiddleware(to => {
   const { userId } = useAuth();
 
   if (userId.value && isProtectedRoute(to)) {
+    // Add custom logic to run before redirecting
     return navigateTo('/sign-in');
   }
 });
