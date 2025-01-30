@@ -114,7 +114,8 @@
     "devBrowser",
     "object",
     "oauth",
-    "web3"
+    "web3",
+    "pathMatcher"
   ],
   "scripts": {
     "build": "tsup",
