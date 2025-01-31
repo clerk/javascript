@@ -7,7 +7,7 @@ import { ProfileSection, useCardState, withCardStateProvider } from '../../eleme
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { getFieldError, handleError } from '../../utils';
 
-export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
+export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onClick?: () => void }) => {
   const card = useCardState();
   const { user } = useUser();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
@@ -56,6 +56,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
       <ProfileSection.ActionMenu
         id='web3Wallets'
         triggerLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
+        onClick={onClick}
       >
         {unconnectedStrategies.map(strategy => (
           <ProfileSection.ActionMenuItem

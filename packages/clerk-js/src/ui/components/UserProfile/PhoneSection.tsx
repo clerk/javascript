@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/types';
+import { Fragment } from 'react';
 
 import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
@@ -51,9 +52,10 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
     >
       <Action.Root>
         <ProfileSection.ItemList id='phoneNumbers'>
-          {sortIdentificationBasedOnVerification(user?.phoneNumbers, user?.primaryPhoneNumberId).map(phone => (
-            <Action.Root key={phone.id}>
-              <Action.Closed value=''>
+          {sortIdentificationBasedOnVerification(user?.phoneNumbers, user?.primaryPhoneNumberId).map(phone => {
+            const phoneId = phone.id;
+            return (
+              <Fragment key={phoneId}>
                 <ProfileSection.Item id='phoneNumbers'>
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
@@ -63,7 +65,7 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
                       <Text sx={t => ({ color: t.colors.$colorText })}>
                         {stringToFormattedPhoneString(phone.phoneNumber)}
                       </Text>
-                      {user?.primaryPhoneNumberId === phone.id && (
+                      {user?.primaryPhoneNumberId === phoneId && (
                         <Badge localizationKey={localizationKeys('badge__primary')} />
                       )}
                       {phone.verification.status !== 'verified' && (
@@ -74,21 +76,21 @@ export const PhoneSection = ({ shouldAllowCreation = true }: { shouldAllowCreati
 
                   <PhoneMenu phone={phone} />
                 </ProfileSection.Item>
-              </Action.Closed>
 
-              <Action.Open value='remove'>
-                <Action.Card variant='destructive'>
-                  <RemovePhoneScreen phoneId={phone.id} />
-                </Action.Card>
-              </Action.Open>
+                <Action.Open value={`remove-${phoneId}`}>
+                  <Action.Card variant='destructive'>
+                    <RemovePhoneScreen phoneId={phoneId} />
+                  </Action.Card>
+                </Action.Open>
 
-              <Action.Open value='verify'>
-                <Action.Card>
-                  <PhoneScreen phoneId={phone.id} />
-                </Action.Card>
-              </Action.Open>
-            </Action.Root>
-          ))}
+                <Action.Open value={`verify-${phoneId}`}>
+                  <Action.Card>
+                    <PhoneScreen phoneId={phoneId} />
+                  </Action.Card>
+                </Action.Open>
+              </Fragment>
+            );
+          })}
           {shouldAllowCreation && (
             <>
               <Action.Trigger value='add'>
@@ -114,6 +116,7 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
   const card = useCardState();
   const { open } = useActionContext();
   const { user } = useUser();
+  const phoneId = phone.id;
 
   if (!user) {
     return null;
@@ -131,7 +134,7 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary'),
             // TODO-STEPUP: Is this a sensitive action ?
-            onClick: () => open('verify'),
+            onClick: () => open(`verify-${phoneId}`),
           }
         : null,
       !isPrimary && isVerified
@@ -144,13 +147,13 @@ const PhoneMenu = ({ phone }: { phone: PhoneNumberResource }) => {
       !isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__unverified'),
-            onClick: () => open('verify'),
+            onClick: () => open(`verify-${phoneId}`),
           }
         : null,
       {
         label: localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => open(`remove-${phoneId}`),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

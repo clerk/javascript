@@ -10,7 +10,7 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 
-const ConnectMenuButton = (props: { strategy: OAuthStrategy }) => {
+const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
   const card = useCardState();
   const { user } = useUser();
@@ -95,7 +95,7 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy }) => {
   );
 };
 
-export const AddConnectedAccount = () => {
+export const AddConnectedAccount = ({ onClick }: { onClick?: () => void }) => {
   const { user } = useUser();
   const { strategies } = useEnabledThirdPartyProviders();
 
@@ -114,6 +114,7 @@ export const AddConnectedAccount = () => {
     <ProfileSection.ActionMenu
       triggerLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
       id='connectedAccounts'
+      onClick={onClick}
     >
       {unconnectedStrategies.map(strategy => (
         <ConnectMenuButton

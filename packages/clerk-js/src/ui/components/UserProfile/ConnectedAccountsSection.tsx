@@ -1,5 +1,6 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
+import { Fragment, useState } from 'react';
 
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
@@ -51,6 +52,7 @@ export const ConnectedAccountsSection = withCardStateProvider(
     const { user } = useUser();
     const card = useCardState();
     const hasExternalAccounts = Boolean(user?.externalAccounts?.length);
+    const [actionValue, setActionValue] = useState<string | null>(null);
 
     if (!user || (!shouldAllowCreation && !hasExternalAccounts)) {
       return null;
@@ -68,7 +70,10 @@ export const ConnectedAccountsSection = withCardStateProvider(
         id='connectedAccounts'
       >
         <Card.Alert>{card.error}</Card.Alert>
-        <Action.Root>
+        <Action.Root
+          value={actionValue}
+          onChange={setActionValue}
+        >
           <ProfileSection.ItemList id='connectedAccounts'>
             {accounts.map(account => (
               <ConnectedAccount
@@ -77,7 +82,7 @@ export const ConnectedAccountsSection = withCardStateProvider(
               />
             ))}
           </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddConnectedAccount />}
+          {shouldAllowCreation && <AddConnectedAccount onClick={() => setActionValue(null)} />}
         </Action.Root>
       </ProfileSection.Root>
     );
@@ -89,6 +94,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const { navigate } = useRouter();
   const { user } = useUser();
   const card = useCardState();
+  const accountId = account.id;
 
   const isModal = mode === 'modal';
   const redirectUrl = isModal
@@ -158,7 +164,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     );
 
   return (
-    <Action.Root key={account.id}>
+    <Fragment key={account.id}>
       <ProfileSection.Item id='connectedAccounts'>
         <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
           <ImageOrInitial />
@@ -181,7 +187,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
           </Box>
         </Flex>
 
-        <ConnectedAccountMenu />
+        <ConnectedAccountMenu account={account} />
       </ProfileSection.Item>
       {shouldDisplayReconnect && (
         <Box
@@ -222,24 +228,25 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
         </Text>
       )}
 
-      <Action.Open value='remove'>
+      <Action.Open value={`remove-${accountId}`}>
         <Action.Card variant='destructive'>
           <RemoveConnectedAccountScreen accountId={account.id} />
         </Action.Card>
       </Action.Open>
-    </Action.Root>
+    </Fragment>
   );
 };
 
-const ConnectedAccountMenu = () => {
+const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource }) => {
   const { open } = useActionContext();
+  const accountId = account.id;
 
   const actions = (
     [
       {
         label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => open(`remove-${accountId}`),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
