@@ -8,6 +8,7 @@ import type {
 import { constants } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import { isTruthy } from '@clerk/shared/underscore';
+import type { Jwt } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
@@ -61,7 +62,7 @@ export const getAuth = createGetAuth({
   noAuthStatusMessage: getAuthAuthHeaderMissing(),
 });
 
-export const parseJwt = (req: RequestLike) => {
+export const parseJwt = (req: RequestLike): Jwt => {
   const cookieToken = getCookie(req, constants.Cookies.Session);
   const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
   return decodeJwt(cookieToken || headerToken || '');

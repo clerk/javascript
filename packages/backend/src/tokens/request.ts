@@ -453,7 +453,10 @@ ${error.getFullMessage()}`,
 
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
-    const { data: decodeResult } = decodeJwt(sessionTokenInHeader!);
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(sessionTokenInHeader!);
+    if (decodedErrors) {
+      return handleError(decodedErrors[0], 'header');
+    }
     if (decodeResult?.payload.sub.startsWith('mch_')) {
       return signedOut(authenticateContext, 'Machine tokens cannot be used to authenticate user requests');
     }
@@ -463,9 +466,9 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      // use `await` to force this try/catch handle the signedIn invocation
       return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
+      // TODO: is it necessary to have this try/catch in addition to the explicit error return handling above?
       return handleError(err, 'header');
     }
   }
@@ -736,7 +739,10 @@ ${error.getFullMessage()}`,
 
     const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
-      const { data: decodedData } = decodeJwt(sessionTokenInHeader);
+      const { data: decodedData, errors: decodedErrors } = decodeJwt(sessionTokenInHeader);
+      if (decodedErrors) {
+        return handleError(decodedErrors[0], 'header');
+      }
       if (decodedData?.payload.sub.startsWith('mch_')) {
         return handleMachineError(errors[0]);
       }

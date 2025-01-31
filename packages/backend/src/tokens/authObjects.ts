@@ -30,6 +30,7 @@ export type SignedInAuthObject = {
   sessionClaims: JwtPayload;
   sessionId: string;
   actor: ActClaim | undefined;
+  entity: 'user';
   userId: string;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
@@ -53,6 +54,7 @@ export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
   actor: null;
+  entity: 'user';
   userId: null;
   orgId: null;
   orgRole: null;
@@ -74,13 +76,13 @@ export type AuthenticatedMachineObject = {
   claims: JwtPayload;
   machineId: string;
   sessionId: null;
+  entity: 'machine';
   actor: null;
   userId: null;
   orgId: null;
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  __experimental_factorVerificationAge: null;
   has: CheckAuthorizationFromSessionClaims;
   getToken: () => string;
   debug: AuthObjectDebug;
@@ -92,12 +94,12 @@ export type UnauthenticatedMachineObject = {
   machineId: null;
   sessionId: null;
   actor: null;
+  entity: 'machine';
   userId: null;
   orgId: null;
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  __experimental_factorVerificationAge: null;
   has: CheckAuthorizationFromSessionClaims;
   getToken: ServerGetToken;
   debug: AuthObjectDebug;
@@ -145,12 +147,14 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
+  const entity = 'user';
 
   // fva can be undefined for instances that have not opt-in
   const factorVerificationAge = fva ?? null;
 
   return {
     actor,
+    entity,
     sessionClaims,
     sessionId,
     userId,
@@ -170,6 +174,7 @@ export function signedInAuthObject(
  */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
+    entity: 'user',
     sessionClaims: null,
     sessionId: null,
     userId: null,
@@ -197,6 +202,7 @@ export function authenticatedMachineObject(
   return {
     sessionClaims: null,
     claims,
+    entity: 'machine',
     machineId,
     sessionId: null,
     actor: null,
@@ -205,7 +211,6 @@ export function authenticatedMachineObject(
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    __experimental_factorVerificationAge: null,
     getToken,
     has: () => false,
     debug: createDebug(debugData),
@@ -215,6 +220,7 @@ export function authenticatedMachineObject(
 export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
   return {
     sessionClaims: null,
+    entity: 'machine',
     claims: null,
     machineId: null,
     sessionId: null,
@@ -224,7 +230,6 @@ export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): U
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    __experimental_factorVerificationAge: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),

@@ -1,10 +1,6 @@
 import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
-// This generic allows the types to show up in autocomplete
-// We also need to redefine the types here because they don't show up outside the factory and should match the function signature from request.ts
-export type EntityTypes = 'machine' | 'user' | 'any';
-
 export type AuthenticateRequestOptions = {
   publishableKey?: string;
   domain?: string;
@@ -19,6 +15,7 @@ export type AuthenticateRequestOptions = {
   entity?: 'user' | 'machine' | 'any';
 } & VerifyTokenOptions;
 
+export type EntityTypes = 'user' | 'machine' | 'any';
 /**
  * Defines the options for syncing an organization or personal account state from the URL to the clerk session.
  * Useful if the application requires the inclusion of a URL that indicates that a given clerk organization
