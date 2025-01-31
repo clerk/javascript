@@ -1,5 +1,7 @@
 import * as path from 'node:path';
 
+import type { AccountlessApplication } from '@clerk/backend';
+
 import { constants } from '../constants';
 import { createLogger, fs } from '../scripts';
 import { application } from './application';
@@ -129,6 +131,28 @@ export const applicationConfig = () => {
     },
     get scripts() {
       return scripts;
+    },
+    get copyKeylessToEnv() {
+      const writer = async (appDir: string) => {
+        const CONFIG_PATH = path.join(appDir, '.clerk', '.tmp', 'keyless.json');
+        try {
+          const fileAsString = await fs.readFile(CONFIG_PATH, { encoding: 'utf-8' });
+          const maybeAccountlessApplication: AccountlessApplication = JSON.parse(fileAsString);
+          if (maybeAccountlessApplication.publishableKey) {
+            await fs.writeFile(
+              path.join(appDir, '.env'),
+              `${envFormatters.public('CLERK_PUBLISHABLE_KEY')}=${maybeAccountlessApplication.publishableKey}\n` +
+                `${envFormatters.private('CLERK_SECRET_KEY')}=${maybeAccountlessApplication.secretKey}`,
+              {
+                flag: 'a',
+              },
+            );
+          }
+        } catch (e) {
+          throw new Error('unable to copy keys from .clerk/', e);
+        }
+      };
+      return writer;
     },
     get envWriter() {
       const defaultWriter = async (appDir: string, env: EnvironmentConfig) => {
