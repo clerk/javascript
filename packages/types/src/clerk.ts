@@ -795,10 +795,7 @@ export interface Resources {
   organization?: OrganizationResource | null;
 }
 
-export type RoutingStrategy =
-  | 'path'
-  | 'hash'
-  | 'virtual';
+export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
 /**
  * Internal is a navigation type that affects the component
@@ -895,14 +892,7 @@ export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | {
-      path?: never;
-      routing?: Extract<
-        RoutingStrategy,
-        | 'hash'
-        | 'virtual'
-      >;
-    };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
 export type SignInProps = RoutingOptions & {
   /**
