@@ -1,5 +1,17 @@
 # @clerk/tanstack-start
 
+## 0.9.2
+
+### Patch Changes
+
+- Fix type mismatch between TanStack Start and Clerk event handlers ([#5051](https://github.com/clerk/javascript/pull/5051)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/backend@1.23.11
+  - @clerk/clerk-react@5.22.10
+  - @clerk/shared@2.20.18
+
 ## 0.9.1
 
 ### Patch Changes
