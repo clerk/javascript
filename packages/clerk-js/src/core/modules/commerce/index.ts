@@ -30,6 +30,6 @@ export class Commerce implements CommerceNamespace {
     console.log(params);
     const defaultProduct = products.find(product => product.isDefault);
 
-    return defaultProduct?.plans || [];
+    return defaultProduct?.plans.sort((a, b) => a.amount - b.amount) || [];
   };
 }

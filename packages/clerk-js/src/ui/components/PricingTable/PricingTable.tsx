@@ -60,6 +60,7 @@ const PlanCard = ({
         backgroundColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$tableBodyShadow,
         maxWidth: 320,
+        width: compact ? 'auto' : 320,
       })}
     >
       <Col
@@ -177,7 +178,7 @@ const PlanCard = ({
                 colorScheme='neutral'
                 size='sm'
               />
-              <Text>{feature.description}</Text>
+              <Text>{feature.description ?? feature.name}</Text>
             </Flex>
           ))}
         </Col>
