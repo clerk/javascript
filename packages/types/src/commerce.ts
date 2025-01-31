@@ -27,12 +27,15 @@ export interface CommercePlanResource extends ClerkResource {
   name: string;
   amount: number;
   amountFormatted: string;
+  annualMonthlyAmount: number;
+  annualMonthlyAmountFormatted: string;
   currencySymbol: string;
   currency: string;
   description: string;
   isRecurring: boolean;
   hasBaseFee: boolean;
   payerType: string[];
+  publiclyVisible: boolean;
   slug: string;
   avatarUrl: string;
   features: CommerceFeatureResource[];

@@ -1,36 +1,53 @@
 import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, PricingTableProps } from '@clerk/types';
+import { useState } from 'react';
 
 import { usePricingTableContext } from '../../contexts';
 import { Badge, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { Avatar } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
+import { InternalThemeProvider } from '../../styledSystem';
 
 export const PricingTable = (props: PricingTableProps) => {
   const { commerce } = useClerk();
+  const [planPeriod, setPlanPeriod] = useState('month');
 
   const { data: plans } = useFetch(commerce?.getPlans, 'commerce-plans');
 
   return (
-    <Flex
-      gap={4}
-      align='start'
-      sx={{ width: '100%' }}
-    >
-      {plans?.map(plan => (
-        <PlanCard
-          key={plan.id}
-          plan={plan}
-          props={props}
-        />
-      ))}
-    </Flex>
+    <InternalThemeProvider>
+      <Flex
+        gap={4}
+        align='start'
+        sx={{ width: '100%' }}
+      >
+        {plans?.map(plan => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            period={planPeriod}
+            setPeriod={setPlanPeriod}
+            props={props}
+          />
+        ))}
+      </Flex>
+    </InternalThemeProvider>
   );
 };
 
-const PlanCard = ({ plan, props }: { plan: CommercePlanResource; props: PricingTableProps }) => {
-  const { ctaPosition = 'bottom' } = props;
+const PlanCard = ({
+  plan,
+  period,
+  setPeriod,
+  props,
+}: {
+  plan: CommercePlanResource;
+  period: string;
+  setPeriod: (k: string) => void;
+  props: PricingTableProps;
+}) => {
+  const { ctaPosition = 'bottom', collapseFeatures = false } = props;
   const { mode = 'mounted' } = usePricingTableContext();
   const compact = mode === 'modal';
   const isActivePlan = !plan.hasBaseFee;
@@ -95,32 +112,42 @@ const PlanCard = ({ plan, props }: { plan: CommercePlanResource; props: PricingT
           </Col>
 
           {plan.hasBaseFee ? (
-            <Flex
-              gap={2}
-              align='baseline'
-            >
-              <Heading textVariant={compact ? 'h2' : 'h1'}>
-                {plan.currencySymbol}
-                {plan.amountFormatted}
-              </Heading>
+            <>
               <Flex
-                gap={1}
+                gap={2}
                 align='baseline'
               >
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
+                <Heading textVariant={compact ? 'h2' : 'h1'}>
+                  {plan.currencySymbol}
+                  {period === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+                </Heading>
+                <Flex
+                  gap={1}
+                  align='baseline'
                 >
-                  /
-                </Text>
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  sx={{ textTransform: 'lowercase' }}
-                  localizationKey={localizationKeys('commerce_month')}
-                />
+                  <Text
+                    variant='caption'
+                    colorScheme='secondary'
+                  >
+                    /
+                  </Text>
+                  <Text
+                    variant='caption'
+                    colorScheme='secondary'
+                    sx={{ textTransform: 'lowercase' }}
+                    localizationKey={localizationKeys('commerce_month')}
+                  />
+                </Flex>
               </Flex>
-            </Flex>
+              <SegmentedControl
+                selected={period}
+                setSelected={setPeriod}
+                options={[
+                  { label: 'Monthly', value: 'month' },
+                  { label: 'Annually', value: 'year' },
+                ]}
+              />
+            </>
           ) : (
             <Heading
               textVariant={compact ? 'h2' : 'h1'}
@@ -129,30 +156,32 @@ const PlanCard = ({ plan, props }: { plan: CommercePlanResource; props: PricingT
           )}
         </Col>
       </Col>
-      <Col
-        gap={compact ? 2 : 3}
-        align='start'
-        sx={t => ({
-          order: ctaPosition === 'top' ? 2 : 1,
-          backgroundColor: t.colors.$white,
-          padding: compact ? t.space.$3 : t.space.$4,
-        })}
-      >
-        {plan.features.map(feature => (
-          <Flex
-            gap={2}
-            align='baseline'
-            key={feature.id}
-          >
-            <Icon
-              icon={Check}
-              colorScheme='neutral'
-              size='sm'
-            />
-            <Text>{feature.description}</Text>
-          </Flex>
-        ))}
-      </Col>
+      {plan.features.length > 0 && !collapseFeatures && (
+        <Col
+          gap={compact ? 2 : 3}
+          align='start'
+          sx={t => ({
+            order: ctaPosition === 'top' ? 2 : 1,
+            backgroundColor: t.colors.$white,
+            padding: compact ? t.space.$3 : t.space.$4,
+          })}
+        >
+          {plan.features.map(feature => (
+            <Flex
+              gap={2}
+              align='baseline'
+              key={feature.id}
+            >
+              <Icon
+                icon={Check}
+                colorScheme='neutral'
+                size='sm'
+              />
+              <Text>{feature.description}</Text>
+            </Flex>
+          ))}
+        </Col>
+      )}
       <Flex
         align='center'
         sx={t => ({
@@ -176,5 +205,50 @@ const PlanCard = ({ plan, props }: { plan: CommercePlanResource; props: PricingT
         />
       </Flex>
     </Col>
+  );
+};
+
+type SegmentedControlOption = {
+  label: string;
+  value: string;
+};
+type SegmentedControlProps = {
+  selected?: string;
+  setSelected?: (k: string) => void;
+  options: SegmentedControlOption[];
+};
+
+const SegmentedControl = ({ selected, setSelected, options }: SegmentedControlProps) => {
+  return (
+    <Flex
+      sx={t => ({
+        backgroundColor: t.colors.$neutralAlpha50,
+        borderRadius: t.radii.$md,
+        boxShadow:
+          '0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(0, 0, 0, 0.06)',
+      })}
+    >
+      {options.map(option => (
+        <Button
+          key={option.value}
+          variant='unstyled'
+          textVariant='caption'
+          focusRing={false}
+          onClick={() => setSelected && setSelected(option.value)}
+          sx={t => ({
+            padding: `${t.space.$1} ${t.space.$2x5}`,
+            backgroundColor: option.value === selected ? t.colors.$white : 'transparent',
+            borderRadius: t.radii.$md,
+            boxShadow:
+              option.value === selected
+                ? `0px 0px 0px 1px var(--color-Generated-Border, rgba(0, 0, 0, 0.06)), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 2px 0px rgba(0, 0, 0, 0.08)`
+                : 'none',
+            color: option.value === selected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+          })}
+        >
+          {option.label}
+        </Button>
+      ))}
+    </Flex>
   );
 };
