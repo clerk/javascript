@@ -1,5 +1,63 @@
 # @clerk/nuxt
 
+## 1.1.0
+
+### Minor Changes
+
+- Add `createRouteMatcher()` helper function that allows you to protect multiple pages or API routes. ([#5050](https://github.com/clerk/javascript/pull/5050)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  For protecting pages (in a global route middleware):
+
+  ```ts
+  // createRouteMatcher is automatically imported
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)']);
+
+  export default defineNuxtRouteMiddleware(to => {
+    const { userId } = useAuth();
+
+    if (!userId.value && isProtectedRoute(to)) {
+      // Add custom logic to run before redirecting
+      return navigateTo('/sign-in');
+    }
+  });
+  ```
+
+  For protecting API routes:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+
+  // Unlike pages, you need to import `createRouteMatcher` from `@clerk/nuxt/server`
+  const isProtectedRoute = createRouteMatcher(['/api/user(.*)', '/api/projects(.*)']);
+
+  export default clerkMiddleware(event => {
+    const { userId } = event.context.auth;
+
+    if (!userId && isProtectedRoute(event)) {
+      setResponseStatus(event, 401);
+      return 'You are not authorized to access this resource.';
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+  - @clerk/vue@1.1.9
+
+## 1.0.13
+
+### Patch Changes
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`83f145621397986c8eca828c0001fba83e3fc941`](https://github.com/clerk/javascript/commit/83f145621397986c8eca828c0001fba83e3fc941), [`4773d0ad4ed27928fa53357906c0f3a349b9f871`](https://github.com/clerk/javascript/commit/4773d0ad4ed27928fa53357906c0f3a349b9f871), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/vue@1.1.8
+  - @clerk/backend@1.23.9
+  - @clerk/types@4.44.2
+
 ## 1.0.12
 
 ### Patch Changes

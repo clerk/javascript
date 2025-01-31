@@ -1151,7 +1151,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  authenticateWithOKXWallet = async (params: AuthenticateWithOKXWalletParams): Promise<void> => {
+  authenticateWithOKXWallet = async (params?: AuthenticateWithOKXWalletParams): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
