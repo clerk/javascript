@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.44.3
+
+### Patch Changes
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.44.2
 
 ### Patch Changes
