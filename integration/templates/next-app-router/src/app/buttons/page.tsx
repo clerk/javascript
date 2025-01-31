@@ -6,7 +6,6 @@ export default function Home() {
       <SignInButton
         mode='modal'
         forceRedirectUrl='/protected'
-        signUpForceRedirectUrl='/protected'
       >
         Sign in button (force)
       </SignInButton>
@@ -21,7 +20,6 @@ export default function Home() {
       <SignUpButton
         mode='modal'
         forceRedirectUrl='/protected'
-        signInForceRedirectUrl='/protected'
       >
         Sign up button (force)
       </SignUpButton>
