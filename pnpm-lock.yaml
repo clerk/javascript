@@ -963,6 +963,9 @@ importers:
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.2
         version: 2.1.4
+      h3:
+        specifier: ^1.13.0
+        version: 1.14.0
 
   packages/testing:
     dependencies:

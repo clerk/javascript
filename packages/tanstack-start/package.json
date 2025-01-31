@@ -69,7 +69,8 @@
   "devDependencies": {
     "@tanstack/react-router": "^1.97.25",
     "@tanstack/start": "^1.97.25",
-    "esbuild-plugin-file-path-extensions": "^2.1.2"
+    "esbuild-plugin-file-path-extensions": "^2.1.2",
+    "h3": "^1.13.0"
   },
   "peerDependencies": {
     "@tanstack/react-router": ">=1.85.9",
