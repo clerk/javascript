@@ -443,12 +443,12 @@ export interface Clerk {
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignInUrl(): string;
+  buildAfterSignInUrl({ redirectUrl }?: { redirectUrl?: string | null }): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignUpUrl(): string;
+  buildAfterSignUpUrl({ redirectUrl }?: { redirectUrl?: string | null }): string;
 
   /**
    * Returns the configured afterSignOutUrl of the instance.
