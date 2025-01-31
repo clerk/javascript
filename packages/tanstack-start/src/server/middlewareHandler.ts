@@ -12,15 +12,15 @@ export type HandlerCallback<TRouter extends AnyRouter> = (ctx: {
   responseHeaders: Headers;
 }) => Response | Promise<Response>;
 
-type EventHandler = ReturnType<typeof eventHandler>;
-
-export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => EventHandler;
+export type CustomizeStartHandler<TRouter extends AnyRouter> = (
+  cb: HandlerCallback<TRouter>,
+) => ReturnType<typeof eventHandler>;
 
 export function createClerkHandler<TRouter extends AnyRouter>(
   eventHandler: CustomizeStartHandler<TRouter>,
   clerkOptions: LoaderOptions = {},
 ) {
-  return (cb: HandlerCallback<TRouter>): EventHandler => {
+  return (cb: HandlerCallback<TRouter>) => {
     return eventHandler(async ({ request, router, responseHeaders }) => {
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
