@@ -1,5 +1,53 @@
 # @clerk/nuxt
 
+## 1.1.0
+
+### Minor Changes
+
+- Add `createRouteMatcher()` helper function that allows you to protect multiple pages or API routes. ([#5050](https://github.com/clerk/javascript/pull/5050)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  For protecting pages (in a global route middleware):
+
+  ```ts
+  // createRouteMatcher is automatically imported
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)']);
+
+  export default defineNuxtRouteMiddleware(to => {
+    const { userId } = useAuth();
+
+    if (!userId.value && isProtectedRoute(to)) {
+      // Add custom logic to run before redirecting
+      return navigateTo('/sign-in');
+    }
+  });
+  ```
+
+  For protecting API routes:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+
+  // Unlike pages, you need to import `createRouteMatcher` from `@clerk/nuxt/server`
+  const isProtectedRoute = createRouteMatcher(['/api/user(.*)', '/api/projects(.*)']);
+
+  export default clerkMiddleware(event => {
+    const { userId } = event.context.auth;
+
+    if (!userId && isProtectedRoute(event)) {
+      setResponseStatus(event, 401);
+      return 'You are not authorized to access this resource.';
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+  - @clerk/vue@1.1.9
+
 ## 1.0.13
 
 ### Patch Changes
