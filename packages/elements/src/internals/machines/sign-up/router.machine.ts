@@ -82,7 +82,7 @@ export const SignUpRouterMachine = setup({
       void context.clerk.setActive({
         session,
         redirectUrl: context.clerk.buildAfterSignUpUrl({
-          redirectUrl: context.router?.searchParams().get('redirect_url'),
+          params: context.router?.searchParams(),
         }),
       });
     },
@@ -202,7 +202,7 @@ export const SignUpRouterMachine = setup({
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
-            redirectUrl: context.router?.searchParams().get('redirect_url'),
+            params: context.router?.searchParams(),
           }),
         },
       })),
@@ -219,7 +219,7 @@ export const SignUpRouterMachine = setup({
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
-            redirectUrl: context.router?.searchParams().get('redirect_url'),
+            params: context.router?.searchParams(),
           }),
         },
       })),
@@ -236,7 +236,7 @@ export const SignUpRouterMachine = setup({
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
-            redirectUrl: context.router?.searchParams().get('redirect_url'),
+            params: context.router?.searchParams(),
           }),
         },
       })),
@@ -319,7 +319,7 @@ export const SignUpRouterMachine = setup({
               type: 'navigateExternal',
               params: ({ context }) => ({
                 path: context.clerk.buildAfterSignUpUrl({
-                  redirectUrl: context.router?.searchParams().get('redirect_url'),
+                  params: context.router?.searchParams(),
                 }),
               }),
             },
