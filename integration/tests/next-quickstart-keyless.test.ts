@@ -54,11 +54,14 @@ test.describe('Keyless mode @quickstart', () => {
     const [newPage] = await Promise.all([context.waitForEvent('page'), claim.click()]);
 
     await newPage.waitForLoadState();
-    await newPage.waitForURL(url =>
-      url.href.startsWith(
-        'https://dashboard.clerk.com/sign-in?redirect_url=https%3A%2F%2Fdashboard.clerk.com%2Fapps%2Fclaim%3Ftoken',
-      ),
-    );
+    await newPage.waitForURL(url => {
+      const urlToReturnTo = 'https://dashboard.clerk.com/apps/claim?token=';
+      return (
+        url.pathname === '/apps/claim/sign-in' &&
+        url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
+        url.searchParams.get('sign_up_force_redirect_url')?.startsWith(urlToReturnTo)
+      );
+    });
   });
 
   test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
