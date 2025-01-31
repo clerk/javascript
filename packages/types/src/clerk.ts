@@ -798,7 +798,6 @@ export interface Resources {
 export type RoutingStrategy =
   | 'path'
   | 'hash'
-  /** @deprecated Use 'path' or 'hash' routing instead */
   | 'virtual';
 
 /**
@@ -901,7 +900,6 @@ export type RoutingOptions =
       routing?: Extract<
         RoutingStrategy,
         | 'hash'
-        /** @deprecated Use 'path' or 'hash' routing instead */
         | 'virtual'
       >;
     };
