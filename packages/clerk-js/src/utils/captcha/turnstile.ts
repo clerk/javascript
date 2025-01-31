@@ -141,6 +141,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
+      visibleDiv.style.maxHeight = '0';
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -155,6 +156,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    div.style.maxHeight = '0';
     document.body.appendChild(div);
   }
 
