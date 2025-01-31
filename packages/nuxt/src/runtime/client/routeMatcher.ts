@@ -6,12 +6,14 @@ type RouteLocation = Parameters<RouteMiddleware>[0];
 export type RouteMatcherParam = PathMatcherParam;
 
 /**
- * Returns a function that accepts a Vue Router route location and returns whether the route matches the list of
- * predefined routes that can be passed in as the first argument.
+ * `createRouteMatcher` is a Clerk helper function that allows you to protect multiple routes. It accepts an array of routes and checks if the route the user is trying to visit matches one of the routes passed to it.
  *
- * You can use glob patterns to match multiple routes or a function to match against the route object.
- * Path patterns and regular expressions are supported, for example: `['/foo', '/bar(.*)'] or `[/^\/foo\/.*$/]`
- * For more information, see: https://clerk.com/docs
+ * The `createRouteMatcher` helper function returns a function that accepts a Vue Router route location and will return `true` if the user is trying to access a route that matches on of the routes passed to `createRouteMatcher`.
+ *
+ * @example
+ * ['/foo', '/bar(.*)']
+ * @example
+ * [/^\/foo\/.*$/]
  */
 export const createRouteMatcher = (routes: RouteMatcherParam) => {
   const matcher = createPathMatcher(routes);
