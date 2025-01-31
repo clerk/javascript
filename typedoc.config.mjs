@@ -6,7 +6,7 @@ const IGNORE_LIST = [
   '.DS_Store',
   'dev-cli',
   'expo-passkeys',
-  'tailwind-css-transformer',
+  'tailwindcss-transformer',
   'testing',
   'themes',
   'ui',
@@ -29,10 +29,6 @@ const config = {
   // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
   json: './.typedoc/output.json',
   entryPointStrategy: 'packages',
-  excludePrivate: true,
-  blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important'],
-  modifierTags: [...OptionDefaults.modifierTags],
-  exclude: ['**/*+(.spec|.test).ts'],
   plugin: ['typedoc-plugin-missing-exports'],
   packageOptions: {
     includeVersion: false,
@@ -43,8 +39,11 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
+    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important'],
+    modifierTags: [...OptionDefaults.modifierTags],
+    exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },
-  entryPoints: getPackages(),
+  entryPoints: ['packages/nextjs', 'packages/react', 'packages/backend', 'packages/types'], // getPackages(),
 };
 
 export default config;

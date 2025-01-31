@@ -1,5 +1,25 @@
 # Change Log
 
+## 6.10.5
+
+### Patch Changes
+
+- Previously the `createPathMatcher()` function was re-implemented both in `@clerk/astro` and `@clerk/nextjs`, this PR moves this logic to `@clerk/shared`. ([#5043](https://github.com/clerk/javascript/pull/5043)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can use it like so:
+
+  ```ts
+  import { createPathMatcher } from '@clerk/shared/pathMatcher';
+  ```
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/clerk-react@5.22.9
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+
 ## 6.10.4
 
 ### Patch Changes

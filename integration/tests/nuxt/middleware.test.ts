@@ -24,11 +24,13 @@ test.describe('custom middleware @nuxt', () => {
       )
       .addFile(
         'server/middleware/clerk.js',
-        () => `import { clerkMiddleware } from '@clerk/nuxt/server';
+        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
 
         export default clerkMiddleware((event) => {
           const { userId } = event.context.auth
-          if (!userId && event.path === '/api/me') {
+          const isProtectedRoute = createRouteMatcher(['/api/me']);
+
+          if (!userId && isProtectedRoute(event)) {
             throw createError({
               statusCode: 401,
               statusMessage: 'You are not authorized to access this resource.'

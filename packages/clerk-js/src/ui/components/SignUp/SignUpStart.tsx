@@ -328,7 +328,7 @@ function _SignUpStart(): JSX.Element {
                 />
               </Form.ControlRow>
             )}
-            {!shouldShowForm && <CaptchaElement maxHeight='0' />}
+            {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
 
