@@ -87,7 +87,7 @@ export type {
 /**
  * Resources
  */
-export type {
+export {
   AccountlessApplication,
   AllowlistIdentifier,
   Client,
