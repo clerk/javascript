@@ -6,6 +6,8 @@ import { canUseKeyless } from '../utils/feature-flags';
 
 const keylessCookiePrefix = `__clerk_keys_`;
 
+const keylessRedirectCountCookieName = `${keylessCookiePrefix}redirect_count`;
+
 const getKeylessCookieName = (): string => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const PATH = process.env.PWD;
@@ -46,4 +48,4 @@ function getKeylessCookieValue(getter: (cookieName: string) => string | undefine
   return keyless;
 }
 
-export { getKeylessCookieValue, getKeylessCookieName };
+export { getKeylessCookieValue, getKeylessCookieName, keylessRedirectCountCookieName };

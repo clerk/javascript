@@ -5,7 +5,7 @@ import { redirect, RedirectType } from 'next/navigation';
 
 import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
-import { getKeylessCookieName } from '../server/keyless';
+import { getKeylessCookieName, keylessRedirectCountCookieName } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
@@ -18,11 +18,16 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
 
   const request = new Request('https://placeholder.com', { headers: await headers() });
 
-  const redirectCount = Number(cookieStore.get('__clerk_keys_redirect_count')?.value) || 1;
-
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
   // @ts-expect-error Request will work as well
-  if (detectClerkMiddleware(request) && redirectCount < 2) {
+  const detectedMiddelware = detectClerkMiddleware(request);
+
+  /**
+   * Prevents infinite redirects in when the `returnUrl` will result to a 404 (not-found) page.
+   */
+  const redirectCount = Number(cookieStore.get(keylessRedirectCountCookieName)?.value) || 1;
+
+  if (detectedMiddelware && redirectCount < 2) {
     /**
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */
