@@ -558,7 +558,7 @@ export const nlNL: LocalizationResource = {
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
-    form_identifier_not_found: 'Dit identificerende gegeven kan niet worden gevonden.',
+    form_identifier_not_found: 'Geen account gevonden met deze gegevens. Controleer en probeer het opnieuw.',
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',
