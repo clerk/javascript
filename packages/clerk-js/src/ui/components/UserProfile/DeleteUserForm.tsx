@@ -18,7 +18,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { setActive, __internal_setActiveContext } = useClerk();
   const [deleteUserWithReverification] = useReverification(() => user?.delete());
 
-  const confirmationField = useFormControl('deleteConfirmation', 'Delete account', {
+  const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
     label: localizationKeys('userProfile.deletePage.actionDescription'),
     isRequired: true,
