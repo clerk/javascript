@@ -14,15 +14,14 @@ const hasCloudflareContext = (context: any): context is CloudflareEnv => {
  * @param context - Optional context object that may contain environment values
  * @returns The environment variable value or empty string if not found
  */
-export const getEnvVariable = <T = unknown>(name: string, context?: T): string => {
+export const getEnvVariable = (name: string, context?: Record<string, any>): string => {
   // Node envs
   if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
     return process.env[name];
   }
 
-  // @ts-expect-error - Vite specific
+  // Vite specific
   if (typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env[name] === 'string') {
-    // @ts-expect-error - Vite specific
     return import.meta.env[name];
   }
 
@@ -36,8 +35,8 @@ export const getEnvVariable = <T = unknown>(name: string, context?: T): string =
   }
 
   // Check whether the value exists in the context object directly
-  if (context && typeof context[name as keyof typeof context] === 'string') {
-    return context[name as keyof typeof context] as string;
+  if (context && typeof context[name] === 'string') {
+    return context[name];
   }
 
   // Cloudflare workers
