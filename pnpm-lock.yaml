@@ -555,10 +555,10 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       next:
-        specifier: ^14.2.22
+        specifier: ^14.2.23
         version: 14.2.23(@babel/core@7.26.7)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
-        specifier: ^4.31.0
+        specifier: ^4.33.0
         version: 4.33.0
 
   packages/expo:
