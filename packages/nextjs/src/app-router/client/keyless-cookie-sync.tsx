@@ -9,7 +9,7 @@ import { canUseKeyless } from '../../utils/feature-flags';
 
 export function KeylessCookieSync(props: PropsWithChildren<AccountlessApplication>) {
   const segments = useSelectedLayoutSegments();
-  const isNotFoundRoute = segments[0]?.startsWith('/_not-found');
+  const isNotFoundRoute = segments[0]?.startsWith('/_not-found') || false;
 
   useEffect(() => {
     if (canUseKeyless && !isNotFoundRoute) {
