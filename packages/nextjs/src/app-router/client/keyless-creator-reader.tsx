@@ -1,3 +1,4 @@
+import { useSelectedLayoutSegments } from 'next/navigation';
 import React, { useEffect } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
@@ -5,12 +6,17 @@ import { createOrReadKeylessAction } from '../keyless-actions';
 
 export const KeylessCreatorOrReader = (props: NextClerkProviderProps) => {
   const { children } = props;
+  const segments = useSelectedLayoutSegments();
+  const isNotFoundRoute = segments[0]?.startsWith('/_not-found') || false;
   const [state, fetchKeys] = React.useActionState(createOrReadKeylessAction, null);
   useEffect(() => {
+    if (isNotFoundRoute) {
+      return;
+    }
     React.startTransition(() => {
       fetchKeys();
     });
-  }, []);
+  }, [isNotFoundRoute]);
 
   if (!React.isValidElement(children)) {
     return children;
