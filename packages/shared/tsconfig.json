@@ -20,5 +20,5 @@
     "allowJs": true
   },
   "exclude": ["node_modules"],
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "tsup.config.ts"]
 }
