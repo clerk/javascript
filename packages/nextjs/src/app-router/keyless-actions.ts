@@ -11,7 +11,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   const cookieStore = await cookies();
-  cookieStore.set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  cookieStore.set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
@@ -55,7 +55,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
 
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
-  void (await cookies()).set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  void (await cookies()).set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: false,
     httpOnly: false,
   });
