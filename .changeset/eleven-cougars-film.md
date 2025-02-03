@@ -1,6 +1,6 @@
 ---
 "@clerk/react-router": patch
-"@clerk/shared": patch
+"@clerk/shared": minor
 "@clerk/tanstack-start": patch
 ---
 
