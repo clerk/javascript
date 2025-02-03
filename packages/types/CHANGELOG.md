@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.45.0
+
+### Minor Changes
+
+- - `@clerk/clerk-js`, `@clerk/types`: Add `redirectUrl` option to `buildAfterSignInUrl()` and `buildAfterSignUpUrl()` methods. ([#5052](https://github.com/clerk/javascript/pull/5052)) by [@brkalow](https://github.com/brkalow)
+
+  - `@clerk/elements`: Ensure redirect_url params passed to Elements components are always passed to Clerk's underlying `build*Url()` methods.
+
+### Patch Changes
+
+- Reverts [#4977](https://github.com/clerk/javascript/pull/4977) ([#5057](https://github.com/clerk/javascript/pull/5057)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Marks virtual routing as deprecated.
+
+## 4.44.3
+
+### Patch Changes
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.44.2
 
 ### Patch Changes

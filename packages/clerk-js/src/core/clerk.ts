@@ -1045,12 +1045,12 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.homeUrl);
   }
 
-  public buildAfterSignInUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignInUrl());
+  public buildAfterSignInUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignInUrl());
   }
 
-  public buildAfterSignUpUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignUpUrl());
+  public buildAfterSignUpUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignUpUrl());
   }
 
   public buildAfterSignOutUrl(): string {
