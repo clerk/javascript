@@ -14,7 +14,7 @@ import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
-import { invalidateCacheAction } from '../server-actions';
+import { invalidateCacheAction, redirectAndInvalidateCache } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -25,6 +25,18 @@ import { useAwaitableReplace } from './useAwaitableReplace';
 const LazyCreateKeylessApplication = dynamic(() =>
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
+
+declare global {
+  export interface Window {
+    __clerk_nav_await: Array<(value: void) => void>;
+    __clerk_nav: (to: string) => Promise<void>;
+    __clerk_internal_invalidateCachePromise: () => void | undefined;
+    __clerk_redirectAndClearCache: (redirectUrl: string) => Promise<void>;
+    next?: {
+      version: string;
+    };
+  }
+}
 
 const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   if (isNextWithUnstableServerActions) {
@@ -87,6 +99,10 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
           void invalidateCacheAction().then(() => res());
         }
       });
+    };
+
+    window.__clerk_redirectAndClearCache = (redirectUrl: string) => {
+      return redirectAndInvalidateCache(redirectUrl);
     };
 
     window.__unstable__onAfterSetActive = () => {

@@ -875,7 +875,7 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    await onBeforeSetActive();
+    // await onBeforeSetActive();
 
     // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
@@ -907,7 +907,7 @@ export class Clerk implements ClerkInterface {
     const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
     if (beforeEmit) {
       beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
+      // this.#setTransitiveState();
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
@@ -918,14 +918,15 @@ export class Clerk implements ClerkInterface {
 
     if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
+      // this.#setTransitiveState();
 
       if (this.client.isEligibleForTouch()) {
         const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
 
         await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
       } else {
-        await this.navigate(redirectUrl);
+        await window.__clerk_redirectAndClearCache(redirectUrl).catch(() => {});
+        // await this.navigate(redirectUrl);
       }
 
       beforeUnloadTracker?.stopTracking();
@@ -939,7 +940,7 @@ export class Clerk implements ClerkInterface {
     this.#setAccessors(newSession);
 
     this.#emit();
-    await onAfterSetActive();
+    // await onAfterSetActive();
     this.#resetComponentsState();
   };
 
