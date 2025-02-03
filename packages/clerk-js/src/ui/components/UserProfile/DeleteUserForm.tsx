@@ -11,7 +11,11 @@ type DeleteUserFormProps = FormProps;
 export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps) => {
   const { onReset } = props;
   const card = useCardState();
-  const { afterSignOutUrl, afterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const {
+    afterSignOutUrl,
+    afterMultiSessionSingleSignOutUrl,
+    // navigateAfterSignOut
+  } = useSignOutContext();
   const { user } = useUser();
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
@@ -40,6 +44,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
 
       return await setActive({
         session: null,
+        // beforeEmit: navigateAfterSignOut
         redirectUrl,
       });
     } catch (e) {
