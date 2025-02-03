@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.52.0
+
+### Minor Changes
+
+- Update `@coinbase/wallet-sdk` depedency to `4.2.4`. ([#4945](https://github.com/clerk/javascript/pull/4945)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.51.0
 
 ### Minor Changes

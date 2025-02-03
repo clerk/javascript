@@ -1,5 +1,11 @@
 # @clerk/nuxt
 
+## 1.1.2
+
+### Patch Changes
+
+- Add `<Waitlist />` component to the set of auto-imported components ([#5067](https://github.com/clerk/javascript/pull/5067)) by [@davidpattaguan](https://github.com/davidpattaguan)
+
 ## 1.1.1
 
 ### Patch Changes
