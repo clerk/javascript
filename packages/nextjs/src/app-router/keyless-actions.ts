@@ -5,29 +5,31 @@ import { redirect, RedirectType } from 'next/navigation';
 
 import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
-import { getKeylessCookieName, keylessRedirectCountCookieName } from '../server/keyless';
+import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   const cookieStore = await cookies();
+  const request = new Request('https://placeholder.com', { headers: await headers() });
+
+  const keyless = getKeylessCookieValue(name => cookieStore.get(name)?.value);
+  const pksMatch = keyless?.publishableKey === publishableKey;
+  const sksMatch = keyless?.secretKey === secretKey;
+  if (pksMatch && sksMatch) {
+    // Return early, syncing in not needed.
+    return;
+  }
+
+  // Set the new keys in the cookie.
   cookieStore.set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
 
-  const request = new Request('https://placeholder.com', { headers: await headers() });
-
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
   // @ts-expect-error Request will work as well
-  const detectedMiddelware = detectClerkMiddleware(request);
-
-  /**
-   * Prevents infinite redirects in when the `returnUrl` will result to a 404 (not-found) page.
-   */
-  const redirectCount = Number(cookieStore.get(keylessRedirectCountCookieName)?.value) || 1;
-
-  if (detectedMiddelware && redirectCount < 2) {
+  if (detectClerkMiddleware(request)) {
     /**
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */

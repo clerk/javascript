@@ -12,7 +12,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
-import { getKeylessCookieValue, keylessRedirectCountCookieName } from './keyless';
+import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
   isNextjsNotFoundError,
@@ -276,14 +276,7 @@ const returnBackFromKeylessSync = (request: NextMiddlewareRequestParam) => {
   const url = new URL(request.url);
   url.pathname = '';
 
-  const redirectCount = Number(request.cookies.get(keylessRedirectCountCookieName)?.value) || 0;
-  const headers = new Headers();
-  headers.append(
-    'Set-Cookie',
-    `${keylessRedirectCountCookieName}=${redirectCount + 1}; Path=/; SameSite=Lax; HttpOnly; Max-Age=5;`,
-  );
-  const response = NextResponse.redirect(returnUrl || url.toString(), { headers });
-  return response;
+  return NextResponse.redirect(returnUrl || url.toString());
 };
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
