@@ -1,5 +1,15 @@
 # Change Log
 
+## 6.11.0
+
+### Minor Changes
+
+- Enable Keyless by default. To disable keyless use `NEXT_PUBLIC_CLERK_KEYLESS_DISABLED=1`. ([#4898](https://github.com/clerk/javascript/pull/4898)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bug fix: On keyless avoid infinite redirect loop when page does not exist and application is attempting to sync state with middleware. ([#5073](https://github.com/clerk/javascript/pull/5073)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 6.10.6
 
 ### Patch Changes
