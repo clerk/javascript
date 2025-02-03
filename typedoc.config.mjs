@@ -1,12 +1,12 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import { OptionDefaults } from 'typedoc';
 
 const IGNORE_LIST = [
   '.DS_Store',
   'dev-cli',
-  'eslint-config-custom',
   'expo-passkeys',
-  'tailwind-css-transformer',
+  'tailwindcss-transformer',
   'testing',
   'themes',
   'ui',
@@ -29,18 +29,21 @@ const config = {
   // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
   json: './.typedoc/output.json',
   entryPointStrategy: 'packages',
-  excludePrivate: true,
-  blockTags: ['@param', '@returns'],
-  modifierTags: ['@alpha', '@beta', '@experimental', '@deprecated'],
+  plugin: ['typedoc-plugin-missing-exports'],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
     sortEntryPoints: true,
     sort: 'alphabetical',
     excludeExternals: true,
+    excludeInternal: true,
+    excludeNotDocumented: true,
     gitRevision: 'main',
+    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important'],
+    modifierTags: [...OptionDefaults.modifierTags],
+    exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },
-  entryPoints: getPackages(),
+  entryPoints: ['packages/nextjs', 'packages/react', 'packages/backend', 'packages/types'], // getPackages(),
 };
 
 export default config;

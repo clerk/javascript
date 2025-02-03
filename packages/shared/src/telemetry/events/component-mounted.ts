@@ -1,6 +1,6 @@
 import type { TelemetryEventRaw } from '@clerk/types';
 
-const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED' as const;
+const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_SAMPLING_RATE = 0.1;
 
 type ComponentMountedBase = {

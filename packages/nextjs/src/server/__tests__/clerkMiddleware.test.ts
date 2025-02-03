@@ -84,27 +84,25 @@ describe('ClerkMiddleware type tests', () => {
 
   it('fails for unknown props', () => {
     // @ts-expect-error - unknown prop
-    clerkMiddlewareMock({ hello: '' });
+    void clerkMiddlewareMock({ hello: '' });
   });
 
   it('can be used with a handler and an optional options object', () => {
     clerkMiddlewareMock(
-      async (auth, request, event) => {
+      async (auth, request) => {
         const { getToken } = await auth();
         await getToken();
         request.cookies.clear();
-        event.sourcePage;
       },
       { secretKey: '', publishableKey: '' },
     );
   });
 
   it('can be used with just a handler and an optional options object', () => {
-    clerkMiddlewareMock(async (auth, request, event) => {
+    clerkMiddlewareMock(async (auth, request) => {
       const { getToken } = await auth();
       await getToken();
       request.cookies.clear();
-      event.sourcePage;
     });
   });
 

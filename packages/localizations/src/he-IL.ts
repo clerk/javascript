@@ -128,6 +128,7 @@ export const heIL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'הזמן',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'הסר חבר',
         tableHeader__actions: undefined,
@@ -453,6 +454,7 @@ export const heIL: LocalizationResource = {
       actionText: 'אין לך חשבון?',
       actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'התחבר',
       titleCombined: undefined,
     },
@@ -532,7 +534,9 @@ export const heIL: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
+      subtitleCombined: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
+      titleCombined: 'צור את החשבון שלך',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -684,6 +688,11 @@ export const heIL: LocalizationResource = {
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות כתובת אימייל זו.',

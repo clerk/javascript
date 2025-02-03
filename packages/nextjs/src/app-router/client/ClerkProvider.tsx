@@ -26,17 +26,6 @@ const LazyCreateKeylessApplication = dynamic(() =>
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
 
-declare global {
-  export interface Window {
-    __clerk_nav_await: Array<(value: void) => void>;
-    __clerk_nav: (to: string) => Promise<void>;
-    __clerk_internal_invalidateCachePromise: () => void | undefined;
-    next?: {
-      version: string;
-    };
-  }
-}
-
 const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   if (isNextWithUnstableServerActions) {
     const deprecationWarning = `Clerk:\nYour current Next.js version (${nextPackage.version}) will be deprecated in the next major release of "@clerk/nextjs". Please upgrade to next@14.1.0 or later.`;
@@ -123,11 +112,11 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps) => {
-  const { children, ...rest } = props;
+export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
+  const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
-  if (safePublishableKey || !canUseKeyless) {
+  if (safePublishableKey || !canUseKeyless || disableKeyless) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 

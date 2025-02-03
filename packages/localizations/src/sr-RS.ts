@@ -129,6 +129,7 @@ export const srRS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozovi',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -459,6 +460,7 @@ export const srRS: LocalizationResource = {
       actionText: 'Nemaš nalog?',
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
+      subtitleCombined: undefined,
       title: 'Prijavi se na {{applicationName}}',
       titleCombined: undefined,
     },
@@ -538,7 +540,9 @@ export const srRS: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Već imaš nalog?',
       subtitle: 'Dobrodošao! Molimo popuni detalje da započneš.',
+      subtitleCombined: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',
+      titleCombined: 'Kreiraj svoj nalog',
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
@@ -695,6 +699,11 @@ export const srRS: LocalizationResource = {
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
         messageLine2: 'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',

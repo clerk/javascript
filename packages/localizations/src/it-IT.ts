@@ -130,6 +130,7 @@ export const itIT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invita',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Rimuovi membro',
         tableHeader__actions: 'Azioni',
@@ -460,6 +461,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Non hai un account?',
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
       subtitle: 'per continuare su {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Accedi',
       titleCombined: undefined,
     },
@@ -540,7 +542,9 @@ export const itIT: LocalizationResource = {
       actionLink__use_phone: 'Usa telefono',
       actionText: 'Hai già un account?',
       subtitle: 'per continuare su {{applicationName}}',
+      subtitleCombined: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
+      titleCombined: 'Crea il tuo account',
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
@@ -697,6 +701,11 @@ export const itIT: LocalizationResource = {
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',

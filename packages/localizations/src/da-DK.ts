@@ -129,6 +129,7 @@ export const daDK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: 'Handlinger',
@@ -459,6 +460,7 @@ export const daDK: LocalizationResource = {
       actionText: 'Ingen konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
     },
@@ -538,7 +540,9 @@ export const daDK: LocalizationResource = {
       actionLink__use_phone: 'Brug telefon',
       actionText: 'Har du en konto?',
       subtitle: 'Forsæt til {{applicationName}}',
+      subtitleCombined: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
+      titleCombined: 'Opret din konto',
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
@@ -694,6 +698,11 @@ export const daDK: LocalizationResource = {
         resendButton: 'Send link igen',
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med denne e-mailadresse.',

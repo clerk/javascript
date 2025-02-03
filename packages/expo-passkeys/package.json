@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-passkeys",
-  "version": "0.1.11",
+  "version": "0.1.18",
   "description": "Passkeys library to be used with Clerk for expo",
   "keywords": [
     "react-native",
@@ -25,7 +25,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "open:android": "open -a \"Android Studio\" example/android",
     "open:ios": "xed example/ios",
     "publish:local": "pnpm yalc push --replace  --sig"
