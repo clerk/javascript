@@ -1,5 +1,97 @@
 # Change Log
 
+## 4.45.0
+
+### Minor Changes
+
+- - `@clerk/clerk-js`, `@clerk/types`: Add `redirectUrl` option to `buildAfterSignInUrl()` and `buildAfterSignUpUrl()` methods. ([#5052](https://github.com/clerk/javascript/pull/5052)) by [@brkalow](https://github.com/brkalow)
+
+  - `@clerk/elements`: Ensure redirect_url params passed to Elements components are always passed to Clerk's underlying `build*Url()` methods.
+
+### Patch Changes
+
+- Reverts [#4977](https://github.com/clerk/javascript/pull/4977) ([#5057](https://github.com/clerk/javascript/pull/5057)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Marks virtual routing as deprecated.
+
+## 4.44.3
+
+### Patch Changes
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
+## 4.44.2
+
+### Patch Changes
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.44.1
+
+### Patch Changes
+
+- Add `subtitleCombined` localizations to sign-in-or-up flow. ([#4988](https://github.com/clerk/javascript/pull/4988)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduced searching for members list on `OrganizationProfile` ([#4942](https://github.com/clerk/javascript/pull/4942)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.44.0
+
+### Minor Changes
+
+- Deprecated `userProfile.emailAddressPage.emailLink.formHint` and `userProfile.emailAddressPage.emailCode.formHint` in favor of `userProfile.emailAddressPage.formHint` ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.43.0
+
+### Minor Changes
+
+- - Introduced an `upsert` method to the `SignUp` resource, which reuses the existing sign-up attempt ID if it exists. ([#4720](https://github.com/clerk/javascript/pull/4720)) by [@kostaspt](https://github.com/kostaspt)
+
+  - Fix a ticket flow issue on `<SignUp />` component, where in some rare cases the initial ticket/context is lost, because of creating a new sign-up attempt ID.
+
+## 4.42.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update modal methods to use the correct types. ([#4931](https://github.com/clerk/javascript/pull/4931)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.41.2
+
+### Patch Changes
+
+- Remove experimental prefix from combined title. ([#4935](https://github.com/clerk/javascript/pull/4935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.41.1
+
+### Patch Changes
+
+- Support `enterprise_sso` strategy (SAML, OIDC, EASIE) on custom flows with `@clerk/elements` ([#4916](https://github.com/clerk/javascript/pull/4916)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.41.0
+
+### Minor Changes
+
+- Introduce sign-in-or-up flow. ([#4788](https://github.com/clerk/javascript/pull/4788)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Improve runtime prop checking for single-file components ([#4902](https://github.com/clerk/javascript/pull/4902)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Skip fraud protection if client has bypass enabled ([#4907](https://github.com/clerk/javascript/pull/4907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.40.3
+
+### Patch Changes
+
+- Update `socialButtonsBlockButtonManyInView` to only accept `'${string}{{provider|titleize}}${string}'` or `undefined`. ([#4887](https://github.com/clerk/javascript/pull/4887)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.40.2
 
 ### Patch Changes

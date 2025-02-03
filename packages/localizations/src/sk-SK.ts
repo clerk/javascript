@@ -129,6 +129,7 @@ export const skSK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvať',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstrániť člena',
         tableHeader__actions: undefined,
@@ -458,8 +459,9 @@ export const skSK: LocalizationResource = {
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Prihlásiť sa',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',
@@ -537,7 +539,9 @@ export const skSK: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
       subtitle: 'pre pokračovanie do {{applicationName}}',
+      subtitleCombined: 'pre pokračovanie do {{applicationName}}',
       title: 'Vytvorte si účet',
+      titleCombined: 'Vytvorte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
@@ -549,7 +553,6 @@ export const skSK: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -594,6 +597,7 @@ export const skSK: LocalizationResource = {
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -692,6 +696,11 @@ export const skSK: LocalizationResource = {
         resendButton: 'Znovu odoslať odkaz',
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstránená z tohto účtu.',
         messageLine2: 'Nebudete sa môcť prihlásiť pomocou tejto e-mailovej adresy.',

@@ -1,5 +1,128 @@
 # Change Log
 
+## 1.23.11
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/shared@2.20.18
+
+## 1.23.10
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+
+## 1.23.9
+
+### Patch Changes
+
+- Mark keyless onboarding as complete when stored keys match explicit keys ([#4971](https://github.com/clerk/javascript/pull/4971)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+
+## 1.23.8
+
+### Patch Changes
+
+- Improve JSDoc comments to provide you with better IntelliSense information in your IDE ([#4994](https://github.com/clerk/javascript/pull/4994)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5)]:
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+
+## 1.23.7
+
+### Patch Changes
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/shared@2.20.14
+
+## 1.23.6
+
+### Patch Changes
+
+- Add `orderBy` to `getOrganizationMembershipList` ([#4976](https://github.com/clerk/javascript/pull/4976)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/shared@2.20.13
+  - @clerk/types@4.43.0
+
+## 1.23.5
+
+### Patch Changes
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/shared@2.20.12
+
+## 1.23.4
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/shared@2.20.11
+
+## 1.23.3
+
+### Patch Changes
+
+- Updated dependencies [[`9eef7713212378351e8e01628611eaa18de250e8`](https://github.com/clerk/javascript/commit/9eef7713212378351e8e01628611eaa18de250e8)]:
+  - @clerk/shared@2.20.10
+
+## 1.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`7ffc99b48977b9f6c74c0c71c500b60cb8aba65e`](https://github.com/clerk/javascript/commit/7ffc99b48977b9f6c74c0c71c500b60cb8aba65e)]:
+  - @clerk/types@4.41.1
+  - @clerk/shared@2.20.9
+
+## 1.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d`](https://github.com/clerk/javascript/commit/4af35380f18d1d06c15ad1f5745c2d5a1ab1c37d), [`aa48b1f9e890b2402e9d05989a4820141076f7bf`](https://github.com/clerk/javascript/commit/aa48b1f9e890b2402e9d05989a4820141076f7bf), [`53bd34fff38b17498edf66cc4bc2d42d707f28dc`](https://github.com/clerk/javascript/commit/53bd34fff38b17498edf66cc4bc2d42d707f28dc)]:
+  - @clerk/types@4.41.0
+  - @clerk/shared@2.20.8
+
+## 1.23.0
+
+### Minor Changes
+
+- `authenticateRequest()` will now set a refreshsed session cookie on the response when an expired session token is refreshed via the Clerk API. ([#4884](https://github.com/clerk/javascript/pull/4884)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Add property `query` to `GetInvitationListParams` to allow filtering based on `email_address` or `id`. ([#4804](https://github.com/clerk/javascript/pull/4804)) by [@effektsvk](https://github.com/effektsvk)
+
+- Updated dependencies [[`fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6`](https://github.com/clerk/javascript/commit/fd7a5be73db3acaa7daeb9b15af73c2ce99d03a6)]:
+  - @clerk/types@4.40.3
+  - @clerk/shared@2.20.7
+
+## 1.22.0
+
+### Minor Changes
+
+- Update Session resource with new properties to align with OpenAPI spec ([#4869](https://github.com/clerk/javascript/pull/4869)) by [@octoper](https://github.com/octoper)
+
+  - `lastActiveOrganizationId`
+  - `latestActivity`
+  - `actor`
+
+### Patch Changes
+
+- Fixes an issue with the satellite sync flow for development instances. ([#4864](https://github.com/clerk/javascript/pull/4864)) by [@BRKalow](https://github.com/BRKalow)
+
+- Upgrading cookies@1.0.2 and snakecase-keys@8.0.1 ([#4881](https://github.com/clerk/javascript/pull/4881)) by [@renovate](https://github.com/apps/renovate)
+
 ## 1.21.6
 
 ### Patch Changes

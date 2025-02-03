@@ -43,7 +43,7 @@ async function loadGIS() {
   if (!window.google) {
     try {
       await loadScript('https://accounts.google.com/gsi/client', { defer: true });
-    } catch (_) {
+    } catch {
       // Rethrow with specific message
       clerkFailedToLoadThirdPartyScript('Google Identity Services');
     }

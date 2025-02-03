@@ -4,7 +4,7 @@ import React from 'react';
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToAfterSignUp } from '../../common';
-import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -39,10 +39,9 @@ function _SignUpStart(): JSX.Element {
   const { attributes } = userSettings;
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
-  const options = useOptions();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
-  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
+  const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -178,6 +177,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          case ERROR_CODES.CAPTCHA_INVALID:
             card.setError(error);
             break;
           default:
@@ -218,7 +218,14 @@ function _SignUpStart(): JSX.Element {
     if (fields.ticket) {
       const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'ticket',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -238,7 +245,7 @@ function _SignUpStart(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     return signUp
-      .create(buildRequest(fieldsToSubmit))
+      .upsert(buildRequest(fieldsToSubmit))
       .then(res =>
         completeSignUpFlow({
           signUp: res,
@@ -275,8 +282,18 @@ function _SignUpStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
+            <Header.Title
+              localizationKey={
+                isCombinedFlow ? localizationKeys('signUp.start.titleCombined') : localizationKeys('signUp.start.title')
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signUp.start.subtitleCombined')
+                  : localizationKeys('signUp.start.subtitle')
+              }
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex

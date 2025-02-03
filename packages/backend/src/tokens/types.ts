@@ -2,70 +2,116 @@ import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
+  /**
+   * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
   publishableKey?: string;
+  /**
+   * The domain of a [satellite application](https://clerk.com/docs/advanced-usage/satellite-domains) in a multi-domain setup.
+   */
   domain?: string;
+  /**
+   * Whether the instance is a satellite domain in a multi-domain setup. Defaults to `false`.
+   */
   isSatellite?: boolean;
+  /**
+   * The proxy URL from a multi-domain setup.
+   */
   proxyUrl?: string;
+  /**
+   * The sign-in URL from a multi-domain setup.
+   */
   signInUrl?: string;
+  /**
+   * The sign-up URL from a multi-domain setup.
+   */
   signUpUrl?: string;
+  /**
+   * Full URL or path to navigate to after successful sign in. Defaults to `/`.
+   */
   afterSignInUrl?: string;
+  /**
+   * Full URL or path to navigate to after successful sign up. Defaults to `/`.
+   */
   afterSignUpUrl?: string;
+  /**
+   * Used to activate a specific [organization](https://clerk.com/docs/organizations/overview) or [personal account](https://clerk.com/docs/organizations/organization-workspaces#organization-workspaces-in-the-clerk-dashboard:~:text=Personal%20account) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
+   *
+   * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
+   */
   organizationSyncOptions?: OrganizationSyncOptions;
+  /**
+   * @internal
+   */
   apiClient?: ApiClient;
   entity?: 'user' | 'machine' | 'any';
 } & VerifyTokenOptions;
 
 export type EntityTypes = 'user' | 'machine' | 'any';
 /**
- * Defines the options for syncing an organization or personal account state from the URL to the clerk session.
- * Useful if the application requires the inclusion of a URL that indicates that a given clerk organization
- * (or personal account) must be active on the clerk session.
- *
- * If a mismatch between the active organization on the session and the organization as indicated by the URL is
- * detected, an attempt to activate the given organization will be made.
- *
- * WARNING: If the activation cannot be performed, either because an organization does not exist or the user lacks
- * access, then the active organization on the session will not be changed (and a warning will be logged). It is
- * ultimately the responsibility of the page to verify that the resources are appropriate to render given the URL,
- * and handle mismatches appropriately (e.g. by returning a 404).
+ * @expand
  */
 export type OrganizationSyncOptions = {
   /**
-   * URL patterns that are organization-specific and contain an organization ID or slug as a path token.
-   * If a request matches this path, the organization identifier will be extracted and activated before rendering.
+   * Specifies URL patterns that are organization-specific, containing an organization ID or slug as a path parameter. If a request matches this path, the organization identifier will be used to set that org as active.
    *
-   * WARNING: If the organization cannot be activated either because it does not exist or the user lacks access,
-   * organization-related fields will be set to null. The server component must detect this and respond
-   * with an appropriate error (e.g., notFound()).
+   * If the route also matches the `personalAccountPatterns` prop, this prop takes precedence.
    *
-   * If the route also matches the personalAccountPatterns, this takes precedence.
+   * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * Must have a path token named either ":id" (matches a clerk organization ID) or ":slug" (matches a clerk
-   * organization slug).
+   * @warning
+   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
    *
-   * Common examples:
-   * - ["/orgs/:slug", "/orgs/:slug/(.*)"]
-   * - ["/orgs/:id", "/orgs/:id/(.*)"]
-   * - ["/app/:any/orgs/:slug", "/app/:any/orgs/:slug/(.*)"]
+   * @example
+   * ["/orgs/:slug", "/orgs/:slug/(.*)"]
+   * @example
+   * ["/orgs/:id", "/orgs/:id/(.*)"]
+   * @example
+   * ["/app/:any/orgs/:slug", "/app/:any/orgs/:slug/(.*)"]
    */
   organizationPatterns?: Pattern[];
 
   /**
-   * URL patterns for resources in the context of a clerk personal account (user-specific, outside any organization).
-   * If the route also matches the organizationPattern, the organizationPatterns takes precedence.
+   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces#organization-workspaces-in-the-clerk-dashboard:~:text=Personal%20account) (user-specific, outside any organization).
    *
-   * Common examples:
-   * - ["/user", "/user/(.*)"]
-   * - ["/user/:any", "/user/:any/(.*)"]
+   * If the route also matches the `organizationPattern` prop, the `organizationPattern` prop takes precedence.
+   *
+   * @example
+   * ["/user", "/user/(.*)"]
+   * @example
+   * ["/user/:any", "/user/:any/(.*)"]
    */
   personalAccountPatterns?: Pattern[];
 };
 
 /**
- * A pattern representing the structure of a URL path.
- * In addition to a valid URL, may include:
- * - Named path tokens prefixed with a colon (e.g., ":id", ":slug", ":any")
- * - Wildcard token (e.g., ".(*)"), which will match the remainder of the path
- * Examples: "/orgs/:slug", "/app/:any/orgs/:id", "/personal-account/(.*)"
+ * A `Pattern` is a `string` that represents the structure of a URL path. In addition to any valid URL, it may include:
+ * - Named path parameters prefixed with a colon (e.g., `:id`, `:slug`, `:any`).
+ * - Wildcard token, `(.*)`, which matches the remainder of the path.
+ *
+ * @example
+ * /orgs/:slug
+ *
+ * ```ts
+ * '/orgs/acmecorp' // matches (`:slug` value: acmecorp)
+ * '/orgs' // does not match
+ * '/orgs/acmecorp/settings' // does not match
+ * ```
+ *
+ * @example
+ * /app/:any/orgs/:id
+ *
+ * ```ts
+ * '/app/petstore/orgs/org_123' // matches (`:id` value: org_123)
+ * '/app/dogstore/v2/orgs/org_123' // does not match
+ * ```
+ *
+ * @example
+ * /personal-account/(.*)
+ *
+ * ```ts
+ * '/personal-account/settings' // matches
+ * '/personal-account' // does not match
+ * ```
  */
 type Pattern = string;

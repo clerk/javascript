@@ -130,6 +130,7 @@ export const fiFI: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Kutsu',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -461,8 +462,9 @@ export const fiFI: LocalizationResource = {
       actionText: 'Eikö sinulla ole tiliä?',
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',
@@ -540,7 +542,9 @@ export const fiFI: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
+      subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
+      titleCombined: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -552,7 +556,6 @@ export const fiFI: LocalizationResource = {
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
@@ -597,6 +600,7 @@ export const fiFI: LocalizationResource = {
       sentencePrefix: 'Salasanan on sisällettävä',
     },
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -696,6 +700,11 @@ export const fiFI: LocalizationResource = {
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
         messageLine2:

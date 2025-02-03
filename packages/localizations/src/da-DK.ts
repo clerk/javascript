@@ -129,6 +129,7 @@ export const daDK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: 'Handlinger',
@@ -459,8 +460,9 @@ export const daDK: LocalizationResource = {
       actionText: 'Ingen konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'Forsæt til {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Log ind',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bekræftelseskode',
@@ -538,11 +540,13 @@ export const daDK: LocalizationResource = {
       actionLink__use_phone: 'Brug telefon',
       actionText: 'Har du en konto?',
       subtitle: 'Forsæt til {{applicationName}}',
+      subtitleCombined: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
+      titleCombined: 'Opret din konto',
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: 'Vælg en metode til at fortsætte',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -550,7 +554,6 @@ export const daDK: LocalizationResource = {
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
-    form_identifier_exists: 'Identifikatoren findes allerede.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
@@ -595,6 +598,7 @@ export const daDK: LocalizationResource = {
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',
@@ -694,6 +698,11 @@ export const daDK: LocalizationResource = {
         resendButton: 'Send link igen',
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med denne e-mailadresse.',

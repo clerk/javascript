@@ -1,7 +1,7 @@
 export function safeAccess(fn: any, fallback: any) {
   try {
     return fn();
-  } catch (e) {
+  } catch {
     return fallback;
   }
 }

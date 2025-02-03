@@ -131,6 +131,7 @@ export const roRO: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitați',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Îndepărtați membrul',
         tableHeader__actions: undefined,
@@ -462,8 +463,9 @@ export const roRO: LocalizationResource = {
       actionText: 'Nu aveți cont?',
       actionText__join_waitlist: undefined,
       subtitle: 'pentru a continua la {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Conectați-vă',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Cod de verificare',
@@ -541,7 +543,9 @@ export const roRO: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Aveți un cont?',
       subtitle: 'pentru a continua la {{applicationName}}',
+      subtitleCombined: 'pentru a continua la {{applicationName}}',
       title: 'Creați-vă un cont',
+      titleCombined: 'Creați-vă un cont',
     },
   },
   socialButtonsBlockButton: 'Continuați cu {{provider|titleize}}',
@@ -553,7 +557,6 @@ export const roRO: LocalizationResource = {
     captcha_unavailable:
       'Înscrierea a eșuat din cauza unei validări nereușite a robotului. Vă rugăm să reîmprospătați pagina pentru a încerca din nou sau contactați serviciul de asistență pentru mai multă asistență.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -599,6 +602,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
         'Parola dvs. funcționează, dar ar putea fi mai puternică. Încercați să adăugați mai multe caractere.',
@@ -700,6 +704,11 @@ export const roRO: LocalizationResource = {
         resendButton: 'Nu ați primit un link? Trimiteți din nou',
         successMessage: 'E-mailul {{identifier}} a fost adăugat în contul dvs.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} va fi eliminat din acest cont.',
         messageLine2: 'Nu veți mai putea să vă conectați folosind această adresă de e-mail.',

@@ -6,7 +6,7 @@ export function isValidUrl(val: unknown): val is string {
   try {
     new URL(val as string);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

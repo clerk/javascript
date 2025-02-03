@@ -244,7 +244,7 @@ const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | M
   if (requestState.message) {
     try {
       headers.set(constants.Headers.AuthMessage, requestState.message);
-    } catch (e) {
+    } catch {
       // headers.set can throw if unicode strings are passed to it. In this case, simply do nothing
     }
   }
@@ -252,7 +252,7 @@ const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | M
   if (requestState.reason) {
     try {
       headers.set(constants.Headers.AuthReason, requestState.reason);
-    } catch (e) {
+    } catch {
       /* empty */
     }
   }
@@ -260,7 +260,7 @@ const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | M
   if (requestState.status) {
     try {
       headers.set(constants.Headers.AuthStatus, requestState.status);
-    } catch (e) {
+    } catch {
       /* empty */
     }
   }

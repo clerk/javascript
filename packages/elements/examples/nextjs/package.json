@@ -22,14 +22,12 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^18.19.33",
+    "@types/node": "^18.19.73",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8",
-    "eslint-config-next": "14.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   }
 }

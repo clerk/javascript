@@ -114,7 +114,7 @@ function resourceChanged<T extends AcceptedResource | undefined | null>(prev: T,
     if (User.isUserResource(prev)) {
       return userChanged(prev, next as UserResource);
     }
-  } catch (e) {
+  } catch {
     // If something goes terribly wrong, prefer doing an unnecessary rerender
     return true;
   }

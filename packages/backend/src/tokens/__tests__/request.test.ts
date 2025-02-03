@@ -43,7 +43,9 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module 'vitest' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Assertion<T = any> extends CustomMatchers<T> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
@@ -1198,130 +1200,138 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeSignedInToAuth();
   });
 
-  test('refreshToken: returns signed in with valid refresh token cookie if token is expired and refresh token exists', async () => {
-    server.use(
-      http.get('https://api.clerk.test/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
-    );
+  describe('refreshToken', async () => {
+    test('returns signed in with valid refresh token cookie if token is expired and refresh token exists', async () => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
 
-    // return cookies from endpoint
-    const refreshSession = vi.fn(() => ({
-      object: 'token',
-      jwt: mockJwt,
-    }));
+      // return cookies from endpoint
+      const refreshSession = vi.fn(() => ({
+        object: 'cookies',
+        cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
+      }));
 
-    const requestState = await authenticateRequest(
-      mockRequestWithCookies(
-        {
-          ...defaultHeaders,
-          origin: 'https://example.com',
-        },
-        { __client_uat: `12345`, __session: mockExpiredJwt, __refresh_MqCvchyS: 'can_be_anything' },
-      ),
-      mockOptions({
-        secretKey: 'test_deadbeef',
-        publishableKey: PK_LIVE,
-        apiClient: { sessions: { refreshSession } },
-      }),
-    );
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
 
-    expect(requestState).toBeSignedIn();
-    expect(requestState.toAuth()).toBeSignedInToAuth();
-    expect(refreshSession).toHaveBeenCalled();
-  });
+      expect(requestState).toBeSignedIn();
+      expect(requestState.toAuth()).toBeSignedInToAuth();
+      expect(requestState.headers.getSetCookie()).toContain(
+        `__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`,
+      );
+      expect(refreshSession).toHaveBeenCalled();
+    });
 
-  test('refreshToken: does not try to refresh if refresh token does not exist', async () => {
-    server.use(
-      http.get('https://api.clerk.test/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
-    );
+    test('does not try to refresh if refresh token does not exist', async () => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
 
-    // return cookies from endpoint
-    const refreshSession = vi.fn(() => ({
-      object: 'token',
-      jwt: mockJwt,
-    }));
+      // return cookies from endpoint
+      const refreshSession = vi.fn(() => ({
+        object: 'cookies',
+        cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
+      }));
 
-    await authenticateRequest(
-      mockRequestWithCookies(
-        {
-          ...defaultHeaders,
-          origin: 'https://example.com',
-        },
-        { __client_uat: `12345`, __session: mockExpiredJwt },
-      ),
-      mockOptions({
-        secretKey: 'test_deadbeef',
-        publishableKey: PK_LIVE,
-        apiClient: { sessions: { refreshSession } },
-      }),
-    );
-    expect(refreshSession).not.toHaveBeenCalled();
-  });
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          { __client_uat: `12345`, __session: mockExpiredJwt },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
+      expect(refreshSession).not.toHaveBeenCalled();
+    });
 
-  test('refreshToken: does not try to refresh if refresh exists but token is not expired', async () => {
-    // return cookies from endpoint
-    const refreshSession = vi.fn(() => ({
-      object: 'token',
-      jwt: mockJwt,
-    }));
+    test('does not try to refresh if refresh exists but token is not expired', async () => {
+      // return cookies from endpoint
+      const refreshSession = vi.fn(() => ({
+        object: 'cookies',
+        cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
+      }));
 
-    await authenticateRequest(
-      mockRequestWithCookies(
-        {
-          ...defaultHeaders,
-          origin: 'https://example.com',
-        },
-        // client_uat is missing, need to handshake not to refresh
-        { __session: mockJwt, __refresh_MqCvchyS: 'can_be_anything' },
-      ),
-      mockOptions({
-        secretKey: 'test_deadbeef',
-        publishableKey: PK_LIVE,
-        apiClient: { sessions: { refreshSession } },
-      }),
-    );
+      await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          // client_uat is missing, need to handshake not to refresh
+          { __session: mockJwt, __refresh_MqCvchyS: 'can_be_anything' },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
 
-    expect(refreshSession).not.toHaveBeenCalled();
-  });
+      expect(refreshSession).not.toHaveBeenCalled();
+    });
 
-  test('refreshToken: uses suffixed refresh cookie even if un-suffixed is present', async () => {
-    server.use(
-      http.get('https://api.clerk.test/v1/jwks', () => {
-        return HttpResponse.json(mockJwks);
-      }),
-    );
+    test('uses suffixed refresh cookie even if un-suffixed is present', async () => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
 
-    // return cookies from endpoint
-    const refreshSession = vi.fn(() => ({
-      object: 'token',
-      jwt: mockJwt,
-    }));
+      // return cookies from endpoint
+      const refreshSession = vi.fn(() => ({
+        object: 'cookies',
+        cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
+      }));
 
-    const requestState = await authenticateRequest(
-      mockRequestWithCookies(
-        {
-          ...defaultHeaders,
-          origin: 'https://example.com',
-        },
-        {
-          __client_uat: `12345`,
-          __session: mockExpiredJwt,
-          __refresh_MqCvchyS: 'can_be_anything',
-          __refresh: 'should_not_be_used',
-        },
-      ),
-      mockOptions({
-        secretKey: 'test_deadbeef',
-        publishableKey: PK_LIVE,
-        apiClient: { sessions: { refreshSession } },
-      }),
-    );
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(
+          {
+            ...defaultHeaders,
+            origin: 'https://example.com',
+          },
+          {
+            __client_uat: `12345`,
+            __session: mockExpiredJwt,
+            __refresh_MqCvchyS: 'can_be_anything',
+            __refresh: 'should_not_be_used',
+          },
+        ),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+          publishableKey: PK_LIVE,
+          apiClient: { sessions: { refreshSession } },
+        }),
+      );
 
-    expect(requestState).toBeSignedIn();
-    expect(requestState.toAuth()).toBeSignedInToAuth();
-    expect(refreshSession).toHaveBeenCalled();
+      expect(requestState).toBeSignedIn();
+      expect(requestState.toAuth()).toBeSignedInToAuth();
+      expect(requestState.headers.getSetCookie()).toContain(
+        `__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`,
+      );
+      expect(refreshSession).toHaveBeenCalled();
+    });
   });
 });

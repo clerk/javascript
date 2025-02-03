@@ -6,7 +6,7 @@ import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcas
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
-import { addClerkPrefix, stripScheme } from '@clerk/shared/url';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
@@ -34,7 +34,6 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
-  LoadedClerk,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -68,7 +67,6 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { UI } from '../ui/new';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -155,12 +153,7 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
-function clerkIsLoaded(clerk: ClerkInterface): clerk is LoadedClerk {
-  return !!clerk.client;
-}
-
 export class Clerk implements ClerkInterface {
-  public __experimental_ui?: UI;
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -312,7 +305,17 @@ export class Clerk implements ClerkInterface {
     this.#publishableKey = key;
     this.#instanceType = publishableKey.instanceType;
 
-    this.#fapiClient = createFapiClient(this);
+    this.#fapiClient = createFapiClient({
+      domain: this.domain,
+      frontendApi: this.frontendApi,
+      // this.instanceType is assigned above
+      instanceType: this.instanceType as InstanceType,
+      isSatellite: this.isSatellite,
+      getSessionId: () => {
+        return this.session?.id;
+      },
+      proxyUrl: this.proxyUrl,
+    });
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
   }
@@ -353,20 +356,10 @@ export class Clerk implements ClerkInterface {
     } else {
       this.#loaded = await this.#loadInNonStandardBrowser();
     }
-
-    if (BUILD_ENABLE_NEW_COMPONENTS) {
-      if (clerkIsLoaded(this)) {
-        this.__experimental_ui = new UI({
-          router: this.#options.__experimental_router,
-          clerk: this,
-          options: this.#options,
-        });
-      }
-    }
   };
 
-  #isCombinedFlow(): boolean {
-    return this.#options.experimental?.combinedFlow && this.#options.signInUrl === this.#options.signUpUrl;
+  #isCombinedSignInOrUpFlow(): boolean {
+    return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -578,20 +571,21 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    if (props?.__experimental?.newComponents && this.__experimental_ui) {
-      this.__experimental_ui.mount('SignIn', node, props);
-    } else {
-      this.assertComponentsReady(this.#componentControls);
-      void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
-        controls.mountComponent({
-          name: 'SignIn',
-          appearanceKey: 'signIn',
-          node,
-          props,
-        }),
-      );
-    }
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+      controls.mountComponent({
+        name: 'SignIn',
+        appearanceKey: 'signIn',
+        node,
+        props,
+      }),
+    );
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('SignIn', {
+        ...props,
+        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+      }),
+    );
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -604,19 +598,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    if (props?.__experimental?.newComponents && this.__experimental_ui) {
-      this.__experimental_ui.mount('SignUp', node, props);
-    } else {
-      this.assertComponentsReady(this.#componentControls);
-      void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
-        controls.mountComponent({
-          name: 'SignUp',
-          appearanceKey: 'signUp',
-          node,
-          props,
-        }),
-      );
-    }
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+      controls.mountComponent({
+        name: 'SignUp',
+        appearanceKey: 'signUp',
+        node,
+        props,
+      }),
+    );
     this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 
@@ -1055,12 +1045,12 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.homeUrl);
   }
 
-  public buildAfterSignInUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignInUrl());
+  public buildAfterSignInUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignInUrl());
   }
 
-  public buildAfterSignUpUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignUpUrl());
+  public buildAfterSignUpUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignUpUrl());
   }
 
   public buildAfterSignOutUrl(): string {
@@ -2093,16 +2083,18 @@ export class Clerk implements ClerkInterface {
   };
 
   #handleKeylessPrompt = () => {
-    void this.#componentControls?.ensureMounted().then(controls => {
-      if (this.#options.__internal_claimKeylessApplicationUrl) {
+    if (this.#options.__internal_keyless_claimKeylessApplicationUrl) {
+      void this.#componentControls?.ensureMounted().then(controls => {
+        // TODO(@pantelis): Investigate if this resets existing props
         controls.updateProps({
           options: {
-            __internal_claimKeylessApplicationUrl: this.#options.__internal_claimKeylessApplicationUrl,
-            __internal_copyInstanceKeysUrl: this.#options.__internal_copyInstanceKeysUrl,
+            __internal_keyless_claimKeylessApplicationUrl: this.#options.__internal_keyless_claimKeylessApplicationUrl,
+            __internal_keyless_copyInstanceKeysUrl: this.#options.__internal_keyless_copyInstanceKeysUrl,
+            __internal_keyless_dismissPrompt: this.#options.__internal_keyless_dismissPrompt,
           },
         });
-      }
-    });
+      });
+    }
   };
 
   #buildUrl = (
@@ -2114,13 +2106,17 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    if (this.#isCombinedSignInOrUpFlow()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      signInOrUpUrl = this.#options.signInUrl!;
+    }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
     const initValues = new URLSearchParams(_initValues || {});
     const url = buildURL(
       {
         base: signInOrUpUrl,
-        hashPath: this.#isCombinedFlow() && key === 'signUpUrl' ? '/create' : '',
+        hashPath: this.#isCombinedSignInOrUpFlow() && key === 'signUpUrl' ? '/create' : '',
         hashSearchParams: [initValues, redirectUrls],
       },
       { stringify: true },
@@ -2181,7 +2177,7 @@ export class Clerk implements ClerkInterface {
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
       removeClerkQueryParam('__clerk_help');
-    } catch (_) {
+    } catch {
       // ignore
     }
   };

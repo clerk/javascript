@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { canUseKeyless__server } from '../utils/feature-flags';
+import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -48,7 +48,14 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+/**
+ * The `clerkMiddleware()` function accepts an optional object. The following options are available.
+ * @interface
+ */
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  /**
+   * If true, additional debug information will be logged to the console.
+   */
   debug?: boolean;
 };
 
@@ -84,6 +91,9 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
+/**
+ * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
+ */
 // @ts-expect-error TS is not happy here. Will dig into it
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
@@ -106,16 +116,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       );
       const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL;
       const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL;
-      const entity = 'any' as const;
 
       const options = {
         publishableKey,
         secretKey,
         signInUrl,
         signUpUrl,
-        entity,
         ...resolvedParams,
       };
+
+      options.entity = 'any';
 
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
@@ -227,7 +237,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     };
 
     const nextMiddleware: NextMiddleware = async (request, event) => {
-      if (canUseKeyless__server) {
+      if (canUseKeyless) {
         return keylessMiddleware(request, event);
       }
 

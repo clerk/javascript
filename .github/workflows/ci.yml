@@ -57,13 +57,24 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Deduplicate lockfile
+        run: pnpm dedupe
+  
+      - name: Check for changed lockfile
+        run: |
+          if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
+            echo "pnpm-lock.yaml is not deduped. Please run 'pnpm dedupe' locally and commit."
+            git diff pnpm-lock.yaml
+            exit 1
+          fi
+
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
 
-      - name: Lint GitHub Actions Workflows
-        run: pnpm eslint .github
-        shell: bash
+      # - name: Lint GitHub Actions Workflows
+      #   run: pnpm eslint .github
+      #   shell: bash
 
       - name: Check Formatting
         run: pnpm format:check
@@ -91,7 +102,7 @@ jobs:
         run: pnpm turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:

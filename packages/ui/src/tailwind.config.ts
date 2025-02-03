@@ -115,6 +115,7 @@ const config = {
     },
   },
   plugins: [
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     plugin(function ({ addBase, addVariant, theme }) {
       /**
        * Extends Tailwind's built-in `addBase` function by scoping styles to
