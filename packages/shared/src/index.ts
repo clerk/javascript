@@ -35,6 +35,5 @@ export * from './object';
 export * from './logger';
 export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
-export { fastDeepMergeAndKeep, fastDeepMergeAndReplace } from './utils/fastDeepMerge';
 export { getEnvVariable } from './getEnvVariable';
 export * from './pathMatcher';
