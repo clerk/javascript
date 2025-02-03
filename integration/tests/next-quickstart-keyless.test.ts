@@ -116,4 +116,23 @@ test.describe('Keyless mode @quickstart', () => {
 
     await u.po.keylessPopover.waitForUnmounted();
   });
+
+  test('Navigates to non existed page (/_not-found) without a infinite redirect loop.', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.po.keylessPopover.waitForMounted();
+
+    const redirectMap = new Map<string, number>();
+    page.on('request', request => {
+      const url = request.url();
+      redirectMap.set(url, (redirectMap.get(url) || 0) + 1);
+      expect(redirectMap.get(url)).toBeLessThanOrEqual(1);
+    });
+
+    await u.page.goToRelative('/something');
+    await u.page.waitForAppUrl('/something');
+  });
 });
