@@ -1,5 +1,18 @@
 # @clerk/elements
 
+## 0.22.19
+
+### Patch Changes
+
+- - `@clerk/clerk-js`, `@clerk/types`: Add `redirectUrl` option to `buildAfterSignInUrl()` and `buildAfterSignUpUrl()` methods. ([#5052](https://github.com/clerk/javascript/pull/5052)) by [@brkalow](https://github.com/brkalow)
+
+  - `@clerk/elements`: Ensure redirect_url params passed to Elements components are always passed to Clerk's underlying `build*Url()` methods.
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/clerk-react@5.22.10
+  - @clerk/shared@2.20.18
+
 ## 0.22.18
 
 ### Patch Changes

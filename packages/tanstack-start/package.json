@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -69,8 +69,7 @@
   "devDependencies": {
     "@tanstack/react-router": "^1.97.25",
     "@tanstack/start": "^1.97.25",
-    "esbuild-plugin-file-path-extensions": "^2.1.2",
-    "h3": "^1.13.0"
+    "esbuild-plugin-file-path-extensions": "^2.1.2"
   },
   "peerDependencies": {
     "@tanstack/react-router": ">=1.85.9",

@@ -119,7 +119,7 @@ importers:
         specifier: ^29.3.1
         version: 29.5.12
       '@types/node':
-        specifier: ^22.10.8
+        specifier: ^22.12.0
         version: 22.12.0
       '@types/react':
         specifier: catalog:react
@@ -465,31 +465,31 @@ importers:
         version: 1.2.2(@swc/helpers@0.5.15)
       '@rspack/plugin-react-refresh':
         specifier: ^1.0.1
-        version: 1.0.1(react-refresh@0.14.2)
+        version: 1.0.1(react-refresh@0.16.0)
       '@svgr/webpack':
-        specifier: ^6.2.1
+        specifier: ^6.5.1
         version: 6.5.1
       '@types/webpack-dev-server':
         specifier: ^4.7.2
         version: 4.7.2(webpack@5.94.0(esbuild@0.24.2))
       '@types/webpack-env':
-        specifier: ^1.16.4
-        version: 1.18.1
+        specifier: ^1.18.8
+        version: 1.18.8
       react-refresh:
-        specifier: ^0.14.0
-        version: 0.14.2
+        specifier: ^0.16.0
+        version: 0.16.0
       react-refresh-typescript:
-        specifier: ^2.0.5
-        version: 2.0.9(react-refresh@0.14.2)(typescript@5.6.3)
+        specifier: ^2.0.10
+        version: 2.0.10(react-refresh@0.16.0)(typescript@5.6.3)
       terser-webpack-plugin:
-        specifier: ^5.3.10
+        specifier: ^5.3.11
         version: 5.3.11(esbuild@0.24.2)(webpack@5.94.0(esbuild@0.24.2))
       ts-loader:
-        specifier: ^9.3.0
-        version: 9.5.1(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2))
+        specifier: ^9.5.2
+        version: 9.5.2(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2))
       webpack-merge:
-        specifier: ^5.9.0
-        version: 5.9.0
+        specifier: ^5.10.0
+        version: 5.10.0
 
   packages/dev-cli:
     dependencies:
@@ -555,10 +555,10 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       next:
-        specifier: ^14.2.22
+        specifier: ^14.2.23
         version: 14.2.23(@babel/core@7.26.7)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
-        specifier: ^4.31.0
+        specifier: ^4.33.0
         version: 4.33.0
 
   packages/expo:
@@ -963,9 +963,6 @@ importers:
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.2
         version: 2.1.4
-      h3:
-        specifier: ^1.13.0
-        version: 1.14.0
 
   packages/testing:
     dependencies:
@@ -5554,8 +5551,8 @@ packages:
     resolution: {integrity: sha512-Y3p0Fmfvp0MHBDoCzo+xFJaWTw0/z37mWIo6P15j+OtmUDLvznJWdZNeD7Q004R+MpQlys12oXbXsrXRmxwg4Q==}
     deprecated: This is a stub types definition. webpack-dev-server provides its own type definitions, so you do not need this installed.
 
-  '@types/webpack-env@1.18.1':
-    resolution: {integrity: sha512-D0HJET2/UY6k9L6y3f5BL+IDxZmPkYmPT4+qBrRdmRLYRuV0qNKizMgTvYxXZYn+36zjPeoDZAEYBCM6XB+gww==}
+  '@types/webpack-env@1.18.8':
+    resolution: {integrity: sha512-G9eAoJRMLjcvN4I08wB5I7YofOb/kaJNd5uoCMX+LbKXTPCF+ZIHuqTnFaK9Jz1rgs035f9JUPUhNFtqgucy/A==}
 
   '@types/ws@8.5.12':
     resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
@@ -8574,6 +8571,10 @@ packages:
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
+
+  flat@5.0.2:
+    resolution: {integrity: sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==}
+    hasBin: true
 
   flatted@3.3.1:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
@@ -12342,14 +12343,18 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-refresh-typescript@2.0.9:
-    resolution: {integrity: sha512-chAnOO4vpxm/3WkgOVmti+eN8yUtkJzeGkOigV6UA9eDFz12W34e/SsYe2H5+RwYJ3+sfSZkVbiXcG1chEBxlg==}
+  react-refresh-typescript@2.0.10:
+    resolution: {integrity: sha512-Cj8ZKTPEEdSoxiopFq0tB0rq/Wl90yWzAX1LEp9CGvzvauDUmC4BHIQXzcuT8/61naq/KmkR3A9VzqdZ9c6j1g==}
     peerDependencies:
-      react-refresh: 0.10.x || 0.11.x || 0.12.x || 0.13.x || 0.14.x
+      react-refresh: 0.10.x || 0.11.x || 0.12.x || 0.13.x || 0.14.x || 0.15.x || 0.16.x || 0.17.x
       typescript: ^4.8 || ^5.0
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
+    engines: {node: '>=0.10.0'}
+
+  react-refresh@0.16.0:
+    resolution: {integrity: sha512-FPvF2XxTSikpJxcr+bHut2H4gJ17+18Uy20D5/F+SKzFap62R3cM5wH6b8WN3LyGSYeQilLEcJcR1fjBSI2S1A==}
     engines: {node: '>=0.10.0'}
 
   react-remove-scroll-bar@2.3.6:
@@ -13752,8 +13757,8 @@ packages:
       esbuild:
         optional: true
 
-  ts-loader@9.5.1:
-    resolution: {integrity: sha512-rNH3sK9kGZcH9dYzC7CewQm4NtxJTjSEVRJ2DyBZR7f8/wcta+iV44UPCXc5+nzDzivKtlzV6c9P4e+oFhDLYg==}
+  ts-loader@9.5.2:
+    resolution: {integrity: sha512-Qo4piXvOTWcMGIgRiuFa6nHNm+54HbYaZCKqc9eeZCLRy3XqafQgwX2F7mofrbJG3g7EEb+lkiR+z2Lic2s3Zw==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       typescript: '*'
@@ -14683,8 +14688,8 @@ packages:
       webpack-cli:
         optional: true
 
-  webpack-merge@5.9.0:
-    resolution: {integrity: sha512-6NbRQw4+Sy50vYNTw7EyOn41OZItPiXB8GNv3INSoe3PSFaHJEz3SHTrYVaRm2LilNGnFUzh0FAwqPEmU/CwDg==}
+  webpack-merge@5.10.0:
+    resolution: {integrity: sha512-+4zXKdx7UnO+1jaN4l2lHVD+mFvnlZQP/6ljaJVb4SZiwIKeUnrT5l0gkT8z+n4hKpC+jpOv6O9R+gLtag7pSA==}
     engines: {node: '>=10.0.0'}
 
   webpack-sources@3.2.3:
@@ -20223,12 +20228,12 @@ snapshots:
 
   '@rspack/lite-tapable@1.0.1': {}
 
-  '@rspack/plugin-react-refresh@1.0.1(react-refresh@0.14.2)':
+  '@rspack/plugin-react-refresh@1.0.1(react-refresh@0.16.0)':
     dependencies:
       error-stack-parser: 2.1.4
       html-entities: 2.5.2
     optionalDependencies:
-      react-refresh: 0.14.2
+      react-refresh: 0.16.0
 
   '@rtsao/scc@1.1.0': {}
 
@@ -21499,7 +21504,7 @@ snapshots:
       - webpack
       - webpack-cli
 
-  '@types/webpack-env@1.18.1': {}
+  '@types/webpack-env@1.18.8': {}
 
   '@types/ws@8.5.12':
     dependencies:
@@ -25443,6 +25448,8 @@ snapshots:
     dependencies:
       flatted: 3.3.1
       keyv: 4.5.4
+
+  flat@5.0.2: {}
 
   flatted@3.3.1: {}
 
@@ -30097,12 +30104,14 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-refresh-typescript@2.0.9(react-refresh@0.14.2)(typescript@5.6.3):
+  react-refresh-typescript@2.0.10(react-refresh@0.16.0)(typescript@5.6.3):
     dependencies:
-      react-refresh: 0.14.2
+      react-refresh: 0.16.0
       typescript: 5.6.3
 
   react-refresh@0.14.2: {}
+
+  react-refresh@0.16.0: {}
 
   react-remove-scroll-bar@2.3.6(@types/react@18.3.12)(react@18.3.1):
     dependencies:
@@ -31770,7 +31779,7 @@ snapshots:
       babel-jest: 29.7.0(@babel/core@7.26.7)
       esbuild: 0.24.2
 
-  ts-loader@9.5.1(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2)):
+  ts-loader@9.5.2(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2)):
     dependencies:
       chalk: 4.1.2
       enhanced-resolve: 5.18.0
@@ -32892,9 +32901,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  webpack-merge@5.9.0:
+  webpack-merge@5.10.0:
     dependencies:
       clone-deep: 4.0.1
+      flat: 5.0.2
       wildcard: 2.0.1
 
   webpack-sources@3.2.3: {}
