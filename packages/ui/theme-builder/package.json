@@ -27,7 +27,7 @@
     "react": "18.3.1",
     "react-colorful": "^5.6.1",
     "react-dom": "18.3.1",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.6"
   },
   "devDependencies": {
     "eslint": "^8",
