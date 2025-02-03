@@ -129,7 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
       'RedirectToCreateOrganization',
       'SignedIn',
       'SignedOut',
-      'Waitlist'
+      'Waitlist',
     ];
     components.forEach(component => {
       void addComponent({
