@@ -18,9 +18,11 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
 
   const request = new Request('https://placeholder.com', { headers: await headers() });
 
+  const redirectCount = Number(cookieStore.get('__clerk_keys_redirect_count')?.value) || 1;
+
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
   // @ts-expect-error Request will work as well
-  if (detectClerkMiddleware(request)) {
+  if (detectClerkMiddleware(request) && redirectCount < 2) {
     /**
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */
