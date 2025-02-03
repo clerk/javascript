@@ -17,7 +17,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
       <Outlet />
       <TanStackRouterDevtools position='bottom-right' />
     </ClerkProvider>
