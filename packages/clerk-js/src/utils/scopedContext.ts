@@ -4,19 +4,20 @@ type ScopedContext<T> = {
 };
 
 function createScopedContext<T>(): ScopedContext<T> {
-  const contextStack: T[] = [];
+  let currentContext: T | undefined;
 
   return {
     async run<R>(context: T, fn: () => R): Promise<Awaited<R>> {
-      contextStack.push(context);
+      const previousContext = currentContext;
+      currentContext = context;
       try {
         return await fn();
       } finally {
-        contextStack.pop();
+        currentContext = previousContext;
       }
     },
     get(): T | undefined {
-      return contextStack[contextStack.length - 1];
+      return currentContext;
     },
   };
 }
