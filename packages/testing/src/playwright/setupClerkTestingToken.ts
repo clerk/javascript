@@ -42,9 +42,15 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
     const response = await route.fetch({
       url: originalUrl.toString(),
     });
-
     const json = await response.json();
-    json.response.captcha_bypass = true;
+
+    if (json?.response?.captcha_bypass === false) {
+      json.response.captcha_bypass = true;
+    }
+
+    if (json?.client?.captcha_bypass === false) {
+      json.client.captcha_bypass = true;
+    }
 
     await route.fulfill({ response, json });
   });
