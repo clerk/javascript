@@ -472,7 +472,7 @@ ${error.getFullMessage()}`,
       return handleError(decodedErrors[0], 'header');
     }
     if (decodeResult?.payload.sub.startsWith('mch_')) {
-      return signedOut(authenticateContext, 'Machine tokens cannot be used to authenticate user requests');
+      return signedOut(authenticateContext, TokenVerificationErrorReason.MachineTokenUsedForUserRequest);
     }
 
     try {
@@ -730,16 +730,17 @@ ${error.getFullMessage()}`,
     if (!sessionTokenInHeader) {
       return handleError(new Error('No token in header'), 'header');
     }
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(sessionTokenInHeader);
+    if (decodedErrors) {
+      return handleMachineError(decodedErrors[0]);
+    }
+    if (decodeResult?.payload.sub.startsWith('user_')) {
+      return machineUnauthenticated(authenticateContext, TokenVerificationErrorReason.UserTokenUsedForMachineRequest);
+    }
 
     const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(errors[0]);
-    }
-    if (data.sub.startsWith('user_')) {
-      return machineUnauthenticated(
-        authenticateContext,
-        'Expected a machine token but received a user token. Please verify the token type and ensure you are passing a machine token to the machine authentication function',
-      );
     }
     return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data);
   }

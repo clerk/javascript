@@ -22,6 +22,8 @@ export const TokenVerificationErrorReason = {
   RemoteJWKMissing: 'jwk-remote-missing',
   JWKFailedToResolve: 'jwk-failed-to-resolve',
   JWKKidMismatch: 'jwk-kid-mismatch',
+  MachineTokenUsedForUserRequest: 'machine-token-used-for-user-request',
+  UserTokenUsedForMachineRequest: 'user-token-used-for-machine-request',
 };
 
 export type TokenVerificationErrorReason =
