@@ -923,7 +923,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit) {
+    if (redirectUrl && !__beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
