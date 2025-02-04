@@ -133,7 +133,7 @@
     "typescript-eslint": "8.21.0",
     "uuid": "8.3.2",
     "verdaccio": "^5.26.3",
-    "vitest": "3.0.2",
+    "vitest": "3.0.5",
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
