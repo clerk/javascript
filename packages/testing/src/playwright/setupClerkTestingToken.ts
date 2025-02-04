@@ -57,9 +57,8 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
       }
 
       await route.fulfill({
-        status: response.status(),
-        headers: response.headers(),
-        json: json,
+        response,
+        json,
       });
     } catch {
       await route.continue({
