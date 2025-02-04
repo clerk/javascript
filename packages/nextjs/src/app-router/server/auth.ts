@@ -13,6 +13,8 @@ import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
 
+// This generic allows the types to show up in autocomplete
+// We also need to redefine the types here because they don't show up outside the factory
 type EntityTypeToAuth<T extends EntityTypes> = T extends 'user'
   ? Auth
   : T extends 'machine'

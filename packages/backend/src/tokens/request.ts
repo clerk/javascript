@@ -666,7 +666,7 @@ ${error.getFullMessage()}`,
   async function handleError(
     err: unknown,
     tokenCarrier: TokenCarrier,
-  ): Promise<SignedInState | SignedOutState | HandshakeState | MachineUnauthenticatedState> {
+  ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
       return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
     }
