@@ -31,27 +31,40 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
   }
   const apiUrl = `https://${fapiUrl}/v1/**/*`;
 
-  await page.route(apiUrl, async (route, request) => {
-    const originalUrl = new URL(request.url());
+  await page.route(apiUrl, async route => {
+    const originalUrl = new URL(route.request().url());
     const testingToken = process.env.CLERK_TESTING_TOKEN;
 
     if (testingToken) {
       originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
     }
 
-    const response = await route.fetch({
-      url: originalUrl.toString(),
-    });
-    const json = await response.json();
+    try {
+      const response = await route.fetch({
+        url: originalUrl.toString(),
+      });
 
-    if (json?.response?.captcha_bypass === false) {
-      json.response.captcha_bypass = true;
+      const json = await response.json();
+
+      // Override captcha_bypass in /v1/client
+      if (json?.response?.captcha_bypass === false) {
+        json.response.captcha_bypass = true;
+      }
+
+      // Override captcha_bypass in piggybacking
+      if (json?.client?.captcha_bypass === false) {
+        json.client.captcha_bypass = true;
+      }
+
+      await route.fulfill({
+        status: response.status(),
+        headers: response.headers(),
+        json: json,
+      });
+    } catch {
+      await route.continue({
+        url: originalUrl.toString(),
+      });
     }
-
-    if (json?.client?.captcha_bypass === false) {
-      json.client.captcha_bypass = true;
-    }
-
-    await route.fulfill({ response, json });
   });
 };
