@@ -61,9 +61,11 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
         json,
       });
     } catch {
-      await route.continue({
-        url: originalUrl.toString(),
-      });
+      await route
+        .continue({
+          url: originalUrl.toString(),
+        })
+        .catch(console.error);
     }
   });
 };
