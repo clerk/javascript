@@ -1,5 +1,13 @@
 # @clerk/tanstack-start
 
+## 0.9.3
+
+### Patch Changes
+
+- Reverts [#5051](https://github.com/clerk/javascript/pull/5051) ([#5068](https://github.com/clerk/javascript/pull/5068)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  This type change is no longer needed as the underlying `h3` version compatibility issue has been resolved upstream in the TanStack Router repository ([TanStack/router#3310](https://github.com/TanStack/router/pull/3310))
+
 ## 0.9.2
 
 ### Patch Changes
