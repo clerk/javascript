@@ -31,7 +31,7 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
   }
   const apiUrl = `https://${fapiUrl}/v1/**/*`;
 
-  await page.route(apiUrl, (route, request) => {
+  await page.route(apiUrl, async (route, request) => {
     const originalUrl = new URL(request.url());
     const testingToken = process.env.CLERK_TESTING_TOKEN;
 
@@ -39,8 +39,13 @@ export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestin
       originalUrl.searchParams.set(TESTING_TOKEN_PARAM, testingToken);
     }
 
-    void route.continue({
+    const response = await route.fetch({
       url: originalUrl.toString(),
     });
+
+    const json = await response.json();
+    json.response.captcha_bypass = true;
+
+    await route.fulfill({ response, json });
   });
 };
