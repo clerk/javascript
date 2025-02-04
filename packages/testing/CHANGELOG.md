@@ -1,5 +1,11 @@
 # @clerk/testing
 
+## 1.4.20
+
+### Patch Changes
+
+- Fix captcha triggering on Playwright tests ([#5075](https://github.com/clerk/javascript/pull/5075)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.4.19
 
 ### Patch Changes
