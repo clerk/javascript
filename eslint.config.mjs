@@ -19,6 +19,117 @@ const ECMA_VERSION = 2021,
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
   TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
 
+const noSetActiveRedirectUrl = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow calling `setActive` with `{ redirectUrl }` as a parameter.',
+      recommended: false,
+    },
+    messages: {
+      noRedirectUrl: 'Calling `setActive` with `{ redirectUrl }` as an argument is not allowed.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        // Detect direct function calls: `setActive({ redirectUrl })`
+        const isDirectCall = node.callee.type === 'Identifier' && node.callee.name === 'setActive';
+
+        // Detect property calls: `clerk.setActive({ redirectUrl })` or `this.setActive({ redirectUrl })`
+        const isObjectCall = node.callee.type === 'MemberExpression' && node.callee.property.name === 'setActive';
+
+        if (!isDirectCall && !isObjectCall) {
+          return; // Exit if it's not a `setActive` call
+        }
+
+        // Ensure the first argument is an object containing `{ redirectUrl }`
+        const firstArg = node.arguments[0];
+
+        if (
+          firstArg &&
+          firstArg.type === 'ObjectExpression' &&
+          firstArg.properties.some(prop => prop.key.name === 'redirectUrl')
+        ) {
+          context.report({
+            node: firstArg,
+            messageId: 'noRedirectUrl',
+          });
+        }
+      },
+    };
+  },
+};
+
+const noNavigateUseClerk = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow any usage of `navigate` from `useClerk()`',
+      recommended: false,
+    },
+    messages: {
+      noNavigate: 'Usage of `navigate` from `useClerk()` is not allowed. Use `useRouter() instead`.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const sourceCode = context.getSourceCode();
+
+    return {
+      // Case 1: Destructuring `navigate` from `useClerk()`
+      VariableDeclarator(node) {
+        if (
+          node.id.type === 'ObjectPattern' && // Checks if it's an object destructuring
+          node.init?.type === 'CallExpression' &&
+          node.init.callee.name === 'useClerk'
+        ) {
+          for (const property of node.id.properties) {
+            if (property.type === 'Property' && property.key.name === 'navigate') {
+              context.report({
+                node: property,
+                messageId: 'noNavigate',
+              });
+            }
+          }
+        }
+      },
+
+      // Case 2 & 3: Accessing `navigate` on a variable or directly calling `useClerk().navigate`
+      MemberExpression(node) {
+        if (
+          node.property.name === 'navigate' &&
+          node.object.type === 'CallExpression' &&
+          node.object.callee.name === 'useClerk'
+        ) {
+          // Case 3: Direct `useClerk().navigate`
+          context.report({
+            node,
+            messageId: 'noNavigate',
+          });
+        } else if (node.property.name === 'navigate' && node.object.type === 'Identifier') {
+          // Case 2: `clerk.navigate` where `clerk` is assigned `useClerk()`
+          const scope = sourceCode.scopeManager.acquire(node);
+          if (!scope) return;
+
+          const variable = scope.variables.find(v => v.name === node.object.name);
+
+          if (
+            variable?.defs?.[0]?.node?.init?.type === 'CallExpression' &&
+            variable.defs[0].node.init.callee.name === 'useClerk'
+          ) {
+            context.report({
+              node,
+              messageId: 'noNavigate',
+            });
+          }
+        }
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -283,6 +394,22 @@ export default tseslint.config([
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'warn',
+    },
+  },
+  {
+    name: 'packages/clerk-js',
+    files: ['packages/clerk-js/src/ui/**/*'],
+    plugins: {
+      'custom-rules': {
+        rules: {
+          'no-navigate-useClerk': noNavigateUseClerk,
+          'no-setActive-redirectUrl': noSetActiveRedirectUrl,
+        },
+      },
+    },
+    rules: {
+      'custom-rules/no-navigate-useClerk': 'error',
+      'custom-rules/no-setActive-redirectUrl': 'error',
     },
   },
   {

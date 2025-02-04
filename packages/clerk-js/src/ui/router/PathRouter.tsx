@@ -12,6 +12,8 @@ interface PathRouterProps {
 }
 
 export const PathRouter = ({ basePath, preservedParams, children }: PathRouterProps): JSX.Element | null => {
+  // Disabling is acceptable since this is a Router component
+  // eslint-disable-next-line custom-rules/no-navigate-useClerk
   const { navigate } = useClerk();
   const [stripped, setStripped] = React.useState(false);
 

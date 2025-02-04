@@ -40,6 +40,8 @@ export const BaseRouter = ({
   urlStateParam,
   children,
 }: BaseRouterProps): JSX.Element => {
+  // Disabling is acceptable since this is a Router component
+  // eslint-disable-next-line custom-rules/no-navigate-useClerk
   const { navigate: externalNavigate } = useClerk();
 
   const [routeParts, setRouteParts] = React.useState({
