@@ -25,11 +25,15 @@ const mockClaimedInstanceEnvironmentCall = async (page: Page) => {
 test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
+  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
+    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
+      dashboardUrl = 'https://dashboard.clerkstage.dev/';
+    }
     await app.dev();
   });
 
@@ -74,7 +78,7 @@ test.describe('Keyless mode @quickstart', () => {
 
     await newPage.waitForLoadState();
     await newPage.waitForURL(url => {
-      const urlToReturnTo = 'https://dashboard.clerk.com/apps/claim?token=';
+      const urlToReturnTo = `${dashboardUrl}apps/claim?token=`;
       return (
         url.pathname === '/apps/claim/sign-in' &&
         url.searchParams.get('sign_in_force_redirect_url')?.startsWith(urlToReturnTo) &&
@@ -102,11 +106,9 @@ test.describe('Keyless mode @quickstart', () => {
     ]);
 
     await newPage.waitForLoadState();
-    await newPage.waitForURL(url =>
-      url.href.startsWith(
-        'https://dashboard.clerk.com/sign-in?redirect_url=https%3A%2F%2Fdashboard.clerk.com%2Fapps%2Fapp_',
-      ),
-    );
+    await newPage.waitForURL(url => {
+      return url.href.startsWith(`${dashboardUrl}sign-in?redirect_url=${encodeURIComponent(dashboardUrl)}apps%2Fapp_`);
+    });
   });
 
   test('Claimed application with keys inside .env, on dismiss, keyless prompt is removed.', async ({
