@@ -15,6 +15,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  BeforeEmitCallback,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -100,6 +101,7 @@ import {
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
+import { createScopedContext } from '../utils/scopedContext';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
@@ -169,6 +171,8 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
+
+  public __internal_setActiveContext = createScopedContext<{ beforeEmit: BeforeEmitCallback }>();
 
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
@@ -906,13 +910,16 @@ export class Clerk implements ClerkInterface {
     //   automatic reloading when reloading shouldn't be happening.
     const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
     if (beforeEmit) {
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
-      await beforeEmit(newSession);
+    }
+    const __beforeEmit = beforeEmit || this.__internal_setActiveContext.get()?.beforeEmit;
+    if (__beforeEmit) {
+      beforeUnloadTracker?.startTracking();
+      this.#setTransitiveState();
+      await __beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
 

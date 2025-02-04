@@ -605,7 +605,17 @@ export interface Clerk {
    * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
    **/
   __internal_reloadInitialResources: () => Promise<void>;
+
+  /**
+   *
+   */
+  __internal_setActiveContext: ScopedContext<{ beforeEmit: BeforeEmitCallback }>;
 }
+
+type ScopedContext<T> = {
+  run<R>(context: T, fn: () => R): Promise<Awaited<R>>;
+  get(): T | undefined;
+};
 
 export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
