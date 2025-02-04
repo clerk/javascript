@@ -4,4 +4,4 @@
 "@clerk/tanstack-start": patch
 ---
 
-Create shared isomorphic environment variable retrieval function
+Introduce unified environment variable handling across all supported platforms
