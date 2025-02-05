@@ -1,5 +1,12 @@
 # @clerk/ui
 
+## 0.3.21
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/elements@0.22.20
+
 ## 0.3.20
 
 ### Patch Changes
