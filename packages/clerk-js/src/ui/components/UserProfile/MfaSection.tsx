@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, VerificationStrategy } from '@clerk/types';
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
@@ -19,6 +19,7 @@ export const MfaSection = () => {
     userSettings: { attributes },
   } = useEnvironment();
   const { user } = useUser();
+  const [actionValue, setActionValue] = useState<string | null>(null);
 
   if (!user) {
     return null;
@@ -41,10 +42,13 @@ export const MfaSection = () => {
       centered={false}
       id='mfa'
     >
-      <Action.Root>
+      <Action.Root
+        value={actionValue}
+        onChange={setActionValue}
+      >
         <ProfileSection.ItemList id='mfa'>
           {showTOTP && (
-            <Action.Root>
+            <>
               <ProfileSection.Item
                 id='mfa'
                 hoverable
@@ -63,19 +67,20 @@ export const MfaSection = () => {
                 <MfaTOTPMenu />
               </ProfileSection.Item>
 
-              <Action.Open value='remove'>
+              <Action.Open value='remove-totp'>
                 <Action.Card variant='destructive'>
                   <RemoveMfaTOTPScreen />
                 </Action.Card>
               </Action.Open>
-            </Action.Root>
+            </>
           )}
 
           {secondFactors.includes('phone_code') &&
             mfaPhones.map(phone => {
               const isDefault = !showTOTP && phone.defaultSecondFactor;
+              const phoneId = phone.id;
               return (
-                <Action.Root key={phone.id}>
+                <Fragment key={phoneId}>
                   <ProfileSection.Item
                     id='mfa'
                     hoverable
@@ -97,17 +102,17 @@ export const MfaSection = () => {
                     />
                   </ProfileSection.Item>
 
-                  <Action.Open value='remove'>
+                  <Action.Open value={`remove-${phoneId}`}>
                     <Action.Card variant='destructive'>
-                      <RemoveMfaPhoneCodeScreen phoneId={phone.id} />
+                      <RemoveMfaPhoneCodeScreen phoneId={phoneId} />
                     </Action.Card>
                   </Action.Open>
-                </Action.Root>
+                </Fragment>
               );
             })}
 
           {showBackupCode && (
-            <Action.Root>
+            <>
               <ProfileSection.Item
                 id='mfa'
                 hoverable
@@ -129,10 +134,13 @@ export const MfaSection = () => {
                   <MfaBackupCodeCreateScreen />
                 </Action.Card>
               </Action.Open>
-            </Action.Root>
+            </>
           )}
 
-          <MfaAddMenu secondFactorsAvailableToAdd={secondFactorsAvailableToAdd} />
+          <MfaAddMenu
+            secondFactorsAvailableToAdd={secondFactorsAvailableToAdd}
+            onClick={() => setActionValue(null)}
+          />
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
@@ -147,6 +155,7 @@ type MfaPhoneCodeMenuProps = {
 const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
   const { open } = useActionContext();
   const card = useCardState();
+  const phoneId = phone.id;
 
   const actions = (
     [
@@ -160,7 +169,7 @@ const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
       {
         label: localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => open(`remove-${phoneId}`),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
@@ -191,7 +200,7 @@ const MfaTOTPMenu = () => {
       {
         label: localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => open('remove-totp'),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
@@ -201,11 +210,12 @@ const MfaTOTPMenu = () => {
 
 type MfaAddMenuProps = ProfileSectionActionMenuItemProps & {
   secondFactorsAvailableToAdd: string[];
+  onClick?: () => void;
 };
 
 const MfaAddMenu = (props: MfaAddMenuProps) => {
   const { open } = useActionContext();
-  const { secondFactorsAvailableToAdd } = props;
+  const { secondFactorsAvailableToAdd, onClick } = props;
   const [selectedStrategy, setSelectedStrategy] = useState<VerificationStrategy>();
 
   const strategies = React.useMemo(
@@ -245,6 +255,7 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
           <ProfileSection.ActionMenu
             id='mfa'
             triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
+            onClick={onClick}
           >
             {strategies.map(
               method =>
