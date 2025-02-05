@@ -118,13 +118,10 @@ export abstract class BaseResource {
       const message = errors?.[0]?.long_message;
       const code = errors?.[0]?.code;
 
-      const isCaptchaRequired = code === 'requires_captcha';
-      const isClientEndpointBlocked = requestInit.path === '/client' && code === 'resource_forbidden';
-
       // if the status is 401, we need to handle unauthenticated as we did before
       // otherwise, we are going to ignore the requires_captcha error
       // as we're going to handle it by triggering the captcha challenge
-      if (status === 401 && !isCaptchaRequired && !isClientEndpointBlocked) {
+      if (status === 401 && code !== 'requires_captcha') {
         await BaseResource.clerk.handleUnauthenticated();
       }
 
