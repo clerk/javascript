@@ -3,6 +3,8 @@ import type { TelemetryEventRaw } from '@clerk/types';
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_SAMPLING_RATE = 0.1;
 
+type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+
 type ComponentMountedBase = {
   component: string;
 };
@@ -15,7 +17,7 @@ type EventPrebuiltComponentMounted = ComponentMountedBase & {
 };
 
 type EventComponentMounted = ComponentMountedBase & {
-  [key: string]: boolean | string;
+  [key: string]: JSONValue;
 };
 
 /**
@@ -23,6 +25,7 @@ type EventComponentMounted = ComponentMountedBase & {
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
+ * @param additionalPayload - Additional data to send with the event.
  *
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
@@ -30,6 +33,7 @@ type EventComponentMounted = ComponentMountedBase & {
 export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
+  additionalPayload?: Record<string, JSONValue>,
 ): TelemetryEventRaw<EventPrebuiltComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
@@ -40,6 +44,7 @@ export function eventPrebuiltComponentMounted(
       baseTheme: Boolean(props?.appearance?.baseTheme),
       elements: Boolean(props?.appearance?.elements),
       variables: Boolean(props?.appearance?.variables),
+      ...additionalPayload,
     },
   };
 }
