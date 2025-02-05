@@ -12,6 +12,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   currencySymbol!: string;
   currency!: string;
   description!: string;
+  isActiveForPayer!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
   payerType!: string[];
@@ -39,6 +40,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.currencySymbol = data.currency_symbol;
     this.currency = data.currency;
     this.description = data.description;
+    this.isActiveForPayer = data.is_active_for_payer;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
     this.payerType = data.payer_type;

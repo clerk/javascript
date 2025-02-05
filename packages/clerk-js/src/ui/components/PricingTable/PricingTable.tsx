@@ -50,7 +50,7 @@ const PlanCard = ({
   const { ctaPosition = 'bottom', collapseFeatures = false } = props;
   const { mode = 'mounted' } = usePricingTableContext();
   const compact = mode === 'modal';
-  const isActivePlan = !plan.hasBaseFee;
+  const isActivePlan = plan.isActiveForPayer;
 
   return (
     <Col
@@ -163,7 +163,7 @@ const PlanCard = ({
           align='start'
           sx={t => ({
             order: ctaPosition === 'top' ? 2 : 1,
-            backgroundColor: t.colors.$white,
+            backgroundColor: t.colors.$colorBackground,
             padding: compact ? t.space.$3 : t.space.$4,
           })}
         >
@@ -238,7 +238,7 @@ const SegmentedControl = ({ selected, setSelected, options }: SegmentedControlPr
           onClick={() => setSelected && setSelected(option.value)}
           sx={t => ({
             padding: `${t.space.$1} ${t.space.$2x5}`,
-            backgroundColor: option.value === selected ? t.colors.$white : 'transparent',
+            backgroundColor: option.value === selected ? t.colors.$colorBackground : 'transparent',
             borderRadius: t.radii.$md,
             boxShadow:
               option.value === selected

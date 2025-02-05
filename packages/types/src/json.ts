@@ -614,6 +614,7 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   currency_symbol: string;
   currency: string;
   description: string;
+  is_active_for_payer: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   payer_type: string[];
