@@ -2161,7 +2161,11 @@ export class Clerk implements ClerkInterface {
     return {
       ...defaultOptions,
       ...options,
-      allowedRedirectOrigins: createAllowedRedirectOrigins(options?.allowedRedirectOrigins, this.frontendApi),
+      allowedRedirectOrigins: createAllowedRedirectOrigins(
+        options?.allowedRedirectOrigins,
+        this.frontendApi,
+        this.instanceType,
+      ),
     };
   };
 
