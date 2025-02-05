@@ -80,7 +80,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     flowName?: FlowMetadata['flow'];
     startPath?: string;
     onClose?: ModalProps['handleClose'];
-    onExternalNavigate?: () => any;
+    onExternalNavigate: () => any;
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
     canCloseModal?: boolean;

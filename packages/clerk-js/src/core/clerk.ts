@@ -191,6 +191,7 @@ export class Clerk implements ClerkInterface {
   #loaded = false;
 
   #listeners: Array<(emission: Resources) => void> = [];
+  #externalNavigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -947,7 +948,6 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
     await onAfterSetActive();
-    this.#resetComponentsState();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -969,10 +969,23 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
+  public __internal_externalNavigationListener = (listener: () => void): UnsubscribeCallback => {
+    this.#externalNavigationListeners.push(listener);
+    const unsubscribe = () => {
+      this.#externalNavigationListeners = this.#externalNavigationListeners.filter(l => l !== listener);
+    };
+    return unsubscribe;
+  };
+
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
     if (!to || !inBrowser()) {
       return;
     }
+
+    setTimeout(() => {
+      // Notify after the navigation, in order to visit a page with the updated context set above.
+      this.#notifyExternalNavigationListeners();
+    }, 0);
 
     let toURL = new URL(to, window.location.href);
 
@@ -2041,15 +2054,14 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
+  #notifyExternalNavigationListeners = (): void => {
+    for (const listener of this.#externalNavigationListeners) {
+      listener();
+    }
   };
 
-  #resetComponentsState = () => {
-    if (Clerk.mountComponentRenderer) {
-      this.closeSignUp();
-      this.closeSignIn();
-    }
+  #broadcastSignOutEvent = () => {
+    this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
   #setTransitiveState = () => {

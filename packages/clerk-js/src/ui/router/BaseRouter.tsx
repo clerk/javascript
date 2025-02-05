@@ -15,7 +15,6 @@ interface BaseRouterProps {
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any> | any;
-  onExternalNavigate?: () => any;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
   urlStateParam?: {
@@ -34,7 +33,6 @@ export const BaseRouter = ({
   getPath,
   getQueryString,
   internalNavigate,
-  onExternalNavigate,
   refreshEvents,
   preservedParams,
   urlStateParam,
@@ -42,7 +40,7 @@ export const BaseRouter = ({
 }: BaseRouterProps): JSX.Element => {
   // Disabling is acceptable since this is a Router component
   // eslint-disable-next-line custom-rules/no-navigate-useClerk
-  const { navigate: externalNavigate } = useClerk();
+  const { navigate: clerkNavigate } = useClerk();
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
@@ -96,11 +94,12 @@ export const BaseRouter = ({
       return;
     }
 
-    if (toURL.origin !== window.location.origin || !toURL.pathname.startsWith('/' + basePath)) {
-      if (onExternalNavigate) {
-        onExternalNavigate();
-      }
-      const res = await externalNavigate(toURL.href);
+    const isCrossOrigin = toURL.origin !== window.location.origin;
+    const isOutsideOfUIComponent = !toURL.pathname.startsWith('/' + basePath);
+
+    if (isOutsideOfUIComponent || isCrossOrigin) {
+      const res = await clerkNavigate(toURL.href);
+      // TODO: Since we are closing the modal, why do we need to refresh ? wouldn't that unmount everything causing the state to refresh ?
       refresh();
       return res;
     }

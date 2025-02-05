@@ -11,11 +11,11 @@ type DeleteUserFormProps = FormProps;
 export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps) => {
   const { onReset } = props;
   const card = useCardState();
-  const { navigateAfterMultiSessionSingleSignOutUrl, navigateAfterSignOut } = useSignOutContext();
+  const { afterSignOutUrl, afterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const { user } = useUser();
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
-  const { setActive, __internal_setActiveContext } = useClerk();
+  const { setActive } = useClerk();
   const [deleteUserWithReverification] = useReverification(() => user?.delete());
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
@@ -36,13 +36,15 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
 
     try {
       await deleteUserWithReverification();
-      const beforeEmit = otherSessions.length === 0 ? navigateAfterSignOut : navigateAfterMultiSessionSingleSignOutUrl;
+      const redirectUrl = otherSessions.length === 0 ? afterSignOutUrl : afterMultiSessionSingleSignOutUrl;
 
-      return __internal_setActiveContext.run({ beforeEmit }, () => {
-        return setActive({
-          session: null,
-        });
+      // return __internal_setActiveContext.run({ beforeEmit }, () => {
+      // eslint-disable-next-line custom-rules/no-setActive-redirectUrl
+      return setActive({
+        session: null,
+        redirectUrl,
       });
+      // });
     } catch (e) {
       handleError(e, [], card.setError);
     }

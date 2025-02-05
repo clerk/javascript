@@ -391,6 +391,8 @@ export interface Clerk {
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
+  __internal_externalNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
   /**
    * Set the active session and organization explicitly.
    *
