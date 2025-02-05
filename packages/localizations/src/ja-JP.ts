@@ -129,6 +129,7 @@ export const jaJP: LocalizationResource = {
     },
     membersPage: {
       action__invite: '招待',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
         tableHeader__actions: undefined,
@@ -460,8 +461,9 @@ export const jaJP: LocalizationResource = {
       actionText: 'アカウントをお持ちでないですか？',
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: undefined,
       title: 'サインイン',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '検証コード',
@@ -539,7 +541,9 @@ export const jaJP: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
+      titleCombined: 'アカウントを作成',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
@@ -551,7 +555,6 @@ export const jaJP: LocalizationResource = {
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: 'フォームコードが正しくありません。',
-    form_identifier_exists: '識別子が既に存在します。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -597,6 +600,7 @@ export const jaJP: LocalizationResource = {
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
     phone_number_exists: 'この電話番号は既に使用されています。別の電話番号を試してください。',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',
       goodPassword: '素晴らしい仕事です。これは優れたパスワードです。',
@@ -694,6 +698,11 @@ export const jaJP: LocalizationResource = {
         resendButton: 'リンクを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
         messageLine2: 'このメールアドレスを使用してのサインインはできなくなります。',

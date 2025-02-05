@@ -213,7 +213,7 @@ export const defineConfig: DefineConfig = options => {
 export const { compose, dva, cx } = defineConfig();
 
 export function getDescriptors(elements: ParsedElements, descriptorList: string) {
-  const descriptors = descriptorList.split(' ') as (keyof ParsedElements)[];
+  const descriptors = descriptorList.split(' ');
   return descriptors.map(d => {
     const value = elements[d];
     if (!value) {

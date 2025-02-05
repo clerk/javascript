@@ -1,16 +1,9 @@
-import { runWithExponentialBackOff } from '@clerk/shared';
+import { runWithExponentialBackOff } from '@clerk/shared/utils';
 
 type Message = {
   _id: string;
   subject: string;
 };
-
-interface ErrorResponse {
-  message: string;
-  error: string;
-}
-
-type InboxFilterResponse = { messages: Message[] } | ErrorResponse;
 
 export const createEmailService = () => {
   const cleanEmail = (email: string) => {
@@ -19,7 +12,8 @@ export const createEmailService = () => {
 
   const fetcher = async (url: string | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers || {});
-    headers.set('Mailsac-Key', process.env.MAILSAC_API_KEY as string);
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    headers.set('Mailsac-Key', process.env.MAILSAC_API_KEY);
     return fetch(url, { ...init, headers });
   };
 
@@ -34,11 +28,7 @@ export const createEmailService = () => {
     return runWithExponentialBackOff(
       async () => {
         const res = await fetcher(url);
-        const json = (await res.json()) as InboxFilterResponse;
-        if ('message' in json) {
-          throw new Error(`Mailsac API Error: ${json.error} - ${json.message}`);
-        }
-
+        const json = (await res.json()) as unknown as { messages: Message[] };
         const message = json.messages[0];
         if (!message) {
           throw new Error('message not found');

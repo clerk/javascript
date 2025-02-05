@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
@@ -24,6 +25,7 @@ export type SignInContextType = SignInCtx & {
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
+  isCombinedFlow: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -31,18 +33,23 @@ export const SignInContext = createContext<SignInCtx | null>(null);
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = options.experimental?.combinedFlow;
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  const { componentName, mode, ..._ctx } = context;
-  const ctx = _ctx.__experimental?.combinedProps ? { ..._ctx, ..._ctx.__experimental?.combinedProps } : _ctx;
+  const isCombinedFlow =
+    (signUpMode !== 'restricted' &&
+      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
+    context.withSignUp ||
+    false;
+
+  const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
     [],
@@ -77,21 +84,22 @@ export const useSignInContext = (): SignInContextType => {
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+  const authQueryString = redirectUrls.toSearchParams().toString();
+
   const emailLinkRedirectUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signUpUrl,
-    authQueryString: '',
+    authQueryString,
     path: ctx.path,
-    endpoint: options.experimental?.combinedFlow
-      ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE
-      : MAGIC_LINK_VERIFY_PATH_ROUTE,
+    endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signUpUrl,
-    authQueryString: '',
+    authQueryString,
     path: ctx.path,
-    endpoint: options.experimental?.combinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
+    endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
   });
 
   if (isCombinedFlow) {
@@ -118,6 +126,7 @@ export const useSignInContext = (): SignInContextType => {
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: redirectUrls.toSearchParams().toString(),
-  } as SignInContextType;
+    authQueryString,
+    isCombinedFlow,
+  };
 };

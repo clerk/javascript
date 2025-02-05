@@ -17,8 +17,17 @@ import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDef
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationListParams = {
+  /**
+   * `true` or an object with any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   */
   userMemberships?: true | PaginatedHookConfig<GetUserOrganizationMembershipParams>;
+  /**
+   * `true` or an object with [`status: OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization-list#organization-invitation-status) or any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   */
   userInvitations?: true | PaginatedHookConfig<GetUserOrganizationInvitationsParams>;
+  /**
+   * `true` or an object with [`status: OrganizationSuggestionsStatus | OrganizationSuggestionStatus[]`](https://clerk.com/docs/references/react/use-organization-list#organization-suggestion-status) or any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   */
   userSuggestions?: true | PaginatedHookConfig<GetUserOrganizationSuggestionsParams>;
 };
 
@@ -44,31 +53,70 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
   params?: T,
 ) =>
   | {
+      /**
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       */
       isLoaded: false;
+      /**
+       * A function that returns a `Promise` which resolves to the newly created `Organization`.
+       */
       createOrganization: undefined;
+      /**
+       * A function that sets the active session and/or organization.
+       */
       setActive: undefined;
+      /**
+       * Returns `PaginatedResources` which includes a list of the user's organization memberships.
+       */
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      /**
+       * Returns `PaginatedResources` which includes a list of the user's organization invitations.
+       */
       userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
+      /**
+       * Returns `PaginatedResources` which includes a list of suggestions for organizations that the user can join.
+       */
       userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
   | {
+      /**
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       */
       isLoaded: boolean;
+      /**
+       * A function that returns a `Promise` which resolves to the newly created `Organization`.
+       */
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
+      /**
+       * A function that sets the active session and/or organization.
+       */
       setActive: SetActive;
+      /**
+       * Returns `PaginatedResources` which includes a list of the user's organization memberships.
+       */
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
         T['userMemberships'] extends { infinite: true } ? true : false
       >;
+      /**
+       * Returns `PaginatedResources` which includes a list of the user's organization invitations.
+       */
       userInvitations: PaginatedResources<
         UserOrganizationInvitationResource,
         T['userInvitations'] extends { infinite: true } ? true : false
       >;
+      /**
+       * Returns `PaginatedResources` which includes a list of suggestions for organizations that the user can join.
+       */
       userSuggestions: PaginatedResources<
         OrganizationSuggestionResource,
         T['userSuggestions'] extends { infinite: true } ? true : false
       >;
     };
 
+/**
+ * The `useOrganizationList()` hook provides access to the current user's organization memberships, invitations, and suggestions. It also includes methods for creating new organizations and managing the active organization.
+ */
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 

@@ -9,45 +9,52 @@ import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
-type UseAuth = (initialAuthState?: any) => UseAuthReturn;
-
 /**
- * Returns the current auth state, the user and session ids and the `getToken`
- * that can be used to retrieve the given template or the default Clerk token.
- *
- * Until Clerk loads, `isLoaded` will be set to `false`.
- * Once Clerk loads, `isLoaded` will be set to `true`, and you can
- * safely access the `userId` and `sessionId` variables.
- *
- * For projects using NextJs or Remix, you can have immediate access to this data during SSR
- * simply by using the `ClerkProvider`.
+ * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
  * @example
- * A simple example:
  *
+ * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
+ *
+ * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
  * import { useAuth } from '@clerk/clerk-react'
  *
- * function Hello() {
- *   const { isSignedIn, sessionId, userId } = useAuth();
- *   if(isSignedIn) {
- *     return null;
+ * export default function ExternalDataPage() {
+ *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
+ *
+ *   const fetchExternalData = async () => {
+ *     const token = await getToken()
+ *
+ *     // Fetch data from an external API
+ *     const response = await fetch('https://api.example.com/data', {
+ *       headers: {
+ *         Authorization: `Bearer ${token}`,
+ *       },
+ *     })
+ *
+ *     return response.json()
  *   }
- *   console.log(sessionId, userId)
- *   return <div>...</div>
+ *
+ *   if (!isLoaded) {
+ *     return <div>Loading...</div>
+ *   }
+ *
+ *   if (!isSignedIn) {
+ *     return <div>Sign in to view this page</div>
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <p>
+ *         Hello, {userId}! Your current active session is {sessionId}.
+ *       </p>
+ *       <button onClick={fetchExternalData}>Fetch Data</button>
+ *     </div>
+ *   )
  * }
- *
- * @example
- * Basic example in a NextJs app. This page will be fully rendered during SSR:
- *
- * import { useAuth } from '@clerk/nextjs'
- *
- * export HelloPage = () => {
- *   const { isSignedIn, sessionId, userId } = useAuth();
- *   console.log(isSignedIn, sessionId, userId)
- *   return <div>...</div>
- * }
+ * ```
  */
-export const useAuth: UseAuth = (initialAuthState = {}) => {
+export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
   const authContextFromHook = useAuthContext();
@@ -90,7 +97,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
  * session and user identifiers, organization roles, and a `has` function for authorization checks.
  * Additionally, it provides `signOut` and `getToken` functions if applicable.
  *
- * Example usage:
+ * @example
  * ```tsx
  * const {
  *   isLoaded,

@@ -19,7 +19,7 @@ export const isPrerenderingBailout = (e: unknown) => {
   return routeRegex.test(message) || dynamicServerUsage || bailOutPrerendering;
 };
 
-export async function buildRequestLike() {
+export async function buildRequestLike(): Promise<NextRequest> {
   try {
     // Dynamically import next/headers, otherwise Next12 apps will break
     // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
@@ -34,7 +34,7 @@ export async function buildRequestLike() {
     }
 
     throw new Error(
-      `Clerk: auth() and currentUser() are only supported in App Router (/app directory).\nIf you're using /pages, try getAuth() instead.\nOriginal error: ${e}`,
+      `Clerk: auth(), currentUser() and clerkClient(), are only supported in App Router (/app directory).\nIf you're using /pages, try getAuth() instead.\nOriginal error: ${e}`,
     );
   }
 }
@@ -67,7 +67,7 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
     // Grab the nonce by trimming the 'nonce-' prefix.
     ?.slice(7, -1);
 
-  // If we could't find the nonce, then we're done.
+  // If we couldn't find the nonce, then we're done.
   if (!nonce) {
     return;
   }

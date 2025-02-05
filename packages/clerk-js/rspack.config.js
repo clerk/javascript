@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 const rspack = require('@rspack/core');
 const packageJSON = require('./package.json');
 const path = require('path');
@@ -50,7 +50,6 @@ const common = ({ mode, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        BUILD_ENABLE_NEW_COMPONENTS: JSON.stringify(process.env.BUILD_ENABLE_NEW_COMPONENTS),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -82,7 +81,7 @@ const common = ({ mode, disableRHC = false }) => {
             chunks: 'all',
           },
           coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|ieee754|preact|keccak|buffer|string_decoder|sha\.js|base64-js|safe-buffer|util-deprecate|inherits)[\\/]/,
+            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
@@ -519,6 +518,12 @@ const devConfig = ({ mode, env }) => {
               historyApiFallback: true,
             }
           : {}),
+      },
+      cache: true,
+      experiments: {
+        cache: {
+          type: 'persistent',
+        },
       },
     };
   };

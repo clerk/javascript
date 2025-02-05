@@ -126,6 +126,7 @@ export const zhCN: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀请',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成员',
         tableHeader__actions: undefined,
@@ -449,8 +450,9 @@ export const zhCN: LocalizationResource = {
       actionText: '还没有账户？',
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: undefined,
       title: '登录',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: '验证码',
@@ -528,7 +530,9 @@ export const zhCN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '已经有账户了？',
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: '继续使用 {{applicationName}}',
       title: '创建您的账户',
+      titleCombined: '创建您的账户',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
@@ -538,7 +542,6 @@ export const zhCN: LocalizationResource = {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -582,6 +585,7 @@ export const zhCN: LocalizationResource = {
       sentencePrefix: '您的密码必须包含',
     },
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',
@@ -678,6 +682,11 @@ export const zhCN: LocalizationResource = {
         resendButton: '重发链接',
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电子邮件地址登录。',

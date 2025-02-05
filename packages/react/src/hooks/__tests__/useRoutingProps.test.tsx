@@ -16,7 +16,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('defaults to path routing and a path prop is required', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props);
       return <div>{JSON.stringify(options)}</div>;
     };
@@ -27,7 +27,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('the path option is ignored when "hash" routing prop', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };
@@ -43,7 +43,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('the path option is ignored when "virtual" routing prop', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };
@@ -59,7 +59,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('throws error when "hash" routing and path prop are set', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props);
       return <div>{JSON.stringify(options)}</div>;
     };
@@ -77,7 +77,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('throws error when "virtual" routing and path prop are set', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props);
       return <div>{JSON.stringify(options)}</div>;
     };
@@ -95,7 +95,7 @@ describe('useRoutingProps()', () => {
   });
 
   test('path prop has priority over path option', () => {
-    const TestingComponent = props => {
+    const TestingComponent = (props: any) => {
       const options = useRoutingProps('TestingComponent', props, { path: '/path-option' });
       return <div>{JSON.stringify(options)}</div>;
     };

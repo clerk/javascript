@@ -10,6 +10,7 @@ import SignUp from './sign-up';
 import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
 import UserButtonCustom from './custom-user-button';
+import UserButtonCustomDynamicLabels from './custom-user-button/with-dynamic-labels.tsx';
 import UserButtonCustomTrigger from './custom-user-button-trigger';
 import UserButton from './user-button';
 import Waitlist from './waitlist';
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
       {
         path: '/custom-user-button',
         element: <UserButtonCustom />,
+      },
+      {
+        path: '/custom-user-button-dynamic-labels',
+        element: <UserButtonCustomDynamicLabels />,
       },
       {
         path: '/custom-user-button-trigger',

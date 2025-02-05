@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.6.10",
+  "version": "2.7.5",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -61,9 +61,10 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
@@ -75,7 +76,6 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
     "expo-auth-session": "^5.4.0",

@@ -63,9 +63,9 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
   formFieldInputPlaceholder__organizationName: 'Όνομα οργανισμού',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
-  formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Εισάγετε τον κωδικό σας',
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -130,6 +130,7 @@ export const elGR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Πρόσκληση',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Αφαίρεση μέλους',
         tableHeader__actions: 'Ενέργειες',
@@ -462,8 +463,9 @@ export const elGR: LocalizationResource = {
       actionText: 'Δεν έχετε λογαριασμό;',
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Σύνδεση',
-      __experimental_titleCombined: 'Συνέχεια στο {{applicationName}}',
+      titleCombined: 'Συνέχεια στο {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Κωδικός επαλήθευσης',
@@ -542,7 +544,9 @@ export const elGR: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Έχετε ήδη λογαριασμό;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
+      titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
     },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
@@ -554,7 +558,6 @@ export const elGR: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -600,6 +603,7 @@ export const elGR: LocalizationResource = {
       sentencePrefix: 'Ο κωδικός πρόσβασής σας πρέπει να περιέχει',
     },
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
         'Ο κωδικός πρόσβασής σας είναι αρκετός, αλλά θα μπορούσε να είναι πιο ισχυρός. Δοκιμάστε να προσθέσετε περισσότερους χαρακτήρες.',
@@ -702,6 +706,11 @@ export const elGR: LocalizationResource = {
         resendButton: 'Δεν λάβατε κάποιον σύνδεσμο; Επανάληψη αποστολής',
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'Η διεύθυνση {{identifier}} θα αφαιρεθεί από αυτόν τον λογαριασμό.',
         messageLine2: 'Δεν θα μπορείτε πλέον να συνδεθείτε χρησιμοποιώντας αυτήν τη διεύθυνση email.',

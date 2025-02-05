@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect, useMemo } from 'react';
 
-import { SignInContext, useCoreSignUp, useEnvironment, useOptions, useSignUpContext } from '../../contexts';
+import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useLocalizations } from '../../customizables';
 import {
   Card,
@@ -32,11 +32,16 @@ function _SignUpContinue() {
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes, usernameSettings } = userSettings;
   const { t, locale } = useLocalizations();
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, initialValues = {} } = useSignUpContext();
+  const {
+    afterSignUpUrl,
+    signInUrl,
+    unsafeMetadata,
+    initialValues = {},
+    isCombinedFlow: _isCombinedFlow,
+  } = useSignUpContext();
   const signUp = useCoreSignUp();
-  const options = useOptions();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const isCombinedFlow = !!(options.experimental?.combinedFlow && !!isWithinSignInContext);
+  const isCombinedFlow = !!(_isCombinedFlow && !!isWithinSignInContext);
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -104,7 +109,6 @@ function _SignUpContinue() {
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
-  const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
 
   const fields = determineActiveFields({
     attributes,
@@ -117,7 +121,6 @@ function _SignUpContinue() {
   minimizeFieldsForExistingSignup(fields, signUp);
 
   const oauthOptions = userSettings.authenticatableSocialStrategies;
-  const web3Options = userSettings.web3FirstFactors;
 
   const handleChangeActive = (type: ActiveIdentifier) => {
     if (!emailOrPhone(attributes, isProgressiveSignUp)) {
@@ -179,7 +182,6 @@ function _SignUpContinue() {
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
-  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   const headerTitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.title')
@@ -204,10 +206,10 @@ function _SignUpContinue() {
             gap={8}
           >
             <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && !onlyLegalConsentMissing && (
+              {showOauthProviders && !onlyLegalConsentMissing && (
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
-                  enableWeb3Providers={showWeb3Providers}
+                  enableWeb3Providers={false}
                   continueSignUp
                 />
               )}

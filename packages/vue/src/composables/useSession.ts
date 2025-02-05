@@ -12,7 +12,6 @@ type UseSession = () => ToComputedRefs<UseSessionReturn>;
  * information about the active session and methods to manage it.
  *
  * @example
- *
  * <script setup>
  * import { useSession } from '@clerk/vue'
  *

@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     legacyOutput: true,
     treeshake: true,
-    noExternal: ['@clerk/clerk-react'],
+    noExternal: ['@clerk/clerk-react', '@clerk/shared'],
     external: ['use-sync-external-store'],
     define: {
       PACKAGE_NAME: `"${name}"`,

@@ -78,34 +78,27 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha(fallbackUrl: string) {
+async function loadCaptcha() {
   if (!window.turnstile) {
-    await loadCaptchaFromCloudflareURL()
-      .catch(() => loadCaptchaFromFAPIProxiedURL(fallbackUrl))
-      .catch(() => {
-        throw { captchaError: 'captcha_script_failed_to_load' };
-      });
+    await loadCaptchaFromCloudflareURL().catch(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw { captchaError: 'captcha_script_failed_to_load' };
+    });
   }
   return window.turnstile;
 }
 
 async function loadCaptchaFromCloudflareURL() {
   try {
+    if (__BUILD_DISABLE_RHC__) {
+      return Promise.reject(new Error('Captcha not supported in this environment'));
+    }
+
     return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
   } catch (err) {
     console.warn(
       'Clerk: Failed to load the CAPTCHA script from Cloudflare. If you see a CSP error in your browser, please add the necessary CSP rules to your app. Visit https://clerk.com/docs/security/clerk-csp for more information.',
     );
-    throw err;
-  }
-}
-
-async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
-  try {
-    return await loadScript(fallbackUrl, { defer: true });
-  } catch (err) {
-    // Rethrow with specific message
-    console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', fallbackUrl);
     throw err;
   }
 }
@@ -118,9 +111,9 @@ async function loadCaptchaFromFAPIProxiedURL(fallbackUrl: string) {
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
 export const getTurnstileToken = async (opts: CaptchaOptions) => {
-  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = opts;
+  const { siteKey, widgetType, invisibleSiteKey } = opts;
   const { modalContainerQuerySelector, modalWrapperQuerySelector, closeModal, openModal } = opts;
-  const captcha: Turnstile = await loadCaptcha(scriptUrl);
+  const captcha: Turnstile = await loadCaptcha();
   const errorCodes: (string | number)[] = [];
 
   let captchaToken = '';
@@ -148,7 +141,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
-      visibleDiv.style.display = 'block';
+      visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -163,6 +156,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    div.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
     document.body.appendChild(div);
   }
 
@@ -178,12 +172,22 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             closeModal?.();
             resolve([token, id]);
           },
-          'before-interactive-callback': async () => {
+          'before-interactive-callback': () => {
             if (modalWrapperQuerySelector) {
               const el = document.querySelector(modalWrapperQuerySelector) as HTMLElement;
               el?.style.setProperty('visibility', 'visible');
               el?.style.setProperty('pointer-events', 'all');
-              return;
+            } else {
+              const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+              if (visibleWidget) {
+                // We unset the max-height to allow the widget to expand
+                visibleWidget.style.maxHeight = 'unset';
+                // We set the min-height to the height of the Turnstile widget
+                // because the widget initially does a small layout shift
+                // and then expands to the correct height
+                visibleWidget.style.minHeight = '68px';
+                visibleWidget.style.marginBottom = '1.5rem';
+              }
             }
           },
           'error-callback': function (errorCode) {
@@ -226,6 +230,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
     };
@@ -238,7 +243,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     }
     const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleWidget) {
-      visibleWidget.style.display = 'none';
+      visibleWidget.style.maxHeight = '0';
+      visibleWidget.style.minHeight = 'unset';
+      visibleWidget.style.marginBottom = 'unset';
     }
   }
 

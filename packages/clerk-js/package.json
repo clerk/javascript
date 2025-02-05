@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.44.0",
+  "version": "5.52.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -32,6 +32,7 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
@@ -42,7 +43,7 @@
     "dev": "rspack serve --config rspack.config.js",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000 --env sandbox=1",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint || true",
     "test": "jest",
@@ -56,7 +57,7 @@
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "@coinbase/wallet-sdk": "4.0.4",
+    "@coinbase/wallet-sdk": "4.2.4",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
@@ -74,20 +75,19 @@
     "regenerator-runtime": "0.13.11"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/ui": "workspace:*",
-    "@rsdoctor/rspack-plugin": "^0.4.7",
-    "@rspack/cli": "^1.0.14",
-    "@rspack/core": "^1.0.14",
-    "@rspack/plugin-react-refresh": "^1.0.0",
-    "@svgr/webpack": "^6.2.1",
+    "@rsdoctor/rspack-plugin": "^0.4.13",
+    "@rspack/cli": "^1.2.2",
+    "@rspack/core": "^1.2.2",
+    "@rspack/plugin-react-refresh": "^1.0.1",
+    "@svgr/webpack": "^6.5.1",
     "@types/webpack-dev-server": "^4.7.2",
-    "@types/webpack-env": "^1.16.4",
-    "react-refresh": "^0.14.0",
-    "react-refresh-typescript": "^2.0.5",
-    "terser-webpack-plugin": "^5.3.10",
-    "ts-loader": "^9.3.0",
-    "webpack-merge": "^5.9.0"
+    "@types/webpack-env": "^1.18.8",
+    "react-refresh": "^0.16.0",
+    "react-refresh-typescript": "^2.0.10",
+    "terser-webpack-plugin": "^5.3.11",
+    "ts-loader": "^9.5.2",
+    "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

@@ -2,20 +2,7 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useTransition } from 'react';
 
-import type { NextClerkProviderProps } from '../../types';
 import { removeBasePath } from '../../utils/removeBasePath';
-
-declare global {
-  interface Window {
-    __clerk_internal_navigations: Record<
-      string,
-      {
-        fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
-        promisesBuffer: Array<() => void> | undefined;
-      }
-    >;
-  }
-}
 
 const getClerkNavigationObject = (name: string) => {
   window.__clerk_internal_navigations ??= {};

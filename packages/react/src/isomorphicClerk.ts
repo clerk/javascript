@@ -61,7 +61,7 @@ import type {
 } from './types';
 import { isConstructor } from './utils';
 
-if (typeof __BUILD_DISABLE_RHC__ === 'undefined') {
+if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
 }
 
@@ -1151,7 +1151,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  authenticateWithOKXWallet = async (params: AuthenticateWithOKXWalletParams): Promise<void> => {
+  authenticateWithOKXWallet = async (params?: AuthenticateWithOKXWalletParams): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithOKXWallet(params);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;

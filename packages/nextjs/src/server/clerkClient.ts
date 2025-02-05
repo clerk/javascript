@@ -19,6 +19,7 @@ const clerkClient = async () => {
     requestData = decryptClerkRequestData(encryptedRequestData);
   } catch (err) {
     if (err && isPrerenderingBailout(err)) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw err;
     }
   }
