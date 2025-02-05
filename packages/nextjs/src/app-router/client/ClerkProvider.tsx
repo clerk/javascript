@@ -75,16 +75,21 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
        *  For more information on cache invalidation, see:
        * https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
        */
-      return new Promise(res => {
-        window.__clerk_internal_invalidateCachePromise = res;
+      return new Promise(resolve => {
+        window.__clerk_internal_invalidateCachePromise = resolve;
 
         // NOTE: the following code will allow `useReverification()` to work properly when `handlerReverification` is called inside `startTransition`
-        if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
-          startTransition(() => {
-            router.refresh();
-          });
-        } else {
-          void invalidateCacheAction().then(() => res());
+        if (window.next?.version && typeof window.next.version === 'string') {
+          if (window.next.version.startsWith('13')) {
+            startTransition(() => {
+              router.refresh();
+            });
+          } else if (window.next.version.startsWith('14')) {
+            void invalidateCacheAction().then(resolve);
+          } else {
+            // Next.js v15 and above have a less aggressive router cache that doesn't need to be invalidated.
+            resolve();
+          }
         }
       });
     };
