@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.22.11
+
+### Patch Changes
+
+- Fix an issue where `<UserButton />` wouldn't update when custom menu item props changed ([#5069](https://github.com/clerk/javascript/pull/5069)) by [@nikospapcom](https://github.com/nikospapcom)
+
 ## 5.22.10
 
 ### Patch Changes
