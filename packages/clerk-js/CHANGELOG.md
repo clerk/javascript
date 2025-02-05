@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.52.1
+
+### Patch Changes
+
+- Add virtual routing deprecation warning. ([#5072](https://github.com/clerk/javascript/pull/5072)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure only one action is open per section within `UserProfile`. ([#5030](https://github.com/clerk/javascript/pull/5030)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Prevent infinite loop when the client is blocked ([#5083](https://github.com/clerk/javascript/pull/5083)) by [@anagstef](https://github.com/anagstef)
+
 ## 5.52.0
 
 ### Minor Changes
