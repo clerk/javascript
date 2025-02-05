@@ -340,4 +340,51 @@ describe('MfaPage', () => {
       expect(fixtures.clerk.user?.disableTOTP).toHaveBeenCalled();
     });
   });
+
+  describe('Handles opening/closing actions', () => {
+    it('closes remove sms code form when add two-step verification action is clicked', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+        });
+      });
+
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+      await waitFor(() => getByText('Two-step verification'));
+
+      const itemButton = getByText(/\+30 691 1111111/i)?.parentElement?.parentElement?.parentElement?.children[1];
+
+      expect(itemButton).toBeDefined();
+
+      await act(async () => {
+        await userEvent.click(itemButton!);
+      });
+      await waitFor(() => getByText(/^remove$/i));
+      await userEvent.click(getByText(/^remove$/i));
+
+      await expect(queryByRole('heading', { name: /remove two-step verification/i })).toBeInTheDocument();
+
+      await act(async () => {
+        await userEvent.click(getByRole('button', { name: /Add two-step verification/i }));
+      });
+
+      await waitFor(() =>
+        expect(queryByRole('heading', { name: /remove two-step verification/i })).not.toBeInTheDocument(),
+      );
+    });
+  });
 });
