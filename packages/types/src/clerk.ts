@@ -391,6 +391,10 @@ export interface Clerk {
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
+  /**
+   * Internal function that notifies modal UI components when a navigation event occurs,
+   * allowing them to close if necessary.
+   */
   __internal_externalNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
