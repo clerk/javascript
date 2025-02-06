@@ -68,6 +68,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     const client_id_after_sign_out = await u.page.locator('p[data-clerk-id]').innerHTML();
     expect(client_id).toEqual(client_id_after_sign_out);
   });
+
+  test('Protected routes do not persist after sign out', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
+    await u.page.getByTestId('protected').waitFor();
+    await u.page.getByRole('link', { name: 'Home' }).click();
+    await u.page.getByRole('button', { name: 'Open user button' }).click();
+
+    await u.page.getByRole('menuitem', { name: 'Sign out' }).click();
+    await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
+    await u.page.waitForURL(/sign-in\?redirect_url/);
+  });
 });
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_destroy_client] })(
