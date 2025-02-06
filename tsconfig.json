@@ -3,7 +3,7 @@
   "compilerOptions": {
     "alwaysStrict": false,
     "declaration": true,
-    "declarationMap": false,
+    "declarationMap": true,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,

@@ -8,7 +8,7 @@
     "moduleResolution": "Bundler",
     "importHelpers": true,
     "declaration": true,
-    "declarationMap": false,
+    "declarationMap": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
