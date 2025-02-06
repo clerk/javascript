@@ -29,7 +29,7 @@ const config = {
   // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
   json: './.typedoc/output.json',
   entryPointStrategy: 'packages',
-  plugin: ['typedoc-plugin-missing-exports'],
+  plugin: ['typedoc-plugin-markdown'],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -47,6 +47,11 @@ const config = {
     disableSources: true,
   },
   entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
+  /**
+   * typedoc-plugin-markdown options
+   */
+  hidePageHeader: true,
+  hideBreadcrumbs: true,
 };
 
 export default config;
