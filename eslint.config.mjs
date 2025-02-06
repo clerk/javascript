@@ -19,49 +19,6 @@ const ECMA_VERSION = 2021,
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
   TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
 
-const noSetActiveRedirectUrl = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Disallow calling `setActive` with `{ redirectUrl }` as a parameter.',
-      recommended: false,
-    },
-    messages: {
-      noRedirectUrl: 'Calling `setActive` with `{ redirectUrl }` as an argument is not allowed.',
-    },
-    schema: [],
-  },
-  create(context) {
-    return {
-      CallExpression(node) {
-        // Detect direct function calls: `setActive({ redirectUrl })`
-        const isDirectCall = node.callee.type === 'Identifier' && node.callee.name === 'setActive';
-
-        // Detect property calls: `clerk.setActive({ redirectUrl })` or `this.setActive({ redirectUrl })`
-        const isObjectCall = node.callee.type === 'MemberExpression' && node.callee.property.name === 'setActive';
-
-        if (!isDirectCall && !isObjectCall) {
-          return; // Exit if it's not a `setActive` call
-        }
-
-        // Ensure the first argument is an object containing `{ redirectUrl }`
-        const firstArg = node.arguments[0];
-
-        if (
-          firstArg &&
-          firstArg.type === 'ObjectExpression' &&
-          firstArg.properties.some(prop => prop.key.name === 'redirectUrl')
-        ) {
-          context.report({
-            node: firstArg,
-            messageId: 'noRedirectUrl',
-          });
-        }
-      },
-    };
-  },
-};
-
 const noNavigateUseClerk = {
   meta: {
     type: 'problem',
@@ -70,7 +27,8 @@ const noNavigateUseClerk = {
       recommended: false,
     },
     messages: {
-      noNavigate: 'Usage of `navigate` from `useClerk()` is not allowed. Use `useRouter() instead`.',
+      noNavigate:
+        'Usage of `navigate` from `useClerk()` is not allowed.\nUse `useRouter().navigate` to navigate in-between flows or `setActive({ redirectUrl })`.',
     },
     schema: [],
   },
@@ -403,13 +361,11 @@ export default tseslint.config([
       'custom-rules': {
         rules: {
           'no-navigate-useClerk': noNavigateUseClerk,
-          'no-setActive-redirectUrl': noSetActiveRedirectUrl,
         },
       },
     },
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
-      'custom-rules/no-setActive-redirectUrl': 'error',
     },
   },
   {

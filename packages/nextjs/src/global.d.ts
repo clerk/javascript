@@ -14,24 +14,14 @@ declare namespace NodeJS {
   }
 }
 
-type RequireMetadata<T extends (to: any, metadata?: any) => any> = T extends (
-  to: infer To,
-  metadata?: infer Metadata,
-) => infer R
-  ? (to: To, metadata: Metadata) => R
-  : never;
-
-type NavigationFunction =
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  | RequireMetadata<NonNullable<import('./types').NextClerkProviderProps['routerPush']>>
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  | RequireMetadata<NonNullable<import('./types').NextClerkProviderProps['routerReplace']>>;
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type NextClerkProviderProps = import('./types').NextClerkProviderProps;
 
 interface Window {
   __clerk_internal_navigations: Record<
     string,
     {
-      fun: NavigationFunction;
+      fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
       promisesBuffer: Array<() => void> | undefined;
     }
   >;

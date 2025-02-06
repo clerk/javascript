@@ -30,7 +30,9 @@ import type {
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
-import type { Nullable, Override } from './utils';
+import type { Nullable } from './utils';
+
+type Override<T, U> = Omit<T, keyof U> & U;
 
 export type SignInJSONSnapshot = Override<
   Nullable<SignInJSON, 'status' | 'identifier' | 'supported_first_factors' | 'supported_second_factors'>,

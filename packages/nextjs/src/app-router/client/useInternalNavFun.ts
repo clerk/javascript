@@ -15,7 +15,7 @@ export const useInternalNavFun = (props: {
   windowNav: typeof window.history.pushState | typeof window.history.replaceState | undefined;
   routerNav: AppRouterInstance['push'] | AppRouterInstance['replace'];
   name: string;
-}): NavigationFunction => {
+}) => {
   const { windowNav, routerNav, name } = props;
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -68,8 +68,8 @@ export const useInternalNavFun = (props: {
     }
   }, [pathname, isPending]);
 
-  return useCallback<NavigationFunction>((to, metadata) => {
-    return getClerkNavigationObject(name).fun(to, metadata);
+  return useCallback((to: string) => {
+    return getClerkNavigationObject(name).fun(to);
     // We are not expecting name to change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -100,11 +100,3 @@ export type Autocomplete<U extends T, T = string> = U | (T & Record<never, never
 export type Without<T, W> = {
   [P in keyof T as Exclude<P, W>]: T[P];
 };
-
-/**
- * Overrides the type of existing properties
- * const obj =  { a: string, b: number }  as const;
- * type Value = Override<typeof obj, { b: string }>
- * Value contains: { a:string, b: string }
- */
-export type Override<T, U> = Omit<T, keyof U> & U;

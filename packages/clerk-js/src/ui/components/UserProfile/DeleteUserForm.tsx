@@ -38,13 +38,10 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       await deleteUserWithReverification();
       const redirectUrl = otherSessions.length === 0 ? afterSignOutUrl : afterMultiSessionSingleSignOutUrl;
 
-      // return __internal_setActiveContext.run({ beforeEmit }, () => {
-      // eslint-disable-next-line custom-rules/no-setActive-redirectUrl
-      return setActive({
+      return await setActive({
         session: null,
         redirectUrl,
       });
-      // });
     } catch (e) {
       handleError(e, [], card.setError);
     }
