@@ -201,10 +201,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
-        publishableKey: keyless?.publishableKey,
-        secretKey: keyless?.secretKey,
-      });
+      const keylessKeysForRequestData =
+        // Only pass keyless credentials when there are no explicit keys
+        secretKey === keyless?.secretKey
+          ? {
+              publishableKey: keyless?.publishableKey,
+              secretKey: keyless?.secretKey,
+            }
+          : {};
+
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
 
       return handlerResult;
     });
@@ -219,7 +225,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const resolvedParams = typeof params === 'function' ? params(request) : params;
       const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
+
+      console.log('isMIssing', isMissingPublishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
        */
