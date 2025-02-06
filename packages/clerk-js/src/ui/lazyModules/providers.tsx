@@ -57,7 +57,7 @@ type LazyComponentRendererProps = React.PropsWithChildren<
 type PortalProps = Parameters<typeof Portal>[0];
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
-  if (props.componentProps?.routing === 'virtual') {
+  if (props?.componentProps?.routing === 'virtual') {
     deprecated('routing="virtual"', 'Use routing="hash" instead.');
   }
   return (
