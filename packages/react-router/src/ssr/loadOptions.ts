@@ -1,10 +1,11 @@
 import { createClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
+import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
-import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
+import { getPublicEnvVariables } from '../utils/env';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { patchRequest } from './utils';

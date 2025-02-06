@@ -203,10 +203,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
-        publishableKey: keyless?.publishableKey,
-        secretKey: keyless?.secretKey,
-      });
+      const keylessKeysForRequestData =
+        // Only pass keyless credentials when there are no explicit keys
+        secretKey === keyless?.secretKey
+          ? {
+              publishableKey: keyless?.publishableKey,
+              secretKey: keyless?.secretKey,
+            }
+          : {};
+
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
 
       return handlerResult;
     });
