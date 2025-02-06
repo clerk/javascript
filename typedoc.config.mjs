@@ -39,11 +39,14 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important'],
+    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important', '@memberof'],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    readme: 'none',
+    disableGit: true,
+    disableSources: true,
   },
-  entryPoints: ['packages/nextjs', 'packages/react', 'packages/backend', 'packages/types'], // getPackages(),
+  entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
 };
 
 export default config;
