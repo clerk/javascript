@@ -7,14 +7,17 @@
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "sourceMap": false,
     "strict": true,
-    "types": []
+    "types": [],
+    "noEmit": false,
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/__tests__/**/*"]
 }

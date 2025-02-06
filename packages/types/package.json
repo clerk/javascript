@@ -24,14 +24,14 @@
   "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
-  "module": "dist/esm/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
-    "clean": "rimraf ./dist",
+    "build:declarations": "tsc --emitDeclarationOnly --declaration",
     "dev": "tsup --watch",
     "lint": "eslint src"
   },

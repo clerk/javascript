@@ -25,7 +25,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -35,7 +35,7 @@
     },
     "./internal": {
       "import": {
-        "types": "./dist/internal.d.mts",
+        "types": "./dist/internal.d.ts",
         "default": "./dist/internal.mjs"
       },
       "require": {
@@ -45,7 +45,7 @@
     },
     "./errors": {
       "import": {
-        "types": "./dist/errors.d.mts",
+        "types": "./dist/errors.d.ts",
         "default": "./dist/errors.mjs"
       },
       "require": {
@@ -63,6 +63,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc --emitDeclarationOnly --declaration",
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",

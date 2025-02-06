@@ -12,7 +12,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -22,7 +22,7 @@
     },
     "./*": {
       "import": {
-        "types": "./dist/*.d.mts",
+        "types": "./dist/*.d.ts",
         "default": "./dist/*.mjs"
       },
       "require": {
@@ -32,7 +32,7 @@
     },
     "./react": {
       "import": {
-        "types": "./dist/react/index.d.mts",
+        "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.mjs"
       },
       "require": {
@@ -42,7 +42,7 @@
     },
     "./utils": {
       "import": {
-        "types": "./dist/utils/index.d.mts",
+        "types": "./dist/utils/index.d.ts",
         "default": "./dist/utils/index.mjs"
       },
       "require": {
@@ -52,7 +52,7 @@
     },
     "./workerTimers": {
       "import": {
-        "types": "./dist/workerTimers/index.d.mts",
+        "types": "./dist/workerTimers/index.d.ts",
         "default": "./dist/workerTimers/index.mjs"
       },
       "require": {
@@ -62,7 +62,7 @@
     },
     "./dom": {
       "import": {
-        "types": "./dist/dom/index.d.mts",
+        "types": "./dist/dom/index.d.ts",
         "default": "./dist/dom/index.mjs"
       },
       "require": {
@@ -119,6 +119,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:declarations": "tsc --emitDeclarationOnly --declaration",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",

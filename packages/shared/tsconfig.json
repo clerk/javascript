@@ -14,11 +14,11 @@
     "declarationMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "declarationDir": "dist/types",
+    "declarationDir": "./dist",
     "jsx": "react",
     "lib": ["ES6", "DOM", "WebWorker"],
     "allowJs": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/__tests__/**/*"],
   "include": ["src", "global.d.ts"]
 }

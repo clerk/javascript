@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "declaration": true,
     "declarationMap": true,
+    "declarationDir": "./dist",
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
@@ -21,5 +22,6 @@
     "strict": true,
     "target": "ES2019"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["**/__tests__/**/*"]
 }
