@@ -1,4 +1,4 @@
-import { inBrowser, isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { inBrowser as inClientSide, isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -84,6 +84,7 @@ import {
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
+  inBrowser,
   isDevAccountPortalOrigin,
   isError,
   isOrganizationId,
@@ -1995,7 +1996,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #setupBrowserListeners = (): void => {
-    if (!inBrowser()) {
+    if (!inClientSide()) {
       return;
     }
 
