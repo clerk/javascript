@@ -54,6 +54,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .catch(err => handleError(err, [], card.setError));
   };
 
+  console.log(props.factor, shouldAvoidPrepare);
+
   useFetch(
     shouldAvoidPrepare
       ? undefined
@@ -63,8 +65,11 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             .then(() => props.onFactorPrepare())
             .catch(err => handleError(err, [], card.setError)),
     {
-      name: 'prepare',
-      strategy: props.factor.strategy,
+      name: 'signIn.prepareFirstFactor',
+      factor: props.factor,
+    },
+    {
+      staleTime: 100,
     },
   );
 
