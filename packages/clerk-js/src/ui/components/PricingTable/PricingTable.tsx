@@ -2,18 +2,27 @@ import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, PricingTableProps } from '@clerk/types';
 import { useState } from 'react';
 
-import { usePricingTableContext } from '../../contexts';
+import { CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Badge, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { Avatar } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
+import { Checkout } from '../Checkout';
 
 export const PricingTable = (props: PricingTableProps) => {
   const { commerce } = useClerk();
+  const { mode = 'mounted' } = usePricingTableContext();
   const [planPeriod, setPlanPeriod] = useState('month');
+  const [selectedPlan, setSelectedPlan] = useState<CommercePlanResource>();
+  const [showCheckout, setShowCheckout] = useState(false);
 
-  const { data: plans } = useFetch(commerce?.getPlans, 'commerce-plans');
+  const { data: plans } = useFetch(commerce?.billing.getPlans, 'commerce-plans');
+
+  const selectPlan = (plan: CommercePlanResource) => {
+    setSelectedPlan(plan);
+    setShowCheckout(true);
+  };
 
   return (
     <InternalThemeProvider>
@@ -28,10 +37,27 @@ export const PricingTable = (props: PricingTableProps) => {
             plan={plan}
             period={planPeriod}
             setPeriod={setPlanPeriod}
+            onSelect={selectPlan}
             props={props}
           />
         ))}
       </Flex>
+      <CheckoutContext.Provider
+        value={{
+          componentName: 'Checkout',
+          mode,
+          show: showCheckout,
+          close: () => setShowCheckout(false),
+        }}
+      >
+        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+        <div>
+          <Checkout
+            planPeriod={planPeriod}
+            planId={selectedPlan?.id}
+          />
+        </div>
+      </CheckoutContext.Provider>
     </InternalThemeProvider>
   );
 };
@@ -40,11 +66,13 @@ const PlanCard = ({
   plan,
   period,
   setPeriod,
+  onSelect,
   props,
 }: {
   plan: CommercePlanResource;
   period: string;
   setPeriod: (k: string) => void;
+  onSelect: (plan: CommercePlanResource) => void;
   props: PricingTableProps;
 }) => {
   const { ctaPosition = 'bottom', collapseFeatures = false } = props;
@@ -145,7 +173,7 @@ const PlanCard = ({
                 setSelected={setPeriod}
                 options={[
                   { label: 'Monthly', value: 'month' },
-                  { label: 'Annually', value: 'year' },
+                  { label: 'Annually', value: 'annual' },
                 ]}
               />
             </>
@@ -203,6 +231,7 @@ const PlanCard = ({
           localizationKey={
             isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
           }
+          onClick={() => onSelect(plan)}
         />
       </Flex>
     </Col>

@@ -33,6 +33,11 @@ const fadeIn = keyframes`
   100% { opacity: 1; }
 `;
 
+const fadeOut = keyframes`
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
 const inAnimation = keyframes`
   0% {
     opacity: 0;
@@ -123,11 +128,24 @@ const navbarSlideIn = keyframes`
   100% {opacity: 1; transform: translateX(0);}
 `;
 
+const checkoutBladeIn = keyframes`
+  0% { opacity: 0; translate: 100% 0; }
+  10% { opacity: 1; }
+  100% { opacity: 1; translate: 0; }
+`;
+
+const checkoutBladeOut = keyframes`
+  0% { opacity: 1; translate: 0; }
+  90% { opacity: 1; }
+  100% { opacity: 0; translate: 100% 0; }
+`;
+
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
   modalSlideAndFade,
   fadeIn,
+  fadeOut,
   textInSmall,
   textInBig,
   blockBigIn,
@@ -137,4 +155,6 @@ export const animations = {
   inDelayAnimation,
   outAnimation,
   notificationAnimation,
+  checkoutBladeIn,
+  checkoutBladeOut,
 };

@@ -2,8 +2,14 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { ClerkResource } from './resource';
 
 export interface CommerceNamespace {
+  billing: CommerceBillingNamespace;
+  addPaymentSource: (params: AddPaymentSourceParams) => Promise<any>;
+}
+
+export interface CommerceBillingNamespace {
   getProducts: (params?: GetProductsParams) => Promise<ClerkPaginatedResponse<CommerceProductResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
+  startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
 }
 
 export type GetProductsParams = ClerkPaginationParams<{
@@ -48,4 +54,69 @@ export interface CommerceFeatureResource extends ClerkResource {
   description: string;
   slug: string;
   avatarUrl: string;
+}
+
+export interface AddPaymentSourceParams {
+  gateway: 'stripe' | 'paypal';
+  paymentMethod: string;
+  paymentToken: string;
+}
+
+export interface CommercePaymentSourceResource extends ClerkResource {
+  id: string;
+  last4: string;
+  paymentMethod: string;
+  cardType: string;
+}
+
+export interface CommerceInvoiceResource extends ClerkResource {
+  id: string;
+  planId: string;
+  paymentSourceId: string;
+  totals: CommerceCheckoutTotals;
+  paymentDueOn: number;
+  paidOn: number;
+  status: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface CommerceSubscriptionResource extends ClerkResource {
+  id: string;
+  instanceId: string;
+  paymentSourceId: string;
+  status: string;
+  planId: string;
+  plan: CommercePlanResource;
+  createdAt: number;
+  updatedAt: number;
+}
+
+interface CommerceMoney {
+  amount: number;
+  formattedAmount: string;
+  currency: string;
+  currencySymbol: string;
+}
+
+interface CommerceCheckoutTotals {
+  subtotal: CommerceMoney;
+  grandTotal: CommerceMoney;
+  taxTotal: CommerceMoney;
+  totalDueNow: CommerceMoney;
+}
+
+export interface CreateCheckoutParams {
+  planId: string;
+  planPeriod: string;
+}
+
+export interface CommerceCheckoutResource extends ClerkResource {
+  id: string;
+  plan: CommercePlanResource;
+  paymentSource: CommercePaymentSourceResource;
+  status: string;
+  totals: CommerceCheckoutTotals;
+  subscription: CommerceSubscriptionResource;
+  invoice: CommerceInvoiceResource;
 }

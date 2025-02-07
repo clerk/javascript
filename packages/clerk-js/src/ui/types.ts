@@ -1,5 +1,6 @@
 import type {
   __internal_UserVerificationProps,
+  CheckoutProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -38,6 +39,7 @@ export type AvailableComponentProps =
   | OrganizationListProps
   | WaitlistProps
   | PricingTableProps
+  | CheckoutProps
   | __internal_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
@@ -103,6 +105,13 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
+export type CheckoutCtx = CheckoutProps & {
+  componentName: 'Checkout';
+  mode?: ComponentMode;
+  show?: boolean;
+  close?: () => void;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -115,6 +124,7 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | PricingTableCtx;
+  | PricingTableCtx
+  | CheckoutCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

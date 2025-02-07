@@ -18,6 +18,7 @@ const componentImportPaths = {
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
+  Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -93,6 +94,8 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
+export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
+
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
 };
@@ -118,6 +121,7 @@ export const ClerkComponents = {
   WaitlistModal,
   BlankCaptchaModal,
   PricingTable,
+  Checkout,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

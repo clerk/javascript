@@ -1,5 +1,6 @@
 import type {
   Appearance,
+  CheckoutTheme,
   CreateOrganizationTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
@@ -396,6 +397,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the PricingTable component from.
    */
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a checkout component at the target element.
+   * @param targetNode Target node to mount the Checkout component.
+   * @param props configuration parameters.
+   */
+  mountCheckout: (targetNode: HTMLDivElement, props?: CheckoutProps) => void;
+
+  /**
+   * Unmount a checkout component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the Checkout component from.
+   */
+  unmountCheckout: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1431,6 +1447,13 @@ export type PricingTableProps = {
   appearance?: PricingTableTheme;
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
+};
+
+export type CheckoutProps = {
+  appearance?: CheckoutTheme;
+  planId?: string;
+  planPeriod?: string;
+  checkoutId?: string;
 };
 
 export interface HandleEmailLinkVerificationParams {
