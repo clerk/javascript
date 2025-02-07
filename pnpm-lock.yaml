@@ -277,9 +277,9 @@ importers:
       typedoc:
         specifier: 0.27.6
         version: 0.27.6(typescript@5.6.3)
-      typedoc-plugin-missing-exports:
-        specifier: 3.1.0
-        version: 3.1.0(typedoc@0.27.6(typescript@5.6.3))
+      typedoc-plugin-markdown:
+        specifier: 4.4.1
+        version: 4.4.1(typedoc@0.27.6(typescript@5.6.3))
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -469,24 +469,9 @@ importers:
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
-      '@types/webpack-dev-server':
-        specifier: ^4.7.2
-        version: 4.7.2(webpack@5.94.0(esbuild@0.24.2))
       '@types/webpack-env':
         specifier: ^1.18.8
         version: 1.18.8
-      react-refresh:
-        specifier: ^0.16.0
-        version: 0.16.0
-      react-refresh-typescript:
-        specifier: ^2.0.10
-        version: 2.0.10(react-refresh@0.16.0)(typescript@5.6.3)
-      terser-webpack-plugin:
-        specifier: ^5.3.11
-        version: 5.3.11(esbuild@0.24.2)(webpack@5.94.0(esbuild@0.24.2))
-      ts-loader:
-        specifier: ^9.5.2
-        version: 9.5.2(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2))
       webpack-merge:
         specifier: ^5.10.0
         version: 5.10.0
@@ -5550,10 +5535,6 @@ packages:
 
   '@types/webextension-polyfill@0.10.7':
     resolution: {integrity: sha512-10ql7A0qzBmFB+F+qAke/nP1PIonS0TXZAOMVOxEUsm+lGSW6uwVcISFNa0I4Oyj0884TZVWGGMIWeXOVSNFHw==}
-
-  '@types/webpack-dev-server@4.7.2':
-    resolution: {integrity: sha512-Y3p0Fmfvp0MHBDoCzo+xFJaWTw0/z37mWIo6P15j+OtmUDLvznJWdZNeD7Q004R+MpQlys12oXbXsrXRmxwg4Q==}
-    deprecated: This is a stub types definition. webpack-dev-server provides its own type definitions, so you do not need this installed.
 
   '@types/webpack-env@1.18.8':
     resolution: {integrity: sha512-G9eAoJRMLjcvN4I08wB5I7YofOb/kaJNd5uoCMX+LbKXTPCF+ZIHuqTnFaK9Jz1rgs035f9JUPUhNFtqgucy/A==}
@@ -12340,12 +12321,6 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-refresh-typescript@2.0.10:
-    resolution: {integrity: sha512-Cj8ZKTPEEdSoxiopFq0tB0rq/Wl90yWzAX1LEp9CGvzvauDUmC4BHIQXzcuT8/61naq/KmkR3A9VzqdZ9c6j1g==}
-    peerDependencies:
-      react-refresh: 0.10.x || 0.11.x || 0.12.x || 0.13.x || 0.14.x || 0.15.x || 0.16.x || 0.17.x
-      typescript: ^4.8 || ^5.0
-
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
     engines: {node: '>=0.10.0'}
@@ -13750,13 +13725,6 @@ packages:
       esbuild:
         optional: true
 
-  ts-loader@9.5.2:
-    resolution: {integrity: sha512-Qo4piXvOTWcMGIgRiuFa6nHNm+54HbYaZCKqc9eeZCLRy3XqafQgwX2F7mofrbJG3g7EEb+lkiR+z2Lic2s3Zw==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      typescript: '*'
-      webpack: ^5.0.0
-
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
@@ -13944,10 +13912,11 @@ packages:
     resolution: {integrity: sha512-q7QNVDGTdl702bVFiI5eY4l/HkgCM6at9KhcFbgUAzezHFbOVy4+0O/lCjsABEQwbZPravVfBIiBVGo89yzHFg==}
     engines: {node: '>= 0.4'}
 
-  typedoc-plugin-missing-exports@3.1.0:
-    resolution: {integrity: sha512-Sogbaj+qDa21NjB3SlIw4JXSwmcl/WOjwiPNaVEcPhpNG/MiRTtpwV81cT7h1cbu9StpONFPbddYWR0KV/fTWA==}
+  typedoc-plugin-markdown@4.4.1:
+    resolution: {integrity: sha512-fx23nSCvewI9IR8lzIYtzDphETcgTDuxKcmHKGD4lo36oexC+B1k4NaCOY58Snqb4OlE8OXDAGVcQXYYuLRCNw==}
+    engines: {node: '>= 18'}
     peerDependencies:
-      typedoc: 0.26.x || 0.27.x
+      typedoc: 0.27.x
 
   typedoc@0.27.6:
     resolution: {integrity: sha512-oBFRoh2Px6jFx366db0lLlihcalq/JzyCVp7Vaq1yphL/tbgx2e+bkpkCgJPunaPvPwoTOXSwasfklWHm7GfAw==}
@@ -21488,17 +21457,6 @@ snapshots:
   '@types/unist@3.0.3': {}
 
   '@types/webextension-polyfill@0.10.7': {}
-
-  '@types/webpack-dev-server@4.7.2(webpack@5.94.0(esbuild@0.24.2))':
-    dependencies:
-      webpack-dev-server: 5.0.4(webpack@5.94.0(esbuild@0.24.2))
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-      - webpack
-      - webpack-cli
 
   '@types/webpack-env@1.18.8': {}
 
@@ -30092,14 +30050,10 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-refresh-typescript@2.0.10(react-refresh@0.16.0)(typescript@5.6.3):
-    dependencies:
-      react-refresh: 0.16.0
-      typescript: 5.6.3
-
   react-refresh@0.14.2: {}
 
-  react-refresh@0.16.0: {}
+  react-refresh@0.16.0:
+    optional: true
 
   react-remove-scroll-bar@2.3.6(@types/react@18.3.12)(react@18.3.1):
     dependencies:
@@ -31762,16 +31716,6 @@ snapshots:
       babel-jest: 29.7.0(@babel/core@7.26.7)
       esbuild: 0.24.2
 
-  ts-loader@9.5.2(typescript@5.6.3)(webpack@5.94.0(esbuild@0.24.2)):
-    dependencies:
-      chalk: 4.1.2
-      enhanced-resolve: 5.18.0
-      micromatch: 4.0.8
-      semver: 7.6.3
-      source-map: 0.7.4
-      typescript: 5.6.3
-      webpack: 5.94.0(esbuild@0.24.2)
-
   ts-node@10.9.2(@types/node@22.12.0)(typescript@5.6.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -31962,7 +31906,7 @@ snapshots:
       typed-array-buffer: 1.0.3
       typed-array-byte-offset: 1.0.4
 
-  typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.6.3)):
+  typedoc-plugin-markdown@4.4.1(typedoc@0.27.6(typescript@5.6.3)):
     dependencies:
       typedoc: 0.27.6(typescript@5.6.3)
 
