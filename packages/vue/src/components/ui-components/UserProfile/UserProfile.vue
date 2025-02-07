@@ -6,7 +6,8 @@ import { computed, provide } from 'vue';
 import { UserProfileInjectionKey } from '../../../keys';
 import { useUserProfileCustomPages } from '../../../utils/useCustomPages';
 
-const props = defineProps<UserProfileProps>();
+type Props = Omit<UserProfileProps, 'customPages'>;
+const props = defineProps<Props>();
 
 const clerk = useClerk();
 const { customPages, customPagesPortals, addCustomPage } = useUserProfileCustomPages();
