@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Add `menuButtonMoreOptions` element descriptor.
+Add `menuButtonEllipsis` element descriptor.

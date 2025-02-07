@@ -346,7 +346,7 @@ export type ElementsConfig = {
   selectOption: WithOptions<SelectId>;
 
   menuButton: WithOptions<MenuId>;
-  menuButtonMoreOptions: WithOptions;
+  menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
