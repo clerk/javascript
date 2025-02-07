@@ -1,58 +1,6 @@
+import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { AppLoadContext } from 'react-router';
-
-type CloudflareEnv = { env: Record<string, string> };
-
-const hasCloudflareProxyContext = (context: any): context is { cloudflare: CloudflareEnv } => {
-  return !!context?.cloudflare?.env;
-};
-
-const hasCloudflareContext = (context: any): context is CloudflareEnv => {
-  return !!context?.env;
-};
-
-/**
- *
- * Utility function to get env variables across Node and Edge runtimes.
- *
- * @param name
- * @returns string
- */
-export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
-  // Node envs
-  if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
-    return process.env[name];
-  }
-
-  // @ts-expect-error - Vite specific
-  if (typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env[name] === 'string') {
-    // @ts-expect-error - Vite specific
-    return import.meta.env[name];
-  }
-
-  if (hasCloudflareProxyContext(context)) {
-    return context.cloudflare.env[name] || '';
-  }
-
-  // Cloudflare
-  if (hasCloudflareContext(context)) {
-    return context.env[name] || '';
-  }
-
-  // Check whether the value exists in the context object directly
-  if (context && typeof context[name] === 'string') {
-    return context[name];
-  }
-
-  // Cloudflare workers
-  try {
-    return globalThis[name as keyof typeof globalThis];
-  } catch (_) {
-    // This will raise an error in Cloudflare Pages
-  }
-
-  return '';
-};
 
 export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
   return {

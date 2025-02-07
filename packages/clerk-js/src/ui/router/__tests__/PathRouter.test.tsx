@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import type Clerk from '../../../core/clerk';
+import type { Clerk } from '../../../core/clerk';
 import { PathRouter, Route, useRouter } from '..';
 
 const mockNavigate = jest.fn();

@@ -33,8 +33,9 @@ export const SignInContext = createContext<SignInCtx | null>(null);
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
 
@@ -43,7 +44,8 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const isCombinedFlow =
-    Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) ||
+    (signUpMode !== 'restricted' &&
+      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
     context.withSignUp ||
     false;
 
@@ -82,17 +84,20 @@ export const useSignInContext = (): SignInContextType => {
   signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+  const authQueryString = redirectUrls.toSearchParams().toString();
+
   const emailLinkRedirectUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signUpUrl,
-    authQueryString: '',
+    authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signUpUrl,
-    authQueryString: '',
+    authQueryString,
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
   });
@@ -121,7 +126,7 @@ export const useSignInContext = (): SignInContextType => {
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: redirectUrls.toSearchParams().toString(),
+    authQueryString,
     isCombinedFlow,
   };
 };

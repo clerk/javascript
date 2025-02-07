@@ -48,7 +48,14 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+/**
+ * The `clerkMiddleware()` function accepts an optional object. The following options are available.
+ * @interface
+ */
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  /**
+   * If true, additional debug information will be logged to the console.
+   */
   debug?: boolean;
 };
 
@@ -84,6 +91,9 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
+/**
+ * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
+ */
 // @ts-expect-error TS is not happy here. Will dig into it
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [request, event] = parseRequestAndEvent(args);
@@ -191,10 +201,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
-        publishableKey: keyless?.publishableKey,
-        secretKey: keyless?.secretKey,
-      });
+      const keylessKeysForRequestData =
+        // Only pass keyless credentials when there are no explicit keys
+        secretKey === keyless?.secretKey
+          ? {
+              publishableKey: keyless?.publishableKey,
+              secretKey: keyless?.secretKey,
+            }
+          : {};
+
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
 
       return handlerResult;
     });

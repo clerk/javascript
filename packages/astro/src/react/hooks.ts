@@ -9,7 +9,6 @@ import type {
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 
-// @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
 import { $authStore } from '../stores/external';
@@ -121,8 +120,6 @@ type UseAuth = () => UseAuthReturn;
  * For projects using a server, you can have immediate access to this data during SSR.
  *
  * @example
- * A simple example:
- *
  * function Hello() {
  *   const { isSignedIn, sessionId, userId } = useAuth();
  *   if(isSignedIn) {
@@ -132,9 +129,8 @@ type UseAuth = () => UseAuthReturn;
  *   return <div>...</div>
  * }
  *
- * @example
  * This page will be fully rendered during SSR:
- *
+ * @example
  * export HelloPage = () => {
  *   const { isSignedIn, sessionId, userId } = useAuth();
  *   console.log(isSignedIn, sessionId, userId)

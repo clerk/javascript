@@ -229,7 +229,7 @@ export function isValidUrl(val: unknown): val is string {
   try {
     new URL(val as string);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -237,7 +237,7 @@ export function isValidUrl(val: unknown): val is string {
 export function relativeToAbsoluteUrl(url: string, origin: string | URL): URL {
   try {
     return new URL(url);
-  } catch (e) {
+  } catch {
     return new URL(url, origin);
   }
 }
@@ -294,10 +294,10 @@ export const hasUrlInFragment = (_url: URL | string) => {
  * and also includes all search params from both places.
  *
  * @example
- * Input
- * https://accounts.clerk.com/sign-in?user_param=hello#/verify/factor-one?redirect_url=/protected
- * Return value:
- * https://accounts.clerk.com/sign-in/verify/factor-one?user_param=hello&redirect_url=/protected
+ * ```ts
+ * mergeFragmentIntoUrl('https://accounts.clerk.com/sign-in?user_param=hello#/verify/factor-one?redirect_url=/protected')
+ * // Returns: 'https://accounts.clerk.com/sign-in/verify/factor-one?user_param=hello&redirect_url=/protected'
+ * ```
  */
 export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
   const url = new URL(_url);
@@ -384,6 +384,7 @@ export const isAllowedRedirect =
 export function createAllowedRedirectOrigins(
   allowedRedirectOrigins: Array<string | RegExp> | undefined,
   frontendApi: string,
+  instanceType?: string,
 ): (string | RegExp)[] | undefined {
   if (Array.isArray(allowedRedirectOrigins) && !!allowedRedirectOrigins.length) {
     return allowedRedirectOrigins;
@@ -396,6 +397,10 @@ export function createAllowedRedirectOrigins(
 
   origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
   origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+
+  if (instanceType === 'development') {
+    origins.push(`https://${frontendApi}`);
+  }
 
   return origins;
 }

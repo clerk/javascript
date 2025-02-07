@@ -25,6 +25,7 @@ type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
   orderBy?: WithSign<'name' | 'created_at' | 'members_count'>;
+  organizationId?: string[];
 }>;
 
 type CreateParams = {
@@ -206,53 +207,45 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
-    const { organizationId, limit, offset } = params;
+    const { organizationId, ...queryParams } = params;
     this.requireId(organizationId);
 
     return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'memberships'),
-      queryParams: { limit, offset },
+      queryParams,
     });
   }
 
   public async createOrganizationMembership(params: CreateOrganizationMembershipParams) {
-    const { organizationId, userId, role } = params;
+    const { organizationId, ...bodyParams } = params;
     this.requireId(organizationId);
 
     return this.request<OrganizationMembership>({
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'memberships'),
-      bodyParams: {
-        userId,
-        role,
-      },
+      bodyParams,
     });
   }
 
   public async updateOrganizationMembership(params: UpdateOrganizationMembershipParams) {
-    const { organizationId, userId, role } = params;
+    const { organizationId, userId, ...bodyParams } = params;
     this.requireId(organizationId);
 
     return this.request<OrganizationMembership>({
       method: 'PATCH',
       path: joinPaths(basePath, organizationId, 'memberships', userId),
-      bodyParams: {
-        role,
-      },
+      bodyParams,
     });
   }
 
   public async updateOrganizationMembershipMetadata(params: UpdateOrganizationMembershipMetadataParams) {
-    const { organizationId, userId, publicMetadata, privateMetadata } = params;
+    const { organizationId, userId, ...bodyParams } = params;
 
     return this.request<OrganizationMembership>({
       method: 'PATCH',
       path: joinPaths(basePath, organizationId, 'memberships', userId, 'metadata'),
-      bodyParams: {
-        publicMetadata,
-        privateMetadata,
-      },
+      bodyParams,
     });
   }
 
@@ -267,13 +260,13 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async getOrganizationInvitationList(params: GetOrganizationInvitationListParams) {
-    const { organizationId, status, limit, offset } = params;
+    const { organizationId, ...queryParams } = params;
     this.requireId(organizationId);
 
     return this.request<PaginatedResourceResponse<OrganizationInvitation[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'invitations'),
-      queryParams: { status, limit, offset },
+      queryParams,
     });
   }
 
@@ -284,7 +277,7 @@ export class OrganizationAPI extends AbstractAPI {
     return this.request<OrganizationInvitation>({
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'invitations'),
-      bodyParams: { ...bodyParams },
+      bodyParams,
     });
   }
 
@@ -300,40 +293,37 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async revokeOrganizationInvitation(params: RevokeOrganizationInvitationParams) {
-    const { organizationId, invitationId, requestingUserId } = params;
+    const { organizationId, invitationId, ...bodyParams } = params;
     this.requireId(organizationId);
 
     return this.request<OrganizationInvitation>({
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'invitations', invitationId, 'revoke'),
-      bodyParams: {
-        requestingUserId,
-      },
+      bodyParams,
     });
   }
 
   public async getOrganizationDomainList(params: GetOrganizationDomainListParams) {
-    const { organizationId, limit, offset } = params;
+    const { organizationId, ...queryParams } = params;
     this.requireId(organizationId);
 
     return this.request<PaginatedResourceResponse<OrganizationDomain[]>>({
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'domains'),
-      queryParams: { limit, offset },
+      queryParams,
     });
   }
 
   public async createOrganizationDomain(params: CreateOrganizationDomainParams) {
-    const { organizationId, name, enrollmentMode, verified = true } = params;
+    const { organizationId, ...bodyParams } = params;
     this.requireId(organizationId);
 
     return this.request<OrganizationDomain>({
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'domains'),
       bodyParams: {
-        name,
-        enrollmentMode,
-        verified,
+        ...bodyParams,
+        verified: bodyParams.verified ?? true,
       },
     });
   }

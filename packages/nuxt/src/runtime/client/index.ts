@@ -1,0 +1,1 @@
+export { createRouteMatcher } from './routeMatcher';

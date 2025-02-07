@@ -177,8 +177,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
-      expect(prefilledEmail).toBe(fakeUser.email);
+      const prefilledEmail = u.po.signUp.getEmailAddressInput();
+      await expect(prefilledEmail).toHaveValue(fakeUser.email);
 
       await u.po.signUp.setPassword(fakeUser.password);
       await u.po.signUp.continue();
@@ -207,8 +207,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledUsername = await u.po.signUp.getUsernameInput().inputValue();
-      expect(prefilledUsername).toBe(fakeUser.username);
+      const prefilledUsername = u.po.signUp.getUsernameInput();
+      await expect(prefilledUsername).toHaveValue(fakeUser.username);
 
       await u.po.signUp.setEmailAddress(fakeUser.email);
       await u.po.signUp.setPassword(fakeUser.password);
@@ -237,8 +237,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
-      expect(prefilledEmail).toBe(fakeUser.email);
+      const prefilledEmail = u.po.signUp.getEmailAddressInput();
+      await expect(prefilledEmail).toHaveValue(fakeUser.email);
 
       await u.po.signUp.setPassword(fakeUser.password);
       await u.po.signUp.continue();

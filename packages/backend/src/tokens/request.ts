@@ -211,10 +211,10 @@ ${error.getFullMessage()}`,
         return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
-      throw retryError;
+      throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
     }
 
-    throw error;
+    throw new Error(error?.message || 'Clerk: Handshake failed.');
   }
 
   async function refreshToken(

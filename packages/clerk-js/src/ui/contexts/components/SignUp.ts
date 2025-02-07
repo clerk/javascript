@@ -32,11 +32,17 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
+  const isCombinedFlow =
+    (signUpMode !== 'restricted' &&
+      Boolean(
+        !options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl) && signUpMode === 'public',
+      )) ||
+    false;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -77,12 +83,14 @@ export const useSignUpContext = (): SignUpContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
+  const authQueryString = redirectUrls.toSearchParams().toString();
+
   const emailLinkRedirectUrl =
     ctx.emailLinkRedirectUrl ??
     buildRedirectUrl({
       routing: ctx.routing,
       baseUrl: signUpUrl,
-      authQueryString: '',
+      authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
     });
@@ -91,7 +99,7 @@ export const useSignUpContext = (): SignUpContextType => {
     buildRedirectUrl({
       routing: ctx.routing,
       baseUrl: signUpUrl,
-      authQueryString: '',
+      authQueryString,
       path: ctx.path,
       endpoint: isCombinedFlow ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
     });
@@ -113,7 +121,7 @@ export const useSignUpContext = (): SignUpContextType => {
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: redirectUrls.toSearchParams().toString(),
+    authQueryString,
     isCombinedFlow,
   };
 };

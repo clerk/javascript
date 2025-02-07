@@ -22,9 +22,21 @@ import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDef
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
+  /**
+   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `enrollmentMode` property of type [`OrganizationEnrollmentMode`](https://clerk.com/docs/references/react/use-organization#organization-enrollment-mode) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
+  /**
+   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `status` property of type [`OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization#organization-invitation-status) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
+  /**
+   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `role` property of type [`OrganizationCustomRoleKey[]`](https://clerk.com/docs/references/react/use-organization#organization-custome-role-key) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
+  /**
+   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `status` property of type [`OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization#organization-invitation-status) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
 
@@ -32,39 +44,102 @@ type UseOrganization = <T extends UseOrganizationParams>(
   params?: T,
 ) =>
   | {
+      /**
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       */
       isLoaded: false;
+      /**
+       * The currently active organization.
+       */
       organization: undefined;
+      /**
+       * The current organization membership.
+       */
       membership: undefined;
+      /**
+       * Includes a paginated list of the organization's domains.
+       */
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
+      /**
+       * Includes a paginated list of the organization's membership requests.
+       */
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
+      /**
+       * Includes a paginated list of the organization's memberships.
+       */
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      /**
+       * Includes a paginated list of the organization's invitations.
+       */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
   | {
+      /**
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       */
       isLoaded: true;
+      /**
+       * The currently active organization.
+       */
       organization: OrganizationResource;
+      /**
+       * The current organization membership.
+       */
       membership: undefined;
+      /**
+       * Includes a paginated list of the organization's domains.
+       */
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
+      /**
+       * Includes a paginated list of the organization's membership requests.
+       */
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
+      /**
+       * Includes a paginated list of the organization's memberships.
+       */
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
+      /**
+       * Includes a paginated list of the organization's invitations.
+       */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
   | {
+      /**
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       */
       isLoaded: boolean;
+      /**
+       * The currently active organization.
+       */
       organization: OrganizationResource | null;
+      /**
+       * The current organization membership.
+       */
       membership: OrganizationMembershipResource | null | undefined;
+      /**
+       * Includes a paginated list of the organization's domains.
+       */
       domains: PaginatedResources<
         OrganizationDomainResource,
         T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
+      /**
+       * Includes a paginated list of the organization's membership requests.
+       */
       membershipRequests: PaginatedResources<
         OrganizationMembershipRequestResource,
         T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
+      /**
+       * Includes a paginated list of the organization's memberships.
+       */
       memberships: PaginatedResources<
         OrganizationMembershipResource,
         T['memberships'] extends { infinite: true } ? true : false
       > | null;
+      /**
+       * Includes a paginated list of the organization's invitations.
+       */
       invitations: PaginatedResources<
         OrganizationInvitationResource,
         T['invitations'] extends { infinite: true } ? true : false
@@ -89,6 +164,9 @@ const undefinedPaginatedResource = {
   setData: undefined,
 } as const;
 
+/**
+ * The `useOrganization()` hook retrieves attributes of the currently active organization.
+ */
 export const useOrganization: UseOrganization = params => {
   const {
     domains: domainListParams,
@@ -124,6 +202,7 @@ export const useOrganization: UseOrganization = params => {
     role: undefined,
     keepPreviousData: false,
     infinite: false,
+    query: undefined,
   });
 
   const invitationsSafeValues = useWithSafeValues(invitationsListParams, {
@@ -163,6 +242,7 @@ export const useOrganization: UseOrganization = params => {
           initialPage: membersSafeValues.initialPage,
           pageSize: membersSafeValues.pageSize,
           role: membersSafeValues.role,
+          query: membersSafeValues.query,
         };
 
   const invitationsParams =

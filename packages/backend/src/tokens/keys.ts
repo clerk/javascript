@@ -60,7 +60,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
     }
 
     const modulus = localKey
-      .replace(/(\r\n|\n|\r)/gm, '')
+      .replace(/\r\n|\n|\r/g, '')
       .replace(PEM_HEADER, '')
       .replace(PEM_TRAILER, '')
       .replace(RSA_PREFIX, '')
@@ -85,14 +85,29 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
 }
 
 export type LoadClerkJWKFromRemoteOptions = {
+  /**
+   * @internal
+   */
   kid: string;
   /**
    * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
    */
   jwksCacheTtlInMs?: number;
+  /**
+   * A flag to skip ignore cache and always fetch JWKS before each jwt verification.
+   */
   skipJwksCache?: boolean;
+  /**
+   * The Clerk Secret Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
   secretKey?: string;
+  /**
+   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint. Defaults to `'https://api.clerk.com'`.
+   */
   apiUrl?: string;
+  /**
+   * The version passed to the Clerk API. Defaults to `'v1'`.
+   */
   apiVersion?: string;
 };
 

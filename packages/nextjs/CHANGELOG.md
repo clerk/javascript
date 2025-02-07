@@ -1,5 +1,132 @@
 # Change Log
 
+## 6.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`0fa449cd09c9973297464a14f785895e3ddcab4d`](https://github.com/clerk/javascript/commit/0fa449cd09c9973297464a14f785895e3ddcab4d)]:
+  - @clerk/clerk-react@5.22.11
+
+## 6.11.0
+
+### Minor Changes
+
+- Enable Keyless by default. To disable keyless use `NEXT_PUBLIC_CLERK_KEYLESS_DISABLED=1`. ([#4898](https://github.com/clerk/javascript/pull/4898)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bug fix: On keyless avoid infinite redirect loop when page does not exist and application is attempting to sync state with middleware. ([#5073](https://github.com/clerk/javascript/pull/5073)) by [@panteliselef](https://github.com/panteliselef)
+
+## 6.10.6
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/backend@1.23.11
+  - @clerk/clerk-react@5.22.10
+  - @clerk/shared@2.20.18
+
+## 6.10.5
+
+### Patch Changes
+
+- Previously the `createPathMatcher()` function was re-implemented both in `@clerk/astro` and `@clerk/nextjs`, this PR moves this logic to `@clerk/shared`. ([#5043](https://github.com/clerk/javascript/pull/5043)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can use it like so:
+
+  ```ts
+  import { createPathMatcher } from '@clerk/shared/pathMatcher';
+  ```
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/clerk-react@5.22.9
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+
+## 6.10.4
+
+### Patch Changes
+
+- Mark keyless onboarding as complete when stored keys match explicit keys ([#4971](https://github.com/clerk/javascript/pull/4971)) by [@panteliselef](https://github.com/panteliselef)
+
+- Gracefully handle failure to create keyless. ([#5015](https://github.com/clerk/javascript/pull/5015)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Remove warning for accessing Node APIs when running `next build` with `clerkMiddleware` imported. ([#5028](https://github.com/clerk/javascript/pull/5028)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`4773d0ad4ed27928fa53357906c0f3a349b9f871`](https://github.com/clerk/javascript/commit/4773d0ad4ed27928fa53357906c0f3a349b9f871), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/backend@1.23.9
+  - @clerk/types@4.44.2
+  - @clerk/clerk-react@5.22.8
+
+## 6.10.3
+
+### Patch Changes
+
+- Improve error messages when `clerkMiddleware` is missing by suggesting the correct path to place the `middleware.ts` file. ([#4979](https://github.com/clerk/javascript/pull/4979)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve JSDoc comments to provide you with better IntelliSense information in your IDE ([#4994](https://github.com/clerk/javascript/pull/4994)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5), [`dd58c2507f8a7af4ebfc1241e2672a5678a83eaa`](https://github.com/clerk/javascript/commit/dd58c2507f8a7af4ebfc1241e2672a5678a83eaa)]:
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+  - @clerk/backend@1.23.8
+  - @clerk/clerk-react@5.22.7
+
+## 6.10.2
+
+### Patch Changes
+
+- Avoid calling `safeParseClerkFile` before checking if keyless is allowed. ([#4981](https://github.com/clerk/javascript/pull/4981)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/backend@1.23.7
+  - @clerk/clerk-react@5.22.6
+  - @clerk/shared@2.20.14
+
+## 6.10.1
+
+### Patch Changes
+
+- Append `return_url` when logging the claimUrl for on Keyless. ([#4958](https://github.com/clerk/javascript/pull/4958)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`e0cea9a9bf8b90858067154cba9c149d1634dc91`](https://github.com/clerk/javascript/commit/e0cea9a9bf8b90858067154cba9c149d1634dc91), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/shared@2.20.13
+  - @clerk/backend@1.23.6
+  - @clerk/types@4.43.0
+  - @clerk/clerk-react@5.22.5
+
+## 6.10.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Decrease frequency of logs related to Keyless. ([#4953](https://github.com/clerk/javascript/pull/4953)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/backend@1.23.5
+  - @clerk/clerk-react@5.22.4
+  - @clerk/shared@2.20.12
+
+## 6.9.15
+
+### Patch Changes
+
+- Updated dependencies [[`418ec5c62c4eb600566faab07684c068a29007e3`](https://github.com/clerk/javascript/commit/418ec5c62c4eb600566faab07684c068a29007e3)]:
+  - @clerk/types@4.41.2
+  - @clerk/clerk-react@5.22.3
+  - @clerk/backend@1.23.4
+  - @clerk/shared@2.20.11
+
 ## 6.9.14
 
 ### Patch Changes

@@ -81,6 +81,7 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
 async function loadCaptcha() {
   if (!window.turnstile) {
     await loadCaptchaFromCloudflareURL().catch(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw { captchaError: 'captcha_script_failed_to_load' };
     });
   }
@@ -89,6 +90,10 @@ async function loadCaptcha() {
 
 async function loadCaptchaFromCloudflareURL() {
   try {
+    if (__BUILD_DISABLE_RHC__) {
+      return Promise.reject(new Error('Captcha not supported in this environment'));
+    }
+
     return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
   } catch (err) {
     console.warn(
@@ -136,6 +141,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
+      visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -150,6 +156,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    div.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
     document.body.appendChild(div);
   }
 
@@ -173,8 +180,12 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             } else {
               const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
               if (visibleWidget) {
+                // We unset the max-height to allow the widget to expand
                 visibleWidget.style.maxHeight = 'unset';
-                visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
+                // We set the min-height to the height of the Turnstile widget
+                // because the widget initially does a small layout shift
+                // and then expands to the correct height
+                visibleWidget.style.minHeight = '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
@@ -219,6 +230,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
     };

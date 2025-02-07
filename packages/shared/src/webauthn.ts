@@ -11,7 +11,7 @@ function isWebAuthnSupported() {
 async function isWebAuthnAutofillSupported(): Promise<boolean> {
   try {
     return isWebAuthnSupported() && (await window.PublicKeyCredential.isConditionalMediationAvailable());
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -22,7 +22,7 @@ async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
       typeof window !== 'undefined' &&
       (await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())
     );
-  } catch (e) {
+  } catch {
     return false;
   }
 }

@@ -162,8 +162,8 @@ function addCurrentRouteIndicator(currentRoute: string) {
     '/keyless': () => {
       Clerk.__unstable__updateProps({
         options: {
-          __internal_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
-          __internal_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
+          __internal_keyless_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
+          __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
         },
       });
     },

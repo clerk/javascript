@@ -212,7 +212,9 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     const ref = refs.current[clampedIndex];
     if (ref) {
       ref.focus();
-      values[clampedIndex] && ref.select();
+      if (values[clampedIndex]) {
+        ref.select();
+      }
     }
   };
 

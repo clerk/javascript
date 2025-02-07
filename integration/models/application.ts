@@ -12,7 +12,7 @@ export const application = (
   appDirName: string,
   serverUrl: string | undefined,
 ) => {
-  const { name, scripts, envWriter } = config;
+  const { name, scripts, envWriter, copyKeylessToEnv } = config;
   const logger = createLogger({ prefix: `${appDirName}` });
   const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
   const cleanupFns: { (): unknown }[] = [];
@@ -20,6 +20,7 @@ export const application = (
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
   let buildOutput = '';
+  let serveOutput = '';
 
   const self = {
     name,
@@ -34,6 +35,9 @@ export const application = (
     withEnv: async (env: EnvironmentConfig) => {
       state.env = env;
       return envWriter(appDirPath, env);
+    },
+    keylessToEnv: async () => {
+      return copyKeylessToEnv(appDirPath);
     },
     setup: async (opts?: { strategy?: 'ci' | 'i' | 'copy'; force?: boolean }) => {
       const { force } = opts || {};
@@ -93,7 +97,11 @@ export const application = (
     get buildOutput() {
       return buildOutput;
     },
+    get serveOutput() {
+      return serveOutput;
+    },
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
+      const log = logger.child({ prefix: 'serve' }).info;
       const port = opts.port || (await getPort());
       // TODO: get serverUrl as in dev()
       const serverUrl = `http://localhost:${port}`;
@@ -102,6 +110,10 @@ export const application = (
       const proc = run(scripts.serve, {
         cwd: appDirPath,
         env: { PORT: port.toString() },
+        log: (msg: string) => {
+          serveOutput += `\n${msg}`;
+          log(msg);
+        },
       });
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);
