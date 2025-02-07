@@ -1,4 +1,4 @@
-import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
+import { inBrowser, isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -7,7 +7,7 @@ import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { handleValueOrFn, noop } from '@clerk/shared/utils';
+import { createDeferredPromise, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   ActiveSessionResource,
@@ -84,7 +84,6 @@ import {
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
-  inBrowser,
   isDevAccountPortalOrigin,
   isError,
   isOrganizationId,
@@ -190,6 +189,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #touchedWhileOffline = false;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1859,7 +1859,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -1994,13 +1994,34 @@ export class Clerk implements ClerkInterface {
     return session || null;
   };
 
-  #setupListeners = (): void => {
-    if (!inClientSide()) {
+  #setupBrowserListeners = (): void => {
+    if (!inBrowser()) {
       return;
     }
 
-    this.#pageLifecycle?.onPageFocus(() => {
+    this.#pageLifecycle?.onPageFocus(async () => {
       if (this.session) {
+        if (!isBrowserOnline()) {
+          if (this.#touchedWhileOffline) {
+            return;
+          }
+          this.#touchedWhileOffline = true;
+          const promiseWithResolvers = createDeferredPromise();
+          const controller = new AbortController();
+          window.addEventListener(
+            'online',
+            e => {
+              promiseWithResolvers.resolve(e);
+            },
+            {
+              signal: controller.signal,
+            },
+          );
+          await promiseWithResolvers.promise;
+          controller.abort();
+          this.#touchedWhileOffline = false;
+        }
+
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
