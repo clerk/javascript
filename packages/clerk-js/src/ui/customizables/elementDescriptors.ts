@@ -222,6 +222,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectOption',
 
   'menuButton',
+  'menuButtonEllipsis',
   'menuList',
   'menuItem',
 
