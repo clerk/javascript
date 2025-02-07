@@ -81,12 +81,7 @@
     "@rspack/core": "^1.2.2",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@svgr/webpack": "^6.5.1",
-    "@types/webpack-dev-server": "^4.7.2",
     "@types/webpack-env": "^1.18.8",
-    "react-refresh": "^0.16.0",
-    "react-refresh-typescript": "^2.0.10",
-    "terser-webpack-plugin": "^5.3.11",
-    "ts-loader": "^9.5.2",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {
