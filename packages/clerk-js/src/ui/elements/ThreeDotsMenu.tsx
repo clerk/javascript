@@ -33,7 +33,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
           })}
           variant='ghost'
           colorScheme='neutral'
-          elementDescriptor={[descriptors.menuButton, descriptors.menuButtonEllipsis]}
+          elementDescriptor={[descriptors.menuButton, descriptors.menuButtonMoreOptions]}
         >
           <Icon
             icon={ThreeDots}
