@@ -38,12 +38,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
 
-          if (enableEnvSchema) {
-            logger.info(
-              'Env schema enabled. To ensure that secret keys are validated, please set `experimental.env.validateSecrets` to true.',
-            );
-          }
-
           const internalParams: ClerkOptions = {
             ...params,
             sdkMetadata: {
@@ -87,11 +81,9 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 target: 'es2022',
               },
             },
-            experimental: {
-              env: {
-                schema: {
-                  ...(enableEnvSchema ? generateClerkEnvSchema() : {}),
-                },
+            env: {
+              schema: {
+                ...(enableEnvSchema ? createClerkEnvSchema() : {}),
               },
             },
           });
@@ -173,7 +165,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
   };
 }
 
-function generateClerkEnvSchema() {
+function createClerkEnvSchema() {
   return {
     PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
     PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
