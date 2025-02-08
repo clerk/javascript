@@ -15,6 +15,11 @@ export function is4xxError(e: any): boolean {
   return !!status && status >= 400 && status < 500;
 }
 
+export function is5xxError(e: any): boolean {
+  const status = e?.status;
+  return !!status && status >= 500;
+}
+
 export function isNetworkError(e: any): boolean {
   // TODO: revise during error handling epic
   const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
