@@ -2,7 +2,7 @@
 '@clerk/astro': minor
 ---
 
-Add support for [experimental `astro:env` API](https://docs.astro.build/en/reference/configuration-reference/#experimentalenv).
+Add support for type-safe environment variables using the [`astro:env` API](https://docs.astro.build/en/reference/configuration-reference/#experimentalenv).
 
 You can opt-in to add a type-safe schema for all your Clerk environment variables by enabling the `enableEnvSchema` option.
 
