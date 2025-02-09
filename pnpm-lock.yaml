@@ -869,11 +869,11 @@ importers:
         specifier: catalog:peer-react
         version: 18.3.1(react@18.3.1)
       std-env:
-        specifier: ^3.7.0
+        specifier: ^3.8.0
         version: 3.8.0
       swr:
-        specifier: ^2.2.0
-        version: 2.2.5(react@18.3.1)
+        specifier: ^2.3.2
+        version: 2.3.2(react@18.3.1)
     devDependencies:
       '@types/glob-to-regexp':
         specifier: 0.4.4
@@ -13417,10 +13417,10 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  swr@2.2.5:
-    resolution: {integrity: sha512-QtxqyclFeAsxEUeZIYmsaQ0UjimSq1RZ9Un7I68/0ClKK/U3LoyQunwkQfJZr2fc22DfIXLNDc2wFyTEikCUpg==}
+  swr@2.3.2:
+    resolution: {integrity: sha512-RosxFpiabojs75IwQ316DGoDRmOqtiAj0tg8wCcbEu4CiLZBs/a9QNtHV7TUfDXmmlgqij/NqzKq/eLelyv9xA==}
     peerDependencies:
-      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
@@ -31411,9 +31411,9 @@ snapshots:
       csso: 5.0.5
       picocolors: 1.1.1
 
-  swr@2.2.5(react@18.3.1):
+  swr@2.3.2(react@18.3.1):
     dependencies:
-      client-only: 0.0.1
+      dequal: 2.0.3
       react: 18.3.1
       use-sync-external-store: 1.4.0(react@18.3.1)
 
