@@ -354,7 +354,7 @@
 
 - The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
 
-  Removed the `__experimental_` preffix.
+  Removed the `__experimental_` prefix.
 
 ### Patch Changes
 
@@ -436,7 +436,7 @@
 
 ### Patch Changes
 
-- Remove @clerk/clerk-react as a dev depedency. Move @clerk/shared to depedencies (previously devDepedencies). ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
+- Remove @clerk/clerk-react as a dev depedency. Move @clerk/shared to dependencies (previously devDepedencies). ([#4114](https://github.com/clerk/javascript/pull/4114)) by [@BRKalow](https://github.com/BRKalow)
 
 - Updated dependencies [[`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc), [`3b50b67bd`](https://github.com/clerk/javascript/commit/3b50b67bd40da33c9e36773aa05462717e9f44cc)]:
   - @clerk/shared@2.10.0

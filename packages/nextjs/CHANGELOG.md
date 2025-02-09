@@ -264,9 +264,9 @@
 
 - Using the same peerDependencies semver for react and react-dom ([#4758](https://github.com/clerk/javascript/pull/4758)) by [@jacekradko](https://github.com/jacekradko)
 
-- Hide warning about missing `CLERK_ENCRYPTION_KEY` when the secret key is not explictily provided as option to `clerkMiddleware`. ([#4766](https://github.com/clerk/javascript/pull/4766)) by [@panteliselef](https://github.com/panteliselef)
+- Hide warning about missing `CLERK_ENCRYPTION_KEY` when the secret key is not explicitly provided as option to `clerkMiddleware`. ([#4766](https://github.com/clerk/javascript/pull/4766)) by [@panteliselef](https://github.com/panteliselef)
 
-- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internal usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
 
 - Support `unstable_rethrow` usage inside `clerkMiddleware()` for the canary version of `notFound()`. ([#4727](https://github.com/clerk/javascript/pull/4727)) by [@panteliselef](https://github.com/panteliselef)
 
@@ -1543,7 +1543,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -1935,7 +1935,7 @@
 - 2e77cd737: Set correct information on required Node.js and React versions in README
 - ae3a6683a: Ignore `.test.ts` files for the build output. Should result in smaller bundle size.
 - 32992906c: Fix partial prerendering error when using NextJS by correctly rethrowing partial prerendering (PPR) error.
-- c22cd5214: Fix type inferance for auth helper.
+- c22cd5214: Fix type inference for auth helper.
 - b67f6ab79: Fix property `Page`/ `Link` missing from the `UserProfile` / `OrganizationProfile`
   when imported from `@clerk/nextjs` or `@clerk/remix`.
 - f77e8cdbd: Add Autocomplete TS generic for union literals
@@ -2858,7 +2858,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -3569,7 +3569,7 @@
 
 - Support `audience` parameter in authentication request ([#1004](https://github.com/clerk/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
 
-  The audience parameter is used to verify the the aud claim in
+  The audience parameter is used to verify the aud claim in
   the request matches the value of the parameter or is included
   (when the user provides a list).
 

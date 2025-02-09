@@ -262,7 +262,7 @@
 
 ### Patch Changes
 
-- Add backwards compatibility for ignoring prerendered routes in Astro ([#4694](https://github.com/clerk/javascript/pull/4694)) by [@wobsoriano](https://github.com/wobsoriano)
+- Add backwards compatibility for ignoring pre-rendered routes in Astro ([#4694](https://github.com/clerk/javascript/pull/4694)) by [@wobsoriano](https://github.com/wobsoriano)
 
 - Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`b6aa589f75be62a89a3853d496176ed2f2c0e2c5`](https://github.com/clerk/javascript/commit/b6aa589f75be62a89a3853d496176ed2f2c0e2c5), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
   - @clerk/types@4.36.0
@@ -845,7 +845,7 @@
   + import { SignInButton } from "@clerk/astro/components"
   ```
 
-- Simplify submodules and drop the `bunlded` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Simplify submodules and drop the `bundled` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Moved
 
@@ -864,7 +864,7 @@
 
 - Add a reusable ID generation function by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Remove `@nanostores/react` from depedency. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Remove `@nanostores/react` from dependency. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Introduce `<AuthenticateWithRedirectCallback/>` as an Astro and as a React component by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
