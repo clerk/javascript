@@ -109,12 +109,20 @@ export type ClerkProp =
   | undefined
   | null;
 
-type ButtonProps = {
-  mode?: 'redirect' | 'modal';
+type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+  mode: 'modal';
+  appearance: T['appearance'];
   children?: React.ReactNode;
 };
 
-export type SignInButtonProps = ButtonProps &
+type ButtonPropsRedirect = {
+  mode?: 'redirect';
+  children?: React.ReactNode;
+};
+
+type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
+
+export type SignInButtonProps = ButtonProps<SignInProps> &
   Pick<
     SignInProps,
     | 'fallbackRedirectUrl'
@@ -127,7 +135,7 @@ export type SignInButtonProps = ButtonProps &
 
 export type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps &
+} & ButtonProps<SignUpProps> &
   Pick<
     SignUpProps,
     | 'fallbackRedirectUrl'
@@ -137,7 +145,10 @@ export type SignUpButtonProps = {
     | 'initialValues'
   >;
 
-export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;
+export type SignInWithMetamaskButtonProps = {
+  mode?: 'redirect' | 'modal';
+  children?: React.ReactNode;
+} & RedirectUrlProp;
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
