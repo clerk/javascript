@@ -435,7 +435,7 @@ type _LocalizationResource = {
       };
       passkeysSection: {
         title: LocalizationValue;
-        addButton: LocalizationValue;
+        primaryButton: LocalizationValue;
         menuAction__rename: LocalizationValue;
         menuAction__destructive: LocalizationValue;
       };
