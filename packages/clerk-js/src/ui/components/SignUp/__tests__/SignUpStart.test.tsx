@@ -117,7 +117,6 @@ describe('SignUpStart', () => {
       expect(button.parentElement?.tagName.toUpperCase()).toBe('BUTTON');
     });
 
-    // TODO:
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
       const { wrapper } = await createFixtures(f => {
         f.withSocialProvider({ provider });
