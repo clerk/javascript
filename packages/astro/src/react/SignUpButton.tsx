@@ -34,7 +34,7 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
     }
 
     if (mode === 'modal') {
-      return clerk.openSignUp(opts);
+      return clerk.openSignUp({ ...opts, appearance: props.appearance });
     }
 
     return clerk.redirectToSignUp({

@@ -1388,6 +1388,40 @@ export interface HandleEmailLinkVerificationParams {
   onVerifiedOnOtherDevice?: () => void;
 }
 
+type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+  mode: 'modal';
+  appearance?: T['appearance'];
+};
+
+type ButtonPropsRedirect = {
+  mode?: 'redirect';
+};
+
+type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
+
+export type SignInButtonProps = ButtonProps<SignInProps> &
+  Pick<
+    SignInProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
+    | 'withSignUp'
+  >;
+
+export type SignUpButtonProps = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+} & ButtonProps<SignUpProps> &
+  Pick<
+    SignUpProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
+  >;
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;

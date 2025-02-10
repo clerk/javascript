@@ -7,9 +7,9 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   RedirectUrlProp,
-  SignInProps,
+  SignInButtonProps as _SignInButtonProps,
   SignInRedirectOptions,
-  SignUpProps,
+  SignUpButtonProps as _SignUpButtonProps,
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
@@ -109,41 +109,13 @@ export type ClerkProp =
   | undefined
   | null;
 
-type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
-  mode: 'modal';
-  appearance?: T['appearance'];
+export type SignInButtonProps = _SignInButtonProps & {
   children?: React.ReactNode;
 };
 
-type ButtonPropsRedirect = {
-  mode?: 'redirect';
+export type SignUpButtonProps = _SignUpButtonProps & {
   children?: React.ReactNode;
 };
-
-type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
-
-export type SignInButtonProps = ButtonProps<SignInProps> &
-  Pick<
-    SignInProps,
-    | 'fallbackRedirectUrl'
-    | 'forceRedirectUrl'
-    | 'signUpForceRedirectUrl'
-    | 'signUpFallbackRedirectUrl'
-    | 'initialValues'
-    | 'withSignUp'
-  >;
-
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps<SignUpProps> &
-  Pick<
-    SignUpProps,
-    | 'fallbackRedirectUrl'
-    | 'forceRedirectUrl'
-    | 'signInForceRedirectUrl'
-    | 'signInFallbackRedirectUrl'
-    | 'initialValues'
-  >;
 
 export type SignInWithMetamaskButtonProps = {
   mode?: 'redirect' | 'modal';
