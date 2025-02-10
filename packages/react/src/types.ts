@@ -111,7 +111,7 @@ export type ClerkProp =
 
 type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
   mode: 'modal';
-  appearance: T['appearance'];
+  appearance?: T['appearance'];
   children?: React.ReactNode;
 };
 
