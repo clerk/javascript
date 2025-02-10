@@ -65,6 +65,11 @@ export type AuthenticateWithRedirectParams = {
   continueSignUp?: boolean;
 
   /**
+   * Whether to continue existing SignIn (if present) or create a new SignIn.
+   */
+  continueSignIn?: boolean;
+
+  /**
    * One of the supported OAuth providers you can use to authenticate with, eg 'oauth_google'.
    * Alternatively `saml` or `enterprise_sso`, to authenticate with Enterprise SSO.
    */

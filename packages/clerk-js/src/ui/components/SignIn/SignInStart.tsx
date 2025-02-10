@@ -336,6 +336,7 @@ export function _SignInStart(): JSX.Element {
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
+      continueSignIn: true,
     });
   };
 
