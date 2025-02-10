@@ -77,7 +77,7 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
 
   return (
     <Animated asChild>
-      <Flex sx={{ width: '100%' }}>
+      <Flex>
         <InputWithIcon
           value={value}
           type='search'
