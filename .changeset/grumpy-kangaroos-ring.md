@@ -2,7 +2,7 @@
 '@clerk/vue': patch
 ---
 
-Adds ability to render custom `<UserProfile` links inside `<UserButton>` component.
+Adds ability to render custom `<UserProfile>` links inside `<UserButton>` component.
 
 Example:
 
