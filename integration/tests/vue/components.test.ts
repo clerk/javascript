@@ -108,7 +108,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedOut();
   });
 
-  test('render custom pages and links inside user button', async ({ page, context }) => {
+  test('render custom user profile pages and links inside user button', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
