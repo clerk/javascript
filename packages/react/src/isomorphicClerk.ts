@@ -123,7 +123,7 @@ type IsomorphicLoadedClerk = Without<
   | 'client'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__internal_externalNavigationListener'
+  | '__internal_addNavigationListener'
 > & {
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
