@@ -443,12 +443,12 @@ export interface Clerk {
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignInUrl(): string;
+  buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignUpUrl(): string;
+  buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignOutUrl of the instance.
@@ -831,10 +831,6 @@ type RouterFn = (
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 
-export type WithInternalRouting<T> =
-  | (Omit<T, 'routing' | 'path'> & { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> })
-  | (Omit<T, 'routing' | 'path'> & { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> });
-
 export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;
@@ -896,7 +892,7 @@ export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
 export type SignInProps = RoutingOptions & {
   /**

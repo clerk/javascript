@@ -90,7 +90,9 @@ export const SignInRouterMachine = setup({
 
       void context.clerk.setActive({
         session,
-        redirectUrl: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+        redirectUrl: context.clerk.buildAfterSignInUrl({
+          params: context.router?.searchParams(),
+        }),
       });
 
       enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
@@ -199,8 +201,9 @@ export const SignInRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signInUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -215,8 +218,9 @@ export const SignInRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signInUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -231,8 +235,9 @@ export const SignInRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signInUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -326,7 +331,9 @@ export const SignInRouterMachine = setup({
             {
               type: 'navigateExternal',
               params: ({ context }) => ({
-                path: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+                path: context.clerk.buildAfterSignInUrl({
+                  params: context.router?.searchParams(),
+                }),
               }),
             },
           ],

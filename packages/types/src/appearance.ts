@@ -346,6 +346,7 @@ export type ElementsConfig = {
   selectOption: WithOptions<SelectId>;
 
   menuButton: WithOptions<MenuId>;
+  menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
@@ -502,7 +503,7 @@ export type Variables = {
   /**
    * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
    * for normal, medium, semibold and bold text respectively.
-   * You can override the default weights by passing a {@FontWeightScale} object
+   * You can override the default weights by passing a {@link FontWeightScale} object
    * @default { normal: 400, medium: 500, semibold: 600, bold: 700 };
    */
   fontWeight?: FontWeightScale;

@@ -1045,12 +1045,12 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.homeUrl);
   }
 
-  public buildAfterSignInUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignInUrl());
+  public buildAfterSignInUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignInUrl());
   }
 
-  public buildAfterSignUpUrl(): string {
-    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignUpUrl());
+  public buildAfterSignUpUrl({ params }: { params?: URLSearchParams } = {}): string {
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options, {}, params).getAfterSignUpUrl());
   }
 
   public buildAfterSignOutUrl(): string {
@@ -1493,15 +1493,24 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const newClient = await Client.getOrCreateInstance().fetch();
-    this.updateClient(newClient);
-    if (this.session) {
-      return;
+    try {
+      const newClient = await Client.getOrCreateInstance().fetch();
+      this.updateClient(newClient);
+      if (this.session) {
+        return;
+      }
+      if (opts.broadcast) {
+        this.#broadcastSignOutEvent();
+      }
+      return this.setActive({ session: null });
+    } catch (err) {
+      // Handle the 403 Forbidden
+      if (err.status === 403) {
+        return this.setActive({ session: null });
+      } else {
+        throw err;
+      }
     }
-    if (opts.broadcast) {
-      this.#broadcastSignOutEvent();
-    }
-    return this.setActive({ session: null });
   };
 
   public authenticateWithGoogleOneTap = async (
@@ -2161,7 +2170,11 @@ export class Clerk implements ClerkInterface {
     return {
       ...defaultOptions,
       ...options,
-      allowedRedirectOrigins: createAllowedRedirectOrigins(options?.allowedRedirectOrigins, this.frontendApi),
+      allowedRedirectOrigins: createAllowedRedirectOrigins(
+        options?.allowedRedirectOrigins,
+        this.frontendApi,
+        this.instanceType,
+      ),
     };
   };
 

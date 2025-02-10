@@ -70,7 +70,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   sessions: SessionJSON[];
   sign_up: SignUpJSON | null;
   sign_in: SignInJSON | null;
-  captcha_bypass?: boolean;
+  captcha_bypass?: boolean; // this is used by the @clerk/testing package
   last_active_session_id: string | null;
   cookie_expires_at: number | null;
   created_at: number;

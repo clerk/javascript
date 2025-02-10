@@ -32,8 +32,9 @@ After following the quickstart you'll have learned how to:
 Run the development server:
 ```bash
 > cd playground/browser-extension
+> n 18.17
 > npm i
-> npm dev
+> npm run dev
 ```
 
 In a separate terminal, build and publish the development package to your local registry:

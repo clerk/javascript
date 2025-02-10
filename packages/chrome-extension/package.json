@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.2.2",
+  "version": "2.2.8",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/search-for-rhc.mjs dist",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs directory dist",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",

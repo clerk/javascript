@@ -1,5 +1,95 @@
 # Change Log
 
+## 5.52.2
+
+### Patch Changes
+
+- Update `@coinbase/wallet-sdk` dependency to `4.3.0`, to resolve [SDK Security Advisory](https://github.com/coinbase/coinbase-wallet-sdk/security/advisories/GHSA-8rgj-285w-qcq4) ([#5120](https://github.com/clerk/javascript/pull/5120)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Add `menuButtonEllipsis` element descriptor. ([#5090](https://github.com/clerk/javascript/pull/5090)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix issue accessing routing option when componentProps is undefined. ([#5088](https://github.com/clerk/javascript/pull/5088)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `createAllowedRedirectOrigins` now takes the instance type into account to include Frontend API URL for development instances. This is necessary to properly support Clerk as an IdP with OAuth for development instances. ([#4767](https://github.com/clerk/javascript/pull/4767)) by [@kostaspt](https://github.com/kostaspt)
+
+- Replaces hard-coded string `"Add a passkey"` with a new localization key `userProfile.start.passkeysSection.primaryButton` ([#5105](https://github.com/clerk/javascript/pull/5105)) by [@Philitician](https://github.com/Philitician)
+
+- Avoid triggering email code verification twice on React strict mode ([#5095](https://github.com/clerk/javascript/pull/5095)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`26d273cd16941491fa05bca0ee64108956573177`](https://github.com/clerk/javascript/commit/26d273cd16941491fa05bca0ee64108956573177), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+  - @clerk/localizations@3.10.5
+
+## 5.52.1
+
+### Patch Changes
+
+- Add virtual routing deprecation warning. ([#5072](https://github.com/clerk/javascript/pull/5072)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure only one action is open per section within `UserProfile`. ([#5030](https://github.com/clerk/javascript/pull/5030)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Prevent infinite loop when the client is blocked ([#5083](https://github.com/clerk/javascript/pull/5083)) by [@anagstef](https://github.com/anagstef)
+
+## 5.52.0
+
+### Minor Changes
+
+- Update `@coinbase/wallet-sdk` depedency to `4.2.4`. ([#4945](https://github.com/clerk/javascript/pull/4945)) by [@panteliselef](https://github.com/panteliselef)
+
+## 5.51.0
+
+### Minor Changes
+
+- - `@clerk/clerk-js`, `@clerk/types`: Add `redirectUrl` option to `buildAfterSignInUrl()` and `buildAfterSignUpUrl()` methods. ([#5052](https://github.com/clerk/javascript/pull/5052)) by [@brkalow](https://github.com/brkalow)
+
+  - `@clerk/elements`: Ensure redirect_url params passed to Elements components are always passed to Clerk's underlying `build*Url()` methods.
+
+### Patch Changes
+
+- Reverts [#4977](https://github.com/clerk/javascript/pull/4977) ([#5057](https://github.com/clerk/javascript/pull/5057)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Marks virtual routing as deprecated.
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/localizations@3.10.4
+  - @clerk/shared@2.20.18
+
+## 5.50.2
+
+### Patch Changes
+
+- Fix captcha layout shift on transfer flow, custom flows and invisible ([#5049](https://github.com/clerk/javascript/pull/5049)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+  - @clerk/localizations@3.10.3
+
+## 5.50.1
+
+### Patch Changes
+
+- Removes Turnstile remotely-hosted code from builds for unsupported environments ([#5039](https://github.com/clerk/javascript/pull/5039)) by [@tmilewski](https://github.com/tmilewski)
+
+- Opt out of combined flow when sign up mode is restricted. ([#5020](https://github.com/clerk/javascript/pull/5020)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a cookie instead of localStorage for the active org ID to avoid issues when localStorage is disabled at the browser level. ([#4394](https://github.com/clerk/javascript/pull/4394)) by [@brkalow](https://github.com/brkalow)
+
+- Removes web3 provider options from progressive sign up step. web3 providers don't have the ability to fill in missing fields. ([#5036](https://github.com/clerk/javascript/pull/5036)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Do not throw error on `captchaHeartbeat` if `displayConfig` is `null`. ([#5032](https://github.com/clerk/javascript/pull/5032)) by [@jacekradko](https://github.com/jacekradko)
+
+- Pass the `signInUrl` throught to the sign up context when within the combined flow. ([#5042](https://github.com/clerk/javascript/pull/5042)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+  - @clerk/localizations@3.10.2
+
 ## 5.50.0
 
 ### Minor Changes
