@@ -1,5 +1,5 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
-import { OAUTH_PROVIDERS } from '@clerk/types';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
@@ -117,6 +117,7 @@ describe('SignUpStart', () => {
       expect(button.parentElement?.tagName.toUpperCase()).toBe('BUTTON');
     });
 
+    // TODO:
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
       const { wrapper } = await createFixtures(f => {
         f.withSocialProvider({ provider });

@@ -1,5 +1,5 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/types';
-import { OAUTH_PROVIDERS } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
 import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
