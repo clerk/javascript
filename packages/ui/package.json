@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.3.21",
+  "version": "0.3.22",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",

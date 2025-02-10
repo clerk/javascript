@@ -1,5 +1,26 @@
 # Change Log
 
+## 1.24.0
+
+### Minor Changes
+
+- Add organizationId to GetOrganizationListParams ([#4882](https://github.com/clerk/javascript/pull/4882)) by [@jacekradko](https://github.com/jacekradko)
+
+- Deprecate usage of the `oauth_` prefix in `client.users.getUserOauthAccessToken()`. Going forward, please use the provider name without that prefix. Example: ([#5097](https://github.com/clerk/javascript/pull/5097)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```diff
+  - client.users.getUserOauthAccessToken('user_id', 'oauth_google')
+  + client.users.getUserOauthAccessToken('user_id', 'google')
+  ```
+
+### Patch Changes
+
+- Adds types for organization domain webhook events ([#4819](https://github.com/clerk/javascript/pull/4819)) by [@ijxy](https://github.com/ijxy)
+
+- Updated dependencies [[`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
 ## 1.23.11
 
 ### Patch Changes
