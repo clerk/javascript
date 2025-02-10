@@ -7,7 +7,7 @@ import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { createDeferredPromise, handleValueOrFn, noop } from '@clerk/shared/utils';
+import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   ActiveSessionResource,
@@ -2001,35 +2001,36 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#pageLifecycle?.onPageFocus(async () => {
-      if (this.session) {
-        if (!isBrowserOnline()) {
-          if (this.#touchedWhileOffline) {
-            return;
-          }
-          this.#touchedWhileOffline = true;
-          const promiseWithResolvers = createDeferredPromise();
-          const controller = new AbortController();
-          window.addEventListener(
-            'online',
-            e => {
-              promiseWithResolvers.resolve(e);
-            },
-            {
-              signal: controller.signal,
-            },
-          );
-          await promiseWithResolvers.promise;
-          controller.abort();
-          this.#touchedWhileOffline = false;
-        }
+      if (!this.session || this.#touchedWhileOffline) {
+        return;
+      }
 
+      const performTouch = async () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        void this.#touchLastActiveSession(this.session);
+        return this.#touchLastActiveSession(this.session);
+      };
+
+      if (isBrowserOnline()) {
+        return performTouch();
       }
+
+      this.#touchedWhileOffline = true;
+      const controller = new AbortController();
+      window.addEventListener(
+        'online',
+        () => {
+          void performTouch();
+          this.#touchedWhileOffline = false;
+          controller.abort();
+        },
+        {
+          signal: controller.signal,
+        },
+      );
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
