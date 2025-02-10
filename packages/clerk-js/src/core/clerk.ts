@@ -1,4 +1,4 @@
-import { inBrowser as inClientSide, isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -99,6 +99,7 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -190,7 +191,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #touchedWhileOffline = false;
+  #offlineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -2001,7 +2002,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#pageLifecycle?.onPageFocus(async () => {
-      if (!this.session || this.#touchedWhileOffline) {
+      if (!this.session) {
         return;
       }
 
@@ -2014,23 +2015,7 @@ export class Clerk implements ClerkInterface {
         return this.#touchLastActiveSession(this.session);
       };
 
-      if (isBrowserOnline()) {
-        return performTouch();
-      }
-
-      this.#touchedWhileOffline = true;
-      const controller = new AbortController();
-      window.addEventListener(
-        'online',
-        () => {
-          void performTouch();
-          this.#touchedWhileOffline = false;
-          controller.abort();
-        },
-        {
-          signal: controller.signal,
-        },
-      );
+      this.#offlineScheduler.schedule(performTouch);
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
