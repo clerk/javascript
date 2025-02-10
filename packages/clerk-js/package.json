@@ -57,7 +57,7 @@
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "@coinbase/wallet-sdk": "4.2.4",
+    "@coinbase/wallet-sdk": "4.3.0",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
