@@ -1,5 +1,4 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isBrowserOnline } from '@clerk/shared/browser';
 import { is4xxError } from '@clerk/shared/error';
 import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type {
@@ -86,8 +85,7 @@ export class Session extends BaseResource implements SessionResource {
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     return runWithExponentialBackOff(() => this._getToken(options), {
-      shouldRetry: (error: unknown, currentIteration: number) =>
-        !is4xxError(error) && currentIteration < 4 && isBrowserOnline(),
+      shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
     });
   };
 
