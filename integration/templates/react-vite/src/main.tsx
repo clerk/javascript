@@ -18,6 +18,7 @@ import OrganizationProfile from './organization-profile';
 import OrganizationList from './organization-list';
 import CreateOrganization from './create-organization';
 import OrganizationSwitcher from './organization-switcher';
+import Buttons from './buttons';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: '/protected',
         element: <Protected />,
+      },
+      {
+        path: '/buttons',
+        element: <Buttons />,
       },
       {
         path: '/custom-user-profile/*',
