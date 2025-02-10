@@ -4,7 +4,6 @@ import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
-import { createOfflineScheduler } from '../../utils/offlineScheduler';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -41,7 +40,7 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
-  private offlineScheduler = createOfflineScheduler();
+  private isRefreshTokenOnFocusPending = false;
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
@@ -130,7 +129,27 @@ export class AuthCookieService {
         return this.refreshSessionToken({ updateCookieImmediately: true });
       };
       if (document.visibilityState === 'visible') {
-        this.offlineScheduler.schedule(refreshImmediately);
+        if (this.isRefreshTokenOnFocusPending) {
+          return;
+        }
+
+        if (isBrowserOnline()) {
+          return void refreshImmediately();
+        }
+
+        this.isRefreshTokenOnFocusPending = true;
+        const controller = new AbortController();
+        window.addEventListener(
+          'online',
+          () => {
+            void refreshImmediately();
+            this.isRefreshTokenOnFocusPending = false;
+            controller.abort();
+          },
+          {
+            signal: controller.signal,
+          },
+        );
       }
     });
   }
