@@ -864,6 +864,7 @@ export const enUS: LocalizationResource = {
         },
       },
       passkeysSection: {
+        primaryButton: 'Add a passkey',
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
         title: 'Passkeys',

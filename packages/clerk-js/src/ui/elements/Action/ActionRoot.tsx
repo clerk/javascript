@@ -4,7 +4,11 @@ import { useCallback, useState } from 'react';
 
 import { Animated } from '..';
 
-type ActionRootProps = PropsWithChildren<{ animate?: boolean }>;
+type ActionRootProps = PropsWithChildren<{
+  animate?: boolean;
+  value?: string | null;
+  onChange?: (value: string | null) => void;
+}>;
 
 type ActionOpen = (value: string) => void;
 
@@ -15,16 +19,29 @@ export const [ActionContext, useActionContext, _] = createContextAndHook<{
 }>('ActionContext');
 
 export const ActionRoot = (props: ActionRootProps) => {
-  const { animate = true, children } = props;
-  const [active, setActive] = useState<string | null>(null);
+  const { animate = true, children, value: controlledValue, onChange } = props;
+  const [internalValue, setInternalValue] = useState<string | null>(null);
+
+  const active = controlledValue !== undefined ? controlledValue : internalValue;
 
   const close = useCallback(() => {
-    setActive(null);
-  }, []);
+    if (onChange) {
+      onChange(null);
+    } else {
+      setInternalValue(null);
+    }
+  }, [onChange]);
 
-  const open: ActionOpen = useCallback(value => {
-    setActive(value);
-  }, []);
+  const open: ActionOpen = useCallback(
+    newValue => {
+      if (onChange) {
+        onChange(newValue);
+      } else {
+        setInternalValue(newValue);
+      }
+    },
+    [onChange],
+  );
 
   const body = <ActionContext.Provider value={{ value: { active, open, close } }}>{children}</ActionContext.Provider>;
 

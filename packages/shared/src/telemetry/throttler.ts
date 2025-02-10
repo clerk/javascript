@@ -48,7 +48,7 @@ export class TelemetryEventThrottler {
   #generateKey(event: TelemetryEvent): string {
     const { sk: _sk, pk: _pk, payload, ...rest } = event;
 
-    const sanitizedEvent = {
+    const sanitizedEvent: Omit<TelemetryEvent, 'sk' | 'pk' | 'payload'> & TelemetryEvent['payload'] = {
       ...payload,
       ...rest,
     };

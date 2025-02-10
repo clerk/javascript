@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
+import { Fragment } from 'react';
 
 import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
 import { Badge, Flex, localizationKeys, Text } from '../../customizables';
@@ -46,39 +47,42 @@ export const EmailsSection = ({ shouldAllowCreation = true }) => {
     >
       <Action.Root>
         <ProfileSection.ItemList id='emailAddresses'>
-          {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
-            <Action.Root key={email.emailAddress}>
-              <ProfileSection.Item id='emailAddresses'>
-                <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
-                  <Text
-                    sx={t => ({ color: t.colors.$colorText })}
-                    truncate
-                  >
-                    {email.emailAddress}
-                  </Text>
-                  {user?.primaryEmailAddressId === email.id && (
-                    <Badge localizationKey={localizationKeys('badge__primary')} />
-                  )}
-                  {email.verification.status !== 'verified' && (
-                    <Badge localizationKey={localizationKeys('badge__unverified')} />
-                  )}
-                </Flex>
-                <EmailMenu email={email} />
-              </ProfileSection.Item>
+          {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => {
+            const emailId = email.id;
+            return (
+              <Fragment key={email.emailAddress}>
+                <ProfileSection.Item id='emailAddresses'>
+                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
+                    <Text
+                      sx={t => ({ color: t.colors.$colorText })}
+                      truncate
+                    >
+                      {email.emailAddress}
+                    </Text>
+                    {user?.primaryEmailAddressId === emailId && (
+                      <Badge localizationKey={localizationKeys('badge__primary')} />
+                    )}
+                    {email.verification.status !== 'verified' && (
+                      <Badge localizationKey={localizationKeys('badge__unverified')} />
+                    )}
+                  </Flex>
+                  <EmailMenu email={email} />
+                </ProfileSection.Item>
 
-              <Action.Open value='remove'>
-                <Action.Card variant='destructive'>
-                  <RemoveEmailScreen emailId={email.id} />
-                </Action.Card>
-              </Action.Open>
+                <Action.Open value={`remove-${emailId}`}>
+                  <Action.Card variant='destructive'>
+                    <RemoveEmailScreen emailId={emailId} />
+                  </Action.Card>
+                </Action.Open>
 
-              <Action.Open value='verify'>
-                <Action.Card>
-                  <EmailScreen emailId={email.id} />
-                </Action.Card>
-              </Action.Open>
-            </Action.Root>
-          ))}
+                <Action.Open value={`verify-${emailId}`}>
+                  <Action.Card>
+                    <EmailScreen emailId={emailId} />
+                  </Action.Card>
+                </Action.Open>
+              </Fragment>
+            );
+          })}
           {shouldAllowCreation && (
             <>
               <Action.Trigger value='add'>
@@ -104,10 +108,11 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
   const card = useCardState();
   const { user } = useUser();
   const { open } = useActionContext();
-  const isPrimary = user?.primaryEmailAddressId === email.id;
+  const emailId = email.id;
+  const isPrimary = user?.primaryEmailAddressId === emailId;
   const isVerified = email.verification.status === 'verified';
   const setPrimary = () => {
-    return user?.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
+    return user?.update({ primaryEmailAddressId: emailId }).catch(e => handleError(e, [], card.setError));
   };
 
   const actions = (
@@ -115,7 +120,7 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__primary'),
-            onClick: () => open('verify'),
+            onClick: () => open(`verify-${emailId}`),
           }
         : null,
       !isPrimary && isVerified
@@ -127,13 +132,13 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       !isPrimary && !isVerified
         ? {
             label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__unverified'),
-            onClick: () => open('verify'),
+            onClick: () => open(`verify-${emailId}`),
           }
         : null,
       {
         label: localizationKeys('userProfile.start.emailAddressesSection.destructiveAction'),
         isDestructive: true,
-        onClick: () => open('remove'),
+        onClick: () => open(`remove-${emailId}`),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
   ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];

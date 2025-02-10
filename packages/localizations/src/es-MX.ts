@@ -820,7 +820,7 @@ export const esMX: LocalizationResource = {
       imageFormTitle: 'Imagen de perfil',
       readonly: 'Tu información de perfil ha sido proporcionada por la conexión de empresa y no se puede editar.',
       successMessage: 'Tu perfil ha sido actualizado.',
-      title: 'Actualizar Cuenta',
+      title: 'Actualizar perfil',
     },
     start: {
       activeDevicesSection: {
@@ -892,7 +892,7 @@ export const esMX: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {

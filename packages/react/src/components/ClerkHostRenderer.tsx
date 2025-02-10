@@ -63,9 +63,10 @@ export class ClerkHostRenderer extends React.PureComponent<
 
     // Remove children and customPages from props before comparing
     // children might hold circular references which deepEqual can't handle
-    // and the implementation of customPages or customMenuItems relies on props getting new references
-    const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
-    const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
+    // and the implementation of customPages relies on props getting new references
+    const prevProps = without(_prevProps.props, 'customPages', 'children');
+    const newProps = without(this.props.props, 'customPages', 'children');
+
     // instead, we simply use the length of customPages to determine if it changed or not
     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;

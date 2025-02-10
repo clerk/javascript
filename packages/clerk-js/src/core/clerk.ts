@@ -1506,15 +1506,24 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const newClient = await Client.getOrCreateInstance().fetch();
-    this.updateClient(newClient);
-    if (this.session) {
-      return;
+    try {
+      const newClient = await Client.getOrCreateInstance().fetch();
+      this.updateClient(newClient);
+      if (this.session) {
+        return;
+      }
+      if (opts.broadcast) {
+        this.#broadcastSignOutEvent();
+      }
+      return this.setActive({ session: null });
+    } catch (err) {
+      // Handle the 403 Forbidden
+      if (err.status === 403) {
+        return this.setActive({ session: null });
+      } else {
+        throw err;
+      }
     }
-    if (opts.broadcast) {
-      this.#broadcastSignOutEvent();
-    }
-    return this.setActive({ session: null });
   };
 
   public authenticateWithGoogleOneTap = async (
@@ -2173,7 +2182,11 @@ export class Clerk implements ClerkInterface {
     return {
       ...defaultOptions,
       ...options,
-      allowedRedirectOrigins: createAllowedRedirectOrigins(options?.allowedRedirectOrigins, this.frontendApi),
+      allowedRedirectOrigins: createAllowedRedirectOrigins(
+        options?.allowedRedirectOrigins,
+        this.frontendApi,
+        this.instanceType,
+      ),
     };
   };
 
