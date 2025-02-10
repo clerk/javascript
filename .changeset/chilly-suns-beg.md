@@ -4,17 +4,17 @@
 
 Add support for type-safe environment variables using the [`astro:env` API](https://docs.astro.build/en/reference/configuration-reference/#env).
 
-You can opt-in to add a type-safe schema for all your Clerk environment variables by enabling the `enableEnvSchema` option.
-
-```js
-export default defineConfig({
-  integrations: [clerk({ enableEnvSchema: true })],
-})
-```
-
-Afterwards you can use the environment variables like so:
+The integration now provides a type-safe schema for all Clerk environment variables by default. You can use the environment variables like so:
 
 ```js
 import { PUBLIC_CLERK_PUBLISHABLE_KEY } from "astro:env/client"
 import { CLERK_SECRET_KEY } from "astro:env/server"
+```
+
+To override this behavior, you can disable the feature by setting `enableEnvSchema` to `false`:
+
+```js
+export default defineConfig({
+  integrations: [clerk({ enableEnvSchema: false })],
+})
 ```
