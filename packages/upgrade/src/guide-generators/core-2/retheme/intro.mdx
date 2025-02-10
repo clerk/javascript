@@ -1,0 +1,11 @@
+The new version ships with improved design and UX across all of Clerk's [UI components](/docs/components/overview). If you have used the [`appearance` prop](/docs/components/customization/overview) or tokens for a [custom theme](/docs/components/customization/overview#create-a-custom-theme), you will likely need to make some adjustments to ensure your styling is still looking great. If you're using the [localization prop](/docs/components/customization/localization) you will likely need to make adjustments to account for added or removed localization keys.
+
+<Callout type='info'>
+  If you are not customizing the appearance of your components, or using `localization`, you can skip this section. If
+  you are, we recommend using our CLI (`npx @clerk/upgrade`) to scan for changes required as part of the component
+  redesign more quickly.
+</Callout>
+
+The sections below contain more info on each change made to the customization ids and localization keys for reference. Regardless of how thoroughly you have reviewed the following information, we still recommend that you ensure that you have taken some time to manually look through each of your views to ensure that everything looks good still.
+
+Also worth noting - if you are using Clerk's account portal (hosted sign in page), and would like to enable the new design there, you can do so via the "customization" tab on the [account portal page](https://dashboard.clerk.com/last-active?path=account-portal) in your dashboard. Selecting "Core 2" from the "ClerkJS Components" dropdown will enable the new designs.

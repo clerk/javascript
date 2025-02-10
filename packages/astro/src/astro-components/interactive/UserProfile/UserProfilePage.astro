@@ -1,0 +1,24 @@
+---
+import CustomProfilePageRenderer from '../CustomProfilePageRenderer.astro'
+
+const reorderItemsLabels = ['account', 'security'] as const;
+type ReorderItemsLabels = typeof reorderItemsLabels[number];
+
+type Props<Label extends string> = {
+  label: Label
+} & (Label extends ReorderItemsLabels
+  ? {
+      url?: string
+    }
+  : {
+    url: string
+  }
+)
+
+const { url, label } = Astro.props
+---
+
+<CustomProfilePageRenderer label={label} url={url} type="page" component="user-profile" reorderItemsLabels={reorderItemsLabels}>
+    <slot name="label-icon" slot="label-icon" />
+    <slot />
+</CustomProfilePageRenderer>

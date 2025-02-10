@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`clerk initializes clerk with constants 1`] = `
+[
+  [
+    {
+      "apiUrl": "https://api.clerk.com",
+      "apiVersion": "v1",
+      "jwtKey": "",
+      "sdkMetadata": {
+        "environment": "test",
+        "name": "@clerk/fastify",
+        "version": "0.0.0-test",
+      },
+      "secretKey": "TEST_SECRET_KEY",
+      "userAgent": "@clerk/fastify@0.0.0-test",
+    },
+  ],
+]
+`;

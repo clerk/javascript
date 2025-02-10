@@ -1,0 +1,114 @@
+{
+  "name": "@clerk/localizations",
+  "version": "3.10.4",
+  "description": "Localizations for the Clerk components",
+  "keywords": [
+    "react",
+    "next",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "customisation",
+    "localizations"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/localizations"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "types": "./dist/*.d.mts",
+        "default": "./dist/*.mjs"
+      },
+      "require": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "ar-SA",
+    "be-BY",
+    "ca-ES",
+    "cs-CZ",
+    "da-DK",
+    "de-DE",
+    "el-GR",
+    "en-GB",
+    "en-US",
+    "es-ES",
+    "fi-FI",
+    "fr-FR",
+    "he-IL",
+    "id-ID",
+    "is-IS",
+    "it-IT",
+    "ja-JP",
+    "ko-KR",
+    "mn-MN",
+    "nb-NO",
+    "nl-NL",
+    "nl-BE",
+    "pl-PL",
+    "pt-BR",
+    "pt-PT",
+    "ro-RO",
+    "ru-RU",
+    "sk-SK",
+    "sv-SE",
+    "tr-TR",
+    "uk-UA",
+    "vi-VN",
+    "zh-CN",
+    "zh-TW",
+    "es-MX",
+    "bg-BG",
+    "th-TH",
+    "hu-HU",
+    "sr-RS",
+    "hr-HR"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs localizations",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@clerk/types": "workspace:^"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

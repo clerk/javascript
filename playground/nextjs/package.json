@@ -1,0 +1,28 @@
+{
+  "name": "@playground/nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:yalc": "pnpm yalc:add && rm -rf .next && next dev --port 4011",
+    "yalc:add": "pnpm yalc add @clerk/nextjs @clerk/clerk-react @clerk/backend @clerk/types @clerk/shared",
+    "dev": "rm -rf .next && next dev --port 4011",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "canary",
+    "@clerk/themes": "canary",
+    "next": "^15",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.8.3",
+    "@types/react": "18.2.33",
+    "@types/react-dom": "18.2.14",
+    "eslint": "8.24.0",
+    "eslint-config-next": "12.3.1",
+    "typescript": "4.8.4"
+  }
+}

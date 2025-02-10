@@ -1,0 +1,61 @@
+{
+  "name": "@clerk/fastify",
+  "version": "2.1.19",
+  "description": "Clerk SDK for Fastify",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "fastify"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/fastify"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "cookies": "0.8.0",
+    "fastify-plugin": "^5.0.1"
+  },
+  "devDependencies": {
+    "fastify": "^5.0.0"
+  },
+  "peerDependencies": {
+    "fastify": ">=5"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

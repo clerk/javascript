@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "NodeNext",
+    "target": "ESNext"
+  },
+  "exclude": ["templates"]
+}

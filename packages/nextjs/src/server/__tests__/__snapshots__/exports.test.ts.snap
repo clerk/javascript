@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/server public exports > should not include a breaking change 1`] = `
+[
+  "auth",
+  "buildClerkProps",
+  "clerkClient",
+  "clerkMiddleware",
+  "createClerkClient",
+  "createRouteMatcher",
+  "currentUser",
+  "getAuth",
+  "reverificationError",
+  "reverificationErrorResponse",
+  "verifyToken",
+]
+`;

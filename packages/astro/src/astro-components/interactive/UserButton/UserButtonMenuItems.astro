@@ -1,0 +1,18 @@
+<clerk-user-button-menu-items>
+ <slot />
+</clerk-user-button-menu-items>
+
+<script>
+/**
+ * In the React version, menu items need to be wrapped in a `<UserButton.MenuItems>` component.
+ * We are trying to replicate that behavior here by adding a wrapper component
+ * and check if it exists inside the menu items components.
+ */
+class ClerkUserButtonMenuItems extends HTMLElement {
+  constructor() {
+    super();
+  }
+}
+
+customElements.define('clerk-user-button-menu-items', ClerkUserButtonMenuItems);
+</script>

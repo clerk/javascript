@@ -1,0 +1,28 @@
+{
+  "search.exclude": {
+    "**/.tsup": true,
+    "**/.turbo": true,
+    "**/.yalc": true,
+    "**/node_modules": true,
+    ".temp_integration": true,
+    "packages/*/dist": true,
+    "pnpm-lock.yaml": true,
+  },
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+  },
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "json.schemas": [
+    {
+      "fileMatch": ["manifest.json"],
+      "url": "https://json.schemastore.org/chrome-manifest.json"
+    }
+  ],
+  "npm.packageManager": "pnpm",
+}

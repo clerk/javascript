@@ -1,0 +1,67 @@
+# See https://github.com/actions/labeler
+
+astro:
+  - packages/astro/**
+
+backend:
+  - packages/backend/**
+
+chrome-extension:
+  - packages/chrome-extension/**
+
+clerk-js:
+  - packages/clerk-js/**
+
+elements:
+  - packages/elements/**
+
+expo:
+  - packages/expo/**
+
+express:
+  - packages/express/**
+
+fastify:
+  - packages/fastify/**
+
+localizations:
+  - packages/localizations/**
+
+nextjs:
+  - packages/nextjs/**
+
+nuxt:
+  - packages/nuxt/**
+
+react:
+  - packages/react/**
+
+react-router:
+  - packages/react-router/**
+
+remix:
+  - packages/remix/**
+
+tanstack:
+  - packages/tanstack-start/**
+
+testing:
+  - packages/testing/**
+
+themes:
+  - packages/themes/**
+
+types:
+  - packages/types/**
+
+vue:
+  - packages/vue/**
+
+playground:
+  - playground/**
+
+actions:
+  - .github/workflows/**
+
+integration:
+  - integration/**

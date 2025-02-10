@@ -1,0 +1,30 @@
+# As squash merging is enforced in this repository, we enforce conventional commits
+# in the PR title, which is used as the commit message on merge, to ensure that the
+# commit messages that make it into the main branch follow a standard format.
+# This step is done in a separate workflow file so that we can trigger on the `edited` pull_request event type.
+name: PR Title Lint
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+
+jobs:
+  pr-title-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          sparse-checkout: |
+            commitlint.config.ts
+            packages/*/package.json
+          sparse-checkout-cone-mode: false
+
+      - name: Lint Pull Request Title
+        run: |
+          npm init --scope=clerk --yes
+          npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
+          echo '${{ github.event.pull_request.title }}' | npm exec @commitlint/cli -- --config commitlint.config.ts

@@ -1,0 +1,100 @@
+{
+  "name": "@clerk/astro",
+  "version": "2.1.19",
+  "description": "Clerk SDK for Astro",
+  "keywords": [
+    "auth",
+    "authentication",
+    "astro",
+    "astro-integration",
+    "clerk",
+    "typescript",
+    "passwordless",
+    "astro-component",
+    "withastro"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/astro"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#async-local-storage": {
+      "workerd": "./dist/async-local-storage.server.js",
+      "browser": "./dist/async-local-storage.client.js",
+      "node": "./dist/async-local-storage.server.js",
+      "default": "./dist/async-local-storage.server.js"
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal/index.d.ts",
+      "import": "./dist/internal/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    },
+    "./env": "./env.d.ts",
+    "./components": "./components/index.ts",
+    "./package.json": "./package.json"
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "client",
+    "server",
+    "internal",
+    "components",
+    "env.d.ts",
+    "types.ts"
+  ],
+  "scripts": {
+    "build": "tsup --onSuccess \"pnpm build:dts\" && pnpm copy:components",
+    "build:dts": "tsc --emitDeclarationOnly --declaration",
+    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
+    "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
+    "lint": "eslint src env.d.ts",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:publint": "pnpm copy:components && publint",
+    "publish:local": "pnpm yalc push --replace --sig"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "nanoid": "5.0.9",
+    "nanostores": "0.11.3"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "astro": "^4.15.0 || ^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

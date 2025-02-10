@@ -1,0 +1,112 @@
+name: Major Version Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  check-major-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for major changesets
+        id: check_major
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
+
+            // Get list of files changed in the PR
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            let pullRequest = context.payload.pull_request;
+
+            if (!pullRequest) {
+              // Fetch the pull request data
+              const pullRequestData = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+              });
+              pullRequest = pullRequestData.data;
+            }
+
+            // Check if any changeset files indicate a major bump
+            let hasMajorChangeset = false;
+            for (const file of files) {
+              if (file.filename.startsWith('.changeset/') && file.status !== 'removed') {
+                // Fetch the contents of the changeset file
+                const { data: changesetContent } = await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: file.filename,
+                  ref: pullRequest.head.sha,
+                });
+
+                const content = Buffer.from(changesetContent.content, changesetContent.encoding).toString();
+
+                if (/major/.test(content)) {
+                  hasMajorChangeset = true;
+                  break;
+                }
+              }
+            }
+
+            core.setOutput('has_major_changeset', hasMajorChangeset);
+
+      - name: Check if major version bump is allowed
+        if: steps.check_major.outputs.has_major_changeset == 'true'
+        id: check_approval
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload?.pull_request?.number || context.payload?.issue?.number;
+            const org = context.repo.owner;
+
+            // Get all comments on the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            let approvalFound = false;
+            for (const comment of comments) {
+              if (comment.body.trim().toLowerCase() === '!allow-major') {
+                const username = comment.user.login;
+
+                // Check if the user is a public member of the organization
+                try {
+                  const { status } = await github.rest.orgs.checkMembershipForUser({
+                    org,
+                    username,
+                  });
+
+                  if (status === 204) {
+                    approvalFound = true;
+                    break;
+                  }
+                } catch (error) {
+                  if (error.status !== 204) {
+                    // User is not a public member
+                    continue;
+                  }
+                }
+              }
+            }
+
+            if (!approvalFound) {
+              core.setFailed('Major version bump requires approval from an organization member by commenting "!allow-major" on the PR.');
+            } else {
+              console.log('Major version bump approved by an organization member.');
+            }

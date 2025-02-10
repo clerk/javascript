@@ -1,0 +1,91 @@
+{
+  "name": "@clerk/nextjs",
+  "version": "6.11.1",
+  "description": "Clerk SDK for NextJS",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "nextjs",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/nextjs"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./server": {
+      "types": "./dist/types/server/index.d.ts",
+      "import": "./dist/esm/server/index.js",
+      "require": "./dist/cjs/server/index.js"
+    },
+    "./errors": {
+      "types": "./dist/types/errors.d.ts",
+      "import": "./dist/esm/errors.js",
+      "require": "./dist/cjs/errors.js"
+    },
+    "./internal": {
+      "types": "./dist/types/internal.d.ts",
+      "import": "./dist/esm/internal.js",
+      "require": "./dist/cjs/internal.js"
+    }
+  },
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "server",
+    "errors"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "lint": "eslint src/",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution unexpected-module-syntax",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "crypto-js": "4.2.0",
+    "server-only": "0.0.1",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "4.2.2",
+    "next": "^14.2.23"
+  },
+  "peerDependencies": {
+    "next": "^13.5.4 || ^14.0.3 || ^15.0.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrganizationSuggestion has the same initial properties 1`] = `
+OrganizationSuggestion {
+  "accept": [Function],
+  "createdAt": 1970-01-01T00:00:12.345Z,
+  "id": "test_id",
+  "pathRoot": "",
+  "publicOrganizationData": {
+    "hasImage": true,
+    "id": "test_org_id",
+    "imageUrl": "test_image_url",
+    "name": "Test org",
+    "slug": "test-org",
+  },
+  "status": "pending",
+  "updatedAt": 1970-01-01T00:00:05.678Z,
+}
+`;

@@ -1,0 +1,97 @@
+{
+  "name": "@clerk/clerk-react",
+  "version": "5.22.11",
+  "description": "Clerk React library",
+  "keywords": [
+    "clerk",
+    "react",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/react"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.mjs"
+      },
+      "require": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    },
+    "./errors": {
+      "import": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.mjs"
+      },
+      "require": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "internal",
+    "errors"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs react",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev --env.publish",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --ignore-rules false-cjs",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@clerk/localizations": "workspace:*",
+    "@clerk/themes": "workspace:*",
+    "@types/semver": "^7.5.8"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

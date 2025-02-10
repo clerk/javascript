@@ -1,0 +1,285 @@
+name: CI
+
+on:
+  merge_group:
+  pull_request:
+    branches:
+      - main
+      - release/v4
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
+  check-permissions:
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+          echo "${{ github.triggering_actor }} does not have permissions on this repo."
+          echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
+          echo "Job originally triggered by ${{ github.actor }}"
+          exit 1
+
+  formatting-linting:
+    needs: [check-permissions]
+    name: Formatting, linting & changeset checks
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    env:
+      TURBO_SUMMARIZE: false
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Deduplicate lockfile
+        run: pnpm dedupe
+  
+      - name: Check for changed lockfile
+        run: |
+          if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
+            echo "pnpm-lock.yaml is not deduped. Please run 'pnpm dedupe' locally and commit."
+            git diff pnpm-lock.yaml
+            exit 1
+          fi
+
+      - name: Require Changeset
+        if: ${{ !(github.event_name == 'merge_group') }}
+        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
+
+      # - name: Lint GitHub Actions Workflows
+      #   run: pnpm eslint .github
+      #   shell: bash
+
+      - name: Check Formatting
+        run: pnpm format:check
+
+      - name: Build Packages
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Check size using bundlewatch
+        run: pnpm turbo bundlewatch $TURBO_ARGS --only
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_BRANCH: ${{ github.ref	}}
+          CI_BRANCH_BASE: refs/heads/main
+
+      - name: Lint packages using publint
+        run: pnpm turbo lint:publint $TURBO_ARGS --only
+
+      - name: Lint types using attw
+        run: pnpm turbo lint:attw $TURBO_ARGS --only
+
+      - name: Run lint
+        run: pnpm turbo lint $TURBO_ARGS --only -- --quiet
+
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v4
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-lint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .turbo/runs
+          retention-days: 5
+
+  unit-tests:
+    needs: [check-permissions]
+    name: Unit Tests
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    env:
+      TURBO_SUMMARIZE: false
+
+    strategy:
+      matrix:
+        node-version: [18,22]
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          node-version: ${{ matrix.node-version }}
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.node-version }}" == "18" ]; then
+            echo "Running tests on Node 18 only for packages with LTS support."
+            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
+          else
+            echo "Running tests for all packages on Node 22."
+            pnpm turbo test $TURBO_ARGS
+          fi
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v4
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
+          path: .turbo/runs
+          retention-days: 5
+
+  integration-tests:
+    needs: [check-permissions]
+    name: Integration Tests
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue', 'nuxt', 'react-router']
+        test-project: ['chrome']
+        include:
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '13'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '14'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '15'
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Task Status
+        id: task-status
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+        run: |
+          AFFECTED=0
+          (pnpm turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          echo "affected=${AFFECTED}"
+          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+
+      - name: Verdaccio
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+
+      - name: Edit .npmrc [link-workspace-packages=false]
+        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
+
+      - name: Install @clerk/backend in /integration
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ./integration
+        run: pnpm init && pnpm add @clerk/backend
+
+      - name: Install @clerk/clerk-js in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
+
+      - name: Copy components @clerk/astro
+        if: ${{ matrix.test-name == 'astro' }}
+        run: cd packages/astro && pnpm copy:components
+
+      - name: Write all ENV certificates to files in integration/certs
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        uses: actions/github-script@v7
+        env:
+          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
+          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
+        with:
+            script: |
+                const fs = require('fs');
+                const path = require('path');
+                const rootCa = process.env.INTEGRATION_ROOT_CA;
+                console.log('rootCa', rootCa);
+                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
+                const certs = JSON.parse(process.env.INTEGRATION_CERTS);
+                for (const [name, cert] of Object.entries(certs)) {
+                    fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
+                }
+
+      - name: LS certs
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ./integration/certs
+        run: ls -la && pwd
+
+      - name: Run Integration Tests
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        id: integration-tests
+        run: sudo npm install -g pnpm && sudo --preserve-env pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+
+
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1

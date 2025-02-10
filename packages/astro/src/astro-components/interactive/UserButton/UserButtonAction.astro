@@ -1,0 +1,24 @@
+---
+import MenuItemRenderer from './MenuItemRenderer.astro';
+
+type ReorderItemsLabels = 'manageAccount' | 'signOut'
+
+type Props<Label extends string> = {
+  label: Label
+  parent?: string
+} & (Label extends ReorderItemsLabels
+  ? {
+      open?: string
+    }
+  : (
+      | { open: string; clickIdentifier?: string }
+      | { open?: string; clickIdentifier: string }
+    )
+)
+
+const { label, open, clickIdentifier, parent } = Astro.props
+---
+
+<MenuItemRenderer label={label} open={open} clickIdentifier={clickIdentifier} parent={parent}>
+  <slot name="label-icon" slot="label-icon" />
+</MenuItemRenderer>

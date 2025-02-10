@@ -1,0 +1,38 @@
+{
+  "name": "@clerk/dev-cli",
+  "version": "0.0.10",
+  "description": "CLI tool designed to simplify the process of iterating on packages within the clerk/javascript repository",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/dev-cli"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "type": "module",
+  "main": "bin/cli.js",
+  "bin": {
+    "clerk-dev": "bin/cli.js"
+  },
+  "scripts": {
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "concurrently": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "globby": "^14.0.2",
+    "jscodeshift": "^0.16.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

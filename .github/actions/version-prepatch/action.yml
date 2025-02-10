@@ -1,0 +1,20 @@
+name: Version Prepatch
+description: Bump a package to the next prepatch version using a specific tag
+inputs:
+  package:
+    description: 'The package to bump'
+    required: true
+  tag:
+    description: 'The tag to use'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Bump prepatch version
+      id: bump-prepatch-version
+      shell: bash
+      run: pnpm version-packages prepatch --no-git-tag-version --preid=$TAG --workspace=$PACKAGE
+      env:
+        PACKAGE: ${{ inputs.package }}
+        TAG: ${{ inputs.tag }}

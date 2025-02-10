@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord
+    url: https://clerk.com/discord
+    about: Ask questions, get help, and discuss new things you're building with the Clerk community
+  - name: Documentation
+    url: https://clerk.com/docs
+    about: Learn more about Clerk and how to use it
+  - name: Feature Requests
+    url: https://feedback.clerk.com
+    about: Describe a new capability you would like to see in Clerk's JavaScript packages

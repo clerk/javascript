@@ -1,0 +1,29 @@
+---
+import type { UserButtonProps, UserProfileProps, Without } from "@clerk/types";
+
+type Props = Without<UserButtonProps, 'userProfileProps'> & {
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  /**
+   * If you have more than one UserButton on a page, providing a custom ID is required
+   * to properly scope menu items to the correct button.
+   *
+   * Example usage:
+   * ```tsx
+   * <UserButton id="someId">
+   *     <UserButton.MenuItems>
+   *         <UserButton.Link parent="someId" label="User" href="/user">
+   *             <Icon slot="label-icon" />
+   *         </UserButton.Link>
+   *     </UserButton.MenuItems>
+   * </UserButton>
+   * ```
+   */
+  id?: string;
+}
+
+import InternalUIComponentRenderer from '../InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="user-button" />
+
+<slot />

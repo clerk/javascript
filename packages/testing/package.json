@@ -1,0 +1,92 @@
+{
+  "name": "@clerk/testing",
+  "version": "1.4.20",
+  "description": "Utilities to help you create E2E test suites for apps using Clerk",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "playwright",
+    "cypress",
+    "testing",
+    "e2e"
+  ],
+  "homepage": "https://clerk.com",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/testing"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    "./playwright": {
+      "import": {
+        "types": "./dist/types/playwright/index.d.ts",
+        "default": "./dist/playwright/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/playwright/index.d.ts",
+        "default": "./dist/playwright/index.js"
+      }
+    },
+    "./cypress": {
+      "import": {
+        "types": "./dist/types/cypress/index.d.ts",
+        "default": "./dist/cypress/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/cypress/index.d.ts",
+        "default": "./dist/cypress/index.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "playwright",
+    "cypress"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "cypress": "^13.9.0"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1",
+    "cypress": "^13"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    },
+    "cypress": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

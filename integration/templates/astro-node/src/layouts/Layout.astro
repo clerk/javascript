@@ -1,0 +1,144 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+import { SignedIn, SignedOut } from "@clerk/astro/components";
+import { LanguagePicker } from "../components/LanguagePicker";
+import CustomUserButton from "../components/CustomUserButton.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="bg-black/40 backdrop-blur-md border-b border-b-zinc-800">
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="md:flex md:items-center md:gap-12">
+            <a class="block text-teal-600" href="/">
+              <span>Home</span>
+            </a>
+          </div>
+
+          <div class="hidden md:block">
+            <nav aria-label="Global">
+              <ul class="flex items-center gap-6 text-sm">
+                <li>
+                  <a
+                    class="text-gray-100 transition hover:text-gray-400"
+                    href="/user"
+                  >
+                    User
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-gray-100 transition hover:text-gray-400"
+                    href="/organization"
+                  >
+                    Organization
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-gray-100 transition hover:text-gray-400"
+                    href="/discover"
+                  >
+                    Discover
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <div class="flex gap-5 items-center">
+            <LanguagePicker client:idle />
+
+            <SignedIn>
+              <CustomUserButton />
+            </SignedIn>
+
+            <SignedOut>
+              <div class="sm:flex sm:gap-4">
+                <a
+                  class="inline-flex group relative isolate w-fit transform-gpu overflow-hidden rounded-md px-3 py-[0.1875rem] cursor-pointer after:absolute after:inset-0 after:hover:opacity-100 transition duration-300 ease-[cubic-bezier(.4,.36,0,1)] after:duration-300 after:ease-[cubic-bezier(.4,.36,0,1)] after:transtion-opacity shadow-[inset_0px_1px_0px_theme(colors.white/12%),inset_0px_-1px_0px_theme(colors.white/4%),0px_2px_2px_-1px_rgb(66,67,77,0.24),0px_4px_4px_-2px_rgb(66,67,77,0.12)] bg-[#3C169C] ring-1 ring-[#230B6A] after:bg-[linear-gradient(theme(colors.white/24%),theme(colors.white/16%)_46%,theme(colors.white/12%)_54%,theme(colors.white/8%))] after:opacity-60 [--text-color:#FFFFFF]"
+                  href="/sign-in"
+                >
+                  <span
+                    class="text-[0.8125rem] font-medium leading-6 text-[--text-color] drop-shadow-[--text-drop-shadow]"
+                  >
+                    Login
+                  </span>
+                </a>
+
+                <div class="hidden sm:flex">
+                  <a
+                    class="inline-flex group relative isolate w-fit transform-gpu overflow-hidden rounded-md px-3 py-[0.1875rem] cursor-pointer after:absolute after:inset-0 after:hover:opacity-100 transition duration-300 ease-[cubic-bezier(.4,.36,0,1)] after:duration-300 after:ease-[cubic-bezier(.4,.36,0,1)] after:transtion-opacity shadow-[inset_0px_1px_0px_theme(colors.white/12%),inset_0px_-1px_0px_theme(colors.white/4%),0px_2px_2px_-1px_rgb(66,67,77,0.24),0px_4px_4px_-2px_rgb(66,67,77,0.12)] bg-newGray-900 ring-1 ring-newGray-950 after:bg-[linear-gradient(theme(colors.white/24%),theme(colors.white/16%)_46%,theme(colors.white/12%)_54%,theme(colors.white/8%))] after:opacity-60 [--text-color:#FFFFFF]"
+                    href="/sign-up"
+                  >
+                    <span
+                      class="text-[0.8125rem] font-medium leading-6 text-[--text-color] drop-shadow-[--text-drop-shadow]"
+                    >
+                      Register
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </SignedOut>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+<style is:global>
+  :root {
+    --accent: 136, 58, 234;
+    --accent-light: 224, 204, 250;
+    --accent-dark: 49, 10, 101;
+    --accent-gradient: linear-gradient(
+      45deg,
+      rgb(var(--accent)),
+      rgb(var(--accent-light)) 30%,
+      white 60%
+    );
+  }
+  html {
+    font-family: system-ui, sans-serif;
+    background: #13151a;
+    background-size: 224px;
+  }
+  code {
+    font-family:
+      Menlo,
+      Monaco,
+      Lucida Console,
+      Liberation Mono,
+      DejaVu Sans Mono,
+      Bitstream Vera Sans Mono,
+      Courier New,
+      monospace;
+  }
+  main {
+    padding: 1rem;
+    margin: auto;
+    width: calc(100% - 2rem);
+    max-width: 800px;
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+</style>

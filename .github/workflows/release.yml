@@ -1,0 +1,142 @@
+name: Release
+run-name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - release/v4
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release
+    if: ${{ github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+      pull-requests: write
+      issues: read
+      statuses: write
+      checks: write
+
+    steps:
+      - name: Echo github context
+        run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
+
+      - name: Build release
+        run: pnpm turbo build $TURBO_ARGS --force
+
+      - name: Create Release PR
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          commit: 'ci(repo): Version packages'
+          title: 'ci(repo): Version packages'
+          publish: pnpm release
+          # Workaround for https://github.com/changesets/changesets/issues/421
+          version: pnpm version-packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Trigger workflows on related repos
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const preMode = require("fs").existsSync("./.changeset/pre.json");
+            if (!preMode) {
+              const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              const nextjsVersion = require('./packages/nextjs/package.json').version;
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'cloudflare-workers',
+                workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
+                ref: 'main',
+                inputs: { version: clerkjsVersion }
+              })
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'dashboard',
+                workflow_id: 'prepare-nextjs-sdk-update.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
+              })
+            } else{
+              core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
+            }
+
+      - name: Generate notification payload
+        id: notification
+        if: steps.changesets.outputs.published == 'true'
+        run: payload=$(node scripts/notify.mjs '${{ steps.changesets.outputs.publishedPackages }}' '${{ github.actor }}') && echo ::set-output name=payload::${payload//$'\n'/'%0A'}
+
+      - name: Send commit log to Slack
+        id: slack
+        if: steps.changesets.outputs.published == 'true'
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: ${{ steps.notification.outputs.payload }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  # We're running the CI workflow (where node v20 modules are cached) in
+  # merge_group and not on main, we need to explicitly cache node_modules here so
+  # that follow-on branches can use the cached version of node_modules rather
+  # than recreating them every time.
+  cache-for-alternate-node-versions:
+    name: Cache for Alternate Node Versions
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    continue-on-error: true
+
+    strategy:
+      matrix:
+        version: [22] # NOTE: 18 is cached in the main release workflow
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Cache node_modules (Node v${{ matrix.version }})
+        uses: ./.github/actions/init
+        with:
+          node-version: ${{ matrix.version }}
+          turbo-team: ''
+          turbo-token: ''

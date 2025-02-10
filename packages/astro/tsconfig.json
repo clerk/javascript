@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["src", "env.d.ts", "client.d.ts"],
+  "compilerOptions": {
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    // Enable top-level await.
+    "target": "ES2022",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "declarationDir": "dist/types",
+    "noUncheckedIndexedAccess": true
+  },
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    // We're ignoring the files below because they are published as-is and is not processed/bundled with tsup.
+    // This cause TS to throw errors even though we're not bundling it.
+    "src/astro-components/**/*.ts"
+  ]
+}

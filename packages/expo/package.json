@@ -1,0 +1,114 @@
+{
+  "name": "@clerk/clerk-expo",
+  "version": "2.7.5",
+  "description": "Clerk React Native/Expo library",
+  "keywords": [
+    "react",
+    "react-native",
+    "expo",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "default": "./dist/web/index.js"
+    },
+    "./passkeys": {
+      "types": "./dist/passkeys/index.d.ts",
+      "default": "./dist/passkeys/index.js"
+    },
+    "./local-credentials": {
+      "types": "./dist/local-credentials/index.d.ts",
+      "default": "./dist/local-credentials/index.js"
+    },
+    "./secure-store": {
+      "types": "./dist/secure-store/index.d.ts",
+      "default": "./dist/secure-store/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "web",
+    "local-credentials",
+    "passkeys",
+    "secure-store"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "lint": "eslint src",
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "base-64": "^1.0.0",
+    "react-native-url-polyfill": "2.0.0",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@clerk/expo-passkeys": "workspace:*",
+    "@types/base-64": "^1.0.2",
+    "expo-auth-session": "^5.4.0",
+    "expo-local-authentication": "^13.8.0",
+    "expo-secure-store": "^12.8.1",
+    "expo-web-browser": "^12.8.2",
+    "react-native": "^0.73.9"
+  },
+  "peerDependencies": {
+    "@clerk/expo-passkeys": ">=0.0.6",
+    "expo-auth-session": ">=5",
+    "expo-local-authentication": ">=13.5.0",
+    "expo-secure-store": ">=12.4.0",
+    "expo-web-browser": ">=12.5.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react",
+    "react-native": ">=0.73"
+  },
+  "peerDependenciesMeta": {
+    "@clerk/expo-passkeys": {
+      "optional": true
+    },
+    "expo-local-authentication": {
+      "optional": true
+    },
+    "expo-secure-store": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

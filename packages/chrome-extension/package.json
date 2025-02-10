@@ -1,0 +1,71 @@
+{
+  "name": "@clerk/chrome-extension",
+  "version": "2.2.7",
+  "description": "Clerk SDK for Chrome extensions",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "chrome",
+    "extension"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/chrome-extension"
+  },
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "background",
+    "dist",
+    "internal",
+    "react"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs directory dist",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace  --sig",
+    "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
+    "test:ci": "jest --maxWorkers=70%",
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "webextension-polyfill": "^0.10.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "*",
+    "@types/webextension-polyfill": "^0.10.7",
+    "type-fest": "^4.8.3"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

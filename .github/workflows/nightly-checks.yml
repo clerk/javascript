@@ -1,0 +1,66 @@
+name: Nightly upstream tests
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
+
+jobs:
+  integration-tests:
+    name: Integration Tests
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    strategy:
+      matrix:
+        test-name: ['nextjs']
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
+      - name: Verdaccio
+        uses: ./.github/actions/verdaccio
+        with:
+          publish-cmd: |
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+
+      - name: Install @clerk/backend in /integration
+        working-directory: ./integration
+        run: pnpm init && pnpm add @clerk/backend
+
+      - name: Install @clerk/clerk-js in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
+
+      - name: Run Integration Tests
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force --no-cache
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          E2E_NEXTJS_VERSION: 'canary'
+          E2E_REACT_VERSION: '19.0.0-beta-04b058868c-20240508'
+          E2E_REACT_DOM_VERSION: '19.0.0-beta-04b058868c-20240508'
+          E2E_NPM_FORCE: 'true'
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}

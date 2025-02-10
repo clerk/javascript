@@ -1,0 +1,13 @@
+---
+import { UserProfile } from "@clerk/astro/components/interactive";
+import Layout from "../../layouts/react/Layout.astro";
+import {PageWithUser} from "../../components/page-with-user";
+import StreamUser from "../../components/StreamUser.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <!--<UserProfile client:load/>-->
+  <PageWithUser client:load>
+    <StreamUser />
+  </PageWithUser>
+</Layout>

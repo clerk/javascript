@@ -1,0 +1,50 @@
+{
+  "name": "@clerk/themes",
+  "version": "2.2.16",
+  "description": "Themes for the Clerk auth components",
+  "keywords": [
+    "react",
+    "next",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "customisation",
+    "themes"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/themes"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "dist/themes/src/index.js",
+  "source": "src/index.js",
+  "typings": "dist/themes/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@clerk/types": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

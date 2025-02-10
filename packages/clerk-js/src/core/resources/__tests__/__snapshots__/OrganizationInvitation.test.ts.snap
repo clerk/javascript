@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrganizationInvitation has the same initial properties 1`] = `
+OrganizationInvitation {
+  "createdAt": 1970-01-01T00:00:12.345Z,
+  "emailAddress": "test_email",
+  "id": "test_id",
+  "organizationId": "test_organization_id",
+  "pathRoot": "",
+  "publicMetadata": {
+    "public": "metadata",
+  },
+  "revoke": [Function],
+  "role": "basic_member",
+  "status": "pending",
+  "updatedAt": 1970-01-01T00:00:05.678Z,
+}
+`;

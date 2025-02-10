@@ -1,0 +1,14 @@
+---
+import { OrganizationList } from "@clerk/astro/components";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <div class="w-full flex justify-center">
+    <OrganizationList
+      afterSelectOrganizationUrl="/organization"
+      afterCreateOrganizationUrl="/organization"
+      afterSelectPersonalUrl="/user"
+    />
+  </div>
+</Layout>

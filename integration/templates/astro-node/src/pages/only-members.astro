@@ -1,0 +1,19 @@
+---
+import { Protect } from "@clerk/astro/components";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Page is only accessible by members">
+  <div class="w-full flex justify-center flex-col">
+    <Protect role="basic_member">
+      <Fragment slot="fallback">
+        <h1 class="text-2xl text-center">Not a member</h1>
+        <a
+          class="text-sm text-center text-gray-100 transition hover:text-gray-400"
+          href="/only-admins">Go to Admin Page</a
+        >
+      </Fragment>
+      <h1 class="text-2xl text-center">I'm a member</h1>
+    </Protect>
+  </div>
+</Layout>

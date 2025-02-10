@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`constants from environment variables 1`] = `
+{
+  "API_URL": "CLERK_API_URL",
+  "API_VERSION": "CLERK_API_VERSION",
+  "Cookies": {
+    "ClientUat": "__client_uat",
+    "DevBrowser": "__clerk_db_jwt",
+    "Handshake": "__clerk_handshake",
+    "RedirectCount": "__clerk_redirect_count",
+    "Refresh": "__refresh",
+    "Session": "__session",
+  },
+  "Headers": {
+    "Accept": "accept",
+    "AuthMessage": "x-clerk-auth-message",
+    "AuthReason": "x-clerk-auth-reason",
+    "AuthSignature": "x-clerk-auth-signature",
+    "AuthStatus": "x-clerk-auth-status",
+    "AuthToken": "x-clerk-auth-token",
+    "Authorization": "authorization",
+    "CacheControl": "cache-control",
+    "ClerkRedirectTo": "x-clerk-redirect-to",
+    "ClerkRequestData": "x-clerk-request-data",
+    "ClerkUrl": "x-clerk-clerk-url",
+    "CloudFrontForwardedProto": "cloudfront-forwarded-proto",
+    "ContentType": "content-type",
+    "EnableDebug": "x-clerk-debug",
+    "ForwardedHost": "x-forwarded-host",
+    "ForwardedPort": "x-forwarded-port",
+    "ForwardedProto": "x-forwarded-proto",
+    "Host": "host",
+    "Location": "location",
+    "Origin": "origin",
+    "Referrer": "referer",
+    "SecFetchDest": "sec-fetch-dest",
+    "UserAgent": "user-agent",
+  },
+  "JWT_KEY": "CLERK_JWT_KEY",
+  "PUBLISHABLE_KEY": "CLERK_PUBLISHABLE_KEY",
+  "SDK_METADATA": {
+    "environment": "test",
+    "name": "@clerk/fastify",
+    "version": "0.0.0-test",
+  },
+  "SECRET_KEY": "CLERK_SECRET_KEY",
+}
+`;

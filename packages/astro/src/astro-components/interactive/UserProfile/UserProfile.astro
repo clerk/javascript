@@ -1,0 +1,10 @@
+---
+import type { UserProfileProps, Without } from '@clerk/types'
+
+type Props = Without<UserProfileProps, 'customPages'>
+
+import InternalUIComponentRenderer from '../InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="user-profile" />
+<slot />

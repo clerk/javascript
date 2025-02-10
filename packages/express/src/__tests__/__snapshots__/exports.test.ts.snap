@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`module exports should not change unless explicitly set 1`] = `
+[
+  "authenticateRequest",
+  "clerkClient",
+  "clerkMiddleware",
+  "createClerkClient",
+  "getAuth",
+  "requireAuth",
+  "verifyToken",
+]
+`;

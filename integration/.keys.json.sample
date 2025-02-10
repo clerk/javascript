@@ -1,0 +1,50 @@
+{
+  "with-email-codes": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-email-links": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-custom-roles": {
+    "pk": "",
+    "sk": ""
+  },
+  "core-2-all-enabled": {
+    "pk": "",
+    "sk": ""
+  },
+  "sessions-prod-1": {
+    "pk": "",
+    "sk": ""
+  },
+  "sessions-dev-1": {
+    "pk": "",
+    "sk": ""
+  },
+  "sessions-prod-2": {
+    "pk": "",
+    "sk": ""
+  },
+  "sessions-dev-2": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-restricted-mode": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-reverification": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-legal-consent": {
+    "pk": "",
+    "sk": ""
+  },
+  "with-waitlist-mode": {
+    "pk": "",
+    "sk": ""
+  }
+}

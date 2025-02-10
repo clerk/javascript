@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      async
+      crossorigin="anonymous"
+      data-clerk-publishable-key="<YOUR_PUBLISHABLE_KEY_GOES_HERE>"
+      src="https://<YOUR_FRONTEND_API_URL_GOES_HERE>/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+      type="text/javascript"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .text {
+        line-height: 1.5em;
+      }
+
+      #errors p {
+        color: red;
+        padding: 20px 25px;
+        background: #faecec;
+        border-radius: 4px;
+        margin: 0 auto;
+        max-width: 960px;
+      }
+
+      header {
+        background: #3e3e3e;
+        color: white;
+      }
+
+      header .wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 960px;
+        min-height: 32px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+      }
+
+      #username {
+        margin-right: 20px;
+      }
+
+      .buttons {
+        display: flex;
+      }
+
+      #orgswitcher {
+        margin-right: 20px;
+      }
+
+      main {
+        margin: 50px auto;
+        max-width: 960px;
+      }
+
+      button {
+        appearance: none;
+        padding: 10px 20px;
+        border-radius: 3px;
+        border: none;
+        background: #4a7ad8;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #6391ec;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrapper">
+        <h3>Clerk JS Playground</h3>
+        <div class="buttons">
+          <div id="orgswitcher"></div>
+          <div class="user-info">
+            <div id="username"></div>
+            <div id="userbutton"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <p class="text">
+        A simple playground for tinkering with vanilla js clerk and testing changes to components. To get started,
+        create an application on Clerk and set your API key to the <code>data-clerk-publishable-key</code> data attribute
+        of the script that loads clerkJS.
+      </p>
+      <p>Use the buttons below to trigger basic functionality. Feel free to add more buttons as well!</p>
+
+      <button onClick="openSignUp()">Sign Up</button>
+      <button onClick="openSignIn()">Sign In</button>
+      <button onClick="showUserProfile()">User Profile</button>
+      <button onClick="openCreateOrganization()">Create Org</button>
+      <button onClick="showOrganizationProfile()">Org Profile</button>
+      <button onClick="signOut()">Sign Out</button>
+    </main>
+
+    <div id="errors"></div>
+    <div id="stage"></div>
+
+    <script>
+      window.addEventListener("load", async function () {
+        await Clerk.load();
+        console.log("ClerkJS is loaded");
+
+        if (Clerk.user) {
+          document.getElementById('username').innerText = Clerk.user.primaryEmailAddress.emailAddress;
+          Clerk.mountUserButton(document.getElementById('userbutton'));
+        }
+        if (Clerk.organization) {
+          Clerk.mountOrganizationSwitcher(document.getElementById('orgswitcher'));
+        }
+      });
+
+      const stage = document.getElementById('stage');
+      // clerkjs functions return null when there's an error and use console.info for reporting
+      // i recommend changing this, but for now we patch console.info to be able to display the err
+      const consoleInfo = console.info.bind(console);
+      console.info = message => {
+        const errs = document.getElementById('errors');
+        errs.innerHTML = '';
+        errs.append(el('p', message));
+        consoleInfo(message);
+      };
+
+      function openSignIn() {
+        Clerk.openSignIn();
+      }
+
+      function openSignUp() {
+        Clerk.openSignUp();
+      }
+
+      function signOut() {
+        Clerk.signOut();
+      }
+
+      function openCreateOrganization() {
+        Clerk.openCreateOrganization();
+      }
+
+      function showUserProfile() {
+        Clerk.mountUserProfile(stage);
+      }
+
+      function showOrganizationProfile() {
+        Clerk.mountOrganizationProfile(stage);
+      }
+
+      // utility fn
+      function el(tagName, content) {
+        const tag = document.createElement(tagName);
+        tag.innerText = content;
+        return tag;
+      }
+    </script>
+  </body>
+</html>

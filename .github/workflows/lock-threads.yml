@@ -1,0 +1,85 @@
+name: 'Lock stale PRs and issues'
+
+on:
+  workflow_dispatch:
+  schedule:
+    # This runs once a day
+    # https://crontab.guru/every-day
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write # only for delete-branch option
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: lock-threads
+
+jobs:
+  action:
+    timeout-minutes: 3
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/stale@v9
+        name: Regular stale action
+        with:
+          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          days-before-issue-stale: 30
+          days-before-pr-stale: 50
+          days-before-issue-close: 10
+          days-before-pr-close: 10
+          exempt-all-assignees: true
+          exempt-issue-labels: 'needs-triage,prioritized,confirmed,needs-reproduction'
+          stale-issue-message: |
+            Hello 👋
+
+            We currently close issues after 40 days of inactivity. It's been 30 days since the last update here. If we missed this issue, please reply here. Otherwise, we'll close this issue in 10 days.
+
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+
+            Thanks for being a part of the Clerk community! 🙏
+          stale-pr-message: |
+            Hello 👋
+
+            We currently close PRs after 60 days of inactivity. It's been 50 days since the last update here. If we missed this PR, please reply here. Otherwise, we'll close this PR in 10 days.
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-issue-message: |
+            Hello again 👋
+
+            After 40 days of no activity, we'll close this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it.
+
+            As a friendly reminder: The best way to see an issue fixed is to open a pull request. If you're not sure how to do that, please check out our [contributing guide](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-pr-message: |
+            Hello again 👋
+
+            After 60 days of no activity, we'll close this PR. Keep in mind, I'm just a robot, so if I've closed this PR in error, please reply here and my human colleagues will reopen it.
+
+            Thanks for being a part of the Clerk community! 🙏
+      - uses: actions/stale@v9
+        name: Stale action for needs-reproduction issues
+        with:
+          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          days-before-issue-stale: 7
+          days-before-issue-close: 1
+          exempt-all-assignees: true
+          any-of-issue-labels: 'needs-reproduction'
+          stale-issue-message: |
+            Hello 👋
+
+            In an effort to keep our GitHub issues clean and focused, we close any issues that are awaiting a reproduction after 8 days on inactivity, and it has been 7 days. This issue will be closed tomorrow unless a reproduction is provided. If it takes longer than this to get a reproduction, that's ok, just drop a comment and we will remove the Stale label.
+
+            [How to create a minimal reproduction](https://clerkdev.notion.site/clerkdev/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48)
+
+            Thanks for being a part of the Clerk community! 🙏
+          close-issue-message: |
+            After 8 days without a reproduction being supplied, we are closing this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it. Likewise if a reproduction is prepared after it has been closed.
+      - uses: dessant/lock-threads@v4
+        with:
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          issue-inactive-days: '365'
+          issue-comment: 'This issue has been automatically locked since there has not been any recent activity after it was closed. Please open a new issue for related bugs.'
+          process-only: 'issues'
+          log-output: true

@@ -1,0 +1,95 @@
+name: "🐛 Bug Report"
+description: Report a bug in Clerk's JavaScript packages.
+labels:
+  - "needs-triage"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Welcome 👋🏻
+
+        Thank you for taking the time to report an issue with Clerk's JavaScript packages. Please fill out the information below to help us resolve your issue faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord). We triage GitHub issues weekly, so it may take a week or so to get a response. If you have a more urgent need, please reach out to [support](https://clerk.com/support).
+  - type: checkboxes
+    attributes:
+      label: Preliminary Checks
+      description: Please make sure that you verify each checkbox and follow the instructions for them.
+      options:
+        - label: |
+            I have reviewed the documentation: https://clerk.com/docs
+          required: true
+        - label: |
+            I have searched for existing issues: https://github.com/clerk/javascript/issues
+          required: true
+        - label: |
+            I have not already reached out to Clerk support via email or Discord (if you have, no need to open an issue here)
+          required: true
+        - label: |
+            This issue is not a question, general help request, or anything other than a bug report directly related to Clerk. Please ask questions in our Discord community: https://clerk.com/discord.
+          required: true
+  - type: input
+    id: reproduction-link
+    attributes:
+      label: Reproduction
+      placeholder: "https://github.com/username/repository-name/"
+      description: |
+        Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.).
+
+        **Do not link to your actual project**, but provide a minimal reproduction in a fresh project. [How to create a minimal reproduction](https://clerkdev.notion.site/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48?pvs=4)
+
+        Optionally you can attach a [Replay recording](https://www.replay.io/) to the README of your minimal reproduction:
+        - [How to record a Replay](https://docs.replay.io/getting-started/recording-your-first-replay)
+    validations:
+      required: true
+  - type: input
+    id: publishable-key
+    attributes:
+      label: Publishable key
+      placeholder: "pk_test_123456789"
+      description: |
+        Go to your Clerk dashboard and to the **API Keys** section. Copy the **Publishable key** and paste it here.
+
+        This key should be used in your frontend code, can be safely shared, and does not need to be kept secret.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description
+      description: Describe the issue that you're seeing.
+      value: |
+        <!-- Be as precise as you can. Feel free to share screenshots, videos, or data from the devtools of your browser -->
+
+        **Steps to reproduce:**
+
+        1. Step 1
+        2. Step 2
+
+        **Expected behavior:**
+
+        <!-- Describe what you expected to happen -->
+
+        **Actual behavior:**
+
+        <!-- Describe what actually happened -->
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Environment
+      render: Shell
+      description: Run "pnpm dlx envinfo --system --browsers --binaries --npmPackages" in your project directory and paste the output here.
+      placeholder: |
+        You'll get an output similar to this:
+
+        System:
+          OS: Operating System
+          CPU: CPU
+        Binaries:
+          Node: X
+          npm: X
+        Browsers:
+          Chrome: X
+          Edge: X
+        npmPackages:
+          clerk: X => X
+    validations:
+      required: true

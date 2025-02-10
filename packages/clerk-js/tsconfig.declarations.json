@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "./dist",
+    "declarationDir": "./dist/types",
+    "noImplicitReturns": false
+  },
+  "include": [
+    "src/index.ts",
+    "src/index.browser.ts",
+    "src/index.headless.ts",
+    "src/index.headless.browser.ts",
+    "src/**/*.d.ts"
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "name": "@clerk/backend",
+  "version": "1.23.11",
+  "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/backend"
+  },
+  "license": "MIT",
+  "imports": {
+    "#crypto": {
+      "edge-light": "./dist/runtime/browser/crypto.mjs",
+      "worker": "./dist/runtime/browser/crypto.mjs",
+      "browser": "./dist/runtime/browser/crypto.mjs",
+      "node": {
+        "require": "./dist/runtime/node/crypto.js",
+        "import": "./dist/runtime/node/crypto.mjs"
+      },
+      "default": "./dist/runtime/browser/crypto.mjs"
+    }
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./errors": {
+      "import": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.mjs"
+      },
+      "require": {
+        "types": "./dist/errors.d.ts",
+        "default": "./dist/errors.js"
+      }
+    },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.mjs"
+      },
+      "require": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      }
+    },
+    "./jwt": {
+      "import": {
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.mjs"
+      },
+      "require": {
+        "types": "./dist/jwt/index.d.ts",
+        "default": "./dist/jwt/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "errors",
+    "internal",
+    "jwt"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "build:lib": "tsup --env.NODE_ENV production",
+    "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
+    "clean": "rimraf ./dist",
+    "lint": "eslint src",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack . --ignore-rules false-cjs",
+    "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
+    "test:node": "vitest run --environment node",
+    "test:edge-runtime": "vitest run --environment edge-runtime",
+    "test:cloudflare-miniflare": "vitest run --environment miniflare",
+    "test:watch": "run-s test:watch:node test:watch:edge-runtime test:watch:cloudflare-miniflare",
+    "test:watch:node": "vitest watch --environment node",
+    "test:watch:edge-runtime": "vitest watch --environment edge-runtime",
+    "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "cookie": "1.0.2",
+    "snakecase-keys": "8.0.1",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@edge-runtime/vm": "5.0.0",
+    "msw": "2.7.0",
+    "npm-run-all": "^4.1.5",
+    "vitest-environment-miniflare": "2.14.4"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

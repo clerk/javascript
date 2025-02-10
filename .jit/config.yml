@@ -1,0 +1,31 @@
+folders:
+  - path: /packages/backend
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/clerk-js
+    exclude:
+      - ./**/*.test.ts
+      - ./**/test/fixtureHelpers.ts
+  - path: /packages/expo
+  - path: /packages/fastify
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/localizations
+  - path: /packages/nextjs
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/react
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/remix
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/shared
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/themes
+  - path: /packages/types
+  - path: /packages/express
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/testing

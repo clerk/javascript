@@ -1,0 +1,50 @@
+name: Run Verdaccio
+description: Checkout, setup node and dependencies
+inputs:
+  auth-email:
+    description: 'The email to use for auth'
+    required: false
+    default: 'test@test.com'
+  auth-password:
+    description: 'The pass to use for auth'
+    required: false
+    default: 'pass'
+  auth-user:
+    description: 'The user to use for auth'
+    required: false
+    default: 'user'
+  publish-cmd:
+    description: 'The command to use to publish'
+    required: true
+  registry:
+    description: 'The registry to use'
+    required: false
+    default: 'http://localhost:4873'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update NPM Registry to Verdaccio
+      shell: bash
+      run: pnpm set registry ${{ inputs.registry }}
+
+    - name: Run Verdaccio (using publish config)
+      shell: bash
+      run: |
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
+        sleep 5
+        pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
+
+    - name: Publish to Verdaccio
+      shell: bash
+      run: ${{ inputs.publish-cmd }}
+
+    - name: Stop Verdaccio
+      shell: bash
+      run: kill -9 $VERDACCIO_PID
+
+    - name: Run Verdaccio (using install config)
+      shell: bash
+      run: |
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
+        pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken

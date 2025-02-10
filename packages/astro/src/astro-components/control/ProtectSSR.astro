@@ -1,0 +1,14 @@
+---
+import type { ProtectProps } from '../../types';
+
+type Props = ProtectProps;
+
+const { has, userId } = Astro.locals.auth();
+const isUnauthorized =
+  !userId ||
+  (typeof Astro.props.condition === "function" &&
+    !Astro.props.condition(has)) ||
+  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+---
+
+{isUnauthorized ? <slot name="fallback" /> : <slot />}

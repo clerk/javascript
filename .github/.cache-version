@@ -1,0 +1,3 @@
+# Update this file to invalidate **all** cache on GitHub actions (use sparingly)
+
+version: v3

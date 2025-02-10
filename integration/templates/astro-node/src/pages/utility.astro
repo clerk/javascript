@@ -1,0 +1,13 @@
+---
+import { ClerkLoaded, ClerkLoading } from '@clerk/astro/react';
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Utility">
+    <ClerkLoading client:load>
+      <div>Clerk is loading</div>
+    </ClerkLoading>
+    <ClerkLoaded client:load>
+        <div>Clerk is loaded</div>
+    </ClerkLoaded>
+</Layout>

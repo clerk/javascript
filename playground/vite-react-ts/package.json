@@ -1,0 +1,35 @@
+{
+  "name": "vite-react-ts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "dev:yalc": "pnpm yalc:add && vite",
+    "yalc:add": "pnpm yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
+    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
+    "@clerk/types": "file:.yalc/@clerk/types",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.37",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9"
+  }
+}

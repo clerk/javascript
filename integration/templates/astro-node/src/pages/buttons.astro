@@ -1,0 +1,24 @@
+---
+import { SignInButton, SignUpButton } from '@clerk/astro/components';
+
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <SignInButton
+    asChild
+    mode="modal"
+    fallbackRedirectUrl="/user"
+  >
+    <button>
+      Sign in
+    </button>
+  </SignInButton>
+
+  <SignUpButton
+    mode="modal"
+    fallbackRedirectUrl="/user"
+  >
+    Sign up
+  </SignUpButton>
+</Layout>

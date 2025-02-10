@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getAuth(req) throws error if clerkPlugin is on registered 1`] = `
+"🔒 Clerk: The "clerkPlugin" should be registered before using the "getAuth".
+Example:
+
+import { clerkPlugin } from '@clerk/fastify';
+
+const server: FastifyInstance = Fastify({ logger: true });
+server.register(clerkPlugin);
+
+For more info, check out the docs: https://clerk.com/docs,
+or come say hi in our discord server: https://clerk.com/discord
+"
+`;

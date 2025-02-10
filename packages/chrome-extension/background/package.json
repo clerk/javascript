@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/background/index.js",
+  "module": "../dist/esm/background/index.js",
+  "types": "../dist/types/background/index.d.ts"
+}

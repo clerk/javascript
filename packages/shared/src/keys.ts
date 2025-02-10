@@ -1,0 +1,139 @@
+import type { PublishableKey } from '@clerk/types';
+
+import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
+import { isomorphicAtob } from './isomorphicAtob';
+import { isomorphicBtoa } from './isomorphicBtoa';
+
+type ParsePublishableKeyOptions = {
+  fatal?: boolean;
+  domain?: string;
+  proxyUrl?: string;
+};
+
+const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
+const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
+
+// This regex matches the publishable like frontend API keys (e.g. foo-bar-13.clerk.accounts.dev)
+const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.accounts([a-z.]*)(dev|com)$/i;
+
+export function buildPublishableKey(frontendApi: string): string {
+  const isDevKey =
+    PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
+    (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
+  const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
+  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
+}
+
+export function parsePublishableKey(
+  key: string | undefined,
+  options: ParsePublishableKeyOptions & { fatal: true },
+): PublishableKey;
+export function parsePublishableKey(
+  key: string | undefined,
+  options?: ParsePublishableKeyOptions,
+): PublishableKey | null;
+export function parsePublishableKey(
+  key: string | undefined,
+  options: { fatal?: boolean; domain?: string; proxyUrl?: string } = {},
+): PublishableKey | null {
+  key = key || '';
+
+  if (!key || !isPublishableKey(key)) {
+    if (options.fatal && !key) {
+      throw new Error(
+        'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
+      );
+    }
+    if (options.fatal && !isPublishableKey(key)) {
+      throw new Error('Publishable key not valid.');
+    }
+    return null;
+  }
+
+  const instanceType = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) ? 'production' : 'development';
+
+  let frontendApi = isomorphicAtob(key.split('_')[2]);
+
+  // TODO(@dimkl): validate packages/clerk-js/src/utils/instance.ts
+  frontendApi = frontendApi.slice(0, -1);
+
+  if (options.proxyUrl) {
+    frontendApi = options.proxyUrl;
+  } else if (instanceType !== 'development' && options.domain) {
+    frontendApi = `clerk.${options.domain}`;
+  }
+
+  return {
+    instanceType,
+    frontendApi,
+  };
+}
+
+/**
+ * Checks if the provided key is a valid publishable key.
+ *
+ * @param key - The key to be checked. Defaults to an empty string if not provided.
+ * @returns `true` if 'key' is a valid publishable key, `false` otherwise.
+ */
+export function isPublishableKey(key: string = '') {
+  try {
+    const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
+
+    const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
+
+    return hasValidPrefix && hasValidFrontendApiPostfix;
+  } catch {
+    return false;
+  }
+}
+
+export function createDevOrStagingUrlCache() {
+  const devOrStagingUrlCache = new Map<string, boolean>();
+
+  return {
+    isDevOrStagingUrl: (url: string | URL): boolean => {
+      if (!url) {
+        return false;
+      }
+
+      const hostname = typeof url === 'string' ? url : url.hostname;
+      let res = devOrStagingUrlCache.get(hostname);
+      if (res === undefined) {
+        res = DEV_OR_STAGING_SUFFIXES.some(s => hostname.endsWith(s));
+        devOrStagingUrlCache.set(hostname, res);
+      }
+      return res;
+    },
+  };
+}
+
+export function isDevelopmentFromPublishableKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('pk_test_');
+}
+
+export function isProductionFromPublishableKey(apiKey: string): boolean {
+  return apiKey.startsWith('live_') || apiKey.startsWith('pk_live_');
+}
+
+export function isDevelopmentFromSecretKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}
+
+export function isProductionFromSecretKey(apiKey: string): boolean {
+  return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
+}
+
+export async function getCookieSuffix(
+  publishableKey: string,
+  subtle: SubtleCrypto = globalThis.crypto.subtle,
+): Promise<string> {
+  const data = new TextEncoder().encode(publishableKey);
+  const digest = await subtle.digest('sha-1', data);
+  const stringDigest = String.fromCharCode(...new Uint8Array(digest));
+  // Base 64 Encoding with URL and Filename Safe Alphabet: https://datatracker.ietf.org/doc/html/rfc4648#section-5
+  return isomorphicBtoa(stringDigest).replace(/\+/gi, '-').replace(/\//gi, '_').substring(0, 8);
+}
+
+export const getSuffixedCookieName = (cookieName: string, cookieSuffix: string): string => {
+  return `${cookieName}_${cookieSuffix}`;
+};

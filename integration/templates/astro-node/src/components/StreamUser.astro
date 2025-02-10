@@ -1,0 +1,6 @@
+---
+import { Code } from "astro:components";
+const user = await Astro.locals.currentUser();
+---
+
+<Code code={JSON.stringify(user)} lang={"json"} wrap />

@@ -1,0 +1,28 @@
+---
+import {
+  OrganizationSwitcher,
+  OrganizationProfile,
+} from "@clerk/astro/components";
+import Layout from "../layouts/Layout.astro";
+import Streaming from "../layouts/Streaming.astro";
+
+const { userId, redirectToSignIn } = Astro.locals.auth()
+
+if(!userId) {
+  return redirectToSignIn()
+}
+---
+
+<Layout title="Welcome to Astro.">
+  <Streaming />
+  <div class="w-full flex justify-center flex-col">
+    <OrganizationSwitcher
+      appearance={{
+        elements: {
+          organizationSwitcherTrigger: "text-white",
+        },
+      }}
+    />
+    <OrganizationProfile />
+  </div>
+</Layout>

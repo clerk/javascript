@@ -1,0 +1,98 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+dist
+tmp
+out-tsc
+out
+**/dist/*
+**/build/*
+packages/*/dist/**
+
+# dependencies
+node_modules
+**/node_modules/**
+
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+**/coverage/**
+*.tsbuildinfo
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Tooling
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+.turbo
+
+lerna-debug.log
+.next
+.dev.vars
+.env.local
+.yalc
+yalc.lock
+playground/*/build
+playground/*/public/build
+playground/*/.cache
+playground/custom
+
+# Examples & Playground apps dependency locks
+packages/*/examples/*/package-lock.json
+packages/*/examples/*/yarn.lock
+playground/*/package-lock.json
+playground/*/yarn.lock
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# integration testing
+.keys.json
+.env.json
+.temp_integration
+playwright-report
+test-results
+
+# Verdaccio
+.verdaccio
+
+# Workflow Outputs
+/packages/*/*.tgz
+/packages/*/tsconfig.test.vitest-temp.json
+
+# Scripts
+scripts/.env
+!scripts/.env.example
+
+# typedoc
+.typedoc

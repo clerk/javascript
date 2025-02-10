@@ -1,0 +1,23 @@
+---
+import SignedInCSR from './SignedInCSR.astro';
+import SignedInSSR from './SignedInSSR.astro';
+
+import { isStaticOutput } from 'virtual:@clerk/astro/config';
+
+type Props = {
+  isStatic?: boolean
+  /**
+   * The class name to apply to the outermost element of the component.
+   * This class is only applied to static components.
+   */
+  class?: string
+}
+
+const { isStatic, class: className } = Astro.props
+
+const SignedInComponent = isStaticOutput(isStatic) ? SignedInCSR : SignedInSSR;
+---
+
+<SignedInComponent class={className}>
+  <slot />
+</SignedInComponent>

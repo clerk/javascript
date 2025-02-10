@@ -1,0 +1,27 @@
+---
+type Props = {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<clerk-signed-out class={className} hidden>
+  <slot />
+</clerk-signed-out>
+
+<script>
+import { type AuthState, BaseClerkControlElement } from './BaseClerkControlElement';
+
+class ClerkSignedOut extends BaseClerkControlElement {
+  protected onAuthStateChange(state: AuthState): void {
+    if (state.userId) {
+      this.setAttribute('hidden', '');
+    } else {
+      this.removeAttribute('hidden');
+    }
+  }
+}
+
+customElements.define('clerk-signed-out', ClerkSignedOut);
+</script>

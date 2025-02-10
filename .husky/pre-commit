@@ -1,0 +1,42 @@
+#!/bin/bash
+. "$(dirname "$0")/_/husky.sh"
+
+###############################
+## Determine Staged Packages
+###############################
+#
+#staged_files=$(git diff --name-only --cached --diff-filter=ACM)
+#
+## Initialize an empty string to hold the unique folder paths
+#unique_folders=""
+#
+## Loop through each staged file
+#for file in $staged_files; do
+#  # Extract the first two folders from the file path
+#  folder=$(echo $file | awk -F'/' '{print $1 "/" $2}')
+#
+#  # Filter files which end with .mjs, .js, .jsx, .ts, or .tsx [NOTE: Should match ./.lintstagedrc.json]
+#  if [[ $file =~ \.(mjs|js|jsx|ts|tsx)$ ]]; then
+#    # Check if this folder is already in the list of unique folders
+#    if [[ $folder == packages/* ]] && [[ ! " $unique_folders " =~ "$folder" ]]; then
+#      # Append the folder to the list of unique folders
+#      unique_folders="$unique_folders --filter={./$folder}^..."
+#    fi
+#  fi
+#done
+#
+###############################
+## Build Staged Packages
+###############################
+#
+#if [ -n "$unique_folders" ]; then
+#  pnpm turbo run build --output-logs=errors-only $unique_folders
+#else
+#  echo "SKIPPING: No packages to build"
+#fi
+
+##############################
+# Run Lint Staged
+##############################
+
+pnpm lint-staged

@@ -1,0 +1,76 @@
+{
+  "name": "@clerk/vue",
+  "version": "1.1.10",
+  "description": "Clerk SDK for Vue",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "vue",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/vue"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --onSuccess \"pnpm build:dts\"",
+    "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^"
+  },
+  "devDependencies": {
+    "@testing-library/vue": "^8.1.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue.ts/tsx-auto-props": "^0.6.0",
+    "unplugin-vue": "^5.2.1",
+    "vue": "3.5.13",
+    "vue-tsc": "^2.2.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
