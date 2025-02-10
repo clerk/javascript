@@ -18,7 +18,7 @@ export const VirtualRouter = ({
   onExternalNavigate,
   children,
 }: VirtualRouterProps): JSX.Element => {
-  const { __internal_externalNavigationListener } = useClerk();
+  const { __internal_addNavigationListener } = useClerk();
   const [currentURL, setCurrentURL] = React.useState(
     new URL('/' + VIRTUAL_ROUTER_BASE_PATH + startPath, window.location.origin),
   );
@@ -27,7 +27,7 @@ export const VirtualRouter = ({
   useEffect(() => {
     let unsubscribe = () => {};
     if (onExternalNavigate) {
-      unsubscribe = __internal_externalNavigationListener(onExternalNavigate);
+      unsubscribe = __internal_addNavigationListener(onExternalNavigate);
     }
     return () => {
       unsubscribe();

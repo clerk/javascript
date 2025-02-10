@@ -187,7 +187,7 @@ export class Clerk implements ClerkInterface {
   #loaded = false;
 
   #listeners: Array<(emission: Resources) => void> = [];
-  #externalNavigationListeners: Array<() => void> = [];
+  #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -962,10 +962,10 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_externalNavigationListener = (listener: () => void): UnsubscribeCallback => {
-    this.#externalNavigationListeners.push(listener);
+  public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
+    this.#navigationListeners.push(listener);
     const unsubscribe = () => {
-      this.#externalNavigationListeners = this.#externalNavigationListeners.filter(l => l !== listener);
+      this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
     return unsubscribe;
   };
@@ -975,9 +975,11 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    /**
+     * Trigger all navigation listeners. In order for modal UI components to close.
+     */
     setTimeout(() => {
-      // Notify after the navigation, in order to visit a page with the updated context set above.
-      this.#notifyExternalNavigationListeners();
+      this.#emitNavigationListeners();
     }, 0);
 
     let toURL = new URL(to, window.location.href);
@@ -2056,8 +2058,8 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #notifyExternalNavigationListeners = (): void => {
-    for (const listener of this.#externalNavigationListeners) {
+  #emitNavigationListeners = (): void => {
+    for (const listener of this.#navigationListeners) {
       listener();
     }
   };
