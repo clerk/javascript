@@ -108,6 +108,36 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedOut();
   });
 
+  test('render custom user profile pages and links inside user button', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.waitForAppUrl('/');
+    await u.po.userButton.waitForMounted();
+
+    // Open UserProfile modal through UserButton
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+    await u.page.getByRole('menuitem', { name: /Manage account/i }).click();
+    await u.po.userProfile.waitForUserProfileModal();
+
+    // Verify custom pages and links are visible in the UserProfile
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Test custom UserProfilePage is accessible and renders correctly
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+    await expect(u.page.getByText('This is the custom terms page')).toBeVisible();
+
+    // Test UserProfileLink navigation works
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
   test('render user profile and current user data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
