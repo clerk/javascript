@@ -1,18 +1,16 @@
-import { useSessionList } from '@clerk/shared/react';
-import type { ActiveSessionResource, UserResource } from '@clerk/types';
+import { useClerk } from '@clerk/shared/react';
+import type { UserResource } from '@clerk/types';
 
 type UseMultipleSessionsParam = {
   user: UserResource | null | undefined;
 };
 
 const useMultipleSessions = (params: UseMultipleSessionsParam) => {
-  const { sessions } = useSessionList();
-  const activeSessions = sessions?.filter(s => s.status === 'active') as ActiveSessionResource[];
-  const otherSessions = activeSessions.filter(s => s.user?.id !== params.user?.id);
+  const clerk = useClerk();
 
   return {
-    activeSessions,
-    otherSessions,
+    authenticatedSessions: clerk.client.authenticatedSessions,
+    otherSessions: clerk.client.authenticatedSessions.filter(s => s.user?.id !== params.user?.id),
   };
 };
 
