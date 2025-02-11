@@ -1,0 +1,66 @@
+{
+  "name": "@clerk/agent-toolkit",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Clerk Toolkit for AI Agents",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/agent-toolkit"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./langchain": {
+      "types": "./dist/langchain/index.d.ts",
+      "require": "./dist/langchain/index.js",
+      "import": "./dist/langchain/index.mjs"
+    },
+    "./ai-sdk": {
+      "types": "./dist/ai-sdk/index.d.ts",
+      "require": "./dist/ai-sdk/index.js",
+      "import": "./dist/ai-sdk/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack .",
+    "lint:publint": "publint",
+    "test:cache:clear": "jest --clearCache --useStderr"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "zod": "^3.24.1"
+  },
+  "peerDependencies": {
+    "@langchain/core": "^0.3.6",
+    "ai": "^3.4.7 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@langchain/core": {
+      "optional": true
+    },
+    "ai": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

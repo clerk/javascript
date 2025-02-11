@@ -1,0 +1,8 @@
+---
+'@clerk/agent-toolkit': patch
+'@clerk/backend': patch
+---
+
+Introduce @clerk/agent-toolkit package. The Clerk Agent Toolkit enables popular agent frameworks, including Vercel's AI SDK and LangChain, to integrate with Clerk using tools (also known as function calling).
+
+This package exposes a subset of Clerk's functionality to agent frameworks, allowing you to build powerful agentic systems capable of managing users, user data, organizations, and more.
