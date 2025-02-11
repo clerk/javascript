@@ -4,7 +4,7 @@ import type { SignInButtonProps } from '@clerk/types'
 import type { ButtonProps } from '../../types';
 import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignInButtonProps & ButtonProps<Tag>>
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & SignInButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
