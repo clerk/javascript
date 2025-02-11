@@ -127,7 +127,7 @@ export async function POST(req: Request) {
 }
 ```
 
-## Use with Langchain
+## Using Langchain
 
 1. Install the Clerk Agent Toolkit package:
 
