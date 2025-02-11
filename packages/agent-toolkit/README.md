@@ -25,7 +25,7 @@
 
 </div>
 
-> ℹ️ Developer Preview
+> [!IMPORTANT]
 >
 > Agent behavior is typically non-deterministic. Ensure you thoroughly test your integration and evaluate your application's performance. Additionally, consider scoping this toolkit's tools to specific users to limit resource access.
 >
