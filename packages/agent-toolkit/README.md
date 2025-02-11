@@ -58,7 +58,7 @@ The Clerk Agent Toolkit package provides two main import paths:
 The toolkit offers the same tools and core APIs across frameworks, but their public interfaces may vary slightly to align with each framework's design:
 
 - `createClerkToolkit(options)`: Instantiates a new Clerk toolkit.
-- `toolkit.injectSessionClaims(systemPrompt)`: Injects session claims (userId, sessionId, orgId, etc.) into the system prompt, making them accessible to the AI model.
+- `toolkit.injectSessionClaims(systemPrompt)`: Injects session claims (`userId`, `sessionId`, `orgId`, etc.) into the system prompt, making them accessible to the AI model.
 - `toolkit.users()`: Provides tools for managing users.
 - `toolkit.organizations()`: Provides tools for managing organizations.
 - `toolkit.allTools()`: Returns all available tools.
