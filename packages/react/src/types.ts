@@ -7,9 +7,7 @@ import type {
   LoadedClerk,
   MultiDomainAndOrProxy,
   RedirectUrlProp,
-  SignInButtonProps as _SignInButtonProps,
   SignInRedirectOptions,
-  SignUpButtonProps as _SignUpButtonProps,
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
@@ -108,14 +106,6 @@ export type ClerkProp =
   | HeadlessBrowserClerkConstructor
   | undefined
   | null;
-
-export type SignInButtonProps = _SignInButtonProps & {
-  children?: React.ReactNode;
-};
-
-export type SignUpButtonProps = _SignUpButtonProps & {
-  children?: React.ReactNode;
-};
 
 export type SignInWithMetamaskButtonProps = {
   mode?: 'redirect' | 'modal';
