@@ -23,6 +23,14 @@ export interface PasskeyVerificationResource extends VerificationResource {
 
 export type VerificationStatus = 'unverified' | 'verified' | 'transferable' | 'failed' | 'expired';
 
+export type EmailLinkVerificationStatus =
+  | 'expired'
+  | 'failed'
+  | 'loading'
+  | 'verified'
+  | 'verified_switch_tab'
+  | 'client_mismatch';
+
 export interface CodeVerificationAttemptParam {
   code: string;
   signature?: never;

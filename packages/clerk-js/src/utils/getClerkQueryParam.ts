@@ -1,3 +1,5 @@
+import type { EmailLinkVerificationStatus } from '@clerk/types';
+
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
 
 const _ClerkQueryParams = [
@@ -16,16 +18,8 @@ const _ClerkQueryParams = [
 type ClerkQueryParam = (typeof _ClerkQueryParams)[number];
 
 type ClerkQueryParamsToValuesMap = {
-  __clerk_status: VerificationStatus | TicketStatus;
+  __clerk_status: EmailLinkVerificationStatus | TicketStatus;
 } & Record<(typeof _ClerkQueryParams)[number], string>;
-
-export type VerificationStatus =
-  | 'expired'
-  | 'failed'
-  | 'loading'
-  | 'verified'
-  | 'verified_switch_tab'
-  | 'client_mismatch';
 
 type TicketStatus = 'sign_in' | 'sign_up';
 

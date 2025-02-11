@@ -1,8 +1,8 @@
 import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
+import type { EmailLinkVerificationStatus } from '@clerk/types';
 import React from 'react';
 
-import type { VerificationStatus } from '../../utils';
 import { completeSignUpFlow } from '../../utils';
 import { useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
@@ -16,7 +16,7 @@ export type EmailLinkVerifyProps = {
   verifyEmailPath?: string;
   verifyPhonePath?: string;
   continuePath?: string;
-  texts: Record<VerificationStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
+  texts: Record<EmailLinkVerificationStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
@@ -24,7 +24,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
   const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
-  const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatus>('loading');
+  const [verificationStatus, setVerificationStatus] = React.useState<EmailLinkVerificationStatus>('loading');
 
   const startVerification = async () => {
     try {
@@ -41,7 +41,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         navigate,
       });
     } catch (err) {
-      let status: VerificationStatus = 'failed';
+      let status: EmailLinkVerificationStatus = 'failed';
       if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.Expired) {
         status = 'expired';
       }
