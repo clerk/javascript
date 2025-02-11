@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.2.17
+
+### Patch Changes
+
+- Invert OKX Wallet icon in dark theme. ([#5100](https://github.com/clerk/javascript/pull/5100)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/types@4.45.1
+
 ## 2.2.16
 
 ### Patch Changes

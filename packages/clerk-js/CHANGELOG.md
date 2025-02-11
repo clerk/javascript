@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.52.2
+
+### Patch Changes
+
+- Update `@coinbase/wallet-sdk` dependency to `4.3.0`, to resolve [SDK Security Advisory](https://github.com/coinbase/coinbase-wallet-sdk/security/advisories/GHSA-8rgj-285w-qcq4) ([#5120](https://github.com/clerk/javascript/pull/5120)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Add `menuButtonEllipsis` element descriptor. ([#5090](https://github.com/clerk/javascript/pull/5090)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix issue accessing routing option when componentProps is undefined. ([#5088](https://github.com/clerk/javascript/pull/5088)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `createAllowedRedirectOrigins` now takes the instance type into account to include Frontend API URL for development instances. This is necessary to properly support Clerk as an IdP with OAuth for development instances. ([#4767](https://github.com/clerk/javascript/pull/4767)) by [@kostaspt](https://github.com/kostaspt)
+
+- Replaces hard-coded string `"Add a passkey"` with a new localization key `userProfile.start.passkeysSection.primaryButton` ([#5105](https://github.com/clerk/javascript/pull/5105)) by [@Philitician](https://github.com/Philitician)
+
+- Avoid triggering email code verification twice on React strict mode ([#5095](https://github.com/clerk/javascript/pull/5095)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`26d273cd16941491fa05bca0ee64108956573177`](https://github.com/clerk/javascript/commit/26d273cd16941491fa05bca0ee64108956573177), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+  - @clerk/localizations@3.10.5
+
 ## 5.52.1
 
 ### Patch Changes
