@@ -69,7 +69,7 @@ For more details on each tool, refer to the framework-specific directories or th
 ### Prerequisites
 
 - `ai-sdk`: `"^3.4.7 || ^4.0.0"`, or `langchain`: `"^0.3.6"`
-- A Clerk application
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_agent_toolkit).
 - An API key for an AI model compatible with Langchain
 
 ### Example Repository
