@@ -23,8 +23,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
     await mainTab.page.addInitScript(() => {
-      // @ts-expect-error
-      if (navigator?.connection?.rtt === 0 || navigator?.downlink?.rtt === 0) {
+      /**
+       * Playwright may define connection incorrectly, we are overriding to null
+       */
+      if (
+        navigator.onLine &&
+        // @ts-expect-error Cannot find `connection`
+        (navigator?.connection?.rtt === 0 || navigator?.downlink?.rtt === 0)
+      ) {
         Object.defineProperty(Object.getPrototypeOf(navigator), 'connection', { value: null });
       }
     });
@@ -36,10 +42,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await mainTab.po.expect.toBeSignedIn();
 
     await mainTab.tabs.runInNewTab(async m => {
-      await m.page.addInitScript(() => {
-        Object.defineProperty(Object.getPrototypeOf(navigator), 'onLine', { value: true });
-      });
-
       await m.page.goToAppHome();
 
       await m.page.waitForClerkJsLoaded();
