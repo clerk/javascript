@@ -185,7 +185,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=true');
+    await u.page.goToRelative('/custom-pages/organization-profile');
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
@@ -216,7 +216,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=false');
+    await u.page.goToRelative('/custom-pages/organization-profile');
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
