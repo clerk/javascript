@@ -1,5 +1,5 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
-import { OAUTH_PROVIDERS } from '@clerk/types';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';

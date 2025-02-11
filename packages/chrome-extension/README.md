@@ -66,7 +66,7 @@ Please see the latest extension [authentication support matrix](https://clerk.co
     ```
 
 5.  **Update the extension manifest:** You'll need to update your extension manifest permissions to support Clerk.
-    1. [**Base configuration**:](/packages/chrome-extension/docs/manifest.md#base-configuration) Use this if you plan to only use Clerk in the context of the extention.
+    1. [**Base configuration**:](/packages/chrome-extension/docs/manifest.md#base-configuration) Use this if you plan to only use Clerk in the context of the extension.
     2. [**Session sync configuration**:](/packages/chrome-extension/docs/manifest.md#sync-host-configuration) Use this if you plan to share authentication with a website in the same browser.
 6.  **Add Clerk to your app:** Though not required, we generally suggest using Plasmo for browser extension development. This will enforce common standards across your extension as well as allow for easier integration with other browsers in the future.
 
