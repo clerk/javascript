@@ -6,8 +6,25 @@ import type { ClerkTool } from './clerk-tool';
 export type SdkAdapter<T> = (clerkClient: ClerkClient, context: ToolkitContext, clerkTool: ClerkTool) => T;
 
 export type ToolkitContext = {
+  /**
+   * The userId of the currently signed-in user.
+   * This is used to scope the tools to a specific user.
+   */
   userId?: string;
+  /**
+   * All JWT claims of the current session.
+   * This is used to scope the tools to a specific session or to make the LLM
+   * aware of the sessions details.
+   */
   sessionClaims?: SignedInAuthObject['sessionClaims'];
+  /**
+   * Whether to explicitly allow private metadata access.
+   * By default, private metadata are pruned from all resources, before
+   * the resources become available to the LLM. This is important to help avoid
+   * leaking sensitive information to carefully crafted user prompts.
+   *
+   * @default false
+   */
   allowPrivateMetadata?: boolean;
 };
 

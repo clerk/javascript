@@ -34,8 +34,7 @@
     "dev": "tsup --watch",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm no-resolution",
-    "lint:publint": "publint",
-    "test:cache:clear": "jest --clearCache --useStderr"
+    "lint:publint": "publint"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

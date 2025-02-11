@@ -20,6 +20,11 @@ export type ClerkToolkit = ClerkToolkitBase & {
   [key in keyof typeof tools]: () => { [tool in keyof (typeof tools)[key]]: ReturnType<typeof adapter> };
 };
 
+/**
+ * Creates a Clerk toolkit with the given parameters.
+ * The toolkit is a collection of tools that can be used to augment the AI's capabilities,
+ * For more details, refer to the [package's docs](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/README.md).
+ */
 export const createClerkToolkit = async (params: CreateClerkToolkitParams = {}): Promise<ClerkToolkit> => {
   const clerkClient = params.clerkClient || _clerkClient;
   const context = params.context || defaultToolkitContext;
