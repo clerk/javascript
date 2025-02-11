@@ -15,11 +15,11 @@ export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
   pathRoot = '/environment';
-  authConfig!: AuthConfigResource;
-  displayConfig!: DisplayConfigResource;
-  userSettings!: UserSettingsResource;
-  organizationSettings!: OrganizationSettingsResource;
-  maintenanceMode!: boolean;
+  authConfig: AuthConfigResource;
+  displayConfig: DisplayConfigResource;
+  userSettings: UserSettingsResource;
+  organizationSettings: OrganizationSettingsResource;
+  maintenanceMode: boolean;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
