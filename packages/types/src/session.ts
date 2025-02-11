@@ -131,20 +131,29 @@ export interface SessionResource extends ClerkResource {
   __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 
+/**
+ * Represents a session resource that has completed all tasks
+ * and authentication factors
+ */
 export interface ActiveSessionResource extends SessionResource {
   status: 'active';
   user: UserResource;
 }
 
+/**
+ * Represents a session resource that has pending tasks to be
+ * completed, eg: User has to select an organization
+ */
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';
   user: UserResource;
 }
 
-// todo: figure out better naming
-// the goal here is just to encapsulate those both sessions so we don't keep repeating
-// the same union everyone for the same purpose: the user has successfully verified / authenticated themselves
-export type AuthenticatedSession = ActiveSessionResource | PendingSessionResource;
+/**
+ * Represents session resources for users who have completed
+ * the full authentication flow.
+ */
+export type AuthenticatedSessionResource = ActiveSessionResource | PendingSessionResource;
 
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;

@@ -4,7 +4,7 @@ import type { SignInResource } from 'signIn';
 import type { SetActive, SignOut } from './clerk';
 import type { ActJWTClaim } from './jwt';
 import type {
-  ActiveSessionResource,
+  AuthenticatedSessionResource,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
@@ -180,7 +180,7 @@ export type UseSessionReturn =
   | {
       isLoaded: true;
       isSignedIn: true;
-      session: ActiveSessionResource;
+      session: AuthenticatedSessionResource;
     };
 
 /**

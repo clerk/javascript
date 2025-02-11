@@ -31,7 +31,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ActiveSessionResource } from './session';
+import type { AuthenticatedSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -63,7 +63,7 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: AuthenticatedSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -130,8 +130,8 @@ export interface Clerk {
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 
-  /** Active Session. */
-  session: ActiveSessionResource | null | undefined;
+  /** Current Session. */
+  session: AuthenticatedSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
@@ -708,9 +708,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     polling?: boolean;
     /**
-     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last authenticated session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
-    selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
+    selectInitialSession?: (client: ClientResource) => AuthenticatedSessionResource | null;
     /**
      * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
@@ -796,7 +796,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: ActiveSessionResource | null;
+  session?: AuthenticatedSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -869,10 +869,10 @@ export type SignUpRedirectOptions = RedirectOptions &
 
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set as active.
+   * The session resource or session id (string version) to be set on the client.
    * If `null`, the current session is deleted.
    */
-  session?: ActiveSessionResource | string | null;
+  session?: AuthenticatedSessionResource | string | null;
 
   /**
    * The organization resource or organization ID/slug (string version) to be set as active in the current session.

@@ -10,7 +10,7 @@ import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
-  ActiveSessionResource,
+  AuthenticatedSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -164,7 +164,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public client: ClientResource | undefined;
-  public session: ActiveSessionResource | null | undefined;
+  public session: AuthenticatedSessionResource | null | undefined;
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
@@ -387,7 +387,7 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    if (!opts.sessionId || this.client.activeSessions.length === 1) {
+    if (!opts.sessionId || this.client.authenticatedSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
@@ -397,7 +397,7 @@ export class Clerk implements ClerkInterface {
       return handleSetActive();
     }
 
-    const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
+    const session = this.client.authenticatedSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
@@ -877,12 +877,12 @@ export class Clerk implements ClerkInterface {
         : noop;
 
     if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
+      session = (this.client.sessions.find(x => x.id === session) as AuthenticatedSessionResource) || null;
     }
 
     let newSession = session === undefined ? this.session : session;
 
-    // At this point, the `session` variable should contain either an `ActiveSessionResource`
+    // At this point, the `session` variable should contain either an `AuthenticatedSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
@@ -920,7 +920,7 @@ export class Clerk implements ClerkInterface {
     //   Note that this will also update the session's active organization
     //   id.
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchLastActiveSession(newSession);
+      await this.#touchCurrentSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
     }
@@ -2028,14 +2028,14 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
+  #defaultSession = (client: ClientResource): AuthenticatedSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
+      const lastActiveSession = client.authenticatedSessions.find(s => s.id === client.lastActiveSessionId);
       if (lastActiveSession) {
         return lastActiveSession;
       }
     }
-    const session = client.activeSessions[0];
+    const session = client.authenticatedSessions[0];
     return session || null;
   };
 
@@ -2055,7 +2055,7 @@ export class Clerk implements ClerkInterface {
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        return this.#touchLastActiveSession(this.session);
+        return this.#touchCurrentSession(this.session);
       };
 
       this.#sessionTouchOfflineScheduler.schedule(performTouch);
@@ -2069,7 +2069,7 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (session?: AuthenticatedSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
@@ -2118,14 +2118,14 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  #setAccessors = (session?: ActiveSessionResource | null) => {
+  #setAccessors = (session?: AuthenticatedSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
     this.#aliasUser();
   };
 
-  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
-    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
+  #getSessionFromClient = (sessionId: string | undefined): AuthenticatedSessionResource | null => {
+    return this.client?.authenticatedSessions.find(x => x.id === sessionId) || null;
   };
 
   #aliasUser = () => {
