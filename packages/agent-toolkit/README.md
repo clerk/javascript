@@ -190,7 +190,7 @@ export async function POST(req: Request) {
 
 ### Using a Custom `clerkClient`
 
-If you need to set the Clerk secret key dynamically or use different Clerk instances, pass a custom `clerkClient`:
+If you need to set the Clerk secret key dynamically or use different Clerk instances, pass a custom `clerkClient`. Install `@clerk/backend` into your project and call the `createClerkClient` function:
 
 ```typescript
 import { createClerkToolkit } from '@clerk/agent-toolkit/ai-sdk';
