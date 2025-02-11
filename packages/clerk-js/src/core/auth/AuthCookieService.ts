@@ -1,4 +1,3 @@
-import { isBrowserOnline } from '@clerk/shared/browser';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
@@ -136,10 +135,6 @@ export class AuthCookieService {
     updateCookieImmediately?: boolean;
   } = {}): Promise<void> {
     if (!this.clerk.session) {
-      return;
-    }
-
-    if (!isBrowserOnline()) {
       return;
     }
 
