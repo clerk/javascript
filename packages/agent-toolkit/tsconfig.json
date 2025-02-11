@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "target": "ES2020",
+    "target": "ES2022",
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,

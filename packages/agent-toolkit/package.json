@@ -17,13 +17,11 @@
   "sideEffects": false,
   "exports": {
     "./langchain": {
-      "types": "./dist/langchain/index.d.ts",
-      "require": "./dist/langchain/index.js",
+      "types": "./dist/langchain/index.d.mts",
       "import": "./dist/langchain/index.mjs"
     },
     "./ai-sdk": {
-      "types": "./dist/ai-sdk/index.d.ts",
-      "require": "./dist/ai-sdk/index.js",
+      "types": "./dist/ai-sdk/index.d.mts",
       "import": "./dist/ai-sdk/index.mjs"
     }
   },
@@ -35,7 +33,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm no-resolution",
     "lint:publint": "publint",
     "test:cache:clear": "jest --clearCache --useStderr"
   },

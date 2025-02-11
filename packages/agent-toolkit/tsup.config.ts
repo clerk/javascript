@@ -9,10 +9,10 @@ export default defineConfig(overrideOptions => {
     entry: ['src/ai-sdk/index.ts', 'src/langchain/index.ts'],
     dts: true,
     // onSuccess: 'tsc',
-    minify: isProd,
+    minify: false,
     clean: true,
     sourcemap: true,
-    format: ['cjs', 'esm'],
+    format: ['esm'],
     // legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
