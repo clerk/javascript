@@ -136,6 +136,16 @@ export interface ActiveSessionResource extends SessionResource {
   user: UserResource;
 }
 
+export interface PendingSessionResource extends SessionResource {
+  status: 'pending';
+  user: UserResource;
+}
+
+// todo: figure out better naming
+// the goal here is just to encapsulate those both sessions so we don't keep repeating
+// the same union everyone for the same purpose: the user has successfully verified / authenticated themselves
+export type AuthenticatedSession = ActiveSessionResource | PendingSessionResource;
+
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
   status: string;
@@ -159,7 +169,15 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
+export type SessionStatus =
+  | 'abandoned'
+  | 'active'
+  | 'ended'
+  | 'expired'
+  | 'removed'
+  | 'replaced'
+  | 'revoked'
+  | 'pending';
 
 export interface PublicUserData {
   firstName: string | null;
