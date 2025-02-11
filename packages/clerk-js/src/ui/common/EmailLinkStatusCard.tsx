@@ -1,6 +1,6 @@
+import type { EmailLinkVerificationStatus } from '@clerk/types';
 import React from 'react';
 
-import type { VerificationStatus } from '../../utils/getClerkQueryParam';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner, Text } from '../customizables';
 import { Card, Header } from '../elements';
@@ -12,10 +12,10 @@ import { animations } from '../styledSystem';
 type EmailLinkStatusCardProps = React.PropsWithChildren<{
   title: LocalizationKey;
   subtitle: LocalizationKey;
-  status: VerificationStatus;
+  status: EmailLinkVerificationStatus;
 }>;
 
-const StatusToIcon: Record<Exclude<VerificationStatus, 'loading'>, React.ComponentType> = {
+const StatusToIcon: Record<Exclude<EmailLinkVerificationStatus, 'loading'>, React.ComponentType> = {
   verified: TickShield,
   verified_switch_tab: SwitchArrows,
   expired: ExclamationTriangle,
@@ -23,7 +23,7 @@ const StatusToIcon: Record<Exclude<VerificationStatus, 'loading'>, React.Compone
   client_mismatch: ExclamationTriangle,
 };
 
-const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus, 'loading'>) =>
+const statusToColor = (theme: InternalTheme, status: Exclude<EmailLinkVerificationStatus, 'loading'>) =>
   ({
     verified: theme.colors.$success500,
     verified_switch_tab: theme.colors.$primary500,
@@ -53,7 +53,7 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   );
 };
 
-const StatusRow = (props: { status: VerificationStatus }) => {
+const StatusRow = (props: { status: EmailLinkVerificationStatus }) => {
   return (
     <Flex
       elementDescriptor={descriptors.verificationLinkStatusBox}
@@ -82,7 +82,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
   );
 };
 
-const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) => {
+const StatusIcon = (props: { status: Exclude<EmailLinkVerificationStatus, 'loading'> }) => {
   const { status } = props;
 
   return (
