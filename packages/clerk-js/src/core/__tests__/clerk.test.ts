@@ -148,6 +148,7 @@ describe('Clerk singleton', () => {
     });
   });
 
+  // todo -> add tests for pending
   describe('.setActive', () => {
     const mockSession = {
       id: '1',
@@ -455,6 +456,7 @@ describe('Clerk singleton', () => {
     });
   });
 
+  // todo -> add tests for pending
   describe('.load()', () => {
     const mockSession = {
       id: '1',

@@ -1,5 +1,5 @@
 import { useSession, useUser } from '@clerk/shared/react';
-import type { ActiveSessionResource } from '@clerk/types';
+import type { AuthenticatedSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment, useUserButtonContext } from '../../contexts';
@@ -14,7 +14,7 @@ type UserButtonPopoverProps = { close?: (open: boolean) => void } & PropsOfCompo
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
   const { close: unsafeClose, ...rest } = props;
   const close = () => unsafeClose?.(false);
-  const { session } = useSession() as { session: ActiveSessionResource };
+  const { session } = useSession() as { session: AuthenticatedSessionResource };
   const userButtonContext = useUserButtonContext();
   const { __experimental_asStandalone } = userButtonContext;
   const { authConfig } = useEnvironment();

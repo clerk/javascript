@@ -1,4 +1,4 @@
-import type { ActiveSessionResource } from '@clerk/types';
+import type { AuthenticatedSessionResource } from '@clerk/types';
 
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import { useRouter } from '../../../ui/router';
@@ -13,9 +13,9 @@ import type { DefaultItemIds, MenuItem } from '../../utils/createCustomMenuItems
 
 type SingleSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;
-  handleSignOutSessionClicked: (session: ActiveSessionResource) => () => Promise<unknown> | void;
+  handleSignOutSessionClicked: (session: AuthenticatedSessionResource) => () => Promise<unknown> | void;
   handleUserProfileActionClicked: (startPath?: string) => Promise<unknown> | void;
-  session: ActiveSessionResource;
+  session: AuthenticatedSessionResource;
   completedCallback: () => void;
 };
 
@@ -113,12 +113,12 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
 
 type MultiSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;
-  handleSignOutSessionClicked: (session: ActiveSessionResource) => () => Promise<unknown> | void;
-  handleSessionClicked: (session: ActiveSessionResource) => () => Promise<unknown> | void;
+  handleSignOutSessionClicked: (session: AuthenticatedSessionResource) => () => Promise<unknown> | void;
+  handleSessionClicked: (session: AuthenticatedSessionResource) => () => Promise<unknown> | void;
   handleAddAccountClicked: () => Promise<unknown> | void;
   handleUserProfileActionClicked: (startPath?: string) => Promise<unknown> | void;
-  session: ActiveSessionResource;
-  otherSessions: ActiveSessionResource[];
+  session: AuthenticatedSessionResource;
+  otherSessions: AuthenticatedSessionResource[];
   completedCallback: () => void;
 };
 

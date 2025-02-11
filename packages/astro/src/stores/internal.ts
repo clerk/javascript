@@ -1,5 +1,5 @@
 import type {
-  ActiveSessionResource,
+  AuthenticatedSessionResource,
   Clerk,
   ClientResource,
   InitialState,
@@ -12,7 +12,7 @@ export const $csrState = map<{
   isLoaded: boolean;
   client: ClientResource | undefined | null;
   user: UserResource | undefined | null;
-  session: ActiveSessionResource | undefined | null;
+  session: AuthenticatedSessionResource | undefined | null;
   organization: OrganizationResource | undefined | null;
 }>({
   isLoaded: false,
