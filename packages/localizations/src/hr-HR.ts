@@ -511,13 +511,13 @@ export const hrHR: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Slažem se s {{ privacyPolicyLink || link("Politikom privatnosti") }}',
+        label__onlyTermsOfService: 'Slažem se s {{ termsOfServiceLink || link("Uvjetima korištenja") }}',
+        label__termsOfServiceAndPrivacyPolicy: 'Slažem se s {{ termsOfServiceLink || link("Uvjetima korištenja") }} i {{ privacyPolicyLink || link("Politikom privatnosti") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Molimo pročitajte i prihvatite uvjete kako biste nastavili',
+        title: 'Pravni pristanak',
       },
     },
     phoneCode: {
