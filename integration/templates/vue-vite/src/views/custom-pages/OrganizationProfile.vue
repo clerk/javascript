@@ -10,30 +10,29 @@ const dedicatedPage = route.query.dedicatedPage === 'true';
 </script>
 
 <template>
-  <div>is dedicated page: {{ dedicatedPage }}</div>
   <OrganizationSwitcher>
     <OrganizationSwitcher.OrganizationProfilePage
       v-if="!dedicatedPage"
-        label="Terms"
-        url="terms"
-      >
-        <template #labelIcon>
-          <div>Icon</div>
-        </template>
-        <div>
-          <h1>Custom Terms Page</h1>
-          <p>This is the custom terms page</p>
-        </div>
-      </OrganizationSwitcher.OrganizationProfilePage>
-      <OrganizationSwitcher.OrganizationProfileLink
-        v-if="!dedicatedPage"
-        label="Homepage"
-        url="/"
-      >
-        <template #labelIcon>
-          <div>Icon</div>
-        </template>
-      </OrganizationSwitcher.OrganizationProfileLink>
+      label="Terms"
+      url="terms"
+    >
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
+      <div>
+        <h1>Custom Terms Page</h1>
+        <p>This is the custom terms page</p>
+      </div>
+    </OrganizationSwitcher.OrganizationProfilePage>
+    <OrganizationSwitcher.OrganizationProfileLink
+      v-if="!dedicatedPage"
+      label="Homepage"
+      url="/"
+    >
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
+    </OrganizationSwitcher.OrganizationProfileLink>
   </OrganizationSwitcher>
   <OrganizationProfile v-if="dedicatedPage">
     <OrganizationProfile.Page

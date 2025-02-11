@@ -186,10 +186,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
 
     await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=true');
-
     await u.po.organizationSwitcher.waitForMounted();
-
-    console.log(await u.page.content());
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     // Check if custom pages and links are visible
@@ -209,7 +206,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.waitForAppUrl('/');
   });
 
-  test('render organization profile with custom pages and links inside organization switcher', async ({
+  test('render organization profile with custom pages and links inside an organization switcher', async ({
     page,
     context,
   }) => {
@@ -220,9 +217,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
 
     await u.page.goToRelative('/custom-pages/organization-profile?dedicatedPage=false');
-
-    // console.log(await u.page.content())
-
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 

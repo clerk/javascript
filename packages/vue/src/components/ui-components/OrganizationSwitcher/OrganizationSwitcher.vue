@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useClerk } from '../../../composables';
 import type { OrganizationSwitcherProps, OrganizationProfileProps } from '@clerk/types';
-import { ClerkHostRenderer } from '../../ClerkHostRenderer';
+import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 import { useOrganizationProfileCustomPages } from '../../../utils/useCustomPages';
 import { computed, provide } from 'vue';
 import { OrganizationProfileInjectionKey } from '../../../keys';
