@@ -15,9 +15,6 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
   "exports": {
     "./langchain": {
       "types": "./dist/langchain/index.d.ts",
@@ -30,6 +27,9 @@
       "import": "./dist/ai-sdk/index.mjs"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",

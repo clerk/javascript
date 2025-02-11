@@ -34,6 +34,7 @@
 > This SDK is recommended for testing purposes only unless you are confident in the agent's behavior and have implemented necessary security measures such as guardrails and best practices.
 
 ## Table of Contents
+
 1. [Getting Started](#getting-started)
 2. [Public APIs](#public-apis)
 3. [Use with Vercel's AI SDK](#use-with-vercels-ai-sdk)
@@ -66,11 +67,13 @@ The toolkit offers the same tools and core APIs across frameworks, but their pub
 For more details on each tool, refer to the framework-specific directories or the [Clerk BAPI documentation](https://clerk.com/docs/reference/backend-api).
 
 ### Prerequisites
+
 - `ai-sdk`: `"^3.4.7 || ^4.0.0"`, or `langchain`: `"^0.3.6"`
 - A Clerk application
 - An API key for an AI model compatible with Langchain
 
 ### Example Repository
+
 - [Clerk AI SDK Example](https://github.com/clerk/agent-toolkit-example)
 
 ## Use with Vercel's AI SDK
@@ -91,11 +94,11 @@ For more details on each tool, refer to the framework-specific directories or th
 
 ```typescript
 // Import the helper from the ai-sdk path
-import { createClerkToolkit } from "@clerk/agent-toolkit/ai-sdk";
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
-import { auth } from "@clerk/nextjs/server";
-import { systemPrompt } from "@/lib/ai/prompts";
+import { createClerkToolkit } from '@clerk/agent-toolkit/ai-sdk';
+import { openai } from '@ai-sdk/openai';
+import { streamText } from 'ai';
+import { auth } from '@clerk/nextjs/server';
+import { systemPrompt } from '@/lib/ai/prompts';
 
 export const maxDuration = 30;
 
@@ -109,7 +112,7 @@ export async function POST(req: Request) {
   const toolkit = await createClerkToolkit({ context: { userId } });
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai('gpt-4o'),
     messages,
     // Optional - inject session claims into the system prompt
     system: toolkit.injectSessionClaims(systemPrompt),
@@ -125,8 +128,6 @@ export async function POST(req: Request) {
 ```
 
 ## Use with Langchain
-
-
 
 1. Install the Clerk Agent Toolkit package:
 
@@ -144,12 +145,12 @@ export async function POST(req: Request) {
 
 ```typescript
 // Import the helper from the langchain path
-import { createClerkToolkit } from "@clerk/agent-toolkit/langchain";
-import { ChatOpenAI } from "@langchain/openai";
-import { auth } from "@clerk/nextjs/server";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { LangChainAdapter } from "ai";
-import { systemPrompt } from "@/lib/ai/prompts";
+import { createClerkToolkit } from '@clerk/agent-toolkit/langchain';
+import { ChatOpenAI } from '@langchain/openai';
+import { auth } from '@clerk/nextjs/server';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { LangChainAdapter } from 'ai';
+import { systemPrompt } from '@/lib/ai/prompts';
 
 export const maxDuration = 30;
 
@@ -161,8 +162,8 @@ export async function POST(req: Request) {
   // Optional - scope the toolkit to a specific user
   const toolkit = await createClerkToolkit({ context: { userId } });
 
-  const model = new ChatOpenAI({ model: "gpt-4o", temperature: 0 });
-  
+  const model = new ChatOpenAI({ model: 'gpt-4o', temperature: 0 });
+
   // Bind the tools you want to use to the model
   const modelWithTools = model.bindTools(toolkit.users());
 
@@ -183,8 +184,7 @@ export async function POST(req: Request) {
   const stream = await modelWithTools.stream(messages);
   return LangChainAdapter.toDataStreamResponse(stream);
 }
-
-````
+```
 
 ## Advanced Usage
 
@@ -193,21 +193,21 @@ export async function POST(req: Request) {
 If you need to set the Clerk secret key dynamically or use different Clerk instances, pass a custom `clerkClient`:
 
 ```typescript
-import { createClerkToolkit } from "@clerk/agent-toolkit/ai-sdk";
-import { createClerkClient } from "@clerk/backend";
+import { createClerkToolkit } from '@clerk/agent-toolkit/ai-sdk';
+import { createClerkClient } from '@clerk/backend';
 
 export async function POST(req: Request) {
   // Create a new Clerk client
-  const clerkClient = createClerkClient({ secretKey: "sk_" });
+  const clerkClient = createClerkClient({ secretKey: 'sk_' });
 
   // Instantiate a new Clerk toolkit with the custom client
   const toolkit = await createClerkToolkit({ clerkClient });
 
   // Use the toolkit as usual
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai('gpt-4o'),
     messages,
-    tools: toolkit.users()
+    tools: toolkit.users(),
   });
 }
 ```

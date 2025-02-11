@@ -1,4 +1,4 @@
-import type {ToolkitContext} from "./types";
+import type { ToolkitContext } from './types';
 
 export const defaultToolkitContext: ToolkitContext = {
   allowPrivateMetadata: false,
