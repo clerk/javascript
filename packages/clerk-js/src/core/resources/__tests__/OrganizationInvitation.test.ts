@@ -10,10 +10,15 @@ describe('OrganizationInvitation', () => {
       public_metadata: {
         public: 'metadata',
       },
+      private_metadata: {
+        private: 'metadata',
+      },
       role: 'basic_member',
       created_at: 12345,
       updated_at: 5678,
+      expires_at: 12345,
       status: 'pending',
+      url: 'url',
     });
 
     expect(organizationInvitation).toMatchSnapshot();

@@ -15,8 +15,11 @@ export class OrganizationInvitation extends BaseResource implements Organization
   emailAddress!: string;
   organizationId!: string;
   publicMetadata: OrganizationInvitationPublicMetadata = {};
+  privateMetadata: OrganizationInvitationPrivateMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: OrganizationCustomRoleKey;
+  url!: string;
+  expiresAt!: Date;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -66,10 +69,13 @@ export class OrganizationInvitation extends BaseResource implements Organization
       this.emailAddress = data.email_address;
       this.organizationId = data.organization_id;
       this.publicMetadata = data.public_metadata;
+      this.privateMetadata = data.private_metadata;
       this.role = data.role;
       this.status = data.status;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
+      this.expiresAt = data.expires_at;
+      this.url = data.url;
     }
     return this;
   }

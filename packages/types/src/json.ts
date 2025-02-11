@@ -406,10 +406,13 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   organization_id: string;
   public_metadata: OrganizationInvitationPublicMetadata;
+  private_metadata: OrganizationInvitationPrivateMetadata;
   status: OrganizationInvitationStatus;
   role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;
+  expires_at: number;
+  url: string;
 }
 
 export interface OrganizationDomainVerificationJSON {

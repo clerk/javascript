@@ -212,6 +212,8 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   private_metadata: OrganizationInvitationPrivateMetadata;
   created_at: number;
   updated_at: number;
+  expires_at: number;
+  url: string;
 }
 
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {

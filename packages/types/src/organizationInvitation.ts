@@ -21,8 +21,11 @@ export interface OrganizationInvitationResource extends ClerkResource {
   emailAddress: string;
   organizationId: string;
   publicMetadata: OrganizationInvitationPublicMetadata;
+  privateMetadata: OrganizationInvitationPrivateMetadata;
   role: OrganizationCustomRoleKey;
   status: OrganizationInvitationStatus;
+  url: string;
+  expiresAt: Date;
   createdAt: Date;
   updatedAt: Date;
   revoke: () => Promise<OrganizationInvitationResource>;
