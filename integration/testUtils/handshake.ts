@@ -108,6 +108,7 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     state,
     extraClaims,
   }: {
+    // todo -> add tests for pending
     state: 'active' | 'expired' | 'early';
     extraClaims?: Map<string, any>;
   }) => {

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
+import type { AuthenticatedSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
 import { useCardState } from '../../elements';
@@ -20,10 +20,10 @@ type UseMultisessionActionsParams = {
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
-  const { activeSessions, otherSessions } = useMultipleSessions({ user: opts.user });
+  const { authenticatedSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
 
-  const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
+  const handleSignOutSessionClicked = (session: AuthenticatedSessionResource) => () => {
     if (otherSessions.length === 0) {
       return signOut(opts.navigateAfterSignOut);
     }
@@ -66,7 +66,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return signOut(opts.navigateAfterSignOut);
   };
 
-  const handleSessionClicked = (session: ActiveSessionResource) => async () => {
+  const handleSessionClicked = (session: AuthenticatedSessionResource) => async () => {
     card.setLoading();
     return setActive({ session, redirectUrl: opts.afterSwitchSessionUrl }).finally(() => {
       card.setIdle();
@@ -87,6 +87,6 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     handleSessionClicked,
     handleAddAccountClicked,
     otherSessions,
-    activeSessions,
+    authenticatedSessions,
   };
 };

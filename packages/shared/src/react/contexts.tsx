@@ -1,7 +1,7 @@
 'use client';
 
 import type {
-  ActiveSessionResource,
+  AuthenticatedSessionResource,
   ClerkOptions,
   ClientResource,
   LoadedClerk,
@@ -17,7 +17,7 @@ import { createContextAndHook } from './hooks/createContextAndHook';
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
 const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
-const [SessionContext, useSessionContext] = createContextAndHook<ActiveSessionResource | null | undefined>(
+const [SessionContext, useSessionContext] = createContextAndHook<AuthenticatedSessionResource | null | undefined>(
   'SessionContext',
 );
 
