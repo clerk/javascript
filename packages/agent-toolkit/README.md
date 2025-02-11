@@ -64,7 +64,7 @@ The toolkit offers the same tools and core APIs across frameworks, but their pub
 - `toolkit.allTools()`: Returns all available tools.
 - `toolkit.toolMap()`: **(Langchain only)** Returns an object mapping available tools, useful for calling tools by name.
 
-For more details on each tool, refer to the framework-specific directories or the [Clerk BAPI documentation](https://clerk.com/docs/reference/backend-api).
+For more details on each tool, refer to the framework-specific directories or the [Clerk Backend API documentation](https://clerk.com/docs/reference/backend-api).
 
 ### Prerequisites
 
