@@ -183,7 +183,12 @@ export abstract class BaseResource {
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
     const { action, body, method, path, skipUpdateClient } = params;
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body }, { skipUpdateClient });
+    let json;
+    if (skipUpdateClient) {
+      json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body }, { skipUpdateClient });
+    } else {
+      json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    }
     return this.fromJSON((json?.response || json) as J);
   }
 
