@@ -120,8 +120,8 @@
   ],
   "scripts": {
     "build": "tsup",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "postinstall": "node ./scripts/postinstall.mjs",

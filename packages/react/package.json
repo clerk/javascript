@@ -63,8 +63,8 @@
   ],
   "scripts": {
     "build": "tsup",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev --env.publish",
     "lint": "eslint src",

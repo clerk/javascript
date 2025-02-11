@@ -5,7 +5,7 @@
     "declarationDir": "./dist",
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "exclude": ["**/__tests__/**/*"]
 }

@@ -28,6 +28,6 @@ export default defineConfig(overrideOptions => {
       __DEV__: `${isWatch}`,
     },
   };
-  
+
   return runAfterLast(['pnpm build:declarations', shouldPublish && 'pnpm publish:local'])(options);
 });
