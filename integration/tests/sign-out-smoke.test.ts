@@ -23,7 +23,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
     await mainTab.page.addInitScript(() => {
-      Object.defineProperty(Object.getPrototypeOf(navigator), 'onLine', { value: true });
+      // @ts-expect-error
+      if (navigator?.connection?.rtt === 0 || navigator?.downlink?.rtt === 0) {
+        Object.defineProperty(Object.getPrototypeOf(navigator), 'connection', { value: null });
+      }
     });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);

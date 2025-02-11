@@ -75,7 +75,7 @@ export function isBrowserOnline(): boolean {
   // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility
   // @ts-ignore
   const isExperimentalConnectionOnline = navigator?.connection?.rtt !== 0 && navigator?.connection?.downlink !== 0;
-  return isExperimentalConnectionOnline || isNavigatorOnline;
+  return isExperimentalConnectionOnline && isNavigatorOnline;
 }
 
 /**
