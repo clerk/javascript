@@ -179,7 +179,7 @@
   This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
 
   - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
-  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+  - `__internal_reloadInitialResources()`: This function is used to reload the initial resources (Environment/Client) from the Frontend API.
 
 - Updated dependencies [[`66ad299e4b6496ea4a93799de0f1ecfad920ddad`](https://github.com/clerk/javascript/commit/66ad299e4b6496ea4a93799de0f1ecfad920ddad), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d), [`e1748582d0c89462f48a482a7805871b7065fa19`](https://github.com/clerk/javascript/commit/e1748582d0c89462f48a482a7805871b7065fa19), [`7f7edcaa8228c26d19e9081979100ada7e982095`](https://github.com/clerk/javascript/commit/7f7edcaa8228c26d19e9081979100ada7e982095), [`dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d`](https://github.com/clerk/javascript/commit/dd3fdc7b2a96ddb90b33c6f1cefb055a60f99a9d)]:
   - @clerk/shared@2.20.1
@@ -1208,7 +1208,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -1878,7 +1878,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -2265,7 +2265,7 @@
 
 ### Patch Changes
 
-- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
 

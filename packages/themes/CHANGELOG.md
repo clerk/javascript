@@ -731,7 +731,7 @@
 
 ### Patch Changes
 
-- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+- Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
 
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.

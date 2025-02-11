@@ -24,7 +24,7 @@ During installation, `mkcert` automatically adds its root CA to your machine's t
 export NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"
 ```
 
-or provide the `NODE_EXTRA_CA_CERTS` when runnning your tests:
+or provide the `NODE_EXTRA_CA_CERTS` when running your tests:
 
 ```shell
 NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem" playwright test...

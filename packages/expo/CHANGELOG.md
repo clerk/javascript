@@ -1334,7 +1334,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -1955,7 +1955,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 

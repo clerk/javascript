@@ -933,7 +933,7 @@
   ```ts
   import { clerkClient } from '@clerk/clerk-sdk-node';
 
-  // Use the default settings from the already instanciated clerkClient
+  // Use the default settings from the already instantiated clerkClient
   clerkClient.verifyToken(token);
   // or provide overrides the options
   clerkClient.verifyToken(token, {
@@ -1563,7 +1563,7 @@
 - 2e77cd737: Set correct information on required Node.js and React versions in README
 - 63dfe8dc9: Resolve Vercel edge-runtime "TypeError: Failed to parse URL" when `@clerk/remix` is used
 - e921af259: Replace enums with `as const` objects so `@clerk/backend` is consistent with the other packages
-- c22cd5214: Fix type inferance for auth helper.
+- c22cd5214: Fix type inference for auth helper.
 - 7cb1241a9: Trigger the handshake when no dev browser token exists in development.
 - bad4de1a2: Fixed an issue where errors returned from backend api requests are not converted to camelCase.
 - 66b283653: Fix infinite redirect loops for production instances with incorrect secret keys'
@@ -2644,7 +2644,7 @@
 
 - Update `authenticateRequest()` to respect the `CloudFront-Forwarded-Proto` header when determining the correct `forwardedProto` value. This fixes an issue when Clerk is used in applications that are deployed behind AWS CloudFront, where previously all requests were treated as cross-origin. ([#1817](https://github.com/clerk/javascript/pull/1817)) by [@dimkl](https://github.com/dimkl)
 
-- Remove experimenta jsdoc tags from multi-domain types. ([#1819](https://github.com/clerk/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
+- Remove experimental jsdoc tags from multi-domain types. ([#1819](https://github.com/clerk/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
 
 - Updated dependencies [[`b59b6b75d`](https://github.com/clerk/javascript/commit/b59b6b75dc61bc4d7e61f7cca774f3731a2929b9), [`164f3aac7`](https://github.com/clerk/javascript/commit/164f3aac7928bc69301846130cc77986569d4e91), [`68259a2bb`](https://github.com/clerk/javascript/commit/68259a2bb8193befdde9101d4ec9bf305881d5e2), [`33e927c59`](https://github.com/clerk/javascript/commit/33e927c59fbf06436ff642ef9f846bd3b467e3e1), [`9514618d6`](https://github.com/clerk/javascript/commit/9514618d65cfdde0ff011eabd41a992b61fc8dc1), [`c7c6912f3`](https://github.com/clerk/javascript/commit/c7c6912f34874467bc74104690fe9f95491cc10d), [`71bb1c7b5`](https://github.com/clerk/javascript/commit/71bb1c7b570f7b0bbc377c8104c9abcc1af4cacf)]:
   - @clerk/types@3.54.0
@@ -2870,7 +2870,7 @@
 
 - Support `audience` parameter in authentication request ([#1004](https://github.com/clerk/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
 
-  The audience parameter is used to verify the the aud claim in
+  The audience parameter is used to verify the aud claim in
   the request matches the value of the parameter or is included
   (when the user provides a list).
 
