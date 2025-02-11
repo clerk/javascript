@@ -22,6 +22,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
 
   test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
+    await mainTab.page.addInitScript(() => {
+      Object.defineProperty(Object.getPrototypeOf(navigator), 'onLine', { value: true });
+    });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
     await mainTab.po.signIn.continue();
@@ -30,6 +33,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await mainTab.po.expect.toBeSignedIn();
 
     await mainTab.tabs.runInNewTab(async m => {
+      await m.page.addInitScript(() => {
+        Object.defineProperty(Object.getPrototypeOf(navigator), 'onLine', { value: true });
+      });
+
       await m.page.goToAppHome();
 
       await m.page.waitForClerkJsLoaded();
