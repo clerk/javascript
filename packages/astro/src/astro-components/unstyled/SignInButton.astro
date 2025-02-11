@@ -22,7 +22,7 @@ const {
   signUpFallbackRedirectUrl,
   signUpForceRedirectUrl,
   mode,
-  ...elementProps
+  ...props
 } = Astro.props
 
 const signInOptions = {
@@ -44,20 +44,20 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+    <Tag {...props} data-clerk-unstyled-id={safeId}>
       <slot>Sign in</slot>
     </Tag >
   )
 }
 
-<script is:inline define:vars={{ elementProps, signInOptions, mode, safeId }}>
+<script is:inline define:vars={{ props, signInOptions, mode, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
   btn.addEventListener("click", () => {
     const clerk = window.Clerk
 
     if (mode === 'modal') {
-      return clerk.openSignIn({ ...signInOptions, appearance: elementProps.appearance });
+      return clerk.openSignIn({ ...signInOptions, appearance: props.appearance });
     }
 
     return clerk.redirectToSignIn({
