@@ -76,7 +76,7 @@ For more details on each tool, refer to the framework-specific directories or th
 
 - [Clerk AI SDK Example](https://github.com/clerk/agent-toolkit-example)
 
-## Use with Vercel's AI SDK
+## Using Vercel's AI SDK
 
 1. Install the Clerk Agent Toolkit package:
 
