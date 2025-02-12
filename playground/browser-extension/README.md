@@ -27,7 +27,7 @@ After following the quickstart you'll have learned how to:
 - Test your Chrome Extension
 
 
-## Connect with developement package
+## Connect with development package
 
 Run the development server:
 ```bash

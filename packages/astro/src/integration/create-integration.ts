@@ -1,5 +1,6 @@
 import type { ClerkOptions } from '@clerk/types';
 import type { AstroIntegration } from 'astro';
+import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
@@ -13,11 +14,12 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
+  enableEnvSchema?: boolean;
 };
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
   return (params?: Params): AstroIntegration => {
-    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl } = params || {};
+    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
@@ -77,6 +79,11 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
               },
               build: {
                 target: 'es2022',
+              },
+            },
+            env: {
+              schema: {
+                ...(enableEnvSchema ? createClerkEnvSchema() : {}),
               },
             },
           });
@@ -155,6 +162,29 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
         },
       },
     };
+  };
+}
+
+function createClerkEnvSchema() {
+  return {
+    PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
+    PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
+    PUBLIC_CLERK_SIGN_UP_URL: envField.string({ context: 'client', access: 'public', optional: true }),
+    PUBLIC_CLERK_IS_SATELLITE: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    PUBLIC_CLERK_PROXY_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+    PUBLIC_CLERK_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+    PUBLIC_CLERK_JS_URL: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+    PUBLIC_CLERK_JS_VARIANT: envField.enum({
+      context: 'client',
+      access: 'public',
+      optional: true,
+      values: ['headless'],
+    }),
+    PUBLIC_CLERK_JS_VERSION: envField.string({ context: 'client', access: 'public', optional: true }),
+    PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
+    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
 }
 

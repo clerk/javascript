@@ -1,7 +1,7 @@
 import type { MenuId } from '@clerk/types';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Icon } from '../customizables';
+import { Button, descriptors, Icon } from '../customizables';
 import { ThreeDots } from '../icons';
 import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
@@ -33,6 +33,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
           })}
           variant='ghost'
           colorScheme='neutral'
+          elementDescriptor={[descriptors.menuButton, descriptors.menuButtonEllipsis]}
         >
           <Icon
             icon={ThreeDots}

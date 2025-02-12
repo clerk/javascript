@@ -38,9 +38,12 @@ export * from './TestingToken';
 
 export type {
   EmailWebhookEvent,
+  OrganizationWebhookEvent,
+  OrganizationDomainWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
-  OrganizationWebhookEvent,
+  PermissionWebhookEvent,
+  RoleWebhookEvent,
   SessionWebhookEvent,
   SMSWebhookEvent,
   UserWebhookEvent,

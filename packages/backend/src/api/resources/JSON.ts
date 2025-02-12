@@ -1,5 +1,8 @@
 import type {
   InvitationStatus,
+  OrganizationDomainVerificationStatus,
+  OrganizationDomainVerificationStrategy,
+  OrganizationEnrollmentMode,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
@@ -20,6 +23,7 @@ export const ObjectType = {
   MachineToken: 'machine_token',
   OauthAccessToken: 'oauth_access_token',
   Organization: 'organization',
+  OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
@@ -181,6 +185,27 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   created_by?: string;
   created_at: number;
   updated_at: number;
+}
+
+export interface OrganizationDomainJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OrganizationDomain;
+  id: string;
+  name: string;
+  organization_id: string;
+  enrollment_mode: OrganizationEnrollmentMode;
+  verification: OrganizationDomainVerificationJSON | null;
+  affiliation_email_address: string | null;
+  created_at: number;
+  updated_at: number;
+  total_pending_invitations: number;
+  total_pending_suggestions: number;
+}
+
+export interface OrganizationDomainVerificationJSON {
+  status: OrganizationDomainVerificationStatus;
+  strategy: OrganizationDomainVerificationStrategy;
+  attempts: number;
+  expires_at: number;
 }
 
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
