@@ -27,13 +27,15 @@ export type UseSignInActiveSessionListParams = {
   omitCurrent: boolean;
 };
 
-export function useSignInActiveSessionList(params?: UseSignInActiveSessionListParams): SignInActiveSessionListItem[] {
+export function useSignInSessionList(params?: UseSignInActiveSessionListParams): SignInActiveSessionListItem[] {
   const { omitCurrent = true } = params || {};
 
   return SignInRouterCtx.useSelector(state => {
-    const activeSessions = state.context.clerk?.client?.activeSessions || [];
+    const authenticatedSessions = state.context.clerk?.client?.authenticatedSessions || [];
     const currentSessionId = state.context.clerk?.session?.id;
-    const filteredSessions = omitCurrent ? activeSessions.filter(s => s.id !== currentSessionId) : activeSessions;
+    const filteredSessions = omitCurrent
+      ? authenticatedSessions.filter(s => s.id !== currentSessionId)
+      : authenticatedSessions;
 
     return filteredSessions.map(s => ({
       id: s.id,
