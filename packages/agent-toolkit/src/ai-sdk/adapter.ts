@@ -3,6 +3,9 @@ import { tool } from 'ai';
 
 import type { SdkAdapter } from '../lib/types';
 
+/**
+ * Converts a `ClerkTool` to an AI SDK `Tool`.
+ */
 export const adapter: SdkAdapter<Tool> = (clerkClient, context, clerkTool) => {
   return tool({
     description: clerkTool.description,
