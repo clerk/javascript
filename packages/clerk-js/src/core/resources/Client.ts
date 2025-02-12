@@ -54,6 +54,9 @@ export class Client extends BaseResource implements ClientResource {
     return this.signIn;
   }
 
+  /**
+   * @deprecated Use `authenticatedSessions` instead
+   */
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   }
