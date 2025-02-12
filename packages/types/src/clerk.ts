@@ -127,6 +127,13 @@ export interface Clerk {
   /** Clerk flag for loading Clerk in a standard browser setup */
   isStandardBrowser: boolean | undefined;
 
+  /**
+   * Indicates whether the current user has a valid, fully authenticated client session.
+   * A session is considered valid when the user has successfully authenticated,
+   * completed all required authentication factors, and resolved all pending authentication tasks.
+   */
+  hasAuthenticatedClient: boolean;
+
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 

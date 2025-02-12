@@ -132,7 +132,7 @@ export interface SessionResource extends ClerkResource {
 }
 
 /**
- * Represents a session resource that has completed all tasks
+ * Represents a session resource that has completed all pending tasks
  * and authentication factors
  */
 export interface ActiveSessionResource extends SessionResource {
@@ -141,8 +141,7 @@ export interface ActiveSessionResource extends SessionResource {
 }
 
 /**
- * Represents a session resource that has pending tasks to be
- * completed, eg: User has to select an organization
+ * Represents a session resource that is authenticated but has pending tasks
  */
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';
