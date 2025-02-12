@@ -187,6 +187,7 @@ export class Clerk implements ClerkInterface {
   #loaded = false;
 
   #listeners: Array<(emission: Resources) => void> = [];
+  #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -906,12 +907,12 @@ export class Clerk implements ClerkInterface {
     //   automatic reloading when reloading shouldn't be happening.
     const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
     if (beforeEmit) {
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
+      beforeUnloadTracker?.startTracking();
+      this.#setTransitiveState();
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
@@ -940,7 +941,6 @@ export class Clerk implements ClerkInterface {
 
     this.#emit();
     await onAfterSetActive();
-    this.#resetComponentsState();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -962,10 +962,25 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
+  public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
+    this.#navigationListeners.push(listener);
+    const unsubscribe = () => {
+      this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
+    };
+    return unsubscribe;
+  };
+
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
     if (!to || !inBrowser()) {
       return;
     }
+
+    /**
+     * Trigger all navigation listeners. In order for modal UI components to close.
+     */
+    setTimeout(() => {
+      this.#emitNavigationListeners();
+    }, 0);
 
     let toURL = new URL(to, window.location.href);
 
@@ -2043,15 +2058,14 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
+  #emitNavigationListeners = (): void => {
+    for (const listener of this.#navigationListeners) {
+      listener();
+    }
   };
 
-  #resetComponentsState = () => {
-    if (Clerk.mountComponentRenderer) {
-      this.closeSignUp();
-      this.closeSignIn();
-    }
+  #broadcastSignOutEvent = () => {
+    this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
   #setTransitiveState = () => {
