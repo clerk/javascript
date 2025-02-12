@@ -114,7 +114,8 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     const claims = { sub: 'user_12345' } as Claims;
 
     const now = Math.floor(Date.now() / 1000);
-    if (state === 'active' || state === 'pending') {
+    const isAuthenticated = state === 'active' || state === 'pending';
+    if (isAuthenticated) {
       claims.iat = now;
       claims.nbf = now - 10;
       claims.exp = now + 60;
