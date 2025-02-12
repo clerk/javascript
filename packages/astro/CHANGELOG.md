@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 2.1.20
+
+### Patch Changes
+
+- Adds types for organization domain webhook events ([#4819](https://github.com/clerk/javascript/pull/4819)) by [@ijxy](https://github.com/ijxy)
+
+- Updated dependencies [[`ce44176efd4f2132001c49b815cbee409463bbea`](https://github.com/clerk/javascript/commit/ce44176efd4f2132001c49b815cbee409463bbea), [`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`c0f2daebe15642cd0cef16aafa1df1ece8ef771d`](https://github.com/clerk/javascript/commit/c0f2daebe15642cd0cef16aafa1df1ece8ef771d), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472), [`5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2`](https://github.com/clerk/javascript/commit/5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2)]:
+  - @clerk/backend@1.24.0
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
 ## 2.1.19
 
 ### Patch Changes
@@ -262,7 +273,7 @@
 
 ### Patch Changes
 
-- Add backwards compatibility for ignoring prerendered routes in Astro ([#4694](https://github.com/clerk/javascript/pull/4694)) by [@wobsoriano](https://github.com/wobsoriano)
+- Add backwards compatibility for ignoring pre-rendered routes in Astro ([#4694](https://github.com/clerk/javascript/pull/4694)) by [@wobsoriano](https://github.com/wobsoriano)
 
 - Updated dependencies [[`8ee5d84995fa17532491ff96efac5738c9bcd9ef`](https://github.com/clerk/javascript/commit/8ee5d84995fa17532491ff96efac5738c9bcd9ef), [`09fedd1df155d30cc055ce701b133aa6470e9b47`](https://github.com/clerk/javascript/commit/09fedd1df155d30cc055ce701b133aa6470e9b47), [`b6aa589f75be62a89a3853d496176ed2f2c0e2c5`](https://github.com/clerk/javascript/commit/b6aa589f75be62a89a3853d496176ed2f2c0e2c5), [`235eaae4c3c9400492fca47d20a47c7081041565`](https://github.com/clerk/javascript/commit/235eaae4c3c9400492fca47d20a47c7081041565)]:
   - @clerk/types@4.36.0
@@ -845,7 +856,7 @@
   + import { SignInButton } from "@clerk/astro/components"
   ```
 
-- Simplify submodules and drop the `bunlded` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Simplify submodules and drop the `bundled` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Moved
 
@@ -864,7 +875,7 @@
 
 - Add a reusable ID generation function by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
-- Remove `@nanostores/react` from depedency. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Remove `@nanostores/react` from dependency. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Introduce `<AuthenticateWithRedirectCallback/>` as an Astro and as a React component by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
