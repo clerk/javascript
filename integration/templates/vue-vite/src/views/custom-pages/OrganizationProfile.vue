@@ -4,7 +4,10 @@ import { OrganizationProfile, OrganizationSwitcher } from '@clerk/vue';
 
 <template>
   <OrganizationSwitcher>
-    <OrganizationSwitcher.OrganizationProfilePage label="Terms" url="terms">
+    <OrganizationSwitcher.OrganizationProfilePage
+      label="Terms"
+      url="terms"
+    >
       <template #labelIcon>
         <div>Icon</div>
       </template>
@@ -13,14 +16,20 @@ import { OrganizationProfile, OrganizationSwitcher } from '@clerk/vue';
         <p>This is the custom terms page</p>
       </div>
     </OrganizationSwitcher.OrganizationProfilePage>
-    <OrganizationSwitcher.OrganizationProfileLink label="Homepage" url="/">
+    <OrganizationSwitcher.OrganizationProfileLink
+      label="Homepage"
+      url="/"
+    >
       <template #labelIcon>
         <div>Icon</div>
       </template>
     </OrganizationSwitcher.OrganizationProfileLink>
   </OrganizationSwitcher>
   <OrganizationProfile>
-    <OrganizationProfile.Page label="Terms" url="terms">
+    <OrganizationProfile.Page
+      label="Terms"
+      url="terms"
+    >
       <template #labelIcon>
         <div>Icon</div>
       </template>
@@ -29,7 +38,10 @@ import { OrganizationProfile, OrganizationSwitcher } from '@clerk/vue';
         <p>This is the custom terms page</p>
       </div>
     </OrganizationProfile.Page>
-    <OrganizationProfile.Link label="Homepage" url="/">
+    <OrganizationProfile.Link
+      label="Homepage"
+      url="/"
+    >
       <template #labelIcon>
         <div>Icon</div>
       </template>
