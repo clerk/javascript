@@ -71,15 +71,6 @@ type ProtectProps =
 
 export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };
 
-export type ButtonProps<Tag> = {
-  /**
-   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
-   * Use the default slot with the 'asChild' prop instead.
-   * @example
-   * <SignInButton asChild>
-   *   <button>Sign in</button>
-   * </SignInButton>
-   */
-  as: Tag;
+export type AsChildProps<T> = T & {
   asChild?: boolean;
 };
