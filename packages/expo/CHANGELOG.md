@@ -1,5 +1,28 @@
 # Change Log
 
+## 2.7.7
+
+### Patch Changes
+
+- Accept custom `redirectURL` for SSO callback via `startSSOFlow` ([#5102](https://github.com/clerk/javascript/pull/5102)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Usage:
+
+  ```ts
+  await startSSOFlow({
+    strategy: 'oauth_google',
+    redirectUrl: AuthSession.makeRedirectUri({
+      path: 'dashboard',
+    }),
+  });
+  ```
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3)]:
+  - @clerk/clerk-react@5.22.13
+  - @clerk/types@4.46.0
+  - @clerk/clerk-js@5.52.3
+  - @clerk/shared@2.21.1
+
 ## 2.7.6
 
 ### Patch Changes

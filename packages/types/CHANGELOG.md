@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.46.0
+
+### Minor Changes
+
+- Introduce `__internal_addNavigationListener` method the `Clerk` singleton. ([#5092](https://github.com/clerk/javascript/pull/5092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract common button component props. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.45.1
 
 ### Patch Changes

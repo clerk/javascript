@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.10.6
+
+### Patch Changes
+
+- Add hr-HR translations for localization keys under `signUp.legalConsent`. ([#5131](https://github.com/clerk/javascript/pull/5131)) by [@harunsmrkovic](https://github.com/harunsmrkovic)
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+
 ## 3.10.5
 
 ### Patch Changes
