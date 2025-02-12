@@ -10,6 +10,7 @@ const snapshot = `---
 '@clerk/clerk-js': patch
 '@clerk/backend': patch
 '@clerk/fastify': patch
+'@clerk/agent-toolkit': patch
 '@clerk/nextjs': patch
 '@clerk/shared': patch
 '@clerk/themes': patch
