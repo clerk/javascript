@@ -3,6 +3,7 @@ import * as http from 'node:http';
 import { expect, test } from '@playwright/test';
 
 import type { OrganizationSyncOptions } from '../../packages/backend/src/tokens/types';
+import type { AuthenticatedSessionResource } from '../../packages/types';
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
@@ -69,75 +70,77 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('standard signed-in - dev', async () => {
-    const config = generateConfig({ mode: 'test' });
-    const { token, claims } = config.generateToken({ state: 'active' });
-    const clientUat = claims.iat;
-    const res = await fetch(app.serverUrl + '/', {
-      headers: new Headers({
-        Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
-        'X-Publishable-Key': config.pk,
-        'X-Secret-Key': config.sk,
-        'Sec-Fetch-Dest': 'document',
-      }),
-      redirect: 'manual',
+  (['active', 'pending'] satisfies Array<AuthenticatedSessionResource['status']>).forEach(state => {
+    test(`standard signed-in with ${state} session - dev`, async () => {
+      const config = generateConfig({ mode: 'test' });
+      const { token, claims } = config.generateToken({ state });
+      const clientUat = claims.iat;
+      const res = await fetch(app.serverUrl + '/', {
+        headers: new Headers({
+          Cookie: `${devBrowserCookie} __client_uat=${clientUat}; __session=${token}`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          'Sec-Fetch-Dest': 'document',
+        }),
+        redirect: 'manual',
+      });
+      expect(res.status).toBe(200);
     });
-    expect(res.status).toBe(200);
-  });
 
-  test('standard signed-in - authorization header - dev', async () => {
-    const config = generateConfig({
-      mode: 'test',
+    test(`standard signed-in with ${state} - authorization header - dev`, async () => {
+      const config = generateConfig({
+        mode: 'test',
+      });
+      const { token, claims } = config.generateToken({ state });
+      const clientUat = claims.iat;
+      const res = await fetch(app.serverUrl + '/', {
+        headers: new Headers({
+          Cookie: `${devBrowserCookie} __client_uat=${clientUat};`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          Authorization: `Bearer ${token}`,
+          'Sec-Fetch-Dest': 'document',
+        }),
+        redirect: 'manual',
+      });
+      expect(res.status).toBe(200);
     });
-    const { token, claims } = config.generateToken({ state: 'active' });
-    const clientUat = claims.iat;
-    const res = await fetch(app.serverUrl + '/', {
-      headers: new Headers({
-        Cookie: `${devBrowserCookie} __client_uat=${clientUat};`,
-        'X-Publishable-Key': config.pk,
-        'X-Secret-Key': config.sk,
-        Authorization: `Bearer ${token}`,
-        'Sec-Fetch-Dest': 'document',
-      }),
-      redirect: 'manual',
-    });
-    expect(res.status).toBe(200);
-  });
 
-  test('standard signed-in - prod', async () => {
-    const config = generateConfig({
-      mode: 'live',
+    test(`standard signed-in with ${state} - prod`, async () => {
+      const config = generateConfig({
+        mode: 'live',
+      });
+      const { token, claims } = config.generateToken({ state });
+      const clientUat = claims.iat;
+      const res = await fetch(app.serverUrl + '/', {
+        headers: new Headers({
+          Cookie: `__client_uat=${clientUat}; __session=${token}`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          'Sec-Fetch-Dest': 'document',
+        }),
+        redirect: 'manual',
+      });
+      expect(res.status).toBe(200);
     });
-    const { token, claims } = config.generateToken({ state: 'active' });
-    const clientUat = claims.iat;
-    const res = await fetch(app.serverUrl + '/', {
-      headers: new Headers({
-        Cookie: `__client_uat=${clientUat}; __session=${token}`,
-        'X-Publishable-Key': config.pk,
-        'X-Secret-Key': config.sk,
-        'Sec-Fetch-Dest': 'document',
-      }),
-      redirect: 'manual',
-    });
-    expect(res.status).toBe(200);
-  });
 
-  test('standard signed-in - authorization header - prod', async () => {
-    const config = generateConfig({
-      mode: 'live',
+    test(`standard signed-in with ${state} - authorization header - prod`, async () => {
+      const config = generateConfig({
+        mode: 'live',
+      });
+      const { token, claims } = config.generateToken({ state });
+      const clientUat = claims.iat;
+      const res = await fetch(app.serverUrl + '/', {
+        headers: new Headers({
+          Cookie: `__client_uat=${clientUat};`,
+          'X-Publishable-Key': config.pk,
+          'X-Secret-Key': config.sk,
+          Authorization: `Bearer ${token}`,
+        }),
+        redirect: 'manual',
+      });
+      expect(res.status).toBe(200);
     });
-    const { token, claims } = config.generateToken({ state: 'active' });
-    const clientUat = claims.iat;
-    const res = await fetch(app.serverUrl + '/', {
-      headers: new Headers({
-        Cookie: `__client_uat=${clientUat};`,
-        'X-Publishable-Key': config.pk,
-        'X-Secret-Key': config.sk,
-        Authorization: `Bearer ${token}`,
-      }),
-      redirect: 'manual',
-    });
-    expect(res.status).toBe(200);
   });
 
   test('expired session token - dev', async () => {
@@ -919,7 +922,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
   };
   type When = {
     // With this initial state...
-    initialAuthState: 'active' | 'expired' | 'early';
+    initialAuthState: 'active' | 'expired' | 'early' | 'pending';
     initialSessionClaims: Map<string, string>;
 
     // When the customer app specifies these orgSyncOptions to middleware...
@@ -985,6 +988,25 @@ test.describe('Client handshake with organization activation @nextjs', () => {
         fapiOrganizationIdParamValue: 'org_a',
       },
     },
+    {
+      name: 'Pending session, no org in session, but org a requested by ID => attempts to activate org A',
+      when: {
+        initialAuthState: 'pending',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_a',
+      },
+    },
 
     // ---------------- Header-based auth tests ----------------
     // Header-based auth requests come from non-browser actors, which don't have the __client cookie.
@@ -994,6 +1016,25 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       name: 'Header-based auth should not handshake with active auth',
       when: {
         initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'header',
+        secFetchDestHeader: null,
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Header-based auth should not handshake with pending auth',
+      when: {
+        initialAuthState: 'pending',
         initialSessionClaims: new Map<string, string>([
           // Intentionally empty
         ]),
@@ -1029,7 +1070,7 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       },
     },
 
-    // ---------------- Existing session active org tests ----------------
+    // ---------------- Existing session org tests ----------------
     {
       name: 'Active session, org A active in session, but org B is requested by ID => attempts to activate org B',
       when: {
@@ -1113,6 +1154,70 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       },
     },
 
+    {
+      name: 'Pending session, org A active in session, but org B is requested by ID => attempts to activate org B',
+      when: {
+        initialAuthState: 'pending',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_b',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'org_b',
+      },
+    },
+    {
+      name: 'Pending session, no active org in session, but org B is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'pending',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+    {
+      name: 'Pending session, org a in session, but *an org B subresource* is requested by slug => attempts to activate org B',
+      when: {
+        initialAuthState: 'pending',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: [
+            '/organizations-by-slug/:slug',
+            '/organizations-by-slug/:id/(.*)',
+            '/organizations-by-id/:id',
+            '/organizations-by-id/:id/(.*)',
+          ],
+        },
+        appRequestPath: '/organizations-by-slug/bcorp/settings',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 307,
+        fapiOrganizationIdParamValue: 'bcorp',
+      },
+    },
+
     // ---------------- Personal account tests ----------------
     {
       name: 'Active session, org a in session, but *the personal account* is requested => attempts to activate PWS',
@@ -1163,6 +1268,44 @@ test.describe('Client handshake with organization activation @nextjs', () => {
       name: 'Active session, org a active in session, and org a is requested => nothing to activate!',
       when: {
         initialAuthState: 'active',
+        initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/organizations-by-id/org_a',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Pending session, nothing session, and the personal account is requested => nothing to activate!',
+      when: {
+        initialAuthState: 'pending',
+        initialSessionClaims: new Map<string, string>([
+          // Intentionally empty
+        ]),
+        orgSyncOptions: {
+          organizationPatterns: ['/organizations-by-slug/:slug', '/organizations-by-slug/:id/(.*)'],
+          personalAccountPatterns: ['/personal-account', '/personal-account/(.*)'],
+        },
+        appRequestPath: '/personal-account',
+        tokenAppearsIn: 'cookie',
+        secFetchDestHeader: 'document',
+      },
+      then: {
+        expectStatus: 200,
+        fapiOrganizationIdParamValue: null,
+      },
+    },
+    {
+      name: 'Pending session, org a active in session, and org a is requested => nothing to activate!',
+      when: {
+        initialAuthState: 'pending',
         initialSessionClaims: new Map<string, string>([['org_id', 'org_a']]),
         orgSyncOptions: {
           organizationPatterns: ['/organizations-by-id/:id', '/organizations-by-id/:id/(.*)'],
@@ -1338,7 +1481,7 @@ test.describe('Client handshake with an organization activation avoids infinite 
   test('Ignores organization config when being redirected to', async () => {
     // Create a new map with an org_id key
     const { token, claims } = config.generateToken({
-      state: 'active', // Must be active - handshake logic only runs once session is determined to be active
+      state: 'active',
       extraClaims: new Map<string, string>([]),
     });
 
