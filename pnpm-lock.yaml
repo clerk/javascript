@@ -322,6 +322,10 @@ importers:
       zod:
         specifier: ^3.24.1
         version: 3.24.1
+    devDependencies:
+      esbuild-plugin-file-path-extensions:
+        specifier: ^2.1.4
+        version: 2.1.4
 
   packages/astro:
     dependencies:

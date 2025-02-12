@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
     "sourceMap": false,
     "strict": true,
     "esModuleInterop": true,

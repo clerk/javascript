@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { esbuildPluginFilePathExtensions } from 'esbuild-plugin-file-path-extensions';
 
 import { name, version } from './package.json';
 
@@ -19,5 +20,6 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${!isProd}`,
     },
+    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
   };
 });
