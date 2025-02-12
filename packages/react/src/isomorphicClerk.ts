@@ -658,6 +658,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  get hasAuthenticatedClient(): boolean {
+    if (this.clerkjs) {
+      return this.clerkjs.hasAuthenticatedClient;
+    } else {
+      return false;
+    }
+  }
+
   __unstable__setEnvironment(...args: any): void {
     if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
       (this.clerkjs as any).__unstable__setEnvironment(args);
