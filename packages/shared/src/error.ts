@@ -210,7 +210,14 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err.name === 'EmailLinkError';
 }
 
+/** @deprecated Please use `EmailLinkErrorCodeStatus` instead.*/
 export const EmailLinkErrorCode = {
+  Expired: 'expired',
+  Failed: 'failed',
+  ClientMismatch: 'client_mismatch',
+};
+
+export const EmailLinkErrorCodeStatus = {
   Expired: 'expired',
   Failed: 'failed',
   ClientMismatch: 'client_mismatch',
