@@ -392,6 +392,12 @@ export interface Clerk {
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
+   * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
+   * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   */
+  __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
+  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
