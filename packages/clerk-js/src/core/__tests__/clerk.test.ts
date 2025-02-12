@@ -127,7 +127,6 @@ describe('Clerk singleton', () => {
 
     mockClientFetch.mockReturnValue(
       Promise.resolve({
-        activeSessions: [],
         authenticatedSessions: [],
       }),
     );

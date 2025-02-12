@@ -6,7 +6,6 @@ import type { ClientJSONSnapshot } from './snapshots';
 
 export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
-  activeSessions: ActiveSessionResource[];
   authenticatedSessions: (ActiveSessionResource | PendingSessionResource)[];
   hasAuthenticated: boolean;
   signUp: SignUpResource;
@@ -25,4 +24,8 @@ export interface ClientResource extends ClerkResource {
   createdAt: Date | null;
   updatedAt: Date | null;
   __internal_toSnapshot: () => ClientJSONSnapshot;
+  /**
+   * @deprecated Use `authenticatedSessions` instead
+   */
+  activeSessions: ActiveSessionResource[];
 }
