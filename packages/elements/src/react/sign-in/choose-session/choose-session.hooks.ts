@@ -23,11 +23,11 @@ export function useSignInChooseSessionIsActive() {
   return useActiveTags(routerRef, 'step:choose-session');
 }
 
-export type UseSignInActiveSessionListParams = {
+export type useSignInSessionListParams = {
   omitCurrent: boolean;
 };
 
-export function useSignInSessionList(params?: UseSignInActiveSessionListParams): SignInActiveSessionListItem[] {
+export function useSignInSessionList(params?: useSignInSessionListParams): SignInActiveSessionListItem[] {
   const { omitCurrent = true } = params || {};
 
   return SignInRouterCtx.useSelector(state => {
