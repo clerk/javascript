@@ -12,7 +12,7 @@ const _SignInAccountSwitcher = () => {
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
-  const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
+  const { handleSignOutAllClicked, handleSessionClicked, authenticatedSessions, handleAddAccountClicked } =
     useMultisessionActions({
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
@@ -40,7 +40,7 @@ const _SignInAccountSwitcher = () => {
             })}
           >
             <Actions role='menu'>
-              {activeSessions.map(s => (
+              {authenticatedSessions.map(s => (
                 <PreviewButton
                   key={s.id}
                   onClick={handleSessionClicked(s)}
