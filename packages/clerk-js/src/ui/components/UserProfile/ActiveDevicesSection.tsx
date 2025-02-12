@@ -29,7 +29,7 @@ export const ActiveDevicesSection = () => {
           <FullHeightLoader />
         ) : (
           sessions?.sort(currentSessionFirst(session!.id)).map(sa => {
-            if (sa.status !== 'active') {
+            if (!['active', 'pending'].includes(sa.status)) {
               return null;
             }
             return (
