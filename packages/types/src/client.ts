@@ -8,6 +8,7 @@ export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
   activeSessions: ActiveSessionResource[];
   authenticatedSessions: (ActiveSessionResource | PendingSessionResource)[];
+  hasAuthenticated: boolean;
   signUp: SignUpResource;
   signIn: SignInResource;
   isNew: () => boolean;
