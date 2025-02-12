@@ -6,7 +6,6 @@ import { Header } from './components/Header.js';
 import { Scan } from './components/Scan.js';
 import { SDKWorkflow } from './components/SDKWorkflow.js';
 import SDKS from './constants/sdks.js';
-import { getClerkMajorVersion } from './util/get-clerk-version.js';
 import guessFrameworks from './util/guess-framework.js';
 
 /**
@@ -34,7 +33,6 @@ export default function App(props) {
   const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
   const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
   const [fromVersion, setFromVersion] = useState(props.fromVersion);
-  const [fromVersionGuessAttempted, setFromVersionGuessAttempted] = useState(false);
 
   const [toVersion, setToVersion] = useState(props.toVersion);
   const [dir, setDir] = useState(props.dir);
@@ -42,7 +40,6 @@ export default function App(props) {
   const [configComplete, setConfigComplete] = useState(false);
   const [configVerified, setConfigVerified] = useState(false);
   const [uuid, setUuid] = useState();
-  let fromVersionGuess = false;
 
   if (yolo) {
     setSdks(SDKS.map(s => s.value));
@@ -75,12 +72,6 @@ export default function App(props) {
     setUuid(_uuid);
     setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
-  }
-
-  // We try to guess which version of Clerk they are using
-  if (isEmpty(sdks) && !fromVersion && !fromVersionGuess && !fromVersionGuessAttempted) {
-    fromVersionGuess = getClerkMajorVersion();
-    setFromVersionGuessAttempted(true);
   }
 
   // No support for v3 or below, sadly
