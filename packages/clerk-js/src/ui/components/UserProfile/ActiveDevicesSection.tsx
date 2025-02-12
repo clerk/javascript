@@ -1,5 +1,5 @@
 import { useReverification, useSession, useUser } from '@clerk/shared/react';
-import type { SessionWithActivitiesResource } from '@clerk/types';
+import type { AuthenticatedSessionResource, SessionWithActivitiesResource } from '@clerk/types';
 
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements';
@@ -29,7 +29,7 @@ export const ActiveDevicesSection = () => {
           <FullHeightLoader />
         ) : (
           sessions?.sort(currentSessionFirst(session!.id)).map(sa => {
-            if (!['active', 'pending'].includes(sa.status)) {
+            if (!isAuthenticated(sa.status)) {
               return null;
             }
             return (
@@ -43,6 +43,10 @@ export const ActiveDevicesSection = () => {
       </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
+};
+
+const isAuthenticated = (status: string): status is AuthenticatedSessionResource['status'] => {
+  return ['active', 'pending'].includes(status as AuthenticatedSessionResource['status']);
 };
 
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
