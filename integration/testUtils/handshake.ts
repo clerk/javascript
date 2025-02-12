@@ -108,14 +108,13 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     state,
     extraClaims,
   }: {
-    state: 'active' | 'expired' | 'early' | 'pending';
+    state: 'active' | 'expired' | 'early';
     extraClaims?: Map<string, any>;
   }) => {
     const claims = { sub: 'user_12345' } as Claims;
 
     const now = Math.floor(Date.now() / 1000);
-    const isAuthenticated = state === 'active' || state === 'pending';
-    if (isAuthenticated) {
+    if (state === 'active') {
       claims.iat = now;
       claims.nbf = now - 10;
       claims.exp = now + 60;
