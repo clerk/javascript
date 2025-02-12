@@ -214,7 +214,7 @@ export const EmailLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
   ClientMismatch: 'client_mismatch',
-};
+} as const;
 
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
