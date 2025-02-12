@@ -38,7 +38,7 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
     // '0' indicates the user is signed out
     let val = '0';
 
-    if (client && client.updatedAt && client.authenticatedSessions.length > 0) {
+    if (client && client.updatedAt && client.hasAuthenticated) {
       // truncate timestamp to seconds, since this is a unix timestamp
       val = Math.floor(client.updatedAt.getTime() / 1000).toString();
     }
