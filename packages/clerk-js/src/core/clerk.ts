@@ -286,6 +286,10 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  get hasAuthenticatedClient(): boolean {
+    return !!this.client?.hasAuthenticated;
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -2004,9 +2008,9 @@ export class Clerk implements ClerkInterface {
 
   #defaultSession = (client: ClientResource): AuthenticatedSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.authenticatedSessions.find(s => s.id === client.lastActiveSessionId);
-      if (lastActiveSession) {
-        return lastActiveSession;
+      const currentSession = client.authenticatedSessions.find(s => s.id === client.lastActiveSessionId);
+      if (currentSession) {
+        return currentSession;
       }
     }
     const session = client.authenticatedSessions[0];
