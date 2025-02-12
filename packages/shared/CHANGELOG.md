@@ -1,5 +1,26 @@
 # Change Log
 
+## 2.21.0
+
+### Minor Changes
+
+- Introduce unified environment variable handling across all supported platforms ([#4985](https://github.com/clerk/javascript/pull/4985)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  import { getEnvVariable } from '@clerk/shared/getEnvVariable';
+
+  const publishableKey = getEnvVariable('CLERK_PUBLISHABLE_KEY');
+  ```
+
+### Patch Changes
+
+- Small JSDoc and type improvements ([#5099](https://github.com/clerk/javascript/pull/5099)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/types@4.45.1
+
 ## 2.20.18
 
 ### Patch Changes
@@ -1259,7 +1280,7 @@
 
 ### Patch Changes
 
-- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
 
@@ -1309,7 +1330,7 @@
   - `useOrganizations`
   - `getRequestUrl`
 
-- Removes the patch for disabling swr-devtools causing apps with swr and broswers with the devtools extention to break. ([#1794](https://github.com/clerk/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
+- Removes the patch for disabling swr-devtools causing apps with swr and browsers with the devtools extention to break. ([#1794](https://github.com/clerk/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
 
 ## 0.23.1
 

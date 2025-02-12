@@ -170,7 +170,8 @@ export const applicationConfig = () => {
             [...env.privateVariables]
               .filter(([_, v]) => v)
               .map(([k, v]) => `${envFormatters.private(k)}=${v}`)
-              .join('\n'),
+              .join('\n') +
+            '\n',
         );
       };
       return defaultWriter;

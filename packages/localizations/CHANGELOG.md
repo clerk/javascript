@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.10.5
+
+### Patch Changes
+
+- Update "profile" translations for en-MX.ts ([#5081](https://github.com/clerk/javascript/pull/5081)) by [@alanmoyano](https://github.com/alanmoyano)
+
+  - `userProfile.profilePage.title`
+  - `userProfile.start.profileSection.primaryButton`
+
+- Replaces hard-coded string `"Add a passkey"` with a new localization key `userProfile.start.passkeysSection.primaryButton` ([#5105](https://github.com/clerk/javascript/pull/5105)) by [@Philitician](https://github.com/Philitician)
+
+- Updated dependencies [[`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/types@4.45.1
+
 ## 3.10.4
 
 ### Patch Changes
@@ -299,7 +313,7 @@
 
 - The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
 
-  Removed the `__experimental_` preffix.
+  Removed the `__experimental_` prefix.
 
 ### Patch Changes
 
@@ -1264,7 +1278,7 @@
 
 ### Patch Changes
 
-- Fix: localized key for invalid email addreses in InviteMembers form. ([#1781](https://github.com/clerk/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
+- Fix: localized key for invalid email addresses in InviteMembers form. ([#1781](https://github.com/clerk/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
 
 - Updated dependencies [[`5c8754239`](https://github.com/clerk/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81)]:
   - @clerk/types@3.53.0
@@ -1306,7 +1320,7 @@
 
 ### Patch Changes
 
-- Organization Switcher now diplays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerk/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
+- Organization Switcher now displays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerk/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
 
 - Update pl-Pl localization ([#1678](https://github.com/clerk/javascript/pull/1678)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
 

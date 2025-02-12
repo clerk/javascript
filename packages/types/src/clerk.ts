@@ -392,6 +392,12 @@ export interface Clerk {
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
+   * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
+   * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   */
+  __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
+  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -1387,6 +1393,40 @@ export interface HandleEmailLinkVerificationParams {
    */
   onVerifiedOnOtherDevice?: () => void;
 }
+
+type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+  mode: 'modal';
+  appearance?: T['appearance'];
+};
+
+type ButtonPropsRedirect = {
+  mode?: 'redirect';
+};
+
+type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
+
+export type SignInButtonProps = ButtonProps<SignInProps> &
+  Pick<
+    SignInProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
+    | 'withSignUp'
+  >;
+
+export type SignUpButtonProps = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+} & ButtonProps<SignUpProps> &
+  Pick<
+    SignUpProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
+  >;
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;

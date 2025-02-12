@@ -384,6 +384,7 @@ export const isAllowedRedirect =
 export function createAllowedRedirectOrigins(
   allowedRedirectOrigins: Array<string | RegExp> | undefined,
   frontendApi: string,
+  instanceType?: string,
 ): (string | RegExp)[] | undefined {
   if (Array.isArray(allowedRedirectOrigins) && !!allowedRedirectOrigins.length) {
     return allowedRedirectOrigins;
@@ -396,6 +397,10 @@ export function createAllowedRedirectOrigins(
 
   origins.push(`https://${getETLDPlusOneFromFrontendApi(frontendApi)}`);
   origins.push(`https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`);
+
+  if (instanceType === 'development') {
+    origins.push(`https://${frontendApi}`);
+  }
 
   return origins;
 }

@@ -7,6 +7,7 @@ import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 const CUSTOM_PROFILE_PAGE = '/custom-user-profile';
 const CUSTOM_BUTTON_PAGE = '/custom-user-button';
 const CUSTOM_BUTTON_TRIGGER_PAGE = '/custom-user-button-trigger';
+const CUSTOM_BUTTON_DYNAMIC_LABELS_PAGE = '/custom-user-button-dynamic-labels';
 
 async function waitForMountedComponent(
   component: 'UserButton' | 'UserProfile',
@@ -318,6 +319,60 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         await action.click();
         await u.po.userButton.waitForPopoverClosed();
         await pendingDialog;
+      });
+    });
+
+    test.describe('User Button with dynamic labels', () => {
+      test('click Chat is OFF and ensure that state has been changed', async ({ page, context }) => {
+        const u = createTestUtils({ app, page, context });
+        await u.po.signIn.goTo();
+        await u.po.signIn.waitForMounted();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+        await u.po.expect.toBeSignedIn();
+
+        await u.page.goToRelative(CUSTOM_BUTTON_DYNAMIC_LABELS_PAGE);
+        await u.po.userButton.waitForMounted();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+
+        const pagesContainer = u.page.locator('div.cl-userButtonPopoverActions__multiSession').first();
+        const buttons = await pagesContainer.locator('button').all();
+
+        expect(buttons.length).toBe(9);
+
+        const expectedTexts = [
+          '🌐Chat is OFF',
+          '🌐Theme: ☀️ Light',
+          '🌐Notifications 🔕 OFF',
+          '🌍Language: EN',
+          'Manage account',
+          'Sign out',
+          '🌐Visit Clerk',
+          '🌐Visit User page',
+          '🔔Custom Alert',
+        ];
+
+        for (let i = 0; i < buttons.length; i++) {
+          await expect(buttons[i]).toHaveText(expectedTexts[i]);
+        }
+
+        const chatButton = buttons[0];
+        const notificationsButton = buttons[2];
+        const languageButton = buttons[3];
+
+        // Test chat toggle
+        await chatButton.click();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+        await expect(chatButton).toHaveText('🌐Chat is ON');
+        await expect(languageButton).toHaveText('🌍Language: EN');
+
+        await notificationsButton.click();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+        await expect(notificationsButton).toHaveText('🌐Notifications 🔔 ON');
+        await expect(chatButton).toHaveText('🌐Chat is ON');
+        await expect(languageButton).toHaveText('🌍Language: EN');
       });
     });
   },
