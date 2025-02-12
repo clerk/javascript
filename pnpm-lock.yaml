@@ -380,10 +380,10 @@ importers:
         specifier: '*'
         version: 0.0.114
       '@types/webextension-polyfill':
-        specifier: ^0.10.7
-        version: 0.10.7
+        specifier: ^0.12.1
+        version: 0.12.1
       type-fest:
-        specifier: ^4.8.3
+        specifier: ^4.33.0
         version: 4.33.0
 
   packages/clerk-js:
@@ -5572,8 +5572,8 @@ packages:
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
 
-  '@types/webextension-polyfill@0.10.7':
-    resolution: {integrity: sha512-10ql7A0qzBmFB+F+qAke/nP1PIonS0TXZAOMVOxEUsm+lGSW6uwVcISFNa0I4Oyj0884TZVWGGMIWeXOVSNFHw==}
+  '@types/webextension-polyfill@0.12.1':
+    resolution: {integrity: sha512-xPTFWwQ8BxPevPF2IKsf4hpZNss4LxaOLZXypQH4E63BDLmcwX/RMGdI4tB4VO4Nb6xDBH3F/p4gz4wvof1o9w==}
 
   '@types/webpack-env@1.18.8':
     resolution: {integrity: sha512-G9eAoJRMLjcvN4I08wB5I7YofOb/kaJNd5uoCMX+LbKXTPCF+ZIHuqTnFaK9Jz1rgs035f9JUPUhNFtqgucy/A==}
@@ -21530,7 +21530,7 @@ snapshots:
 
   '@types/unist@3.0.3': {}
 
-  '@types/webextension-polyfill@0.10.7': {}
+  '@types/webextension-polyfill@0.12.1': {}
 
   '@types/webpack-env@1.18.8': {}
 
