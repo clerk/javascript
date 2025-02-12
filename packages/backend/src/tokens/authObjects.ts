@@ -72,8 +72,7 @@ export type SignedOutAuthObject = {
 };
 
 export type AuthenticatedMachineObject = {
-  sessionClaims: null;
-  claims: JwtPayload;
+  machineClaims: JwtPayload;
   machineId: string;
   sessionId: null;
   entity: 'machine';
@@ -89,8 +88,7 @@ export type AuthenticatedMachineObject = {
 };
 
 export type UnauthenticatedMachineObject = {
-  sessionClaims: null;
-  claims: null;
+  machineClaims: null;
   machineId: null;
   sessionId: null;
   actor: null;
@@ -192,16 +190,15 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
 
 export function authenticatedMachineObject(
   machineToken: string,
-  claims: JwtPayload,
+  machineClaims: JwtPayload,
   debugData?: AuthObjectDebugData,
 ): AuthenticatedMachineObject {
-  const { sub: machineId } = claims;
+  const { sub: machineId } = machineClaims;
   const getToken = () => {
     return machineToken;
   };
   return {
-    sessionClaims: null,
-    claims,
+    machineClaims,
     entity: 'machine',
     machineId,
     sessionId: null,
@@ -219,9 +216,8 @@ export function authenticatedMachineObject(
 
 export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
   return {
-    sessionClaims: null,
     entity: 'machine',
-    claims: null,
+    machineClaims: null,
     machineId: null,
     sessionId: null,
     actor: null,
