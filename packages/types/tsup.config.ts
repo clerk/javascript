@@ -10,6 +10,6 @@ export default defineConfig(() => {
     sourcemap: true,
     format: ['cjs', 'esm'],
     legacyOutput: true,
-    dts: true,
+    onSuccess: 'pnpm build:declarations',
   };
 });
