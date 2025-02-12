@@ -17,17 +17,18 @@ type ModalProps = React.PropsWithChildren<{
   contentSx?: ThemableCssProp;
   containerSx?: ThemableCssProp;
   canCloseModal?: boolean;
+  outsidePress?: boolean;
   style?: React.CSSProperties;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style } = props;
+  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, outsidePress = true, id, style } = props;
   const { disableScroll, enableScroll } = useScrollLock(document.body);
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
-    outsidePress: e => e.target === overlayRef.current,
+    outsidePress: outsidePress === true ? e => e.target === overlayRef.current : false,
     canCloseModal,
   });
 
