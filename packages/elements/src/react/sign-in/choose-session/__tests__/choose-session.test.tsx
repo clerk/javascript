@@ -8,7 +8,7 @@ import * as Hooks from '../choose-session.hooks';
 describe('SignInSessionList/SignInSessionListItem', () => {
   beforeAll(() => {
     jest.spyOn(Hooks, 'useSignInChooseSessionIsActive').mockImplementation(() => true);
-    jest.spyOn(Hooks, 'useSignInActiveSessionList').mockImplementation(() => [
+    jest.spyOn(Hooks, 'useSignInSessionList').mockImplementation(() => [
       {
         id: 'abc123',
         firstName: 'firstName',

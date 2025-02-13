@@ -1,10 +1,11 @@
-import type {
-  ActiveSessionResource,
-  ClientJSON,
-  ClientJSONSnapshot,
-  ClientResource,
-  SignInResource,
-  SignUpResource,
+import {
+  type ActiveSessionResource,
+  type AuthenticatedSessionResource,
+  type ClientJSON,
+  type ClientJSONSnapshot,
+  type ClientResource,
+  type SignInResource,
+  type SignUpResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -53,8 +54,15 @@ export class Client extends BaseResource implements ClientResource {
     return this.signIn;
   }
 
+  /**
+   * @deprecated Use `authenticatedSessions` instead
+   */
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
+  }
+
+  get authenticatedSessions(): AuthenticatedSessionResource[] {
+    return this.sessions.filter(s => s.status === 'active' || s.status === 'pending') as AuthenticatedSessionResource[];
   }
 
   create(): Promise<this> {
@@ -108,6 +116,10 @@ export class Client extends BaseResource implements ClientResource {
 
   public sendCaptchaToken(params: unknown): Promise<ClientResource> {
     return this._basePostBypass({ body: params, path: this.path() + '/verify' });
+  }
+
+  get hasAuthenticated() {
+    return (this.authenticatedSessions ?? []).length > 0;
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
