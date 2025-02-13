@@ -477,7 +477,6 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'blankCaptcha' as any}
       componentAppearance={{}}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
       flowName={'blankCaptcha'}
       onClose={() => componentsControls.closeModal('blankCaptcha')}
       startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
