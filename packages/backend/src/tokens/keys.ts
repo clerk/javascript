@@ -13,7 +13,7 @@ import {
 } from '../errors';
 import { runtime } from '../runtime';
 import { joinPaths } from '../util/path';
-import { callWithRetry } from '../util/shared';
+import { retry } from '../util/shared';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -137,8 +137,8 @@ export async function loadClerkJWKFromRemote({
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }
-    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
-    const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
+    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion) as Promise<{ keys: JsonWebKeyWithKid[] }>;
+    const { keys } = await retry(fetcher);
 
     if (!keys || !keys.length) {
       throw new TokenVerificationError({
