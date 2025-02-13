@@ -3,8 +3,6 @@ import type { TelemetryEventRaw } from '@clerk/types';
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_SAMPLING_RATE = 0.1;
 
-type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
-
 type ComponentMountedBase = {
   component: string;
 };
@@ -16,9 +14,7 @@ type EventPrebuiltComponentMounted = ComponentMountedBase & {
   baseTheme: boolean;
 };
 
-type EventComponentMounted = ComponentMountedBase & {
-  [key: string]: JSONValue;
-};
+type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
 
 /**
  * Helper function for `telemetry.record()`. Create a consistent event object for when a prebuilt (AIO) component is mounted.
@@ -33,7 +29,7 @@ type EventComponentMounted = ComponentMountedBase & {
 export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
-  additionalPayload?: Record<string, JSONValue>,
+  additionalPayload?: TelemetryEventRaw['payload'],
 ): TelemetryEventRaw<EventPrebuiltComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
@@ -62,7 +58,7 @@ export function eventPrebuiltComponentMounted(
  */
 export function eventComponentMounted(
   component: string,
-  props: Record<string, string | boolean> = {},
+  props: TelemetryEventRaw['payload'] = {},
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
