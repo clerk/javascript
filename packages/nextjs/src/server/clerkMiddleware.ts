@@ -125,8 +125,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         ...resolvedParams,
       };
 
-      options.entity = 'any';
-
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
       const resolvedClerkClient = await clerkClient();
@@ -148,7 +146,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
-        createAuthenticateRequestOptions(clerkRequest, options),
+        createAuthenticateRequestOptions(clerkRequest, { ...options, entity: 'any' }),
       );
 
       logger.debug('requestState', () => ({

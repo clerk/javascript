@@ -14,7 +14,7 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
 
   const loadedOptions = loadOptions(args, opts);
   // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
-  const requestState = await authenticateRequest(args, loadedOptions);
+  const requestState = await authenticateRequest(args, { ...loadedOptions, entity: 'any' });
 
   return stripPrivateDataFromObject(requestState.toAuth());
 }

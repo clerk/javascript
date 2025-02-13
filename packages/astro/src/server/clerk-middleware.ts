@@ -78,7 +78,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, options, context),
+      createAuthenticateRequestOptions(clerkRequest, { ...options, entity: 'any' }, context),
     );
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);

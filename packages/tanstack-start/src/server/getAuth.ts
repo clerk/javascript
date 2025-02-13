@@ -18,7 +18,7 @@ export async function getAuth(request: Request, opts?: GetAuthOptions): GetAuthR
 
   const loadedOptions = loadOptions(request, opts);
 
-  const requestState = await authenticateRequest(request, loadedOptions);
+  const requestState = await authenticateRequest(request, { ...loadedOptions, entity: 'any' });
 
   return stripPrivateDataFromObject(requestState.toAuth());
 }
