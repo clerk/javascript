@@ -1,5 +1,35 @@
 # @clerk/astro
 
+## 2.2.0
+
+### Minor Changes
+
+- Add support for type-safe environment variables using the [`astro:env` API](https://docs.astro.build/en/reference/configuration-reference/#env). ([#5104](https://github.com/clerk/javascript/pull/5104)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  The integration now provides a type-safe schema for all Clerk environment variables by default. You can use the environment variables like so:
+
+  ```js
+  import { PUBLIC_CLERK_PUBLISHABLE_KEY } from 'astro:env/client';
+  import { CLERK_SECRET_KEY } from 'astro:env/server';
+  ```
+
+  To override this behavior, you can disable the feature by setting `enableEnvSchema` to `false`:
+
+  ```js
+  export default defineConfig({
+    integrations: [clerk({ enableEnvSchema: false })],
+  });
+  ```
+
+### Patch Changes
+
+- Add the ability to specify an appearance for modal component usages. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`128fd8909ae083c0d274dee7c6810e8574e1ce33`](https://github.com/clerk/javascript/commit/128fd8909ae083c0d274dee7c6810e8574e1ce33)]:
+  - @clerk/types@4.46.0
+  - @clerk/backend@1.24.1
+  - @clerk/shared@2.21.1
+
 ## 2.1.20
 
 ### Patch Changes

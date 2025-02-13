@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.24.1
+
+### Patch Changes
+
+- Adds an internal `raw()` getter method to the `User` resource that returns the raw JSON payload of the request that instantiated the resource. ([#5130](https://github.com/clerk/javascript/pull/5130)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+  - @clerk/shared@2.21.1
+
 ## 1.24.0
 
 ### Minor Changes
