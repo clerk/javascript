@@ -1,20 +1,9 @@
 ---
 '@clerk/clerk-js': minor
-'@clerk/elements': patch
-'@clerk/shared': patch
-'@clerk/astro': patch
-'@clerk/clerk-react': patch
-'@clerk/types': patch
-'@clerk/clerk-expo': patch
-'@clerk/vue': patch
 ---
 
-### @clerk/clerk-js
-
 - Introduce a new client session status: `pending`
-- Handle and initialize a `pending` session as an authenticated state, similarity as `active`
-
-[TODO - Add more details here on DX changes such as `activeSessions` deprecation after tacking code review feedback]
+- Initialize a `pending` session as an authenticated state
 
 ```diff
 - if (Clerk.user) {
