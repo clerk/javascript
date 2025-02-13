@@ -51,13 +51,17 @@ export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChang
     const eventValue = event.target.value;
     onSearchChange(eventValue);
 
-    if (!eventValue || eventValue.length < minLength) {
-      searchField.setInfo('3 character minimum');
+    if (eventValue.length < minLength) {
+      searchField.setInfo(t(localizationKeys('organizationProfile.membersPage.action__search_minLength')));
       return;
     }
 
     searchField.clearFeedback();
   };
+
+  useEffect(() => {
+    onQueryChange(query);
+  }, [query, onQueryChange]);
 
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
@@ -71,10 +75,6 @@ export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChang
       memberships?.fetchPage?.(1);
     }
   }, [query, memberships]);
-
-  useEffect(() => {
-    onQueryChange(query);
-  }, [query, onQueryChange]);
 
   const isFetchingNewData = value && !!memberships?.isLoading && !!memberships.data?.length;
 
@@ -103,7 +103,6 @@ export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChang
               />
             )
           }
-          onKeyUp={handleKeyUp}
           onChange={handleChange}
           elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />

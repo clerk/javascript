@@ -129,6 +129,8 @@ export const nlBE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Uitnodigen',
+      action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Verwijder lid',
         tableHeader__actions: 'Acties',
@@ -866,6 +868,7 @@ export const nlBE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

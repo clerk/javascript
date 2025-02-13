@@ -130,6 +130,7 @@ export const daDK: LocalizationResource = {
     membersPage: {
       action__invite: 'Inviter',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjern medlem',
         tableHeader__actions: 'Handlinger',
@@ -868,6 +869,7 @@ export const daDK: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjern adgangsnøgle',
         menuAction__rename: 'Omdøb adgangsnøgle',
+        primaryButton: undefined,
         title: 'Adgangsnøgler',
       },
       passwordSection: {

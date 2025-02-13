@@ -130,6 +130,7 @@ export const jaJP: LocalizationResource = {
     membersPage: {
       action__invite: '招待',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
         tableHeader__actions: undefined,
@@ -865,6 +866,7 @@ export const jaJP: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

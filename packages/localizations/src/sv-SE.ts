@@ -130,6 +130,7 @@ export const svSE: LocalizationResource = {
     membersPage: {
       action__invite: 'Bjud in',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
         tableHeader__actions: 'Åtgärder',
@@ -871,6 +872,7 @@ export const svSE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ta bort',
         menuAction__rename: 'Byt namn',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

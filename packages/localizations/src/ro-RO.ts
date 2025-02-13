@@ -132,6 +132,7 @@ export const roRO: LocalizationResource = {
     membersPage: {
       action__invite: 'Invitați',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Îndepărtați membrul',
         tableHeader__actions: undefined,
@@ -878,6 +879,7 @@ export const roRO: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

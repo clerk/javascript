@@ -131,6 +131,7 @@ export const elGR: LocalizationResource = {
     membersPage: {
       action__invite: 'Πρόσκληση',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Αφαίρεση μέλους',
         tableHeader__actions: 'Ενέργειες',
@@ -879,6 +880,7 @@ export const elGR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

@@ -132,6 +132,7 @@ export const esMX: LocalizationResource = {
     membersPage: {
       action__invite: 'Invitar',
       action__search: 'Buscar',
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Eliminar miembro',
         tableHeader__actions: undefined,
@@ -876,6 +877,7 @@ export const esMX: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar',
         menuAction__rename: 'Renombrar',
+        primaryButton: undefined,
         title: 'Llaves de acceso',
       },
       passwordSection: {

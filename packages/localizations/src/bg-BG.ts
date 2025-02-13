@@ -130,6 +130,7 @@ export const bgBG: LocalizationResource = {
     membersPage: {
       action__invite: 'Покани',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Премахване на член',
         tableHeader__actions: undefined,
@@ -868,6 +869,7 @@ export const bgBG: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

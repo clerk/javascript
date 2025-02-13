@@ -131,6 +131,7 @@ export const mnMN: LocalizationResource = {
     membersPage: {
       action__invite: 'Урих',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Гишүүнийг хасах',
         tableHeader__actions: undefined,
@@ -871,6 +872,7 @@ export const mnMN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

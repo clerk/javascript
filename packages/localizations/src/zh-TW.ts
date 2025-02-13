@@ -129,6 +129,7 @@ export const zhTW: LocalizationResource = {
     membersPage: {
       action__invite: '邀請',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成員',
         tableHeader__actions: undefined,
@@ -851,6 +852,7 @@ export const zhTW: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

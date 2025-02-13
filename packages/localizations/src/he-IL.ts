@@ -129,6 +129,7 @@ export const heIL: LocalizationResource = {
     membersPage: {
       action__invite: 'הזמן',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'הסר חבר',
         tableHeader__actions: undefined,
@@ -850,6 +851,7 @@ export const heIL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'הגדר סיסמה',
         menuAction__rename: 'עדכן סיסמה',
+        primaryButton: undefined,
         title: 'סיסמה',
       },
       passwordSection: {

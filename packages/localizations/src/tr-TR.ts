@@ -130,6 +130,7 @@ export const trTR: LocalizationResource = {
     membersPage: {
       action__invite: 'Davet et',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Üyeyi kaldır',
         tableHeader__actions: undefined,
@@ -871,6 +872,7 @@ export const trTR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Kaldır',
         menuAction__rename: 'Yeniden Adlandır',
+        primaryButton: undefined,
         title: 'Geçiş Anahtarları',
       },
       passwordSection: {

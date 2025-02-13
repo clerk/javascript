@@ -130,6 +130,7 @@ export const koKR: LocalizationResource = {
     membersPage: {
       action__invite: '초대',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: '회원 제거',
         tableHeader__actions: undefined,
@@ -856,6 +857,7 @@ export const koKR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

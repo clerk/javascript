@@ -133,6 +133,7 @@ export const deDE: LocalizationResource = {
     membersPage: {
       action__invite: 'Einladen',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
@@ -883,6 +884,7 @@ export const deDE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Entfernen',
         menuAction__rename: 'Umbenennen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

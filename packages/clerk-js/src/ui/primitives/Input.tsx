@@ -61,23 +61,10 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
   // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
-  const { errorMessageId, ignorePasswordManager, ...fieldControlProps } = sanitizeInputProps(fieldControl, [
-    'errorMessageId',
-    'ignorePasswordManager',
-    'feedbackType',
-  ]);
-
-  const getFeedbackType = (fieldControl: ReturnType<typeof useFormField>, hasError: InputProps['hasError']) => {
-    if (!fieldControl) {
-      return null;
-    }
-
-    if (fieldControl.feedbackType) {
-      return fieldControl.feedbackType;
-    }
-
-    return hasError ? 'error' : null;
-  };
+  const { errorMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
+    fieldControl,
+    ['errorMessageId', 'ignorePasswordManager', 'feedbackType'],
+  );
 
   const propsWithoutVariants = filterProps({
     ...props,
@@ -88,7 +75,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   const _disabled = isDisabled || fieldControlProps.isDisabled;
   const _required = isRequired || fieldControlProps.isRequired;
   const _hasError = hasError || fieldControlProps.hasError;
-  const feedbackType = getFeedbackType(fieldControl, hasError);
 
   /**
    * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol

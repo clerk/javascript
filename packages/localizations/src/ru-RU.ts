@@ -134,6 +134,7 @@ export const ruRU: LocalizationResource = {
     membersPage: {
       action__invite: 'Пригласить',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить участника',
         tableHeader__actions: 'Действия',
@@ -887,6 +888,7 @@ export const ruRU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Удалить',
         menuAction__rename: 'Переименовать',
+        primaryButton: undefined,
         title: 'Ключи доступа',
       },
       passwordSection: {

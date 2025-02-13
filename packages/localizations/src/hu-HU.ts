@@ -130,6 +130,7 @@ export const huHU: LocalizationResource = {
     membersPage: {
       action__invite: 'Meghívás',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Tag eltávolítása',
         tableHeader__actions: undefined,
@@ -873,6 +874,7 @@ export const huHU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eltávolítás',
         menuAction__rename: 'Átnevezés',
+        primaryButton: undefined,
         title: 'Passkey-k',
       },
       passwordSection: {

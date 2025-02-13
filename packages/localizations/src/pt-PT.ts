@@ -129,6 +129,7 @@ export const ptPT: LocalizationResource = {
     membersPage: {
       action__invite: 'Convidar',
       action__search: 'Pesquisar',
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
@@ -868,6 +869,7 @@ export const ptPT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover chave de acesso',
         menuAction__rename: 'Renomear chave de acesso',
+        primaryButton: undefined,
         title: 'Chaves de Acesso',
       },
       passwordSection: {

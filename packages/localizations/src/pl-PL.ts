@@ -130,6 +130,7 @@ export const plPL: LocalizationResource = {
     membersPage: {
       action__invite: 'Zaproś',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Usuń użytkownika',
         tableHeader__actions: undefined,
@@ -875,6 +876,7 @@ export const plPL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Usuń',
         menuAction__rename: 'Zmień nazwę',
+        primaryButton: undefined,
         title: 'Klucze dostępu',
       },
       passwordSection: {
