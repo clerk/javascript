@@ -1,5 +1,25 @@
 # @clerk/tanstack-start
 
+## 0.10.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5151](https://github.com/clerk/javascript/pull/5151)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/tanstack-start/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/tanstack-start/errors'
+  ```
+
+  PR https://github.com/clerk/javascript/pull/5142
+
+### Patch Changes
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6)]:
+  - @clerk/shared@2.22.0
+  - @clerk/clerk-react@5.23.0
+  - @clerk/backend@1.24.2
+
 ## 0.9.6
 
 ### Patch Changes

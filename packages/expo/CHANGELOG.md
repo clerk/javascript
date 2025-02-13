@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.7.8
+
+### Patch Changes
+
+- Updated dependencies [[`3fac68329c39811f18d18dce03ba1f816ee51837`](https://github.com/clerk/javascript/commit/3fac68329c39811f18d18dce03ba1f816ee51837), [`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6)]:
+  - @clerk/clerk-js@5.53.0
+  - @clerk/shared@2.22.0
+  - @clerk/clerk-react@5.23.0
+
 ## 2.7.7
 
 ### Patch Changes
