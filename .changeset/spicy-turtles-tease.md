@@ -7,6 +7,8 @@ Introduce `getAuth()` helper to retrieve authentication state from the event obj
 Example:
 
 ```ts
+import { getAuth } from '@clerk/nuxt/server';
+
 export default eventHandler((event) => {
   const { userId } = getAuth(event);
 
