@@ -19,6 +19,75 @@ const ECMA_VERSION = 2021,
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
   TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
 
+const noNavigateUseClerk = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow any usage of `navigate` from `useClerk()`',
+      recommended: false,
+    },
+    messages: {
+      noNavigate:
+        'Usage of `navigate` from `useClerk()` is not allowed.\nUse `useRouter().navigate` to navigate in-between flows or `setActive({ redirectUrl })`.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const sourceCode = context.getSourceCode();
+
+    return {
+      // Case 1: Destructuring `navigate` from `useClerk()`
+      VariableDeclarator(node) {
+        if (
+          node.id.type === 'ObjectPattern' && // Checks if it's an object destructuring
+          node.init?.type === 'CallExpression' &&
+          node.init.callee.name === 'useClerk'
+        ) {
+          for (const property of node.id.properties) {
+            if (property.type === 'Property' && property.key.name === 'navigate') {
+              context.report({
+                node: property,
+                messageId: 'noNavigate',
+              });
+            }
+          }
+        }
+      },
+
+      // Case 2 & 3: Accessing `navigate` on a variable or directly calling `useClerk().navigate`
+      MemberExpression(node) {
+        if (
+          node.property.name === 'navigate' &&
+          node.object.type === 'CallExpression' &&
+          node.object.callee.name === 'useClerk'
+        ) {
+          // Case 3: Direct `useClerk().navigate`
+          context.report({
+            node,
+            messageId: 'noNavigate',
+          });
+        } else if (node.property.name === 'navigate' && node.object.type === 'Identifier') {
+          // Case 2: `clerk.navigate` where `clerk` is assigned `useClerk()`
+          const scope = sourceCode.scopeManager.acquire(node);
+          if (!scope) return;
+
+          const variable = scope.variables.find(v => v.name === node.object.name);
+
+          if (
+            variable?.defs?.[0]?.node?.init?.type === 'CallExpression' &&
+            variable.defs[0].node.init.callee.name === 'useClerk'
+          ) {
+            context.report({
+              node,
+              messageId: 'noNavigate',
+            });
+          }
+        }
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -283,6 +352,20 @@ export default tseslint.config([
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'warn',
+    },
+  },
+  {
+    name: 'packages/clerk-js',
+    files: ['packages/clerk-js/src/ui/**/*'],
+    plugins: {
+      'custom-rules': {
+        rules: {
+          'no-navigate-useClerk': noNavigateUseClerk,
+        },
+      },
+    },
+    rules: {
+      'custom-rules/no-navigate-useClerk': 'error',
     },
   },
   {

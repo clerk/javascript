@@ -1,10 +1,10 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-import type { SignUpProps } from '@clerk/types'
+import type { SignUpButtonProps } from '@clerk/types'
 import type { ButtonProps } from '../../types'
 import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils'
 
-type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignUpProps & ButtonProps<Tag>>
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> & SignUpButtonProps;
 
 import { generateSafeId } from '@clerk/astro/internal';
 
@@ -23,7 +23,7 @@ const {
   signInForceRedirectUrl,
   mode,
   unsafeMetadata,
-  ...elementProps
+  ...props
 } = Astro.props
 
 const signUpOptions = {
@@ -46,20 +46,20 @@ if (asChild) {
   asChild ? (
     <Fragment set:html={htmlElement} />
   ) : (
-    <Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+    <Tag {...props} data-clerk-unstyled-id={safeId}>
       <slot>Sign up</slot>
     </Tag >
   )
 }
 
-<script is:inline define:vars={{ signUpOptions, mode, safeId }}>
+<script is:inline define:vars={{ props, signUpOptions, mode, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
   btn.addEventListener("click", () => {
     const clerk = window.Clerk
 
     if (mode === 'modal') {
-      return clerk.openSignUp(signUpOptions);
+      return clerk.openSignUp({ ...signUpOptions, appearance: props.appearance });
     }
 
     return clerk.redirectToSignUp({

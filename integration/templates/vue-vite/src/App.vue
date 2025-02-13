@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SignedIn, SignedOut, OrganizationSwitcher, ClerkLoaded, ClerkLoading } from '@clerk/vue';
+import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from '@clerk/vue';
 import CustomUserButton from './components/CustomUserButton.vue';
 </script>
 
@@ -11,7 +11,6 @@ import CustomUserButton from './components/CustomUserButton.vue';
       </div>
       <SignedIn>
         <CustomUserButton />
-        <OrganizationSwitcher />
       </SignedIn>
       <SignedOut>
         <RouterLink to="/sign-in">Sign in</RouterLink>

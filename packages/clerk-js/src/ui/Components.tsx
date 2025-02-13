@@ -463,13 +463,15 @@ const Components = (props: ComponentsProps) => {
   );
 
   const mountedBlankCaptchaModal = (
+    /**
+     * Captcha modal should not close on `Clerk.navigate()`, hence we are not passing `onExternalNavigate`.
+     */
     <LazyModalRenderer
       globalAppearance={state.appearance}
       appearanceKey={'blankCaptcha' as any}
       componentAppearance={{}}
       flowName={'blankCaptcha'}
       onClose={() => componentsControls.closeModal('blankCaptcha')}
-      onExternalNavigate={() => componentsControls.closeModal('blankCaptcha')}
       startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
       componentName={'BlankCaptchaModal'}
       canCloseModal={false}
