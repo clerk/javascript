@@ -238,31 +238,67 @@ describe('clerkMiddleware(params)', () => {
     expect(decryptedData).toEqual(options);
   });
 
-  it('allows access to request object to dynamically define options', async () => {
-    const options = {
-      secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
-      publishableKey: 'pk_test_xxxxxxxxxxxxx',
-      signInUrl: '/foo',
-      signUpUrl: '/bar',
-    };
-    const resp = await clerkMiddleware(
-      () => {
-        return NextResponse.next();
-      },
-      req => ({
-        ...options,
-        domain: req.nextUrl.host,
-      }),
-    )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
-    expect(resp?.status).toEqual(200);
+  describe('allows access to request object to define options via callback', () => {
+    it('with synchronous callback', async () => {
+      const options = {
+        secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        signInUrl: '/foo',
+        signUpUrl: '/bar',
+      };
+      const resp = await clerkMiddleware(
+        () => {
+          return NextResponse.next();
+        },
+        req => ({
+          ...options,
+          domain: req.nextUrl.host,
+        }),
+      )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(resp?.status).toEqual(200);
 
-    const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
-    assert.ok(requestData);
+      const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+      assert.ok(requestData);
 
-    const decryptedData = decryptClerkRequestData(requestData);
+      const decryptedData = decryptClerkRequestData(requestData);
 
-    expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-    expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+      expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+    });
+
+    it('with asynchronous callback', async () => {
+      const options = {
+        secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        signInUrl: '/foo',
+        signUpUrl: '/bar',
+      };
+
+      const mockFetchOptionsExternalStore = (_req: NextRequest) => Promise.resolve(options);
+
+      const resp = await clerkMiddleware(
+        () => {
+          return NextResponse.next();
+        },
+        async req => {
+          const resolvedOptions = await mockFetchOptionsExternalStore(req);
+
+          return {
+            ...resolvedOptions,
+            domain: req.nextUrl.host,
+          };
+        },
+      )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(resp?.status).toEqual(200);
+
+      const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+      assert.ok(requestData);
+
+      const decryptedData = decryptClerkRequestData(requestData);
+
+      expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+    });
   });
 
   describe('auth().redirectToSignIn()', () => {
