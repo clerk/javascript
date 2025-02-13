@@ -511,13 +511,14 @@ export const fiFI: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Hyväksyn {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
+        label__onlyTermsOfService: 'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }} ja {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Lue ja hyväksy ehdot jatkaaksesi',
+        title: 'Käyttöehdot ja tietosuojaseloste',
       },
     },
     phoneCode: {
