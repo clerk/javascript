@@ -28,15 +28,25 @@ const typedocPluginMarkdownOptions = {
   hidePageHeader: true,
   hideBreadcrumbs: true,
   hidePageTitle: true,
+  parametersFormat: 'table',
+  interfacePropertiesFormat: 'table',
+  classPropertiesFormat: 'table',
+  enumMembersFormat: 'table',
+  propertyMembersFormat: 'table',
+  typeDeclarationFormat: 'table',
+  typeDeclarationVisibility: 'compact',
+  useHTMLAnchors: false,
 };
 
 /** @type {Partial<import("typedoc").TypeDocOptions>} */
 const config = {
   out: './.typedoc/docs',
+  cleanOutputDir: true,
   // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
   json: './.typedoc/output.json',
   entryPointStrategy: 'packages',
-  plugin: ['typedoc-plugin-markdown'],
+  plugin: ['typedoc-plugin-markdown', './.typedoc/custom-theme.mjs'],
+  theme: 'clerkTheme',
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,

@@ -96,3 +96,4 @@ scripts/.env
 
 # typedoc
 .typedoc
+!.typedoc/custom-theme.mjs
