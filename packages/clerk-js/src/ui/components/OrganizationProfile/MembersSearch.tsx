@@ -1,10 +1,11 @@
 import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/types';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
 import { InputWithIcon } from '../../../ui/elements';
 import { Field } from '../../../ui/elements/FieldControl';
+import { useDebounce } from '../../../ui/hooks';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 import { useFormControl } from '../../../ui/utils';
@@ -30,63 +31,33 @@ type MembersSearchProps = {
   /**
    * Handler for `query` value changes
    */
-  onQueryTrigger: (query: string) => void;
+  onQueryChange: (query: string) => void;
   /**
    * Minimum search length to trigger query
    */
-  minLength?: number;
+  minLength: number;
 };
 
-const membersSearchDebounceMs = 500;
-
-export const MembersSearch = ({
-  query,
-  value,
-  memberships,
-  onSearchChange,
-  onQueryTrigger,
-  minLength = 3,
-}: MembersSearchProps) => {
+export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChange, minLength }: MembersSearchProps) => {
+  const { t } = useLocalizations();
   const searchField = useFormControl('search', '', {
     type: 'search',
     label: '',
     placeholder: localizationKeys('organizationProfile.membersPage.action__search'),
   });
-
-  const { t } = useLocalizations();
-
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const query = useDebounce(value, 600);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const eventValue = event.target.value;
     onSearchChange(eventValue);
 
-    const shouldClearQuery = eventValue === '';
-    if (shouldClearQuery) {
-      searchField.clearFeedback();
-      onQueryTrigger(eventValue);
+    if (!eventValue || eventValue.length < minLength) {
+      searchField.setInfo('3 character minimum');
+      return;
     }
+
+    searchField.clearFeedback();
   };
-
-  // Debounce the input value changes until the user stops typing
-  // to trigger the `query` param setter
-  function handleKeyUp() {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    // Test rollback behavior + add localization key
-    debounceTimer.current = setTimeout(() => {
-      const isValid = value.trim().length === 0 || value.trim().length >= minLength;
-
-      if (!isValid) {
-        searchField.setInfo('3 character minimum');
-      } else {
-        searchField.clearFeedback();
-        onQueryTrigger(value.trim());
-      }
-    }, membersSearchDebounceMs);
-  }
 
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
@@ -100,6 +71,10 @@ export const MembersSearch = ({
       memberships?.fetchPage?.(1);
     }
   }, [query, memberships]);
+
+  useEffect(() => {
+    onQueryChange(query);
+  }, [query, onQueryChange]);
 
   const isFetchingNewData = value && !!memberships?.isLoading && !!memberships.data?.length;
 

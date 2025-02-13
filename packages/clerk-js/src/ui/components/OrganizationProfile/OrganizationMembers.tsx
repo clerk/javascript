@@ -26,6 +26,7 @@ import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvit
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
 export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
+const MEMBERS_SEARCH_QUERY_MIN_LENGTH = 3;
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
@@ -43,7 +44,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
     memberships: canReadMemberships
       ? {
           keepPreviousData: true,
-          query: query || undefined,
+          query: query && query.length > MEMBERS_SEARCH_QUERY_MIN_LENGTH ? query : undefined,
         }
       : undefined,
   });
@@ -140,11 +141,12 @@ export const OrganizationMembers = withCardStateProvider(() => {
                       <MembersActionsRow
                         actionSlot={
                           <MembersSearch
+                            minLength={MEMBERS_SEARCH_QUERY_MIN_LENGTH}
                             query={query}
                             value={search}
                             memberships={memberships}
                             onSearchChange={query => setSearch(query)}
-                            onQueryTrigger={query => setQuery(query)}
+                            onQueryChange={query => setQuery(query)}
                           />
                         }
                       />
