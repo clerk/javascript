@@ -239,7 +239,7 @@ describe('clerkMiddleware(params)', () => {
   });
 
   describe('allows access to request object to define options via callback', () => {
-    it('with synchronously callback', async () => {
+    it('with synchronous callback', async () => {
       const options = {
         secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
         publishableKey: 'pk_test_xxxxxxxxxxxxx',
@@ -266,7 +266,7 @@ describe('clerkMiddleware(params)', () => {
       expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
     });
 
-    it('with asynchronously callback', async () => {
+    it('with asynchronous callback', async () => {
       const options = {
         secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
         publishableKey: 'pk_test_xxxxxxxxxxxxx',
