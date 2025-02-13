@@ -79,7 +79,7 @@
     "authorization",
     "authorization-errors",
     "browser",
-    "callWithRetry",
+    "retry",
     "color",
     "cookie",
     "date",
