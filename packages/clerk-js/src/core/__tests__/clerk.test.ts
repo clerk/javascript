@@ -344,7 +344,7 @@ describe('Clerk singleton', () => {
         it('sets active organization by slug', async () => {
           const mockSession2 = {
             id: '1',
-            status: 'active',
+            status,
             user: {
               organizationMemberships: [
                 {
@@ -1287,7 +1287,7 @@ describe('Clerk singleton', () => {
       const mockSession = {
         id: sessionId,
         remove: jest.fn(),
-        status: 'active',
+        status,
         user: {},
         touch: jest.fn(() => Promise.resolve()),
         getToken: jest.fn(),
