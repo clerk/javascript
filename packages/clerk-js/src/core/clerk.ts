@@ -150,6 +150,7 @@ const defaultOptions: ClerkOptions = {
   signUpFallbackRedirectUrl: undefined,
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
+  modalsCloseOnClickOutside: true,
 };
 
 export class Clerk implements ClerkInterface {
@@ -280,6 +281,10 @@ export class Clerk implements ClerkInterface {
 
   get isStandardBrowser(): boolean {
     return this.#options.standardBrowser || false;
+  }
+
+  get modalsCloseOnClickOutside(): boolean {
+    return this.#options.modalsCloseOnClickOutside || true;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {

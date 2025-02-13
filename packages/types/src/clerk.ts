@@ -761,6 +761,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     waitlistUrl?: string;
     /**
+     * This option allows you to disable modals closing when users click outside on the overlays.
+     * @default true
+     */
+    modalsCloseOnClickOutside?: boolean;
+    /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
