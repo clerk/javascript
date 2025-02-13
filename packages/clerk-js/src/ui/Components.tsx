@@ -402,6 +402,7 @@ const Components = (props: ComponentsProps) => {
       onExternalNavigate={() => componentsControls.closeModal('userVerification')}
       startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
       componentName={'UserVerificationModal'}
+      modalContainerSx={{ alignItems: 'center' }}
     >
       <UserVerificationModal {...userVerificationModal} />
     </LazyModalRenderer>
