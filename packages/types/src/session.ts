@@ -150,7 +150,7 @@ export interface PendingSessionResource extends SessionResource {
 
 /**
  * Represents session resources for users who have completed
- * the full authentication flow.
+ * the full authentication flow
  */
 export type AuthenticatedSessionResource = ActiveSessionResource | PendingSessionResource;
 
