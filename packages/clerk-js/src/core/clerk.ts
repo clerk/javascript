@@ -372,6 +372,9 @@ export class Clerk implements ClerkInterface {
 
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+
+      // Notify other tabs that user is signing out.
+      this.__internal_broadcastSignOutEvent();
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -876,14 +879,6 @@ export class Clerk implements ClerkInterface {
     }
 
     await onBeforeSetActive();
-
-    // If this.session exists, then signOut was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
-    if (shouldSignOutSession) {
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -1503,6 +1498,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
@@ -1514,7 +1510,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.#broadcastSignOutEvent();
+        this.__internal_broadcastSignOutEvent();
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -2024,9 +2020,12 @@ export class Clerk implements ClerkInterface {
       }
     });
 
+    /**
+     * Background tabs get notified of a signout event from active tab.
+     */
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
-        void this.handleUnauthenticated();
+        void this.handleUnauthenticated({ broadcast: false });
       }
     });
   };
@@ -2063,7 +2062,7 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
+  public __internal_broadcastSignOutEvent = () => {
     this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 

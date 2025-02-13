@@ -43,7 +43,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
       await m.po.expect.toBeSignedOut();
     });
 
-    await mainTab.po.expect.toBeSignedOut();
+    await mainTab.po.expect.toBeSignedOut({ timeOut: 2 * 1_000 });
   });
 
   test('sign out persisting client', async ({ page, context }) => {
