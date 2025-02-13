@@ -2,7 +2,7 @@
 '@clerk/nextjs': patch
 ---
 
-Update `clerkMiddleware` request callback to also accept an asynchronous function
+Update `clerkMiddleware` request callback to accept an asynchronous function
 
 ```ts
 export default clerkMiddleware(
