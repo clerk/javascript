@@ -13,10 +13,11 @@ import { useSignIn } from '@clerk/vue'
 import { isClerkAPIResponseError } from '@clerk/vue/errors'
 
 // ... form state refs and other setup ...
+const { signIn } = useSignIn()
 
 const handleSubmit = async () => {
   try {
-    const signInAttempt = await signIn.create({
+    const signInAttempt = await signIn.value.create({
       identifier: email.value,
       password: password.value,
     })
