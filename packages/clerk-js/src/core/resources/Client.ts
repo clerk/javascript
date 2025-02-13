@@ -88,7 +88,7 @@ export class Client extends BaseResource implements ClientResource {
        * and delays emitting until `setActive` is called within `Clerk.signOut()`
        * TODO: Remove this property while persisting the desired outcome
        */
-      skipUpdateClient: true,
+      skipUpdateClient: false,
     }).then(e => {
       SessionTokenCache.clear();
       return e as unknown as ClientResource;

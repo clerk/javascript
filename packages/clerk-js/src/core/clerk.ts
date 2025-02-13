@@ -364,7 +364,7 @@ export class Clerk implements ClerkInterface {
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
-    if (!this.client) {
+    if (!this.client || this.client.sessions.length === 0) {
       return;
     }
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -1511,10 +1511,6 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.session) {
       return;
     }
-    const clearSession = () => {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-      return this.setActive({ session: null });
-    };
     try {
       const newClient = await Client.getOrCreateInstance().fetch();
       this.updateClient(newClient);
@@ -1524,11 +1520,11 @@ export class Clerk implements ClerkInterface {
       if (opts.broadcast) {
         this.#broadcastSignOutEvent();
       }
-      return clearSession();
+      return this.setActive({ session: null });
     } catch (err) {
       // Handle the 403 Forbidden
       if (err.status === 403) {
-        return clearSession();
+        return this.setActive({ session: null });
       } else {
         throw err;
       }
@@ -2076,6 +2072,10 @@ export class Clerk implements ClerkInterface {
 
   #broadcastSignOutEvent = () => {
     this.#broadcastChannel?.postMessage({ type: 'signout' });
+  };
+
+  public __internal_broadcastSignOutEvent = () => {
+    this.#broadcastSignOutEvent();
   };
 
   #setTransitiveState = () => {

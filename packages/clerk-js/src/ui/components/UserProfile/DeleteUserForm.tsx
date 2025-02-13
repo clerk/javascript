@@ -15,7 +15,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { user } = useUser();
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
-  const { signOut } = useClerk();
+  const { setActive } = useClerk();
   const [deleteUserWithReverification] = useReverification(() => user?.delete());
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
@@ -38,7 +38,8 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       await deleteUserWithReverification();
       const redirectUrl = otherSessions.length === 0 ? afterSignOutUrl : afterMultiSessionSingleSignOutUrl;
 
-      return await signOut({
+      return await setActive({
+        session: null,
         redirectUrl,
       });
     } catch (e) {

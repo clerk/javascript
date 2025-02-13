@@ -241,7 +241,10 @@ export class User extends BaseResource implements UserResource {
   };
 
   delete = (): Promise<void> => {
-    return this._baseDelete({ path: '/me' });
+    return this._baseDelete({ path: '/me' }).then(res => {
+      User.clerk.__internal_broadcastSignOutEvent();
+      return res;
+    });
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {
