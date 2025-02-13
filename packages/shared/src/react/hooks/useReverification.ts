@@ -121,11 +121,10 @@ type UseReverificationResult<
 /**
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
  *
- * @warning
- *
- * This feature is currently in public beta. **It is not recommended for production use.**
- *
- * Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.5.0` or later, `@clerk/clerk-react@5.17.0` or later, and `@clerk/clerk-js@5.35.0` or later.
+ * > [!WARNING]
+ * > This feature is currently in public beta. **It is not recommended for production use.**
+ * >
+ * > Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.5.0` or later, `@clerk/clerk-react@5.17.0` or later, and `@clerk/clerk-js@5.35.0` or later.
  *
  * @example
  * ### Handle cancellation of the reverification process

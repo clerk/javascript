@@ -38,14 +38,21 @@ const typedocPluginMarkdownOptions = {
   useHTMLAnchors: false,
 };
 
+const frontmatterTags = ['description', 'title'];
+const frontmatterBlockTags = frontmatterTags.map(tag => `@${tag}`);
+
+/** @type {Partial<import("typedoc-plugin-frontmatter").PluginOptions>} */
+const typedocPluginFrontmatterOptions = {
+  frontmatterCommentTags: frontmatterTags,
+  preserveFrontmatterCommentTags: false,
+};
+
 /** @type {Partial<import("typedoc").TypeDocOptions>} */
 const config = {
   out: './.typedoc/docs',
-  cleanOutputDir: true,
-  // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
-  json: './.typedoc/output.json',
+  json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
-  plugin: ['typedoc-plugin-markdown', './.typedoc/custom-theme.mjs'],
+  plugin: ['typedoc-plugin-markdown', 'typedoc-plugin-frontmatter', './.typedoc/custom-theme.mjs'],
   theme: 'clerkTheme',
   packageOptions: {
     includeVersion: false,
@@ -56,15 +63,17 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important', '@memberof'],
+    blockTags: [...OptionDefaults.blockTags, ...frontmatterBlockTags, '@warning', '@note', '@important', '@memberof'],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,
     disableSources: true,
+    cleanOutputDir: true,
   },
   entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
   ...typedocPluginMarkdownOptions,
+  ...typedocPluginFrontmatterOptions,
 };
 
 export default config;
