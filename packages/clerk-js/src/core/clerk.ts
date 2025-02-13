@@ -374,7 +374,8 @@ export class Clerk implements ClerkInterface {
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-      this.#broadcastSignOutEvent();
+      // Notify other tabs that user is signing out.
+      this.__internal_broadcastSignOutEvent();
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -879,14 +880,6 @@ export class Clerk implements ClerkInterface {
     }
 
     await onBeforeSetActive();
-
-    // If this.session exists, then signOut was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    // const shouldSignOutSession = this.session && newSession === null;
-    // if (shouldSignOutSession) {
-    //   this.#broadcastSignOutEvent();
-    //   eventBus.dispatch(events.TokenUpdate, { token: null });
-    // }
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -1518,7 +1511,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.#broadcastSignOutEvent();
+        this.__internal_broadcastSignOutEvent();
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -2070,12 +2063,8 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
-  };
-
   public __internal_broadcastSignOutEvent = () => {
-    this.#broadcastSignOutEvent();
+    this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
   #setTransitiveState = () => {
