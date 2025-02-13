@@ -3,9 +3,11 @@ import type { GetMembersParams } from '@clerk/types';
 import { useEffect, useRef } from 'react';
 
 import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
-import { Animated, InputWithIcon } from '../../../ui/elements';
+import { InputWithIcon } from '../../../ui/elements';
+import { Field } from '../../../ui/elements/FieldControl';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
+import { useFormControl } from '../../../ui/utils';
 import { ACTIVE_MEMBERS_PAGE_SIZE } from './OrganizationMembers';
 
 type MembersSearchProps = {
@@ -29,11 +31,28 @@ type MembersSearchProps = {
    * Handler for `query` value changes
    */
   onQueryTrigger: (query: string) => void;
+  /**
+   * Minimum search length to trigger query
+   */
+  minLength?: number;
 };
 
 const membersSearchDebounceMs = 500;
 
-export const MembersSearch = ({ query, value, memberships, onSearchChange, onQueryTrigger }: MembersSearchProps) => {
+export const MembersSearch = ({
+  query,
+  value,
+  memberships,
+  onSearchChange,
+  onQueryTrigger,
+  minLength = 3,
+}: MembersSearchProps) => {
+  const searchField = useFormControl('search', '', {
+    type: 'search',
+    label: '',
+    placeholder: localizationKeys('organizationProfile.membersPage.action__search'),
+  });
+
   const { t } = useLocalizations();
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,6 +63,7 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
 
     const shouldClearQuery = eventValue === '';
     if (shouldClearQuery) {
+      searchField.clearFeedback();
       onQueryTrigger(eventValue);
     }
   };
@@ -55,8 +75,16 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
       clearTimeout(debounceTimer.current);
     }
 
+    // Test rollback behavior + add localization key
     debounceTimer.current = setTimeout(() => {
-      onQueryTrigger(value.trim());
+      const isValid = value.trim().length === 0 || value.trim().length >= minLength;
+
+      if (!isValid) {
+        searchField.setInfo('3 character minimum');
+      } else {
+        searchField.clearFeedback();
+        onQueryTrigger(value.trim());
+      }
     }, membersSearchDebounceMs);
   }
 
@@ -76,14 +104,19 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
   const isFetchingNewData = value && !!memberships?.isLoading && !!memberships.data?.length;
 
   return (
-    <Animated asChild>
-      <Flex sx={{ width: '100%' }}>
+    <Flex
+      sx={{ minWidth: '50%', position: 'relative' }}
+      direction='col'
+    >
+      <Field.Root {...searchField}>
         <InputWithIcon
+          {...searchField.props}
           value={value}
           type='search'
           autoCapitalize='none'
           spellCheck={false}
           aria-label='Search'
+          minLength={minLength}
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
           leftIcon={
             isFetchingNewData ? (
@@ -99,7 +132,9 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
           onChange={handleChange}
           elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />
-      </Flex>
-    </Animated>
+
+        <Field.Feedback />
+      </Field.Root>
+    </Flex>
   );
 };
