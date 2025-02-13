@@ -477,9 +477,6 @@ importers:
         specifier: 0.13.11
         version: 0.13.11
     devDependencies:
-      '@clerk/ui':
-        specifier: workspace:*
-        version: link:../ui
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
         version: 0.4.13(@rspack/core@1.2.2(@swc/helpers@0.5.15))(webpack@5.94.0(esbuild@0.24.2))
