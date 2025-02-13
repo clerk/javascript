@@ -6,7 +6,7 @@ import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
-import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from '../resources/internal';
+import { BaseResource, Client, EmailLinkErrorCodeStatus, Environment, SignIn, SignUp } from '../resources/internal';
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
@@ -1878,7 +1878,7 @@ describe('Clerk singleton', () => {
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
-      }).rejects.toThrow(EmailLinkErrorCode.Expired);
+      }).rejects.toThrow(EmailLinkErrorCodeStatus.Expired);
       expect(mockSetActive).not.toHaveBeenCalled();
     });
 
@@ -1900,7 +1900,7 @@ describe('Clerk singleton', () => {
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
-      }).rejects.toThrow(EmailLinkErrorCode.Failed);
+      }).rejects.toThrow(EmailLinkErrorCodeStatus.Failed);
       expect(mockSetActive).not.toHaveBeenCalled();
     });
 
@@ -1946,7 +1946,7 @@ describe('Clerk singleton', () => {
       sut.setActive = mockSetActive;
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
-      }).rejects.toThrow(EmailLinkErrorCode.Failed);
+      }).rejects.toThrow(EmailLinkErrorCodeStatus.Failed);
       expect(mockSetActive).not.toHaveBeenCalled();
     });
 
@@ -1972,7 +1972,7 @@ describe('Clerk singleton', () => {
 
       await expect(async () => {
         await sut.handleEmailLinkVerification({});
-      }).rejects.toThrow(EmailLinkErrorCode.Failed);
+      }).rejects.toThrow(EmailLinkErrorCodeStatus.Failed);
       expect(mockSetActive).not.toHaveBeenCalled();
     });
   });
