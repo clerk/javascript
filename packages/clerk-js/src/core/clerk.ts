@@ -364,7 +364,7 @@ export class Clerk implements ClerkInterface {
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
-    if (!this.client || this.client.sessions.length === 0) {
+    if (!this.client) {
       return;
     }
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -373,6 +373,8 @@ export class Clerk implements ClerkInterface {
 
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+
+      this.#broadcastSignOutEvent();
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -880,11 +882,11 @@ export class Clerk implements ClerkInterface {
 
     // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
-    if (shouldSignOutSession) {
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
+    // const shouldSignOutSession = this.session && newSession === null;
+    // if (shouldSignOutSession) {
+    //   this.#broadcastSignOutEvent();
+    //   eventBus.dispatch(events.TokenUpdate, { token: null });
+    // }
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -1504,10 +1506,15 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
     }
+    const clearSession = () => {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+      return this.setActive({ session: null });
+    };
     try {
       const newClient = await Client.getOrCreateInstance().fetch();
       this.updateClient(newClient);
@@ -1517,11 +1524,11 @@ export class Clerk implements ClerkInterface {
       if (opts.broadcast) {
         this.#broadcastSignOutEvent();
       }
-      return this.setActive({ session: null });
+      return clearSession();
     } catch (err) {
       // Handle the 403 Forbidden
       if (err.status === 403) {
-        return this.setActive({ session: null });
+        return clearSession();
       } else {
         throw err;
       }
@@ -2025,9 +2032,12 @@ export class Clerk implements ClerkInterface {
       }
     });
 
+    /**
+     * Background tabs get notified of a signout event from active tab.
+     */
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
-        void this.handleUnauthenticated();
+        void this.handleUnauthenticated({ broadcast: false });
       }
     });
   };
