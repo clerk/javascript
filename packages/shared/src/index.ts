@@ -12,7 +12,6 @@ export * from './utils';
 
 export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey';
 export * from './browser';
-export { callWithRetry } from './callWithRetry';
 export * from './color';
 export * from './constants';
 export * from './date';
