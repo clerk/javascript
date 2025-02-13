@@ -2,7 +2,7 @@
 "@clerk/nuxt": minor
 ---
 
-Introduce `getAuth()` helper to retrieve authentication state from the event object.
+Introduce `getAuth()` helper to retrieve authentication state from the [event](https://h3.unjs.io/guide/event) object.
 
 Example:
 
