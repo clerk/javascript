@@ -96,13 +96,14 @@ export interface SessionResource extends ClerkResource {
   /**
    * Factor Verification Age
    * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
+   * [firstFactorAge, secondFactorAge]
    */
-  factorVerificationAge: [fistFactorAge: number, secondFactorAge: number] | null;
+  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
+  tasks: SessionTasks | null;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
@@ -167,6 +168,10 @@ export interface PublicUserData {
   hasImage: boolean;
   identifier: string;
   userId?: string;
+}
+
+export interface SessionTasks {
+  orgs: Record<string, unknown>;
 }
 
 export type GetTokenOptions = {
