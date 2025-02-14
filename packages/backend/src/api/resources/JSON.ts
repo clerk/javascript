@@ -388,6 +388,7 @@ export interface WaitlistEntryJSON extends ClerkResourceJSON {
   email_address: string;
   id: string;
   invitation: InvitationJSON | null;
+  is_locked: boolean;
   object: typeof ObjectType.WaitlistEntry;
   status: string;
   updated_at: number;
