@@ -2,12 +2,12 @@ import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/types';
 import { useEffect } from 'react';
 
-import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
-import { InputWithIcon } from '../../../ui/elements';
-import { Field } from '../../../ui/elements/FieldControl';
-import { MagnifyingGlass } from '../../../ui/icons';
-import { Spinner } from '../../../ui/primitives';
-import { useFormControl } from '../../../ui/utils';
+import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../customizables';
+import { InputWithIcon } from '../../elements';
+import { Field } from '../../elements/FieldControl';
+import { MagnifyingGlass } from '../../icons';
+import { Spinner } from '../../primitives';
+import { useFormControl } from '../../utils';
 import { ACTIVE_MEMBERS_PAGE_SIZE } from './OrganizationMembers';
 
 type MembersSearchProps = {
@@ -29,7 +29,7 @@ type MembersSearchProps = {
   minLength: number;
 };
 
-export const MembersSearch = ({ memberships, onChange, minLength }: MembersSearchProps) => {
+export const MembersSearchForm = ({ memberships, onChange, minLength }: MembersSearchProps) => {
   const { t } = useLocalizations();
   const searchField = useFormControl('search', '', {
     type: 'search',

@@ -22,7 +22,7 @@ import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
-import { MembersSearch } from './MembersSearch';
+import { MembersSearchForm } from './MembersSearchForm';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
@@ -141,7 +141,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     >
                       <MembersActionsRow
                         actionSlot={
-                          <MembersSearch
+                          <MembersSearchForm
                             minLength={MEMBERS_SEARCH_QUERY_MIN_LENGTH}
                             query={query}
                             memberships={memberships}
