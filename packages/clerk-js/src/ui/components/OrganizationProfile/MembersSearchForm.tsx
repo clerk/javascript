@@ -2,6 +2,7 @@ import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/types';
 import { useEffect } from 'react';
 
+import { sanitizeInputProps } from '../../../ui/primitives/hooks';
 import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { InputWithIcon } from '../../elements';
 import { Field } from '../../elements/FieldControl';
@@ -36,6 +37,7 @@ export const MembersSearchForm = ({ memberships, onChange, minLength }: MembersS
     label: '',
     placeholder: localizationKeys('organizationProfile.membersPage.action__search'),
   });
+  const { placeholder, ...inputProps } = sanitizeInputProps(searchField);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.trim();
@@ -73,13 +75,16 @@ export const MembersSearchForm = ({ memberships, onChange, minLength }: MembersS
     >
       <Field.Root {...searchField}>
         <InputWithIcon
-          {...searchField.props}
           type='search'
-          autoCapitalize='none'
           spellCheck={false}
           aria-label='Search'
+          autoCapitalize='none'
           minLength={minLength}
+          onFocus={inputProps.onFocus}
+          onBlur={inputProps.onBlur}
+          onChange={handleChange}
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
+          elementDescriptor={descriptors.organizationProfileMembersSearchInput}
           leftIcon={
             isFetchingNewData ? (
               <Spinner size='xs' />
@@ -90,8 +95,6 @@ export const MembersSearchForm = ({ memberships, onChange, minLength }: MembersS
               />
             )
           }
-          onChange={handleChange}
-          elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />
 
         <Field.Feedback />
