@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../../ui/customizables';
 import { InputWithIcon } from '../../../ui/elements';
 import { Field } from '../../../ui/elements/FieldControl';
-import { useDebounce } from '../../../ui/hooks';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
 import { useFormControl } from '../../../ui/utils';
@@ -21,44 +20,41 @@ type MembersSearchProps = {
    */
   memberships: ReturnType<typeof useOrganization>['memberships'];
   /**
-   * Handler for `query` value changes
+   * Handler for value changes
    */
-  onQueryChange: (query: string) => void;
+  onChange: (query: string) => void;
   /**
    * Minimum search length to trigger query
    */
   minLength: number;
 };
 
-export const MembersSearch = ({ memberships, onQueryChange, minLength }: MembersSearchProps) => {
+export const MembersSearch = ({ memberships, onChange, minLength }: MembersSearchProps) => {
   const { t } = useLocalizations();
   const searchField = useFormControl('search', '', {
     type: 'search',
     label: '',
     placeholder: localizationKeys('organizationProfile.membersPage.action__search'),
   });
-  const query = useDebounce(searchField.value, 600);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const eventValue = event.target.value;
-    searchField.onChange(event);
+    const value = event.target.value.trim();
 
-    if (eventValue.length < minLength) {
-      searchField.setInfo(t(localizationKeys('organizationProfile.membersPage.action__search_minLength')));
+    searchField.onChange(event);
+    onChange(value);
+
+    if (value.length >= minLength) {
+      searchField.clearFeedback();
       return;
     }
 
-    searchField.clearFeedback();
+    searchField.setInfo(t(localizationKeys('organizationProfile.membersPage.action__search_minLength')));
   };
-
-  useEffect(() => {
-    onQueryChange(query);
-  }, [query, onQueryChange]);
 
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
   useEffect(() => {
-    if (!query || !memberships?.data) {
+    if (!searchField.value || !memberships?.data) {
       return;
     }
 
@@ -66,7 +62,7 @@ export const MembersSearch = ({ memberships, onQueryChange, minLength }: Members
     if (hasOnePageLeft) {
       memberships?.fetchPage?.(1);
     }
-  }, [query, memberships]);
+  }, [searchField.value, memberships]);
 
   const isFetchingNewData = searchField.value && !!memberships?.isLoading && !!memberships.data?.length;
 

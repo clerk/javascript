@@ -1,6 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { useDebounce } from '../../../ui/hooks';
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
@@ -36,6 +37,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
 
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 600);
 
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
@@ -43,7 +45,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
     memberships: canReadMemberships
       ? {
           keepPreviousData: true,
-          query: query && query.length > MEMBERS_SEARCH_QUERY_MIN_LENGTH ? query : undefined,
+          query: query.length >= MEMBERS_SEARCH_QUERY_MIN_LENGTH ? debouncedQuery : undefined,
         }
       : undefined,
   });
@@ -143,7 +145,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                             minLength={MEMBERS_SEARCH_QUERY_MIN_LENGTH}
                             query={query}
                             memberships={memberships}
-                            onQueryChange={query => setQuery(query)}
+                            onChange={query => setQuery(query)}
                           />
                         }
                       />
