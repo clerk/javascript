@@ -6,7 +6,6 @@ import type { UVFactorTwoCodeCard } from './UVFactorTwoCodeForm';
 import { UVFactorTwoCodeForm } from './UVFactorTwoCodeForm';
 
 type UVFactorTwoPhoneCodeCardProps = UVFactorTwoCodeCard & { factor: PhoneCodeFactor };
-
 export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) => {
   const { session } = useSession();
 
