@@ -72,6 +72,7 @@ export const MembersSearchForm = ({ memberships, onChange, minLength }: MembersS
     <Flex
       sx={{ minWidth: '50%', position: 'relative' }}
       direction='col'
+      elementDescriptor={descriptors.organizationProfileMembersSearchContainer}
     >
       <Field.Root {...searchField}>
         <InputWithIcon
