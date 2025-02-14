@@ -20,6 +20,7 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
             width: '100%',
             marginLeft: 'auto',
             padding: `${t.space.$none} ${t.space.$1}`,
+            clipPath: `inset(-4px -4px -4px -4px)`,
           })}
           gap={actionSlot ? 2 : undefined}
         >
