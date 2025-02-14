@@ -103,7 +103,7 @@ describe('retry', () => {
     expect(attempts).toBe(3);
   });
 
-  test('disables immediate retry when retryImmediatelyOnce is false', async () => {
+  test('disables immediate retry when retryImmediately is false', async () => {
     let attempts = 0;
     retry(
       () => {
