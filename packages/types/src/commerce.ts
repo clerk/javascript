@@ -3,13 +3,15 @@ import type { ClerkResource } from './resource';
 
 export interface CommerceNamespace {
   billing: CommerceBillingNamespace;
-  addPaymentSource: (params: AddPaymentSourceParams) => Promise<any>;
+  getPaymentSources: () => Promise<ClerkPaginatedResponse<CommercePaymentSourceResource>>;
+  addPaymentSource: (params: AddPaymentSourceParams) => Promise<CommercePaymentSourceResource>;
 }
 
 export interface CommerceBillingNamespace {
   getProducts: (params?: GetProductsParams) => Promise<ClerkPaginatedResponse<CommerceProductResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
+  confirmCheckout: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
 }
 
 export type GetProductsParams = ClerkPaginationParams<{
@@ -73,37 +75,32 @@ export interface CommerceInvoiceResource extends ClerkResource {
   id: string;
   planId: string;
   paymentSourceId: string;
-  totals: CommerceCheckoutTotals;
+  totals: CommerceTotals;
   paymentDueOn: number;
   paidOn: number;
   status: string;
-  createdAt: number;
-  updatedAt: number;
 }
 
 export interface CommerceSubscriptionResource extends ClerkResource {
   id: string;
-  instanceId: string;
   paymentSourceId: string;
-  status: string;
-  planId: string;
   plan: CommercePlanResource;
-  createdAt: number;
-  updatedAt: number;
+  planPeriod: string;
+  status: string;
 }
 
-interface CommerceMoney {
+export interface CommerceMoney {
   amount: number;
-  formattedAmount: string;
+  amountFormatted: string;
   currency: string;
   currencySymbol: string;
 }
 
-interface CommerceCheckoutTotals {
+export interface CommerceTotals {
   subtotal: CommerceMoney;
   grandTotal: CommerceMoney;
   taxTotal: CommerceMoney;
-  totalDueNow: CommerceMoney;
+  totalDueNow?: CommerceMoney;
 }
 
 export interface CreateCheckoutParams {
@@ -111,12 +108,20 @@ export interface CreateCheckoutParams {
   planPeriod: string;
 }
 
+export interface ConfirmCheckoutParams {
+  checkoutId: string;
+  paymentSourceId?: string;
+}
+
 export interface CommerceCheckoutResource extends ClerkResource {
   id: string;
+  externalClientSecret: string;
+  externalGatewayId: string;
+  invoice?: CommerceInvoiceResource;
+  paymentSource?: CommercePaymentSourceResource;
   plan: CommercePlanResource;
-  paymentSource: CommercePaymentSourceResource;
+  planPeriod: string;
   status: string;
-  totals: CommerceCheckoutTotals;
-  subscription: CommerceSubscriptionResource;
-  invoice: CommerceInvoiceResource;
+  totals: CommerceTotals;
+  subscription?: CommerceSubscriptionResource;
 }

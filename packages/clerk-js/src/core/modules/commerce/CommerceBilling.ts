@@ -1,15 +1,16 @@
 import type {
   ClerkPaginatedResponse,
   CommerceBillingNamespace,
-  CommerceCheckoutResource,
+  CommerceCheckoutJSON,
   CommerceProductJSON,
+  ConfirmCheckoutParams,
   CreateCheckoutParams,
   GetPlansParams,
   GetProductsParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
-import { BaseResource, CommerceProduct } from '../../resources/internal';
+import { BaseResource, CommerceCheckout, CommerceProduct } from '../../resources/internal';
 
 export class CommerceBilling implements CommerceBillingNamespace {
   getProducts = async (params?: GetProductsParams) => {
@@ -36,12 +37,24 @@ export class CommerceBilling implements CommerceBillingNamespace {
   };
 
   startCheckout = async (params: CreateCheckoutParams) => {
-    return await BaseResource._fetch({
-      path: `/me/commerce/checkouts`,
-      method: 'POST',
-      body: params as any,
-    }).then(res => {
-      return res as unknown as CommerceCheckoutResource;
-    });
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/checkouts`,
+        method: 'POST',
+        body: params as any,
+      })
+    )?.response as unknown as CommerceCheckoutJSON;
+    return new CommerceCheckout(json);
+  };
+
+  confirmCheckout = async (params: ConfirmCheckoutParams) => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/checkouts/${params.checkoutId}/confirm`,
+        method: 'PATCH',
+        body: { paymentSourceId: params.paymentSourceId } as any,
+      })
+    )?.response as unknown as CommerceCheckoutJSON;
+    return new CommerceCheckout(json);
   };
 }

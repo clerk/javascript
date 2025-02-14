@@ -1,5 +1,12 @@
-import type { AddPaymentSourceParams, CommerceBillingNamespace, CommerceNamespace } from '@clerk/types';
+import type {
+  AddPaymentSourceParams,
+  ClerkPaginatedResponse,
+  CommerceBillingNamespace,
+  CommerceNamespace,
+  CommercePaymentSourceJSON,
+} from '@clerk/types';
 
+import { BaseResource, CommercePaymentSource } from '../../resources/internal';
 import { CommerceBilling } from './CommerceBilling';
 
 export class Commerce implements CommerceNamespace {
@@ -13,7 +20,26 @@ export class Commerce implements CommerceNamespace {
   }
 
   addPaymentSource = async (params: AddPaymentSourceParams) => {
-    console.log(params);
-    return await Promise.resolve();
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/payment_sources`,
+        method: 'POST',
+        body: params as any,
+      })
+    )?.response as unknown as CommercePaymentSourceJSON;
+    return new CommercePaymentSource(json);
+  };
+
+  getPaymentSources = async () => {
+    return await BaseResource._fetch({
+      path: `/me/commerce/payment_sources`,
+      method: 'GET',
+    }).then(res => {
+      const { data: paymentSources, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>;
+      return {
+        total_count,
+        data: paymentSources.map(paymentSource => new CommercePaymentSource(paymentSource)),
+      };
+    });
   };
 }

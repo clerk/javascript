@@ -632,3 +632,59 @@ export interface CommerceProductJSON extends ClerkResourceJSON {
   is_default: boolean;
   plans: CommercePlanJSON[];
 }
+
+export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_source';
+  id: string;
+  last4: string;
+  payment_method: string;
+  card_type: string;
+}
+
+export interface CommerceInvoiceJSON extends ClerkResourceJSON {
+  object: 'commerce_invoice';
+  id: string;
+  paid_on: number;
+  payment_due_on: number;
+  payment_source_id: string;
+  plan_id: string;
+  status: string;
+  totals: CommerceTotalsJSON;
+}
+
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: 'commerce_subscription';
+  id: string;
+  payment_source_id: string;
+  plan: CommercePlanJSON;
+  plan_period: string;
+  status: string;
+}
+
+export interface CommerceMoneyJSON {
+  amount: number;
+  amount_formatted: string;
+  currency: string;
+  currency_symbol: string;
+}
+
+export interface CommerceTotalsJSON {
+  grand_total: CommerceMoneyJSON;
+  subtotal: CommerceMoneyJSON;
+  tax_total: CommerceMoneyJSON;
+  total_due_now?: CommerceMoneyJSON;
+}
+
+export interface CommerceCheckoutJSON extends ClerkResourceJSON {
+  object: 'commerce_checkout';
+  id: string;
+  external_client_secret: string;
+  external_gateway_id: string;
+  invoice?: CommerceInvoiceJSON;
+  payment_source?: CommercePaymentSourceJSON;
+  plan: CommercePlanJSON;
+  plan_period: string;
+  status: string;
+  subscription?: CommerceSubscriptionJSON;
+  totals: CommerceTotalsJSON;
+}

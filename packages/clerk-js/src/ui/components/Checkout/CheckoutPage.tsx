@@ -1,19 +1,40 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CheckoutProps } from '@clerk/types';
+import type { CheckoutProps, CommerceCheckoutResource, CommercePlanResource, CommerceTotals } from '@clerk/types';
+import { Elements } from '@stripe/react-stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, Flex, Heading, Icon, Text } from '../../customizables';
+import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner, Text } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { Close } from '../../icons';
 import { animations } from '../../styledSystem';
+import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
+
+const COMMERCE_STRIPE_PUBLISHABLE_KEY =
+  'pk_test_51QPnGjRsxrFoQgOSJShlz3CnfW8qiPr3OzgwYp2yNhZTQjdE1Xt0bJ7fKueh2RsRN2tofhWKJ0TaxcZLk9LTXicE00LakhxwTD';
 
 export const CheckoutPage = (props: CheckoutProps) => {
   const { planId, planPeriod } = props;
   const { commerce } = useClerk();
   const { mode = 'mounted', show = false } = useCheckoutContext();
+  const [checkout, setCheckout] = useState<CommerceCheckoutResource>();
+  const stripePromise = useRef<Promise<Stripe | null> | null>(null);
 
-  const { data: checkout } = useFetch(commerce?.billing.startCheckout, { planId, planPeriod });
+  const { data, isLoading } = useFetch(commerce?.billing.startCheckout, { planId, planPeriod });
+
+  useEffect(() => {
+    if (data) {
+      setCheckout(data);
+      stripePromise.current = loadStripe(COMMERCE_STRIPE_PUBLISHABLE_KEY, { stripeAccount: data.externalGatewayId });
+    }
+  }, [data]);
+
+  const onConfirm = (newCheckout: CommerceCheckoutResource) => {
+    setCheckout(newCheckout);
+  };
 
   return (
     <>
@@ -42,32 +63,64 @@ export const CheckoutPage = (props: CheckoutProps) => {
         })}
       >
         <CheckoutHeader title='Checkout' />
-        <Box
-          sx={t => ({
-            overflowY: 'auto',
-            /* Height should be 100% of parent minus any headers/footers */
-            height: `calc(100% - ${t.space.$12})`,
-            /* Optional: hide horizontal scrollbar */
-            overflowX: 'hidden',
-          })}
-        >
-          <Col
-            gap={3}
+        {isLoading ? (
+          <Flex
+            align='center'
+            justify='center'
+            sx={{ width: '100%', height: '100%' }}
+          >
+            <Spinner />
+          </Flex>
+        ) : !checkout ? (
+          <Flex
+            align='center'
+            justify='center'
+            sx={{ width: '100%', height: '100%' }}
+          >
+            <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
+          </Flex>
+        ) : checkout.status === 'completed' ? (
+          <CheckoutComplete
+            checkout={checkout}
+            sx={t => ({ height: `calc(100% - ${t.space.$12})` })}
+          />
+        ) : (
+          <Box
             sx={t => ({
-              padding: t.space.$4,
-              backgroundColor: t.colors.$neutralAlpha25,
-              borderBottomWidth: t.borderWidths.$normal,
-              borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
+              overflowY: 'auto',
+              /* minus the height of the header */
+              height: `calc(100% - ${t.space.$12})`,
+              overflowX: 'hidden',
             })}
           >
-            <CheckoutPlanRows />
-            <CheckoutSubtotalRows />
-            <CheckoutTotalRow />
-          </Col>
+            <Col
+              gap={3}
+              sx={t => ({
+                padding: t.space.$4,
+                backgroundColor: t.colors.$neutralAlpha25,
+                borderBottomWidth: t.borderWidths.$normal,
+                borderBottomStyle: t.borderStyles.$solid,
+                borderBottomColor: t.colors.$neutralAlpha100,
+              })}
+            >
+              <CheckoutPlanRows
+                plan={checkout.plan}
+                planPeriod={checkout.planPeriod}
+              />
+              <CheckoutTotalsRows totals={checkout.totals} />
+            </Col>
 
-          <CheckoutForm checkout={checkout || undefined} />
-        </Box>
+            <Elements
+              stripe={stripePromise.current}
+              options={{ clientSecret: checkout.externalClientSecret }}
+            >
+              <CheckoutForm
+                checkout={checkout}
+                onConfirm={onConfirm}
+              />
+            </Elements>
+          </Box>
+        )}
       </Box>
     </>
   );
@@ -110,7 +163,7 @@ const CheckoutHeader = ({ title }: { title: string }) => {
   );
 };
 
-const CheckoutPlanRows = () => {
+const CheckoutPlanRows = ({ plan, planPeriod }: { plan: CommercePlanResource; planPeriod: string }) => {
   return (
     <Col
       gap={3}
@@ -128,16 +181,19 @@ const CheckoutPlanRows = () => {
         gap={2}
       >
         <Box>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Bronze Plan</Text>
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>{plan.name}</Text>
         </Box>
         <Col align='end'>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>$9.99</Text>
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+            {plan.currencySymbol}
+            {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+          </Text>
           <Text
             colorScheme='secondary'
             variant='caption'
             sx={t => ({ lineHeight: t.lineHeights.$normal })}
           >
-            per month
+            per month{planPeriod === 'annual' ? ', times 12 months' : ''}
           </Text>
         </Col>
       </Flex>
@@ -145,48 +201,57 @@ const CheckoutPlanRows = () => {
   );
 };
 
-const CheckoutSubtotalRows = () => {
+const CheckoutTotalsRows = ({ totals }: { totals: CommerceTotals }) => {
   return (
-    <Col
-      gap={3}
-      align='stretch'
-      sx={t => ({
-        paddingBlockEnd: t.space.$3,
-        borderBottomWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$neutralAlpha100,
-        color: t.colors.$colorTextSecondary,
-      })}
-    >
+    <>
+      <Col
+        gap={3}
+        align='stretch'
+        sx={t => ({
+          paddingBlockEnd: t.space.$3,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$neutralAlpha100,
+          color: t.colors.$colorTextSecondary,
+        })}
+      >
+        <Flex
+          align='baseline'
+          justify='between'
+          gap={2}
+        >
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Subtotal</Text>
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+            {totals.subtotal.currencySymbol}
+            {totals.subtotal.amountFormatted}
+          </Text>
+        </Flex>
+        <Flex
+          align='baseline'
+          justify='between'
+          gap={2}
+        >
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Tax</Text>
+          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+            {totals.taxTotal.currencySymbol}
+            {totals.taxTotal.amountFormatted}
+          </Text>
+        </Flex>
+      </Col>
       <Flex
         align='baseline'
         justify='between'
         gap={2}
       >
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Subtotal</Text>
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>$9.99</Text>
+        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+          Total{totals.totalDueNow ? ' Due Today' : ''}
+        </Text>
+        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+          {totals.totalDueNow
+            ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
+            : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`}
+        </Text>
       </Flex>
-      <Flex
-        align='baseline'
-        justify='between'
-        gap={2}
-      >
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Tax</Text>
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>$1.00</Text>
-      </Flex>
-    </Col>
-  );
-};
-
-const CheckoutTotalRow = () => {
-  return (
-    <Flex
-      align='baseline'
-      justify='between'
-      gap={2}
-    >
-      <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Total Due Today</Text>
-      <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>$10.99</Text>
-    </Flex>
+    </>
   );
 };
