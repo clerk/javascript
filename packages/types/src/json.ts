@@ -16,6 +16,7 @@ import type { SessionStatus } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
+import type { SessionTasks } from './tasks';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -76,29 +77,6 @@ export interface ClientJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-// export type ClientJSON = ClerkResourceJSON & {
-//   object: 'client';
-//   id: string;
-//   status: any;
-//   sessions: SessionJSON[];
-//   sign_up: SignUpJSON | null;
-//   sign_in: SignInJSON | null;
-//   last_active_session_id: string | null;
-//   cookie_expires_at: number | null;
-//   created_at: number;
-//   updated_at: number;
-// } | {
-//   object: 'client';
-//   id: null;
-//   status: null;
-//   sessions: null
-//   sign_up: null
-//   sign_in: null
-//   last_active_session_id: null
-//   cookie_expires_at: null
-//   created_at: null;
-//   updated_at: null;
-// }
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: 'sign_up';
@@ -140,6 +118,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
   actor: ActJWTClaim | null;
+  tasks: SessionTasks | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;
