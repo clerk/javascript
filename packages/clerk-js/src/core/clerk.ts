@@ -643,7 +643,17 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted(
+        'UserProfile',
+        props,
+        props?.customPages?.length || 0 > 0
+          ? {
+              customPages: true,
+            }
+          : undefined,
+      ),
+    );
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -798,7 +808,21 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('UserButton', props, {
+        ...(props?.customMenuItems?.length || 0 > 0
+          ? {
+              customItems: true,
+            }
+          : undefined),
+
+        ...(props?.__experimental_asStandalone
+          ? {
+              standalone: true,
+            }
+          : undefined),
+      }),
+    );
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
