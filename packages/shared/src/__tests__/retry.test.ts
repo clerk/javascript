@@ -64,7 +64,7 @@ describe('retry', () => {
     jest.useRealTimers();
   });
 
-  test('respects firstDelay option', async () => {
+  test('respects initialDelay option', async () => {
     let attempts = 0;
     retry(
       () => {
