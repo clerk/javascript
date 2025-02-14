@@ -116,7 +116,8 @@
     "oauth",
     "web3",
     "getEnvVariable",
-    "pathMatcher"
+    "pathMatcher",
+    "organization"
   ],
   "scripts": {
     "build": "tsup",
