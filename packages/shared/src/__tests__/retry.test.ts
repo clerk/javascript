@@ -35,7 +35,7 @@ describe('retry', () => {
     expect(attempts).toBe(2);
   });
 
-  test('maxDelay prevents delays from growing beyond the limit', async () => {
+  test('maxDelayBetweenRetries prevents delays from growing beyond the limit', async () => {
     jest.useFakeTimers();
     let attempts = 0;
 
