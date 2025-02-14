@@ -130,7 +130,7 @@ export const ptBR: LocalizationResource = {
     membersPage: {
       action__invite: 'Convidar',
       action__search: 'Pesquisar',
-      action__search_minLength: undefined,
+      action__search_minLength: 'Mínimo de 3 caracteres',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
