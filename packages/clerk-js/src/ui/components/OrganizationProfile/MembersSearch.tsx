@@ -17,10 +17,6 @@ type MembersSearchProps = {
    */
   query: GetMembersParams['query'];
   /**
-   * Controlled input field value by parent component
-   */
-  value: string;
-  /**
    * Paginated organization memberships
    */
   memberships: ReturnType<typeof useOrganization>['memberships'];
@@ -38,18 +34,18 @@ type MembersSearchProps = {
   minLength: number;
 };
 
-export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChange, minLength }: MembersSearchProps) => {
+export const MembersSearch = ({ memberships, onQueryChange, minLength }: MembersSearchProps) => {
   const { t } = useLocalizations();
   const searchField = useFormControl('search', '', {
     type: 'search',
     label: '',
     placeholder: localizationKeys('organizationProfile.membersPage.action__search'),
   });
-  const query = useDebounce(value, 600);
+  const query = useDebounce(searchField.value, 600);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const eventValue = event.target.value;
-    onSearchChange(eventValue);
+    searchField.onChange(event);
 
     if (eventValue.length < minLength) {
       searchField.setInfo(t(localizationKeys('organizationProfile.membersPage.action__search_minLength')));
@@ -76,7 +72,7 @@ export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChang
     }
   }, [query, memberships]);
 
-  const isFetchingNewData = value && !!memberships?.isLoading && !!memberships.data?.length;
+  const isFetchingNewData = searchField.value && !!memberships?.isLoading && !!memberships.data?.length;
 
   return (
     <Flex
@@ -86,7 +82,6 @@ export const MembersSearch = ({ value, memberships, onSearchChange, onQueryChang
       <Field.Root {...searchField}>
         <InputWithIcon
           {...searchField.props}
-          value={value}
           type='search'
           autoCapitalize='none'
           spellCheck={false}
