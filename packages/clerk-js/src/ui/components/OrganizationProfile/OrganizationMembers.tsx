@@ -143,7 +143,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                             minLength={MEMBERS_SEARCH_QUERY_MIN_LENGTH}
                             query={query}
                             memberships={memberships}
-                            onSearchChange={query => setSearch(query)}
                             onQueryChange={query => setQuery(query)}
                           />
                         }

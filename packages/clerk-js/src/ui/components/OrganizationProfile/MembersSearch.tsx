@@ -21,10 +21,6 @@ type MembersSearchProps = {
    */
   memberships: ReturnType<typeof useOrganization>['memberships'];
   /**
-   * Handler for change event on input field
-   */
-  onSearchChange: (value: string) => void;
-  /**
    * Handler for `query` value changes
    */
   onQueryChange: (query: string) => void;
