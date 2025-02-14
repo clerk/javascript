@@ -1,6 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkInstanceContext } from '@clerk/shared/react';
-import type { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk, UseAuthReturn } from '@clerk/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
@@ -23,6 +23,21 @@ vi.mock('../../errors/errorThrower', () => ({
     }),
   },
 }));
+
+const stubSessionClaims = (input: {
+  sessionId: string;
+  userId: string;
+  orgId?: string;
+}): NonNullable<UseAuthReturn['sessionClaims']> => ({
+  __raw: '',
+  exp: 1,
+  iat: 1,
+  iss: '',
+  nbf: 1,
+  sid: input.sessionId,
+  sub: input.userId,
+  org_id: input.orgId,
+});
 
 const TestComponent = () => {
   const { isLoaded, isSignedIn } = useAuth();
@@ -77,6 +92,7 @@ describe('useDerivedAuth', () => {
     expect(current.isLoaded).toBe(false);
     expect(current.isSignedIn).toBeUndefined();
     expect(current.sessionId).toBeUndefined();
+    expect(current.sessionClaims).toBeUndefined();
     expect(current.userId).toBeUndefined();
     expect(current.actor).toBeUndefined();
     expect(current.orgId).toBeUndefined();
@@ -92,6 +108,7 @@ describe('useDerivedAuth', () => {
     expect(current.isLoaded).toBe(true);
     expect(current.isSignedIn).toBe(false);
     expect(current.sessionId).toBeNull();
+    expect(current.sessionClaims).toBeNull();
     expect(current.userId).toBeNull();
     expect(current.actor).toBeNull();
     expect(current.orgId).toBeNull();
@@ -104,14 +121,15 @@ describe('useDerivedAuth', () => {
   it('returns signed in with org context when sessionId, userId, orgId, and orgRole are present', () => {
     const authObject = {
       sessionId: 'session123',
+      sessionClaims: stubSessionClaims({ sessionId: 'session123', userId: 'user123' }),
       userId: 'user123',
-      actor: 'actor123',
+      actor: { sub: 'actor123' },
       orgId: 'org123',
       orgRole: 'admin',
       orgSlug: 'my-org',
       signOut: vi.fn(),
       getToken: vi.fn(),
-    };
+    } satisfies Partial<UseAuthReturn>;
 
     const {
       result: { current },
@@ -119,12 +137,13 @@ describe('useDerivedAuth', () => {
 
     expect(current.isLoaded).toBe(true);
     expect(current.isSignedIn).toBe(true);
-    expect(current.sessionId).toBe('session123');
-    expect(current.userId).toBe('user123');
-    expect(current.actor).toBe('actor123');
-    expect(current.orgId).toBe('org123');
-    expect(current.orgRole).toBe('admin');
-    expect(current.orgSlug).toBe('my-org');
+    expect(current.sessionId).toBe(authObject.sessionId);
+    expect(current.userId).toBe(authObject.userId);
+    expect(current.sessionClaims).toBe(authObject.sessionClaims);
+    expect(current.actor?.sub).toBe(authObject.actor.sub);
+    expect(current.orgId).toBe(authObject.orgId);
+    expect(current.orgRole).toBe(authObject.orgRole);
+    expect(current.orgSlug).toBe(authObject.orgSlug);
     expect(typeof current.has).toBe('function');
     expect(current.signOut).toBe(authObject.signOut);
     expect(current.getToken).toBe(authObject.getToken);
@@ -136,21 +155,23 @@ describe('useDerivedAuth', () => {
 
   it('returns signed in without org context when sessionId and userId are present but no orgId', () => {
     const authObject = {
-      sessionId: 'session123',
       userId: 'user123',
-      actor: 'actor123',
+      sessionId: 'session123',
+      sessionClaims: stubSessionClaims({ sessionId: 'session123', userId: 'user123' }),
+      actor: { sub: 'actor123' },
       signOut: vi.fn(),
       getToken: vi.fn(),
-    };
+    } satisfies Partial<UseAuthReturn>;
     const {
       result: { current },
     } = renderHook(() => useDerivedAuth(authObject));
 
     expect(current.isLoaded).toBe(true);
     expect(current.isSignedIn).toBe(true);
-    expect(current.sessionId).toBe('session123');
-    expect(current.userId).toBe('user123');
-    expect(current.actor).toBe('actor123');
+    expect(current.sessionId).toBe(authObject.sessionId);
+    expect(current.userId).toBe(authObject.userId);
+    expect(current.sessionClaims).toBe(authObject.sessionClaims);
+    expect(current.actor?.sub).toBe(authObject.actor.sub);
     expect(current.orgId).toBeNull();
     expect(current.orgRole).toBeNull();
     expect(current.orgSlug).toBeNull();
@@ -165,9 +186,9 @@ describe('useDerivedAuth', () => {
 
   it('throws invalid state error if none of the conditions match', () => {
     const authObject = {
-      sessionId: true,
       userId: undefined,
-    };
+      sessionId: 'session123',
+    } satisfies Partial<UseAuthReturn>;
     renderHook(() => useDerivedAuth(authObject));
 
     // eslint-disable-next-line jest/unbound-method
@@ -177,10 +198,11 @@ describe('useDerivedAuth', () => {
   it('uses provided has function if available', () => {
     const mockHas = vi.fn().mockReturnValue(false);
     const authObject = {
-      sessionId: 'session123',
       userId: 'user123',
+      sessionId: 'session123',
+      sessionClaims: stubSessionClaims({ sessionId: 'session123', userId: 'user123' }),
       has: mockHas,
-    };
+    } satisfies Partial<UseAuthReturn>;
     const {
       result: { current },
     } = renderHook(() => useDerivedAuth(authObject));
