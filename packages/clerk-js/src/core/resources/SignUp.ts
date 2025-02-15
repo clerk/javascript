@@ -81,6 +81,13 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
+  prepareBotProtection = async (): Promise<void> => {
+    if (!__BUILD_DISABLE_RHC__ && !this.clientBypass()) {
+      const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+      await captchaChallenge.prefetchCaptchaScript();
+    }
+  };
+
   create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
     let params: Record<string, unknown> = _params;
 

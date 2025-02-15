@@ -195,6 +195,10 @@ function _SignUpStart(): JSX.Element {
     void handleOauthError();
   }, []);
 
+  React.useEffect(() => {
+    void signUp.prepareBotProtection();
+  }, []);
+
   const handleChangeActive = (type: ActiveIdentifier) => {
     if (!emailOrPhone(attributes, isProgressiveSignUp)) {
       return;
