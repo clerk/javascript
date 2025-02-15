@@ -4,6 +4,5 @@ export {
   isEmailLinkError,
   isKnownError,
   isMetamaskError,
-  EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,
-} from '@clerk/shared/error';
+} from '@clerk/vue/errors';

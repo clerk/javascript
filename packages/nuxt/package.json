@@ -41,6 +41,10 @@
     "./composables": {
       "types": "./dist/runtime/composables/index.d.ts",
       "import": "./dist/runtime/composables/index.js"
+    },
+    "./errors": {
+      "types": "./dist/runtime/errors.d.ts",
+      "import": "./dist/runtime/errors.js"
     }
   },
   "main": "./dist/module.js",
