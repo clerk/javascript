@@ -55,8 +55,8 @@
   },
   "devDependencies": {
     "@types/chrome": "*",
-    "@types/webextension-polyfill": "^0.10.7",
-    "type-fest": "^4.8.3"
+    "@types/webextension-polyfill": "^0.12.1",
+    "type-fest": "^4.34.1"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

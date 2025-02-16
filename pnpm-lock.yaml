@@ -405,11 +405,11 @@ importers:
         specifier: '*'
         version: 0.0.114
       '@types/webextension-polyfill':
-        specifier: ^0.10.7
-        version: 0.10.7
+        specifier: ^0.12.1
+        version: 0.12.1
       type-fest:
-        specifier: ^4.8.3
-        version: 4.33.0
+        specifier: ^4.34.1
+        version: 4.34.1
 
   packages/clerk-js:
     dependencies:
@@ -567,7 +567,7 @@ importers:
         version: 14.2.23(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
         specifier: ^4.33.0
-        version: 4.33.0
+        version: 4.34.1
 
   packages/expo:
     dependencies:
@@ -5795,8 +5795,8 @@ packages:
   '@types/uuid@10.0.0':
     resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
-  '@types/webextension-polyfill@0.10.7':
-    resolution: {integrity: sha512-10ql7A0qzBmFB+F+qAke/nP1PIonS0TXZAOMVOxEUsm+lGSW6uwVcISFNa0I4Oyj0884TZVWGGMIWeXOVSNFHw==}
+  '@types/webextension-polyfill@0.12.1':
+    resolution: {integrity: sha512-xPTFWwQ8BxPevPF2IKsf4hpZNss4LxaOLZXypQH4E63BDLmcwX/RMGdI4tB4VO4Nb6xDBH3F/p4gz4wvof1o9w==}
 
   '@types/webpack-env@1.18.8':
     resolution: {integrity: sha512-G9eAoJRMLjcvN4I08wB5I7YofOb/kaJNd5uoCMX+LbKXTPCF+ZIHuqTnFaK9Jz1rgs035f9JUPUhNFtqgucy/A==}
@@ -14178,8 +14178,8 @@ packages:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
 
-  type-fest@4.33.0:
-    resolution: {integrity: sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g==}
+  type-fest@4.34.1:
+    resolution: {integrity: sha512-6kSc32kT0rbwxD6QL1CYe8IqdzN/J/ILMrNK+HMQCKH3insCDRY/3ITb0vcBss0a3t72fzh2YSzj8ko1HgwT3g==}
     engines: {node: '>=16'}
 
   type-is@1.6.18:
@@ -20347,7 +20347,7 @@ snapshots:
       cookie: 0.4.2
       set-cookie-parser: 2.6.0
       source-map: 0.7.4
-      type-fest: 4.33.0
+      type-fest: 4.34.1
     optionalDependencies:
       typescript: 5.6.3
 
@@ -21950,7 +21950,7 @@ snapshots:
 
   '@types/uuid@10.0.0': {}
 
-  '@types/webextension-polyfill@0.10.7': {}
+  '@types/webextension-polyfill@0.12.1': {}
 
   '@types/webpack-env@1.18.8': {}
 
@@ -23434,7 +23434,7 @@ snapshots:
       chalk: 5.4.1
       cli-boxes: 3.0.0
       string-width: 7.2.0
-      type-fest: 4.33.0
+      type-fest: 4.34.1
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
 
@@ -24717,7 +24717,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.33.0
+      type-fest: 4.34.1
 
   dotenv-expand@11.0.7:
     dependencies:
@@ -26822,7 +26822,7 @@ snapshots:
       slice-ansi: 7.1.0
       stack-utils: 2.0.6
       string-width: 7.2.0
-      type-fest: 4.33.0
+      type-fest: 4.34.1
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
       ws: 8.18.0
@@ -29001,7 +29001,7 @@ snapshots:
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
       strict-event-emitter: 0.5.1
-      type-fest: 4.33.0
+      type-fest: 4.34.1
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.6.3
@@ -29800,7 +29800,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.26.2
       index-to-position: 0.1.2
-      type-fest: 4.33.0
+      type-fest: 4.34.1
 
   parse-latin@7.0.0:
     dependencies:
@@ -30746,7 +30746,7 @@ snapshots:
       '@types/normalize-package-data': 2.4.4
       normalize-package-data: 6.0.2
       parse-json: 8.1.0
-      type-fest: 4.33.0
+      type-fest: 4.34.1
       unicorn-magic: 0.1.0
 
   read-yaml-file@1.1.0:
@@ -31521,7 +31521,7 @@ snapshots:
     dependencies:
       map-obj: 4.3.0
       snake-case: 3.0.4
-      type-fest: 4.33.0
+      type-fest: 4.34.1
 
   socket.io-adapter@2.5.5:
     dependencies:
@@ -32441,7 +32441,7 @@ snapshots:
 
   type-fest@3.13.1: {}
 
-  type-fest@4.33.0: {}
+  type-fest@4.34.1: {}
 
   type-is@1.6.18:
     dependencies:
