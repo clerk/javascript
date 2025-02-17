@@ -404,11 +404,12 @@ export class Clerk implements ClerkInterface {
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
-    // TODO: add telemetry
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'GoogleOneTap' })
       .then(controls => controls.openModal('googleOneTap', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(`GoogleOneTap`, props));
   };
 
   public closeGoogleOneTap = (): void => {
@@ -429,6 +430,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignIn' })
       .then(controls => controls.openModal('signIn', props || {}));
+
+    this.#recordSignInUsage(props, 'Modal');
   };
 
   public closeSignIn = (): void => {
@@ -449,6 +452,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserVerification' })
       .then(controls => controls.openModal('userVerification', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(`UserVerification`, props));
   };
 
   public __internal_closeReverification = (): void => {
@@ -483,6 +488,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignUp' })
       .then(controls => controls.openModal('signUp', props || {}));
+
+    this.#recordSignUpUsage(props, 'Modal');
   };
 
   public closeSignUp = (): void => {
@@ -503,6 +510,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserProfile' })
       .then(controls => controls.openModal('userProfile', props || {}));
+
+    this.#recordUserProfileUsage(props, 'Modal');
   };
 
   public closeUserProfile = (): void => {
@@ -531,6 +540,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
+    this.#recordOrganizationProfileUsage(props, 'Modal');
   };
 
   public closeOrganizationProfile = (): void => {
@@ -551,6 +561,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
+
+    this.#recordCreateOrganizationUsage(props, 'Modal');
   };
 
   public closeCreateOrganization = (): void => {
@@ -563,6 +575,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
+
+    this.#recordWaitlistUsage(props, 'Modal');
   };
 
   public closeWaitlist = (): void => {
@@ -580,17 +594,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(
-        'SignIn',
-        {
-          ...props,
-        },
-        {
-          withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-        },
-      ),
-    );
+    this.#recordSignInUsage(props);
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -612,7 +616,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
+    this.#recordSignUpUsage(props);
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -643,17 +647,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(
-        'UserProfile',
-        props,
-        props?.customPages?.length || 0 > 0
-          ? {
-              customPages: true,
-            }
-          : undefined,
-      ),
-    );
+    this.#recordUserProfileUsage(props);
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -693,7 +687,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationProfile', props));
+    this.#recordOrganizationProfileUsage(props);
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -724,7 +718,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('CreateOrganization', props));
+    this.#recordCreateOrganizationUsage(props);
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -841,7 +835,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props));
+    this.#recordWaitlistUsage(props);
   };
 
   public unmountWaitlist = (node: HTMLDivElement): void => {
@@ -2246,4 +2240,42 @@ export class Clerk implements ClerkInterface {
 
     return allowedProtocols;
   }
+
+  #recordSignInUsage = (props?: SignInProps, mode?: 'Modal') => {
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted(`SignIn${mode || ''}`, props, {
+        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+      }),
+    );
+  };
+
+  #recordSignUpUsage = (props?: SignUpProps, mode?: 'Modal') => {
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp${mode || ''}`, props));
+  };
+
+  #recordUserProfileUsage = (props?: UserProfileProps, mode?: 'Modal') => {
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted(
+        `UserProfile${mode || ''}`,
+        props,
+        props?.customPages?.length || 0 > 0
+          ? {
+              customPages: true,
+            }
+          : undefined,
+      ),
+    );
+  };
+
+  #recordOrganizationProfileUsage = (props?: OrganizationProfileProps, mode?: 'Modal') => {
+    this.telemetry?.record(eventPrebuiltComponentMounted(`OrganizationProfile${mode || ''}`, props));
+  };
+
+  #recordCreateOrganizationUsage = (props?: OrganizationProfileProps, mode?: 'Modal') => {
+    this.telemetry?.record(eventPrebuiltComponentMounted(`CreateOrganization${mode || ''}`, props));
+  };
+
+  #recordWaitlistUsage = (props?: WaitlistProps, mode?: 'Modal') => {
+    this.telemetry?.record(eventPrebuiltComponentMounted(`Waitlist${mode || ''}`, props));
+  };
 }
