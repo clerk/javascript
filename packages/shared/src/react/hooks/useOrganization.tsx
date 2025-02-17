@@ -11,6 +11,7 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 
+import { getCurrentOrganizationMembership } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
   useAssertWrappedByClerkProvider,
@@ -366,12 +367,3 @@ export const useOrganization: UseOrganization = params => {
     invitations,
   };
 };
-
-function getCurrentOrganizationMembership(
-  organizationMemberships: OrganizationMembershipResource[],
-  activeOrganizationId: string,
-) {
-  return organizationMemberships.find(
-    organizationMembership => organizationMembership.organization.id === activeOrganizationId,
-  );
-}

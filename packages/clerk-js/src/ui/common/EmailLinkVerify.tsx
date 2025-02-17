@@ -1,4 +1,4 @@
-import { EmailLinkErrorCode, isEmailLinkError } from '@clerk/shared/error';
+import { EmailLinkErrorCodeStatus, isEmailLinkError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -42,10 +42,10 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
       });
     } catch (err) {
       let status: VerificationStatus = 'failed';
-      if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.Expired) {
+      if (isEmailLinkError(err) && err.code === EmailLinkErrorCodeStatus.Expired) {
         status = 'expired';
       }
-      if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.ClientMismatch) {
+      if (isEmailLinkError(err) && err.code === EmailLinkErrorCodeStatus.ClientMismatch) {
         status = 'client_mismatch';
       }
       setVerificationStatus(status);
