@@ -36,6 +36,9 @@ const typedocPluginMarkdownOptions = {
   typeDeclarationFormat: 'table',
   typeDeclarationVisibility: 'compact',
   useHTMLAnchors: false,
+  tableColumnSettings: {
+    hideSources: true,
+  },
 };
 
 const frontmatterTags = ['description', 'title'];
@@ -54,6 +57,7 @@ const config = {
   entryPointStrategy: 'packages',
   plugin: ['typedoc-plugin-markdown', 'typedoc-plugin-frontmatter', './.typedoc/custom-theme.mjs'],
   theme: 'clerkTheme',
+  readme: 'none',
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -69,7 +73,6 @@ const config = {
     readme: 'none',
     disableGit: true,
     disableSources: true,
-    cleanOutputDir: true,
   },
   entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
   ...typedocPluginMarkdownOptions,
