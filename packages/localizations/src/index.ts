@@ -9,6 +9,7 @@ export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
 export { ptPT } from './pt-PT';
 export { esES } from './es-ES';
+export { esUY } from './es-UY';
 export { fiFI } from './fi-FI';
 export { ruRU } from './ru-RU';
 export { svSE } from './sv-SE';
