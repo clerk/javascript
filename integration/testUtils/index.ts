@@ -36,10 +36,14 @@ const createExpectPageObject = ({ page }: TestArgs) => {
       expect(redirect.status()).toBe(307);
       expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
     },
-    toBeSignedOut: () => {
-      return page.waitForFunction(() => {
-        return !window.Clerk?.user;
-      });
+    toBeSignedOut: (args?: { timeOut: number }) => {
+      return page.waitForFunction(
+        () => {
+          return !window.Clerk?.user;
+        },
+        null,
+        { timeout: args?.timeOut },
+      );
     },
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
