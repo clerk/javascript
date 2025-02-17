@@ -2001,12 +2001,12 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    this.#pageLifecycle?.onPageFocus(async () => {
+    this.#pageLifecycle?.onPageFocus(() => {
       if (!this.session) {
         return;
       }
 
-      const performTouch = async () => {
+      const performTouch = () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }

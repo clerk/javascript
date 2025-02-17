@@ -16,18 +16,17 @@ export const createPageLifecycle = () => {
     return { onPageFocus: noop };
   }
 
-  const callbackQueue: Record<string, Array<() => void | Promise<void>>> = {
+  const callbackQueue: Record<string, Array<() => void>> = {
     focus: [],
   };
 
   window.addEventListener('focus', () => {
     if (document.visibilityState === 'visible') {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       callbackQueue['focus'].forEach(cb => cb());
     }
   });
 
-  const onPageFocus = (cb: () => void | Promise<void>) => {
+  const onPageFocus = (cb: () => void) => {
     callbackQueue['focus'].push(cb);
   };
 
