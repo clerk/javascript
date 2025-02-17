@@ -41,7 +41,7 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
-  private offlineScheduler = createOfflineScheduler();
+  private sessionRefreshOfflineScheduler = createOfflineScheduler();
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
@@ -127,7 +127,8 @@ export class AuthCookieService {
         // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
-        this.offlineScheduler.schedule(() => this.refreshSessionToken({ updateCookieImmediately: true }));
+        // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
+        this.sessionRefreshOfflineScheduler.schedule(() => this.refreshSessionToken({ updateCookieImmediately: true }));
       }
     });
   }

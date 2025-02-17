@@ -191,7 +191,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #offlineScheduler = createOfflineScheduler();
+  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -2015,7 +2015,7 @@ export class Clerk implements ClerkInterface {
         return this.#touchLastActiveSession(this.session);
       };
 
-      this.#offlineScheduler.schedule(performTouch);
+      this.#sessionTouchOfflineScheduler.schedule(performTouch);
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {

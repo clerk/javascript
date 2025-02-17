@@ -1,5 +1,9 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
 
+/**
+ * While online callbacks passed to `.schedule` will execute immediately.
+ * While offline callbacks passed to `.schedule` are de-duped and only the first one will be scheduled for execution when online.
+ */
 export const createOfflineScheduler = () => {
   let scheduled = false;
 
