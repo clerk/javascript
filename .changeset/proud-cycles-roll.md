@@ -2,12 +2,12 @@
 '@clerk/clerk-js': minor
 ---
 
-- Introduce a new client session status: `pending`
-- Initialize a `pending` session as an authenticated state
+- Initialize new `pending` session status as an signed-in state
+- Add new `Clerk.isSignedIn` property to provide a more explicit way to check authentication status, replacing the previous `Clerk.user` check
 
 ```diff
 - if (Clerk.user) {
-+ if (clerk.hasAuthenticatedClient) {
++ if (Clerk.isSignedIn) {
   // Mount user button component
   document.getElementById('signed-in').innerHTML = `
     <div id="user-button"></div>

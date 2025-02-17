@@ -4,10 +4,10 @@ import type { SignInResource } from 'signIn';
 import type { SetActive, SignOut } from './clerk';
 import type { ActJWTClaim } from './jwt';
 import type {
-  AuthenticatedSessionResource,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
+  SignedInSessionResource,
 } from './session';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
@@ -180,7 +180,7 @@ export type UseSessionReturn =
   | {
       isLoaded: true;
       isSignedIn: true;
-      session: AuthenticatedSessionResource;
+      session: SignedInSessionResource;
     };
 
 /**

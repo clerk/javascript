@@ -1,9 +1,9 @@
 import {
   type ActiveSessionResource,
-  type AuthenticatedSessionResource,
   type ClientJSON,
   type ClientJSONSnapshot,
   type ClientResource,
+  type SignedInSessionResource,
   type SignInResource,
   type SignUpResource,
 } from '@clerk/types';
@@ -55,14 +55,14 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   /**
-   * @deprecated Use `authenticatedSessions` instead
+   * @deprecated Use `signedInSessions` instead
    */
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   }
 
-  get authenticatedSessions(): AuthenticatedSessionResource[] {
-    return this.sessions.filter(s => s.status === 'active' || s.status === 'pending') as AuthenticatedSessionResource[];
+  get signedInSessions(): SignedInSessionResource[] {
+    return this.sessions.filter(s => s.status === 'active' || s.status === 'pending') as SignedInSessionResource[];
   }
 
   create(): Promise<this> {
@@ -118,8 +118,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePostBypass({ body: params, path: this.path() + '/verify' });
   }
 
-  get hasAuthenticated() {
-    return (this.authenticatedSessions ?? []).length > 0;
+  get isSignedIn() {
+    return (this.signedInSessions ?? []).length > 0;
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {

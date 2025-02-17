@@ -123,8 +123,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             if (client) {
               void ClientResourceCache.save(client.__internal_toSnapshot());
               if (client.lastActiveSessionId) {
-                const currentSessionToken = client.authenticatedSessions.find(s => s.id === client.lastActiveSessionId);
-                const token = currentSessionToken?.lastActiveToken?.getRawString();
+                const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
+                const token = currentSession?.lastActiveToken?.getRawString();
                 if (token) {
                   void SessionJWTCache.save(token);
                 }

@@ -5,7 +5,6 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
-  AuthenticatedSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -31,6 +30,7 @@ import type {
   RedirectOptions,
   SDKMetadata,
   SetActiveParams,
+  SignedInSessionResource,
   SignInProps,
   SignInRedirectOptions,
   SignInResource,
@@ -616,7 +616,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get session(): AuthenticatedSessionResource | undefined | null {
+  get session(): SignedInSessionResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.session;
     } else {
@@ -658,9 +658,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get hasAuthenticatedClient(): boolean {
+  get isSignedIn(): boolean {
     if (this.clerkjs) {
-      return this.clerkjs.hasAuthenticatedClient;
+      return this.clerkjs.isSignedIn;
     } else {
       return false;
     }

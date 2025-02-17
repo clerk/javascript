@@ -31,7 +31,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { AuthenticatedSessionResource } from './session';
+import type { SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -63,7 +63,7 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: AuthenticatedSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -128,17 +128,17 @@ export interface Clerk {
   isStandardBrowser: boolean | undefined;
 
   /**
-   * Indicates whether the current user has a valid, fully authenticated client session.
+   * Indicates whether the current user has a valid, fully signed-in client session.
    * A session is considered valid when the user has successfully authenticated,
-   * completed all required authentication factors, and resolved all pending authentication tasks.
+   * completed all required authentication factors, and resolved all pending tasks.
    */
-  hasAuthenticatedClient: boolean;
+  isSignedIn: boolean;
 
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 
   /** Current Session. */
-  session: AuthenticatedSessionResource | null | undefined;
+  session: SignedInSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
@@ -715,9 +715,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     polling?: boolean;
     /**
-     * By default, the last authenticated session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
-    selectInitialSession?: (client: ClientResource) => AuthenticatedSessionResource | null;
+    selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
      * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
@@ -803,7 +803,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: AuthenticatedSessionResource | null;
+  session?: SignedInSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -879,7 +879,7 @@ export type SetActiveParams = {
    * The session resource or session id (string version) to be set on the client.
    * If `null`, the current session is deleted.
    */
-  session?: AuthenticatedSessionResource | string | null;
+  session?: SignedInSessionResource | string | null;
 
   /**
    * The organization resource or organization ID/slug (string version) to be set as active in the current session.

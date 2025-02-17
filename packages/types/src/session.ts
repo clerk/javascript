@@ -150,9 +150,9 @@ export interface PendingSessionResource extends SessionResource {
 
 /**
  * Represents session resources for users who have completed
- * the full authentication flow
+ * the full sign-in flow
  */
-export type AuthenticatedSessionResource = ActiveSessionResource | PendingSessionResource;
+export type SignedInSessionResource = ActiveSessionResource | PendingSessionResource;
 
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;

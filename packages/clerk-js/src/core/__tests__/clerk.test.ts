@@ -1,6 +1,6 @@
 import type {
   ActiveSessionResource,
-  AuthenticatedSessionResource,
+  SignedInSessionResource,
   SignInJSON,
   SignUpJSON,
   TokenResource,
@@ -127,7 +127,7 @@ describe('Clerk singleton', () => {
 
     mockClientFetch.mockReturnValue(
       Promise.resolve({
-        authenticatedSessions: [],
+        signedInSessions: [],
       }),
     );
 
@@ -155,7 +155,7 @@ describe('Clerk singleton', () => {
   });
 
   describe('.setActive', () => {
-    describe.each(['active', 'pending'] satisfies Array<AuthenticatedSessionResource['status']>)(
+    describe.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
       'when session has %s status',
       status => {
         const mockSession = {
@@ -185,7 +185,7 @@ describe('Clerk singleton', () => {
 
         it('does not call session touch on signOut', async () => {
           mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
@@ -198,7 +198,7 @@ describe('Clerk singleton', () => {
 
         it('calls session.touch by default', async () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
@@ -208,7 +208,7 @@ describe('Clerk singleton', () => {
 
         it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
           mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
           mockSession.getToken.mockResolvedValue('mocked-token');
 
           const sut = new Clerk(productionPublishableKey);
@@ -222,7 +222,7 @@ describe('Clerk singleton', () => {
 
         it('calls __unstable__onBeforeSetActive before session.touch', async () => {
           mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           (window as any).__unstable__onBeforeSetActive = () => {
             expect(mockSession.touch).not.toHaveBeenCalled();
@@ -236,7 +236,7 @@ describe('Clerk singleton', () => {
 
         it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
           mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           (window as any).__unstable__onBeforeSetActive = () => {
             expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
@@ -250,7 +250,7 @@ describe('Clerk singleton', () => {
         it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
           const beforeEmitMock = jest.fn();
           mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           (window as any).__unstable__onAfterSetActive = () => {
             expect(mockSession.touch).toHaveBeenCalled();
@@ -274,7 +274,7 @@ describe('Clerk singleton', () => {
           };
           mockClientFetch.mockReturnValue(
             Promise.resolve({
-              authenticatedSessions: [mockSession, mockSession2],
+              signedInSessions: [mockSession, mockSession2],
             }),
           );
 
@@ -309,7 +309,7 @@ describe('Clerk singleton', () => {
 
         // TODO: @dimkl include set transitive state
         it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
 
@@ -359,7 +359,7 @@ describe('Clerk singleton', () => {
             touch: jest.fn(),
             getToken: jest.fn(),
           };
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession2] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession2] }));
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
 
@@ -383,7 +383,7 @@ describe('Clerk singleton', () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
           mockClientFetch.mockReturnValue(
             Promise.resolve({
-              authenticatedSessions: [mockSession],
+              signedInSessions: [mockSession],
               cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
               isEligibleForTouch: () => true,
               buildTouchUrl: () =>
@@ -407,7 +407,7 @@ describe('Clerk singleton', () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
           mockClientFetch.mockReturnValue(
             Promise.resolve({
-              authenticatedSessions: [mockSession],
+              signedInSessions: [mockSession],
               cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
               isEligibleForTouch: () => false,
               buildTouchUrl: () =>
@@ -429,7 +429,7 @@ describe('Clerk singleton', () => {
           mockSession.touch.mockReturnValue(Promise.resolve());
           mockClientFetch.mockReturnValue(
             Promise.resolve({
-              authenticatedSessions: [mockSession],
+              signedInSessions: [mockSession],
               cookieExpiresAt: null,
               isEligibleForTouch: () => false,
               buildTouchUrl: () =>
@@ -449,7 +449,7 @@ describe('Clerk singleton', () => {
 
         mockNativeRuntime(() => {
           it('calls session.touch in a non-standard browser', async () => {
-            mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+            mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
             const sut = new Clerk(productionPublishableKey);
             await sut.load({ standardBrowser: false });
@@ -480,7 +480,7 @@ describe('Clerk singleton', () => {
   });
 
   describe('.load()', () => {
-    describe.each(['active', 'pending'] satisfies Array<AuthenticatedSessionResource['status']>)(
+    describe.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
       'when session has %s status',
       status => {
         const mockSession = {
@@ -500,7 +500,7 @@ describe('Clerk singleton', () => {
         it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
           mockClientFetch.mockReturnValue(
             Promise.resolve({
-              authenticatedSessions: [],
+              signedInSessions: [],
             }),
           );
 
@@ -518,7 +518,7 @@ describe('Clerk singleton', () => {
         });
 
         it('updates auth cookie on load from fetched session', async () => {
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
@@ -527,7 +527,7 @@ describe('Clerk singleton', () => {
         });
 
         it('updates auth cookie on token:update event', async () => {
-          mockClientFetch.mockReturnValue(Promise.resolve({ authenticatedSessions: [mockSession] }));
+          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
           const sut = new Clerk(productionPublishableKey);
           await sut.load();
@@ -563,7 +563,7 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           destroy: mockClientDestroy,
         }),
@@ -579,7 +579,7 @@ describe('Clerk singleton', () => {
     it('signs out all sessions if no sessionId is passed and multiple sessions have authenticated status', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [mockSession1, mockSession2, mockSession3],
+          signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
           removeSessions: mockClientRemoveSessions,
@@ -600,12 +600,12 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it.each(['active', 'pending'] satisfies Array<AuthenticatedSessionResource['status']>)(
+    it.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
       'signs out all sessions if no sessionId is passed and only one session has %s status',
       async status => {
         mockClientFetch.mockReturnValue(
           Promise.resolve({
-            authenticatedSessions: [{ ...mockSession1, status }],
+            signedInSessions: [{ ...mockSession1, status }],
             sessions: [{ ...mockSession1, status }],
             destroy: mockClientDestroy,
             removeSessions: mockClientRemoveSessions,
@@ -631,7 +631,7 @@ describe('Clerk singleton', () => {
     it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [mockSession1, mockSession2, mockSession3],
+          signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
         }),
@@ -653,7 +653,7 @@ describe('Clerk singleton', () => {
     it('removes and signs out the session that corresponds to the passed sessionId if it is the current', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [mockSession1, mockSession2, mockSession3],
+          signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
         }),
@@ -676,7 +676,7 @@ describe('Clerk singleton', () => {
     it('removes and signs out the session and redirects to the provided redirectUrl ', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [mockSession1, mockSession2, mockSession3],
+          signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
         }),
@@ -797,7 +797,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
@@ -856,7 +856,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
@@ -918,7 +918,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
@@ -980,7 +980,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1047,7 +1047,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1098,7 +1098,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
@@ -1153,7 +1153,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_second_factor',
             first_factor_verification: {
@@ -1193,7 +1193,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_second_factor',
             first_factor_verification: {
@@ -1247,7 +1247,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           sessions: [mockSession],
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1308,7 +1308,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           sessions: [mockSession],
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1360,7 +1360,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1408,7 +1408,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1456,7 +1456,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1497,7 +1497,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1544,7 +1544,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_first_factor',
           } as unknown as SignInJSON),
@@ -1576,7 +1576,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1624,7 +1624,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn(null),
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1684,7 +1684,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_first_factor',
             first_factor_verification: {
@@ -1734,7 +1734,7 @@ describe('Clerk singleton', () => {
 
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           signIn: new SignIn({
             status: 'needs_new_password',
           } as unknown as SignInJSON),
@@ -1782,7 +1782,7 @@ describe('Clerk singleton', () => {
       ]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [{ id: createdSessionId }],
           signIn: new SignIn({
             status: 'completed',
@@ -1811,7 +1811,7 @@ describe('Clerk singleton', () => {
       setWindowQueryParams([['__clerk_status', 'verified']]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signIn: new SignIn({
             status: 'needs_second_factor',
@@ -1842,7 +1842,7 @@ describe('Clerk singleton', () => {
       ]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [{ id: createdSessionId }],
           signUp: new SignUp({
             status: 'completed',
@@ -1871,7 +1871,7 @@ describe('Clerk singleton', () => {
       setWindowQueryParams([['__clerk_status', 'verified']]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signUp: new SignUp({
             status: 'missing_requirements',
@@ -1898,7 +1898,7 @@ describe('Clerk singleton', () => {
       setWindowQueryParams([['__clerk_status', 'expired']]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signUp: new SignUp(null),
           signIn: new SignIn(null),
@@ -1920,7 +1920,7 @@ describe('Clerk singleton', () => {
       setWindowQueryParams([['__clerk_status', 'failed']]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signUp: new SignUp(null),
           signIn: new SignIn(null),
@@ -1945,7 +1945,7 @@ describe('Clerk singleton', () => {
       ]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signUp: new SignUp(null),
           signIn: new SignIn(null),
@@ -1968,7 +1968,7 @@ describe('Clerk singleton', () => {
       setWindowQueryParams([['__clerk_created_session', 'sess_123']]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [],
           signUp: new SignUp(null),
           signIn: new SignIn(null),
@@ -1991,7 +1991,7 @@ describe('Clerk singleton', () => {
       ]);
       mockClientFetch.mockReturnValue(
         Promise.resolve({
-          authenticatedSessions: [],
+          signedInSessions: [],
           sessions: [{ id: 'sess_123' }],
           signIn: new SignIn({
             status: 'completed',
