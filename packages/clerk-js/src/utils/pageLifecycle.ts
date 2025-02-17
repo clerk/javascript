@@ -1,8 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-
-const noop = () => {
-  //
-};
+import { noop } from '@clerk/shared/utils';
 
 /**
  * Abstracts native browser event listener registration.
@@ -19,17 +16,18 @@ export const createPageLifecycle = () => {
     return { onPageFocus: noop };
   }
 
-  const callbackQueue: Record<string, Array<() => void>> = {
+  const callbackQueue: Record<string, Array<() => void | Promise<void>>> = {
     focus: [],
   };
 
   window.addEventListener('focus', () => {
     if (document.visibilityState === 'visible') {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       callbackQueue['focus'].forEach(cb => cb());
     }
   });
 
-  const onPageFocus = (cb: () => void) => {
+  const onPageFocus = (cb: () => void | Promise<void>) => {
     callbackQueue['focus'].push(cb);
   };
 
