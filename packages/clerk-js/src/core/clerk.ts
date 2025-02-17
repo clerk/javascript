@@ -152,6 +152,8 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
+type ComponentRenderingMode = 'modal' | 'mounted';
+
 export class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
 
@@ -431,7 +433,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'SignIn' })
       .then(controls => controls.openModal('signIn', props || {}));
 
-    this.#recordSignInUsage(props, 'Modal');
+    this.#recordSignInUsage(props, 'modal');
   };
 
   public closeSignIn = (): void => {
@@ -489,7 +491,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'SignUp' })
       .then(controls => controls.openModal('signUp', props || {}));
 
-    this.#recordSignUpUsage(props, 'Modal');
+    this.#recordSignUpUsage(props, 'modal');
   };
 
   public closeSignUp = (): void => {
@@ -511,7 +513,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'UserProfile' })
       .then(controls => controls.openModal('userProfile', props || {}));
 
-    this.#recordUserProfileUsage(props, 'Modal');
+    this.#recordUserProfileUsage(props, 'modal');
   };
 
   public closeUserProfile = (): void => {
@@ -540,7 +542,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
-    this.#recordOrganizationProfileUsage(props, 'Modal');
+    this.#recordComponentUsage('modal', 'OrganizationProfile', props);
   };
 
   public closeOrganizationProfile = (): void => {
@@ -562,7 +564,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
 
-    this.#recordCreateOrganizationUsage(props, 'Modal');
+    this.#recordComponentUsage('modal', 'CreateOrganization', props);
   };
 
   public closeCreateOrganization = (): void => {
@@ -576,7 +578,7 @@ export class Clerk implements ClerkInterface {
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
 
-    this.#recordWaitlistUsage(props, 'Modal');
+    this.#recordComponentUsage('modal', 'Waitlist', props);
   };
 
   public closeWaitlist = (): void => {
@@ -687,7 +689,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.#recordOrganizationProfileUsage(props);
+    this.#recordComponentUsage('mounted', 'OrganizationProfile', props);
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -718,7 +720,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.#recordCreateOrganizationUsage(props);
+    this.#recordComponentUsage('mounted', 'CreateOrganization', props);
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -749,7 +751,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
+    this.#recordComponentUsage('mounted', 'OrganizationSwitcher', props);
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -783,7 +785,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
+    this.#recordComponentUsage('mounted', 'OrganizationList', props);
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -802,21 +804,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted('UserButton', props, {
-        ...(props?.customMenuItems?.length || 0 > 0
-          ? {
-              customItems: true,
-            }
-          : undefined),
+    const additionalData = {
+      ...(props?.customMenuItems?.length || 0 > 0 ? { customItems: true } : undefined),
+      ...(props?.__experimental_asStandalone ? { standalone: true } : undefined),
+    };
 
-        ...(props?.__experimental_asStandalone
-          ? {
-              standalone: true,
-            }
-          : undefined),
-      }),
-    );
+    this.#recordComponentUsage('mounted', 'UserButton', props, additionalData);
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -835,7 +828,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.#recordWaitlistUsage(props);
+    this.#recordComponentUsage('mounted', 'Waitlist', props);
   };
 
   public unmountWaitlist = (node: HTMLDivElement): void => {
@@ -2241,41 +2234,23 @@ export class Clerk implements ClerkInterface {
     return allowedProtocols;
   }
 
-  #recordSignInUsage = (props?: SignInProps, mode?: 'Modal') => {
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(`SignIn${mode || ''}`, props, {
-        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-      }),
-    );
+  #recordComponentUsage = (...args: [ComponentRenderingMode, ...Parameters<typeof eventPrebuiltComponentMounted>]) => {
+    const [mode, name, ...data] = args;
+    const nameWithMode = mode === 'modal' ? `${name}Modal` : name;
+    this.telemetry?.record(eventPrebuiltComponentMounted(nameWithMode, ...data));
   };
 
-  #recordSignUpUsage = (props?: SignUpProps, mode?: 'Modal') => {
-    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp${mode || ''}`, props));
+  #recordSignInUsage = (props?: SignInProps, mode: ComponentRenderingMode = 'mounted') => {
+    const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
+    this.#recordComponentUsage(mode, 'SignIn', props, additionalData);
   };
 
-  #recordUserProfileUsage = (props?: UserProfileProps, mode?: 'Modal') => {
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(
-        `UserProfile${mode || ''}`,
-        props,
-        props?.customPages?.length || 0 > 0
-          ? {
-              customPages: true,
-            }
-          : undefined,
-      ),
-    );
+  #recordSignUpUsage = (props?: SignUpProps, mode: ComponentRenderingMode = 'mounted') => {
+    this.#recordComponentUsage(mode, 'SignUp', props);
   };
 
-  #recordOrganizationProfileUsage = (props?: OrganizationProfileProps, mode?: 'Modal') => {
-    this.telemetry?.record(eventPrebuiltComponentMounted(`OrganizationProfile${mode || ''}`, props));
-  };
-
-  #recordCreateOrganizationUsage = (props?: OrganizationProfileProps, mode?: 'Modal') => {
-    this.telemetry?.record(eventPrebuiltComponentMounted(`CreateOrganization${mode || ''}`, props));
-  };
-
-  #recordWaitlistUsage = (props?: WaitlistProps, mode?: 'Modal') => {
-    this.telemetry?.record(eventPrebuiltComponentMounted(`Waitlist${mode || ''}`, props));
+  #recordUserProfileUsage = (props?: UserProfileProps, mode: ComponentRenderingMode = 'mounted') => {
+    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    this.#recordComponentUsage(mode, 'UserProfile', props, additionalData);
   };
 }
