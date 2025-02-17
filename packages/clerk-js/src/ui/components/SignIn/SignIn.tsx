@@ -14,6 +14,7 @@ import {
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { PendingTask } from '../PendingTask';
 import { SignUpContinue } from '../SignUp/SignUpContinue';
 import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
 import { SignUpStart } from '../SignUp/SignUpStart';
@@ -138,6 +139,7 @@ function SignInRoutes(): JSX.Element {
         <Route>
           <RedirectToSignIn />
         </Route>
+        <PendingTask />
       </Switch>
     </Flow.Root>
   );

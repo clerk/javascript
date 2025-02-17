@@ -6,6 +6,7 @@ import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowC
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { PendingTask } from '../PendingTask';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -80,6 +81,7 @@ function SignUpRoutes(): JSX.Element {
         <Route>
           <RedirectToSignUp />
         </Route>
+        <PendingTask />
       </Switch>
     </Flow.Root>
   );
