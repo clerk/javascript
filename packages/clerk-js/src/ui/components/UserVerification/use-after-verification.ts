@@ -28,7 +28,6 @@ const useAfterVerification = () => {
         case 'complete':
           await setActive({ session: sessionVerification.session.id });
           return afterVerification?.();
-
         case 'needs_second_factor':
           return navigate('./factor-two');
         default:
