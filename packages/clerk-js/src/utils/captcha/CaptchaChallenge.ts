@@ -1,6 +1,7 @@
 import type { Clerk } from '../../core/resources/internal';
 import { getCaptchaToken } from './getCaptchaToken';
 import { retrieveCaptchaInfo } from './retrieveCaptchaInfo';
+import { loadCaptcha } from './turnstile';
 import type { CaptchaOptions } from './types';
 
 export class CaptchaChallenge {
@@ -59,6 +60,16 @@ export class CaptchaChallenge {
     }
 
     return {};
+  }
+
+  public async prefetchCaptchaScript() {
+    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
+
+    if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
+      await loadCaptcha().catch(() => {
+        // Ignore errors
+      });
+    }
   }
 
   /**

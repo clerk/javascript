@@ -78,7 +78,7 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-async function loadCaptcha() {
+export async function loadCaptcha() {
   if (!window.turnstile) {
     await loadCaptchaFromCloudflareURL().catch(() => {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
