@@ -126,6 +126,8 @@ import {
 } from './resources/internal';
 import { warnings } from './warnings';
 
+type SetActiveHook = () => void | Promise<void>;
+
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
 declare global {
@@ -365,8 +367,6 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
-
-    type SetActiveHook = () => void | Promise<void>;
 
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
@@ -865,7 +865,6 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    type SetActiveHook = () => void | Promise<void>;
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
