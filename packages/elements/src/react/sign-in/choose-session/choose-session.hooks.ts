@@ -31,11 +31,9 @@ export function useSignInSessionList(params?: useSignInSessionListParams): SignI
   const { omitCurrent = true } = params || {};
 
   return SignInRouterCtx.useSelector(state => {
-    const authenticatedSessions = state.context.clerk?.client?.authenticatedSessions || [];
+    const signedInSessions = state.context.clerk?.client?.signedInSessions || [];
     const currentSessionId = state.context.clerk?.session?.id;
-    const filteredSessions = omitCurrent
-      ? authenticatedSessions.filter(s => s.id !== currentSessionId)
-      : authenticatedSessions;
+    const filteredSessions = omitCurrent ? signedInSessions.filter(s => s.id !== currentSessionId) : signedInSessions;
 
     return filteredSessions.map(s => ({
       id: s.id,

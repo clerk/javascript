@@ -8,4 +8,4 @@
 '@clerk/vue': minor
 ---
 
-Surface new `pending` session as an authenticated state, similarly as `active`
+Surface new `pending` session as an signed-in state, similarly as `active`

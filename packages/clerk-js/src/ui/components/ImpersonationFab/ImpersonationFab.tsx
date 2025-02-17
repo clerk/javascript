@@ -1,5 +1,5 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import type { AuthenticatedSessionResource } from '@clerk/types';
+import type { SignedInSessionResource } from '@clerk/types';
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
@@ -66,7 +66,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { otherSessions } = useMultipleSessions({ user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
-  const handleSignOutSessionClicked = (session: AuthenticatedSessionResource) => () => {
+  const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
       return signOut(navigateAfterSignOut);
     }

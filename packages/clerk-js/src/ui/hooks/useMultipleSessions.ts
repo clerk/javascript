@@ -9,8 +9,8 @@ const useMultipleSessions = (params: UseMultipleSessionsParam) => {
   const clerk = useClerk();
 
   return {
-    authenticatedSessions: clerk.client.authenticatedSessions,
-    otherSessions: clerk.client.authenticatedSessions.filter(s => s.user?.id !== params.user?.id),
+    signedInSessions: clerk.client.signedInSessions,
+    otherSessions: clerk.client.signedInSessions.filter(s => s.user?.id !== params.user?.id),
   };
 };
 
