@@ -44,6 +44,9 @@ const defaultLayout: ParsedLayout = {
   shimmer: true,
   animations: true,
   unsafe_disableDevelopmentModeWarnings: false,
+  captchaTheme: 'light',
+  captchaSize: 'normal',
+  captchaLanguage: 'en-US',
 };
 
 /**
