@@ -368,6 +368,11 @@ export class Clerk implements ClerkInterface {
 
     type SetActiveHook = () => void | Promise<void>;
 
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
     const onAfterSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
         ? window.__unstable__onAfterSetActive
@@ -379,13 +384,25 @@ export class Clerk implements ClerkInterface {
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
     const executeSignOut = async () => {
+      const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
+
+      await onBeforeSetActive();
+
       this.#broadcastSignOutEvent();
       eventBus.dispatch(events.TokenUpdate, { token: null });
 
+      this.#setTransitiveState();
+
+      beforeUnloadTracker?.startTracking();
       if (signOutCallback) {
         await signOutCallback();
       } else {
         await this.navigate(redirectUrl);
+      }
+      beforeUnloadTracker?.stopTracking();
+
+      if (beforeUnloadTracker?.isUnloading()) {
+        return;
       }
 
       this.#setAccessors();
@@ -2098,15 +2115,11 @@ export class Clerk implements ClerkInterface {
   #setAccessors = (session?: ActiveSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
-    this.#aliasUser();
+    this.user = this.session ? this.session.user : null;
   };
 
   #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
     return this.client?.activeSessions.find(x => x.id === sessionId) || null;
-  };
-
-  #aliasUser = () => {
-    this.user = this.session ? this.session.user : null;
   };
 
   #handleImpersonationFab = () => {
