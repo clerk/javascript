@@ -118,7 +118,7 @@
         await Clerk.load();
         console.log("ClerkJS is loaded");
 
-        if (Clerk.user) {
+        if (Clerk.isSignedIn) {
           document.getElementById('username').innerText = Clerk.user.primaryEmailAddress.emailAddress;
           Clerk.mountUserButton(document.getElementById('userbutton'));
         }

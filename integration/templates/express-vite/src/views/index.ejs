@@ -20,7 +20,7 @@
         const appEl = document.querySelector('#app');
         const controlStateEl = document.querySelector('#user-state');
 
-        if (Clerk.user) {
+        if (Clerk.isSignedIn) {
           Clerk.mountUserButton(appEl);
           controlStateEl.innerHTML = 'SignedIn';
         } else {
