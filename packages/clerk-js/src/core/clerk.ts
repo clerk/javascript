@@ -367,10 +367,6 @@ export class Clerk implements ClerkInterface {
     }
 
     type SetActiveHook = () => void | Promise<void>;
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
 
     const onAfterSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
@@ -382,15 +378,7 @@ export class Clerk implements ClerkInterface {
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-    if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      await onBeforeSetActive();
-
-      if (this.#options.experimental?.persistClient ?? true) {
-        await this.client.removeSessions();
-      } else {
-        await this.client.destroy();
-      }
-
+    const executeSignOut = async () => {
       this.#broadcastSignOutEvent();
       eventBus.dispatch(events.TokenUpdate, { token: null });
 
@@ -400,8 +388,20 @@ export class Clerk implements ClerkInterface {
         await this.navigate(redirectUrl);
       }
 
-      // TODO: Next.js team has confirmed middleware is invoked on any app router navigation, we should be able to tweak this for app router to effectively no-op
+      this.#setAccessors();
+      this.#emit();
+
       await onAfterSetActive();
+    };
+
+    if (!opts.sessionId || this.client.activeSessions.length === 1) {
+      if (this.#options.experimental?.persistClient ?? true) {
+        await this.client.removeSessions();
+      } else {
+        await this.client.destroy();
+      }
+
+      await executeSignOut();
 
       return;
     }
@@ -409,23 +409,11 @@ export class Clerk implements ClerkInterface {
     // Multi-session handling
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
+
     await session?.remove();
 
     if (shouldSignOutCurrent) {
-      await onBeforeSetActive();
-
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-
-      if (signOutCallback) {
-        await signOutCallback();
-      } else {
-        await this.navigate(redirectUrl);
-      }
-
-      await onAfterSetActive();
-
-      return;
+      await executeSignOut();
     }
   };
 
