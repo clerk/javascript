@@ -1,6 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
+import { retry } from '@clerk/shared/retry';
 import type {
   ActJWTClaim,
   CheckAuthorization,
@@ -84,7 +84,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    return runWithExponentialBackOff(() => this._getToken(options), {
+    return retry(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
     });
   };
