@@ -30,6 +30,7 @@ export type SignedInAuthObject = {
   sessionClaims: JwtPayload;
   sessionId: string;
   actor: ActClaim | undefined;
+  entity: 'user';
   userId: string;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
@@ -53,6 +54,7 @@ export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
   actor: null;
+  entity: 'user';
   userId: null;
   orgId: null;
   orgRole: null;
@@ -69,10 +71,46 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
+export type AuthenticatedMachineObject = {
+  machineClaims: JwtPayload;
+  machineId: string;
+  sessionId: null;
+  entity: 'machine';
+  actor: null;
+  userId: null;
+  orgId: null;
+  orgRole: null;
+  orgSlug: null;
+  orgPermissions: null;
+  has: CheckAuthorizationFromSessionClaims;
+  getToken: () => string;
+  debug: AuthObjectDebug;
+};
+
+export type UnauthenticatedMachineObject = {
+  machineClaims: null;
+  machineId: null;
+  sessionId: null;
+  actor: null;
+  entity: 'machine';
+  userId: null;
+  orgId: null;
+  orgRole: null;
+  orgSlug: null;
+  orgPermissions: null;
+  has: CheckAuthorizationFromSessionClaims;
+  getToken: ServerGetToken;
+  debug: AuthObjectDebug;
+};
+
 /**
  * @internal
  */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthObject =
+  | SignedInAuthObject
+  | SignedOutAuthObject
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -107,12 +145,14 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
+  const entity = 'user';
 
   // fva can be undefined for instances that have not opt-in
   const factorVerificationAge = fva ?? null;
 
   return {
     actor,
+    entity,
     sessionClaims,
     sessionId,
     userId,
@@ -132,6 +172,7 @@ export function signedInAuthObject(
  */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
+    entity: 'user',
     sessionClaims: null,
     sessionId: null,
     userId: null,
@@ -147,6 +188,49 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   };
 }
 
+export function authenticatedMachineObject(
+  machineToken: string,
+  machineClaims: JwtPayload,
+  debugData?: AuthObjectDebugData,
+): AuthenticatedMachineObject {
+  const { sub: machineId } = machineClaims;
+  const getToken = () => {
+    return machineToken;
+  };
+  return {
+    machineClaims,
+    entity: 'machine',
+    machineId,
+    sessionId: null,
+    actor: null,
+    userId: null,
+    orgId: null,
+    orgRole: null,
+    orgSlug: null,
+    orgPermissions: null,
+    getToken,
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
+  return {
+    entity: 'machine',
+    machineClaims: null,
+    machineId: null,
+    sessionId: null,
+    actor: null,
+    userId: null,
+    orgId: null,
+    orgRole: null,
+    orgSlug: null,
+    orgPermissions: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
 /**
  * Auth objects moving through the server -> client boundary need to be serializable
  * as we need to ensure that they can be transferred via the network as pure strings.
