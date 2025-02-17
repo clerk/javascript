@@ -131,6 +131,7 @@ export const beBY: LocalizationResource = {
     membersPage: {
       action__invite: 'Пригласить',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить удзельніка',
         tableHeader__actions: 'Дзеянні',
@@ -878,6 +879,7 @@ export const beBY: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Выдаліць passkey',
         menuAction__rename: 'Перайменаваць passkey',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

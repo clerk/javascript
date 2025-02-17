@@ -119,6 +119,7 @@ export const enUS: LocalizationResource = {
     membersPage: {
       action__invite: 'Invite',
       action__search: 'Search',
+      action__search_minLength: '3 character minimum',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -864,9 +865,9 @@ export const enUS: LocalizationResource = {
         },
       },
       passkeysSection: {
-        primaryButton: 'Add a passkey',
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: 'Add a passkey',
         title: 'Passkeys',
       },
       passwordSection: {

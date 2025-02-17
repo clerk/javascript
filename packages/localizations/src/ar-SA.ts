@@ -130,6 +130,7 @@ export const arSA: LocalizationResource = {
     membersPage: {
       action__invite: 'دعوة',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: undefined,
@@ -863,6 +864,7 @@ export const arSA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'إزالة',
         menuAction__rename: 'إعادة تسمية',
+        primaryButton: undefined,
         title: 'مفاتيح المرور',
       },
       passwordSection: {

@@ -131,6 +131,7 @@ export const isIS: LocalizationResource = {
     membersPage: {
       action__invite: 'Bjóða',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjarlægja meðlim',
         tableHeader__actions: undefined,
@@ -876,6 +877,7 @@ export const isIS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjarlægja',
         menuAction__rename: 'Endurnefna',
+        primaryButton: undefined,
         title: 'Lyklar',
       },
       passwordSection: {

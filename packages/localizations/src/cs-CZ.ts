@@ -131,6 +131,7 @@ export const csCZ: LocalizationResource = {
     membersPage: {
       action__invite: 'Pozvat',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstranit člena',
         tableHeader__actions: 'Akce',
@@ -866,6 +867,7 @@ export const csCZ: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Odstranit',
         menuAction__rename: 'Přejmenovat',
+        primaryButton: undefined,
         title: 'Správa klíčů',
       },
       passwordSection: {

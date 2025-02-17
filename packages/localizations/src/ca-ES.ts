@@ -129,6 +129,8 @@ export const caES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convida',
+      action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Elimina membre',
         tableHeader__actions: undefined,
@@ -874,6 +876,7 @@ export const caES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

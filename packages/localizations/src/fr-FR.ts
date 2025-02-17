@@ -132,6 +132,7 @@ export const frFR: LocalizationResource = {
     membersPage: {
       action__invite: 'Inviter',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
@@ -878,6 +879,7 @@ export const frFR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Supprimer',
         menuAction__rename: 'Renommer',
+        primaryButton: undefined,
         title: 'Clés de sécurité',
       },
       passwordSection: {

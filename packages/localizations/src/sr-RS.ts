@@ -130,6 +130,7 @@ export const srRS: LocalizationResource = {
     membersPage: {
       action__invite: 'Pozovi',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -869,6 +870,7 @@ export const srRS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Ključevi za prolaz',
       },
       passwordSection: {

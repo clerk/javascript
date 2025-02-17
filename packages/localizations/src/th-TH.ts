@@ -130,6 +130,7 @@ export const thTH: LocalizationResource = {
     membersPage: {
       action__invite: 'เชิญ',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'ลบสมาชิก',
         tableHeader__actions: 'การดำเนินการ',
@@ -863,6 +864,7 @@ export const thTH: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'ลบ',
         menuAction__rename: 'เปลี่ยนชื่อ',
+        primaryButton: undefined,
         title: 'พาสคีย์',
       },
       passwordSection: {

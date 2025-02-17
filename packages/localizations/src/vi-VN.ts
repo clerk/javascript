@@ -130,6 +130,7 @@ export const viVN: LocalizationResource = {
     membersPage: {
       action__invite: 'Mời',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Gỡ bỏ thành viên',
         tableHeader__actions: undefined,
@@ -867,6 +868,7 @@ export const viVN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

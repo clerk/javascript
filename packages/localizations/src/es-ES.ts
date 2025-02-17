@@ -131,6 +131,7 @@ export const esES: LocalizationResource = {
     membersPage: {
       action__invite: 'Invitar',
       action__search: 'Buscar',
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',
@@ -875,6 +876,7 @@ export const esES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar Clave de Acceso',
         menuAction__rename: 'Renombrar Clave de Acceso',
+        primaryButton: undefined,
         title: 'Sección de Claves de Acceso',
       },
       passwordSection: {

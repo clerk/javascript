@@ -131,6 +131,7 @@ export const fiFI: LocalizationResource = {
     membersPage: {
       action__invite: 'Kutsu',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -872,6 +873,7 @@ export const fiFI: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Poista',
         menuAction__rename: 'Nimeä uudelleen',
+        primaryButton: undefined,
         title: 'Pääsyavaimet',
       },
       passwordSection: {

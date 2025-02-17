@@ -130,6 +130,7 @@ export const ukUA: LocalizationResource = {
     membersPage: {
       action__invite: 'Запросити',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Видалити учасника',
         tableHeader__actions: undefined,
@@ -867,6 +868,7 @@ export const ukUA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

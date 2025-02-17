@@ -131,6 +131,7 @@ export const itIT: LocalizationResource = {
     membersPage: {
       action__invite: 'Invita',
       action__search: undefined,
+      action__search_minLength: undefined,
       activeMembersTab: {
         menuAction__remove: 'Rimuovi membro',
         tableHeader__actions: 'Azioni',
@@ -873,6 +874,7 @@ export const itIT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Rimuovi chiave di accesso',
         menuAction__rename: 'Rinomina chiave di accesso',
+        primaryButton: undefined,
         title: 'Gestisci le tue chiavi di accesso',
       },
       passwordSection: {

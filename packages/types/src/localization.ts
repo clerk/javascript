@@ -761,6 +761,7 @@ type _LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       action__search: LocalizationValue;
+      action__search_minLength: LocalizationValue;
       start: {
         headerTitle__members: LocalizationValue;
         headerTitle__invitations: LocalizationValue;

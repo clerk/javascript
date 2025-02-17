@@ -277,6 +277,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverFooter: WithOptions;
 
+  organizationProfileMembersSearchContainer: WithOptions;
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
 

@@ -1,6 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { useDebounce } from '../../../ui/hooks';
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
@@ -21,11 +22,12 @@ import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
-import { MembersSearch } from './MembersSearch';
+import { MembersSearchForm } from './MembersSearchForm';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
 export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
+const MEMBERS_SEARCH_QUERY_MIN_LENGTH = 3;
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
@@ -35,7 +37,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
 
   const [query, setQuery] = useState('');
-  const [search, setSearch] = useState('');
+  const debouncedQuery = useDebounce(query, 600);
 
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
@@ -43,7 +45,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
     memberships: canReadMemberships
       ? {
           keepPreviousData: true,
-          query: query || undefined,
+          query: query.length >= MEMBERS_SEARCH_QUERY_MIN_LENGTH ? debouncedQuery : undefined,
         }
       : undefined,
   });
@@ -139,12 +141,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     >
                       <MembersActionsRow
                         actionSlot={
-                          <MembersSearch
+                          <MembersSearchForm
+                            minLength={MEMBERS_SEARCH_QUERY_MIN_LENGTH}
                             query={query}
-                            value={search}
                             memberships={memberships}
-                            onSearchChange={query => setSearch(query)}
-                            onQueryTrigger={query => setQuery(query)}
+                            onChange={query => setQuery(query)}
                           />
                         }
                       />
