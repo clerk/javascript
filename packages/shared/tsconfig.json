@@ -9,12 +9,8 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "declarationMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "declarationDir": "dist/types",
     "jsx": "react",
     "lib": ["ES6", "DOM", "WebWorker"],
     "allowJs": true
