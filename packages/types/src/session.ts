@@ -130,10 +130,28 @@ export interface SessionResource extends ClerkResource {
   __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 
+/**
+ * Represents a session resource that has completed all pending tasks
+ * and authentication factors
+ */
 export interface ActiveSessionResource extends SessionResource {
   status: 'active';
   user: UserResource;
 }
+
+/**
+ * Represents a session resource that is authenticated but has pending tasks
+ */
+export interface PendingSessionResource extends SessionResource {
+  status: 'pending';
+  user: UserResource;
+}
+
+/**
+ * Represents session resources for users who have completed
+ * the full authentication flow
+ */
+export type AuthenticatedSessionResource = ActiveSessionResource | PendingSessionResource;
 
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
@@ -158,7 +176,15 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
+export type SessionStatus =
+  | 'abandoned'
+  | 'active'
+  | 'ended'
+  | 'expired'
+  | 'removed'
+  | 'replaced'
+  | 'revoked'
+  | 'pending';
 
 export interface PublicUserData {
   firstName: string | null;

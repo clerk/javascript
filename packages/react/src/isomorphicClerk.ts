@@ -5,7 +5,7 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
-  ActiveSessionResource,
+  AuthenticatedSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -616,7 +616,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get session(): ActiveSessionResource | undefined | null {
+  get session(): AuthenticatedSessionResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.session;
     } else {
@@ -655,6 +655,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       // TODO: add ssr condition
     } else {
       return undefined;
+    }
+  }
+
+  get hasAuthenticatedClient(): boolean {
+    if (this.clerkjs) {
+      return this.clerkjs.hasAuthenticatedClient;
+    } else {
+      return false;
     }
   }
 
