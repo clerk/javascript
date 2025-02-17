@@ -1,8 +1,10 @@
+import { isBrowserOnline } from '@clerk/shared/browser';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
+import { createOfflineScheduler } from '../../utils/offlineScheduler';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -39,6 +41,7 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
+  private sessionRefreshOfflineScheduler = createOfflineScheduler();
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
@@ -124,7 +127,8 @@ export class AuthCookieService {
         // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
-        void this.refreshSessionToken({ updateCookieImmediately: true });
+        // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
+        this.sessionRefreshOfflineScheduler.schedule(() => this.refreshSessionToken({ updateCookieImmediately: true }));
       }
     });
   }
@@ -135,6 +139,10 @@ export class AuthCookieService {
     updateCookieImmediately?: boolean;
   } = {}): Promise<void> {
     if (!this.clerk.session) {
+      return;
+    }
+
+    if (!isBrowserOnline()) {
       return;
     }
 
