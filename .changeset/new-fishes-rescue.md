@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Avoid updating client when removing all sessions.
+Bug fix: Broadcast a sign out event to all opened tabs when `Clerk.signOut()` or `User.delete()` is called.
