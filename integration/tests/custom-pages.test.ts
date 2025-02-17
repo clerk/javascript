@@ -8,6 +8,7 @@ const CUSTOM_PROFILE_PAGE = '/custom-user-profile';
 const CUSTOM_BUTTON_PAGE = '/custom-user-button';
 const CUSTOM_BUTTON_TRIGGER_PAGE = '/custom-user-button-trigger';
 const CUSTOM_BUTTON_DYNAMIC_LABELS_PAGE = '/custom-user-button-dynamic-labels';
+const CUSTOM_BUTTON_DYNAMIC_LABELS_AND_CUSTOM_PAGES_PAGE = '/custom-user-button-dynamic-labels-and-custom-pages';
 
 async function waitForMountedComponent(
   component: 'UserButton' | 'UserProfile',
@@ -373,6 +374,73 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         await expect(notificationsButton).toHaveText('🌐Notifications 🔔 ON');
         await expect(chatButton).toHaveText('🌐Chat is ON');
         await expect(languageButton).toHaveText('🌍Language: EN');
+      });
+    });
+
+    test.describe('User Button with dynamic labels and custom page', () => {
+      test('click Chat is OFF and ensure that state has been changed', async ({ page, context }) => {
+        const u = createTestUtils({ app, page, context });
+        await u.po.signIn.goTo();
+        await u.po.signIn.waitForMounted();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+        await u.po.expect.toBeSignedIn();
+
+        await u.page.goToRelative(CUSTOM_BUTTON_DYNAMIC_LABELS_AND_CUSTOM_PAGES_PAGE);
+        await u.po.userButton.waitForMounted();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+
+        const pagesContainer = u.page.locator('div.cl-userButtonPopoverActions__multiSession').first();
+        const buttons = await pagesContainer.locator('button').all();
+
+        expect(buttons.length).toBe(9);
+
+        const expectedTexts = [
+          '🌐Chat is OFF',
+          '🌐Theme: ☀️ Light',
+          '🌐Notifications 🔕 OFF',
+          '🌍Language: EN',
+          'Manage account',
+          'Sign out',
+          '🌐Visit Clerk',
+          '🌐Visit User page',
+          '🔔Custom Alert',
+        ];
+
+        for (let i = 0; i < buttons.length; i++) {
+          await expect(buttons[i]).toHaveText(expectedTexts[i]);
+        }
+
+        const chatButton = buttons[0];
+        const notificationsButton = buttons[2];
+        const languageButton = buttons[3];
+        const manageAccountButton = buttons[4];
+
+        // Test chat toggle
+        await chatButton.click();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+        await expect(chatButton).toHaveText('🌐Chat is ON');
+        await expect(languageButton).toHaveText('🌍Language: EN');
+
+        await notificationsButton.click();
+        await u.po.userButton.toggleTrigger();
+        await u.po.userButton.waitForPopover();
+        await expect(notificationsButton).toHaveText('🌐Notifications 🔔 ON');
+        await expect(chatButton).toHaveText('🌐Chat is ON');
+        await expect(languageButton).toHaveText('🌍Language: EN');
+
+        await manageAccountButton.click();
+        await u.po.userProfile.waitForMounted();
+
+        const userProfilePageButtons = await u.page.locator('button.cl-navbarButton__custom-page-0').all();
+        const [notificationsPage] = userProfilePageButtons;
+        await expect(notificationsPage.locator('div.cl-navbarButtonIcon__custom-page-0')).toHaveText('🔔');
+
+        await notificationsPage.click();
+
+        const orderSent = page.locator('h1[data-page="notifications-page"]');
+        await orderSent.waitFor({ state: 'attached' });
       });
     });
   },
