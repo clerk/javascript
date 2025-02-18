@@ -1,5 +1,78 @@
 # @clerk/vue
 
+## 1.2.0
+
+### Minor Changes
+
+- Add support for `<OrganizationProfile>` custom pages and links through `<OrganizationSwitcher>` ([#5129](https://github.com/clerk/javascript/pull/5129)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { OrganizationSwitcher } from '@clerk/vue';
+  import Icon from './Icon.vue';
+  </script>
+
+  <template>
+    <header>
+      <OrganizationSwitcher>
+        <OrganizationSwitcher.OrganizationProfilePage
+          label="Custom Page"
+          url="custom"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+          <div>
+            <h1>Custom Organization Profile Page</h1>
+            <p>This is the custom organization profile page</p>
+          </div>
+        </OrganizationSwitcher.OrganizationProfilePage>
+        <OrganizationSwitcher.OrganizationProfileLink
+          label="Homepage"
+          url="/"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+        </OrganizationSwitcher.OrganizationProfileLink>
+      </OrganizationSwitcher>
+    </header>
+  </template>
+  ```
+
+### Patch Changes
+
+- Add the ability to specify an appearance for modal component usages. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds ability to render custom `<UserProfile>` links inside `<UserButton>` component. ([#5128](https://github.com/clerk/javascript/pull/5128)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup>
+  import { UserButton } from '@clerk/vue';
+  </script>
+
+  <template>
+    <UserButton>
+      <UserButton.UserProfileLink
+        label="Homepage"
+        url="/"
+      >
+        <template #labelIcon>
+          <div>Icon</div>
+        </template>
+      </UserButton.UserProfileLink>
+    </UserButton>
+  </template>
+  ```
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+  - @clerk/shared@2.21.1
+
 ## 1.1.11
 
 ### Patch Changes

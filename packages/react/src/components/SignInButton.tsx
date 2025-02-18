@@ -1,12 +1,12 @@
-import type { SignInProps } from '@clerk/types';
+import type { SignInButtonProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
-import type { SignInButtonProps, WithClerkProp } from '../types';
+import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
 export const SignInButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<SignInButtonProps>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SignInButtonProps>>) => {
     const {
       signUpFallbackRedirectUrl,
       forceRedirectUrl,
@@ -31,7 +31,7 @@ export const SignInButton = withClerk(
       };
 
       if (mode === 'modal') {
-        return clerk.openSignIn(opts);
+        return clerk.openSignIn({ ...opts, appearance: props.appearance });
       }
       return clerk.redirectToSignIn({
         ...opts,
