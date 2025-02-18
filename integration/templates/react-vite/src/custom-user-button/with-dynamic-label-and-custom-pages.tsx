@@ -10,7 +10,10 @@ export default function Page() {
 
   return (
     <PageContextProvider>
-      <UserButton fallback={<>Loading user button</>}>
+      <UserButton
+        fallback={<>Loading user button</>}
+        userProfileProps={{ appearance: { elements: { modalBackdrop: { zIndex: '100' } } } }}
+      >
         <UserButton.MenuItems>
           <UserButton.Action
             label={`Chat is ${open ? 'ON' : 'OFF'}`}
@@ -52,6 +55,13 @@ export default function Page() {
             onClick={() => alert('custom-alert')}
           />
         </UserButton.MenuItems>
+        <UserButton.UserProfilePage
+          label='Notifications Page'
+          url='notifications'
+          labelIcon={<span>🔔</span>}
+        >
+          <h1 data-page='notifications-page'>Notifications page</h1>
+        </UserButton.UserProfilePage>
       </UserButton>
     </PageContextProvider>
   );
