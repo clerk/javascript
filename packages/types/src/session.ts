@@ -103,7 +103,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
-  tasks: SessionTasks | null;
+  tasks: Array<SessionTask> | null;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
@@ -170,8 +170,8 @@ export interface PublicUserData {
   userId?: string;
 }
 
-export interface SessionTasks {
-  orgs: Record<string, unknown>;
+export interface SessionTask {
+  key: 'orgs';
 }
 
 export type GetTokenOptions = {

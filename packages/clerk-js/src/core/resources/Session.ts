@@ -12,7 +12,7 @@ import type {
   SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
-  SessionTasks,
+  SessionTask,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -43,7 +43,7 @@ export class Session extends BaseResource implements SessionResource {
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
-  tasks!: SessionTasks | null;
+  tasks: Array<SessionTask> | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
