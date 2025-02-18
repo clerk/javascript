@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.23.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+### Patch Changes
+
+- Fix an infinity re-render issue in `UserProfileModal` when we pass `userProfileProps` in `<UserButton />` and we have `customMenuItems` and `customPages` ([#5145](https://github.com/clerk/javascript/pull/5145)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+
 ## 5.22.13
 
 ### Patch Changes
