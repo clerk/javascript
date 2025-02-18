@@ -60,6 +60,12 @@
       "outputLogs": "new-only",
       "outputs": ["*/package.json", "dist/**", "scripts/**"]
     },
+    "build:declarations": {
+      "dependsOn": ["build"],
+      "inputs": ["tsconfig.declarations.json"],
+      "outputLogs": "new-only",
+      "outputs": ["dist/**"]
+    },
     "dev": {
       "cache": false
     },
