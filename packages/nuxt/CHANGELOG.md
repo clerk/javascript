@@ -1,5 +1,76 @@
 # @clerk/nuxt
 
+## 1.2.0
+
+### Minor Changes
+
+- Introduce `getAuth()` helper to retrieve authentication state from the [event](https://h3.unjs.io/guide/event) object. ([#5158](https://github.com/clerk/javascript/pull/5158)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  import { getAuth } from '@clerk/nuxt/server';
+
+  export default eventHandler(event => {
+    const { userId } = getAuth(event);
+
+    if (!userId) {
+      // User is not authenticated
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Re-export error handling utilities from `@clerk/shared` ([#5155](https://github.com/clerk/javascript/pull/5155)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { useSignIn } from '@clerk/vue';
+  import { isClerkAPIResponseError } from '@clerk/vue/errors';
+
+  // ... form state refs and other setup ...
+  const { signIn } = useSignIn();
+
+  const handleSubmit = async () => {
+    try {
+      const signInAttempt = await signIn.value.create({
+        identifier: email.value,
+        password: password.value,
+      });
+      // ... handle successful sign in ...
+    } catch (err) {
+      // Type guard to safely handle Clerk API errors
+      if (isClerkAPIResponseError(err)) {
+        errors.value = err.errors; // err.errors is properly typed as ClerkAPIError[]
+      }
+    }
+  };
+  </script>
+
+  <template>
+    <!-- Form template here -->
+  </template>
+  ```
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`62200fad4431d625fcb4bf2a521e4650eb615381`](https://github.com/clerk/javascript/commit/62200fad4431d625fcb4bf2a521e4650eb615381)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+  - @clerk/vue@1.2.1
+  - @clerk/backend@1.24.2
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`9b6102c551dcd5500e29e3a3de9e6483796f6686`](https://github.com/clerk/javascript/commit/9b6102c551dcd5500e29e3a3de9e6483796f6686), [`128fd8909ae083c0d274dee7c6810e8574e1ce33`](https://github.com/clerk/javascript/commit/128fd8909ae083c0d274dee7c6810e8574e1ce33), [`98436f018fb19170a1b5781401577dcab6ec706a`](https://github.com/clerk/javascript/commit/98436f018fb19170a1b5781401577dcab6ec706a)]:
+  - @clerk/types@4.46.0
+  - @clerk/vue@1.2.0
+  - @clerk/backend@1.24.1
+  - @clerk/shared@2.21.1
+
 ## 1.1.3
 
 ### Patch Changes

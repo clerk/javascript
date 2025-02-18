@@ -1,23 +1,9 @@
-import type { SignInProps, SignUpProps } from '@clerk/types';
+import type { SignInButtonProps as _SignInButtonProps, SignUpButtonProps as _SignUpButtonProps } from '@clerk/types';
 
-// TODO-SHARED: Duplicate from @clerk/clerk-react
-type ButtonProps = {
-  mode?: 'redirect' | 'modal';
+export type SignInButtonProps = _SignInButtonProps & {
   children?: React.ReactNode;
 };
 
-// TODO-SHARED: Duplicate from @clerk/clerk-react
-export type SignInButtonProps = ButtonProps &
-  Pick<
-    SignInProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
-  >;
-
-// TODO-SHARED: Duplicate from @clerk/clerk-react
-export type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & ButtonProps &
-  Pick<
-    SignUpProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
-  >;
+export type SignUpButtonProps = _SignUpButtonProps & {
+  children?: React.ReactNode;
+};

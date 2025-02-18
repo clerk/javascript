@@ -12,6 +12,17 @@ const isMountProps = (props: any): props is MountProps => {
 const isOpenProps = (props: any): props is OpenProps => {
   return 'open' in props;
 };
+
+const stripMenuItemIconHandlers = (
+  menuItems?: Array<{
+    mountIcon?: (el: HTMLDivElement) => void;
+    unmountIcon?: (el: HTMLDivElement) => void;
+    [key: string]: any;
+  }>,
+) => {
+  return menuItems?.map(({ mountIcon, unmountIcon, ...rest }) => rest);
+};
+
 // README: <ClerkHostRenderer/> should be a class pure component in order for mount and unmount
 // lifecycle props to be invoked correctly. Replacing the class component with a
 // functional component wrapped with a React.memo is not identical to the original
@@ -64,14 +75,24 @@ export class ClerkHostRenderer extends React.PureComponent<
     // Remove children and customPages from props before comparing
     // children might hold circular references which deepEqual can't handle
     // and the implementation of customPages relies on props getting new references
-    const prevProps = without(_prevProps.props, 'customPages', 'children');
-    const newProps = without(this.props.props, 'customPages', 'children');
+    const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
+    const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
 
     // instead, we simply use the length of customPages to determine if it changed or not
     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
 
-    if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
+    // Strip out mountIcon and unmountIcon handlers since they're always generated as new function references,
+    // which would cause unnecessary re-renders in deep equality checks
+    const prevMenuItemsWithoutHandlers = stripMenuItemIconHandlers(_prevProps.props.customMenuItems);
+    const newMenuItemsWithoutHandlers = stripMenuItemIconHandlers(this.props.props.customMenuItems);
+
+    if (
+      !isDeeplyEqual(prevProps, newProps) ||
+      !isDeeplyEqual(prevMenuItemsWithoutHandlers, newMenuItemsWithoutHandlers) ||
+      customPagesChanged ||
+      customMenuItemsChanged
+    ) {
       if (this.rootRef.current) {
         this.props.updateProps({ node: this.rootRef.current, props: this.props.props });
       }

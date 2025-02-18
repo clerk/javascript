@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.1.11",
+  "version": "1.2.1",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -33,6 +33,10 @@
     "./internal": {
       "types": "./dist/internal.d.ts",
       "import": "./dist/internal.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
     }
   },
   "main": "./dist/index.js",

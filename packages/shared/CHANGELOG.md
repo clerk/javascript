@@ -1,5 +1,32 @@
 # Change Log
 
+## 2.22.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Previously, the `getCurrentOrganizationMembership()` function was duplicated in both `@clerk/vue` and `@clerk/shared/react`. This change moves the function to `@clerk/shared/organization`. ([#5168](https://github.com/clerk/javascript/pull/5168)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8)]:
+  - @clerk/types@4.46.1
+
+## 2.21.1
+
+### Patch Changes
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+
 ## 2.21.0
 
 ### Minor Changes
@@ -1280,7 +1307,7 @@
 
 ### Patch Changes
 
-- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+- Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
 
@@ -1330,7 +1357,7 @@
   - `useOrganizations`
   - `getRequestUrl`
 
-- Removes the patch for disabling swr-devtools causing apps with swr and broswers with the devtools extention to break. ([#1794](https://github.com/clerk/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
+- Removes the patch for disabling swr-devtools causing apps with swr and browsers with the devtools extention to break. ([#1794](https://github.com/clerk/javascript/pull/1794)) by [@panteliselef](https://github.com/panteliselef)
 
 ## 0.23.1
 

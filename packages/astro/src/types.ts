@@ -82,5 +82,4 @@ export type ButtonProps<Tag> = {
    */
   as: Tag;
   asChild?: boolean;
-  mode?: 'redirect' | 'modal';
 };

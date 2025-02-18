@@ -24,10 +24,10 @@ test.describe('custom middleware @nuxt', () => {
       )
       .addFile(
         'server/middleware/clerk.js',
-        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+        () => `import { clerkMiddleware, createRouteMatcher, getAuth } from '@clerk/nuxt/server';
 
         export default clerkMiddleware((event) => {
-          const { userId } = event.context.auth
+          const { userId } = getAuth(event);
           const isProtectedRoute = createRouteMatcher(['/api/me']);
 
           if (!userId && isProtectedRoute(event)) {

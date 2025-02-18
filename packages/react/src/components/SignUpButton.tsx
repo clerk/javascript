@@ -1,12 +1,12 @@
-import type { SignUpProps } from '@clerk/types';
+import type { SignUpButtonProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
-import type { SignUpButtonProps, WithClerkProp } from '../types';
+import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
 export const SignUpButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<SignUpButtonProps>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SignUpButtonProps>>) => {
     const {
       fallbackRedirectUrl,
       forceRedirectUrl,
@@ -32,7 +32,7 @@ export const SignUpButton = withClerk(
       };
 
       if (mode === 'modal') {
-        return clerk.openSignUp(opts);
+        return clerk.openSignUp({ ...opts, appearance: props.appearance });
       }
 
       return clerk.redirectToSignUp({
