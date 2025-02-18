@@ -147,6 +147,7 @@ type UseReverificationResult<
     isReVerificationInProgress: boolean;
     verificationLevel: string | undefined;
     cancelReverification: () => void;
+    reverificationCompleted: () => void;
   },
 ];
 
@@ -273,6 +274,7 @@ function useReverification<
       isReVerificationInProgress,
       verificationLevel,
       cancelReverification: reverificationCancel,
+      reverificationCompleted: reverificationCompleted,
     },
   ];
 }
