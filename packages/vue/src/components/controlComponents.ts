@@ -38,10 +38,12 @@ export const ClerkLoading = defineComponent((_, { slots }) => {
 });
 
 export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
-  const { sessionCtx } = useClerkContext();
+  const { sessionCtx, clientCtx } = useClerkContext();
 
   useClerkLoaded(clerk => {
-    if (sessionCtx.value === null && clerk.isSignedIn) {
+    const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
+
+    if (sessionCtx.value === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);

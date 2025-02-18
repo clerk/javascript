@@ -141,7 +141,7 @@ export interface ActiveSessionResource extends SessionResource {
 }
 
 /**
- * Represents a session resource that is authenticated but has pending tasks
+ * Represents a session resource that has completed sign-in but has pending tasks
  */
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';

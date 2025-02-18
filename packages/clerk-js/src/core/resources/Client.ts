@@ -118,10 +118,6 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePostBypass({ body: params, path: this.path() + '/verify' });
   }
 
-  get isSignedIn() {
-    return (this.signedInSessions ?? []).length > 0;
-  }
-
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;

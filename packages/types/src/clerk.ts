@@ -128,9 +128,7 @@ export interface Clerk {
   isStandardBrowser: boolean | undefined;
 
   /**
-   * Indicates whether the current user has a valid, fully signed-in client session.
-   * A session is considered valid when the user has successfully authenticated,
-   * completed all required authentication factors, and resolved all pending tasks.
+   * Indicates whether the current user has a valid signed-in client session
    */
   isSignedIn: boolean;
 

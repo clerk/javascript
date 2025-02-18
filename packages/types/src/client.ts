@@ -1,13 +1,12 @@
 import type { ClerkResource } from './resource';
-import type { ActiveSessionResource, PendingSessionResource, SessionResource } from './session';
+import type { ActiveSessionResource, SessionResource, SignedInSessionResource } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot } from './snapshots';
 
 export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
-  signedInSessions: (ActiveSessionResource | PendingSessionResource)[];
-  isSignedIn: boolean;
+  signedInSessions: SignedInSessionResource[];
   signUp: SignUpResource;
   signIn: SignInResource;
   isNew: () => boolean;

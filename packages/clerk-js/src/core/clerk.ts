@@ -289,7 +289,7 @@ export class Clerk implements ClerkInterface {
   }
 
   get isSignedIn(): boolean {
-    return !!this.client?.isSignedIn;
+    return !!this.session;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {

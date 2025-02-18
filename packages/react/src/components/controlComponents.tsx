@@ -142,10 +142,11 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 };
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
-  const { session, isSignedIn } = clerk;
+  const { client, session } = clerk;
+  const hasSignedInSessions = client.signedInSessions && client.signedInSessions.length > 0;
 
   React.useEffect(() => {
-    if (session === null && isSignedIn) {
+    if (session === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);
