@@ -39,6 +39,7 @@ const typedocPluginMarkdownOptions = {
   tableColumnSettings: {
     hideSources: true,
   },
+  fileExtension: '.mdx',
 };
 
 const frontmatterTags = ['description', 'title'];
@@ -55,7 +56,12 @@ const config = {
   out: './.typedoc/docs',
   json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
-  plugin: ['typedoc-plugin-markdown', 'typedoc-plugin-frontmatter', './.typedoc/custom-theme.mjs'],
+  plugin: [
+    'typedoc-plugin-markdown',
+    'typedoc-plugin-frontmatter',
+    './.typedoc/custom-theme.mjs',
+    './.typedoc/custom-plugin.mjs',
+  ],
   theme: 'clerkTheme',
   readme: 'none',
   packageOptions: {
