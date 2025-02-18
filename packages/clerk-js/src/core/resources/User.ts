@@ -35,6 +35,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
+import { eventBus, events } from '../events';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -242,7 +243,7 @@ export class User extends BaseResource implements UserResource {
 
   delete = (): Promise<void> => {
     return this._baseDelete({ path: '/me' }).then(res => {
-      User.clerk.__internal_broadcastSignOutEvent();
+      eventBus.dispatch(events.UserSignOut, null);
       return res;
     });
   };

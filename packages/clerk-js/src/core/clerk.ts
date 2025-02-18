@@ -376,7 +376,7 @@ export class Clerk implements ClerkInterface {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
       // Notify other tabs that user is signing out.
-      this.__internal_broadcastSignOutEvent();
+      eventBus.dispatch(events.UserSignOut, null);
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -1541,7 +1541,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.__internal_broadcastSignOutEvent();
+        eventBus.dispatch(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -2065,6 +2065,13 @@ export class Clerk implements ClerkInterface {
         void this.handleUnauthenticated({ broadcast: false });
       }
     });
+
+    /**
+     * Allow resources within the singleton to notify other tabs about a signout event (scoped to a single tab)
+     */
+    eventBus.on(events.UserSignOut, () => {
+      this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
@@ -2097,10 +2104,6 @@ export class Clerk implements ClerkInterface {
     for (const listener of this.#navigationListeners) {
       listener();
     }
-  };
-
-  public __internal_broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
   #setTransitiveState = () => {
