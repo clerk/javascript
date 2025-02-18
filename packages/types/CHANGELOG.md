@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.46.1
+
+### Patch Changes
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.46.0
 
 ### Minor Changes

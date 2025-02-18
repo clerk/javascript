@@ -1,24 +1,6 @@
 import { UserButton } from '@clerk/clerk-react';
-import { useContext } from 'react';
-import { PageContext, PageContextProvider } from '../PageContext.tsx';
+import { PageContextProvider } from '../PageContext.tsx';
 import React from 'react';
-
-function Page1() {
-  const { counter, setCounter } = useContext(PageContext);
-
-  return (
-    <>
-      <h1 data-page={1}>Page 1</h1>
-      <p data-page={1}>Counter: {counter}</p>
-      <button
-        data-page={1}
-        onClick={() => setCounter(a => a + 1)}
-      >
-        Update
-      </button>
-    </>
-  );
-}
 
 export default function Page() {
   const [open, setIsOpen] = React.useState(false);

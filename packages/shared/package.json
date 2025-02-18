@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.21.1",
+  "version": "2.22.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -116,7 +116,8 @@
     "oauth",
     "web3",
     "getEnvVariable",
-    "pathMatcher"
+    "pathMatcher",
+    "organization"
   ],
   "scripts": {
     "build": "tsup",
@@ -146,7 +147,7 @@
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.0.0",
-    "esbuild": "0.20.2"
+    "esbuild": "0.25.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

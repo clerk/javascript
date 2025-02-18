@@ -1,12 +1,12 @@
 import type { ClerkResource } from './resource';
-import type { ActiveSessionResource, SessionResource } from './session';
+import type { ActiveSessionResource, SessionResource, SignedInSessionResource } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot } from './snapshots';
 
 export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];
-  activeSessions: ActiveSessionResource[];
+  signedInSessions: SignedInSessionResource[];
   signUp: SignUpResource;
   signIn: SignInResource;
   isNew: () => boolean;
@@ -23,4 +23,8 @@ export interface ClientResource extends ClerkResource {
   createdAt: Date | null;
   updatedAt: Date | null;
   __internal_toSnapshot: () => ClientJSONSnapshot;
+  /**
+   * @deprecated Use `signedInSessions` instead
+   */
+  activeSessions: ActiveSessionResource[];
 }

@@ -10,7 +10,6 @@ import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
-  ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -47,6 +46,7 @@ import type {
   Resources,
   SDKMetadata,
   SetActiveParams,
+  SignedInSessionResource,
   SignInProps,
   SignInRedirectOptions,
   SignInResource,
@@ -98,6 +98,7 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -164,7 +165,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public client: ClientResource | undefined;
-  public session: ActiveSessionResource | null | undefined;
+  public session: SignedInSessionResource | null | undefined;
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
@@ -191,6 +192,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -285,6 +287,10 @@ export class Clerk implements ClerkInterface {
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
     return this.#options[key];
+  }
+
+  get isSignedIn(): boolean {
+    return !!this.session;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
@@ -424,7 +430,7 @@ export class Clerk implements ClerkInterface {
     }
 
     // Multi-session handling
-    const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
+    const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
 
     await session?.remove();
@@ -612,10 +618,15 @@ export class Clerk implements ClerkInterface {
       }),
     );
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('SignIn', {
-        ...props,
-        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-      }),
+      eventPrebuiltComponentMounted(
+        'SignIn',
+        {
+          ...props,
+        },
+        {
+          withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+        },
+      ),
     );
   };
 
@@ -669,7 +680,17 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted(
+        'UserProfile',
+        props,
+        props?.customPages?.length || 0 > 0
+          ? {
+              customPages: true,
+            }
+          : undefined,
+      ),
+    );
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -824,7 +845,21 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('UserButton', props, {
+        ...(props?.customMenuItems?.length || 0 > 0
+          ? {
+              customItems: true,
+            }
+          : undefined),
+
+        ...(props?.__experimental_asStandalone
+          ? {
+              standalone: true,
+            }
+          : undefined),
+      }),
+    );
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -876,12 +911,12 @@ export class Clerk implements ClerkInterface {
         : noop;
 
     if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
+      session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
     let newSession = session === undefined ? this.session : session;
 
-    // At this point, the `session` variable should contain either an `ActiveSessionResource`
+    // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
@@ -919,7 +954,7 @@ export class Clerk implements ClerkInterface {
     //   Note that this will also update the session's active organization
     //   id.
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchLastActiveSession(newSession);
+      await this.#touchCurrentSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
     }
@@ -1903,7 +1938,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -2027,31 +2062,37 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
+  #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
-      if (lastActiveSession) {
-        return lastActiveSession;
+      const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
+      if (currentSession) {
+        return currentSession;
       }
     }
-    const session = client.activeSessions[0];
+    const session = client.signedInSessions[0];
     return session || null;
   };
 
-  #setupListeners = (): void => {
+  #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
     }
 
     this.#pageLifecycle?.onPageFocus(() => {
-      if (this.session) {
+      if (!this.session) {
+        return;
+      }
+
+      const performTouch = () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        void this.#touchLastActiveSession(this.session);
-      }
+        return this.#touchCurrentSession(this.session);
+      };
+
+      this.#sessionTouchOfflineScheduler.schedule(performTouch);
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
@@ -2062,7 +2103,7 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
@@ -2111,14 +2152,14 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  #setAccessors = (session?: ActiveSessionResource | null) => {
+  #setAccessors = (session?: SignedInSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
     this.user = this.session ? this.session.user : null;
   };
 
-  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
-    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
+  #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {
+    return this.client?.signedInSessions.find(x => x.id === sessionId) || null;
   };
 
   #handleImpersonationFab = () => {
