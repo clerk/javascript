@@ -99,6 +99,7 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -190,6 +191,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1902,7 +1904,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -2037,20 +2039,26 @@ export class Clerk implements ClerkInterface {
     return session || null;
   };
 
-  #setupListeners = (): void => {
+  #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
     }
 
     this.#pageLifecycle?.onPageFocus(() => {
-      if (this.session) {
+      if (!this.session) {
+        return;
+      }
+
+      const performTouch = () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        void this.#touchLastActiveSession(this.session);
-      }
+        return this.#touchLastActiveSession(this.session);
+      };
+
+      this.#sessionTouchOfflineScheduler.schedule(performTouch);
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
