@@ -2,4 +2,4 @@
 "@clerk/shared": patch
 ---
 
-fix(shared): Close re-verification modal after completed or canceled/closed.
+fix(shared): Fixes restoretion of the scrollbar behaviour after re-verification it's completed or canceled/closed.
