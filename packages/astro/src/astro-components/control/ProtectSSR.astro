@@ -9,6 +9,13 @@ const isUnauthorized =
   (typeof Astro.props.condition === "function" &&
     !Astro.props.condition(has)) ||
   ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+
+// Note: Astro server islands also use a "fallback" slot for loading states
+// See: https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content
+// We use "protect-fallback" as our preferred slot name to avoid conflicts
+const fallbackSlot = Astro.slots.has('protect-fallback') 
+  ? 'protect-fallback' 
+  : 'fallback';
 ---
 
-{isUnauthorized ? <slot name="fallback" /> : <slot />}
+{isUnauthorized ? <slot name={fallbackSlot} /> : <slot />}

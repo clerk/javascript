@@ -31,5 +31,6 @@ const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
 
 <ProtectComponent {...props}>
   <slot />
+  <slot name="protect-fallback" slot="protect-fallback" />
   <slot name="fallback" slot="fallback" />
 </ProtectComponent>
