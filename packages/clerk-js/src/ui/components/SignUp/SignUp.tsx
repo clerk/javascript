@@ -6,7 +6,7 @@ import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowC
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { PendingTask } from '../PendingTask';
+import { useTaskRoute } from '../Task/useTaskRoute';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -23,6 +23,7 @@ function RedirectToSignUp() {
 
 function SignUpRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
+  const taskRoute = useTaskRoute();
 
   return (
     <Flow.Root flow='signUp'>
@@ -75,13 +76,20 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
+        {taskRoute && (
+          <Route
+            // todo - fix routing underlying issue, do not use index
+            // for some reason, a redirection to sign-in is happening even when `setActive` navigates to `select-organization`
+            {...taskRoute}
+            index
+          />
+        )}
         <Route index>
           <SignUpStart />
         </Route>
         <Route>
           <RedirectToSignUp />
         </Route>
-        <PendingTask />
       </Switch>
     </Flow.Root>
   );

@@ -303,4 +303,8 @@ export class Session extends BaseResource implements SessionResource {
       return token.getRawString() || null;
     });
   }
+
+  get hasTask() {
+    return (this.tasks ?? []).length > 0;
+  }
 }
