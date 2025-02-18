@@ -1,16 +1,16 @@
 import { useSessionContext } from '@clerk/shared/react/index';
-import type { SessionTasks } from '@clerk/types';
+import type { SessionTask } from '@clerk/types';
 import type { ComponentType } from 'react';
 import { withRedirectToAfterSignIn } from 'ui/common';
 
 import { Route } from '../../../ui/router';
 import { OrganizationList } from '../OrganizationList';
 
-const paths: Record<keyof SessionTasks, string> = {
+const paths: Record<SessionTask['key'], string> = {
   orgs: 'select-organization',
 };
 
-const TaskRegistry: Record<keyof SessionTasks, ComponentType> = {
+const TaskRegistry: Record<SessionTask['key'], ComponentType> = {
   orgs: OrganizationList,
 };
 
@@ -21,10 +21,7 @@ function usePendingTask() {
     return null;
   }
 
-  const [pendingTask] = Object.entries(session.tasks ?? {}).map(([task, value]) => ({
-    task,
-    ...value,
-  }));
+  const [pendingTask] = session.tasks ?? [];
 
   return pendingTask;
 }
@@ -37,8 +34,7 @@ export function _PendingTask() {
   }
 
   const Task = TaskRegistry['orgs'];
-  // @ts-ignore
-  const path = paths[pendingTask.task];
+  const path = paths[pendingTask.key];
 
   return (
     <Route path={path}>
