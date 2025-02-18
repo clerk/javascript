@@ -21,4 +21,7 @@ export const dark = experimental_createTheme({
       '--cl-screen': '#111111',
     },
   },
+  layout: {
+    captchaTheme: 'dark',
+  },
 });
