@@ -417,7 +417,7 @@ export class Clerk implements ClerkInterface {
 
     await onBeforeSetActive();
 
-    if (!opts.sessionId || this.client.activeSessions.length === 1) {
+    if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
