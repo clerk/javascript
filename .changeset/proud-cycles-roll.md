@@ -3,4 +3,4 @@
 ---
 
 - Initialize new `pending` session status as an signed-in state
-- Add new `Clerk.isSignedIn` property to provide a more explicit way to check authentication status
+- Deprecate `Clerk.client.activeSessions` in favor of `Clerk.client.signedInSessions`
