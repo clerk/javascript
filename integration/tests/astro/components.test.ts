@@ -481,4 +481,35 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // Components should be rendered on hard reload
     await u.po.userButton.waitForMounted();
   });
+
+  test('server islands protect component shows correct states', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Initial visit - should show loading state
+    await u.page.goToRelative('/server-islands');
+    await expect(u.page.getByText('Loading')).toBeVisible();
+
+    // Wait for loading to disappear before checking next state
+    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
+    await expect(u.page.getByText('Not an admin')).toBeVisible();
+
+    // Sign in as admin user
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeAdmin2.email,
+      password: fakeAdmin2.password,
+    });
+    await u.po.expect.toBeSignedIn();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Visit page again - loading state should still show first
+    await u.page.goToRelative('/server-islands');
+    await expect(u.page.getByText('Loading')).toBeVisible();
+
+    // Wait for loading to disappear before checking authorized state
+    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
+    await expect(u.page.getByText("I'm an admin")).toBeVisible();
+  });
 });
