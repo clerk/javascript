@@ -1,5 +1,50 @@
 # Change Log
 
+## 5.53.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+- Fix issue where `unsafeMetadata` was not associated with sign-ups in the combined sign-in-or-up flow. ([#5161](https://github.com/clerk/javascript/pull/5161)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix navigation issue within combined flow web3 providers when additional fields are required. ([#5141](https://github.com/clerk/javascript/pull/5141)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Pause session touch and token refresh while browser is offline, and resume it when the device comes back online. ([#5098](https://github.com/clerk/javascript/pull/5098)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove logo from use another method verification card. ([#5169](https://github.com/clerk/javascript/pull/5169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Trigger re-verification when setting an email as primary ([#5162](https://github.com/clerk/javascript/pull/5162)) by [@octoper](https://github.com/octoper)
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
+- Adjust verification modal vertical alignment and remove logo usage within verification cards. ([#5153](https://github.com/clerk/javascript/pull/5153)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Track custom pages and custom items usage on `UserButton` and `UserProfile` mount. ([#5163](https://github.com/clerk/javascript/pull/5163)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`4001e0388a705e6dbdbb82eaaa494a688a1c6e9f`](https://github.com/clerk/javascript/commit/4001e0388a705e6dbdbb82eaaa494a688a1c6e9f)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+  - @clerk/localizations@3.10.7
+
+## 5.52.3
+
+### Patch Changes
+
+- Bug fix: Close modals when calling `Clerk.navigate()` or `Clerk.setActive({redirectUrl})`. ([#5092](https://github.com/clerk/javascript/pull/5092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`eab46bc76c0544956268cc51d7ab686f33ddd31a`](https://github.com/clerk/javascript/commit/eab46bc76c0544956268cc51d7ab686f33ddd31a)]:
+  - @clerk/types@4.46.0
+  - @clerk/localizations@3.10.6
+  - @clerk/shared@2.21.1
+
 ## 5.52.2
 
 ### Patch Changes

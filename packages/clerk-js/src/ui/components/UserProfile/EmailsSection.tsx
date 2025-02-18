@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 import { Fragment } from 'react';
 
@@ -111,9 +111,9 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
   const emailId = email.id;
   const isPrimary = user?.primaryEmailAddressId === emailId;
   const isVerified = email.verification.status === 'verified';
-  const setPrimary = () => {
-    return user?.update({ primaryEmailAddressId: emailId }).catch(e => handleError(e, [], card.setError));
-  };
+  const [setPrimary] = useReverification(() => {
+    return user?.update({ primaryEmailAddressId: emailId });
+  });
 
   const actions = (
     [
@@ -126,7 +126,9 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
       !isPrimary && isVerified
         ? {
             label: localizationKeys('userProfile.start.emailAddressesSection.detailsAction__nonPrimary'),
-            onClick: setPrimary,
+            onClick: () => {
+              setPrimary().catch(e => handleError(e, [], card.setError));
+            },
           }
         : null,
       !isPrimary && !isVerified

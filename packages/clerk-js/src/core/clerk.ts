@@ -1,6 +1,6 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -99,6 +99,7 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -120,7 +121,6 @@ import {
   BaseResource,
   Client,
   EmailLinkError,
-  EmailLinkErrorCode,
   Environment,
   isClerkRuntimeError,
   Organization,
@@ -191,6 +191,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -582,10 +583,15 @@ export class Clerk implements ClerkInterface {
       }),
     );
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('SignIn', {
-        ...props,
-        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-      }),
+      eventPrebuiltComponentMounted(
+        'SignIn',
+        {
+          ...props,
+        },
+        {
+          withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
+        },
+      ),
     );
   };
 
@@ -639,7 +645,17 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted(
+        'UserProfile',
+        props,
+        props?.customPages?.length || 0 > 0
+          ? {
+              customPages: true,
+            }
+          : undefined,
+      ),
+    );
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -794,7 +810,21 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('UserButton', props, {
+        ...(props?.customMenuItems?.length || 0 > 0
+          ? {
+              customItems: true,
+            }
+          : undefined),
+
+        ...(props?.__experimental_asStandalone
+          ? {
+              standalone: true,
+            }
+          : undefined),
+      }),
+    );
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -1216,11 +1246,11 @@ export class Clerk implements ClerkInterface {
 
     const verificationStatus = getClerkQueryParam('__clerk_status');
     if (verificationStatus === 'expired') {
-      throw new EmailLinkError(EmailLinkErrorCode.Expired);
+      throw new EmailLinkError(EmailLinkErrorCodeStatus.Expired);
     } else if (verificationStatus === 'client_mismatch') {
-      throw new EmailLinkError(EmailLinkErrorCode.ClientMismatch);
+      throw new EmailLinkError(EmailLinkErrorCodeStatus.ClientMismatch);
     } else if (verificationStatus !== 'verified') {
-      throw new EmailLinkError(EmailLinkErrorCode.Failed);
+      throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
     }
 
     const newSessionId = getClerkQueryParam('__clerk_created_session');
@@ -1874,7 +1904,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -2009,20 +2039,26 @@ export class Clerk implements ClerkInterface {
     return session || null;
   };
 
-  #setupListeners = (): void => {
+  #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
     }
 
     this.#pageLifecycle?.onPageFocus(() => {
-      if (this.session) {
+      if (!this.session) {
+        return;
+      }
+
+      const performTouch = () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        void this.#touchLastActiveSession(this.session);
-      }
+        return this.#touchLastActiveSession(this.session);
+      };
+
+      this.#sessionTouchOfflineScheduler.schedule(performTouch);
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
