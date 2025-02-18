@@ -155,9 +155,9 @@ type IsomorphicLoadedClerk = Without<
   // TODO: Align return type
   buildOrganizationProfileUrl: () => string | void;
   // TODO: Align return type
-  buildAfterSignInUrl: () => string | void;
+  buildAfterSignInUrl: ({ params }: { params?: URLSearchParams }) => string | void;
   // TODO: Align return type
-  buildAfterSignUpUrl: () => string | void;
+  buildAfterSignUpUrl: ({ params }: { params?: URLSearchParams }) => string | void;
   // TODO: Align return type
   buildAfterSignOutUrl: () => string | void;
   // TODO: Align return type
@@ -338,8 +338,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildAfterSignInUrl = (): string | void => {
-    const callback = () => this.clerkjs?.buildAfterSignInUrl() || '';
+  buildAfterSignInUrl = (...args: Parameters<BrowserClerk['buildAfterSignInUrl']>): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignInUrl(...args) || '';
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
@@ -347,8 +347,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildAfterSignUpUrl = (): string | void => {
-    const callback = () => this.clerkjs?.buildAfterSignUpUrl() || '';
+  buildAfterSignUpUrl = (...args: Parameters<BrowserClerk['buildAfterSignInUrl']>): string | void => {
+    const callback = () => this.clerkjs?.buildAfterSignUpUrl(...args) || '';
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
