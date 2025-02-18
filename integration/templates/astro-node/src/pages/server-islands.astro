@@ -5,7 +5,7 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Page is only accessible by members">
   <div class="w-full flex justify-center flex-col">
-    <Protect server:islands role="admin">
+    <Protect server:defer role="admin">
       <p slot="fallback">Loading</p>
       <Fragment slot="protect-fallback">
         <h1 class="text-2xl text-center">Not an admin</h1>
