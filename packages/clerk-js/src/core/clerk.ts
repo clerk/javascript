@@ -386,8 +386,6 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
 
-      await onBeforeSetActive();
-
       this.#broadcastSignOutEvent();
       eventBus.dispatch(events.TokenUpdate, { token: null });
 
@@ -410,6 +408,8 @@ export class Clerk implements ClerkInterface {
 
       await onAfterSetActive();
     };
+
+    await onBeforeSetActive();
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
