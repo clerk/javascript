@@ -1,5 +1,40 @@
 # Change Log
 
+## 6.12.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+### Patch Changes
+
+- Update `clerkMiddleware` request callback to accept an asynchronous function ([#5154](https://github.com/clerk/javascript/pull/5154)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  export default clerkMiddleware(
+    (auth, req) => {
+      // Add your middleware checks
+    },
+    async req => {
+      const options = await getOptions(req);
+      return options;
+    },
+  );
+  ```
+
+- Fix shallow internal-component navigation. ([#5091](https://github.com/clerk/javascript/pull/5091)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`30f6f3808e9b3778d5a9eb275780f94f9e9c7651`](https://github.com/clerk/javascript/commit/30f6f3808e9b3778d5a9eb275780f94f9e9c7651)]:
+  - @clerk/shared@2.22.0
+  - @clerk/clerk-react@5.23.0
+  - @clerk/types@4.46.1
+  - @clerk/backend@1.24.2
+
 ## 6.11.3
 
 ### Patch Changes

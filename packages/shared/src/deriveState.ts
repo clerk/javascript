@@ -1,10 +1,10 @@
 import type {
-  ActiveSessionResource,
   InitialState,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
   Resources,
+  SignedInSessionResource,
   UserResource,
 } from '@clerk/types';
 
@@ -22,7 +22,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const userId = initialState.userId;
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
-  const session = initialState.session as ActiveSessionResource;
+  const session = initialState.session as SignedInSessionResource;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as OrganizationCustomRoleKey;
