@@ -206,7 +206,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
           appearance: 'interaction-only',
           theme: captchaTheme || 'auto',
           size: captchaSize || 'normal',
-          language: captchaLanguage || 'en-US',
+          language: captchaLanguage || 'auto',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
