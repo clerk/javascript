@@ -390,23 +390,24 @@ export class Clerk implements ClerkInterface {
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
     const executeSignOut = async () => {
-      const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out.
       eventBus.dispatch(events.UserSignOut, null);
+      // Clearn up cookies
       eventBus.dispatch(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
-      beforeUnloadTracker?.startTracking();
-      if (signOutCallback) {
-        await signOutCallback();
-      } else {
-        await this.navigate(redirectUrl);
-      }
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        if (signOutCallback) {
+          await signOutCallback();
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
 
-      if (beforeUnloadTracker?.isUnloading()) {
+      if (tracker.isUnloading()) {
         return;
       }
 
@@ -962,40 +963,41 @@ export class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
     if (beforeEmit) {
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-      await beforeEmit(newSession);
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        this.#setTransitiveState();
+        await beforeEmit(newSession);
+      });
     }
 
     if (redirectUrl && !beforeEmit) {
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-
-      if (this.client.isEligibleForTouch()) {
-        const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-
-        await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
-      } else {
-        await this.navigate(redirectUrl);
-      }
-
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        if (!this.client) {
+          // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+          return;
+        }
+        this.#setTransitiveState();
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
     }
 
-    //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker?.isUnloading()) {
+    //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
+    if (tracker.isUnloading()) {
       return;
     }
 
     this.#setAccessors(newSession);
-
     this.#emit();
     await onAfterSetActive();
   };
