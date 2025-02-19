@@ -58,6 +58,12 @@ interface RenderOptions {
    * @default 'always'
    */
   appearance?: 'always' | 'execute' | 'interaction-only';
+  /**
+   * A customer value that can be used to differentiate widgets under the same sitekey
+   * in analytics and which is returned upon validation. This can only contain up to
+   * 32 alphanumeric characters including _ and -.
+   */
+  action?: string;
 }
 
 interface Turnstile {
@@ -166,6 +172,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
         const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
+          action: opts.action,
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
