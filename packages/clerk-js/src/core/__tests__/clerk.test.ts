@@ -609,17 +609,18 @@ describe('Clerk singleton', () => {
           }),
         );
 
-      const sut = new Clerk(productionPublishableKey);
-      sut.navigate = jest.fn();
-      await sut.load();
-      await sut.signOut();
-      await waitFor(() => {
-        expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(mockClientRemoveSessions).toHaveBeenCalled();
-        expect(mockSession1.remove).not.toHaveBeenCalled();
-        expect(sut.navigate).toHaveBeenCalledWith('/');
-      });
-    });
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = jest.fn();
+        await sut.load();
+        await sut.signOut();
+        await waitFor(() => {
+          expect(mockClientDestroy).not.toHaveBeenCalled();
+          expect(mockClientRemoveSessions).toHaveBeenCalled();
+          expect(mockSession1.remove).not.toHaveBeenCalled();
+          expect(sut.navigate).toHaveBeenCalledWith('/');
+        });
+      },
+    );
 
     it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
       mockClientFetch.mockReturnValue(
