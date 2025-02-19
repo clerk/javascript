@@ -28,15 +28,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./internal": {
       "types": "./dist/internal.d.ts",
-      "import": "./dist/internal.js"
+      "default": "./dist/internal.js"
     },
     "./errors": {
       "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.js"
+      "default": "./dist/errors.js"
     }
   },
   "main": "./dist/index.js",
@@ -49,7 +49,7 @@
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run",
