@@ -40,6 +40,7 @@ const typedocPluginMarkdownOptions = {
     hideSources: true,
   },
   fileExtension: '.mdx',
+  excludeScopesInPaths: true,
 };
 
 const frontmatterTags = ['description', 'title'];
