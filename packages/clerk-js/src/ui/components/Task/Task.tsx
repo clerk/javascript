@@ -26,5 +26,5 @@ export function Task(): React.ReactNode {
   const [task] = session.tasks ?? [];
   const Content = TaskRegistry[task.key];
 
-  return <Content />;
+  return Content ? <Content /> : null;
 }
