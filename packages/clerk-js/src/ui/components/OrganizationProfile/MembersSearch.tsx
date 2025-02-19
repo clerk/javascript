@@ -6,6 +6,7 @@ import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../
 import { Animated, InputWithIcon } from '../../../ui/elements';
 import { MagnifyingGlass } from '../../../ui/icons';
 import { Spinner } from '../../../ui/primitives';
+import { mqu } from '../../../ui/styledSystem';
 import { ACTIVE_MEMBERS_PAGE_SIZE } from './OrganizationMembers';
 
 type MembersSearchProps = {
@@ -77,7 +78,14 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
 
   return (
     <Animated asChild>
-      <Flex>
+      <Flex
+        sx={{
+          width: '50%',
+          [mqu.sm]: {
+            width: 'auto',
+          },
+        }}
+      >
         <InputWithIcon
           value={value}
           type='search'
