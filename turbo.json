@@ -64,7 +64,7 @@
       "dependsOn": ["build"],
       "inputs": ["tsconfig.declarations.json"],
       "outputLogs": "new-only",
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**/*.d.ts"]
     },
     "dev": {
       "cache": false
