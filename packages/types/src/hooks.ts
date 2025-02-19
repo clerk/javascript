@@ -16,7 +16,6 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * Return values of the `useAuth()` hook
  * @interface
  */
 export type UseAuthReturn =
@@ -104,7 +103,6 @@ export type UseAuthReturn =
     };
 
 /**
- * Return values of the `useSignIn()` hook
  * @interface
  */
 export type UseSignInReturn =
@@ -129,7 +127,6 @@ export type UseSignInReturn =
     };
 
 /**
- * Return values of the `useSignUp()` hook
  * @interface
  */
 export type UseSignUpReturn =
@@ -154,7 +151,6 @@ export type UseSignUpReturn =
     };
 
 /**
- * Return values of the `useSession()` hook
  * @interface
  */
 export type UseSessionReturn =
@@ -184,7 +180,6 @@ export type UseSessionReturn =
     };
 
 /**
- * Return values of the `useSessionList()` hook
  * @interface
  */
 export type UseSessionListReturn =
@@ -209,7 +204,6 @@ export type UseSessionListReturn =
     };
 
 /**
- * Return values of the `useUser()` hook
  * @interface
  */
 export type UseUserReturn =

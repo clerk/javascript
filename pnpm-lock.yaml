@@ -277,12 +277,12 @@ importers:
       typedoc:
         specifier: 0.27.7
         version: 0.27.7(typescript@5.6.3)
-      typedoc-plugin-frontmatter:
-        specifier: 1.2.1
-        version: 1.2.1(typedoc-plugin-markdown@4.4.2(typedoc@0.27.7(typescript@5.6.3)))
       typedoc-plugin-markdown:
         specifier: 4.4.2
         version: 4.4.2(typedoc@0.27.7(typescript@5.6.3))
+      typedoc-plugin-replace-text:
+        specifier: 4.1.0
+        version: 4.1.0(typedoc@0.27.7(typescript@5.6.3))
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -14209,16 +14209,16 @@ packages:
     resolution: {integrity: sha512-q7QNVDGTdl702bVFiI5eY4l/HkgCM6at9KhcFbgUAzezHFbOVy4+0O/lCjsABEQwbZPravVfBIiBVGo89yzHFg==}
     engines: {node: '>= 0.4'}
 
-  typedoc-plugin-frontmatter@1.2.1:
-    resolution: {integrity: sha512-TKiOOQCxC1uUYldokAegap2oAtDy9QpsUoVDRohcB6Dm45T91qMgkWqHVS8qbCpDc4SJoGqmGTULGfrqeRqXtA==}
-    peerDependencies:
-      typedoc-plugin-markdown: '>=4.4.2'
-
   typedoc-plugin-markdown@4.4.2:
     resolution: {integrity: sha512-kJVkU2Wd+AXQpyL6DlYXXRrfNrHrEIUgiABWH8Z+2Lz5Sq6an4dQ/hfvP75bbokjNDUskOdFlEEm/0fSVyC7eg==}
     engines: {node: '>= 18'}
     peerDependencies:
       typedoc: 0.27.x
+
+  typedoc-plugin-replace-text@4.1.0:
+    resolution: {integrity: sha512-t/vOiGzhcK+8oVQRt6kJ19RKFN5zwQlDiXyx2eWywG7xHt0lSUcfttroGwNLIBnNEd2rLAwe5YVPhSjVoYHBag==}
+    peerDependencies:
+      typedoc: 0.26.x || 0.27.x
 
   typedoc@0.27.7:
     resolution: {integrity: sha512-K/JaUPX18+61W3VXek1cWC5gwmuLvYTOXJzBvD9W7jFvbPnefRnCHQCEPw7MSNrP/Hj7JJrhZtDDLKdcYm6ucg==}
@@ -32501,12 +32501,11 @@ snapshots:
       typed-array-buffer: 1.0.3
       typed-array-byte-offset: 1.0.4
 
-  typedoc-plugin-frontmatter@1.2.1(typedoc-plugin-markdown@4.4.2(typedoc@0.27.7(typescript@5.6.3))):
-    dependencies:
-      typedoc-plugin-markdown: 4.4.2(typedoc@0.27.7(typescript@5.6.3))
-      yaml: 2.7.0
-
   typedoc-plugin-markdown@4.4.2(typedoc@0.27.7(typescript@5.6.3)):
+    dependencies:
+      typedoc: 0.27.7(typescript@5.6.3)
+
+  typedoc-plugin-replace-text@4.1.0(typedoc@0.27.7(typescript@5.6.3)):
     dependencies:
       typedoc: 0.27.7(typescript@5.6.3)
 

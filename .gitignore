@@ -95,5 +95,5 @@ scripts/.env
 !scripts/.env.example
 
 # typedoc
-.typedoc
-!.typedoc/custom-theme.mjs
+.typedoc/docs
+.typedoc/docs.json

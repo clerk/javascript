@@ -43,13 +43,28 @@ const typedocPluginMarkdownOptions = {
   excludeScopesInPaths: true,
 };
 
-const frontmatterTags = ['description', 'title'];
-const frontmatterBlockTags = frontmatterTags.map(tag => `@${tag}`);
-
-/** @type {Partial<import("typedoc-plugin-frontmatter").PluginOptions>} */
-const typedocPluginFrontmatterOptions = {
-  frontmatterCommentTags: frontmatterTags,
-  preserveFrontmatterCommentTags: false,
+/** @type {Partial<import("typedoc-plugin-replace-text").Config>} */
+const typedocPluginReplaceTextOptions = {
+  replaceText: {
+    replacements: [
+      {
+        /**
+         * Inside our JSDoc comments we have absolute links to our docs, e.g. [Foo](https://clerk.com/docs/bar).
+         * We want to replace these with relative links, e.g. [Foo](/docs/bar).
+         */
+        pattern: /https:\/\/clerk\.com\/docs/,
+        replace: '/docs',
+        flags: 'g',
+      },
+      {
+        /**
+         * Sometimes we need to add ```empty``` to an @example so that it's properly rendered (but we don't want to show a codeblock). This removes these placeholders.
+         */
+        pattern: /```empty```/,
+        replace: '',
+      },
+    ],
+  },
 };
 
 /** @type {Partial<import("typedoc").TypeDocOptions>} */
@@ -58,8 +73,8 @@ const config = {
   json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
   plugin: [
+    'typedoc-plugin-replace-text',
     'typedoc-plugin-markdown',
-    'typedoc-plugin-frontmatter',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
   ],
@@ -74,16 +89,16 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags, ...frontmatterBlockTags, '@warning', '@note', '@important', '@memberof'],
+    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important', '@memberof'],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,
     disableSources: true,
+    ...typedocPluginReplaceTextOptions,
   },
   entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
   ...typedocPluginMarkdownOptions,
-  ...typedocPluginFrontmatterOptions,
 };
 
 export default config;

@@ -3,10 +3,10 @@ import type { LoadedClerk } from '@clerk/types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 
 /**
- * The `useClerk()` hook provides access to the [`Clerk`](https://clerk.com/docs/references/javascript/clerk/clerk) object, allowing you to build alternatives to any Clerk Component.
+ * > [!WARNING]
+ * > This composable should only be used for advanced use cases, such as building a completely custom OAuth flow or as an escape hatch to access to the `Clerk` object.
  *
- * @warning
- * This composable should only be used for advanced use cases, such as building a completely custom OAuth flow or as an escape hatch to access to the `Clerk` object.
+ * The `useClerk()` hook provides access to the [`Clerk`](https://clerk.com/docs/references/javascript/clerk/clerk) object, allowing you to build alternatives to any Clerk Component.
  *
  * @returns The `Clerk` object, which includes all the methods and properties listed in the [`Clerk` reference](https://clerk.com/docs/references/javascript/clerk/clerk).
  *
