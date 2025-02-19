@@ -57,7 +57,7 @@ export function eventPrebuiltComponentMounted(
 }
 
 /**
- * Helper function for `telemetry.record()`. Create a consistent event object for when a prebuilt (AIO) component is mounted.
+ * Helper function for `telemetry.record()`. Create a consistent event object for when a prebuilt (AIO) component is opened as a modal.
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
