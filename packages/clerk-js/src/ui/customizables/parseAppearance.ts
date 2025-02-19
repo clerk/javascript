@@ -46,7 +46,7 @@ const defaultLayout: ParsedLayout = {
   unsafe_disableDevelopmentModeWarnings: false,
   captchaTheme: 'light',
   captchaSize: 'normal',
-  captchaLanguage: 'en-US',
+  captchaLanguage: '',
 };
 
 /**
