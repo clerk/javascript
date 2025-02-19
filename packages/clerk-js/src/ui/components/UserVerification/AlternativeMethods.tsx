@@ -34,7 +34,6 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
     supportedFirstFactors: data?.supportedFirstFactors,
   });
 
-  console.log('currentFactor -fa', firstPartyFactors);
 
   return (
     <Flow.Part part={'alternativeMethods'}>
