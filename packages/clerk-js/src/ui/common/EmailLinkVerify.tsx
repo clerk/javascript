@@ -46,6 +46,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         (err.code === EmailLinkErrorCodeStatus.Expired || err.code === EmailLinkErrorCodeStatus.ClientMismatch)
       ) {
         setVerificationStatus(err.code);
+        return;
       }
 
       setVerificationStatus(EmailLinkErrorCodeStatus.Failed);
