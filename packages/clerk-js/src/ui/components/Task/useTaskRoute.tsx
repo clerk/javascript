@@ -6,7 +6,7 @@ import { sessionTaskRoutePaths } from '../../common/tasks';
 import { Task } from './Task';
 
 /**
- * Maps a session task key to routing props and content
+ * Maps a task key to routing props and content
  * @internal
  */
 export function useTaskRoute(): ComponentProps<typeof Route> | null {

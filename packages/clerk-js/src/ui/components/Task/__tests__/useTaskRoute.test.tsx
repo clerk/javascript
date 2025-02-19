@@ -1,16 +1,48 @@
 import { render, waitFor } from '../../../../testUtils';
-import { createFakeUserOrganizationMembership } from '../../../../ui/components/OrganizationSwitcher/__tests__/utlis';
+import { HashRouter, Route, Switch } from '../../../../ui/router';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { Task } from '../Task';
+import { createFakeUserOrganizationMembership } from '../../OrganizationSwitcher/__tests__/utlis';
+import { useTaskRoute } from '../useTaskRoute';
 
-describe('Task', () => {
+const oldWindowLocation = window.location;
+const setWindowOrigin = (origin: string) => {
+  // @ts-ignore
+  delete window.location;
+  // the URL interface is very similar to window.location
+  // we use it to easily mock the location methods in tests
+  (window.location as any) = new URL(origin);
+};
+
+const MockRoute = (): JSX.Element => {
+  const taskRoute = useTaskRoute();
+
+  return (
+    <HashRouter>
+      <Switch>
+        <Route path={taskRoute?.path}>{taskRoute?.children}</Route>
+      </Switch>
+    </HashRouter>
+  );
+};
+
+describe('useTaskRoute', () => {
   describe.each(['SignIn', 'SignUp'] satisfies Array<Parameters<typeof bindCreateFixtures>[0]>)(
     'after %s flow',
     flow => {
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
+
+      afterAll(() => {
+        window.location = oldWindowLocation;
+      });
+
       const { createFixtures } = bindCreateFixtures(flow);
 
       describe('with task', () => {
         it('renders the component', async () => {
+          setWindowOrigin('http://dashboard.example.com/#/select-organization');
+
           const { wrapper, fixtures } = await createFixtures(f => {
             f.withOrganizations();
             f.withUser({
@@ -43,7 +75,7 @@ describe('Task', () => {
             }),
           );
 
-          const { queryByRole } = render(<Task />, { wrapper });
+          const { queryByRole } = render(<MockRoute />, { wrapper });
           await waitFor(() => {
             expect(queryByRole('heading', { name: /choose an organization/i })).toBeInTheDocument();
           });
@@ -52,6 +84,8 @@ describe('Task', () => {
 
       describe('without task', () => {
         it('does not render the component', async () => {
+          setWindowOrigin('http://dashboard.example.com/#/select-organization');
+
           const { wrapper, fixtures } = await createFixtures(f => {
             f.withOrganizations();
             f.withUser({
@@ -83,7 +117,7 @@ describe('Task', () => {
             }),
           );
 
-          const { queryByRole } = render(<Task />, { wrapper });
+          const { queryByRole } = render(<MockRoute />, { wrapper });
           await waitFor(() => {
             expect(queryByRole('heading', { name: /choose an organization/i })).not.toBeInTheDocument();
           });
@@ -92,6 +126,8 @@ describe('Task', () => {
 
       describe('with invalid key', () => {
         it('does not render the component', async () => {
+          setWindowOrigin('http://dashboard.example.com/#/select-organization');
+
           const { wrapper, fixtures } = await createFixtures(f => {
             f.withOrganizations();
             f.withUser({
@@ -126,7 +162,7 @@ describe('Task', () => {
             }),
           );
 
-          const { queryByRole } = render(<Task />, { wrapper });
+          const { queryByRole } = render(<MockRoute />, { wrapper });
           await waitFor(() => {
             expect(queryByRole('heading', { name: /choose an organization/i })).not.toBeInTheDocument();
           });

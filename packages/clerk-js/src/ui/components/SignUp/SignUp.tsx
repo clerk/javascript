@@ -76,14 +76,7 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
-        {taskRoute && (
-          <Route
-            // todo - fix routing underlying issue, do not use index
-            // for some reason, a redirection to sign-in is happening even when `setActive` navigates to `select-organization`
-            {...taskRoute}
-            index
-          />
-        )}
+        {taskRoute && <Route {...taskRoute} />}
         <Route index>
           <SignUpStart />
         </Route>

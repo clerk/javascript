@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Display pending task on `SignIn` and `SignUp` components
+Display after-auth tasks on `SignIn` and `SignUp` components
