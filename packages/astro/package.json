@@ -37,23 +37,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js"
+      "default": "./dist/react/index.js"
     },
     "./client": {
       "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.js"
+      "default": "./dist/client/index.js"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
-      "import": "./dist/internal/index.js"
+      "default": "./dist/internal/index.js"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js"
+      "default": "./dist/server/index.js"
     },
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",

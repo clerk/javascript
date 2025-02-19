@@ -28,19 +28,19 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./ssr.server": {
       "types": "./dist/ssr/index.d.ts",
-      "import": "./dist/ssr/index.js"
+      "default": "./dist/ssr/index.js"
     },
     "./api.server": {
       "types": "./dist/api/index.d.ts",
-      "import": "./dist/api/index.js"
+      "default": "./dist/api/index.js"
     },
     "./errors": {
       "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.js"
+      "default": "./dist/errors.js"
     }
   },
   "main": "dist/index.js",

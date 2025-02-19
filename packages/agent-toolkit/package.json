@@ -19,11 +19,11 @@
   "exports": {
     "./langchain": {
       "types": "./dist/langchain/index.d.ts",
-      "import": "./dist/langchain/index.js"
+      "default": "./dist/langchain/index.js"
     },
     "./ai-sdk": {
       "types": "./dist/ai-sdk/index.d.ts",
-      "import": "./dist/ai-sdk/index.js"
+      "default": "./dist/ai-sdk/index.js"
     }
   },
   "files": [
