@@ -33,6 +33,19 @@ export const setupClerkTestingToken = (params?: SetupClerkTestingTokenParams) =>
     if (testingToken) {
       req.query[TESTING_TOKEN_PARAM] = testingToken;
     }
+
     req.continue();
+
+    req.on('response', res => {
+      // Override captcha_bypass in /v1/client
+      if (res.body?.response?.captcha_bypass === false) {
+        res.body.response.captcha_bypass = true;
+      }
+
+      // Override captcha_bypass in piggybacking
+      if (res.body?.client?.captcha_bypass === false) {
+        res.body.client.captcha_bypass = true;
+      }
+    });
   });
 };

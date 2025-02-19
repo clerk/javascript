@@ -1,5 +1,4 @@
 import type {
-  ActiveSessionResource,
   ActJWTClaim,
   Clerk,
   ClerkOptions,
@@ -9,6 +8,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
+  SignedInSessionResource,
   UserResource,
   Without,
 } from '@clerk/types';
@@ -26,7 +26,7 @@ export interface VueClerkInjectionKeyType {
     orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
   }>;
   clientCtx: ComputedRef<ClientResource | null | undefined>;
-  sessionCtx: ComputedRef<ActiveSessionResource | null | undefined>;
+  sessionCtx: ComputedRef<SignedInSessionResource | null | undefined>;
   userCtx: ComputedRef<UserResource | null | undefined>;
   organizationCtx: ComputedRef<OrganizationResource | null | undefined>;
 }

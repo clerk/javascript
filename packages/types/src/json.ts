@@ -12,7 +12,7 @@ import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './org
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
-import type { SessionStatus } from './session';
+import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
@@ -76,29 +76,6 @@ export interface ClientJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-// export type ClientJSON = ClerkResourceJSON & {
-//   object: 'client';
-//   id: string;
-//   status: any;
-//   sessions: SessionJSON[];
-//   sign_up: SignUpJSON | null;
-//   sign_in: SignInJSON | null;
-//   last_active_session_id: string | null;
-//   cookie_expires_at: number | null;
-//   created_at: number;
-//   updated_at: number;
-// } | {
-//   object: 'client';
-//   id: null;
-//   status: null;
-//   sessions: null
-//   sign_up: null
-//   sign_in: null
-//   last_active_session_id: null
-//   cookie_expires_at: null
-//   created_at: null;
-//   updated_at: null;
-// }
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: 'sign_up';
@@ -133,13 +110,14 @@ export interface SessionJSON extends ClerkResourceJSON {
    * This API is experimental and may change at any moment.
    * @experimental
    */
-  factor_verification_age: [fistFactorAge: number, secondFactorAge: number] | null;
+  factor_verification_age: [firstFactorAge: number, secondFactorAge: number] | null;
   expire_at: number;
   abandon_at: number;
   last_active_at: number;
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
   actor: ActJWTClaim | null;
+  tasks: Array<SessionTask> | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;
