@@ -76,7 +76,7 @@
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
     "lint": "eslint src env.d.ts",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
     "publish:local": "pnpm yalc push --replace --sig"
   },

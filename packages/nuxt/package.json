@@ -56,7 +56,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+    "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run",

@@ -44,7 +44,7 @@
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4000 --env sandbox=1",
     "lint": "eslint src",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
