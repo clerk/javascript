@@ -9,6 +9,18 @@ const isUnauthorized =
   (typeof Astro.props.condition === "function" &&
     !Astro.props.condition(has)) ||
   ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+  
+const hasProtectFallback = Astro.slots.has('protect-fallback');
 ---
 
-{isUnauthorized ? <slot name="fallback" /> : <slot />}
+{
+  isUnauthorized ? (
+    hasProtectFallback ? (
+      <slot name="protect-fallback" />
+    ) : (
+      <slot name="fallback" />
+    )
+  ) : (
+    <slot />
+  )
+}
