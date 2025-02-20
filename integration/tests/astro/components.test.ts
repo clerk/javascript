@@ -485,15 +485,11 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   test('server islands protect component shows correct states', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    // Initial visit - should show loading state
     await u.page.goToRelative('/server-islands');
-
-    // Initial visit - wait for loading state to appear and then disappear
-    await u.page.getByText('Loading').waitFor({ state: 'visible' });
-    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
-
-    // Wait for next state to be ready
-    await u.page.getByText('Not an admin').waitFor({ state: 'visible' });
+    // The loading slot for server islands will appear very quickly.
+    // Wait for next state (default slot) to be ready
+    await expect(u.page.getByText('Loading')).toBeHidden();
+    await expect(u.page.getByText('Not an admin')).toBeVisible();
 
     // Sign in as admin user
     await u.page.goToRelative('/sign-in');
@@ -506,14 +502,9 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-    // Visit page again - loading state should still show first
+    // Visit page again
     await u.page.goToRelative('/server-islands');
-
-    // Initial visit - wait for loading state to appear and then disappear
-    await u.page.getByText('Loading').waitFor({ state: 'visible' });
-    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
-
-    // Wait for loading to disappear before checking authorized state
-    await u.page.getByText("I'm an admin").waitFor({ state: 'visible' });
+    await expect(u.page.getByText('Loading')).toBeHidden();
+    await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
 });
