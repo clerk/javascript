@@ -1,7 +1,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
 export const ugUg: LocalizationResource = {
-  locale: 'ug-CN',
+  locale: 'ug-Ug',
   backButton: 'قايتىش',
   badge__default: 'كۆڭۈلدىكى',
   badge__otherImpersonatorDevice: 'باشقا ماسكۇرلاشقۇچى قۇرال',
