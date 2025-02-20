@@ -59,7 +59,7 @@ interface RenderOptions {
    */
   appearance?: 'always' | 'execute' | 'interaction-only';
   /**
-   * A customer value that can be used to differentiate widgets under the same sitekey
+   * A custom value that can be used to differentiate widgets under the same sitekey
    * in analytics and which is returned upon validation. This can only contain up to
    * 32 alphanumeric characters including _ and -.
    */
