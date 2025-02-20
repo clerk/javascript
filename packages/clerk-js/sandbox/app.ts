@@ -125,8 +125,66 @@ function addCurrentRouteIndicator(currentRoute: string) {
   link.setAttribute('aria-current', 'page');
 }
 
+function appearanceVariableOptions() {
+  assertClerkIsLoaded(Clerk);
+
+  const colorInputIds = [
+    'colorPrimary',
+    'colorNeutral',
+    'colorBackground',
+    'colorTextOnPrimaryBackground',
+    'colorDanger',
+    'colorSuccess',
+    'colorWarning',
+    'colorText',
+    'colorTextSecondary',
+    'colorInputText',
+    'colorInputBackground',
+    'colorShimmer',
+  ] as const;
+
+  const colorInputs = colorInputIds.reduce(
+    (acc, id) => {
+      const element = document.getElementById(id) as HTMLInputElement | null;
+      if (!element) {
+        throw new Error(`Could not find input element with id: ${id}`);
+      }
+      acc[id] = element;
+      return acc;
+    },
+    {} as Record<(typeof colorInputIds)[number], HTMLInputElement>,
+  );
+
+  Object.entries(colorInputs).forEach(([key, input]) => {
+    const savedColor = sessionStorage.getItem(key);
+    if (savedColor) {
+      input.value = savedColor;
+    }
+  });
+
+  const renderColors = () => {
+    Clerk.__unstable__updateProps({
+      appearance: {
+        variables: Object.fromEntries(
+          Object.entries(colorInputs).map(([key, input]) => {
+            sessionStorage.setItem(key, input.value);
+            return [key, input.value];
+          }),
+        ),
+      },
+    });
+  };
+
+  Object.values(colorInputs).forEach(input => {
+    input.addEventListener('change', renderColors);
+  });
+
+  return { renderColors };
+}
+
 (async () => {
   assertClerkIsLoaded(Clerk);
+  const { renderColors } = appearanceVariableOptions();
 
   const routes = {
     '/': () => {
@@ -185,6 +243,7 @@ function addCurrentRouteIndicator(currentRoute: string) {
       signUpUrl: '/sign-up',
     });
     renderCurrentRoute();
+    renderColors();
   } else {
     console.error(`Unknown route: "${route}".`);
   }
