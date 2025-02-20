@@ -128,7 +128,9 @@ function addCurrentRouteIndicator(currentRoute: string) {
 function appearanceVariableOptions() {
   assertClerkIsLoaded(Clerk);
 
-  const colorInputIds = [
+  const resetVariablesBtn = document.getElementById('resetVariablesBtn');
+
+  const variableInputIds = [
     'colorPrimary',
     'colorNeutral',
     'colorBackground',
@@ -141,9 +143,11 @@ function appearanceVariableOptions() {
     'colorInputText',
     'colorInputBackground',
     'colorShimmer',
+    'spacingUnit',
+    'borderRadius',
   ] as const;
 
-  const colorInputs = colorInputIds.reduce(
+  const variableInputs = variableInputIds.reduce(
     (acc, id) => {
       const element = document.getElementById(id) as HTMLInputElement | null;
       if (!element) {
@@ -152,21 +156,21 @@ function appearanceVariableOptions() {
       acc[id] = element;
       return acc;
     },
-    {} as Record<(typeof colorInputIds)[number], HTMLInputElement>,
+    {} as Record<(typeof variableInputIds)[number], HTMLInputElement>,
   );
 
-  Object.entries(colorInputs).forEach(([key, input]) => {
+  Object.entries(variableInputs).forEach(([key, input]) => {
     const savedColor = sessionStorage.getItem(key);
     if (savedColor) {
       input.value = savedColor;
     }
   });
 
-  const renderColors = () => {
+  const updateVariables = () => {
     Clerk.__unstable__updateProps({
       appearance: {
         variables: Object.fromEntries(
-          Object.entries(colorInputs).map(([key, input]) => {
+          Object.entries(variableInputs).map(([key, input]) => {
             sessionStorage.setItem(key, input.value);
             return [key, input.value];
           }),
@@ -175,16 +179,23 @@ function appearanceVariableOptions() {
     });
   };
 
-  Object.values(colorInputs).forEach(input => {
-    input.addEventListener('change', renderColors);
+  Object.values(variableInputs).forEach(input => {
+    input.addEventListener('change', updateVariables);
   });
 
-  return { renderColors };
+  resetVariablesBtn?.addEventListener('click', () => {
+    Object.values(variableInputs).forEach(input => {
+      input.value = input.defaultValue;
+    });
+    updateVariables();
+  });
+
+  return { updateVariables };
 }
 
 (async () => {
   assertClerkIsLoaded(Clerk);
-  const { renderColors } = appearanceVariableOptions();
+  const { updateVariables } = appearanceVariableOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
   document.addEventListener('keydown', e => {
@@ -250,7 +261,7 @@ function appearanceVariableOptions() {
       signUpUrl: '/sign-up',
     });
     renderCurrentRoute();
-    renderColors();
+    updateVariables();
   } else {
     console.error(`Unknown route: "${route}".`);
   }

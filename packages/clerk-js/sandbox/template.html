@@ -277,7 +277,15 @@
       class="fixed inset-y-0 right-0 w-72 overflow-y-auto border-l border-gray-100 bg-white px-2 py-4 max-lg:hidden"
     >
       <fieldset>
-        <legend class="block pb-2 text-sm">Colors</legend>
+        <div class="mb-2 flex items-center justify-between">
+          <legend class="block text-sm">Variables</legend>
+          <button
+            id="resetVariablesBtn"
+            class="text-sm"
+          >
+            Reset
+          </button>
+        </div>
         <label class="flex items-center justify-between border-t border-gray-100 py-2">
           <span class="font-mono text-xs">colorPrimary</span>
           <input
@@ -372,6 +380,24 @@
             type="color"
             id="colorShimmer"
             value="#ffffff"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">spacingUnit</span>
+          <input
+            type="text"
+            id="spacingUnit"
+            value="1rem"
+            class="text-sm outline-none [field-sizing:content]"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">borderRadius</span>
+          <input
+            type="text"
+            id="borderRadius"
+            value="0.375rem"
+            class="text-sm outline-none [field-sizing:content]"
           />
         </label>
       </fieldset>
