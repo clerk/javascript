@@ -1,5 +1,5 @@
 import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { UserProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
@@ -35,7 +35,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
       <UserProfileNavbar contentRef={contentRef}>
         <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('userProfile.navbar.title')} />
         <ProfileCard.Content contentRef={contentRef}>
-          <UserProfileRoutes />
+          {/*This can be a generic skeleton for any page*/}
+          <Suspense fallback={'loading'}>
+            <UserProfileRoutes />
+          </Suspense>
         </ProfileCard.Content>
       </UserProfileNavbar>
     </ProfileCard.Root>

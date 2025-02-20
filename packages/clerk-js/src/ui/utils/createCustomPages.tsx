@@ -242,6 +242,14 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       icon: TickShield,
       path: 'security',
     },
+    {
+      name: 'Lazy Page',
+      id: 'lpage',
+      icon: TickShield,
+      path: 'lazy-page',
+      // TODO(lazy): Uncomment if you want to wait for the page to load and then navigate to it.
+      // preload: () => import('../components/UserProfile/lazy/test').then(m => ({ default: m.LazyTest })),
+    },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {

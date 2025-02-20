@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Heading, Icon, Span, Text, useLocalizations } from '../customizables';
@@ -32,6 +32,7 @@ export type NavbarRoute = {
   id: string;
   icon: React.ComponentType;
   path: string;
+  preload?: () => Promise<any>;
   external?: boolean;
 };
 type NavBarProps = {
@@ -48,12 +49,24 @@ export const NavBar = (props: NavBarProps) => {
   const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const router = useRouter();
+  const lastNavigationRef = useRef<NavbarRoute | undefined>(undefined);
 
   const handleNavigate = (route: NavbarRoute) => {
     if (route?.external) {
       return () => navigate(route.path);
     } else {
-      return () => navigateToInternalRoute(route);
+      return async () => {
+        lastNavigationRef.current = route;
+        if (route.preload) {
+          await route.preload();
+        }
+        // By the time preload has resolved another navigation attempt could have happened.
+        if (lastNavigationRef.current?.path === route.path) {
+          return navigateToInternalRoute(route);
+        }
+        //no op
+        return;
+      };
     }
   };
 
