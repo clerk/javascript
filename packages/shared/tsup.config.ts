@@ -56,7 +56,7 @@ export const WebWorkerMinifyPlugin: Plugin = {
 const preserveImportMetaPlugin: Plugin = {
   name: 'preserve-import-meta',
   setup(build) {
-    build.onEnd(async result => {
+    build.onEnd(result => {
       if (!result.outputFiles) return;
 
       result.outputFiles.forEach(file => {
