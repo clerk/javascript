@@ -122,6 +122,7 @@
   "scripts": {
     "build": "tsup",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
