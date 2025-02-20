@@ -25,7 +25,7 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     dts: true,
     external: ['react', 'react-dom'],
-    esbuildPlugins: [WebWorkerMinifyPlugin as any, preserveImportMetaPlugin],
+    esbuildPlugins: [WebWorkerMinifyPlugin as any, PreserveImportMetaPlugin],
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -53,8 +53,8 @@ export const WebWorkerMinifyPlugin: Plugin = {
  * Preserves import.meta functionality in ESM builds while maintaining ES5 compatibility.
  * We originally used target: 'es2020' to handle this but it broke support for older browsers (e.g. iOS 12).
  */
-const preserveImportMetaPlugin: Plugin = {
-  name: 'preserve-import-meta',
+const PreserveImportMetaPlugin: Plugin = {
+  name: 'PreserveImportMetaPlugin',
   setup(build) {
     build.onEnd(result => {
       if (!result.outputFiles) return;
