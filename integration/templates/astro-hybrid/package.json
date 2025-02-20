@@ -13,7 +13,6 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/node": "^8.3.4",
     "@astrojs/react": "^3.6.2",
-    "@clerk/astro": "2.3.0-snapshot.v20250220200839",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "astro": "^4.15.11",

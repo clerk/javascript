@@ -10,7 +10,7 @@ const astroNode = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  // .addDependency('@clerk/astro', linkPackage('astro'))
+  .addDependency('@clerk/astro', linkPackage('astro'))
   .addDependency('@clerk/types', linkPackage('types'))
   .addDependency('@clerk/localizations', linkPackage('localizations'));
 
