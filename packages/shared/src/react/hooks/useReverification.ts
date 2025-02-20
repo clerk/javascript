@@ -46,6 +46,7 @@ type UseReverificationOptions = {
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
+  closeUIComponent: Clerk['__internal_closeReverification'];
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -98,6 +99,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
           }
 
           return null;
+        } finally {
+          params.closeUIComponent?.();
         }
 
         /**
@@ -184,13 +187,14 @@ function useReverification<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
-  const { __internal_openReverification } = useClerk();
+  const { __internal_openReverification, __internal_closeReverification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
       openUIComponent: __internal_openReverification,
+      closeUIComponent: __internal_closeReverification,
       ...optionsRef.current,
     })(fetcherRef.current);
     return [handler] as const;
