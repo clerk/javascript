@@ -36,3 +36,4 @@ export { huHU } from './hu-HU';
 export { isIS } from './is-IS';
 export { hrHR } from './hr-HR';
 export { idID } from './id-ID';
+export { ugCN } from './ug-Ug';
