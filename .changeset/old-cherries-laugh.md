@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Display after-auth tasks on `SignIn` and `SignUp` components
+Navigate to after-auth tasks

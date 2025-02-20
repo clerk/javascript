@@ -43,9 +43,9 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
+  RedirectToTasksUrlOptions,
   Resources,
   SDKMetadata,
-  SessionTask,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -891,6 +891,12 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
+    // todo - handle the transition on token poller
+    const hasNewTask = newSession && !!newSession?.tasks;
+    if (hasNewTask && newSession) {
+      eventBus.dispatch(events.NewSessionTask, newSession);
+    }
+
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
@@ -932,11 +938,6 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    const hasNewTask = newSession && !!newSession?.tasks;
-    if (hasNewTask && newSession) {
-      eventBus.dispatch(events.NewSessionTask, newSession);
-    }
-
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
@@ -953,8 +954,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    // todo -> how to handle navigation to after sign-in?
-    if (redirectUrl && !beforeEmit) {
+    if (redirectUrl && !beforeEmit && !hasNewTask) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1045,7 +1045,6 @@ export class Clerk implements ClerkInterface {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
       windowNavigate,
     };
-    console.log(stripOrigin(toURL));
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
   };
@@ -1123,7 +1122,8 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public buildTasksUrl({ task, origin }: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string {
+  // todo(fix sign up navigation)
+  public buildTasksUrl({ task, origin }: RedirectToTasksUrlOptions): string {
     if (!task) {
       return '';
     }
@@ -1258,9 +1258,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTask = async (...options: Parameters<typeof this.buildTasksUrl>): Promise<unknown> => {
+  public redirectToTasks = async (options: RedirectToTasksUrlOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl(...options));
+      return this.navigate(this.buildTasksUrl(options));
     }
     return;
   };
@@ -2109,7 +2109,7 @@ export class Clerk implements ClerkInterface {
 
     eventBus.on(events.NewSessionTask, session => {
       console.log('new task 🍪');
-      void this.redirectToTask({ task: session.currentTask });
+      void this.redirectToTasks({ task: session.currentTask });
     });
   };
 

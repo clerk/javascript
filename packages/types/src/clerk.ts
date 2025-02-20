@@ -877,6 +877,11 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+export type RedirectToTasksUrlOptions = {
+  task?: SessionTask;
+  origin?: 'SignIn' | 'SignUp';
+};
+
 export type SetActiveParams = {
   /**
    * The session resource or session id (string version) to be set on the client.
