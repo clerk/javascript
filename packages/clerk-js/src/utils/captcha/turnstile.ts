@@ -61,6 +61,7 @@ interface RenderOptions {
   /**
    * The widget theme. Can take the following values: light, dark, auto.
    * The default is auto, which respects the user preference. This can be forced to light or dark by setting the theme accordingly.
+   * @default 'auto'
    */
   theme?: Layout['captchaTheme'];
   /**
