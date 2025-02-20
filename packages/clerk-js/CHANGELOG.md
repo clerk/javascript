@@ -1,5 +1,43 @@
 # Change Log
 
+## 5.54.0
+
+### Minor Changes
+
+- - Initialize new `pending` session status as an signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  - Deprecate `Clerk.client.activeSessions` in favor of `Clerk.client.signedInSessions`
+  - Introduce `Clerk.isSignedIn` property as an explicit signed-in state check, instead of `!!Clerk.session` or `!!Clerk.user`:
+
+  ```ts
+  - if (Clerk.user) {
+  + if (Clerk.isSignedIn) {
+    // Mount user button component
+    document.getElementById('signed-in').innerHTML = `
+      <div id="user-button"></div>
+    `
+
+    const userbuttonDiv = document.getElementById('user-button')
+
+    clerk.mountUserButton(userbuttonDiv)
+  }
+  ```
+
+### Patch Changes
+
+- Remove full width from OrgProfile members search input. ([#5126](https://github.com/clerk/javascript/pull/5126)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Bug fix: Broadcast a sign out event to all opened tabs when `Clerk.signOut()` or `User.delete()` is called. ([#5133](https://github.com/clerk/javascript/pull/5133)) by [@panteliselef](https://github.com/panteliselef)
+
+- Initialize `tasks` on `Session` resource ([#5170](https://github.com/clerk/javascript/pull/5170)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Pass the `action` property to Turnstile ([#5199](https://github.com/clerk/javascript/pull/5199)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a)]:
+  - @clerk/shared@2.23.0
+  - @clerk/types@4.47.0
+  - @clerk/localizations@3.10.8
+
 ## 5.53.0
 
 ### Minor Changes

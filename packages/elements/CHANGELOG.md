@@ -1,5 +1,18 @@
 # @clerk/elements
 
+## 0.23.0
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a)]:
+  - @clerk/shared@2.23.0
+  - @clerk/clerk-react@5.24.0
+  - @clerk/types@4.47.0
+
 ## 0.22.23
 
 ### Patch Changes

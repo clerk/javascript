@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.47.0
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Initialize `tasks` on `Session` resource ([#5170](https://github.com/clerk/javascript/pull/5170)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.46.1
 
 ### Patch Changes
