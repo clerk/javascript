@@ -374,11 +374,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-
     const onAfterSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
         ? window.__unstable__onAfterSetActive
@@ -417,8 +412,8 @@ export class Clerk implements ClerkInterface {
       await onAfterSetActive();
     };
 
-    await onBeforeSetActive();
-
+    // TODO: Investigate if this is needed
+    // await onBeforeSetActive();
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
