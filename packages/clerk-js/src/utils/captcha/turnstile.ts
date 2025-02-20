@@ -66,7 +66,7 @@ interface RenderOptions {
   theme?: Layout['captchaTheme'];
   /**
    * The widget size. Can take the following values: normal, flexible, compact.
-   * The default is normal.
+   * @default 'normal'
    */
   size?: Layout['captchaSize'];
   /**
