@@ -227,7 +227,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
                 // We set the min-height to the height of the Turnstile widget
                 // because the widget initially does a small layout shift
                 // and then expands to the correct height
-                visibleWidget.style.minHeight = '68px';
+                visibleWidget.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
