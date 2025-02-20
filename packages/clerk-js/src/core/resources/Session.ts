@@ -304,7 +304,7 @@ export class Session extends BaseResource implements SessionResource {
     });
   }
 
-  get hasTask() {
-    return (this.tasks ?? []).length > 0;
+  get currentTask(): SessionTask | undefined {
+    return (this.tasks ?? [])[0];
   }
 }

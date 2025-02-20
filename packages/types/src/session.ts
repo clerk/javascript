@@ -104,7 +104,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
   tasks: Array<SessionTask> | null;
-  hasTask: boolean;
+  currentTask?: SessionTask;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;

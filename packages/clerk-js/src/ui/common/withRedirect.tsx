@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { isSignedInAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -60,8 +60,11 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
     const signInCtx = useSignInContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) =>
+        clerk.session?.currentTask
+          ? clerk.buildTasksUrl({ task: clerk.session?.currentTask, origin: 'SignIn' })
+          : signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
       warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
@@ -79,8 +82,11 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     const signUpCtx = useSignUpContext();
     return withRedirect(
       Component,
-      sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
+      isSignedInAndSingleSessionModeEnabled,
+      ({ clerk }) =>
+        clerk.session?.currentTask
+          ? clerk.buildTasksUrl({ task: clerk.session?.currentTask, origin: 'SignUp' })
+          : signUpCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
       warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
@@ -93,7 +99,7 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
 export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
   withRedirect(
     Component,
-    sessionExistsAndSingleSessionModeEnabled,
+    isSignedInAndSingleSessionModeEnabled,
     ({ environment }) => environment.displayConfig.homeUrl,
     warnings.cannotRenderComponentWhenSessionExists,
   );

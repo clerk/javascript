@@ -45,6 +45,7 @@ import type {
   RedirectOptions,
   Resources,
   SDKMetadata,
+  SessionTask,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -66,6 +67,7 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { sessionTaskRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -89,11 +91,11 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
   noUserExists,
   removeClerkQueryParam,
   requiresUserInput,
-  sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
   windowNavigate,
 } from '../utils';
@@ -427,7 +429,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -481,7 +483,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -930,6 +932,11 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
+    const hasNewTask = newSession && !!newSession?.tasks;
+    if (hasNewTask && newSession) {
+      eventBus.dispatch(events.NewSessionTask, newSession);
+    }
+
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
@@ -946,6 +953,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
+    // todo -> how to handle navigation to after sign-in?
     if (redirectUrl && !beforeEmit) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
@@ -1037,6 +1045,7 @@ export class Clerk implements ClerkInterface {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
       windowNavigate,
     };
+    console.log(stripOrigin(toURL));
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
   };
@@ -1114,13 +1123,18 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public buildTasksUrl(options?: { initialValues?: Record<string, string> }): string {
-    if (!this.environment) {
+  public buildTasksUrl({ task, origin }: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string {
+    if (!task) {
       return '';
     }
-    const taskUrl = this.#options['tasksUrl'];
-    const initValues = new URLSearchParams(options?.initialValues || {});
-    return buildURL({ base: taskUrl, hashSearchParams: [initValues] }, { stringify: true });
+
+    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+
+    const originWithDefault = origin ?? (referrerIsSignUpUrl ? 'SignUp' : 'SignIn');
+    const defaultUrlByOrigin = originWithDefault === 'SignIn' ? this.#options.signInUrl : this.#options.signUpUrl;
+
+    return buildURL({ base: `${defaultUrlByOrigin}/${sessionTaskRoutePaths[task.key]}` }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1240,6 +1254,13 @@ export class Clerk implements ClerkInterface {
   public redirectToWaitlist = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildWaitlistUrl());
+    }
+    return;
+  };
+
+  public redirectToTask = async (...options: Parameters<typeof this.buildTasksUrl>): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildTasksUrl(...options));
     }
     return;
   };
@@ -2084,6 +2105,11 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
+
+    eventBus.on(events.NewSessionTask, session => {
+      console.log('new task 🍪');
+      void this.redirectToTask({ task: session.currentTask });
     });
   };
 

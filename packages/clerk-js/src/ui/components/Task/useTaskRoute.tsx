@@ -12,7 +12,7 @@ import { Task } from './Task';
 export function useTaskRoute(): ComponentProps<typeof Route> | null {
   const session = useSessionContext();
 
-  if (!session?.hasTask) {
+  if (!session?.currentTask) {
     return null;
   }
 
