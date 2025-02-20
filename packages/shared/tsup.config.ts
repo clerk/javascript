@@ -24,9 +24,8 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     dts: true,
-    target: 'es2020',
     external: ['react', 'react-dom'],
-    esbuildPlugins: [WebWorkerMinifyPlugin as any],
+    esbuildPlugins: [WebWorkerMinifyPlugin as any, preserveImportMetaPlugin],
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -46,6 +45,31 @@ export const WebWorkerMinifyPlugin: Plugin = {
       const f = await readFile(args.path);
       const js = await esbuild.transform(f, { loader: 'ts', minify: true });
       return { loader: 'text', contents: js.code };
+    });
+  },
+};
+
+/**
+ * Preserves import.meta functionality in ESM builds while maintaining ES5 compatibility.
+ * We originally used target: 'es2020' to handle this but it broke support for older browsers (e.g. iOS 12).
+ */
+const preserveImportMetaPlugin: Plugin = {
+  name: 'preserve-import-meta',
+  setup(build) {
+    build.onEnd(async result => {
+      if (!result.outputFiles) return;
+
+      result.outputFiles.forEach(file => {
+        if (!file.path.endsWith('.mjs')) return;
+
+        const contents = file.contents;
+        const text = new TextDecoder().decode(contents);
+
+        // Remove esbuild's var import_meta = {} transformation and restore original import.meta references
+        const modified = text.replace(/var\s+import_meta\s*=\s*{};/g, '').replace(/import_meta/g, 'import.meta');
+
+        file.contents = new TextEncoder().encode(modified);
+      });
     });
   },
 };
