@@ -78,7 +78,7 @@ type DeleteOrganizationMembershipParams = {
 
 type CreateOrganizationInvitationParams = {
   organizationId: string;
-  inviterUserId: string;
+  inviterUserId?: string;
   emailAddress: string;
   role: OrganizationMembershipRole;
   redirectUrl?: string;
