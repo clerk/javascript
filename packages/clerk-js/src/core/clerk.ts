@@ -1114,6 +1114,15 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
+  public buildTasksUrl(options?: { initialValues?: Record<string, string> }): string {
+    if (!this.environment) {
+      return '';
+    }
+    const taskUrl = this.#options['tasksUrl'];
+    const initValues = new URLSearchParams(options?.initialValues || {});
+    return buildURL({ base: taskUrl, hashSearchParams: [initValues] }, { stringify: true });
+  }
+
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
       return this.buildUrlWithAuth(

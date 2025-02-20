@@ -477,6 +477,11 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
+   * Returns the url where a custom task page is rendered.
+   */
+  buildTasksUrl(opts?: { initialValues?: Record<string, string> }): string;
+
+  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -765,6 +770,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
     sdkMetadata?: SDKMetadata;
     /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     waitlistUrl?: string;
+    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional and defaults to `signInUrl` */
+    tasksUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
