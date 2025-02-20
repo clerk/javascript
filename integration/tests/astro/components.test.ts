@@ -487,13 +487,13 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Initial visit - should show loading state
     await u.page.goToRelative('/server-islands');
-    await u.page.waitForClerkJsLoaded();
 
-    await expect(u.page.getByText('Loading')).toBeVisible();
-
-    // Wait for loading to disappear before checking next state
+    // Initial visit - wait for loading state to appear and then disappear
+    await u.page.getByText('Loading').waitFor({ state: 'visible' });
     await u.page.getByText('Loading').waitFor({ state: 'hidden' });
-    await expect(u.page.getByText('Not an admin')).toBeVisible();
+
+    // Wait for next state to be ready
+    await u.page.getByText('Not an admin').waitFor({ state: 'visible' });
 
     // Sign in as admin user
     await u.page.goToRelative('/sign-in');
@@ -508,10 +508,12 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Visit page again - loading state should still show first
     await u.page.goToRelative('/server-islands');
-    await expect(u.page.getByText('Loading')).toBeVisible();
+
+    // Initial visit - wait for loading state to appear and then disappear
+    await u.page.getByText('Loading').waitFor({ state: 'visible' });
+    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
 
     // Wait for loading to disappear before checking authorized state
-    await u.page.getByText('Loading').waitFor({ state: 'hidden' });
-    await expect(u.page.getByText("I'm an admin")).toBeVisible();
+    await u.page.getByText("I'm an admin").waitFor({ state: 'visible' });
   });
 });
