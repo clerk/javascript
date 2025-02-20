@@ -91,6 +91,11 @@ export class Client extends BaseResource implements ClientResource {
   removeSessions(): Promise<ClientResource> {
     return this._baseDelete({
       path: this.path() + '/sessions',
+      /**
+       * Skipping updating the client matches the behaviour of `client.destroy`, which allows broadcasting a sign-out event,
+       * and delays emitting until `setActive` is called within `Clerk.signOut()`
+       */
+      skipUpdateClient: true,
     }).then(e => {
       SessionTokenCache.clear();
       return e as unknown as ClientResource;
