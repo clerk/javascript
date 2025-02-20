@@ -487,6 +487,8 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
     // Initial visit - should show loading state
     await u.page.goToRelative('/server-islands');
+    await u.page.waitForClerkJsLoaded();
+
     await expect(u.page.getByText('Loading')).toBeVisible();
 
     // Wait for loading to disappear before checking next state
