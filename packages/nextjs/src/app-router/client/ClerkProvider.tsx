@@ -55,7 +55,7 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   }, [isPending]);
 
   useSafeLayoutEffect(() => {
-    window.__unstable__onBeforeSetActive = () => {
+    window.__unstable__onBeforeSetActive = intent => {
       /**
        * We need to invalidate the cache in case the user is navigating to a page that
        * was previously cached using the auth state that was active at the time.
@@ -78,11 +78,15 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
 
+        const nextVersion = window?.next?.version || '';
+
         // NOTE: the following code will allow `useReverification()` to work properly when `handlerReverification` is called inside `startTransition`
-        if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
+        if (nextVersion.startsWith('13')) {
           startTransition(() => {
             router.refresh();
           });
+        } else if (nextVersion.startsWith('15') && intent === 'sign-out') {
+          res(); // noop
         } else {
           void invalidateCacheAction().then(() => res());
         }

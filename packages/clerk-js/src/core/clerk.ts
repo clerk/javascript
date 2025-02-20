@@ -392,6 +392,7 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
+      await onBeforeSetActive();
       // Notify other tabs that user is signing out.
       eventBus.dispatch(events.UserSignOut, null);
       // Clearn up cookies
@@ -416,8 +417,6 @@ export class Clerk implements ClerkInterface {
 
       await onAfterSetActive();
     };
-
-    await onBeforeSetActive();
 
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
