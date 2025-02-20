@@ -31,6 +31,9 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     ':autofill': {
       animationName: 'onAutoFillStart',
     },
+    '::placeholder': {
+      color: theme.colors.$colorTextSecondary,
+    },
   },
   variants: {
     variant: {
