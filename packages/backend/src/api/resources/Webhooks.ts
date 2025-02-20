@@ -10,6 +10,7 @@ import type {
   SessionJSON,
   SMSMessageJSON,
   UserJSON,
+  WaitlistEntryJSON,
 } from './JSON';
 
 type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
@@ -52,6 +53,8 @@ export type PermissionWebhookEvent = Webhook<
   PermissionJSON
 >;
 
+export type WaitlistEntryWebhookEvent = Webhook<'waitlistEntry.created' | 'waitlistEntry.updated', WaitlistEntryJSON>;
+
 export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
@@ -62,6 +65,7 @@ export type WebhookEvent =
   | OrganizationMembershipWebhookEvent
   | OrganizationInvitationWebhookEvent
   | RoleWebhookEvent
-  | PermissionWebhookEvent;
+  | PermissionWebhookEvent
+  | WaitlistEntryWebhookEvent;
 
 export type WebhookEventType = WebhookEvent['type'];
