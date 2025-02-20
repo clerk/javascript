@@ -66,6 +66,7 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
+    __disableDevelopmentModeWarning,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -97,6 +98,7 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
+    disableDevelopmentModeWarning: __disableDevelopmentModeWarning,
   };
 
   return (
