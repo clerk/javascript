@@ -186,6 +186,13 @@ function appearanceVariableOptions() {
   assertClerkIsLoaded(Clerk);
   const { renderColors } = appearanceVariableOptions();
 
+  const sidebars = document.querySelectorAll('[data-sidebar]');
+  document.addEventListener('keydown', e => {
+    if (e.key === '/') {
+      sidebars.forEach(s => s.classList.toggle('hidden'));
+    }
+  });
+
   const routes = {
     '/': () => {
       mountIndex(app);
