@@ -44,7 +44,7 @@ const defaultLayout: ParsedLayout = {
   shimmer: true,
   animations: true,
   unsafe_disableDevelopmentModeWarnings: false,
-  captchaTheme: 'light',
+  captchaTheme: 'auto',
   captchaSize: 'normal',
   captchaLanguage: '',
 };

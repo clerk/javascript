@@ -633,12 +633,12 @@ export type Layout = {
 
   /**
    * The widget theme. Can take the following values: light, dark, auto.
-   * The default is light.
+   * @default 'auto'
    */
   captchaTheme?: 'auto' | 'light' | 'dark';
   /**
    * The widget size. Can take the following values: normal, flexible, compact.
-   * The default is normal.
+   * @default 'normal'
    */
   captchaSize?: 'normal' | 'flexible' | 'compact';
   /**
