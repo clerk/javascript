@@ -102,10 +102,9 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16"
   },
-  "dependencies": {
+  "devDependencies": {
     "@clerk/types": "workspace:^"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
   },

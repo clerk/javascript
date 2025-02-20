@@ -693,7 +693,7 @@ importers:
         version: 5.0.0
 
   packages/localizations:
-    dependencies:
+    devDependencies:
       '@clerk/types':
         specifier: workspace:^
         version: link:../types
@@ -1008,6 +1008,10 @@ importers:
       csstype:
         specifier: 3.1.3
         version: 3.1.3
+    devDependencies:
+      '@clerk/types':
+        specifier: ^4.46.1
+        version: 4.46.1
 
   packages/ui:
     dependencies:
@@ -2093,6 +2097,10 @@ packages:
 
   '@changesets/write@0.3.2':
     resolution: {integrity: sha512-kDxDrPNpUgsjDbWBvUo27PzKX4gqeKOlhibaOXDJA6kuBisGqNHv/HwGJrAu8U/dSf8ZEFIeHIPtvSlZI1kULw==}
+
+  '@clerk/types@4.46.1':
+    resolution: {integrity: sha512-QwomMjG1v2GqOITU2/rQUC11LFFsqNFUA92VKDo8dS1nN9iQadT6cNk7MZWqEYTxAfAM/IgX/gB00aGsLKaV8g==}
+    engines: {node: '>=18.17.0'}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -16612,6 +16620,10 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 1.0.2
       prettier: 2.8.8
+
+  '@clerk/types@4.46.1':
+    dependencies:
+      csstype: 3.1.3
 
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
