@@ -1,3 +1,4 @@
+import { isDeeplyEqual } from '@clerk/shared/react/index';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor, SignInFirstFactor } from '@clerk/types';
 
@@ -43,29 +44,16 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
   filterOutFactor: SignInFactor | null | undefined;
   supportedFirstFactors: SignInFirstFactor[] | null | undefined;
 }) {
-  const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
   const supportedFirstFactors = _supportedFirstFactors || [];
 
-  const firstFactors = supportedFirstFactors.filter(
-    f => f.strategy !== filterOutFactor?.strategy && !isResetPasswordStrategy(f.strategy),
-  );
+  const firstFactors = supportedFirstFactors.filter(f => !isResetPasswordStrategy(f.strategy));
 
-  const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
+  const shouldAllowForAlternativeStrategies = firstFactors.length > 0;
 
   const firstPartyFactors = supportedFirstFactors
     .filter(f => !f.strategy.startsWith('oauth_'))
-    .filter(f => {
-      if (
-        f.strategy === 'email_code' &&
-        filterOutFactor?.strategy === 'email_code' &&
-        filterOutFactor.emailAddressId === f.emailAddressId
-      ) {
-        return false;
-      }
-
-      return f.strategy === filterOutFactor?.strategy;
-    })
     .filter(factor => factorHasLocalStrategy(factor))
+    .filter(factor => !isDeeplyEqual(factor, filterOutFactor))
     // Only include passkey if the device supports it.
     // @ts-ignore Types are not public yet.
     .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
