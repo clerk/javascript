@@ -10,7 +10,6 @@ import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
-  ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -47,6 +46,7 @@ import type {
   Resources,
   SDKMetadata,
   SetActiveParams,
+  SignedInSessionResource,
   SignInProps,
   SignInRedirectOptions,
   SignInResource,
@@ -99,6 +99,7 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -163,7 +164,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public client: ClientResource | undefined;
-  public session: ActiveSessionResource | null | undefined;
+  public session: SignedInSessionResource | null | undefined;
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
@@ -190,6 +191,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -286,6 +288,10 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  get isSignedIn(): boolean {
+    return !!this.session;
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -372,6 +378,9 @@ export class Clerk implements ClerkInterface {
 
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+
+      // Notify other tabs that user is signing out.
+      eventBus.dispatch(events.UserSignOut, null);
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -385,7 +394,7 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    if (!opts.sessionId || this.client.activeSessions.length === 1) {
+    if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
@@ -395,7 +404,7 @@ export class Clerk implements ClerkInterface {
       return handleSetActive();
     }
 
-    const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
+    const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
@@ -875,12 +884,12 @@ export class Clerk implements ClerkInterface {
         : noop;
 
     if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
+      session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
     let newSession = session === undefined ? this.session : session;
 
-    // At this point, the `session` variable should contain either an `ActiveSessionResource`
+    // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
@@ -906,19 +915,11 @@ export class Clerk implements ClerkInterface {
 
     await onBeforeSetActive();
 
-    // If this.session exists, then signOut was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
-    if (shouldSignOutSession) {
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
-
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchLastActiveSession(newSession);
+      await this.#touchCurrentSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
     }
@@ -1532,6 +1533,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
@@ -1543,7 +1545,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.#broadcastSignOutEvent();
+        eventBus.dispatch(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -1902,7 +1904,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -2026,42 +2028,58 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
+  #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
-      if (lastActiveSession) {
-        return lastActiveSession;
+      const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
+      if (currentSession) {
+        return currentSession;
       }
     }
-    const session = client.activeSessions[0];
+    const session = client.signedInSessions[0];
     return session || null;
   };
 
-  #setupListeners = (): void => {
+  #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
     }
 
     this.#pageLifecycle?.onPageFocus(() => {
-      if (this.session) {
+      if (!this.session) {
+        return;
+      }
+
+      const performTouch = () => {
         if (this.#touchThrottledUntil > Date.now()) {
           return;
         }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
-        void this.#touchLastActiveSession(this.session);
+        return this.#touchCurrentSession(this.session);
+      };
+
+      this.#sessionTouchOfflineScheduler.schedule(performTouch);
+    });
+
+    /**
+     * Background tabs get notified of a signout event from active tab.
+     */
+    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
+      if (data.type === 'signout') {
+        void this.handleUnauthenticated({ broadcast: false });
       }
     });
 
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
-        void this.handleUnauthenticated();
-      }
+    /**
+     * Allow resources within the singleton to notify other tabs about a signout event (scoped to a single tab)
+     */
+    eventBus.on(events.UserSignOut, () => {
+      this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
@@ -2092,10 +2110,6 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
-  };
-
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;
@@ -2110,14 +2124,14 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  #setAccessors = (session?: ActiveSessionResource | null) => {
+  #setAccessors = (session?: SignedInSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
     this.#aliasUser();
   };
 
-  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
-    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
+  #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {
+    return this.client?.signedInSessions.find(x => x.id === sessionId) || null;
   };
 
   #aliasUser = () => {

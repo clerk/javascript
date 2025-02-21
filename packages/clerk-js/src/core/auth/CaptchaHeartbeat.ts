@@ -27,7 +27,7 @@ export class CaptchaHeartbeat {
     }
 
     try {
-      const params = await this.captchaChallenge.invisible();
+      const params = await this.captchaChallenge.invisible({ action: 'heartbeat' });
       await this.clerk.client.sendCaptchaToken(params);
     } catch {
       // Ignore unhandled errors

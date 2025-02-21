@@ -1,5 +1,4 @@
 import { defineConfig } from 'tsup';
-import { esbuildPluginFilePathExtensions } from 'esbuild-plugin-file-path-extensions';
 
 import { name, version } from './package.json';
 
@@ -9,17 +8,14 @@ export default defineConfig(overrideOptions => {
   return {
     entry: ['src/ai-sdk/index.ts', 'src/langchain/index.ts'],
     dts: true,
-    // onSuccess: 'tsc',
-    minify: false,
     clean: true,
+    bundle: true,
     sourcemap: true,
-    format: ['esm'],
-    // legacyOutput: true,
+    format: 'esm',
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${!isProd}`,
     },
-    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
   };
 });
