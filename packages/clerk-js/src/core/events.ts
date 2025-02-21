@@ -4,6 +4,7 @@ export const events = {
   TokenUpdate: 'token:update',
   UserSignOut: 'user:signOut',
   NewSessionTask: 'sessionTask:new',
+  ResolvedSessionTask: 'sessionTask:resolve',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
@@ -15,6 +16,7 @@ type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
   [events.NewSessionTask]: SignedInSessionResource;
+  [events.ResolvedSessionTask]: SignedInSessionResource;
 };
 
 const createEventBus = () => {

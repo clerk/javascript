@@ -477,9 +477,9 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
-   * Returns the url where a custom task page is rendered.
+   * Returns the url where a task page is rendered.
    */
-  buildTasksUrl(options: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string;
+  internal__buildTasksUrl(options: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string;
 
   /**
    *

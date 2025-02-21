@@ -116,6 +116,7 @@ export const BaseRouter = ({
 
       toURL.search = stringifyQueryParams(toQueryParams);
     }
+    console.log({ toURL });
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
     setRouteParts({ path: toURL.pathname, queryString: toURL.search });
     return internalNavRes;

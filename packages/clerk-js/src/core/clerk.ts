@@ -891,11 +891,9 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
-    // todo - handle the transition on token poller
-    const hasNewTask = newSession && !!newSession?.tasks;
-    if (hasNewTask && newSession) {
-      eventBus.dispatch(events.NewSessionTask, newSession);
-    }
+    const isResolvingSessionTasks =
+      !!newSession?.currentTask ||
+      window.location.href.includes(this.internal__buildTasksUrl({ task: newSession?.currentTask }));
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
@@ -954,7 +952,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit && !hasNewTask) {
+    if (redirectUrl && !beforeEmit && !isResolvingSessionTasks) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1011,6 +1009,8 @@ export class Clerk implements ClerkInterface {
     if (!to || !inBrowser()) {
       return;
     }
+
+    console.log({ to });
 
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
@@ -1122,19 +1122,18 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  // todo(fix sign up navigation)
-  public buildTasksUrl({ task, origin }: RedirectToTasksUrlOptions): string {
+  public internal__buildTasksUrl({ task, origin }: RedirectToTasksUrlOptions): string {
     if (!task) {
       return '';
     }
 
     const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
-    const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.includes(signUpUrl);
 
     const originWithDefault = origin ?? (referrerIsSignUpUrl ? 'SignUp' : 'SignIn');
     const defaultUrlByOrigin = originWithDefault === 'SignIn' ? this.#options.signInUrl : this.#options.signUpUrl;
 
-    return buildURL({ base: `${defaultUrlByOrigin}/${sessionTaskRoutePaths[task.key]}` }, { stringify: true });
+    return buildURL({ base: defaultUrlByOrigin, hashPath: sessionTaskRoutePaths[task.key] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1260,7 +1259,7 @@ export class Clerk implements ClerkInterface {
 
   public redirectToTasks = async (options: RedirectToTasksUrlOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl(options));
+      return this.navigate(this.internal__buildTasksUrl(options));
     }
     return;
   };
@@ -1758,11 +1757,21 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      const hasResolvedPreviousTask = this.session.currentTask != session?.currentTask;
+
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
+
+      // Any FAPI call could lead to a task being unsatisfied such as app owners
+      // actions therefore the check must be done on client piggybacking
+      if (session?.currentTask) {
+        eventBus.dispatch(events.NewSessionTask, session);
+      } else if (session && hasResolvedPreviousTask) {
+        eventBus.dispatch(events.ResolvedSessionTask, session);
+      }
     }
 
     this.#emit();
@@ -2108,8 +2117,13 @@ export class Clerk implements ClerkInterface {
     });
 
     eventBus.on(events.NewSessionTask, session => {
-      console.log('new task 🍪');
+      console.log('new session task');
       void this.redirectToTasks({ task: session.currentTask });
+    });
+
+    eventBus.on(events.ResolvedSessionTask, () => {
+      console.log('resolved task');
+      void this.redirectToAfterSignIn();
     });
   };
 
