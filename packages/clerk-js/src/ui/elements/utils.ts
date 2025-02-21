@@ -22,3 +22,50 @@ export function distributeStrategiesIntoRows<T>(strategies: T[], maxStrategiesPe
 
   return rows;
 }
+
+/**
+ * Calculates the number of columns given the total number of items and the maximum columns allowed per row.
+ *
+ * @param {Object} options
+ * @param {number} options.length - The total number of items.
+ * @param {number} options.max - The maximum number of columns allowed per row.
+ * @returns The calculated number of columns.
+ *
+ * Example output for item counts from 1 to 24 with `columns: 6`:
+ *
+ *  1:  [ 1 ]
+ *  2:  [ 1, 2 ]
+ *  3:  [ 1, 2, 3 ]
+ *  4:  [ 1, 2, 3, 4 ]
+ *  5:  [ 1, 2, 3, 4, 5 ]
+ *  6:  [ 1, 2, 3, 4, 5, 6 ]
+ *  7:  [ [1, 2, 3, 4], [5, 6, 7] ]
+ *  8:  [ [1, 2, 3, 4], [5, 6, 7, 8] ]
+ *  9:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9] ]
+ * 10:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10] ]
+ * 11:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11] ]
+ * 12:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12] ]
+ * 13:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13] ]
+ * 14:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14] ]
+ * 15:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11], [12, 13, 14, 15] ]
+ * 16:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15, 16] ]
+ * 17:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15, 16, 17] ]
+ * 18:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18] ]
+ * 19:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19] ]
+ * 20:  [ [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20] ]
+ * 21:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11], [12, 13, 14, 15, 16], [17, 18, 19, 20, 21] ]
+ * 22:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11], [12, 13, 14, 15, 16], [17, 18, 19, 20, 21, 22] ]
+ * 23:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15, 16, 17], [18, 19, 20, 21, 22, 23] ]
+ * 24:  [ [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15, 16, 17, 18], [19, 20, 21, 22, 23, 24] ]
+ *
+ * Examples:
+ * ```
+ * getColumnCount(1); // 1
+ * getColumnCount(7); // 4
+ * getColumnCount(15); // 6
+ * ```
+ */
+export function getColumnCount(length: number, max: number): number {
+  const numRows = Math.ceil(length / max);
+  return Math.ceil(length / numRows);
+}

@@ -5,6 +5,7 @@ import React, { forwardRef, isValidElement } from 'react';
 import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
+  Box,
   Button,
   descriptors,
   Flex,
@@ -18,10 +19,10 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
-import { mqu, type PropsOfComponent } from '../styledSystem';
+import { mq, mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
-import { distributeStrategiesIntoRows } from './utils';
+import { distributeStrategiesIntoRows, getColumnCount } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
@@ -57,6 +58,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
+  const strategyColumns = getColumnCount(strategies.length, MAX_STRATEGIES_PER_ROW);
   const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
 
   const preferBlockButtons =
@@ -90,6 +92,77 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       gap={2}
       elementDescriptor={descriptors.socialButtonsRoot}
     >
+      <Flex
+        wrap='wrap'
+        justify='center'
+        sx={t => ({
+          rowGap: t.sizes.$2,
+          [mq.sm]: {
+            marginLeft: `calc(${t.sizes.$2}*-1)`,
+          },
+        })}
+      >
+        {strategies.map(strategy => {
+          const label =
+            strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              ? `Continue with ${strategyToDisplayData[strategy].name}`
+              : strategyToDisplayData[strategy].name;
+
+          const localizedText =
+            strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              ? localizationKeys('socialButtonsBlockButton', {
+                  provider: strategyToDisplayData[strategy].name,
+                })
+              : localizationKeys('socialButtonsBlockButtonManyInView', {
+                  provider: strategyToDisplayData[strategy].name,
+                });
+          const ref = null;
+
+          const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
+            <Image
+              elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+              elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+              isLoading={card.loadingMetadata === strategy}
+              isDisabled={card.isLoading}
+              src={strategyToDisplayData[strategy].iconUrl}
+              alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+              sx={theme => ({ width: theme.sizes.$4, height: theme.sizes.$4, maxWidth: '100%' })}
+            />
+          ) : (
+            <ProviderInitialIcon
+              id={strategyToDisplayData[strategy].id}
+              value={strategyToDisplayData[strategy].name}
+              isLoading={card.loadingMetadata === strategy}
+              isDisabled={card.isLoading}
+            />
+          );
+
+          return (
+            <Box
+              key={strategy}
+              sx={t => ({
+                [mq.sm]: {
+                  paddingLeft: t.sizes.$2,
+                  width: `calc(100%/${strategyColumns})`,
+                },
+                width: '100%',
+              })}
+            >
+              <ButtonElement
+                id={strategyToDisplayData[strategy].id}
+                ref={ref}
+                onClick={startOauth(strategy)}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                label={label}
+                textLocalizationKey={localizedText}
+                icon={imageOrInitial}
+              />
+            </Box>
+          );
+        })}
+      </Flex>
+      <Box sx={t => ({ height: t.sizes.$4 })} />
       {strategyRows.map((row, rowIndex) => (
         <Grid
           key={row.join('-')}

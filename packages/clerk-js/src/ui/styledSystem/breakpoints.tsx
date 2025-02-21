@@ -13,9 +13,9 @@ const deviceQueries = {
   ios: '@supports (-webkit-touch-callout: none)',
 } as const;
 
-// export const mq = Object.fromEntries(
-//   Object.entries(breakpoints).map(([k, v]) => [k, `@media (min-width: ${v})`]),
-// ) as Record<keyof typeof breakpoints, string>;
+export const mq = Object.fromEntries(
+  Object.entries(breakpoints).map(([k, v]) => [k, `@media (min-width: ${v})`]),
+) as Record<keyof typeof breakpoints, string>;
 
 export const mqu = {
   ...deviceQueries,
