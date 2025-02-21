@@ -34,7 +34,6 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
     supportedFirstFactors: data?.supportedFirstFactors,
   });
 
-
   return (
     <Flow.Part part={'alternativeMethods'}>
       <Card.Root>
