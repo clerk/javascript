@@ -1,3 +1,4 @@
+import { isDeeplyEqual } from '@clerk/shared/react/index';
 import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
 import React, { useEffect } from 'react';
 
@@ -44,6 +45,9 @@ export function _UserVerificationFactorTwo(): JSX.Element {
     toggleAllStrategies();
   };
 
+  const hasAlternativeStrategies =
+    (availableFactors && availableFactors.filter(factor => isDeeplyEqual(factor, currentFactor)).length > 0) || false;
+
   useEffect(() => {
     if (sessionVerification.status === 'needs_first_factor') {
       void navigate('../');
@@ -72,6 +76,7 @@ export function _UserVerificationFactorTwo(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'totp':
@@ -81,6 +86,7 @@ export function _UserVerificationFactorTwo(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'backup_code':
