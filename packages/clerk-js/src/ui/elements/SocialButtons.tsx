@@ -93,6 +93,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       elementDescriptor={descriptors.socialButtonsRoot}
     >
       <Flex
+        elementDescriptor={descriptors.socialButtons}
         wrap='wrap'
         justify='center'
         sx={t => ({
@@ -140,6 +141,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           return (
             <Box
               key={strategy}
+              elementDescriptor={descriptors.socialButtonsColumn}
+              elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               sx={t => ({
                 [mq.sm]: {
                   paddingLeft: t.sizes.$2,

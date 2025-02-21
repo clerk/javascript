@@ -168,6 +168,7 @@ export type ElementsConfig = {
 
   socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
+  socialButtonsColumn: WithOptions;
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
