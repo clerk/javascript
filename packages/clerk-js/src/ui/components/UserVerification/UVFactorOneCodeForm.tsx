@@ -54,18 +54,20 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   };
 
   return (
-    <VerificationCodeCard
-      cardTitle={props.cardTitle}
-      cardSubtitle={props.cardSubtitle}
-      inputLabel={props.inputLabel}
-      resendButton={props.resendButton}
-      onCodeEntryFinishedAction={action}
-      onResendCodeClicked={prepare}
-      safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={session?.user?.imageUrl}
-      onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
-      showAlternativeMethods={props.showAlternativeMethods}
-      onBackLinkClicked={props.onBackLinkClicked}
-    />
+    <div>
+      <VerificationCodeCard
+        cardTitle={props.cardTitle}
+        cardSubtitle={props.cardSubtitle}
+        inputLabel={props.inputLabel}
+        resendButton={props.resendButton}
+        onCodeEntryFinishedAction={action}
+        onResendCodeClicked={prepare}
+        safeIdentifier={props.factor.safeIdentifier}
+        profileImageUrl={session?.user?.imageUrl}
+        onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+        showAlternativeMethods={props.showAlternativeMethods}
+        onBackLinkClicked={props.onBackLinkClicked}
+      />
+    </div>
   );
 };
