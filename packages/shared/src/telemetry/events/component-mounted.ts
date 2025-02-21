@@ -14,15 +14,14 @@ type EventPrebuiltComponentMounted = ComponentMountedBase & {
   baseTheme: boolean;
 };
 
-type EventComponentMounted = ComponentMountedBase & {
-  [key: string]: boolean | string;
-};
+type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
 
 /**
  * Helper function for `telemetry.record()`. Create a consistent event object for when a prebuilt (AIO) component is mounted.
  *
  * @param component - The name of the component.
  * @param props - The props passed to the component. Will be filtered to a known list of props.
+ * @param additionalPayload - Additional data to send with the event.
  *
  * @example
  * telemetry.record(eventPrebuiltComponentMounted('SignUp', props));
@@ -30,6 +29,7 @@ type EventComponentMounted = ComponentMountedBase & {
 export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
+  additionalPayload?: TelemetryEventRaw['payload'],
 ): TelemetryEventRaw<EventPrebuiltComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
@@ -40,6 +40,7 @@ export function eventPrebuiltComponentMounted(
       baseTheme: Boolean(props?.appearance?.baseTheme),
       elements: Boolean(props?.appearance?.elements),
       variables: Boolean(props?.appearance?.variables),
+      ...additionalPayload,
     },
   };
 }
@@ -57,7 +58,7 @@ export function eventPrebuiltComponentMounted(
  */
 export function eventComponentMounted(
   component: string,
-  props: Record<string, string | boolean> = {},
+  props: TelemetryEventRaw['payload'] = {},
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,

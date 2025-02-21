@@ -1,5 +1,150 @@
 # @clerk/nuxt
 
+## 1.2.0
+
+### Minor Changes
+
+- Introduce `getAuth()` helper to retrieve authentication state from the [event](https://h3.unjs.io/guide/event) object. ([#5158](https://github.com/clerk/javascript/pull/5158)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  import { getAuth } from '@clerk/nuxt/server';
+
+  export default eventHandler(event => {
+    const { userId } = getAuth(event);
+
+    if (!userId) {
+      // User is not authenticated
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Re-export error handling utilities from `@clerk/shared` ([#5155](https://github.com/clerk/javascript/pull/5155)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { useSignIn } from '@clerk/vue';
+  import { isClerkAPIResponseError } from '@clerk/vue/errors';
+
+  // ... form state refs and other setup ...
+  const { signIn } = useSignIn();
+
+  const handleSubmit = async () => {
+    try {
+      const signInAttempt = await signIn.value.create({
+        identifier: email.value,
+        password: password.value,
+      });
+      // ... handle successful sign in ...
+    } catch (err) {
+      // Type guard to safely handle Clerk API errors
+      if (isClerkAPIResponseError(err)) {
+        errors.value = err.errors; // err.errors is properly typed as ClerkAPIError[]
+      }
+    }
+  };
+  </script>
+
+  <template>
+    <!-- Form template here -->
+  </template>
+  ```
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`62200fad4431d625fcb4bf2a521e4650eb615381`](https://github.com/clerk/javascript/commit/62200fad4431d625fcb4bf2a521e4650eb615381)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+  - @clerk/vue@1.2.1
+  - @clerk/backend@1.24.2
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`9b6102c551dcd5500e29e3a3de9e6483796f6686`](https://github.com/clerk/javascript/commit/9b6102c551dcd5500e29e3a3de9e6483796f6686), [`128fd8909ae083c0d274dee7c6810e8574e1ce33`](https://github.com/clerk/javascript/commit/128fd8909ae083c0d274dee7c6810e8574e1ce33), [`98436f018fb19170a1b5781401577dcab6ec706a`](https://github.com/clerk/javascript/commit/98436f018fb19170a1b5781401577dcab6ec706a)]:
+  - @clerk/types@4.46.0
+  - @clerk/vue@1.2.0
+  - @clerk/backend@1.24.1
+  - @clerk/shared@2.21.1
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`ce44176efd4f2132001c49b815cbee409463bbea`](https://github.com/clerk/javascript/commit/ce44176efd4f2132001c49b815cbee409463bbea), [`4089ca43c3fea5a2acedc86c6fc8a88e7cbea16b`](https://github.com/clerk/javascript/commit/4089ca43c3fea5a2acedc86c6fc8a88e7cbea16b), [`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`c0f2daebe15642cd0cef16aafa1df1ece8ef771d`](https://github.com/clerk/javascript/commit/c0f2daebe15642cd0cef16aafa1df1ece8ef771d), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472), [`5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2`](https://github.com/clerk/javascript/commit/5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2)]:
+  - @clerk/backend@1.24.0
+  - @clerk/vue@1.1.11
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Add `<Waitlist />` component to the set of auto-imported components ([#5067](https://github.com/clerk/javascript/pull/5067)) by [@davidpattaguan](https://github.com/davidpattaguan)
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/backend@1.23.11
+  - @clerk/shared@2.20.18
+  - @clerk/vue@1.1.10
+
+## 1.1.0
+
+### Minor Changes
+
+- Add `createRouteMatcher()` helper function that allows you to protect multiple pages or API routes. ([#5050](https://github.com/clerk/javascript/pull/5050)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  For protecting pages (in a global route middleware):
+
+  ```ts
+  // createRouteMatcher is automatically imported
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)']);
+
+  export default defineNuxtRouteMiddleware(to => {
+    const { userId } = useAuth();
+
+    if (!userId.value && isProtectedRoute(to)) {
+      // Add custom logic to run before redirecting
+      return navigateTo('/sign-in');
+    }
+  });
+  ```
+
+  For protecting API routes:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+
+  // Unlike pages, you need to import `createRouteMatcher` from `@clerk/nuxt/server`
+  const isProtectedRoute = createRouteMatcher(['/api/user(.*)', '/api/projects(.*)']);
+
+  export default clerkMiddleware(event => {
+    const { userId } = event.context.auth;
+
+    if (!userId && isProtectedRoute(event)) {
+      setResponseStatus(event, 401);
+      return 'You are not authorized to access this resource.';
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+  - @clerk/vue@1.1.9
+
 ## 1.0.13
 
 ### Patch Changes

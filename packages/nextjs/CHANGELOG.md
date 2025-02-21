@@ -1,5 +1,111 @@
 # Change Log
 
+## 6.12.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+### Patch Changes
+
+- Update `clerkMiddleware` request callback to accept an asynchronous function ([#5154](https://github.com/clerk/javascript/pull/5154)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  export default clerkMiddleware(
+    (auth, req) => {
+      // Add your middleware checks
+    },
+    async req => {
+      const options = await getOptions(req);
+      return options;
+    },
+  );
+  ```
+
+- Fix shallow internal-component navigation. ([#5091](https://github.com/clerk/javascript/pull/5091)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`30f6f3808e9b3778d5a9eb275780f94f9e9c7651`](https://github.com/clerk/javascript/commit/30f6f3808e9b3778d5a9eb275780f94f9e9c7651)]:
+  - @clerk/shared@2.22.0
+  - @clerk/clerk-react@5.23.0
+  - @clerk/types@4.46.1
+  - @clerk/backend@1.24.2
+
+## 6.11.3
+
+### Patch Changes
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`128fd8909ae083c0d274dee7c6810e8574e1ce33`](https://github.com/clerk/javascript/commit/128fd8909ae083c0d274dee7c6810e8574e1ce33)]:
+  - @clerk/clerk-react@5.22.13
+  - @clerk/types@4.46.0
+  - @clerk/backend@1.24.1
+  - @clerk/shared@2.21.1
+
+## 6.11.2
+
+### Patch Changes
+
+- Fixes the "Unable to verify request ..." error occured when switching keys from an application running on keyless and a regular claimed application and there is a user signed-in. ([#5085](https://github.com/clerk/javascript/pull/5085)) by [@panteliselef](https://github.com/panteliselef)
+
+- Adds types for organization domain webhook events ([#4819](https://github.com/clerk/javascript/pull/4819)) by [@ijxy](https://github.com/ijxy)
+
+- Updated dependencies [[`ce44176efd4f2132001c49b815cbee409463bbea`](https://github.com/clerk/javascript/commit/ce44176efd4f2132001c49b815cbee409463bbea), [`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`c0f2daebe15642cd0cef16aafa1df1ece8ef771d`](https://github.com/clerk/javascript/commit/c0f2daebe15642cd0cef16aafa1df1ece8ef771d), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472), [`5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2`](https://github.com/clerk/javascript/commit/5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2)]:
+  - @clerk/backend@1.24.0
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+  - @clerk/clerk-react@5.22.12
+
+## 6.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`0fa449cd09c9973297464a14f785895e3ddcab4d`](https://github.com/clerk/javascript/commit/0fa449cd09c9973297464a14f785895e3ddcab4d)]:
+  - @clerk/clerk-react@5.22.11
+
+## 6.11.0
+
+### Minor Changes
+
+- Enable Keyless by default. To disable keyless use `NEXT_PUBLIC_CLERK_KEYLESS_DISABLED=1`. ([#4898](https://github.com/clerk/javascript/pull/4898)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bug fix: On keyless avoid infinite redirect loop when page does not exist and application is attempting to sync state with middleware. ([#5073](https://github.com/clerk/javascript/pull/5073)) by [@panteliselef](https://github.com/panteliselef)
+
+## 6.10.6
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/backend@1.23.11
+  - @clerk/clerk-react@5.22.10
+  - @clerk/shared@2.20.18
+
+## 6.10.5
+
+### Patch Changes
+
+- Previously the `createPathMatcher()` function was re-implemented both in `@clerk/astro` and `@clerk/nextjs`, this PR moves this logic to `@clerk/shared`. ([#5043](https://github.com/clerk/javascript/pull/5043)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can use it like so:
+
+  ```ts
+  import { createPathMatcher } from '@clerk/shared/pathMatcher';
+  ```
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/clerk-react@5.22.9
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+
 ## 6.10.4
 
 ### Patch Changes
@@ -217,9 +323,9 @@
 
 - Using the same peerDependencies semver for react and react-dom ([#4758](https://github.com/clerk/javascript/pull/4758)) by [@jacekradko](https://github.com/jacekradko)
 
-- Hide warning about missing `CLERK_ENCRYPTION_KEY` when the secret key is not explictily provided as option to `clerkMiddleware`. ([#4766](https://github.com/clerk/javascript/pull/4766)) by [@panteliselef](https://github.com/panteliselef)
+- Hide warning about missing `CLERK_ENCRYPTION_KEY` when the secret key is not explicitly provided as option to `clerkMiddleware`. ([#4766](https://github.com/clerk/javascript/pull/4766)) by [@panteliselef](https://github.com/panteliselef)
 
-- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internal usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
 
 - Support `unstable_rethrow` usage inside `clerkMiddleware()` for the canary version of `notFound()`. ([#4727](https://github.com/clerk/javascript/pull/4727)) by [@panteliselef](https://github.com/panteliselef)
 
@@ -1496,7 +1602,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -1888,7 +1994,7 @@
 - 2e77cd737: Set correct information on required Node.js and React versions in README
 - ae3a6683a: Ignore `.test.ts` files for the build output. Should result in smaller bundle size.
 - 32992906c: Fix partial prerendering error when using NextJS by correctly rethrowing partial prerendering (PPR) error.
-- c22cd5214: Fix type inferance for auth helper.
+- c22cd5214: Fix type inference for auth helper.
 - b67f6ab79: Fix property `Page`/ `Link` missing from the `UserProfile` / `OrganizationProfile`
   when imported from `@clerk/nextjs` or `@clerk/remix`.
 - f77e8cdbd: Add Autocomplete TS generic for union literals
@@ -2811,7 +2917,7 @@
     - `WithClerkProp` type
     - `MultisessionAppSupport` component (moved to /internal subpath)
     - `EmailLinkErrorCode` enum
-  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `StructureContext` and related errors to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
 
@@ -3522,7 +3628,7 @@
 
 - Support `audience` parameter in authentication request ([#1004](https://github.com/clerk/javascript/pull/1004)) by [@dimkl](https://github.com/dimkl)
 
-  The audience parameter is used to verify the the aud claim in
+  The audience parameter is used to verify the aud claim in
   the request matches the value of the parameter or is included
   (when the user provides a list).
 

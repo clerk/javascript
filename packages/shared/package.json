@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.20.16",
+  "version": "2.22.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -114,7 +114,10 @@
     "devBrowser",
     "object",
     "oauth",
-    "web3"
+    "web3",
+    "getEnvVariable",
+    "pathMatcher",
+    "organization"
   ],
   "scripts": {
     "build": "tsup",
@@ -124,7 +127,7 @@
     "dev:publish": "pnpm dev -- --env.publish",
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint": "eslint src",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
@@ -144,7 +147,7 @@
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.0.0",
-    "esbuild": "0.20.2"
+    "esbuild": "0.25.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

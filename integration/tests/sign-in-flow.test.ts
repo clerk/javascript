@@ -40,6 +40,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedIn();
   });
 
+  test('(modal) sign in with email and instant password', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/buttons');
+    await u.page.getByText('Sign in button (force)').click();
+    await u.po.signIn.waitForModal();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+    await u.po.signIn.waitForModal('closed');
+  });
+
   test('sign in with email code', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();

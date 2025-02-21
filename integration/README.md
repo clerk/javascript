@@ -565,7 +565,7 @@ Currently, `u` has:
   This handler runs in the context of a new browser, as the second browser is completely isolated. The nested `u` variable shadows the `u` variable of the parent scope to make this distinction apparent.
 
 > [!TIP]
-> You can find more details in the [source code](./testUtils/index.ts) of `createTestUtils`. For example inside [`appPageObject`](./testUtils/appPageObject.ts) you can find out that `u.page` allows you to programatically go to the index page through `u.page.goToStart()`.
+> You can find more details in the [source code](./testUtils/index.ts) of `createTestUtils`. For example inside [`appPageObject`](./testUtils/appPageObject.ts) you can find out that `u.page` allows you to programmatically go to the index page through `u.page.goToStart()`.
 
 ## Concepts
 

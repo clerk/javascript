@@ -4,4 +4,5 @@ export {
   isKnownError,
   isMetamaskError,
   EmailLinkErrorCode,
+  EmailLinkErrorCodeStatus,
 } from '@clerk/clerk-react/errors';
