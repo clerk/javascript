@@ -1,6 +1,6 @@
 import type { CheckoutProps } from '@clerk/types';
-import { useEffect, useState } from 'react';
 
+import { CommerceBlade } from '../../common';
 import { useCheckoutContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
@@ -21,24 +21,14 @@ export const Checkout = (props: CheckoutProps) => {
 };
 
 const AuthenticatedRoutes = withCoreUserGuard((props: CheckoutProps) => {
-  const { show = false } = useCheckoutContext();
-  const [mounted, setMounted] = useState(false);
+  const { mode = 'mounted', isShowingBlade = false } = useCheckoutContext();
 
-  useEffect(() => {
-    if (show) {
-      setMounted(true);
-      return;
-    } else {
-      const timer = setTimeout(() => {
-        setMounted(false);
-      }, 280);
-      return () => clearTimeout(timer);
-    }
-  }, [show, mounted]);
-
-  if (!mounted && !show) {
-    return null;
-  }
-
-  return <CheckoutPage {...props} />;
+  return (
+    <CommerceBlade
+      isOpen={isShowingBlade}
+      isFullscreen={mode === 'mounted'}
+    >
+      <CheckoutPage {...props} />
+    </CommerceBlade>
+  );
 });

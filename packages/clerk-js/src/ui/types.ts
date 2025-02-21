@@ -108,8 +108,8 @@ export type PricingTableCtx = PricingTableProps & {
 export type CheckoutCtx = CheckoutProps & {
   componentName: 'Checkout';
   mode?: ComponentMode;
-  show?: boolean;
-  close?: () => void;
+  isShowingBlade?: boolean;
+  handleCloseBlade?: () => void;
 };
 
 export type AvailableComponentCtx =

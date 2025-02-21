@@ -9,6 +9,7 @@ import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
 import { Checkout } from '../Checkout';
+import { PlanDetailBlade } from './PlanDetailBlade';
 
 export const PricingTable = (props: PricingTableProps) => {
   const { commerce } = useClerk();
@@ -16,12 +17,17 @@ export const PricingTable = (props: PricingTableProps) => {
   const [planPeriod, setPlanPeriod] = useState('month');
   const [selectedPlan, setSelectedPlan] = useState<CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showPlanDetail, setShowPlanDetail] = useState(false);
 
   const { data: plans } = useFetch(commerce?.billing.getPlans, 'commerce-plans');
 
   const selectPlan = (plan: CommercePlanResource) => {
     setSelectedPlan(plan);
-    setShowCheckout(true);
+    if (plan.isActiveForPayer) {
+      setShowPlanDetail(true);
+    } else {
+      setShowCheckout(true);
+    }
   };
 
   return (
@@ -46,8 +52,8 @@ export const PricingTable = (props: PricingTableProps) => {
         value={{
           componentName: 'Checkout',
           mode,
-          show: showCheckout,
-          close: () => setShowCheckout(false),
+          isShowingBlade: showCheckout,
+          handleCloseBlade: () => setShowCheckout(false),
         }}
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
@@ -58,6 +64,11 @@ export const PricingTable = (props: PricingTableProps) => {
           />
         </div>
       </CheckoutContext.Provider>
+      <PlanDetailBlade
+        isOpen={showPlanDetail}
+        handleClose={() => setShowPlanDetail(false)}
+        plan={selectedPlan}
+      />
     </InternalThemeProvider>
   );
 };

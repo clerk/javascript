@@ -1,4 +1,5 @@
 export * from './BlockButtons';
+export * from './CommerceBlade';
 export * from './constants';
 export * from './CalloutWithAction';
 export * from './forms';

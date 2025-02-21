@@ -1447,6 +1447,7 @@ export type PricingTableProps = {
   appearance?: PricingTableTheme;
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
+  layout?: 'default' | 'matrix';
 };
 
 export type CheckoutProps = {

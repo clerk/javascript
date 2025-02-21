@@ -6,7 +6,7 @@ import { Check } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 
 export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutResource; sx?: ThemableCssProp }) => {
-  const { close = () => {} } = useCheckoutContext();
+  const { handleCloseBlade = () => {} } = useCheckoutContext();
 
   return (
     <Col
@@ -26,46 +26,12 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
           flex: 1,
         }}
       >
-        <Box
-          sx={t => ({
-            position: 'relative',
-            width: t.sizes.$16,
-            height: t.sizes.$16,
-            borderRadius: t.radii.$circle,
-            backgroundImage:
-              'linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)',
-          })}
-        >
-          <Box
-            sx={t => ({
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              borderRadius: t.radii.$circle,
-              backgroundImage:
-                'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.00) 60.94%)',
-              backgroundBlendMode: 'plus-lighter, normal',
-              boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
-            })}
-          >
-            <Flex
-              align='center'
-              justify='center'
-              sx={t => ({
-                position: 'absolute',
-                inset: t.space.$1,
-                borderRadius: t.radii.$circle,
-                backgroundColor: t.colors.$colorBackground,
-              })}
-            >
-              <Icon icon={Check} />
-            </Flex>
-          </Box>
-        </Box>
+        <SuccessCircle />
 
         <Col
           align='center'
           gap={2}
+          sx={{ position: 'relative' }}
         >
           <Text variant='h2'>Payment was successful!</Text>
           <Text sx={t => ({ textAlign: 'center', paddingInline: t.space.$8 })}>
@@ -127,11 +93,120 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={close}
+          onClick={handleCloseBlade}
         >
           Continue
         </Button>
       </Col>
     </Col>
+  );
+};
+
+const SuccessCircle = () => {
+  return (
+    <Flex
+      align='center'
+      justify='center'
+      sx={t => ({
+        position: 'relative',
+        width: '100%',
+        height: t.sizes.$16,
+      })}
+    >
+      {/* rings */}
+      <Box>
+        <Box
+          sx={t => ({
+            position: 'absolute',
+            top: `-${t.sizes.$8}`,
+            bottom: `-${t.sizes.$8}`,
+            left: '50%',
+            translate: '-50% 0',
+            aspectRatio: '1/1',
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: t.colors.$neutralAlpha150,
+            borderRadius: t.radii.$circle,
+          })}
+        />
+        <Box
+          sx={t => ({
+            position: 'absolute',
+            top: `-${t.sizes.$24}`,
+            bottom: `-${t.sizes.$24}`,
+            left: '50%',
+            translate: '-50% 0',
+            aspectRatio: '1/1',
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: t.colors.$neutralAlpha200,
+            borderRadius: t.radii.$circle,
+          })}
+        />
+        <Box
+          sx={t => ({
+            position: 'absolute',
+            top: `-${t.sizes.$40}`,
+            bottom: `-${t.sizes.$40}`,
+            left: '50%',
+            translate: '-50% 0',
+            aspectRatio: '1/1',
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: t.colors.$neutralAlpha200,
+            borderRadius: t.radii.$circle,
+          })}
+        />
+      </Box>
+
+      {/* fade overlays */}
+      <Box
+        sx={t => ({
+          position: 'absolute',
+          width: '120%',
+          aspectRatio: '1/1',
+          top: '50%',
+          translate: '0 -50%',
+          backgroundImage: `linear-gradient(to bottom, ${t.colors.$colorBackground} 35%, transparent 48%, transparent 52%, ${t.colors.$colorBackground} 65%)`,
+        })}
+      />
+
+      {/* coin */}
+      <Box
+        sx={t => ({
+          position: 'relative',
+          width: t.sizes.$16,
+          height: t.sizes.$16,
+          borderRadius: t.radii.$circle,
+          backgroundImage:
+            'linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)',
+        })}
+      >
+        <Box
+          sx={t => ({
+            position: 'relative',
+            width: t.sizes.$16,
+            height: t.sizes.$16,
+            borderRadius: t.radii.$circle,
+            backgroundImage: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.00) 60.94%)',
+            backgroundBlendMode: 'plus-lighter, normal',
+            boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
+          })}
+        >
+          <Flex
+            align='center'
+            justify='center'
+            sx={t => ({
+              position: 'absolute',
+              inset: t.space.$1,
+              borderRadius: t.radii.$circle,
+              backgroundColor: t.colors.$colorBackground,
+            })}
+          >
+            <Icon icon={Check} />
+          </Flex>
+        </Box>
+      </Box>
+    </Flex>
   );
 };
