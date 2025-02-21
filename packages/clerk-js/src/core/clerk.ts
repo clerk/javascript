@@ -378,6 +378,9 @@ export class Clerk implements ClerkInterface {
 
     const handleSetActive = () => {
       const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+
+      // Notify other tabs that user is signing out.
+      eventBus.dispatch(events.UserSignOut, null);
       if (signOutCallback) {
         return this.setActive({
           session: null,
@@ -911,14 +914,6 @@ export class Clerk implements ClerkInterface {
     }
 
     await onBeforeSetActive();
-
-    // If this.session exists, then signOut was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
-    if (shouldSignOutSession) {
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -1538,6 +1533,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
@@ -1549,7 +1545,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.#broadcastSignOutEvent();
+        eventBus.dispatch(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -2065,10 +2061,20 @@ export class Clerk implements ClerkInterface {
       this.#sessionTouchOfflineScheduler.schedule(performTouch);
     });
 
+    /**
+     * Background tabs get notified of a signout event from active tab.
+     */
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
-        void this.handleUnauthenticated();
+        void this.handleUnauthenticated({ broadcast: false });
       }
+    });
+
+    /**
+     * Allow resources within the singleton to notify other tabs about a signout event (scoped to a single tab)
+     */
+    eventBus.on(events.UserSignOut, () => {
+      this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
   };
 
@@ -2102,10 +2108,6 @@ export class Clerk implements ClerkInterface {
     for (const listener of this.#navigationListeners) {
       listener();
     }
-  };
-
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
   #setTransitiveState = () => {
