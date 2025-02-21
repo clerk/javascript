@@ -1,4 +1,3 @@
-import { isDeeplyEqual } from '@clerk/shared/react/index';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor, SignInFirstFactor } from '@clerk/types';
 
@@ -33,35 +32,6 @@ export function useAlternativeStrategies<T = SignInFirstFactor>({
   return {
     hasAnyStrategy: shouldAllowForAlternativeStrategies,
     hasFirstParty: !!firstPartyFactors,
-    firstPartyFactors,
-  };
-}
-
-export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
-  filterOutFactor,
-  supportedFirstFactors: _supportedFirstFactors,
-}: {
-  filterOutFactor: SignInFactor | null | undefined;
-  supportedFirstFactors: SignInFirstFactor[] | null | undefined;
-}) {
-  const supportedFirstFactors = _supportedFirstFactors || [];
-
-  const firstFactors = supportedFirstFactors.filter(f => !isResetPasswordStrategy(f.strategy));
-
-  const shouldAllowForAlternativeStrategies = firstFactors.length > 0;
-
-  const firstPartyFactors = supportedFirstFactors
-    .filter(f => !f.strategy.startsWith('oauth_'))
-    .filter(factor => factorHasLocalStrategy(factor))
-    .filter(factor => !isDeeplyEqual(factor, filterOutFactor))
-    // Only include passkey if the device supports it.
-    // @ts-ignore Types are not public yet.
-    .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
-    .sort(allStrategiesButtonsComparator) as T[];
-
-  return {
-    hasAnyStrategy: shouldAllowForAlternativeStrategies,
-    hasFirstParty: firstPartyFactors.length > 0,
     firstPartyFactors,
   };
 }

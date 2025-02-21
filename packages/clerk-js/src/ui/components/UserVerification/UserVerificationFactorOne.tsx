@@ -3,11 +3,11 @@ import React, { useEffect } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
-import { useReverificationAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
+import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
