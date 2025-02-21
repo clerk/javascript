@@ -46,6 +46,7 @@ export type {
   SessionWebhookEvent,
   SMSWebhookEvent,
   UserWebhookEvent,
+  WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
 } from './Webhooks';

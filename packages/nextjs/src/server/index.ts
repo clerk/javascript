@@ -20,6 +20,7 @@ export type {
   SessionJSON,
   SMSMessageJSON,
   UserJSON,
+  WaitlistEntryJSON,
   WebhookEvent,
   WebhookEventType,
   UserWebhookEvent,
@@ -32,6 +33,7 @@ export type {
   RoleWebhookEvent,
   SessionWebhookEvent,
   SMSWebhookEvent,
+  WaitlistEntryWebhookEvent,
 } from '@clerk/backend';
 
 /**
