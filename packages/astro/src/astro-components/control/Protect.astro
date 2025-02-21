@@ -27,9 +27,18 @@ type Props = ProtectProps & {
 const { isStatic, ...props } = Astro.props;
 
 const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
+
+// Note: Astro server islands also use a "fallback" slot for loading states
+// See: https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content
+// We use "protect-fallback" as our preferred slot name to avoid conflicts
+const hasProtectFallback = Astro.slots.has('protect-fallback');
 ---
 
 <ProtectComponent {...props}>
   <slot />
-  <slot name="fallback" slot="fallback" />
+  {hasProtectFallback ? (
+    <slot name="protect-fallback" slot="protect-fallback" />
+  ) : (
+    <slot name="fallback" slot="fallback" />
+  )}
 </ProtectComponent>
