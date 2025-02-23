@@ -38,6 +38,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   const {
     sessionId,
     session,
+    sessionClaims,
     userId,
     user,
     orgId,
@@ -59,9 +60,10 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       orgSlug,
       orgPermissions,
       factorVerificationAge,
+      sessionClaims,
     };
     return { value };
-  }, [sessionId, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge]);
+  }, [sessionId, sessionClaims, userId, actor, orgId, orgRole, orgPermissions, orgSlug, factorVerificationAge]);
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const organizationCtx = React.useMemo(() => {
