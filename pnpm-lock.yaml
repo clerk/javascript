@@ -409,7 +409,7 @@ importers:
         version: 0.10.7
       type-fest:
         specifier: ^4.8.3
-        version: 4.33.0
+        version: 4.35.0
 
   packages/clerk-js:
     dependencies:
@@ -563,11 +563,11 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       next:
-        specifier: ^14.2.23
+        specifier: ^14.2.24
         version: 14.2.24(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
-        specifier: ^4.33.0
-        version: 4.33.0
+        specifier: ^4.35.0
+        version: 4.35.0
 
   packages/expo:
     dependencies:
@@ -14175,8 +14175,8 @@ packages:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
 
-  type-fest@4.33.0:
-    resolution: {integrity: sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g==}
+  type-fest@4.35.0:
+    resolution: {integrity: sha512-2/AwEFQDFEy30iOLjrvHDIH7e4HEWH+f1Yl1bI5XMqzuoCUqwYCdxachgsgv0og/JdVZUhbfjcJAoHj5L1753A==}
     engines: {node: '>=16'}
 
   type-is@1.6.18:
@@ -20345,7 +20345,7 @@ snapshots:
       cookie: 0.4.2
       set-cookie-parser: 2.6.0
       source-map: 0.7.4
-      type-fest: 4.33.0
+      type-fest: 4.35.0
     optionalDependencies:
       typescript: 5.6.3
 
@@ -23432,7 +23432,7 @@ snapshots:
       chalk: 5.4.1
       cli-boxes: 3.0.0
       string-width: 7.2.0
-      type-fest: 4.33.0
+      type-fest: 4.35.0
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
 
@@ -24715,7 +24715,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.33.0
+      type-fest: 4.35.0
 
   dotenv-expand@11.0.7:
     dependencies:
@@ -26820,7 +26820,7 @@ snapshots:
       slice-ansi: 7.1.0
       stack-utils: 2.0.6
       string-width: 7.2.0
-      type-fest: 4.33.0
+      type-fest: 4.35.0
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
       ws: 8.18.0
@@ -28999,7 +28999,7 @@ snapshots:
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
       strict-event-emitter: 0.5.1
-      type-fest: 4.33.0
+      type-fest: 4.35.0
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.6.3
@@ -29798,7 +29798,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.26.2
       index-to-position: 0.1.2
-      type-fest: 4.33.0
+      type-fest: 4.35.0
 
   parse-latin@7.0.0:
     dependencies:
@@ -30744,7 +30744,7 @@ snapshots:
       '@types/normalize-package-data': 2.4.4
       normalize-package-data: 6.0.2
       parse-json: 8.1.0
-      type-fest: 4.33.0
+      type-fest: 4.35.0
       unicorn-magic: 0.1.0
 
   read-yaml-file@1.1.0:
@@ -31519,7 +31519,7 @@ snapshots:
     dependencies:
       map-obj: 4.3.0
       snake-case: 3.0.4
-      type-fest: 4.33.0
+      type-fest: 4.35.0
 
   socket.io-adapter@2.5.5:
     dependencies:
@@ -32437,7 +32437,7 @@ snapshots:
 
   type-fest@3.13.1: {}
 
-  type-fest@4.33.0: {}
+  type-fest@4.35.0: {}
 
   type-is@1.6.18:
     dependencies:
