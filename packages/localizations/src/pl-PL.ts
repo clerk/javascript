@@ -921,7 +921,7 @@ export const plPL: LocalizationResource = {
       subtitle__unavailableWallets: 'Nie ma dostępnych portfeli web3.',
       successMessage: 'Portfel został dodany do Twojego konta.',
       title: 'Dodaj portfel web3',
-      web3WalletButtonsBlockButton: '{{provider|titleize}}',
+      web3WalletButtonsBlockButton: undefined,
     },
   },
   waitlist: {
