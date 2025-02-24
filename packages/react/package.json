@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.22.11",
+  "version": "5.23.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -68,7 +68,7 @@
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev --env.publish",
     "lint": "eslint src",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",

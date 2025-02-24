@@ -222,7 +222,7 @@ const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
   return (
     <ProfileSection.ArrowButton
       id='passkeys'
-      localizationKey={'Add a passkey'}
+      localizationKey={localizationKeys('userProfile.start.passkeysSection.primaryButton')}
       onClick={handleCreatePasskey}
     />
   );

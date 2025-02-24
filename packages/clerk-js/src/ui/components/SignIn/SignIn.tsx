@@ -152,6 +152,7 @@ function SignInRoot() {
     forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
     signInUrl: signInContext.signInUrl,
+    unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
 

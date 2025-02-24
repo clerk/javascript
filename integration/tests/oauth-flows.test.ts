@@ -1,10 +1,10 @@
-import { test } from '@playwright/test';
 import { createClerkClient } from '@clerk/backend';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
+import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
-import { instanceKeys } from '../presets/envs';
 import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {
@@ -78,7 +78,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.page.getByText('Sign in button (force)').click();
 
-    await u.po.signIn.waitForMounted();
+    await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
     await u.page.getByText('Sign in to oauth-provider').waitFor();
 
@@ -103,7 +103,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.page.getByText('Sign up button (force)').click();
 
-    await u.po.signUp.waitForMounted();
+    await u.po.signUp.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
     await u.page.getByText('Sign in to oauth-provider').waitFor();
 

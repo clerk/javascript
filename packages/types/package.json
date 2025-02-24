@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "4.45.0",
+  "version": "4.46.1",
   "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
@@ -33,10 +33,11 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
-    "csstype": "3.1.1"
+    "csstype": "3.1.3"
   },
   "devDependencies": {},
   "engines": {

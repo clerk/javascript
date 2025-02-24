@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.9.4",
+  "version": "0.10.0",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -54,7 +54,7 @@
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig"
   },

@@ -1,5 +1,131 @@
 # @clerk/vue
 
+## 1.2.1
+
+### Patch Changes
+
+- Previously, the `getCurrentOrganizationMembership()` function was duplicated in both `@clerk/vue` and `@clerk/shared/react`. This change moves the function to `@clerk/shared/organization`. ([#5168](https://github.com/clerk/javascript/pull/5168)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Re-export error handling utilities from `@clerk/shared` ([#5155](https://github.com/clerk/javascript/pull/5155)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { useSignIn } from '@clerk/vue';
+  import { isClerkAPIResponseError } from '@clerk/vue/errors';
+
+  // ... form state refs and other setup ...
+  const { signIn } = useSignIn();
+
+  const handleSubmit = async () => {
+    try {
+      const signInAttempt = await signIn.value.create({
+        identifier: email.value,
+        password: password.value,
+      });
+      // ... handle successful sign in ...
+    } catch (err) {
+      // Type guard to safely handle Clerk API errors
+      if (isClerkAPIResponseError(err)) {
+        errors.value = err.errors; // err.errors is properly typed as ClerkAPIError[]
+      }
+    }
+  };
+  </script>
+
+  <template>
+    <!-- Form template here -->
+  </template>
+  ```
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+
+## 1.2.0
+
+### Minor Changes
+
+- Add support for `<OrganizationProfile>` custom pages and links through `<OrganizationSwitcher>` ([#5129](https://github.com/clerk/javascript/pull/5129)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { OrganizationSwitcher } from '@clerk/vue';
+  import Icon from './Icon.vue';
+  </script>
+
+  <template>
+    <header>
+      <OrganizationSwitcher>
+        <OrganizationSwitcher.OrganizationProfilePage
+          label="Custom Page"
+          url="custom"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+          <div>
+            <h1>Custom Organization Profile Page</h1>
+            <p>This is the custom organization profile page</p>
+          </div>
+        </OrganizationSwitcher.OrganizationProfilePage>
+        <OrganizationSwitcher.OrganizationProfileLink
+          label="Homepage"
+          url="/"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+        </OrganizationSwitcher.OrganizationProfileLink>
+      </OrganizationSwitcher>
+    </header>
+  </template>
+  ```
+
+### Patch Changes
+
+- Add the ability to specify an appearance for modal component usages. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds ability to render custom `<UserProfile>` links inside `<UserButton>` component. ([#5128](https://github.com/clerk/javascript/pull/5128)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup>
+  import { UserButton } from '@clerk/vue';
+  </script>
+
+  <template>
+    <UserButton>
+      <UserButton.UserProfileLink
+        label="Homepage"
+        url="/"
+      >
+        <template #labelIcon>
+          <div>Icon</div>
+        </template>
+      </UserButton.UserProfileLink>
+    </UserButton>
+  </template>
+  ```
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+  - @clerk/shared@2.21.1
+
+## 1.1.11
+
+### Patch Changes
+
+- Remove `customPages` prop types from `<UserProfile />`, `<OrganizationProfile />` and `<UserButton />` to align with runtime behavior. ([#5101](https://github.com/clerk/javascript/pull/5101)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
 ## 1.1.10
 
 ### Patch Changes

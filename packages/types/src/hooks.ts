@@ -4,10 +4,10 @@ import type { SignInResource } from 'signIn';
 import type { SetActive, SignOut } from './clerk';
 import type { ActJWTClaim } from './jwt';
 import type {
-  ActiveSessionResource,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
+  SignedInSessionResource,
 } from './session';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
@@ -17,6 +17,7 @@ type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorization
 
 /**
  * Return values of the `useAuth()` hook
+ * @interface
  */
 export type UseAuthReturn =
   | {
@@ -63,137 +64,48 @@ export type UseAuthReturn =
       getToken: GetToken;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: false;
-      /**
-       * The ID of the current user.
-       */
       userId: null;
-      /**
-       * The ID for the current session.
-       */
       sessionId: null;
       actor: null;
-      /**
-       * The ID of the user's active organization.
-       */
       orgId: null;
-      /**
-       * The current user's role in their active organization.
-       */
       orgRole: null;
-      /**
-       * The URL-friendly identifier of the user's active organization.
-       */
       orgSlug: null;
-      /**
-       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/references/backend/types/auth-object#has).
-       */
       has: CheckAuthorizationWithoutOrgOrUser;
-      /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
-       */
       signOut: SignOut;
-      /**
-       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/references/javascript/session#get-token).
-       */
       getToken: GetToken;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: true;
-      /**
-       * The ID of the current user.
-       */
       userId: string;
-      /**
-       * The ID for the current session.
-       */
       sessionId: string;
       actor: ActJWTClaim | null;
-      /**
-       * The ID of the user's active organization.
-       */
       orgId: null;
-      /**
-       * The current user's role in their active organization.
-       */
       orgRole: null;
-      /**
-       * The URL-friendly identifier of the user's active organization.
-       */
       orgSlug: null;
-      /**
-       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/references/backend/types/auth-object#has).
-       */
       has: CheckAuthorizationWithCustomPermissions;
-      /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
-       */
       signOut: SignOut;
-      /**
-       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/references/javascript/session#get-token).
-       */
       getToken: GetToken;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: true;
-      /**
-       * The ID of the current user.
-       */
       userId: string;
-      /**
-       * The ID for the current session.
-       */
       sessionId: string;
       actor: ActJWTClaim | null;
-      /**
-       * The ID of the user's active organization.
-       */
       orgId: string;
-      /**
-       * The current user's role in their active organization.
-       */
       orgRole: OrganizationCustomRoleKey;
-      /**
-       * The URL-friendly identifier of the user's active organization.
-       */
       orgSlug: string | null;
-      /**
-       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/references/backend/types/auth-object#has).
-       */
       has: CheckAuthorizationWithCustomPermissions;
-      /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
-       */
       signOut: SignOut;
-      /**
-       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/references/javascript/session#get-token).
-       */
       getToken: GetToken;
     };
 
 /**
  * Return values of the `useSignIn()` hook
+ * @interface
  */
 export type UseSignInReturn =
   | {
@@ -211,22 +123,14 @@ export type UseSignInReturn =
       setActive: undefined;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * An object that contains the current sign-in attempt status and methods to create a new sign-in attempt.
-       */
       signIn: SignInResource;
-      /**
-       * A function that sets the active session.
-       */
       setActive: SetActive;
     };
 
 /**
  * Return values of the `useSignUp()` hook
+ * @interface
  */
 export type UseSignUpReturn =
   | {
@@ -244,22 +148,14 @@ export type UseSignUpReturn =
       setActive: undefined;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * An object that contains the current sign-up attempt status and methods to create a new sign-up attempt.
-       */
       signUp: SignUpResource;
-      /**
-       * A function that sets the active session.
-       */
       setActive: SetActive;
     };
 
 /**
  * Return values of the `useSession()` hook
+ * @interface
  */
 export type UseSessionReturn =
   | {
@@ -277,36 +173,19 @@ export type UseSessionReturn =
       session: undefined;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: false;
-      /**
-       * Holds the current active session for the user.
-       */
       session: null;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: true;
-      /**
-       * Holds the current active session for the user.
-       */
-      session: ActiveSessionResource;
+      session: SignedInSessionResource;
     };
 
 /**
  * Return values of the `useSessionList()` hook
+ * @interface
  */
 export type UseSessionListReturn =
   | {
@@ -324,22 +203,14 @@ export type UseSessionListReturn =
       setActive: undefined;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A list of sessions that have been registered on the client device.
-       */
       sessions: SessionResource[];
-      /**
-       * A function that sets the active session and/or organization.
-       */
       setActive: SetActive;
     };
 
 /**
  * Return values of the `useUser()` hook
+ * @interface
  */
 export type UseUserReturn =
   | {
@@ -358,26 +229,11 @@ export type UseUserReturn =
     }
   | {
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: false;
-      /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
-       */
       user: null;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * A boolean that indicates whether a user is currently signed in.
-       */
       isSignedIn: true;
-      /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
-       */
       user: UserResource;
     };
