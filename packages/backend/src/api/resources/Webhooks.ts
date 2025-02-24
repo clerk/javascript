@@ -64,4 +64,14 @@ export type WebhookEvent =
   | RoleWebhookEvent
   | PermissionWebhookEvent;
 
+export type WebhookEventPayload<T extends WebhookEventType> = WebhookEvent extends infer U
+  ? U extends { type: infer K }
+    ? T extends K
+      ? Simplify<Omit<U, 'type'> & { type: T }>
+      : never
+    : never
+  : never;
+
 export type WebhookEventType = WebhookEvent['type'];
+
+type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};

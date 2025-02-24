@@ -47,6 +47,7 @@ export type {
   SMSWebhookEvent,
   UserWebhookEvent,
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
 } from './Webhooks';
 

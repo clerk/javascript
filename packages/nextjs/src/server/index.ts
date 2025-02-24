@@ -21,6 +21,7 @@ export type {
   SMSMessageJSON,
   UserJSON,
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
   UserWebhookEvent,
   EmailWebhookEvent,
