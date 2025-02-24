@@ -76,8 +76,8 @@
   },
   "devDependencies": {
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.2.3",
-    "@rspack/core": "^1.2.3",
+    "@rspack/cli": "^1.2.5",
+    "@rspack/core": "^1.2.5",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
