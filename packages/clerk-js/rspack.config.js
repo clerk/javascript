@@ -161,6 +161,17 @@ const typescriptLoaderProd = () => {
         },
       },
     },
+    {
+      test: /\.m?js$/,
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            targets: packageJSON.browserslist,
+          },
+        },
+      },
+    },
   ];
 };
 
