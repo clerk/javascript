@@ -1,6 +1,6 @@
 import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaWidgetType } from '@clerk/types';
+import type { CaptchaWidgetType, Layout } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
@@ -59,6 +59,24 @@ interface RenderOptions {
    */
   appearance?: 'always' | 'execute' | 'interaction-only';
   /**
+   * The widget theme. Can take the following values: light, dark, auto.
+   * The default is auto, which respects the user preference. This can be forced to light or dark by setting the theme accordingly.
+   * @default 'auto'
+   */
+  theme?: Layout['captchaTheme'];
+  /**
+   * The widget size. Can take the following values: normal, flexible, compact.
+   * @default 'normal'
+   */
+  size?: Layout['captchaSize'];
+  /**
+   * Language to display, must be either: auto (default) to use the language that the visitor has chosen,
+   * or an ISO 639-1 two-letter language code (e.g. en) or language and country code (e.g. en-US).
+   * Refer to the list of supported languages for more information.
+   * https://developers.cloudflare.com/turnstile/reference/supported-languages
+   */
+  language?: string;
+  /**
    * A custom value that can be used to differentiate widgets under the same sitekey
    * in analytics and which is returned upon validation. This can only contain up to
    * 32 alphanumeric characters including _ and -.
@@ -109,6 +127,14 @@ async function loadCaptchaFromCloudflareURL() {
   }
 }
 
+function getCaptchaAttibutesFromElemenet(element: HTMLElement) {
+  const theme = element.getAttribute('data-cl-theme');
+  const language = element.getAttribute('data-cl-language');
+  const size = element.getAttribute('data-cl-size');
+
+  return { theme, language, size };
+}
+
 /*
  * How this function works:
  * The widgetType is either 'invisible' or 'smart'.
@@ -125,6 +151,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let captchaToken = '';
   let id = '';
   let turnstileSiteKey = siteKey;
+  let captchaTheme: RenderOptions['theme'];
+  let captchaSize: RenderOptions['size'];
+  let captchaLanguage: RenderOptions['language'];
   let retries = 0;
   let widgetContainerQuerySelector: string | undefined;
   // The backend uses this to determine which Turnstile site-key was used in order to verify the token
@@ -138,7 +167,13 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     captchaWidgetType = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
     await openModal?.();
-    await waitForElement(modalContainerQuerySelector);
+    const modalContainderEl = await waitForElement(modalContainerQuerySelector);
+    if (modalContainderEl) {
+      const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
+      captchaTheme = theme as RenderOptions['theme'];
+      captchaLanguage = language as RenderOptions['language'];
+      captchaSize = size as RenderOptions['size'];
+    }
   }
 
   // smart widget with container provided by user
@@ -148,6 +183,10 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
       visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
+      const { theme, language, size } = getCaptchaAttibutesFromElemenet(visibleDiv);
+      captchaTheme = theme as RenderOptions['theme'];
+      captchaLanguage = language as RenderOptions['language'];
+      captchaSize = size as RenderOptions['size'];
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -172,6 +211,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
         const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
+          theme: captchaTheme || 'auto',
+          size: captchaSize || 'normal',
+          language: captchaLanguage || 'auto',
           action: opts.action,
           retry: 'never',
           'refresh-expired': 'auto',
@@ -192,7 +234,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
                 // We set the min-height to the height of the Turnstile widget
                 // because the widget initially does a small layout shift
                 // and then expands to the correct height
-                visibleWidget.style.minHeight = '68px';
+                visibleWidget.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
