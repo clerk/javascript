@@ -31,7 +31,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { SignedInSessionResource } from './session';
+import type { SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -477,6 +477,11 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
+   * Returns the url where tasks get displayed. It defaults to `signInUrl` or `signUpUrl`.
+   */
+  internal__buildTasksUrl(options: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string;
+
+  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -871,6 +876,11 @@ export type SignUpRedirectOptions = RedirectOptions &
      */
     initialValues?: SignUpInitialValues;
   };
+
+export type RedirectToTasksUrlOptions = {
+  task?: SessionTask;
+  origin?: 'SignIn' | 'SignUp';
+};
 
 export type SetActiveParams = {
   /**

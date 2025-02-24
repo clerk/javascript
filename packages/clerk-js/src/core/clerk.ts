@@ -43,6 +43,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
+  RedirectToTasksUrlOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -66,6 +67,7 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { sessionTaskRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -89,11 +91,11 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
   noUserExists,
   removeClerkQueryParam,
   requiresUserInput,
-  sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
   windowNavigate,
 } from '../utils';
@@ -427,7 +429,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -481,7 +483,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -889,6 +891,10 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
+    const isResolvingSessionTasks =
+      !!newSession?.currentTask ||
+      window.location.href.includes(this.internal__buildTasksUrl({ task: newSession?.currentTask }));
+
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
@@ -946,7 +952,7 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit) {
+    if (redirectUrl && !beforeEmit && !isResolvingSessionTasks) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1003,6 +1009,8 @@ export class Clerk implements ClerkInterface {
     if (!to || !inBrowser()) {
       return;
     }
+
+    console.log('Clerk.navigate is navigating to', { to });
 
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
@@ -1112,6 +1120,20 @@ export class Clerk implements ClerkInterface {
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
     const initValues = new URLSearchParams(options?.initialValues || {});
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
+  }
+
+  public internal__buildTasksUrl({ task = this.session?.currentTask, origin }: RedirectToTasksUrlOptions): string {
+    if (!task) {
+      return '';
+    }
+
+    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.includes(signUpUrl);
+
+    const originWithDefault = origin ?? (referrerIsSignUpUrl ? 'SignUp' : 'SignIn');
+    const defaultUrlByOrigin = originWithDefault === 'SignIn' ? this.#options.signInUrl : this.#options.signUpUrl;
+
+    return buildURL({ base: defaultUrlByOrigin, hashPath: sessionTaskRoutePaths[task.key] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1231,6 +1253,13 @@ export class Clerk implements ClerkInterface {
   public redirectToWaitlist = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildWaitlistUrl());
+    }
+    return;
+  };
+
+  public redirectToTasks = async (options: RedirectToTasksUrlOptions): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.internal__buildTasksUrl(options));
     }
     return;
   };
@@ -1728,11 +1757,21 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      const hasResolvedPreviousTask = this.session.currentTask != session?.currentTask;
+
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
+
+      // Any FAPI call could lead to a task being unsatisfied such as app owners
+      // actions therefore the check must be done on client piggybacking
+      if (session?.currentTask) {
+        eventBus.dispatch(events.NewSessionTask, session);
+      } else if (session && hasResolvedPreviousTask) {
+        eventBus.dispatch(events.ResolvedSessionTask, session);
+      }
     }
 
     this.#emit();
@@ -2075,6 +2114,16 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
+
+    eventBus.on(events.NewSessionTask, session => {
+      console.log('new session task');
+      void this.redirectToTasks({ task: session.currentTask });
+    });
+
+    eventBus.on(events.ResolvedSessionTask, () => {
+      console.log('resolved task');
+      void this.redirectToAfterSignIn();
     });
   };
 
