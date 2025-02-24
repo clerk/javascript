@@ -115,7 +115,7 @@ export type LoadClerkJWKFromRemoteOptions = {
  *
  * Loads a key from JWKS retrieved from the well-known Frontend API endpoint of the issuer.
  * The result is also cached on the module level to avoid network requests in subsequent invocations.
- * The cache lasts 1 hour by default.
+ * The cache lasts up to 5 minutes.
  *
  * @param {Object} options
  * @param {string} options.kid - The id of the key that the JWT was signed with
