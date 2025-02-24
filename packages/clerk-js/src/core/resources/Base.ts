@@ -11,6 +11,7 @@ import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   fetchMaxTries?: number;
+  skipUpdateClient?: boolean;
 };
 
 export type BaseMutateParams = {
@@ -18,6 +19,7 @@ export type BaseMutateParams = {
   body?: any;
   method?: HTTPMethod;
   path?: string;
+  skipUpdateClient?: boolean;
 };
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
@@ -105,7 +107,7 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
+    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
       this._updateClient<J>(payload);
     }
 
@@ -180,8 +182,13 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    const { action, body, method, path, skipUpdateClient } = params;
+    let json;
+    if (skipUpdateClient) {
+      json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body }, { skipUpdateClient });
+    } else {
+      json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    }
     return this.fromJSON((json?.response || json) as J);
   }
 
