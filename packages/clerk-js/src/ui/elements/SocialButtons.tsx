@@ -103,7 +103,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             gridTemplateColumns:
               strategies.length < 1
                 ? `repeat(1, 1fr)`
-                : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `calc((100% - (${strategyRowOneLength} - 1) * ${t.sizes.$2}) / ${strategyRowOneLength})`})`,
+                : `repeat(${row.length}, ${
+                    rowIndex === 0
+                      ? `1fr`
+                      : // Calculate the width of each button based on the width of the buttons within the first row.
+                        // t.sizes.$2 is used here to represent the gap defined on the Grid component.
+                        `calc((100% - (${strategyRowOneLength} - 1) * ${t.sizes.$2}) / ${strategyRowOneLength})`
+                  })`,
           })}
         >
           {row.map(strategy => {
