@@ -242,7 +242,14 @@ export class User extends BaseResource implements UserResource {
   };
 
   delete = (): Promise<void> => {
-    return this._baseDelete({ path: '/me' }).then(res => {
+    return this._baseDelete({
+      path: '/me',
+      /**
+       * Skipping updating the client matches the behaviour of `client.destroy`, which allows broadcasting a sign-out event,
+       * and delays emitting until `setActive` is called within `Clerk.signOut()`
+       */
+      skipUpdateClient: true,
+    }).then(res => {
       eventBus.dispatch(events.UserSignOut, null);
       return res;
     });
