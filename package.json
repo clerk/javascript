@@ -9,7 +9,7 @@
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
     "clean": "turbo clean",
-    "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/tailwindcss-transformer --filter=!@clerk/remix --filter=!@clerk/ui --filter=!@clerk/chrome-extension",
+    "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/remix --filter=!@clerk/chrome-extension",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "format": "prettier --write .",
     "format:check": "prettier --cache --check .",

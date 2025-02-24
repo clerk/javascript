@@ -2,16 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { OptionDefaults } from 'typedoc';
 
-const IGNORE_LIST = [
-  '.DS_Store',
-  'dev-cli',
-  'expo-passkeys',
-  'tailwindcss-transformer',
-  'testing',
-  'themes',
-  'ui',
-  'upgrade',
-];
+const IGNORE_LIST = ['.DS_Store', 'dev-cli', 'expo-passkeys', 'testing', 'themes', 'ui', 'upgrade'];
 
 /**
  * Return an array of relative paths to all folders in the "packages" folder to be used for the "entryPoints" option.

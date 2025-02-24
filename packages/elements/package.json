@@ -63,7 +63,6 @@
     "build:declarations": "tsc --env.NODE_ENV production -p tsconfig.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
-    "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"pnpm dev -w @clerk/ui\" \"cd ../ui/theme-builder && pnpm dev\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
