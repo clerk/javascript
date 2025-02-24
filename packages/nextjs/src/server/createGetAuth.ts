@@ -1,15 +1,22 @@
 import type { AuthObject } from '@clerk/backend';
+import type {
+  AuthenticatedMachineObject,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
+import { getAuthDataFromRequest as getAuthDataFromRequestOriginal } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
-
+type GetAuthOptions = { entity?: 'user' | 'machine' | 'any' };
 /**
  * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
  * Should be used with function like `auth()` that are already asynchronous.
@@ -17,9 +24,11 @@ import { assertAuthStatus } from './utils';
 export const createAsyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
@@ -44,8 +53,25 @@ export const createAsyncGetAuth = ({
         // still throw there is no suggested move location
         assertAuthStatus(req, noAuthStatusMessage);
       }
-
-      return getAuthDataFromRequest(req, { ...opts, logger });
+      // Explicitly declare overloads at the top level
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'machine' },
+      ): Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject>;
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'user' },
+      ): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'any' },
+      ): AuthObject | AuthenticatedMachineObject | UnauthenticatedMachineObject;
+      function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
+      function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
+        // Ensure you spread and pass the correct options, including the logger
+        return getAuthDataFromRequestOriginal(req, { ...opts, logger, entity: options?.entity });
+      }
+      return getAuthDataFromRequest(req, { ...opts, logger, entity: options?.entity });
     };
   });
 
@@ -57,9 +83,11 @@ export const createAsyncGetAuth = ({
 export const createSyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
@@ -68,7 +96,26 @@ export const createSyncGetAuth = ({
       }
 
       assertAuthStatus(req, noAuthStatusMessage);
-      return getAuthDataFromRequest(req, { ...opts, logger });
+
+      // Explicitly declare overloads at the top level
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'machine' },
+      ): Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject>;
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'user' },
+      ): Exclude<AuthObject, AuthenticatedMachineObject | UnauthenticatedMachineObject>;
+      function getAuthDataFromRequest(
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions & { entity: 'any' },
+      ): AuthObject | AuthenticatedMachineObject | UnauthenticatedMachineObject;
+      function getAuthDataFromRequest(req: RequestLike, opts?: GetAuthDataFromRequestOptions): AuthObject;
+      function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) {
+        // Ensure you spread and pass the correct options, including the logger
+        return getAuthDataFromRequestOriginal(req, { ...opts, logger, entity: options?.entity });
+      }
+      return getAuthDataFromRequest(req, { ...opts, logger, entity: options?.entity });
     };
   });
 
