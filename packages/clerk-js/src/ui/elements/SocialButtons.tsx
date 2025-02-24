@@ -57,7 +57,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   }
 
   const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
-  const strategyRowOneLength = strategyRows.at(0)?.length;
+  const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
