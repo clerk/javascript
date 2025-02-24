@@ -2,4 +2,4 @@
 "@clerk/nuxt": patch
 ---
 
-Fix duplicated imports warning
+Fixes an issue where duplicated imports caused warnings in the console.
