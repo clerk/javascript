@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "lib": ["es6", "dom"],
+    "jsx": "react-jsx",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "importHelpers": true,
+    "declaration": true,
+    "declarationMap": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "target": "ES2019",
+    "noEmitOnError": false,
+    "moduleSuffixes": [".ios", ".android", ".native", ""]
+  },
+  "include": ["src", "tsup.config.ts"]
+}
