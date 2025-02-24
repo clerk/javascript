@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { withRedirectToAfterSignUp, withRedirectToTasksAfterSignUp } from '../../common';
+import { withRedirectToAfterSignUp, withRedirectToTasks } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
@@ -346,6 +346,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToTasksAfterSignUp(
-  withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart)),
-);
+export const SignUpStart = withRedirectToTasks(withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart)));

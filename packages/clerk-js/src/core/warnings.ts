@@ -18,10 +18,8 @@ const warnings = {
     'The <SignUp/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the value set in `afterSignUp` URL instead.',
   cannotRenderSignInComponentWhenSessionExists:
     'The <SignIn/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `afterSignIn` URL instead.',
-  cannotRenderSignInComponentWithPendingTasks:
-    'The <SignIn/> component cannot render when a user has pending tasks to resolve, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `tasksUrl` instead.',
-  cannotRenderSignUpComponentWithPendingTasks:
-    'The <SignUp/> component cannot render when a user has pending tasks to resolve, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `tasksUrl` instead.',
+  cannotRenderComponentWithPendingTasks:
+    'The component cannot render when a user has pending tasks to resolve, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `tasksUrl` instead.',
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,

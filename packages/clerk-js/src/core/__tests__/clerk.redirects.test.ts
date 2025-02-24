@@ -122,6 +122,7 @@ describe('Clerk singleton - Redirects', () => {
 
       afterEach(() => {
         mockEnvironmentFetch.mockRestore();
+        mockClientFetch.mockRestore();
       });
 
       it('redirects to signInUrl for development instance', async () => {
@@ -220,6 +221,7 @@ describe('Clerk singleton - Redirects', () => {
 
       afterEach(() => {
         mockEnvironmentFetch.mockRestore();
+        mockClientFetch.mockRestore();
       });
 
       const host = 'http://another-test.host';
@@ -307,6 +309,58 @@ describe('Clerk singleton - Redirects', () => {
 
       expect(mockHref).toHaveBeenNthCalledWith(1, `${host}/`);
       expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/?__clerk_db_jwt=deadbeef`);
+    });
+  });
+
+  describe('on signed-in session with pending tasks', () => {
+    let clerkForProductionInstance: Clerk;
+    let clerkForDevelopmentInstance: Clerk;
+
+    beforeEach(async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfigWithDifferentOrigin,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [
+            {
+              id: '1',
+              remove: jest.fn(),
+              status: 'pending',
+              currentTask: { key: 'org' },
+              user: {},
+              touch: jest.fn(() => Promise.resolve()),
+              getToken: jest.fn(),
+              lastActiveToken: { getRawString: () => 'mocked-token' },
+            },
+          ],
+        }),
+      );
+
+      clerkForProductionInstance = new Clerk(productionPublishableKey);
+      clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
+
+      await clerkForProductionInstance.load(mockedLoadOptions);
+      await clerkForDevelopmentInstance.load(mockedLoadOptions);
+    });
+
+    afterEach(() => {
+      mockEnvironmentFetch.mockRestore();
+      mockClientFetch.mockRestore();
+    });
+
+    it('when session has tasks, redirect to tasks URL', async () => {
+      await clerkForDevelopmentInstance.redirectToTasks();
+
+      expect(mockNavigate).toHaveBeenCalledWith('/#/select-organization', {
+        windowNavigate: expect.any(Function),
+      });
     });
   });
 });

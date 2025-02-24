@@ -26,7 +26,6 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   RedirectOptions,
-  RedirectToTasksUrlOptions,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -334,12 +333,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  internal__buildTasksUrl = (opts: RedirectToTasksUrlOptions): string | void => {
-    const callback = () => this.clerkjs?.internal__buildTasksUrl(opts) || '';
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
-      this.premountMethodCalls.set('internal__buildTasksUrl', callback);
+      this.premountMethodCalls.set('buildTasksUrl', callback);
     }
   };
 

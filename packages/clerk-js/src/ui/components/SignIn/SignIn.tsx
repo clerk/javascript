@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { sessionTaskRoutePaths } from '../../../ui/common/tasks';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -19,7 +20,7 @@ import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
 import { SignUpStart } from '../SignUp/SignUpStart';
 import { SignUpVerifyEmail } from '../SignUp/SignUpVerifyEmail';
 import { SignUpVerifyPhone } from '../SignUp/SignUpVerifyPhone';
-import { useTaskRoute } from '../Task/useTaskRoute';
+import { Task } from '../Task';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
@@ -39,7 +40,6 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
-  const taskRoute = useTaskRoute();
 
   return (
     <Flow.Root flow='signIn'>
@@ -134,7 +134,17 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
-        {taskRoute && <Route {...taskRoute} />}
+
+        {sessionTaskRoutePaths.map(path => (
+          <Route
+            key={path}
+            path={path}
+            canActivate={clerk => !!clerk.session?.currentTask}
+          >
+            <Task />
+          </Route>
+        ))}
+
         <Route index>
           <SignInStart />
         </Route>

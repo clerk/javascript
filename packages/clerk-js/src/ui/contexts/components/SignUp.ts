@@ -25,7 +25,6 @@ export type SignUpContextType = SignUpCtx & {
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
-  tasksUrl: string;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -84,10 +83,6 @@ export const useSignUpContext = (): SignUpContextType => {
   signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
   waitlistUrl = buildURL({ base: waitlistUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
-  const tasksUrl = clerk.internal__buildTasksUrl({
-    origin: 'SignUp',
-  });
-
   const authQueryString = redirectUrls.toSearchParams().toString();
 
   const emailLinkRedirectUrl =
@@ -123,7 +118,6 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
-    tasksUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },

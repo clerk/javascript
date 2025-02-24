@@ -52,21 +52,20 @@ export function withRedirect<P extends AvailableComponentProps>(
   return HOC;
 }
 
-export const withRedirectToTasksAfterSignIn = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+export const withRedirectToTasks = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
   const displayName = Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
-    const signInCtx = useSignInContext();
     return withRedirect(
       Component,
       hasPendingTasksAndSingleSessionModeEnabled,
-      () => signInCtx.tasksUrl,
-      warnings.cannotRenderSignInComponentWithPendingTasks,
+      ({ clerk }) => clerk.buildTasksUrl(),
+      warnings.cannotRenderComponentWithPendingTasks,
     )(props);
   };
 
-  HOC.displayName = `withRedirectToTasksAfterSignIn(${displayName})`;
+  HOC.displayName = `withRedirectToTasks(${displayName})`;
 
   return HOC;
 };
@@ -99,31 +98,12 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     return withRedirect(
       Component,
       isSignedInAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
       warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
 
   HOC.displayName = `withRedirectToAfterSignUp(${displayName})`;
-
-  return HOC;
-};
-
-export const withRedirectToTasksAfterSignUp = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
-  const displayName = Component.displayName || Component.name || 'Component';
-  Component.displayName = displayName;
-
-  const HOC = (props: P) => {
-    const signInCtx = useSignUpContext();
-    return withRedirect(
-      Component,
-      hasPendingTasksAndSingleSessionModeEnabled,
-      () => signInCtx.tasksUrl,
-      warnings.cannotRenderSignUpComponentWithPendingTasks,
-    )(props);
-  };
-
-  HOC.displayName = `withRedirectToTasksAfterSignIn(${displayName})`;
 
   return HOC;
 };

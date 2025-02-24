@@ -2,11 +2,12 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
+import { sessionTaskRoutePaths } from '../../../ui/common/tasks';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { useTaskRoute } from '../Task/useTaskRoute';
+import { Task } from '../Task';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -23,7 +24,6 @@ function RedirectToSignUp() {
 
 function SignUpRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
-  const taskRoute = useTaskRoute();
 
   return (
     <Flow.Root flow='signUp'>
@@ -76,7 +76,15 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
-        {taskRoute && <Route {...taskRoute} />}
+        {sessionTaskRoutePaths.map(path => (
+          <Route
+            key={path}
+            path={path}
+            canActivate={clerk => !!clerk.session?.currentTask}
+          >
+            <Task />
+          </Route>
+        ))}
         <Route index>
           <SignUpStart />
         </Route>

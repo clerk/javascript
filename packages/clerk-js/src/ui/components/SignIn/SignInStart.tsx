@@ -11,7 +11,7 @@ import {
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
-  withRedirectToTasksAfterSignIn,
+  withRedirectToTasks,
 } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
@@ -573,6 +573,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToTasksAfterSignIn(
-  withRedirectToAfterSignIn(withCardStateProvider(_SignInStart)),
-);
+export const SignInStart = withRedirectToTasks(withRedirectToAfterSignIn(withCardStateProvider(_SignInStart)));

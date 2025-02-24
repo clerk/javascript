@@ -43,7 +43,6 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
-  RedirectToTasksUrlOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -67,7 +66,7 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import { sessionTaskRoutePaths } from '../ui/common/tasks';
+import { sessionTaskKeyToRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -891,9 +890,7 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
-    const isResolvingSessionTasks =
-      !!newSession?.currentTask ||
-      window.location.href.includes(this.internal__buildTasksUrl({ task: newSession?.currentTask }));
+    const isResolvingSessionTasks = !!newSession?.currentTask || window.location.href.includes(this.buildTasksUrl());
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
@@ -1122,18 +1119,14 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public internal__buildTasksUrl({ task = this.session?.currentTask, origin }: RedirectToTasksUrlOptions): string {
-    if (!task) {
+  public buildTasksUrl(): string {
+    const currentTask = this.session?.currentTask;
+
+    if (!currentTask) {
       return '';
     }
 
-    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
-    const referrerIsSignUpUrl = signUpUrl && window.location.href.includes(signUpUrl);
-
-    const originWithDefault = origin ?? (referrerIsSignUpUrl ? 'SignUp' : 'SignIn');
-    const defaultUrlByOrigin = originWithDefault === 'SignIn' ? this.#options.signInUrl : this.#options.signUpUrl;
-
-    return buildURL({ base: defaultUrlByOrigin, hashPath: sessionTaskRoutePaths[task.key] }, { stringify: true });
+    return buildURL({ hashPath: sessionTaskKeyToRoutePaths[currentTask.key] }, { stringify: true });
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1257,9 +1250,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (options: RedirectToTasksUrlOptions): Promise<unknown> => {
+  public redirectToTasks = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.internal__buildTasksUrl(options));
+      return this.navigate(this.buildTasksUrl());
     }
     return;
   };
@@ -1757,6 +1750,10 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      // TODO - Resolve after-task redirection
+      // TODO - Resolve issue on closing modals on navigation within Clerk.navigate
+      // sign-in/select-organization -> /home
+      // sign-in -> sign-in/select-organization
       const hasResolvedPreviousTask = this.session.currentTask != session?.currentTask;
 
       // Note: this might set this.session to null
@@ -1765,16 +1762,16 @@ export class Clerk implements ClerkInterface {
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
 
-      // Any FAPI call could lead to a task being unsatisfied such as app owners
-      // actions therefore the check must be done on client piggybacking
+      this.#emit();
+
+      // Tasks handling must be reactive on client piggybacking to support
+      // immediate instance-level configuration changes by app owners
       if (session?.currentTask) {
         eventBus.dispatch(events.NewSessionTask, session);
       } else if (session && hasResolvedPreviousTask) {
         eventBus.dispatch(events.ResolvedSessionTask, session);
       }
     }
-
-    this.#emit();
   };
 
   get __unstable__environment(): EnvironmentResource | null | undefined {
@@ -2116,9 +2113,9 @@ export class Clerk implements ClerkInterface {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
 
-    eventBus.on(events.NewSessionTask, session => {
+    eventBus.on(events.NewSessionTask, () => {
       console.log('new session task');
-      void this.redirectToTasks({ task: session.currentTask });
+      void this.redirectToTasks();
     });
 
     eventBus.on(events.ResolvedSessionTask, () => {
