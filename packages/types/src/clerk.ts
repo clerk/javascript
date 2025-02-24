@@ -477,7 +477,7 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
-   * Returns the url where a task page is rendered.
+   * Returns the url where tasks get displayed. It defaults to `signInUrl` or `signUpUrl`.
    */
   internal__buildTasksUrl(options: { task?: SessionTask; origin?: 'SignIn' | 'SignUp' }): string;
 

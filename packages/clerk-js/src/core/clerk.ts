@@ -1010,7 +1010,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    console.log({ to });
+    console.log('Clerk.navigate is navigating to', { to });
 
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
@@ -1122,7 +1122,7 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public internal__buildTasksUrl({ task, origin }: RedirectToTasksUrlOptions): string {
+  public internal__buildTasksUrl({ task = this.session?.currentTask, origin }: RedirectToTasksUrlOptions): string {
     if (!task) {
       return '';
     }

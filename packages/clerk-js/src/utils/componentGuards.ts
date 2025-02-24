@@ -6,11 +6,6 @@ export type ComponentGuard = (
   options?: ClerkOptions,
 ) => boolean;
 
-// todo -> add tests
-// is signed in, and single session mode enabled, and active session -> redirect to after sign in
-// is signed in, and single session mode, and pending session => redirect to task
-// is signed in, and multi session mode, and active session -> let it be
-// is signed in, and multi session mode, and pending session -> let it be
 export const isSignedInAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
   return !!(clerk.isSignedIn && environment?.authConfig.singleSessionMode);
 };
