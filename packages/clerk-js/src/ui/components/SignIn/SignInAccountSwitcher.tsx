@@ -1,4 +1,4 @@
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToTasksAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Action, Actions, Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
@@ -120,4 +120,6 @@ const _SignInAccountSwitcher = () => {
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(_SignInAccountSwitcher));
+export const SignInAccountSwitcher = withRedirectToTasksAfterSignIn(
+  withRedirectToAfterSignIn(withCardStateProvider(_SignInAccountSwitcher)),
+);

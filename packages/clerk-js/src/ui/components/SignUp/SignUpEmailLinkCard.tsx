@@ -13,6 +13,8 @@ import { handleError } from '../../utils';
 import { completeSignUpFlow } from './util';
 
 export const SignUpEmailLinkCard = () => {
+  console.log('rendering');
+
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
   const signUpContext = useSignUpContext();

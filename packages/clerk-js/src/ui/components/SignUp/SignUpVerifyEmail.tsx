@@ -4,6 +4,8 @@ import { SignUpEmailCodeCard } from './SignUpEmailCodeCard';
 import { SignUpEmailLinkCard } from './SignUpEmailLinkCard';
 
 export const SignUpVerifyEmail = withCardStateProvider(() => {
+  console.log('rendering');
+
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const emailLinkStrategyEnabled = attributes.email_address.verifications.includes('email_link');

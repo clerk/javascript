@@ -7,7 +7,12 @@ import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
+import {
+  getIdentifierControlDisplayValues,
+  groupIdentifiers,
+  withRedirectToAfterSignIn,
+  withRedirectToTasksAfterSignIn,
+} from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -568,4 +573,6 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToTasksAfterSignIn(
+  withRedirectToAfterSignIn(withCardStateProvider(_SignInStart)),
+);

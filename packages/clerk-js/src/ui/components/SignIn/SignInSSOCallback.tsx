@@ -1,3 +1,3 @@
-import { SSOCallback, withRedirectToAfterSignIn } from '../../common';
+import { SSOCallback, withRedirectToAfterSignIn, withRedirectToTasksAfterSignIn } from '../../common';
 
-export const SignInSSOCallback = withRedirectToAfterSignIn(SSOCallback);
+export const SignInSSOCallback = withRedirectToTasksAfterSignIn(withRedirectToAfterSignIn(SSOCallback));

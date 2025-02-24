@@ -1,7 +1,7 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { withRedirectToAfterSignIn, withRedirectToTasksAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -210,4 +210,6 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToTasksAfterSignIn(
+  withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorOne)),
+);
