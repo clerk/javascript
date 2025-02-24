@@ -29,12 +29,12 @@
     "test": "jest"
   },
   "dependencies": {
-    "@babel/parser": "^7.24.5",
-    "cssnano": "7.0.5",
-    "postcss": "^8.4.38",
+    "@babel/parser": "^7.26.9",
+    "cssnano": "7.0.6",
+    "postcss": "^8.5.3",
     "postcss-value-parser": "^4.2.0",
-    "recast": "^0.23.7",
-    "tailwindcss": "^3.4.3",
+    "recast": "^0.23.9",
+    "tailwindcss": "^3.4.17",
     "tslib": "catalog:repo"
   }
 }
