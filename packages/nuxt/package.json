@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.0.12",
+  "version": "1.2.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -28,19 +28,23 @@
   "exports": {
     ".": {
       "types": "./dist/module.d.ts",
-      "import": "./dist/module.js"
+      "default": "./dist/module.js"
     },
     "./server": {
       "types": "./dist/runtime/server/index.d.ts",
-      "import": "./dist/runtime/server/index.js"
+      "default": "./dist/runtime/server/index.js"
     },
     "./components": {
       "types": "./dist/runtime/components/index.d.ts",
-      "import": "./dist/runtime/components/index.js"
+      "default": "./dist/runtime/components/index.js"
     },
     "./composables": {
       "types": "./dist/runtime/composables/index.d.ts",
-      "import": "./dist/runtime/composables/index.js"
+      "default": "./dist/runtime/composables/index.js"
+    },
+    "./errors": {
+      "types": "./dist/runtime/errors.d.ts",
+      "default": "./dist/runtime/errors.js"
     }
   },
   "main": "./dist/module.js",
@@ -52,7 +56,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm",
+    "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
     "test": "vitest run",

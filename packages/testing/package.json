@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.4.16",
+  "version": "1.4.23",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -65,7 +65,7 @@
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "dotenv": "16.4.5"
+    "dotenv": "16.4.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",

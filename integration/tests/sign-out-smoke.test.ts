@@ -22,6 +22,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
 
   test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
+    await mainTab.page.addInitScript(() => {
+      /**
+       * Playwright may define connection incorrectly, we are overriding to null
+       */
+      if (
+        navigator.onLine &&
+        // @ts-expect-error Cannot find `connection`
+        (navigator?.connection?.rtt === 0 || navigator?.downlink?.rtt === 0)
+      ) {
+        Object.defineProperty(Object.getPrototypeOf(navigator), 'connection', { value: null });
+      }
+    });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
     await mainTab.po.signIn.continue();
@@ -43,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
       await m.po.expect.toBeSignedOut();
     });
 
-    await mainTab.po.expect.toBeSignedOut();
+    await mainTab.po.expect.toBeSignedOut({ timeOut: 2 * 1_000 });
   });
 
   test('sign out persisting client', async ({ page, context }) => {

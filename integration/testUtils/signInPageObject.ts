@@ -24,6 +24,11 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
     waitForMounted: (selector = '.cl-signIn-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
+    waitForModal: (state?: 'open' | 'closed') => {
+      return page.waitForSelector('.cl-modalContent:has(.cl-signIn-root)', {
+        state: state === 'closed' ? 'detached' : 'attached',
+      });
+    },
     setIdentifier: (val: string) => {
       return self.getIdentifierInput().fill(val);
     },

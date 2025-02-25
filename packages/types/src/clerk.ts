@@ -31,7 +31,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ActiveSessionResource } from './session';
+import type { SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -63,7 +63,7 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -127,11 +127,16 @@ export interface Clerk {
   /** Clerk flag for loading Clerk in a standard browser setup */
   isStandardBrowser: boolean | undefined;
 
+  /**
+   * Indicates whether the current user has a valid signed-in client session
+   */
+  isSignedIn: boolean;
+
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 
-  /** Active Session. */
-  session: ActiveSessionResource | null | undefined;
+  /** Current Session. */
+  session: SignedInSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
@@ -392,6 +397,12 @@ export interface Clerk {
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
+   * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
+   * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   */
+  __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
+  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -443,12 +454,12 @@ export interface Clerk {
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignInUrl(): string;
+  buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignUpUrl(): string;
+  buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignOutUrl of the instance.
@@ -702,9 +713,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     polling?: boolean;
     /**
-     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
-    selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
+    selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
      * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
@@ -790,7 +801,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: ActiveSessionResource | null;
+  session?: SignedInSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -831,10 +842,6 @@ type RouterFn = (
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 
-export type WithInternalRouting<T> =
-  | (Omit<T, 'routing' | 'path'> & { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> })
-  | (Omit<T, 'routing' | 'path'> & { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> });
-
 export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;
@@ -867,10 +874,10 @@ export type SignUpRedirectOptions = RedirectOptions &
 
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set as active.
+   * The session resource or session id (string version) to be set on the client.
    * If `null`, the current session is deleted.
    */
-  session?: ActiveSessionResource | string | null;
+  session?: SignedInSessionResource | string | null;
 
   /**
    * The organization resource or organization ID/slug (string version) to be set as active in the current session.
@@ -896,7 +903,7 @@ export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
 export type SignInProps = RoutingOptions & {
   /**
@@ -1391,6 +1398,40 @@ export interface HandleEmailLinkVerificationParams {
    */
   onVerifiedOnOtherDevice?: () => void;
 }
+
+type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+  mode: 'modal';
+  appearance?: T['appearance'];
+};
+
+type ButtonPropsRedirect = {
+  mode?: 'redirect';
+};
+
+type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
+
+export type SignInButtonProps = ButtonProps<SignInProps> &
+  Pick<
+    SignInProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
+    | 'withSignUp'
+  >;
+
+export type SignUpButtonProps = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+} & ButtonProps<SignUpProps> &
+  Pick<
+    SignUpProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
+  >;
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;

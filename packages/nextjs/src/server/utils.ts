@@ -183,7 +183,7 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
  **/
 export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
-  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+  keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
     if (!obj) {
@@ -192,7 +192,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessMode)) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys)) {
     return;
   }
 
@@ -209,7 +209,7 @@ export function encryptClerkRequestData(
     ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
-  return AES.encrypt(JSON.stringify({ ...keylessMode, ...requestData }), maybeKeylessEncryptionKey).toString();
+  return AES.encrypt(JSON.stringify({ ...keylessModeKeys, ...requestData }), maybeKeylessEncryptionKey).toString();
 }
 
 /**

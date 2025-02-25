@@ -24,9 +24,16 @@ export const instanceKeys = getInstanceKeys();
 
 const base = environmentConfig()
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', true)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+
+const withKeyless = base
+  .clone()
+  // Creates keyless applications in our staging database.
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
 
 const withEmailCodes = base
   .clone()
@@ -132,6 +139,7 @@ const withSignInOrUpwithRestrictedModeFlow = withEmailCodes
 
 export const envs = {
   base,
+  withKeyless,
   withEmailCodes,
   withEmailCodes_destroy_client,
   withEmailLinks,

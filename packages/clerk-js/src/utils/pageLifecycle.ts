@@ -1,8 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-
-const noop = () => {
-  //
-};
+import { noop } from '@clerk/shared/utils';
 
 /**
  * Abstracts native browser event listener registration.

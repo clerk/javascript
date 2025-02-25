@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDERS } from '@clerk/types';
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { renderHook } from '@testing-library/react';
 
 import { bindCreateFixtures } from '../../../testUtils';

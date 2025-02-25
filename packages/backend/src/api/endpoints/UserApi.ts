@@ -2,6 +2,7 @@ import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
@@ -201,11 +202,30 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async getUserOauthAccessToken(userId: string, provider: `oauth_${OAuthProvider}`) {
+  /** @deprecated Please use getUserOauthAccessToken without the `oauth_` provider prefix . */
+  public async getUserOauthAccessToken(
+    userId: string,
+    provider: `oauth_${OAuthProvider}`,
+  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
+  public async getUserOauthAccessToken(
+    userId: string,
+    provider: OAuthProvider,
+  ): Promise<PaginatedResourceResponse<OauthAccessToken[]>>;
+  public async getUserOauthAccessToken(userId: string, provider: `oauth_${OAuthProvider}` | OAuthProvider) {
     this.requireId(userId);
+    const hasPrefix = provider.startsWith('oauth_');
+    const _provider = hasPrefix ? provider : `oauth_${provider}`;
+
+    if (hasPrefix) {
+      deprecated(
+        'getUserOauthAccessToken(userId, provider)',
+        'Remove the `oauth_` prefix from the `provider` argument.',
+      );
+    }
+
     return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
-      path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
+      path: joinPaths(basePath, userId, 'oauth_access_tokens', _provider),
       queryParams: { paginated: true },
     });
   }

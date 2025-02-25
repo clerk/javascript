@@ -98,7 +98,9 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
+    // @ts-expect-error Error because of the stricter types of internal `push`
     routerPush: push,
+    // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.3.43",
+  "version": "1.3.49",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -47,7 +47,7 @@
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "lint": "eslint src",
-    "lint:attw": "attw --pack .",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",

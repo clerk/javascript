@@ -12,7 +12,6 @@ export * from './utils';
 
 export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey';
 export * from './browser';
-export { callWithRetry } from './callWithRetry';
 export * from './color';
 export * from './constants';
 export * from './date';
@@ -35,3 +34,5 @@ export * from './object';
 export * from './logger';
 export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
+export { getEnvVariable } from './getEnvVariable';
+export * from './pathMatcher';

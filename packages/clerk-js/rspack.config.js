@@ -81,7 +81,7 @@ const common = ({ mode, disableRHC = false }) => {
             chunks: 'all',
           },
           coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|ieee754|preact|keccak|buffer|string_decoder|sha\.js|base64-js|safe-buffer|util-deprecate|inherits)[\\/]/,
+            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
@@ -169,6 +169,17 @@ const typescriptLoaderProd = () => {
                 refresh: false,
               },
             },
+          },
+        },
+      },
+    },
+    {
+      test: /\.m?js$/,
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            targets: packageJSON.browserslist,
           },
         },
       },
