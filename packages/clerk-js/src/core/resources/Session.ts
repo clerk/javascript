@@ -75,7 +75,7 @@ export class Session extends BaseResource implements SessionResource {
        * Skipping updating the client matches the behaviour of `client.destroy`, which allows broadcasting a sign-out event,
        * and delays emitting until `setActive` is called within `Clerk.signOut()`
        */
-      skipUpdateClient: true,
+      skipEmitOnUpdateClient: true,
     });
   };
 

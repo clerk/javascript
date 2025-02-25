@@ -1754,7 +1754,7 @@ export class Clerk implements ClerkInterface {
     this.internal_last_error = value;
   }
 
-  updateClient = (newClient: ClientResource): void => {
+  updateClient = (newClient: ClientResource, skipEmit = false): void => {
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -1763,7 +1763,12 @@ export class Clerk implements ClerkInterface {
         : this.#defaultSession(newClient);
       this.#setAccessors(session);
     }
+
     this.client = newClient;
+
+    if (skipEmit) {
+      return;
+    }
 
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);

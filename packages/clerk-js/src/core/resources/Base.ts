@@ -11,7 +11,7 @@ import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   fetchMaxTries?: number;
-  skipUpdateClient?: boolean;
+  skipEmitOnUpdateClient?: boolean;
 };
 
 export type BaseMutateParams = {
@@ -19,7 +19,7 @@ export type BaseMutateParams = {
   body?: any;
   method?: HTTPMethod;
   path?: string;
-  skipUpdateClient?: boolean;
+  skipEmitOnUpdateClient?: boolean;
 };
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
@@ -107,8 +107,8 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
-      this._updateClient<J>(payload);
+    if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
+      this._updateClient<J>(payload, opts.skipEmitOnUpdateClient);
     }
 
     if (status >= 200 && status <= 299) {
@@ -138,7 +138,7 @@ export abstract class BaseResource {
     return null;
   }
 
-  protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
+  protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null, skipEmitOnUpdateClient = false): void {
     if (!responseJSON) {
       return;
     }
@@ -147,7 +147,7 @@ export abstract class BaseResource {
     const client = responseJSON.client || responseJSON.meta?.client;
 
     if (client && BaseResource.clerk) {
-      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client));
+      BaseResource.clerk.updateClient(Client.getOrCreateInstance().fromJSON(client), skipEmitOnUpdateClient);
     }
   }
 
@@ -182,10 +182,13 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path, skipUpdateClient } = params;
+    const { action, body, method, path, skipEmitOnUpdateClient } = params;
     let json;
-    if (skipUpdateClient) {
-      json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body }, { skipUpdateClient });
+    if (skipEmitOnUpdateClient) {
+      json = await BaseResource._fetch<J>(
+        { method, path: path || this.path(action), body },
+        { skipEmitOnUpdateClient },
+      );
     } else {
       json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
     }
