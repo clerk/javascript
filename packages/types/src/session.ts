@@ -88,15 +88,33 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
   | { role?: never; permission?: never }
 >;
 
+/**
+ * The `Session` object is an abstraction over an HTTP session. It models the period of information exchange between a user and the server.
+ *
+ * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
+ *
+ * As soon as a [`User`](https://clerk.com/docs/references/javascript/user/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/references/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ *
+ * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/authentication/configuration/session-options#multi-session-applications).
+ *
+ * All sessions that are **expired**, **removed**, **replaced**, **ended** or **abandoned** are not considered valid.
+ *
+ * > [!NOTE]
+ * > For more information regarding the different session states, see the [guide on session management](https://clerk.com/docs/authentication/configuration/session-options).
+ */
 export interface SessionResource extends ClerkResource {
+  /**
+   * The unique identifier for the session.
+   */
   id: string;
+  /**
+   * The current state of the session.
+   */
   status: SessionStatus;
   expireAt: Date;
   abandonAt: Date;
   /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [firstFactorAge, secondFactorAge]
+   * An array where each item represents the number of minutes since the last verification of a first or second factor: `[firstFactorAge, secondFactorAge]`.
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
   lastActiveToken: TokenResource | null;
@@ -104,8 +122,14 @@ export interface SessionResource extends ClerkResource {
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
   tasks: Array<SessionTask> | null;
+  /**
+   * The user associated with the session.
+   */
   user: UserResource | null;
   publicUserData: PublicUserData;
+  /**
+   * Marks the session as ended. The session will no longer be active for this `Client` and its status will become **ended**.
+   */
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;

@@ -8,7 +8,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
  *
  * The `useClerk()` hook provides access to the [`Clerk`](https://clerk.com/docs/references/javascript/clerk/clerk) object, allowing you to build alternatives to any Clerk Component.
  *
- * @returns The `Clerk` object, which includes all the methods and properties listed in the [`Clerk` reference](https://clerk.com/docs/references/javascript/clerk/clerk).
+ * @returns The `useClerk()` hook returns the `Clerk` object, which includes all the methods and properties listed in the [`Clerk` reference](https://clerk.com/docs/references/javascript/clerk/clerk).
  *
  * @example
  *

@@ -872,33 +872,37 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+/**
+ * The parameters for the `setActive()` method.
+ * @interface
+ */
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set on the client.
-   * If `null`, the current session is deleted.
+   * The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.
    */
   session?: SignedInSessionResource | string | null;
 
   /**
-   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
-   * If `null`, the currently active organization is removed as active.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session. If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated use the redirectUrl parameter to redirect a user
+   * @deprecated in favor of `redirectUrl`.
    *
-   * Callback run just before the active session and/or organization is set to the passed object.
-   * Can be used to hook up for pre-navigation actions.
+   * CCallback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   * The full URL or path to redirect to just before the active session and/or organization is set.
    */
   redirectUrl?: string;
 };
 
+/**
+ * @inline
+ */
 export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =

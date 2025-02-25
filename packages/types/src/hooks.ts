@@ -17,6 +17,7 @@ type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorization
 
 /**
  * @interface
+ * @inline
  */
 export type UseAuthReturn =
   | {
@@ -36,6 +37,9 @@ export type UseAuthReturn =
        * The ID for the current session.
        */
       sessionId: undefined;
+      /**
+       * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+       */
       actor: undefined;
       /**
        * The ID of the user's active organization.
@@ -103,7 +107,7 @@ export type UseAuthReturn =
     };
 
 /**
- * @interface
+ * @inline
  */
 export type UseSignInReturn =
   | {
@@ -128,6 +132,7 @@ export type UseSignInReturn =
 
 /**
  * @interface
+ * @inline
  */
 export type UseSignUpReturn =
   | {
@@ -151,7 +156,7 @@ export type UseSignUpReturn =
     };
 
 /**
- * @interface
+ * @inline
  */
 export type UseSessionReturn =
   | {
@@ -180,7 +185,7 @@ export type UseSessionReturn =
     };
 
 /**
- * @interface
+ * @inline
  */
 export type UseSessionListReturn =
   | {
@@ -204,7 +209,7 @@ export type UseSessionListReturn =
     };
 
 /**
- * @interface
+ * @inline
  */
 export type UseUserReturn =
   | {
@@ -213,11 +218,11 @@ export type UseUserReturn =
        */
       isLoaded: false;
       /**
-       * A boolean that indicates whether a user is currently signed in.
+       * A boolean that returns `true` if the user is signed in.
        */
       isSignedIn: undefined;
       /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The [`User`](https://clerk.com/docs/references/javascript/user/user) object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }
