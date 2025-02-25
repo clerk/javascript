@@ -13,7 +13,7 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   const cookieStore = await cookies();
   const request = new Request('https://placeholder.com', { headers: await headers() });
 
-  const keyless = getKeylessCookieValue(name => cookieStore.get(name)?.value);
+  const keyless = await getKeylessCookieValue(name => cookieStore.get(name)?.value);
   const pksMatch = keyless?.publishableKey === publishableKey;
   const sksMatch = keyless?.secretKey === secretKey;
   if (pksMatch && sksMatch) {
