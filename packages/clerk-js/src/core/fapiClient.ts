@@ -1,6 +1,6 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
+import { retry } from '@clerk/shared/retry';
 import { camelToSnake } from '@clerk/shared/underscore';
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
@@ -235,9 +235,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'
-            ? await runWithExponentialBackOff(() => fetch(urlStr, fetchOpts), {
-                firstDelay: 500,
-                maxDelay: 3000,
+            ? await retry(() => fetch(urlStr, fetchOpts), {
+                initialDelay: 500,
+                maxDelayBetweenRetries: 3000,
                 shouldRetry: (_: unknown, iterationsCount: number) => {
                   return iterationsCount < maxTries;
                 },

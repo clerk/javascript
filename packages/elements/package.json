@@ -60,7 +60,7 @@
     "app:lint": "(cd examples/nextjs && pnpm lint)",
     "build": "tsup --env.NODE_ENV production",
     "build:analyze": "tsup --env.NODE_ENV production --metafile; open https://esbuild.github.io/analyze/",
-    "build:declarations": "tsc --env.NODE_ENV production -p tsconfig.json",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
     "lint": "eslint src/",
