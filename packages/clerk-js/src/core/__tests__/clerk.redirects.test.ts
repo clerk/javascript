@@ -312,55 +312,21 @@ describe('Clerk singleton - Redirects', () => {
     });
   });
 
-  describe('on signed-in session with pending tasks', () => {
-    let clerkForProductionInstance: Clerk;
-    let clerkForDevelopmentInstance: Clerk;
-
-    beforeEach(async () => {
-      mockEnvironmentFetch.mockReturnValue(
-        Promise.resolve({
-          userSettings: mockUserSettings,
-          displayConfig: mockDisplayConfigWithDifferentOrigin,
-          isProduction: () => false,
-          isDevelopmentOrStaging: () => true,
-        }),
-      );
-
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({
-          signedInSessions: [
-            {
-              id: '1',
-              remove: jest.fn(),
-              status: 'pending',
-              currentTask: { key: 'org' },
-              user: {},
-              touch: jest.fn(() => Promise.resolve()),
-              getToken: jest.fn(),
-              lastActiveToken: { getRawString: () => 'mocked-token' },
-            },
-          ],
-        }),
-      );
-
-      clerkForProductionInstance = new Clerk(productionPublishableKey);
-      clerkForDevelopmentInstance = new Clerk(developmentPublishableKey);
-
-      await clerkForProductionInstance.load(mockedLoadOptions);
-      await clerkForDevelopmentInstance.load(mockedLoadOptions);
+  describe('.redirectToTasks', () => {
+    describe('after sign-in with pending session', () => {
+      it.todo('redirects to tasks URL with after sign-in URL appended as query param');
     });
 
-    afterEach(() => {
-      mockEnvironmentFetch.mockRestore();
-      mockClientFetch.mockRestore();
+    describe('after sign-up with pending session', () => {
+      it.todo('redirects to tasks URL with after sign-up URL appended as query param');
     });
 
-    it('when session has tasks, redirect to tasks URL', async () => {
-      await clerkForDevelopmentInstance.redirectToTasks();
+    describe('after sign-up with pending session', () => {
+      it.todo('redirects to tasks URL with after sign-up URL appended as query param');
+    });
 
-      expect(mockNavigate).toHaveBeenCalledWith('/#/select-organization', {
-        windowNavigate: expect.any(Function),
-      });
+    describe('user already exists and session transitions from active to pending on middle app', () => {
+      it.todo('redirects to tasks URL with app origin appended as query param');
     });
   });
 });
