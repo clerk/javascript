@@ -127,7 +127,7 @@ import {
 } from './resources/internal';
 import { warnings } from './warnings';
 
-type SetActiveHook = () => void | Promise<void>;
+type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -392,10 +392,13 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      await onBeforeSetActive();
+      /**
+       * Hint to each framework, that the user will be signed out.
+       */
+      await onBeforeSetActive('sign-out');
       // Notify other tabs that user is signing out.
       eventBus.dispatch(events.UserSignOut, null);
-      // Clearn up cookies
+      // Clean up cookies
       eventBus.dispatch(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
@@ -418,6 +421,11 @@ export class Clerk implements ClerkInterface {
       await onAfterSetActive();
     };
 
+    /**
+     * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
+     * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
+     */
+    await onBeforeSetActive();
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
@@ -941,7 +949,10 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    await onBeforeSetActive();
+    /**
+     * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
+     */
+    await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
