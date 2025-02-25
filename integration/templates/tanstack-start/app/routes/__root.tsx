@@ -2,9 +2,10 @@ import {
   Outlet,
   ScrollRestoration,
   createRootRoute,
+  Scripts,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import { Meta, Scripts } from '@tanstack/react-start'
+import { HeadContent } from '@tanstack/react-start'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
@@ -35,7 +36,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <ClerkProvider>
       <html>
         <head>
-          <Meta />
+          <HeadContent />
         </head>
         <body>
           {children}
