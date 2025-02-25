@@ -264,7 +264,7 @@ jobs:
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
-        run: sudo npm install -g pnpm && sudo --preserve-env pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'

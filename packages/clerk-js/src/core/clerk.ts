@@ -5,7 +5,11 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
-import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
+import {
+  eventPrebuiltComponentMounted,
+  eventPrebuiltComponentOpened,
+  TelemetryCollector,
+} from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
@@ -450,11 +454,12 @@ export class Clerk implements ClerkInterface {
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
-    // TODO: add telemetry
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'GoogleOneTap' })
       .then(controls => controls.openModal('googleOneTap', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`GoogleOneTap`, props));
   };
 
   public closeGoogleOneTap = (): void => {
@@ -475,6 +480,9 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignIn' })
       .then(controls => controls.openModal('signIn', props || {}));
+
+    const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
+    this.telemetry?.record(eventPrebuiltComponentOpened(`SignIn`, props, additionalData));
   };
 
   public closeSignIn = (): void => {
@@ -495,6 +503,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserVerification' })
       .then(controls => controls.openModal('userVerification', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`UserVerification`, props));
   };
 
   public __internal_closeReverification = (): void => {
@@ -529,6 +539,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignUp' })
       .then(controls => controls.openModal('signUp', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
 
   public closeSignUp = (): void => {
@@ -549,6 +561,9 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserProfile' })
       .then(controls => controls.openModal('userProfile', props || {}));
+
+    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
   };
 
   public closeUserProfile = (): void => {
@@ -577,6 +592,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
   };
 
   public closeOrganizationProfile = (): void => {
@@ -597,6 +614,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
   };
 
   public closeCreateOrganization = (): void => {
@@ -609,6 +628,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
 
   public closeWaitlist = (): void => {
@@ -626,17 +647,9 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(
-        'SignIn',
-        {
-          ...props,
-        },
-        {
-          withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-        },
-      ),
-    );
+
+    const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignIn`, props, additionalData));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -658,7 +671,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp`, props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -689,17 +703,8 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted(
-        'UserProfile',
-        props,
-        props?.customPages?.length || 0 > 0
-          ? {
-              customPages: true,
-            }
-          : undefined,
-      ),
-    );
+    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props, additionalData));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -854,21 +859,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted('UserButton', props, {
-        ...(props?.customMenuItems?.length || 0 > 0
-          ? {
-              customItems: true,
-            }
-          : undefined),
+    const additionalData = {
+      ...(props?.customMenuItems?.length || 0 > 0 ? { customItems: true } : undefined),
+      ...(props?.__experimental_asStandalone ? { standalone: true } : undefined),
+    };
 
-        ...(props?.__experimental_asStandalone
-          ? {
-              standalone: true,
-            }
-          : undefined),
-      }),
-    );
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props, additionalData));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {

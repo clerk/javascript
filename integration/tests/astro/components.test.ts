@@ -481,4 +481,30 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // Components should be rendered on hard reload
     await u.po.userButton.waitForMounted();
   });
+
+  test('server islands protect component shows correct states', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/server-islands');
+    // The loading slot for server islands will appear very quickly.
+    // Wait for next state (default slot) to be ready
+    await expect(u.page.getByText('Loading')).toBeHidden();
+    await expect(u.page.getByText('Not an admin')).toBeVisible();
+
+    // Sign in as admin user
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeAdmin2.email,
+      password: fakeAdmin2.password,
+    });
+    await u.po.expect.toBeSignedIn();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Visit page again
+    await u.page.goToRelative('/server-islands');
+    await expect(u.page.getByText('Loading')).toBeHidden();
+    await expect(u.page.getByText("I'm an admin")).toBeVisible();
+  });
 });
