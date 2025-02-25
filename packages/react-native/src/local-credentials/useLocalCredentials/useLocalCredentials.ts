@@ -1,14 +1,15 @@
 import { useClerk, useSignIn, useUser } from '@clerk/clerk-react';
 import type { SignInResource } from '@clerk/types';
-import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
-import {
-  deleteItemAsync,
-  getItem,
-  getItemAsync,
-  setItemAsync,
-  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
-} from 'expo-secure-store';
 import { useEffect, useState } from 'react';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+import {
+  ACCESS_CONTROL,
+  ACCESSIBLE,
+  getGenericPassword,
+  hasGenericPassword,
+  resetGenericPassword,
+  setGenericPassword,
+} from 'react-native-keychain';
 
 import { errorThrower } from '../../utils';
 import type { BiometricType, LocalCredentials, LocalCredentialsReturn } from './shared';
@@ -18,12 +19,12 @@ const useEnrolledBiometric = () => {
 
   useEffect(() => {
     let ignore = false;
-
-    void isEnrolledAsync().then(res => {
+    const rnBiometrics = new ReactNativeBiometrics();
+    void rnBiometrics.biometricKeysExist().then(({ keysExist }) => {
       if (ignore) {
         return;
       }
-      setIsEnrolled(res);
+      setIsEnrolled(keysExist);
     });
 
     return () => {
@@ -38,29 +39,16 @@ const useAuthenticationType = () => {
   const [authenticationType, setAuthenticationType] = useState<BiometricType | null>(null);
 
   useEffect(() => {
-    let ignore = false;
-
-    void supportedAuthenticationTypesAsync().then(numericTypes => {
-      if (ignore) {
-        return;
-      }
-      if (numericTypes.length === 0) {
-        return;
-      }
-
-      if (
-        numericTypes.includes(AuthenticationType.IRIS) ||
-        numericTypes.includes(AuthenticationType.FACIAL_RECOGNITION)
-      ) {
+    const getBiometrics = async () => {
+      const rnBiometrics = new ReactNativeBiometrics();
+      const { biometryType } = await rnBiometrics.isSensorAvailable();
+      if (biometryType === BiometryTypes.FaceID) {
         setAuthenticationType('face-recognition');
-      } else {
+      } else if (biometryType === BiometryTypes.TouchID) {
         setAuthenticationType('fingerprint');
       }
-    });
-
-    return () => {
-      ignore = true;
     };
+    void getBiometrics();
   }, []);
 
   return authenticationType;
@@ -89,13 +77,13 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
       return identifiers.includes(storedIdentifier);
     };
 
-    void getItemAsync(storeKey)
+    void getGenericPassword(storeKey)
       .catch(() => null)
       .then(res => {
-        if (ignore) {
+        if (ignore || !res) {
           return;
         }
-        setUserOwnsCredentials(getUserCredentials(res));
+        setUserOwnsCredentials(getUserCredentials(res.password));
       });
 
     return () => {
@@ -116,7 +104,16 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
 
   const key = `__clerk_local_auth_${publishableKey}_identifier`;
   const pkey = `__clerk_local_auth_${publishableKey}_password`;
-  const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(!!getItem(key));
+  const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(false);
+
+  useEffect(() => {
+    const checkHasCredentials = async () => {
+      const hasCredentials = await hasGenericPassword(key);
+      setHasLocalAuthCredentials(!!hasCredentials);
+    };
+    void checkHasCredentials();
+  }, [key]);
+
   const [userOwnsCredentials, setUserOwnsCredentials] = useUserOwnsCredentials({ storeKey: key });
   const hasEnrolledBiometric = useEnrolledBiometric();
   const authenticationType = useAuthenticationType();
@@ -124,7 +121,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
   const biometricType = hasEnrolledBiometric ? authenticationType : null;
 
   const setCredentials = async (creds: LocalCredentials) => {
-    if (!(await isEnrolledAsync())) {
+    if (!hasEnrolledBiometric) {
       return;
     }
 
@@ -135,10 +132,10 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     }
 
     if (creds.identifier) {
-      await setItemAsync(key, creds.identifier);
+      await setGenericPassword(key, creds.identifier);
     }
 
-    const storedIdentifier = await getItemAsync(key).catch(() => null);
+    const storedIdentifier = await hasGenericPassword(key).catch(() => null);
 
     if (!storedIdentifier) {
       return errorThrower.throw(
@@ -147,14 +144,14 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     }
 
     setHasLocalAuthCredentials(true);
-    await setItemAsync(pkey, creds.password, {
-      keychainAccessible: WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
-      requireAuthentication: true,
+    await setGenericPassword(pkey, creds.password, {
+      accessible: ACCESSIBLE.WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
+      accessControl: ACCESS_CONTROL.BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE,
     });
   };
 
   const clearCredentials = async () => {
-    await Promise.all([deleteItemAsync(key), deleteItemAsync(pkey)]);
+    await Promise.all([resetGenericPassword(key), resetGenericPassword(pkey)]);
     setHasLocalAuthCredentials(false);
     setUserOwnsCredentials(false);
   };
@@ -165,20 +162,23 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
         `useLocalCredentials: authenticate() Clerk has not loaded yet. Wait for clerk to load before calling this function`,
       );
     }
-    const identifier = await getItemAsync(key).catch(() => null);
+    // note: identifier and password are of type UserCredentials.  So we use
+    //       identifier.password and password.password to get the stored values
+    const identifier = await getGenericPassword(key).catch(() => null);
     if (!identifier) {
       return errorThrower.throw(`useLocalCredentials: authenticate() the identifier could not be found`);
     }
-    const password = await getItemAsync(pkey).catch(() => null);
-
+    const password = await getGenericPassword(pkey).catch(() => null);
     if (!password) {
-      return errorThrower.throw(`useLocalCredentials: authenticate() cannot retrieve a password for ${identifier}`);
+      return errorThrower.throw(
+        `useLocalCredentials: authenticate() cannot retrieve a password for ${identifier.password}`,
+      );
     }
 
     return signIn.create({
       strategy: 'password',
-      identifier,
-      password,
+      identifier: identifier.password,
+      password: password.password,
     });
   };
 
