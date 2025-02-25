@@ -82,6 +82,8 @@ playground/*/yarn.lock
 .temp_integration
 playwright-report
 test-results
+sessions-key.pem
+sessions.pem
 
 # Verdaccio
 .verdaccio
