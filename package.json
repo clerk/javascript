@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/types",
     "bundlewatch": "turbo bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
