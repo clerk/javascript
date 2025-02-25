@@ -8,5 +8,5 @@ type SessionTaskRoutePath = (typeof sessionTaskRoutePaths)[number];
  * @internal
  */
 export const sessionTaskKeyToRoutePaths: Record<SessionTask['key'], SessionTaskRoutePath> = {
-  org: 'select-organization',
+  org: '/select-organization',
 };

@@ -1007,8 +1007,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    console.log('Clerk.navigate is navigating to', { to });
-
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
      */
@@ -1042,6 +1040,7 @@ export class Clerk implements ClerkInterface {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
       windowNavigate,
     };
+
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
   };
@@ -1126,7 +1125,54 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    return buildURL({ hashPath: sessionTaskKeyToRoutePaths[currentTask.key] }, { stringify: true });
+    const referrerIsTaskUrl = window.location.href.includes(sessionTaskKeyToRoutePaths[currentTask.key]);
+    if (referrerIsTaskUrl) {
+      return '';
+    }
+
+    const signInUrl = this.#options.signInUrl || this.environment?.displayConfig.signInUrl;
+    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+    const referrerIsSignInUrl = signInUrl && window.location.href.includes(signInUrl);
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.includes(signUpUrl);
+
+    let redirectUrl = '';
+    if (referrerIsSignInUrl) {
+      redirectUrl = this.buildAfterSignInUrl();
+    } else if (referrerIsSignUpUrl) {
+      redirectUrl = this.buildAfterSignUpUrl();
+    } else {
+      /**
+       * User already has a active session and gets transition to a pending status
+       * on the client update
+       *
+       * It could happen on instance configuration changes that lead to new tasks that
+       * need to get resolved by the user, eg: Force MFA
+       */
+      // Preserves the origin path, eg: /my-app/recipes -> /sign-in/select-organization -> /my-app/recipes
+      redirectUrl = window.location.href;
+    }
+
+    /**
+     * For after sign-in or after sign-up, it's agnostic to the original base path
+     * in order to avoid having to check for the referrer
+     *
+     * If it's coming from a protected route where the user already exists, then
+     * the base path becomes the sign in URL
+     */
+    const shouldAppendBasePath = !referrerIsSignInUrl && !referrerIsSignUpUrl;
+
+    return buildURL(
+      {
+        ...(shouldAppendBasePath
+          ? {
+              base: signInUrl,
+            }
+          : {}),
+        hashPath: sessionTaskKeyToRoutePaths[currentTask.key],
+        hashSearchParams: { redirect_url: redirectUrl },
+      },
+      { stringify: true },
+    );
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1750,10 +1796,6 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
-      // TODO - Resolve after-task redirection
-      // TODO - Resolve issue on closing modals on navigation within Clerk.navigate
-      // sign-in/select-organization -> /home
-      // sign-in -> sign-in/select-organization
       const hasResolvedPreviousTask = this.session.currentTask != session?.currentTask;
 
       // Note: this might set this.session to null
@@ -1762,8 +1804,6 @@ export class Clerk implements ClerkInterface {
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
 
-      this.#emit();
-
       // Tasks handling must be reactive on client piggybacking to support
       // immediate instance-level configuration changes by app owners
       if (session?.currentTask) {
@@ -1771,6 +1811,8 @@ export class Clerk implements ClerkInterface {
       } else if (session && hasResolvedPreviousTask) {
         eventBus.dispatch(events.ResolvedSessionTask, session);
       }
+
+      this.#emit();
     }
   };
 
@@ -2114,13 +2156,14 @@ export class Clerk implements ClerkInterface {
     });
 
     eventBus.on(events.NewSessionTask, () => {
-      console.log('new session task');
       void this.redirectToTasks();
     });
 
     eventBus.on(events.ResolvedSessionTask, () => {
-      console.log('resolved task');
-      void this.redirectToAfterSignIn();
+      // `redirect_url` gets appended based on the origin (after sign-in vs after sign-up),
+      // if it gets accidentally deleted, then fallbacks to the sign in URL
+      const redirectUrl = new URLSearchParams(window.location.search).get('redirect_url') ?? this.buildSignInUrl();
+      void this.navigate(redirectUrl);
     });
   };
 

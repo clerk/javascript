@@ -1,7 +1,7 @@
 import { appConfigs } from '../presets';
 import { testAgainstRunningApps } from '../testUtils';
 
-// TODO ORGS-566 - write integration tests for after-auth flow
+// TODO ORGS-566 - Write integration tests for after-auth flow
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('after-auth flows @generic @nextjs', () => {
   describe('after sign-in', () => {
     // /sign-in -> /sign-in/select-organization
@@ -25,7 +25,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('after-aut
     it.todo('on single-session mode, sign-up redirects back to tasks when accessed with a pending session');
   });
 
-  describe('middle app', () => {
+  describe('when user is using the app and session transitions to active to pending', () => {
     // /my-dashboard/recipes -> /sign-in/select-organization
     it.todo('on session transition to pending with tasks, redirects to tasks');
 

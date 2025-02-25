@@ -314,7 +314,7 @@ describe('Clerk singleton - Redirects', () => {
 
   describe('.redirectToTasks', () => {
     describe('after sign-in with pending session', () => {
-      it.todo('redirects to tasks URL with after sign-in URL appended as query param');
+      it('redirects to tasks URL with after sign-in URL appended as query param');
     });
 
     describe('after sign-up with pending session', () => {
@@ -325,7 +325,7 @@ describe('Clerk singleton - Redirects', () => {
       it.todo('redirects to tasks URL with after sign-up URL appended as query param');
     });
 
-    describe('user already exists and session transitions from active to pending on middle app', () => {
+    describe('from a protected route', () => {
       it.todo('redirects to tasks URL with app origin appended as query param');
     });
   });
