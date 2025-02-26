@@ -11,7 +11,7 @@ Good news! If you've set up your local development environment for Clerk, you've
 To generate a new cert/key pair, you can simply run the following command:
 
 ```bash
-mkcert -cert-file example.pem -key-file example-key.pem "example.com" "*.example.com"
+mkcert -cert-file sessions.pem -key-file sessions-key.pem "example.com" "*.example.com"
 ```
 
 The command above will create a `example.pem` and a `example-key.pem` file in the current directory. The certificate will be valid for `example.com` and all subdomains of `example.com`.

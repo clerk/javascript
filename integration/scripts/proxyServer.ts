@@ -26,7 +26,7 @@ export const createProxyServer = (opts: ProxyServerOptions) => {
       res.writeHead(404);
       res.end();
     }
-  }).listen(usingSSL ? 443 : 80, '127.0.0.1');
+  }).listen(usingSSL ? 8443 : 8880, '127.0.0.1');
 };
 
 export type { Server };
