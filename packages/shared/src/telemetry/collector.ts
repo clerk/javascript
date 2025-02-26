@@ -135,14 +135,15 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     const randomSeed = Math.random();
 
-    if (this.#eventThrottler.isEventThrottled(preparedPayload)) {
+    const toBeSampled =
+      randomSeed <= this.#config.samplingRate &&
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+
+    if (!toBeSampled) {
       return false;
     }
 
-    return (
-      randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
-    );
+    return !this.#eventThrottler.isEventThrottled(preparedPayload);
   }
 
   #scheduleFlush(): void {
