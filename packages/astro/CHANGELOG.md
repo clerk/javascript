@@ -1,5 +1,48 @@
 # @clerk/astro
 
+## 2.3.0
+
+### Minor Changes
+
+- Introduce `protect-fallback` slot to avoid naming conflicts with Astro's server islands [`fallback` slot](https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content). ([#5196](https://github.com/clerk/javascript/pull/5196)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  When using Clerk's `<Protect>` component with `server:defer`, you can now use both slots:
+
+  - `fallback`: Default loading content
+  - `protect-fallback`: Shows when a user doesn't have the `role` or `permission` to access the protected content
+
+  Regular usage without server islands:
+
+  ```astro
+  <Protect role="admin">
+    <p slot="fallback">Not an admin</p>
+    <p>You're an admin</p>
+  </Protect>
+  ```
+
+  Example with server islands:
+
+  ```astro
+  <Protect server:defer role="admin">
+    <p slot="fallback">Loading...</p>
+    <p slot="protect-fallback">Not an admin</p>
+    <p>You're an admin</p>
+  </Protect>
+  ```
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- The [`exports` map](https://nodejs.org/api/packages.html#conditional-exports) inside `package.json` has been slightly adjusted to allow for [`require(esm)`](https://joyeecheung.github.io/blog/2024/03/18/require-esm-in-node-js/) to work correctly. The `"import"` conditions have been changed to `"default"`. ([#5188](https://github.com/clerk/javascript/pull/5188)) by [@LekoArts](https://github.com/LekoArts)
+
+  You shouldn't see any change in behavior/functionality on your end.
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/backend@1.24.3
+
 ## 2.2.1
 
 ### Patch Changes

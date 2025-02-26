@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.8.0
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`3345667bd2420e3efdc59ed421cfc090bd42856e`](https://github.com/clerk/javascript/commit/3345667bd2420e3efdc59ed421cfc090bd42856e), [`250ae5c6997a526be5aede69d28b14cec538e18a`](https://github.com/clerk/javascript/commit/250ae5c6997a526be5aede69d28b14cec538e18a), [`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`b4254456ee62852dc7f39c0d719ced1b81963e9d`](https://github.com/clerk/javascript/commit/b4254456ee62852dc7f39c0d719ced1b81963e9d), [`0540920acd574d72377b6120daf893fb963ac407`](https://github.com/clerk/javascript/commit/0540920acd574d72377b6120daf893fb963ac407), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`5d6f8ea08a8775d646d4d4bdf8c05b87f04f5a1b`](https://github.com/clerk/javascript/commit/5d6f8ea08a8775d646d4d4bdf8c05b87f04f5a1b), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`14c1bfae9d3f3342cb4cb41714cfa9a606ebeae6`](https://github.com/clerk/javascript/commit/14c1bfae9d3f3342cb4cb41714cfa9a606ebeae6), [`b707e942bfd434ff8a3b9a9fadf9d1b694d702c8`](https://github.com/clerk/javascript/commit/b707e942bfd434ff8a3b9a9fadf9d1b694d702c8), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`171719ddda39d2b5515c1101e354cd0599b06687`](https://github.com/clerk/javascript/commit/171719ddda39d2b5515c1101e354cd0599b06687), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`71568bef41ee99b65a9fc0c44cf6d237bb9496ea`](https://github.com/clerk/javascript/commit/71568bef41ee99b65a9fc0c44cf6d237bb9496ea), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/clerk-js@5.54.0
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/clerk-react@5.24.0
+
 ## 2.7.8
 
 ### Patch Changes
