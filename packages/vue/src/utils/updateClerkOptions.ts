@@ -3,7 +3,7 @@ import type { ClerkOptions } from '@clerk/types';
 type ClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
 /**
- * Updates Clerk's appearance and localization options at runtime.
+ * Updates Clerk's options at runtime.
  *
  * @param options - The Clerk options to update
  *
