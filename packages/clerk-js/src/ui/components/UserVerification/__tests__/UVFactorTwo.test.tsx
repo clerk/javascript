@@ -134,8 +134,82 @@ describe('UserVerificationFactorTwo', () => {
     });
   });
 
-  describe('Use another method', () => {
-    it.todo('should list enabled second factor methods without the current one');
+  describe('Use another second factor method', () => {
+    it('should list enabled second factor methods without the current one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_second_factor',
+        supportedSecondFactors: [
+          {
+            strategy: 'phone_code',
+            phoneNumberId: 'phone_1',
+            safeIdentifier: '+3069XXXXXXX1',
+          },
+          {
+            strategy: 'phone_code',
+            phoneNumberId: 'phone_2',
+            safeIdentifier: '+3069XXXXXXX2',
+          },
+        ],
+      });
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
+
+      const { getByText, getByRole } = render(<UserVerificationFactorTwo />, { wrapper });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        getByText('Use another method');
+      });
+
+      await waitFor(() => {
+        getByText('Use another method').click();
+        expect(getByRole('button')).toHaveTextContent('Send SMS code to +3069XXXXXXX1');
+        expect(getByRole('button')).not.toHaveTextContent('Send SMS code to +3069XXXXXXX2');
+      });
+    });
+
+    it.skip('can select another method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_second_factor',
+        supportedSecondFactors: [
+          {
+            strategy: 'phone_code',
+            phoneNumberId: 'phone_1',
+            safeIdentifier: '+3069XXXXXXX1',
+          },
+          {
+            strategy: 'phone_code',
+            phoneNumberId: 'phone_2',
+            safeIdentifier: '+3069XXXXXXX2',
+          },
+        ],
+      });
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
+
+      const { getByText, container } = render(<UserVerificationFactorTwo />, { wrapper });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        expect(container).toHaveTextContent('+3069XXXXXXX1');
+        expect(container).not.toHaveTextContent('+3069XXXXXXX2');
+        getByText('Use another method');
+      });
+
+      await waitFor(() => {
+        getByText('Use another method').click();
+        getByText('Send SMS code to +3069XXXXXXX2').click();
+      });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        expect(container).toHaveTextContent('+3069XXXXXXX2');
+      });
+    });
   });
 
   describe('Get Help', () => {
