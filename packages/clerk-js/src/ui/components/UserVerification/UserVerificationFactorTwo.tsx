@@ -37,7 +37,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   const toggleAllStrategies = () => setShowAllStrategies(s => !s);
 
   const secondFactorsExcludingCurrent = useMemo(
-    () => availableFactors?.filter(factor => secondFactorsAreEqual(factor, currentFactor)),
+    () => availableFactors?.filter(factor => !secondFactorsAreEqual(factor, currentFactor)),
     [availableFactors, currentFactor],
   );
 

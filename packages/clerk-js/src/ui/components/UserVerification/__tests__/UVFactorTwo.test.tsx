@@ -165,12 +165,12 @@ describe('UserVerificationFactorTwo', () => {
 
       await waitFor(() => {
         getByText('Use another method').click();
-        expect(getByRole('button')).toHaveTextContent('Send SMS code to +3069XXXXXXX1');
-        expect(getByRole('button')).not.toHaveTextContent('Send SMS code to +3069XXXXXXX2');
+        expect(getByRole('button')).toHaveTextContent('Send SMS code to +3069XXXXXXX2');
+        expect(getByRole('button')).not.toHaveTextContent('Send SMS code to +3069XXXXXXX1');
       });
     });
 
-    it.skip('can select another method', async () => {
+    it('can select another method', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
@@ -208,6 +208,12 @@ describe('UserVerificationFactorTwo', () => {
       await waitFor(() => {
         getByText('Verification required');
         expect(container).toHaveTextContent('+3069XXXXXXX2');
+        getByText('Use another method');
+      });
+
+      await waitFor(() => {
+        getByText('Use another method').click();
+        expect(container).toHaveTextContent('+3069XXXXXXX1');
       });
     });
   });
