@@ -396,10 +396,6 @@ export class Clerk implements ClerkInterface {
     const executeSignOut = async () => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      /**
-       * Hint to each framework, that the user will be signed out.
-       */
-      await onBeforeSetActive('sign-out');
       // Notify other tabs that user is signing out.
       eventBus.dispatch(events.UserSignOut, null);
       // Clean up cookies
