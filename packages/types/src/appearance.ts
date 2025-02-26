@@ -551,6 +551,12 @@ export type Theme = {
    * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
    */
   elements?: Elements;
+  /**
+   * The appearance of the CAPTCHA widget.
+   * This will be used to style the CAPTCHA widget.
+   * Eg: `theme: 'dark'`
+   */
+  captcha?: CaptchaAppearanceOptions;
 };
 
 export type Layout = {
@@ -630,6 +636,24 @@ export type Layout = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+};
+
+export type CaptchaAppearanceOptions = {
+  /**
+   * The widget theme. Can take the following values: light, dark, auto.
+   * @default 'auto'
+   */
+  theme?: 'auto' | 'light' | 'dark';
+  /**
+   * The widget size. Can take the following values: normal, flexible, compact.
+   * @default 'normal'
+   */
+  size?: 'normal' | 'flexible' | 'compact';
+  /**
+   * Language to display, must be either: auto (default) to use the language that the visitor has chosen, or an ISO 639-1 two-letter language code (e.g. en) or language and country code (e.g. en-US).
+   * Refer to the list of supported languages for more information: https://developers.cloudflare.com/turnstile/reference/supported-languages
+   */
+  language?: string;
 };
 
 export type SignInTheme = Theme;
