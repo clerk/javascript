@@ -1,8 +1,3 @@
-declare module '@clerk/ui/styles.css' {
-  const content: string;
-  export default content;
-}
-
 declare module '*.svg' {
   const value: React.FC<React.SVGAttributes<SVGElement>>;
   export default value;
