@@ -32,6 +32,7 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
+  integrity?: string;
 };
 
 /**
@@ -71,6 +72,7 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
+    integrity: opts.integrity,
     beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
@@ -126,6 +128,10 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
 
   if (options.nonce) {
     obj.nonce = options.nonce;
+  }
+
+  if (options.integrity) {
+    obj.integrity = options.integrity;
   }
 
   return obj;
