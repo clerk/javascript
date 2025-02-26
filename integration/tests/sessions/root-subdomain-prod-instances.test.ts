@@ -18,6 +18,19 @@ import { prepareApplication } from './utils';
 test.describe('root and subdomain production apps @sessions', () => {
   test.describe.configure({ mode: 'serial' });
 
+  test.beforeEach(async ({ context }) => {
+    await context.route('**/v1/**', async route => {
+      const request = route.request();
+
+      const headers = {
+        ...request.headers(),
+        origin: 'https://multiple-apps-e2e.clerk.app',
+      };
+
+      await route.continue({ headers: { ...headers } });
+    });
+  });
+
   /**
    * This test verifies that the session is shared between different apps running on different subdomains
    * but using the same instance. This covers the use case where a customer wants multiple apps sharing the same userbase and session.

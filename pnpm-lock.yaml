@@ -98,8 +98,8 @@ importers:
         specifier: ^20.0.2
         version: 20.0.2
       '@playwright/test':
-        specifier: ^1.44.0
-        version: 1.44.1
+        specifier: 1.50.1
+        version: 1.50.1
       '@testing-library/dom':
         specifier: ^10.1.0
         version: 10.1.0
@@ -564,7 +564,7 @@ importers:
         version: 8.2.2
       next:
         specifier: ^14.2.24
-        version: 14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
         specifier: ^4.35.0
         version: 4.35.0
@@ -733,7 +733,7 @@ importers:
         version: 4.2.2
       next:
         specifier: ^14.2.24
-        version: 14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/nuxt:
     dependencies:
@@ -988,8 +988,8 @@ importers:
         version: 16.4.7
     devDependencies:
       '@playwright/test':
-        specifier: ^1.44.0
-        version: 1.44.1
+        specifier: 1.50.1
+        version: 1.50.1
       cypress:
         specifier: ^13.9.0
         version: 13.9.0
@@ -3905,9 +3905,9 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@playwright/test@1.44.1':
-    resolution: {integrity: sha512-1hZ4TNvD5z9VuhNJ/walIjvMVvYkZKf71axoF/uiAqpntQJXpG64dlXhoDXE3OczPuTuvjf/M5KWFg5VAVUS3Q==}
-    engines: {node: '>=16'}
+  '@playwright/test@1.50.1':
+    resolution: {integrity: sha512-Jii3aBg+CEDpgnuDxEp/h7BimHcUTDlpEtce89xEumlJ5ef2hqepZ+PWp1DDpYC/VO9fmWVI1IlEaoI5fK9FXQ==}
+    engines: {node: '>=18'}
     hasBin: true
 
   '@polka/url@1.0.0-next.28':
@@ -12002,14 +12002,14 @@ packages:
     resolution: {integrity: sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==}
     engines: {node: '>= 0.4.0'}
 
-  playwright-core@1.44.1:
-    resolution: {integrity: sha512-wh0JWtYTrhv1+OSsLPgFzGzt67Y7BE/ZS3jEqgGBlp2ppp1ZDj8c+9IARNW4dwf1poq5MgHreEM2KV/GuR4cFA==}
-    engines: {node: '>=16'}
+  playwright-core@1.50.1:
+    resolution: {integrity: sha512-ra9fsNWayuYumt+NiM069M6OkcRb1FZSK8bgi66AtpFoWkg2+y0bJSNmkFrWhMbEBbVKC/EruAHH3g0zmtwGmQ==}
+    engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.44.1:
-    resolution: {integrity: sha512-qr/0UJ5CFAtloI3avF95Y0L1xQo6r3LQArLIg/z/PoGJ6xa+EwzrwO5lpNr/09STxdHuUoP2mvuELJS+hLdtgg==}
-    engines: {node: '>=16'}
+  playwright@1.50.1:
+    resolution: {integrity: sha512-G8rwsOQJ63XG6BbKj2w5rHeavFjy5zynBA9zsJMMtBoe/Uf757oG12NXz6e6OirF7RCrTVAKFXbLmn1RbL7Qaw==}
+    engines: {node: '>=18'}
     hasBin: true
 
   plist@3.1.0:
@@ -18706,9 +18706,9 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@playwright/test@1.44.1':
+  '@playwright/test@1.50.1':
     dependencies:
-      playwright: 1.44.1
+      playwright: 1.50.1
 
   '@polka/url@1.0.0-next.28': {}
 
@@ -29042,7 +29042,7 @@ snapshots:
 
   nested-error-stacks@2.1.1: {}
 
-  next@14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.24(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.24
       '@swc/helpers': 0.5.5
@@ -29064,7 +29064,7 @@ snapshots:
       '@next/swc-win32-ia32-msvc': 14.2.24
       '@next/swc-win32-x64-msvc': 14.2.24
       '@opentelemetry/api': 1.9.0
-      '@playwright/test': 1.44.1
+      '@playwright/test': 1.50.1
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
@@ -29997,11 +29997,11 @@ snapshots:
 
   pkginfo@0.4.1: {}
 
-  playwright-core@1.44.1: {}
+  playwright-core@1.50.1: {}
 
-  playwright@1.44.1:
+  playwright@1.50.1:
     dependencies:
-      playwright-core: 1.44.1
+      playwright-core: 1.50.1
     optionalDependencies:
       fsevents: 2.3.2
 
