@@ -3,6 +3,7 @@ export {
   ClerkAPIResponseError,
   EmailLinkError,
   EmailLinkErrorCode,
+  EmailLinkErrorCodeStatus,
   isClerkAPIResponseError,
   isClerkRuntimeError,
   isEmailLinkError,

@@ -8,8 +8,8 @@ import {
   SignInActiveSessionContext,
   type SignInActiveSessionListItem,
   useSignInActiveSessionContext,
-  useSignInActiveSessionList,
   useSignInChooseSessionIsActive,
+  useSignInSessionList,
 } from './choose-session.hooks';
 
 // ----------------------------------- TYPES ------------------------------------
@@ -44,7 +44,7 @@ export function SignInChooseSession({ asChild, children, ...props }: SignInChoos
 }
 
 export function SignInSessionList({ asChild, children, includeCurrentSession, ...props }: SignInSessionListProps) {
-  const sessions = useSignInActiveSessionList({ omitCurrent: !includeCurrentSession });
+  const sessions = useSignInSessionList({ omitCurrent: !includeCurrentSession });
 
   if (!children || !sessions?.length) {
     return null;

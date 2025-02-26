@@ -178,7 +178,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.waitForAppUrl('/');
   });
 
-  test('render organization profile with custom pages and links', async ({ page, context }) => {
+  test('render organization profile with custom pages and links in a dedicated page', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -200,6 +200,38 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     // Check reordered default label. General tab is now the last item.
     await u.page.locator('.cl-navbarButton').last().click();
     await expect(u.page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
+  test('render organization profile with custom pages and links inside an organization switcher', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages/organization-profile');
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Open organization profile inside organization switcher
+    await u.po.organizationSwitcher.toggleTrigger();
+    await u.page.waitForSelector('.cl-organizationSwitcherPopoverCard', { state: 'visible' });
+    await u.page.locator('.cl-button__manageOrganization').click();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
     // Click custom link and check navigation
     await u.page.getByRole('button', { name: /Homepage/i }).click();

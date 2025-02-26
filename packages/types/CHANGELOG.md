@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.46.1
+
+### Patch Changes
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
+## 4.46.0
+
+### Minor Changes
+
+- Introduce `__internal_addNavigationListener` method the `Clerk` singleton. ([#5092](https://github.com/clerk/javascript/pull/5092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract common button component props. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.45.1
 
 ### Patch Changes

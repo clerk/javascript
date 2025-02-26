@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`empty className 1`] = `
-"const Button: React.FC<ButtonProps> = ({ children, className }) => {
-    return <button className='cl-test-123'>{children}</button>
-  }"
-`;

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.24.0",
+  "version": "1.24.2",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -85,7 +85,7 @@
     "clean": "rimraf ./dist",
     "lint": "eslint src",
     "lint:publint": "publint",
-    "lint:attw": "attw --pack . --ignore-rules false-cjs",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "vitest run --environment node",
     "test:edge-runtime": "vitest run --environment edge-runtime",
