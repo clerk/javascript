@@ -1,10 +1,10 @@
-import { isDeeplyEqual } from '@clerk/shared/react/index';
 import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { LoadingCard, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { determineStartingSignInSecondFactor } from '../SignIn/utils';
+import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
@@ -22,7 +22,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _UserVerificationFactorTwo(): JSX.Element {
+export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
@@ -45,13 +45,19 @@ export function _UserVerificationFactorTwo(): JSX.Element {
     toggleAllStrategies();
   };
 
-  const hasAlternativeStrategies =
-    (availableFactors && availableFactors.filter(factor => isDeeplyEqual(factor, currentFactor)).length > 0) || false;
+  const hasAlternativeStrategies = useMemo(
+    () =>
+      (availableFactors &&
+        availableFactors.filter(factor => secondFactorsAreEqual(factor, currentFactor)).length > 0) ||
+      false,
+    [availableFactors, currentFactor],
+  );
 
   useEffect(() => {
     if (sessionVerification.status === 'needs_first_factor') {
       void navigate('../');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!currentFactor) {
@@ -97,5 +103,5 @@ export function _UserVerificationFactorTwo(): JSX.Element {
 }
 
 export const UserVerificationFactorTwo = withUserVerificationSessionGuard(
-  withCardStateProvider(_UserVerificationFactorTwo),
+  withCardStateProvider(UserVerificationFactorTwoComponent),
 );
