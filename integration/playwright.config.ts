@@ -42,8 +42,8 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome',
         launchOptions: {
-          // Need to disable web security to test get around CORS issues
-          args: ['--disable-web-security'],
+          // Need to disable web security to get around CORS issues
+          // args: ['--disable-web-security'],
         },
       },
       dependencies: ['setup'],
