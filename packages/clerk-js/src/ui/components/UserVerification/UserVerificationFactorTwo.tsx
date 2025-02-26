@@ -36,6 +36,11 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
   const toggleAllStrategies = () => setShowAllStrategies(s => !s);
 
+  const secondFactorsExcludingCurrent = useMemo(
+    () => availableFactors?.filter(factor => secondFactorsAreEqual(factor, currentFactor)),
+    [availableFactors, currentFactor],
+  );
+
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
@@ -46,11 +51,8 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   };
 
   const hasAlternativeStrategies = useMemo(
-    () =>
-      (availableFactors &&
-        availableFactors.filter(factor => secondFactorsAreEqual(factor, currentFactor)).length > 0) ||
-      false,
-    [availableFactors, currentFactor],
+    () => (secondFactorsExcludingCurrent && secondFactorsExcludingCurrent.length > 0) || false,
+    [secondFactorsExcludingCurrent],
   );
 
   useEffect(() => {
@@ -64,10 +66,10 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     return <LoadingCard />;
   }
 
-  if (showAllStrategies) {
+  if (showAllStrategies && hasAlternativeStrategies) {
     return (
       <UVFactorTwoAlternativeMethods
-        supportedSecondFactors={sessionVerification.supportedSecondFactors}
+        supportedSecondFactors={secondFactorsExcludingCurrent}
         onBackLinkClick={toggleAllStrategies}
         onFactorSelected={selectFactor}
       />
