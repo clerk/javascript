@@ -23,6 +23,7 @@ import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
+  AuthenticateWithRedirectParams,
   LegacyRedirectProps,
   RedirectOptions,
   RedirectUrlProp,
@@ -586,6 +587,10 @@ export interface Clerk {
   authenticateWithGoogleOneTap: (
     params: AuthenticateWithGoogleOneTapParams,
   ) => Promise<SignInResource | SignUpResource>;
+
+  authenticateWithPopup: (
+    params: AuthenticateWithRedirectParams & { popupCallbackUrl: string; popup: Window | null },
+  ) => Promise<unknown>;
 
   /**
    * Creates an organization, adding the current user as admin.

@@ -250,6 +250,37 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
+  public authenticateWithPopup = async (
+    params: AuthenticateWithRedirectParams & { popup: Window | null },
+  ): Promise<void> => {
+    const { strategy, redirectUrl, redirectUrlComplete, identifier, popup } = params || {};
+    if (!popup) {
+      clerkMissingOptionError('popup');
+    }
+
+    const { firstFactorVerification } =
+      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
+        ? await this.prepareFirstFactor({
+            strategy,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: redirectUrlComplete,
+          })
+        : await this.create({
+            strategy,
+            identifier,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: redirectUrlComplete,
+          });
+
+    const { status, externalVerificationRedirectURL } = firstFactorVerification;
+
+    if (status === 'unverified' && externalVerificationRedirectURL) {
+      popup.location.href = externalVerificationRedirectURL.toString();
+    } else {
+      clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
+    }
+  };
+
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');

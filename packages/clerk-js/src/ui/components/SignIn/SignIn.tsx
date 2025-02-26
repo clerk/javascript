@@ -24,6 +24,7 @@ import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInPopupCallback } from './SignInPopupCallback';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -66,6 +67,9 @@ function SignInRoutes(): JSX.Element {
             secondFactorUrl={'../factor-two'}
             resetPasswordUrl={'../reset-password'}
           />
+        </Route>
+        <Route path='popup-callback'>
+          <SignInPopupCallback />
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
