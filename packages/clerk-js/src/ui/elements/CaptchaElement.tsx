@@ -14,11 +14,11 @@ export const CaptchaElement = () => {
   const maxHeightValueRef = useRef('0');
   const minHeightValueRef = useRef('unset');
   const marginBottomValueRef = useRef('unset');
-  const { parsedLayout } = useAppearance();
+  const { parsedCaptcha } = useAppearance();
   const { locale } = useLocalizations();
-  const captchaTheme = parsedLayout?.captchaTheme;
-  const captchaSize = parsedLayout?.captchaSize;
-  const captchaLanguage = parsedLayout?.captchaLanguage || locale;
+  const captchaTheme = parsedCaptcha?.theme;
+  const captchaSize = parsedCaptcha?.size;
+  const captchaLanguage = parsedCaptcha?.language || locale;
 
   useEffect(() => {
     if (!elementRef.current) return;

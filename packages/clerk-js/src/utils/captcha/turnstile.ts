@@ -1,6 +1,6 @@
 import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaWidgetType, Layout } from '@clerk/types';
+import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
@@ -8,6 +8,12 @@ import type { CaptchaOptions } from './types';
 // We use the explicit render mode to be able to control when the widget is rendered.
 // CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
 const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+type CaptchaAttributes = {
+  theme?: RenderOptions['theme'];
+  language?: RenderOptions['language'];
+  size: RenderOptions['size'];
+};
 
 interface RenderOptions {
   /**
@@ -63,19 +69,19 @@ interface RenderOptions {
    * The default is auto, which respects the user preference. This can be forced to light or dark by setting the theme accordingly.
    * @default 'auto'
    */
-  theme?: Layout['captchaTheme'];
+  theme?: CaptchaAppearanceOptions['theme'];
   /**
    * The widget size. Can take the following values: normal, flexible, compact.
    * @default 'normal'
    */
-  size?: Layout['captchaSize'];
+  size?: CaptchaAppearanceOptions['size'];
   /**
    * Language to display, must be either: auto (default) to use the language that the visitor has chosen,
    * or an ISO 639-1 two-letter language code (e.g. en) or language and country code (e.g. en-US).
    * Refer to the list of supported languages for more information.
    * https://developers.cloudflare.com/turnstile/reference/supported-languages
    */
-  language?: string;
+  language?: CaptchaAppearanceOptions['language'];
   /**
    * A custom value that can be used to differentiate widgets under the same sitekey
    * in analytics and which is returned upon validation. This can only contain up to
@@ -127,10 +133,10 @@ async function loadCaptchaFromCloudflareURL() {
   }
 }
 
-function getCaptchaAttibutesFromElemenet(element: HTMLElement) {
-  const theme = element.getAttribute('data-cl-theme');
-  const language = element.getAttribute('data-cl-language');
-  const size = element.getAttribute('data-cl-size');
+function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
+  const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
+  const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
+  const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
 
   return { theme, language, size };
 }
@@ -170,9 +176,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     const modalContainderEl = await waitForElement(modalContainerQuerySelector);
     if (modalContainderEl) {
       const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
-      captchaTheme = theme as RenderOptions['theme'];
-      captchaLanguage = language as RenderOptions['language'];
-      captchaSize = size as RenderOptions['size'];
+      captchaTheme = theme;
+      captchaLanguage = language;
+      captchaSize = size;
     }
   }
 
@@ -184,9 +190,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
       visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
       const { theme, language, size } = getCaptchaAttibutesFromElemenet(visibleDiv);
-      captchaTheme = theme as RenderOptions['theme'];
-      captchaLanguage = language as RenderOptions['language'];
-      captchaSize = size as RenderOptions['size'];
+      captchaTheme = theme;
+      captchaLanguage = language;
+      captchaSize = size;
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',

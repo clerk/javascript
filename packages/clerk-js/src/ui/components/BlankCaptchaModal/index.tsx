@@ -3,11 +3,11 @@ import { Card, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 
 const BlankCard = withCardStateProvider(() => {
-  const { parsedLayout } = useAppearance();
+  const { parsedCaptcha } = useAppearance();
   const { locale } = useLocalizations();
-  const captchaTheme = parsedLayout?.captchaTheme;
-  const captchaSize = parsedLayout?.captchaSize;
-  const captchaLanguage = parsedLayout?.captchaLanguage || locale;
+  const captchaTheme = parsedCaptcha?.theme;
+  const captchaSize = parsedCaptcha?.size;
+  const captchaLanguage = parsedCaptcha?.language || locale;
 
   return (
     <Card.Root>

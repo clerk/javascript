@@ -1,5 +1,5 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
-import type { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
+import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { polishedAppearance } from '../polishedAppearance';
@@ -16,8 +16,12 @@ import {
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
 export type ParsedLayout = Required<Layout>;
+export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
-type PublicAppearanceTopLevelKey = keyof Omit<Appearance, 'baseTheme' | 'elements' | 'layout' | 'variables'>;
+type PublicAppearanceTopLevelKey = keyof Omit<
+  Appearance,
+  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha'
+>;
 
 export type AppearanceCascade = {
   globalAppearance?: Appearance;
@@ -29,6 +33,7 @@ export type ParsedAppearance = {
   parsedElements: ParsedElements;
   parsedInternalTheme: ParsedInternalTheme;
   parsedLayout: ParsedLayout;
+  parsedCaptcha: ParsedCaptcha;
 };
 
 const defaultLayout: ParsedLayout = {
@@ -44,9 +49,12 @@ const defaultLayout: ParsedLayout = {
   shimmer: true,
   animations: true,
   unsafe_disableDevelopmentModeWarnings: false,
-  captchaTheme: 'auto',
-  captchaSize: 'normal',
-  captchaLanguage: '',
+};
+
+const defaultCaptchaOptions: ParsedCaptcha = {
+  theme: 'auto',
+  size: 'normal',
+  language: '',
 };
 
 /**
@@ -66,6 +74,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
 
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
+  const parsedCaptcha = parseCaptcha(appearanceList);
 
   if (
     !appearanceList.find(a => {
@@ -86,7 +95,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
       return res;
     }),
   );
-  return { parsedElements, parsedInternalTheme, parsedLayout };
+  return { parsedElements, parsedInternalTheme, parsedLayout, parsedCaptcha };
 };
 
 const expand = (theme: Theme | undefined, cascade: any[]) => {
@@ -107,6 +116,13 @@ const parseElements = (appearances: Appearance[]) => {
 
 const parseLayout = (appearanceList: Appearance[]) => {
   return { ...defaultLayout, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.layout }), {}) };
+};
+
+const parseCaptcha = (appearanceList: Appearance[]) => {
+  return {
+    ...defaultCaptchaOptions,
+    ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.captcha }), {}),
+  };
 };
 
 const parseVariables = (appearances: Appearance[]) => {

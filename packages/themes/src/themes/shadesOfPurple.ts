@@ -10,7 +10,4 @@ export const shadesOfPurple = experimental_createTheme({
     colorInputText: '#a1fdfe',
     colorShimmer: 'rgba(161,253,254,0.36)',
   },
-  layout: {
-    captchaTheme: 'dark',
-  },
 });
