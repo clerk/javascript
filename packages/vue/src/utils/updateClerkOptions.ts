@@ -20,7 +20,7 @@ export function updateClerkOptions(options: ClerkUpdateOptions) {
   // @ts-expect-error - `__unstable__updateProps` is not exposed as public API from `@clerk/types`
   void window.Clerk.__unstable__updateProps({
     options: {
-      locatization: options.localization,
+      localization: options.localization,
     },
     appearance: options.appearance,
   });
