@@ -5,10 +5,11 @@ import type { IsomorphicClerk } from '../isomorphicClerk';
  */
 const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
   return new Promise<void>(resolve => {
-    if (isomorphicClerk.loaded) {
-      resolve();
-    }
-    isomorphicClerk.addOnLoaded(resolve);
+    isomorphicClerk.onLifecycle(status => {
+      if (status === 'ready') {
+        resolve();
+      }
+    });
   });
 };
 

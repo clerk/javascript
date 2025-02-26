@@ -51,7 +51,7 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   if (existingScript) {
-    return new Promise((resolve, reject) => {
+    const attemptExisting = new Promise((resolve, reject) => {
       existingScript.addEventListener('load', () => {
         resolve(existingScript);
       });
@@ -59,7 +59,24 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
       existingScript.addEventListener('error', () => {
         reject(FAILED_TO_LOAD_ERROR);
       });
+
+      setTimeout(() => {
+        reject();
+      }, 2_000);
     });
+
+    const loaded = await attemptExisting
+      .then(() => true)
+      .catch(msg => {
+        if (msg === FAILED_TO_LOAD_ERROR) {
+          throw msg;
+        }
+        return false;
+      });
+
+    if (loaded) {
+      return;
+    }
   }
 
   if (!opts?.publishableKey) {

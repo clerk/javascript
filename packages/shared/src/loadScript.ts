@@ -47,5 +47,5 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
     });
   };
 
-  return retry(load, { shouldRetry: (_, iterations) => iterations <= 5 });
+  return retry(load, { shouldRetry: (_, iterations) => iterations <= 2 });
 }

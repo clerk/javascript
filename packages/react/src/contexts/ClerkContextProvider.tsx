@@ -1,7 +1,7 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
@@ -18,7 +18,7 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, lifecycleStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -31,8 +31,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
-  const derivedState = deriveState(clerkLoaded, state, initialState);
-  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
+  const derivedState = deriveState(lifecycleStatus === 'ready', state, initialState);
+  const clerkCtx = React.useMemo(() => ({ value: clerk }), [lifecycleStatus]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const {
@@ -88,7 +88,6 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 }
 
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const [loaded, setLoaded] = React.useState(false);
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
 
   React.useEffect(() => {
@@ -99,16 +98,20 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     void isomorphicClerk.__unstable__updateProps({ options });
   }, [options.localization]);
 
-  React.useEffect(() => {
-    isomorphicClerk.addOnLoaded(() => setLoaded(true));
-  }, []);
+  const lifecycleStatus = useSyncExternalStore(
+    isomorphicClerk.onLifecycle,
+    () => isomorphicClerk.lifecycleState,
+    () => isomorphicClerk.lifecycleState,
+  );
+
+  console.log('NININININ', lifecycleStatus);
 
   React.useEffect(() => {
     return () => {
+      isomorphicClerk.setLifecycleAndNotify('loading');
       IsomorphicClerk.clearInstance();
-      setLoaded(false);
     };
   }, []);
 
-  return { isomorphicClerk, loaded };
+  return { isomorphicClerk, lifecycleStatus };
 };

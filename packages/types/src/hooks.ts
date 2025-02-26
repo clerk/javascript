@@ -23,8 +23,17 @@ export type UseAuthReturn =
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
+       * @deprecated
        */
       isLoaded: false;
+      // /**
+      //  * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads successfully.
+      //  */
+      // isReady: false;
+      // /**
+      //  * A boolean that indicates whether Clerk failed to initialize. Initially `false`, becomes `true` once Clerk fails to load..
+      //  */
+      // isError: false;
       /**
        * A boolean that indicates whether a user is currently signed in.
        */

@@ -35,6 +35,32 @@ export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
   return null;
 };
 
+type PropsWithChildrenFunction<P, T> = P & {
+  children?: React.ReactNode | ((item: T) => React.ReactNode);
+};
+
+export const ClerkLifecycle = ({
+  status,
+  children,
+}: PropsWithChildrenFunction<
+  { status?: 'loading' | 'loading-failed' | 'ready' | 'degraded' },
+  'loading' | 'loading-failed' | 'ready' | 'degraded'
+>) => {
+  useAssertWrappedByClerkProvider('ClerkLoaded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  const toRender = typeof children === 'function' ? children(isomorphicClerk.lifecycleState) : children;
+
+  if (isomorphicClerk.lifecycleState === status && !!status) {
+    return status ? toRender : null;
+  }
+
+  return toRender;
+};
+
+/**
+ * @deprecated
+ */
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
@@ -45,6 +71,9 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   return children;
 };
 
+/**
+ * @deprecated
+ */
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoading');
 

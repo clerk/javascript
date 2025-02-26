@@ -6,6 +6,7 @@ export {
   AuthenticateWithRedirectCallback,
   ClerkLoaded,
   ClerkLoading,
+  ClerkLifecycle,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
