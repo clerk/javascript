@@ -49,6 +49,65 @@
   packageRules: [
     {
       groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "agent-toolkit-dev-minor",
+      matchFileNames: [
+        "packages/agent-toolkit/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "agent-toolkit",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "agent-toolkit-dev-major",
+      matchFileNames: [
+        "packages/agent-toolkit/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "agent-toolkit",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "agent-toolkit-prod-minor",
+      matchFileNames: [
+        "packages/agent-toolkit/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "agent-toolkit",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "agent-toolkit-prod-major",
+      matchFileNames: [
+        "packages/agent-toolkit/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "agent-toolkit",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "astro-dev-minor",
       matchFileNames: [
         "packages/astro/package.json",
@@ -1052,65 +1111,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "tailwindcss-transformer-dev-minor",
-      matchFileNames: [
-        "packages/tailwindcss-transformer/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "tailwindcss-transformer",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "tailwindcss-transformer-dev-major",
-      matchFileNames: [
-        "packages/tailwindcss-transformer/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "tailwindcss-transformer",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "tailwindcss-transformer-prod-minor",
-      matchFileNames: [
-        "packages/tailwindcss-transformer/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "tailwindcss-transformer",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "tailwindcss-transformer-prod-major",
-      matchFileNames: [
-        "packages/tailwindcss-transformer/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "tailwindcss-transformer",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "tanstack-start-dev-minor",
       matchFileNames: [
         "packages/tanstack-start/package.json",
@@ -1344,65 +1344,6 @@
         "major",
       ],
       semanticCommitScope: "types",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "ui-dev-minor",
-      matchFileNames: [
-        "packages/ui/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "ui",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "ui-dev-major",
-      matchFileNames: [
-        "packages/ui/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "ui",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "ui-prod-minor",
-      matchFileNames: [
-        "packages/ui/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "ui",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "ui-prod-major",
-      matchFileNames: [
-        "packages/ui/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "ui",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
