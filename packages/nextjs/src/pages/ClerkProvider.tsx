@@ -11,6 +11,7 @@ import { ClerkJSScript } from '../utils/clerk-js-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
+import { RouterTelemetry } from '../utils/router-telemetry';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
@@ -53,6 +54,7 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
         {...mergedProps}
         initialState={initialState}
       >
+        <RouterTelemetry />
         <ClerkJSScript router='pages' />
         {children}
       </ReactClerkProvider>
