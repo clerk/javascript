@@ -54,13 +54,16 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
+  formFieldInputPlaceholder__emailAddresses: undefined,
   formFieldInputPlaceholder__firstName: 'Vorname eingeben',
   formFieldInputPlaceholder__lastName: 'Nachname eingeben',
   formFieldInputPlaceholder__organizationDomain: 'Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'E-Mail-Adresse der Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationName: 'Name der Organisation eingeben',
+  formFieldInputPlaceholder__organizationSlug: undefined,
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
@@ -129,6 +132,7 @@ export const deDE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Einladen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
@@ -461,8 +465,9 @@ export const deDE: LocalizationResource = {
       actionText: 'Kein Account?',
       actionText__join_waitlist: 'Warteliste beitreten',
       subtitle: 'weiter zu {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Einloggen',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
@@ -536,14 +541,15 @@ export const deDE: LocalizationResource = {
       subtitleWaitlist: 'Treten Sie der Warteliste bei, um Benachrichtigungen zu erhalten.',
       title: 'Zugang verweigert',
     },
-
     start: {
       actionLink: 'Einloggen',
       actionLink__use_email: 'Mit E-Mail einloggen',
       actionLink__use_phone: 'Mit Telefonnummer einloggen',
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
+      subtitleCombined: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',
+      titleCombined: 'Erstelle deinen Account',
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
@@ -555,7 +561,6 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
-    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
@@ -605,6 +610,7 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -705,6 +711,11 @@ export const deDE: LocalizationResource = {
         resendButton: 'Link erneut senden',
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',

@@ -88,7 +88,7 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
 
   useEffect(() => {
     let ignore = false;
-    getItemAsync(storeKey)
+    void getItemAsync(storeKey)
       .catch(() => null)
       .then(res => {
         if (ignore) {

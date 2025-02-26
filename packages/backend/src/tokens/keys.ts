@@ -13,7 +13,7 @@ import {
 } from '../errors';
 import { runtime } from '../runtime';
 import { joinPaths } from '../util/path';
-import { callWithRetry } from '../util/shared';
+import { retry } from '../util/shared';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -60,7 +60,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
     }
 
     const modulus = localKey
-      .replace(/(\r\n|\n|\r)/gm, '')
+      .replace(/\r\n|\n|\r/g, '')
       .replace(PEM_HEADER, '')
       .replace(PEM_TRAILER, '')
       .replace(RSA_PREFIX, '')
@@ -85,14 +85,29 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
 }
 
 export type LoadClerkJWKFromRemoteOptions = {
+  /**
+   * @internal
+   */
   kid: string;
   /**
    * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
    */
   jwksCacheTtlInMs?: number;
+  /**
+   * A flag to skip ignore cache and always fetch JWKS before each jwt verification.
+   */
   skipJwksCache?: boolean;
+  /**
+   * The Clerk Secret Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
   secretKey?: string;
+  /**
+   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint. Defaults to `'https://api.clerk.com'`.
+   */
   apiUrl?: string;
+  /**
+   * The version passed to the Clerk API. Defaults to `'v1'`.
+   */
   apiVersion?: string;
 };
 
@@ -100,7 +115,7 @@ export type LoadClerkJWKFromRemoteOptions = {
  *
  * Loads a key from JWKS retrieved from the well-known Frontend API endpoint of the issuer.
  * The result is also cached on the module level to avoid network requests in subsequent invocations.
- * The cache lasts 1 hour by default.
+ * The cache lasts up to 5 minutes.
  *
  * @param {Object} options
  * @param {string} options.kid - The id of the key that the JWT was signed with
@@ -122,8 +137,8 @@ export async function loadClerkJWKFromRemote({
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }
-    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
-    const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
+    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion) as Promise<{ keys: JsonWebKeyWithKid[] }>;
+    const { keys } = await retry(fetcher);
 
     if (!keys || !keys.length) {
       throw new TokenVerificationError({

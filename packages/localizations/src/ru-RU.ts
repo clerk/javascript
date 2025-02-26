@@ -133,6 +133,7 @@ export const ruRU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить участника',
         tableHeader__actions: 'Действия',
@@ -469,8 +470,9 @@ export const ruRU: LocalizationResource = {
       actionText: 'Нет учетной записи?',
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Войти',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Верификационный код',
@@ -551,7 +553,9 @@ export const ruRU: LocalizationResource = {
       actionLink__use_phone: 'Использовать телефон вместо этого',
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
+      titleCombined: 'Создайте Вашу учетную запись',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -563,7 +567,6 @@ export const ruRU: LocalizationResource = {
     captcha_unavailable:
       'Регистрация не удалась из-за неудачной проверки бота. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
@@ -611,6 +614,7 @@ export const ruRU: LocalizationResource = {
       sentencePrefix: 'Ваш пароль должен содержать',
     },
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
       goodPassword: 'Хорошая работа. Это отличный пароль.',
@@ -710,6 +714,11 @@ export const ruRU: LocalizationResource = {
         resendButton: 'Отправить ссылку повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти с использованием этого адреса электронной почты.',

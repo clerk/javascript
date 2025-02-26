@@ -1,9 +1,12 @@
 import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 
-import { ENABLE_KEYLESS } from '../server/constants';
+import { KEYLESS_DISABLED } from '../server/constants';
 import { isNextWithUnstableServerActions } from './sdk-versions';
 
-const canUseKeyless__server = !isNextWithUnstableServerActions && isDevelopmentEnvironment() && ENABLE_KEYLESS;
-const canUseKeyless__client = !isNextWithUnstableServerActions && ENABLE_KEYLESS;
+const canUseKeyless =
+  !isNextWithUnstableServerActions &&
+  // Next.js will inline the value of 'development' or 'production' on the client bundle, so this is client-safe.
+  isDevelopmentEnvironment() &&
+  !KEYLESS_DISABLED;
 
-export { canUseKeyless__client, canUseKeyless__server };
+export { canUseKeyless };

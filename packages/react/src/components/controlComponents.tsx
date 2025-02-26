@@ -140,14 +140,13 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
    */
   return authorized;
 };
-/* eslint-enable react-hooks/rules-of-hooks */
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
-  const hasActiveSessions = client.activeSessions && client.activeSessions.length > 0;
+  const hasSignedInSessions = client.signedInSessions && client.signedInSessions.length > 0;
 
   React.useEffect(() => {
-    if (session === null && hasActiveSessions) {
+    if (session === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);

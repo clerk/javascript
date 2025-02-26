@@ -11,16 +11,16 @@ export class CaptchaChallenge {
    * This will always use the non-interactive variant of the CAPTCHA challenge and will
    * always use the fallback key.
    */
-  public async invisible() {
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
+  public async invisible(opts?: Partial<CaptchaOptions>) {
+    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
 
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
+    if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       return getCaptchaToken({
         siteKey: captchaPublicKeyInvisible,
         invisibleSiteKey: captchaPublicKeyInvisible,
         widgetType: 'invisible',
-        scriptUrl: captchaURL,
         captchaProvider: 'turnstile',
+        action: opts?.action,
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
@@ -41,15 +41,14 @@ export class CaptchaChallenge {
    * Managed challenged start as non-interactive and escalate to interactive if necessary.
    */
   public async managedOrInvisible(opts?: Partial<CaptchaOptions>) {
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
+    const { captchaSiteKey, canUseCaptcha, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
       retrieveCaptchaInfo(this.clerk);
 
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
+    if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       return getCaptchaToken({
         siteKey: captchaSiteKey,
         widgetType: captchaWidgetType,
         invisibleSiteKey: captchaPublicKeyInvisible,
-        scriptUrl: captchaURL,
         captchaProvider,
         ...opts,
       }).catch(e => {
@@ -67,12 +66,13 @@ export class CaptchaChallenge {
    * Similar to managed() but will render the CAPTCHA challenge in a modal
    * managed by clerk-js itself.
    */
-  public async managedInModal() {
+  public async managedInModal(opts?: Partial<CaptchaOptions>) {
     return this.managedOrInvisible({
       modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
       modalContainerQuerySelector: '#cl-modal-captcha-container',
       openModal: () => this.clerk.__internal_openBlankCaptchaModal(),
       closeModal: () => this.clerk.__internal_closeBlankCaptchaModal(),
+      action: opts?.action,
     });
   }
 }

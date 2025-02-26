@@ -1,6 +1,8 @@
+import type { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
 
-const ClerkQueryParams = [
+const _ClerkQueryParams = [
   '__clerk_status',
   '__clerk_created_session',
   '__clerk_invitation_token',
@@ -13,21 +15,21 @@ const ClerkQueryParams = [
   CLERK_SUFFIXED_COOKIES,
 ] as const;
 
-type ClerkQueryParam = (typeof ClerkQueryParams)[number];
+type ClerkQueryParam = (typeof _ClerkQueryParams)[number];
+
+/**
+ * Used for email link verification
+ */
+export type VerifyTokenStatus = 'verified' | (typeof EmailLinkErrorCodeStatus)[keyof typeof EmailLinkErrorCodeStatus];
+
+/**
+ * Used for instance invitations and organization invitations
+ */
+type TicketStatus = 'sign_in' | 'sign_up' | 'complete';
 
 type ClerkQueryParamsToValuesMap = {
-  __clerk_status: VerificationStatus | TicketStatus;
-} & Record<(typeof ClerkQueryParams)[number], string>;
-
-export type VerificationStatus =
-  | 'expired'
-  | 'failed'
-  | 'loading'
-  | 'verified'
-  | 'verified_switch_tab'
-  | 'client_mismatch';
-
-type TicketStatus = 'sign_in' | 'sign_up';
+  __clerk_status: TicketStatus | VerifyTokenStatus;
+} & Record<(typeof _ClerkQueryParams)[number], string>;
 
 export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQueryParamsToValuesMap[T] | null {
   const val = new URL(window.location.href).searchParams.get(param);

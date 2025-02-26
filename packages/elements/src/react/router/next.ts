@@ -25,9 +25,8 @@ export const useNextRouter = (): ClerkHostRouter => {
     push: (path: string) => router.push(path),
     replace: (path: string) =>
       canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
-    shallowPush(path: string) {
-      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
-    },
+    shallowPush: (path: string) =>
+      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {}),
     pathname: () => pathname,
     searchParams: () => searchParams,
     inferredBasePath: () => inferredBasePath,

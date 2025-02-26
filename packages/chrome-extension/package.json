@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.1.12",
+  "version": "2.2.10",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -33,13 +33,13 @@
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/search-for-rhc.mjs dist",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs directory dist",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
@@ -54,7 +54,6 @@
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@types/chrome": "*",
     "@types/webextension-polyfill": "^0.10.7",
     "type-fest": "^4.8.3"

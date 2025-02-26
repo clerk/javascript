@@ -6,6 +6,7 @@ import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
+import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
@@ -35,10 +36,14 @@ const createExpectPageObject = ({ page }: TestArgs) => {
       expect(redirect.status()).toBe(307);
       expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
     },
-    toBeSignedOut: () => {
-      return page.waitForFunction(() => {
-        return !window.Clerk?.user;
-      });
+    toBeSignedOut: (args?: { timeOut: number }) => {
+      return page.waitForFunction(
+        () => {
+          return !window.Clerk?.user;
+        },
+        null,
+        { timeout: args?.timeOut },
+      );
     },
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
@@ -88,6 +93,7 @@ export const createTestUtils = <
   const testArgs = { page, context, browser };
 
   const pageObjects = {
+    keylessPopover: createKeylessPopoverPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),

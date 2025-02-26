@@ -1,12 +1,6 @@
 import { readPackageSync } from 'read-pkg';
 import semverRegex from 'semver-regex';
 
-export function getClerkMajorVersion() {
-  const pkg = readPackageSync();
-  const clerk = pkg.dependencies.clerk;
-  return clerk ? semverRegex().exec(clerk)[0][0] : false;
-}
-
 export function getClerkSdkVersion(sdk) {
   const pkg = readPackageSync();
   const clerkSdk = pkg.dependencies[`@clerk/${sdk}`];

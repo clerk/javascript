@@ -66,7 +66,6 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingrese su contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingrese su número telefónico',
   formFieldInputPlaceholder__username: 'Ingrese su nombre de usuario',
-
   formFieldLabel__automaticInvitations: 'Activar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmación',
@@ -131,6 +130,7 @@ export const esES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',
@@ -422,7 +422,6 @@ export const esES: LocalizationResource = {
       subtitle: 'Use su clave de acceso para continuar con la autenticación.',
       title: 'Clave de acceso',
     },
-
     password: {
       actionLink: 'Usa otro método',
       subtitle: 'para continuar a {{applicationName}}',
@@ -462,10 +461,10 @@ export const esES: LocalizationResource = {
       actionLink__use_username: 'Usar nombre de usuario',
       actionText: '¿No tienes cuenta?',
       actionText__join_waitlist: '¿Te gustaría unirte a la lista de espera?',
-
       subtitle: 'para continuar a {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -521,7 +520,6 @@ export const esES: LocalizationResource = {
         title: 'Por favor, acepta nuestros términos y políticas para continuar',
       },
     },
-
     phoneCode: {
       formSubtitle: 'Introduzca el código de verificación enviado a su número de teléfono',
       formTitle: 'Código de verificación',
@@ -538,14 +536,15 @@ export const esES: LocalizationResource = {
       subtitleWaitlist: 'Te has unido a la lista de espera. Nos pondremos en contacto contigo pronto.',
       title: 'Acceso restringido',
     },
-
     start: {
       actionLink: 'Iniciar sesión',
       actionLink__use_email: 'Usar correo electrónico',
       actionLink__use_phone: 'Usar teléfono',
       actionText: '¿Ya tienes una cuenta?',
       subtitle: 'para continuar en {{applicationName}}',
+      subtitleCombined: 'para continuar en {{applicationName}}',
       title: 'Crea tu cuenta',
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
@@ -557,7 +556,6 @@ export const esES: LocalizationResource = {
     captcha_unavailable:
       'Registro fallido debido a una validación de bot fallida. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     form_code_incorrect: 'El código ingresado es incorrecto.',
-    form_identifier_exists: 'Ya existe una cuenta con este identificador.',
     form_identifier_exists__email_address: 'Ya existe una cuenta con esta dirección de correo electrónico.',
     form_identifier_exists__phone_number: 'Ya existe una cuenta con este número de teléfono.',
     form_identifier_exists__username: 'Ya existe una cuenta con este nombre de usuario.',
@@ -604,8 +602,48 @@ export const esES: LocalizationResource = {
       requireUppercase: 'La contraseña debe contener al menos una letra mayúscula.',
       sentencePrefix: 'Tu contraseña debe cumplir con los requisitos de complejidad.',
     },
+    phone_number_exists: undefined,
+    web3_missing_identifier: undefined,
+    zxcvbn: {
+      couldBeStronger: undefined,
+      goodPassword: undefined,
+      notEnough: undefined,
+      suggestions: {
+        allUppercase: undefined,
+        anotherWord: undefined,
+        associatedYears: undefined,
+        capitalization: undefined,
+        dates: undefined,
+        l33t: undefined,
+        longerKeyboardPattern: undefined,
+        noNeed: undefined,
+        pwned: undefined,
+        recentYears: undefined,
+        repeated: undefined,
+        reverseWords: undefined,
+        sequences: undefined,
+        useWords: undefined,
+      },
+      warnings: {
+        common: undefined,
+        commonNames: undefined,
+        dates: undefined,
+        extendedRepeat: undefined,
+        keyPattern: undefined,
+        namesByThemselves: undefined,
+        pwned: undefined,
+        recentYears: undefined,
+        sequences: undefined,
+        similarToCommon: undefined,
+        simpleRepeat: undefined,
+        straightRow: undefined,
+        topHundred: undefined,
+        topTen: undefined,
+        userInputs: undefined,
+        wordByItself: undefined,
+      },
+    },
   },
-
   userButton: {
     action__addAccount: 'Añadir cuenta',
     action__manageAccount: 'Administrar cuenta',
@@ -666,6 +704,11 @@ export const esES: LocalizationResource = {
         resendButton: 'Reenviar enlace',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} será eliminado de esta cuenta.',
         messageLine2: 'Ya no podrá iniciar sesión con esta dirección de correo electrónico.',
@@ -834,7 +877,6 @@ export const esES: LocalizationResource = {
         menuAction__rename: 'Renombrar Clave de Acceso',
         title: 'Sección de Claves de Acceso',
       },
-
       passwordSection: {
         primaryButton__setPassword: 'Establecer contraseña',
         primaryButton__updatePassword: 'Cambiar contraseña',
@@ -882,7 +924,6 @@ export const esES: LocalizationResource = {
       web3WalletButtonsBlockButton: 'Conectar billetera',
     },
   },
-
   waitlist: {
     start: {
       actionLink: '¡Únete a la lista de espera!',

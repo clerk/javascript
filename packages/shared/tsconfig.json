@@ -9,16 +9,12 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "declarationMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "declarationDir": "dist/types",
     "jsx": "react",
     "lib": ["ES6", "DOM", "WebWorker"],
     "allowJs": true
   },
   "exclude": ["node_modules"],
-  "include": ["src/index.ts", "global.d.ts"]
+  "include": ["src", "global.d.ts"]
 }

@@ -129,6 +129,7 @@ export const svSE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjud in',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
         tableHeader__actions: 'Åtgärder',
@@ -462,8 +463,9 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Logga in',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifieringskod',
@@ -542,7 +544,9 @@ export const svSE: LocalizationResource = {
       actionLink__use_phone: 'Använd telefon istället',
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
+      titleCombined: 'Skapa ditt konto',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -554,7 +558,6 @@ export const svSE: LocalizationResource = {
     captcha_unavailable:
       'Registrering misslyckades på grund av misslyckad bot-validering. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     form_code_incorrect: 'Koden är felaktig',
-    form_identifier_exists: 'Identifieraren finns redan',
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
@@ -599,6 +602,7 @@ export const svSE: LocalizationResource = {
       sentencePrefix: 'Lösenordet måste innehålla',
     },
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -698,6 +702,11 @@ export const svSE: LocalizationResource = {
         resendButton: 'Skicka länken igen',
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2: 'Du kommer inte längre att kunna logga in med denna e-postadress.',

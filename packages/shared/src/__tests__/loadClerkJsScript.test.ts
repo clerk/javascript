@@ -21,8 +21,8 @@ describe('loadClerkJsScript(options)', () => {
     document.querySelector = jest.fn().mockReturnValue(null);
   });
 
-  test('throws error when publishableKey is missing', () => {
-    expect(() => loadClerkJsScript({} as any)).rejects.toThrow(
+  test('throws error when publishableKey is missing', async () => {
+    await expect(() => loadClerkJsScript({} as any)).rejects.toThrow(
       '@clerk/clerk-react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });

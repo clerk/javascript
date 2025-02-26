@@ -21,7 +21,7 @@ function numberFormatSupportedLocalesOf(locale?: string) {
 
   try {
     return (Intl as any).NumberFormat.supportedLocalesOf(locale).length > 0;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

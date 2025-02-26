@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.0.3",
+  "version": "1.2.1",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -28,11 +28,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./internal": {
       "types": "./dist/internal.d.ts",
-      "import": "./dist/internal.js"
+      "default": "./dist/internal.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
     }
   },
   "main": "./dist/index.js",
@@ -44,12 +48,13 @@
     "build": "tsup --onSuccess \"pnpm build:dts\"",
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "dev": "tsup --watch",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
-    "test": "vitest",
-    "test:ci": "vitest --maxWorkers=70%"
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
@@ -60,8 +65,8 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue.ts/tsx-auto-props": "^0.6.0",
     "unplugin-vue": "^5.2.1",
-    "vue": "3.5.12",
-    "vue-tsc": "^2.0.24"
+    "vue": "3.5.13",
+    "vue-tsc": "^2.2.0"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

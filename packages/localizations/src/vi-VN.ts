@@ -129,6 +129,7 @@ export const viVN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Mời',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Gỡ bỏ thành viên',
         tableHeader__actions: undefined,
@@ -458,8 +459,9 @@ export const viVN: LocalizationResource = {
       actionText: 'Chưa có tài khoản?',
       actionText__join_waitlist: undefined,
       subtitle: 'để tiếp tục với {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Đăng nhập',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Mã xác minh',
@@ -537,7 +539,9 @@ export const viVN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
+      subtitleCombined: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
+      titleCombined: 'Tạo tài khoản của bạn',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -549,7 +553,6 @@ export const viVN: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -595,6 +598,7 @@ export const viVN: LocalizationResource = {
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
     phone_number_exists: 'Số điện thoại này đã được sử dụng. Vui lòng thử số khác.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn đủ mạnh, nhưng có thể mạnh hơn. Hãy thêm nhiều ký tự hơn.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -694,6 +698,11 @@ export const viVN: LocalizationResource = {
         resendButton: 'Không nhận được liên kết? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không thể đăng nhập bằng địa chỉ email này nữa.',

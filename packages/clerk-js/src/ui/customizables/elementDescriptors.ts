@@ -155,6 +155,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationSwitcherPopoverActionButtonIcon',
   'organizationSwitcherPopoverFooter',
 
+  'organizationProfileMembersSearchInputIcon',
+  'organizationProfileMembersSearchInput',
+
   'organizationListPreviewItems',
   'organizationListPreviewItem',
   'organizationListPreviewButton',
@@ -219,6 +222,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectOption',
 
   'menuButton',
+  'menuButtonEllipsis',
   'menuList',
   'menuItem',
 

@@ -2,7 +2,6 @@ import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/types';
 
 export type CaptchaOptions = {
   siteKey: string;
-  scriptUrl: string;
   widgetType: CaptchaWidgetType;
   invisibleSiteKey: string;
   captchaProvider: CaptchaProvider;
@@ -10,6 +9,7 @@ export type CaptchaOptions = {
   modalWrapperQuerySelector?: string;
   openModal?: () => Promise<unknown>;
   closeModal?: () => Promise<unknown>;
+  action?: 'verify' | 'signup' | 'heartbeat';
 };
 
 export type GetCaptchaTokenReturn = {

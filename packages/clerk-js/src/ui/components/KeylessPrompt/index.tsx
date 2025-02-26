@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { Flex, Link } from '../../customizables';
@@ -14,40 +15,137 @@ import { useRevalidateEnvironment } from './use-revalidate-environment';
 type KeylessPromptProps = {
   claimUrl: string;
   copyKeysUrl: string;
+  onDismiss: (() => Promise<unknown>) | undefined | null;
 };
 
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
+const baseElementStyles = css`
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  line-height: 1.5;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    segoe ui,
+    helvetica neue,
+    helvetica,
+    Cantarell,
+    Ubuntu,
+    roboto,
+    noto,
+    arial,
+    sans-serif;
+  text-decoration: none;
+`;
+
+/**
+ * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
+ */
+function withLastActiveFallback(cb: () => string): string {
+  try {
+    return cb();
+  } catch {
+    return 'https://dashboard.clerk.com/last-active';
+  }
+}
+
+function handleDashboardUrlParsing(url: string) {
+  // make sure this is a valid url
+  const __url = new URL(url);
+  const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
+
+  const match = __url.href.match(regex);
+
+  if (!match) {
+    throw new Error('invalid value dashboard url structure');
+  }
+
+  // Extracting base domain, app ID with prefix, and instanceId with prefix
+  return {
+    baseDomain: `https://${match[1]}`,
+    appId: `app_${match[2]}`,
+    instanceId: `ins_${match[3]}`,
+  };
+}
+
 const _KeylessPrompt = (_props: KeylessPromptProps) => {
+  const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
-  const claimed = Boolean(useRevalidateEnvironment().authConfig.claimedAt);
 
-  const isForcedExpanded = claimed || isExpanded;
+  useEffect(() => {
+    if (isSignedIn) {
+      setIsExpanded(true);
+    }
+  }, [isSignedIn]);
 
-  const baseElementStyles = css`
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-    background: none;
-    border: none;
-    line-height: 1.5;
-    font-family:
-      -apple-system,
-      BlinkMacSystemFont,
-      avenir next,
-      avenir,
-      segoe ui,
-      helvetica neue,
-      helvetica,
-      Cantarell,
-      Ubuntu,
-      roboto,
-      noto,
-      arial,
-      sans-serif;
-    text-decoration: none;
+  const environment = useRevalidateEnvironment();
+  const claimed = Boolean(environment.authConfig.claimedAt);
+  const success = typeof _props.onDismiss === 'function' && claimed;
+  const appName = environment.displayConfig.applicationName;
+
+  const isForcedExpanded = claimed || success || isExpanded;
+  const claimUrlToDashboard = useMemo(() => {
+    if (claimed) {
+      return _props.copyKeysUrl;
+    }
+
+    const url = new URL(_props.claimUrl);
+    // Clerk Dashboard accepts a `return_url` query param when visiting `/apps/claim`.
+    url.searchParams.append('return_url', window.location.href);
+    return url.href;
+  }, [claimed, _props.copyKeysUrl, _props.claimUrl]);
+
+  const instanceUrlToDashboard = useMemo(() => {
+    return withLastActiveFallback(() => {
+      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
+      const url = new URL(
+        `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/user-authentication/email-phone-username`,
+      );
+      return url.href;
+    });
+  }, [_props.copyKeysUrl]);
+
+  const getKeysUrlFromLastActive = useMemo(() => {
+    return withLastActiveFallback(() => {
+      const redirectUrlParts = handleDashboardUrlParsing(_props.copyKeysUrl);
+      const url = new URL(`${redirectUrlParts.baseDomain}/last-active?path=api-keys`);
+      return url.href;
+    });
+  }, [_props.copyKeysUrl]);
+
+  const mainCTAStyles = css`
+    ${baseElementStyles};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 1.75rem;
+    max-width: 14.625rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12px;
+    color: ${claimed ? 'white' : success ? 'white' : '#fde047'};
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
+    white-space: nowrap;
+    user-select: none;
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+    box-shadow:
+      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+      0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
   `;
 
   return (
@@ -66,8 +164,8 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
           fontFamily: t.fonts.$main,
           background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           boxShadow:
-            '0px 0px 0px 0.5px #2f3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 1px 1px rgba(255, 255, 255, 0.15) inset, 0px 0px 1px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.2)',
-          transition: 'all 210ms cubic-bezier(0.2, 0.9, 0.25, 1)',
+            '0px 0px 0px 0.5px #2F3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.20) inset, 0px 0px 0px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.20);',
+          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
@@ -77,14 +175,14 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             flexDirection: 'column',
             alignItems: 'flex-center',
             justifyContent: 'flex-center',
-            height: '8.75rem',
+            height: claimed || success ? 'fit-content' : isSignedIn ? '11rem' : '12rem',
             overflow: 'hidden',
             width: 'fit-content',
             minWidth: '16.125rem',
             gap: `${t.space.$1x5}`,
             padding: `${t.space.$2x5} ${t.space.$3} ${t.space.$3} ${t.space.$3}`,
             borderRadius: `${t.radii.$xl}`,
-            transition: 'all 220ms cubic-bezier(0.25, 0.8, 0.25, 1)',
+            transition: 'all 230ms cubic-bezier(0.28, 1, 0.32, 1)',
           },
         })}
       >
@@ -108,7 +206,31 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
               gap: t.space.$2,
             })}
           >
-            {claimed ? (
+            {success ? (
+              <svg
+                width='1rem'
+                height='1rem'
+                viewBox='0 0 16 17'
+                fill='none'
+                aria-hidden
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <g opacity='0.88'>
+                  <path
+                    d='M13.8002 8.20039C13.8002 8.96206 13.6502 9.71627 13.3587 10.42C13.0672 11.1236 12.64 11.763 12.1014 12.3016C11.5628 12.8402 10.9234 13.2674 10.2198 13.5589C9.51607 13.8504 8.76186 14.0004 8.0002 14.0004C7.23853 14.0004 6.48432 13.8504 5.78063 13.5589C5.07694 13.2674 4.43756 12.8402 3.89898 12.3016C3.3604 11.763 2.93317 11.1236 2.64169 10.42C2.35022 9.71627 2.2002 8.96206 2.2002 8.20039C2.2002 6.66214 2.81126 5.18688 3.89898 4.09917C4.98669 3.01146 6.46194 2.40039 8.0002 2.40039C9.53845 2.40039 11.0137 3.01146 12.1014 4.09917C13.1891 5.18688 13.8002 6.66214 13.8002 8.20039Z'
+                    fill='#22C543'
+                    fillOpacity='0.16'
+                  />
+                  <path
+                    d='M6.06686 8.68372L7.51686 10.1337L9.93353 6.75039M13.8002 8.20039C13.8002 8.96206 13.6502 9.71627 13.3587 10.42C13.0672 11.1236 12.64 11.763 12.1014 12.3016C11.5628 12.8402 10.9234 13.2674 10.2198 13.5589C9.51607 13.8504 8.76186 14.0004 8.0002 14.0004C7.23853 14.0004 6.48432 13.8504 5.78063 13.5589C5.07694 13.2674 4.43756 12.8402 3.89898 12.3016C3.3604 11.763 2.93317 11.1236 2.64169 10.42C2.35022 9.71627 2.2002 8.96206 2.2002 8.20039C2.2002 6.66214 2.81126 5.18688 3.89898 4.09917C4.98669 3.01146 6.46194 2.40039 8.0002 2.40039C9.53845 2.40039 11.0137 3.01146 12.1014 4.09917C13.1891 5.18688 13.8002 6.66214 13.8002 8.20039Z'
+                    stroke='#22C543'
+                    strokeWidth='1.2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </g>
+              </svg>
+            ) : claimed ? (
               <svg
                 width='1rem'
                 height='1rem'
@@ -190,93 +312,19 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
             <p
               data-text='Clerk is in keyless mode'
-              aria-label={claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              aria-label={
+                success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
+              }
               css={css`
                 ${baseElementStyles};
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
-                position: relative;
-                isolation: isolate;
                 white-space: nowrap;
                 cursor: pointer;
-
-                ${!claimed &&
-                `&::after {
-                  content: attr(data-text);
-                  z-index: 1;
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  color: transparent;
-                  background: linear-gradient(
-                    -100deg,
-                    transparent 0%,
-                    transparent 45%,
-                    rgb(198, 179, 86) 51%,
-                    rgb(198, 179, 86) 55%,
-                    transparent 60%,
-                    transparent 100%
-                  );
-                  background-size: 260% 100%;
-                  background-clip: text;
-                  filter: blur(1.2px);
-                 animation: text-shimmer 12s 1s 1 ease-out forwards;
-                  -webkit-user-select: none;
-                  user-select: none;
-                }
-
-                &::before {
-                  z-index: 2;
-                  content: attr(data-text);
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  color: transparent;
-                  background: linear-gradient(
-                    -100deg,
-                    transparent 0%,
-                    transparent 45%,
-                    rgba(240, 214, 83, 0.7) 50%,
-                    rgb(240, 214, 83) 51%,
-                    rgb(240, 214, 83) 55%,
-                    rgba(240, 214, 83, 0.7) 60%,
-                    transparent 65%,
-                    transparent 100%
-                  );
-                  background-size: 260% 100%;
-                  background-clip: text;
-                 animation: text-shimmer 12s 1s 1 ease-out forwards;
-                  -webkit-user-select: none;
-                  user-select: none;
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                  &::after,
-                  &::before {
-                    animation: none;
-                    background: transparent;
-                  }
-                }
-
-				  @keyframes text-shimmer {
-                  0% {
-                    background-position: 120% center;
-                  }
-                  15% {
-                    background-position: -60% center;
-                  }
-                  85% {
-                    background-position: -60% center;
-                  }
-                  100% {
-                    background-position: -60% center;
-                  }
-                }
-              `};
               `}
             >
-              {claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
+              {success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'}
             </p>
           </Flex>
 
@@ -289,8 +337,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
             xmlns='http://www.w3.org/2000/svg'
             css={css`
               color: #8c8c8c;
-              transition: color 130ms ease-out;
-              display: ${isExpanded && !claimed ? 'block' : 'none'};
+              transition: color 120ms ease-out;
+              display: ${isExpanded && !claimed && !success ? 'block' : 'none'};
+              cursor: pointer;
 
               :hover {
                 color: #eeeeee;
@@ -352,18 +401,28 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                 }
               `}
             >
-              {claimed ? (
+              {success ? (
                 <>
-                  You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
-                  Dashboard.
-                </>
-              ) : (
-                <>
-                  We generated temporary API keys for you. Link this instance to your Clerk account to configure it.{' '}
+                  Your application{' '}
+                  <span
+                    css={css`
+                      display: inline-block;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      max-width: 8.125rem;
+                      vertical-align: bottom;
+                      font-weight: 500;
+                      color: #d5d5d5;
+                    `}
+                  >
+                    {appName}
+                  </span>{' '}
+                  has been claimed. Configure settings from the{' '}
                   <Link
                     isExternal
-                    aria-label='Learn more about Clerk keyless mode'
-                    href='https://clerk.com/docs/keyless'
+                    aria-label='Go to Dashboard to configure settings'
+                    href={instanceUrlToDashboard}
                     sx={t => ({
                       color: t.colors.$whiteAlpha600,
                       textDecoration: 'underline solid',
@@ -373,74 +432,139 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
                       },
                     })}
                   >
-                    Learn more
+                    Clerk Dashboard
                   </Link>
                 </>
+              ) : claimed ? (
+                <>
+                  You claimed this application but haven&apos;t set keys in your environment. Get them from the Clerk
+                  Dashboard.
+                </>
+              ) : (
+                <span>
+                  {isSignedIn
+                    ? "You've created your first user! Link this application to your Clerk account to explore the Dashboard."
+                    : 'This app uses Clerk for authentication. We generated temporary API keys for you. Link this application to your Clerk account to configure it.'}
+                </span>
               )}
             </p>
           </div>
 
-          {isForcedExpanded && (
-            <a
-              href={claimed ? _props.copyKeysUrl : _props.claimUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              data-expanded={isForcedExpanded}
-              css={css`
-                ${baseElementStyles};
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                height: 1.75rem;
-                max-width: 14.625rem;
-                padding: 0.25rem 0.625rem;
-                border-radius: 0.375rem;
-                font-size: 0.75rem;
-                font-weight: 500;
-                letter-spacing: 0.12px;
-                color: ${claimed ? 'white' : '#fde047'};
-                text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
-                white-space: nowrap;
-                user-select: none;
-                background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-                box-shadow:
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
+          {isForcedExpanded &&
+            (success ? (
+              <button
+                type='button'
+                onClick={async () => {
+                  await _props.onDismiss?.();
+                  window.location.reload();
+                }}
+                css={css`
+                  ${mainCTAStyles};
 
-                animation: ${isForcedExpanded && 'show-button 590ms ease-in forwards'};
-                @keyframes show-button {
-                  0%,
-                  8% {
-                    opacity: 0;
+                  &:hover {
+                    background: #4b4b4b;
+                    transition: all 120ms ease-in-out;
                   }
-                  21%,
-                  100% {
-                    opacity: 1;
-                  }
-                }
+                `}
+              >
+                Dismiss
+              </button>
+            ) : (
+              <Flex
+                data-expanded={isForcedExpanded}
+                sx={t => ({
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: t.space.$2x5,
+                })}
+              >
+                <a
+                  href={claimUrlToDashboard}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  css={css`
+                    ${mainCTAStyles};
+                    animation: ${isForcedExpanded && isSignedIn
+                      ? 'show-main-CTA 800ms ease forwards'
+                      : 'show-main-CTA 650ms ease-in forwards'};
 
-                &:hover {
-                  ${claimed
-                    ? `
+                    @keyframes show-main-CTA {
+                      0%,
+                      5% {
+                        opacity: 0;
+                      }
+                      14%,
+                      100% {
+                        opacity: 1;
+                      }
+                    }
+
+                    &:hover {
+                      ${claimed
+                        ? `
                   background: #4B4B4B;
                   transition: all 120ms ease-in-out;`
-                    : `
+                        : `
                   box-shadow:
                     0px 0px 6px 0px rgba(253, 224, 71, 0.24) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.12),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);`}
-                }
-              `}
-            >
-              {claimed ? 'Get API keys' : 'Claim keys'}
-            </a>
-          )}
+                    }
+                  `}
+                >
+                  {claimed ? 'Get API keys' : 'Claim application'}
+                </a>
+
+                {!claimed && (
+                  <>
+                    <span
+                      css={css`
+                        height: 1px;
+                        background-color: #151515;
+                        width: 100%;
+                        box-shadow: 0px 1px 0px 0px #424242;
+                      `}
+                    />
+
+                    <a
+                      href={getKeysUrlFromLastActive}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      css={css`
+                        ${baseElementStyles};
+                        color: #ffffff9e;
+                        font-size: 0.75rem;
+                        transition: color 120ms ease-out;
+
+                        :hover {
+                          color: #ffffffcf;
+                          text-decoration: none;
+                        }
+
+                        animation: ${isForcedExpanded && isSignedIn
+                          ? 'show-secondary-CTA 800ms ease forwards'
+                          : 'show-secondary-CTA 650ms ease-in forwards'};
+
+                        @keyframes show-secondary-CTA {
+                          0%,
+                          9% {
+                            opacity: 0;
+                          }
+                          19%,
+                          100% {
+                            opacity: 1;
+                          }
+                        }
+                      `}
+                    >
+                      Already have a Clerk app? Get keys
+                    </a>
+                  </>
+                )}
+              </Flex>
+            ))}
         </Flex>
       </Flex>
       <BodyPortal>

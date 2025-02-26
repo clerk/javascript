@@ -3,7 +3,7 @@ import type { CaptchaOptions } from './types';
 
 export const getCaptchaToken = (opts: CaptchaOptions) => {
   if (__BUILD_DISABLE_RHC__) {
-    return Promise.reject();
+    return Promise.reject(new Error('Captcha not supported in this environment'));
   }
 
   return getTurnstileToken(opts);

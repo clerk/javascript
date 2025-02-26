@@ -130,6 +130,7 @@ export const isIS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjóða',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjarlægja meðlim',
         tableHeader__actions: undefined,
@@ -462,8 +463,9 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu ekki með reikning?',
       actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
+      subtitleCombined: undefined,
       title: 'Skrá inn í {{applicationName}}',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Staðfestingarkóði',
@@ -542,7 +544,9 @@ export const isIS: LocalizationResource = {
       actionLink__use_phone: 'Nota síma í staðinn',
       actionText: 'Ertu með reikning?',
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
+      subtitleCombined: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
+      titleCombined: 'Stofna reikning',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
@@ -554,7 +558,6 @@ export const isIS: LocalizationResource = {
     captcha_unavailable:
       'Skráning mistókst vegna misheppnaðrar vélmenna staðfestingar. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     form_code_incorrect: undefined,
-    form_identifier_exists: undefined,
     form_identifier_exists__email_address: 'Þetta netfang er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
@@ -601,6 +604,7 @@ export const isIS: LocalizationResource = {
       sentencePrefix: 'Lykilorðið þitt verður að innihalda',
     },
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
       goodPassword: 'Lykilorðið þitt uppfyllir allar nauðsynlegar kröfur.',
@@ -700,6 +704,11 @@ export const isIS: LocalizationResource = {
         resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
         messageLine2: 'Þú munt ekki lengur geta skráð þig inn með þessu netfangi.',

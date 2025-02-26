@@ -129,6 +129,7 @@ export const srRS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozovi',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -459,8 +460,9 @@ export const srRS: LocalizationResource = {
       actionText: 'Nemaš nalog?',
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
+      subtitleCombined: undefined,
       title: 'Prijavi se na {{applicationName}}',
-      __experimental_titleCombined: undefined,
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',
@@ -538,7 +540,9 @@ export const srRS: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Već imaš nalog?',
       subtitle: 'Dobrodošao! Molimo popuni detalje da započneš.',
+      subtitleCombined: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',
+      titleCombined: 'Kreiraj svoj nalog',
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
@@ -550,7 +554,6 @@ export const srRS: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     form_code_incorrect: 'Uneti kod je netačan.',
-    form_identifier_exists: 'Ovaj identifikator je već u upotrebi.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
@@ -597,6 +600,7 @@ export const srRS: LocalizationResource = {
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
       goodPassword: 'Tvoja lozinka ispunjava sve potrebne zahteve.',
@@ -695,6 +699,11 @@ export const srRS: LocalizationResource = {
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
         messageLine2: 'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',

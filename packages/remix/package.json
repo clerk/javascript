@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.4.10",
+  "version": "4.5.0",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -67,8 +67,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig"
   },
@@ -77,11 +77,10 @@
     "@clerk/clerk-react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "cookie": "0.7.0",
+    "cookie": "0.7.2",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
     "@types/cookie": "^0.6.0"

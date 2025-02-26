@@ -32,4 +32,4 @@ pnpm-debug.log*
 *.d.ts.map
 !env.d.ts
 !client.d.ts
-!globals.d.ts
+!global.d.ts

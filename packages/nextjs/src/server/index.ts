@@ -12,8 +12,10 @@ export { clerkClient } from './clerkClient';
 export type {
   DeletedObjectJSON,
   EmailJSON,
-  OrganizationInvitationJSON,
   OrganizationJSON,
+  OrganizationDomainJSON,
+  OrganizationDomainVerificationJSON,
+  OrganizationInvitationJSON,
   OrganizationMembershipJSON,
   SessionJSON,
   SMSMessageJSON,
@@ -22,11 +24,14 @@ export type {
   WebhookEventType,
   UserWebhookEvent,
   EmailWebhookEvent,
-  SMSWebhookEvent,
-  SessionWebhookEvent,
   OrganizationWebhookEvent,
+  OrganizationDomainWebhookEvent,
   OrganizationMembershipWebhookEvent,
   OrganizationInvitationWebhookEvent,
+  PermissionWebhookEvent,
+  RoleWebhookEvent,
+  SessionWebhookEvent,
+  SMSWebhookEvent,
 } from '@clerk/backend';
 
 /**
@@ -44,7 +49,6 @@ export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOpt
  */
 export type {
   OrganizationMembershipRole,
-  // Webhook event types
   // Resources
   AllowlistIdentifier,
   Client,

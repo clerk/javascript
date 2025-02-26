@@ -2,6 +2,11 @@
 <html class="h-full">
   <head>
     <title>clerk-js Sandbox</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -127,7 +132,7 @@
     </script>
   </head>
   <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50">
-    <div class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4">
+    <div class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4 max-lg:hidden">
       <header class="mb-2 flex items-center justify-center gap-x-2 border-b border-gray-100 pb-4">
         <svg
           viewBox="0 0 62 18"
@@ -239,9 +244,9 @@
           <li class="relative">
             <a
               class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
-              href="/accountless"
+              href="/keyless"
             >
-              Accountless
+              Keyless
             </a>
           </li>
           <li class="relative">
@@ -272,10 +277,12 @@
       </nav>
     </div>
 
-    <main class="bg-gray-25 flex h-full flex-1 items-center justify-center overflow-y-auto overflow-x-hidden pl-72">
+    <main
+      class="bg-gray-25 flex h-full min-w-px flex-1 items-center justify-center overflow-y-auto overflow-x-hidden py-12 lg:pl-72"
+    >
       <div
         id="app"
-        class="max-w-full px-8 py-12"
+        class="max-w-full p-12"
       ></div>
     </main>
 

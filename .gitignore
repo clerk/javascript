@@ -82,15 +82,19 @@ playground/*/yarn.lock
 .temp_integration
 playwright-report
 test-results
+sessions-key.pem
+sessions.pem
 
 # Verdaccio
 .verdaccio
 
 # Workflow Outputs
 /packages/*/*.tgz
+/packages/*/tsconfig.test.vitest-temp.json
 
 # Scripts
 scripts/.env
 !scripts/.env.example
 
-
+# typedoc
+.typedoc

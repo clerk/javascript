@@ -1,5 +1,7 @@
 import type { InstanceType } from 'instance';
 
+type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+
 /**
  * @internal
  */
@@ -29,7 +31,7 @@ export type TelemetryEvent = {
    * SDK Version
    */
   sdkv?: string;
-  payload: Record<string, string | number | boolean>;
+  payload: Record<string, JSONValue>;
 };
 
 /**

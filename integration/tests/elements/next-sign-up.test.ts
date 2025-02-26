@@ -36,6 +36,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await fakeUser.deleteIfExists();
   });
 
+  test('does not allow arbitrary redirect URLs on sign up', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+
+    await u.po.signUp.goTo({
+      searchParams: new URLSearchParams({ redirect_url: 'https://evil.com' }),
+      headlessSelector: '[data-test-id="sign-up-step-start"]',
+    });
+
+    await u.po.signUp.signUpWithEmailAndPassword({
+      email: fakeUser.email,
+      password: fakeUser.password,
+    });
+
+    await u.po.signUp.fillTestOtpCode('Enter email verification code');
+    await page.waitForTimeout(2000);
+    // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
+    await u.po.signUp.continue();
+
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await fakeUser.deleteIfExists();
+  });
+
   test("can't sign up with weak password", async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({

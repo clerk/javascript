@@ -1,7 +1,7 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams as HandleOAuthCallbackParamsOriginal,
+  HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   RedirectOptions,
@@ -41,9 +41,9 @@ export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
   const { sessionCtx, clientCtx } = useClerkContext();
 
   useClerkLoaded(clerk => {
-    const hasActiveSessions = clientCtx.value?.activeSessions && clientCtx.value.activeSessions.length > 0;
+    const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
 
-    if (sessionCtx.value === null && hasActiveSessions) {
+    if (sessionCtx.value === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);
@@ -96,17 +96,6 @@ export const RedirectToCreateOrganization = defineComponent(() => {
 
   return () => null;
 });
-
-// TODO: Fix this later and export `Transferable` type from @clerk/types
-// to fix the exported variable error in TS
-type HandleOAuthCallbackParams = Omit<HandleOAuthCallbackParamsOriginal, 'transferable'> & {
-  /**
-   * Indicates whether or not sign in attempts are transferable to the sign up flow.
-   * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
-   * @default true
-   */
-  transferable?: boolean;
-};
 
 export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOAuthCallbackParams) => {
   useClerkLoaded(clerk => {
