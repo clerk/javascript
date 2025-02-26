@@ -17,6 +17,10 @@ type ClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
  * });
  */
 export function updateClerkOptions(options: ClerkUpdateOptions) {
+  if (!window.Clerk) {
+    throw new Error('Missing Clerk instance');
+  }
+
   // @ts-expect-error - `__unstable__updateProps` is not exposed as public API from `@clerk/types`
   void window.Clerk.__unstable__updateProps({
     options: {
