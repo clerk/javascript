@@ -29,9 +29,7 @@ function changeToFrench() {
 </script>
 
 <template>
-  <div>
-    <button @click="enableDarkTheme">Enable Dark Theme</button>
-    <button @click="changeToFrench">Change to French</button>
-  </div>
+  <button @click="enableDarkTheme">Enable Dark Theme</button>
+  <button @click="changeToFrench">Change to French</button>
 </template>
 ```
