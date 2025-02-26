@@ -311,22 +311,4 @@ describe('Clerk singleton - Redirects', () => {
       expect(mockHref).toHaveBeenNthCalledWith(2, `${host}/?__clerk_db_jwt=deadbeef`);
     });
   });
-
-  describe('.redirectToTasks', () => {
-    describe('after sign-in with pending session', () => {
-      it('redirects to tasks URL with after sign-in URL appended as query param');
-    });
-
-    describe('after sign-up with pending session', () => {
-      it.todo('redirects to tasks URL with after sign-up URL appended as query param');
-    });
-
-    describe('after sign-up with pending session', () => {
-      it.todo('redirects to tasks URL with after sign-up URL appended as query param');
-    });
-
-    describe('from a protected route', () => {
-      it.todo('redirects to tasks URL with app origin appended as query param');
-    });
-  });
 });

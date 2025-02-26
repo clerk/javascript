@@ -890,8 +890,6 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
-    const isResolvingSessionTasks = !!newSession?.currentTask || window.location.href.includes(this.buildTasksUrl());
-
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
@@ -949,7 +947,8 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit && !isResolvingSessionTasks) {
+    const hasSessionToResolve = newSession?.currentTask;
+    if (redirectUrl && !beforeEmit && !hasSessionToResolve) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1040,7 +1039,6 @@ export class Clerk implements ClerkInterface {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
       windowNavigate,
     };
-
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
   };
@@ -1118,9 +1116,8 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public buildTasksUrl(): string {
+  public buildTaskUrl(): string {
     const currentTask = this.session?.currentTask;
-
     if (!currentTask) {
       return '';
     }
@@ -1130,46 +1127,13 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const signInUrl = this.#options.signInUrl || this.environment?.displayConfig.signInUrl;
-    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
-    const referrerIsSignInUrl = signInUrl && window.location.href.includes(signInUrl);
-    const referrerIsSignUpUrl = signUpUrl && window.location.href.includes(signUpUrl);
-
-    let redirectUrl = '';
-    if (referrerIsSignInUrl) {
-      redirectUrl = this.buildAfterSignInUrl();
-    } else if (referrerIsSignUpUrl) {
-      redirectUrl = this.buildAfterSignUpUrl();
-    } else {
-      /**
-       * User already has a active session and gets transition to a pending status
-       * on the client update
-       *
-       * It could happen on instance configuration changes that lead to new tasks that
-       * need to get resolved by the user, eg: Force MFA
-       */
-      // Preserves the origin path, eg: /my-app/recipes -> /sign-in/select-organization -> /my-app/recipes
-      redirectUrl = window.location.href;
-    }
-
-    /**
-     * For after sign-in or after sign-up, it's agnostic to the original base path
-     * in order to avoid having to check for the referrer
-     *
-     * If it's coming from a protected route where the user already exists, then
-     * the base path becomes the sign in URL
-     */
-    const shouldAppendBasePath = !referrerIsSignInUrl && !referrerIsSignUpUrl;
+    const referrerIsSignUpUrl = window.location.href.startsWith(this.buildSignUpUrl());
 
     return buildURL(
       {
-        ...(shouldAppendBasePath
-          ? {
-              base: signInUrl,
-            }
-          : {}),
+        // TODO ORGS-531 - Introduce `tasksUrl` as custom option
+        base: referrerIsSignUpUrl ? this.#options.signUpUrl : this.#options.signInUrl,
         hashPath: sessionTaskKeyToRoutePaths[currentTask.key],
-        hashSearchParams: { redirect_url: redirectUrl },
       },
       { stringify: true },
     );
@@ -1296,9 +1260,9 @@ export class Clerk implements ClerkInterface {
     return;
   };
 
-  public redirectToTasks = async (): Promise<unknown> => {
+  public redirectToTask = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildTasksUrl());
+      return this.navigate(this.buildTaskUrl());
     }
     return;
   };
@@ -1796,21 +1760,11 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
-      const hasResolvedPreviousTask = this.session.currentTask != session?.currentTask;
-
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
-
-      // Tasks handling must be reactive on client piggybacking to support
-      // immediate instance-level configuration changes by app owners
-      if (session?.currentTask) {
-        eventBus.dispatch(events.NewSessionTask, session);
-      } else if (session && hasResolvedPreviousTask) {
-        eventBus.dispatch(events.ResolvedSessionTask, session);
-      }
 
       this.#emit();
     }
@@ -2153,17 +2107,6 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
-    });
-
-    eventBus.on(events.NewSessionTask, () => {
-      void this.redirectToTasks();
-    });
-
-    eventBus.on(events.ResolvedSessionTask, () => {
-      // `redirect_url` gets appended based on the origin (after sign-in vs after sign-up),
-      // if it gets accidentally deleted, then fallbacks to the sign in URL
-      const redirectUrl = new URLSearchParams(window.location.search).get('redirect_url') ?? this.buildSignInUrl();
-      void this.navigate(redirectUrl);
     });
   };
 

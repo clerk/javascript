@@ -24,6 +24,8 @@ const runningApps = (params: RunningAppsParams = {}) => {
   const withPattern = (params.withPattern || []).flat().filter(Boolean);
   const { appIds, appUrl, appPk, appSk, clerkApiUrl } = parseEnvOptions();
 
+  console.log({ appIds });
+
   if (appIds.length) {
     // if appIds are provided, we only return the apps with the given ids
     const filter = app => (withEnv.length ? withEnv.includes(app.env) : true);

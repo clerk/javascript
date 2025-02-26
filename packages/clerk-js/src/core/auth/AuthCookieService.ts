@@ -62,6 +62,8 @@ export class AuthCookieService {
       this.setClientUatCookieForDevelopmentInstances();
     });
 
+    eventBus.on(events.NewSessionTask, () => this.handleSessionTasks());
+
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
@@ -151,6 +153,7 @@ export class AuthCookieService {
       if (updateCookieImmediately) {
         this.updateSessionCookie(token);
       }
+      this.handleSessionTasks();
     } catch (e) {
       return this.handleGetTokenError(e);
     }
@@ -222,5 +225,15 @@ export class AuthCookieService {
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  private handleSessionTasks() {
+    const hasPendingStatus = this.clerk.session?.status === 'pending';
+
+    if (!hasPendingStatus) {
+      return;
+    }
+
+    this.clerk.redirectToTask();
   }
 }

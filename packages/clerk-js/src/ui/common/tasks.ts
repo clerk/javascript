@@ -1,6 +1,6 @@
 import type { SessionTask } from '@clerk/types';
 
-export const sessionTaskRoutePaths = ['select-organization'] as const;
+export const sessionTaskRoutePaths = ['add-organization'] as const;
 
 type SessionTaskRoutePath = (typeof sessionTaskRoutePaths)[number];
 
@@ -8,5 +8,5 @@ type SessionTaskRoutePath = (typeof sessionTaskRoutePaths)[number];
  * @internal
  */
 export const sessionTaskKeyToRoutePaths: Record<SessionTask['key'], SessionTaskRoutePath> = {
-  org: '/select-organization',
+  org: 'add-organization',
 };

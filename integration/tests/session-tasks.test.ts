@@ -1,35 +1,42 @@
+import { expect, test } from '@playwright/test';
+
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
-import { testAgainstRunningApps } from '../testUtils';
+import type { FakeUser } from '../testUtils';
+import { createTestUtils } from '../testUtils';
 
-// TODO ORGS-566 - Write integration tests for after-auth flow
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('after-auth flows @generic @nextjs', () => {
-  describe('after sign-in', () => {
-    // /sign-in -> /sign-in/select-organization
-    it.todo('navigates to tasks');
+test.describe('session tasks flow @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+  let fakeUser: FakeUser;
 
-    // /sign-in -> /sign-in/select-organization -> /app (after-sign-in URL)
-    it.todo('navigates to after-sign-in URL when tasks get resolved');
+  test.beforeAll(async () => {
+    app = await appConfigs.next.appRouter.clone().commit();
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withSessionTasks);
+    await app.dev();
 
-    // with session status pending -> accesses /sign-in -> redirects to /sign-in/select-organization
-    it.todo('on single-session mode, sign-in redirects back to tasks when accessed with a pending session');
+    const m = createTestUtils({ app });
+    fakeUser = m.services.users.createFakeUser({
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+    await m.services.users.createBapiUser(fakeUser);
   });
 
-  describe('after sign-up', () => {
-    // /sign-up -> /sign-up/select-organization
-    it.todo('navigates to tasks');
-
-    // /sign-up -> /sign-up/select-organization -> /app/welcome (after-sign-up URL)
-    it.todo('navigates to after-sign-up URL when tasks get resolved');
-
-    // with session status pending -> accesses /sign-up -> redirects to /sign-up/select-organization
-    it.todo('on single-session mode, sign-up redirects back to tasks when accessed with a pending session');
+  test.afterAll(async () => {
+    await fakeUser.deleteIfExists();
+    await app.teardown();
   });
 
-  describe('when user is using the app and session transitions to active to pending', () => {
-    // /my-dashboard/recipes -> /sign-in/select-organization
-    it.todo('on session transition to pending with tasks, redirects to tasks');
-
-    // /my-dashboard/recipes -> /sign-in/select-organization -> /my-dashboard/recipes
-    it.todo('navigates to middle app origin when tasks get resolved');
+  test('on after sign-in, navigates to tasks', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
   });
 });

@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Navigate to session tasks
+Navigate to session task

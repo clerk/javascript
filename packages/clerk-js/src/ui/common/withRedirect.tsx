@@ -60,7 +60,7 @@ export const withRedirectToTasks = <P extends AvailableComponentProps>(Component
     return withRedirect(
       Component,
       hasPendingTasksAndSingleSessionModeEnabled,
-      ({ clerk }) => clerk.buildTasksUrl(),
+      ({ clerk }) => clerk.buildTaskUrl(),
       warnings.cannotRenderComponentWithPendingTasks,
     )(props);
   };
