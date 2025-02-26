@@ -1,7 +1,5 @@
 import type { ClerkOptions } from '@clerk/types';
 
-import { useClerk } from '../composables/useClerk';
-
 type ClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
 /**
@@ -19,10 +17,8 @@ type ClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
  * });
  */
 export function updateClerkOptions(options: ClerkUpdateOptions) {
-  const clerk = useClerk();
-
   // @ts-expect-error - `__unstable__updateProps` is not exposed as public API from `@clerk/types`
-  void clerk.value.__unstable__updateProps({
+  void window.Clerk.__unstable__updateProps({
     options: {
       locatization: options.localization,
     },
