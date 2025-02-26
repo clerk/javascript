@@ -13,6 +13,7 @@ import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { RouterTelemetry } from '../../utils/router-telemetry';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
@@ -107,6 +108,7 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
+        <RouterTelemetry />
         <ClerkJSScript router='app' />
         {children}
       </ReactClerkProvider>
