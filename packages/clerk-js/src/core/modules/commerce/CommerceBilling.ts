@@ -57,4 +57,14 @@ export class CommerceBilling implements CommerceBillingNamespace {
     )?.response as unknown as CommerceCheckoutJSON;
     return new CommerceCheckout(json);
   };
+
+  cancelSubscription = async ({ subscriptionId }: { subscriptionId: string }) => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/subscriptions/${subscriptionId}`,
+        method: 'DELETE',
+      })
+    )?.response;
+    return json;
+  };
 }

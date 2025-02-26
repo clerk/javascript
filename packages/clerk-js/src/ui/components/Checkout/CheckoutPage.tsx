@@ -12,8 +12,7 @@ import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-const COMMERCE_STRIPE_PUBLISHABLE_KEY =
-  'pk_test_51QPnGjRsxrFoQgOSJShlz3CnfW8qiPr3OzgwYp2yNhZTQjdE1Xt0bJ7fKueh2RsRN2tofhWKJ0TaxcZLk9LTXicE00LakhxwTD';
+const COMMERCE_STRIPE_PUBLISHABLE_KEY = 'pk_test_AzTn97Yzl4y1OAnov07b5ihT00NNnE0sp7';
 
 export const CheckoutPage = (props: CheckoutProps) => {
   const { planId, planPeriod } = props;

@@ -12,6 +12,7 @@ export interface CommerceBillingNamespace {
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
   confirmCheckout: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+  cancelSubscription: ({ subscriptionId }: { subscriptionId: string }) => Promise<any>;
 }
 
 export type GetProductsParams = ClerkPaginationParams<{
