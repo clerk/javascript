@@ -1,4 +1,5 @@
 import type { Elements, ElementState } from '@clerk/types';
+import { twMerge } from 'tailwind-merge';
 
 import type { FlowMetadata } from '../elements/contexts';
 import type { ElementDescriptor, ElementId } from './elementDescriptors';
@@ -98,12 +99,13 @@ const addUserProvidedClassnames = (
   elemId: ElementId | undefined,
   state: ElementState | undefined,
 ) => {
+  let mergedCn = cn;
   for (let j = 0; j < elemDescriptors.length; j++) {
     for (let i = 0; i < parsedElements.length; i++) {
-      cn = addClassnamesFromElements(cn, parsedElements[i], elemDescriptors[j], elemId, state);
+      mergedCn = twMerge(mergedCn, addClassnamesFromElements('', parsedElements[i], elemDescriptors[j], elemId, state));
     }
   }
-  return cn; //.trimEnd();
+  return mergedCn;
 };
 
 const getElementState = (props: PropsWithState | undefined): ElementState | undefined => {
