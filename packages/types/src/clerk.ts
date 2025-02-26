@@ -767,9 +767,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
     waitlistUrl?: string;
     /**
      * This option allows you to disable modals closing when users click outside on the overlays.
-     * @default true
+     * @default false
      */
-    modalsCloseOnClickOutside?: boolean;
+    closeModalsOnClickOutsideDisabled?: boolean;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */

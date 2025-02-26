@@ -88,7 +88,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
     canCloseModal?: boolean;
-    outsidePress?: boolean;
+    onClickOutsideDisabled?: boolean;
     modalId?: string;
     modalStyle?: React.CSSProperties;
   } & AppearanceProviderProps
@@ -111,7 +111,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
               canCloseModal={props.canCloseModal}
-              outsidePress={props.outsidePress}
+              onClickOutsideDisabled={props.onClickOutsideDisabled}
             >
               {props.startPath ? (
                 <Suspense>

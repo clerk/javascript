@@ -29,19 +29,28 @@ type ModalProps = React.PropsWithChildren<{
    * Controls whether clicking outside the modal will close it.
    * When true, clicking on the overlay/backdrop element will close the modal.
    * When false, clicking outside will not close the modal.
-   * @default true
+   * @default false
    */
-  outsidePress?: boolean;
+  onClickOutsideDisabled?: boolean;
   style?: React.CSSProperties;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, outsidePress = true, id, style } = props;
+  const {
+    handleClose,
+    handleOpen,
+    contentSx,
+    containerSx,
+    canCloseModal,
+    onClickOutsideDisabled = false,
+    id,
+    style,
+  } = props;
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
-    outsidePress: outsidePress === true ? e => e.target === overlayRef.current : false,
+    outsidePress: onClickOutsideDisabled === true ? false : e => e.target === overlayRef.current,
     canCloseModal,
   });
 

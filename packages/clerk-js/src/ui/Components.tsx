@@ -343,7 +343,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'signIn'}
       componentAppearance={signInModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'signIn'}
       onClose={() => componentsControls.closeModal('signIn')}
       onExternalNavigate={() => componentsControls.closeModal('signIn')}
@@ -361,7 +361,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'signUp'}
       componentAppearance={signUpModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'signUp'}
       onClose={() => componentsControls.closeModal('signUp')}
       onExternalNavigate={() => componentsControls.closeModal('signUp')}
@@ -379,7 +379,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'userProfile'}
       componentAppearance={userProfileModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'userProfile'}
       onClose={() => componentsControls.closeModal('userProfile')}
       onExternalNavigate={() => componentsControls.closeModal('userProfile')}
@@ -400,7 +400,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'userVerification'}
       componentAppearance={userVerificationModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'userVerification'}
       onClose={() => componentsControls.closeModal('userVerification')}
       onExternalNavigate={() => componentsControls.closeModal('userVerification')}
@@ -417,7 +417,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'organizationProfile'}
       componentAppearance={organizationProfileModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'organizationProfile'}
       onClose={() => componentsControls.closeModal('organizationProfile')}
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
@@ -438,7 +438,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'createOrganization'}
       componentAppearance={createOrganizationModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'createOrganization'}
       onClose={() => componentsControls.closeModal('createOrganization')}
       onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
@@ -456,7 +456,7 @@ const Components = (props: ComponentsProps) => {
       globalAppearance={state.appearance}
       appearanceKey={'waitlist'}
       componentAppearance={waitlistModal?.appearance}
-      outsidePress={state.options?.modalsCloseOnClickOutside}
+      onClickOutsideDisabled={state.options?.closeModalsOnClickOutsideDisabled}
       flowName={'waitlist'}
       onClose={() => componentsControls.closeModal('waitlist')}
       onExternalNavigate={() => componentsControls.closeModal('waitlist')}
