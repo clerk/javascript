@@ -90,7 +90,7 @@ const common = ({ mode, disableRHC = false }) => {
            */
           signUp: {
             minChunks: 1,
-            name: 'sign-up',
+            name: 'signup',
             test: module => module.resource && module.resource.includes('/ui/components/SignUp'),
           },
           common: {
