@@ -1,5 +1,5 @@
-import type { Clerk } from '@clerk/types';
-import { useMemo, useRef } from 'react';
+import type { Clerk, SessionVerificationLevel } from '@clerk/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -42,10 +42,19 @@ type UseReverificationOptions = {
    * Determines if an error should throw when the user cancels the reverification process. Defaults to `false`.
    */
   throwOnCancel?: boolean;
+
+  /**
+   * Determines if the reverification process should be controlled by the consumer. Defaults to `false`.
+   */
+  controlled?: boolean;
 };
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
-  openUIComponent: Clerk['__internal_openReverification'];
+  openUIComponent?: Clerk['__internal_openReverification'];
+  setReverificationInProgress?: (inProgress: boolean) => void;
+  setLevel?: (level: string | undefined) => void;
+  setReverificationCancel?: (cancel: () => void) => void;
+  setReverificationCompleted?: (completed: () => void) => void;
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -65,22 +74,36 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
         const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
-        /**
-         * On success resolve the pending promise
-         * On cancel reject the pending promise
-         */
-        params.openUIComponent?.({
-          level: isValidMetadata ? isValidMetadata().level : undefined,
-          afterVerification() {
-            resolvers.resolve(true);
-          },
-          afterVerificationCancelled() {
+        // /**
+        //  * On success resolve the pending promise
+        //  * On cancel reject the pending promise
+        //  */
+        // params.openUIComponent?.({
+        //   level: isValidMetadata ? isValidMetadata().level : undefined,
+        //   afterVerification() {
+        //     resolvers.resolve(true);
+        //   },
+        //   afterVerificationCancelled() {
+        //     resolvers.reject(
+        //       new ClerkRuntimeError('User cancelled attempted verification', {
+        //         code: 'reverification_cancelled',
+        //       }),
+        //     );
+        //   },
+        // });
+
+        params.setLevel?.(isValidMetadata ? isValidMetadata().level : undefined);
+        params.setReverificationInProgress?.(true);
+        params.setReverificationCompleted?.(() => {
+          return () => resolvers.resolve(true);
+        });
+        params.setReverificationCancel?.(() => {
+          return () =>
             resolvers.reject(
               new ClerkRuntimeError('User cancelled attempted verification', {
                 code: 'reverification_cancelled',
               }),
             );
-          },
         });
 
         try {
@@ -98,6 +121,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
           }
 
           return null;
+        } finally {
+          params.setReverificationInProgress?.(true);
         }
 
         /**
@@ -116,7 +141,15 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 type UseReverificationResult<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
-> = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
+> = [
+  (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>,
+  {
+    isReVerificationInProgress: boolean;
+    verificationLevel: string | undefined;
+    cancelReverification: () => void;
+    reverificationCompleted: () => void;
+  },
+];
 
 /**
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
@@ -184,25 +217,66 @@ function useReverification<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
-  const { __internal_openReverification } = useClerk();
+  const optionsWithDefaults: UseReverificationOptions = {
+    controlled: false,
+    ...options,
+  };
+  const clerk = useClerk();
   const fetcherRef = useRef(fetcher);
-  const optionsRef = useRef(options);
+  const optionsRef = useRef(optionsWithDefaults);
+  const [verificationLevel, setVerificationLevel] = useState<string | undefined>(undefined);
+  const [isReVerificationInProgress, setIsReVerificationInProgress] = useState<boolean>(false);
+  const [reverificationCancel, setReverificationCancel] = useState<() => void>(() => {});
+  const [reverificationCompleted, setReverificationCompleted] = useState<() => void>(() => {});
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
-      openUIComponent: __internal_openReverification,
+      setLevel: setVerificationLevel,
+      setReverificationInProgress: setIsReVerificationInProgress,
+      setReverificationCancel,
+      setReverificationCompleted,
       ...optionsRef.current,
     })(fetcherRef.current);
-    return [handler] as const;
-  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
+    return handler;
+  }, []);
+
+  // If controlled, open reverification on mount if re-verification is in progress
+  useEffect(() => {
+    if (!optionsWithDefaults.controlled && isReVerificationInProgress) {
+      clerk.__internal_openReverification({
+        level: (verificationLevel as SessionVerificationLevel) || undefined,
+        afterVerification() {
+          reverificationCompleted();
+        },
+        afterVerificationCancelled() {
+          reverificationCancel();
+        },
+      });
+    }
+  }, [
+    verificationLevel,
+    clerk,
+    isReVerificationInProgress,
+    optionsWithDefaults.controlled,
+    reverificationCancel,
+    reverificationCompleted,
+  ]);
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
-    optionsRef.current = options;
+    optionsRef.current = optionsWithDefaults;
   });
 
-  return handleReverification;
+  return [
+    handleReverification,
+    {
+      isReVerificationInProgress,
+      verificationLevel,
+      cancelReverification: reverificationCancel,
+      reverificationCompleted: reverificationCompleted,
+    },
+  ];
 }
 
 export { useReverification };
