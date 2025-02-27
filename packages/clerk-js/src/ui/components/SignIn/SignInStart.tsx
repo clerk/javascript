@@ -133,6 +133,11 @@ export function _SignInStart(): JSX.Element {
   });
 
   const identifierField = identifierAttribute === 'phone_number' ? phoneIdentifierField : textIdentifierField;
+  const renderPasswordField =
+    identifierAttributes.length === 1 &&
+    identifierAttribute === 'email_address' &&
+    passwordBasedInstance &&
+    !hasSocialOrWeb3Buttons;
 
   const switchToNextIdentifier = () => {
     setIdentifierAttribute(
@@ -475,7 +480,16 @@ export function _SignInStart(): JSX.Element {
                         autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
                       />
                     </Form.ControlRow>
-                    <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                    {renderPasswordField ? (
+                      <Form.ControlRow elementId={instantPasswordField.id}>
+                        <Form.PasswordInput
+                          {...instantPasswordField.props}
+                          isRequired
+                        />
+                      </Form.ControlRow>
+                    ) : (
+                      <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                    )}
                   </Col>
                   <Form.SubmitButton hasArrow />
                 </Form.Root>
