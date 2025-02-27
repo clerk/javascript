@@ -5,7 +5,7 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
-test.describe('session tasks flow @nextjs', () => {
+test.describe('session tasks sign in flow @nextjs', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
   let fakeUser: FakeUser;
@@ -37,6 +37,19 @@ test.describe('session tasks flow @nextjs', () => {
     await u.po.signIn.setPassword(fakeUser.password);
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+  });
+
+  test('with pending tasks, redirects to tasks when accessing root sign in', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    await u.po.signIn.goTo();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
   });
 });
