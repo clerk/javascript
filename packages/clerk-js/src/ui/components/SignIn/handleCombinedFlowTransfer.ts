@@ -2,7 +2,7 @@ import type { LoadedClerk, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
 import type { RouteContextValue } from '../../router/RouteContext';
-import { completeSignUpFlow } from '../SignUp/util';
+import { lazyCompleteSignUpFlow } from './lazy-sign-up';
 
 type HandleCombinedFlowTransferProps = {
   identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username';
@@ -65,7 +65,8 @@ export function handleCombinedFlowTransfer({
       .create({
         [identifierAttribute]: identifierValue,
       })
-      .then(res => {
+      .then(async res => {
+        const completeSignUpFlow = await lazyCompleteSignUpFlow();
         return completeSignUpFlow({
           signUp: res,
           verifyEmailPath: 'create/verify-email-address',

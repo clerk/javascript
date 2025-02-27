@@ -13,12 +13,16 @@ import {
   withCoreSessionSwitchGuard,
 } from '../../contexts';
 import { Flow } from '../../customizables';
+import { useFetch } from '../../hooks';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { SignUpContinue } from '../SignUp/SignUpContinue';
-import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
-import { SignUpStart } from '../SignUp/SignUpStart';
-import { SignUpVerifyEmail } from '../SignUp/SignUpVerifyEmail';
-import { SignUpVerifyPhone } from '../SignUp/SignUpVerifyPhone';
+import {
+  LazySignUpContinue,
+  LazySignUpSSOCallback,
+  LazySignUpStart,
+  LazySignUpVerifyEmail,
+  LazySignUpVerifyPhone,
+  preloadSignUp,
+} from './lazy-sign-up';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
@@ -76,22 +80,23 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
+
         {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}
             >
-              <SignUpVerifyEmail />
+              <LazySignUpVerifyEmail />
             </Route>
             <Route
               path='verify-phone-number'
               canActivate={clerk => !!clerk.client.signUp.phoneNumber}
             >
-              <SignUpVerifyPhone />
+              <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <SignUpSSOCallback
+              <LazySignUpSSOCallback
                 signUpUrl={signUpContext.signUpUrl}
                 signInUrl={signUpContext.signInUrl}
                 signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
@@ -115,23 +120,24 @@ function SignInRoutes(): JSX.Element {
                 path='verify-email-address'
                 canActivate={clerk => !!clerk.client.signUp.emailAddress}
               >
-                <SignUpVerifyEmail />
+                <LazySignUpVerifyEmail />
               </Route>
               <Route
                 path='verify-phone-number'
                 canActivate={clerk => !!clerk.client.signUp.phoneNumber}
               >
-                <SignUpVerifyPhone />
+                <LazySignUpVerifyPhone />
               </Route>
               <Route index>
-                <SignUpContinue />
+                <LazySignUpContinue />
               </Route>
             </Route>
             <Route index>
-              <SignUpStart />
+              <LazySignUpStart />
             </Route>
           </Route>
         )}
+
         <Route index>
           <SignInStart />
         </Route>
@@ -142,6 +148,9 @@ function SignInRoutes(): JSX.Element {
     </Flow.Root>
   );
 }
+
+const usePreloadSignUp = (enabled = false) =>
+  useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
   const signInContext = useSignInContext();
@@ -155,6 +164,11 @@ function SignInRoot() {
     unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
+
+  /**
+   * Preload Sign Up when in Combined Flow.
+   */
+  usePreloadSignUp(signInContext.isCombinedFlow);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>
