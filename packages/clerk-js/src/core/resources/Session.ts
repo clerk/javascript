@@ -14,6 +14,7 @@ import type {
   SessionStatus,
   SessionTask,
   SessionVerificationJSON,
+  SessionVerificationLevel,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
   SessionVerifyAttemptSecondFactorParams,
@@ -25,7 +26,12 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { clerkInvalidStrategy } from '../errors';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential,
+} from '../../utils/passkeys';
+import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
@@ -150,6 +156,9 @@ export class Session extends BaseResource implements SessionResource {
           default: factor.default,
         } as PhoneCodeConfig;
         break;
+      case 'passkey':
+        config = {};
+        break;
       default:
         clerkInvalidStrategy('Session.prepareFirstFactorVerification', (factor as any).strategy);
     }
@@ -171,15 +180,67 @@ export class Session extends BaseResource implements SessionResource {
   attemptFirstFactorVerification = async (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ): Promise<SessionVerificationResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...attemptFactor };
+    }
+
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
-        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
+  };
+
+  attemptFirstFactorPasskeyVerification = async (nonce: string | null): Promise<SessionVerificationResource> => {
+    return this.#attemptPasskeyVerification(nonce, 'first_factor');
+  };
+
+  attemptSecondFactorPasskeyVerification = async (nonce: string | null): Promise<SessionVerificationResource> => {
+    return this.#attemptPasskeyVerification(nonce, 'second_factor');
+  };
+
+  #attemptPasskeyVerification = async (
+    nonce: string | null,
+    level: Omit<SessionVerificationLevel, 'SessionVerificationLevel'>,
+  ): Promise<SessionVerificationResource> => {
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyOptions('get');
+    }
+
+    // Invoke the navigator.create.get() method.
+    const { publicKeyCredential, error } = await webAuthnGetCredential({
+      publicKeyOptions,
+      conditionalUI: false,
+    });
+
+    if (!publicKeyCredential) {
+      throw error;
+    }
+
+    if (level === 'first_factor') {
+      return this.attemptFirstFactorVerification({
+        strategy: 'passkey',
+        publicKeyCredential,
+      });
+    }
+
+    return this.attemptSecondFactorVerification({
+      strategy: 'passkey',
+      publicKeyCredential,
+    });
   };
 
   prepareSecondFactorVerification = async (
@@ -197,13 +258,24 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   attemptSecondFactorVerification = async (
-    params: SessionVerifyAttemptSecondFactorParams,
+    attemptFactor: SessionVerifyAttemptSecondFactorParams,
   ): Promise<SessionVerificationResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...attemptFactor };
+    }
+
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
-        body: params as any,
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
