@@ -91,10 +91,8 @@ export const KeylessPrompt = lazy(() =>
 );
 
 export const PricingTable = lazy(() =>
-  componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
+  componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
 );
-
-export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
@@ -121,7 +119,6 @@ export const ClerkComponents = {
   WaitlistModal,
   BlankCaptchaModal,
   PricingTable,
-  Checkout,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

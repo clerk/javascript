@@ -1,25 +1,25 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CommercePlanResource, PricingTableProps } from '@clerk/types';
+import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
 import { useState } from 'react';
 
-import { CheckoutContext, usePricingTableContext } from '../../contexts';
+import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Badge, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { Avatar } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
-import { Checkout } from '../Checkout';
+import { __experimental_Checkout } from '../Checkout';
 import { PlanDetailBlade } from './PlanDetailBlade';
 
-export const PricingTable = (props: PricingTableProps) => {
-  const { commerce } = useClerk();
+export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
+  const { __experimental_commerce } = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const [planPeriod, setPlanPeriod] = useState('month');
   const [selectedPlan, setSelectedPlan] = useState<CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPlanDetail, setShowPlanDetail] = useState(false);
 
-  const { data: plans } = useFetch(commerce?.billing.getPlans, 'commerce-plans');
+  const { data: plans } = useFetch(__experimental_commerce?.__experimental_billing.getPlans, 'commerce-plans');
 
   const selectPlan = (plan: CommercePlanResource) => {
     setSelectedPlan(plan);
@@ -48,7 +48,7 @@ export const PricingTable = (props: PricingTableProps) => {
           />
         ))}
       </Flex>
-      <CheckoutContext.Provider
+      <__experimental_CheckoutContext.Provider
         value={{
           componentName: 'Checkout',
           mode,
@@ -58,12 +58,12 @@ export const PricingTable = (props: PricingTableProps) => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <Checkout
+          <__experimental_Checkout
             planPeriod={planPeriod}
             planId={selectedPlan?.id}
           />
         </div>
-      </CheckoutContext.Provider>
+      </__experimental_CheckoutContext.Provider>
       <PlanDetailBlade
         isOpen={showPlanDetail}
         handleClose={() => setShowPlanDetail(false)}
@@ -84,7 +84,7 @@ const PlanCard = ({
   period: string;
   setPeriod: (k: string) => void;
   onSelect: (plan: CommercePlanResource) => void;
-  props: PricingTableProps;
+  props: __experimental_PricingTableProps;
 }) => {
   const { ctaPosition = 'bottom', collapseFeatures = false } = props;
   const { mode = 'mounted' } = usePricingTableContext();

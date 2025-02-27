@@ -14,7 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { CommerceNamespace } from './commerce';
+import type { __experimental_CommerceNamespace } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -148,7 +148,7 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /** Commerce Object */
-  commerce: CommerceNamespace;
+  __experimental_commerce: __experimental_CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -393,7 +393,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -401,22 +401,7 @@ export interface Clerk {
    *
    * @param targetNode Target node to unmount the PricingTable component from.
    */
-  unmountPricingTable: (targetNode: HTMLDivElement) => void;
-
-  /**
-   * Mounts a checkout component at the target element.
-   * @param targetNode Target node to mount the Checkout component.
-   * @param props configuration parameters.
-   */
-  mountCheckout: (targetNode: HTMLDivElement, props?: CheckoutProps) => void;
-
-  /**
-   * Unmount a checkout component from the target element.
-   * If there is no component mounted at the target node, results in a noop.
-   *
-   * @param targetNode Target node to unmount the Checkout component from.
-   */
-  unmountCheckout: (targetNode: HTMLDivElement) => void;
+  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -809,6 +794,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
         persistClient: boolean;
         rethrowOfflineNetworkErrors: boolean;
         combinedFlow: boolean;
+        commerce: boolean;
       },
       Record<string, any>
     >;
@@ -1417,14 +1403,14 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-export type PricingTableProps = {
+export type __experimental_PricingTableProps = {
   appearance?: PricingTableTheme;
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
   layout?: 'default' | 'matrix';
 };
 
-export type CheckoutProps = {
+export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: string;

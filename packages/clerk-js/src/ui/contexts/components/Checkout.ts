@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react';
 
-import type { CheckoutCtx } from '../../types';
+import type { __experimental_CheckoutCtx } from '../../types';
 
-export const CheckoutContext = createContext<CheckoutCtx | null>(null);
+export const __experimental_CheckoutContext = createContext<__experimental_CheckoutCtx | null>(null);
 
 export const useCheckoutContext = () => {
-  const context = useContext(CheckoutContext);
+  const context = useContext(__experimental_CheckoutContext);
 
   if (!context || context.componentName !== 'Checkout') {
     throw new Error('Clerk: useCheckoutContext called outside Checkout.');

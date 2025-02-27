@@ -13,19 +13,19 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CommerceNamespace,
+  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  CheckoutProps,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  CommerceNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -44,7 +44,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -124,7 +123,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
-import { Commerce } from './modules/commerce';
+import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -170,7 +169,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  public static _commerce: CommerceNamespace;
+  public static _commerce: __experimental_CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -293,9 +292,9 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get commerce(): CommerceNamespace {
+  get __experimental_commerce(): __experimental_CommerceNamespace {
     if (!Clerk._commerce) {
-      Clerk._commerce = new Commerce();
+      Clerk._commerce = new __experimental_Commerce();
     }
     return Clerk._commerce;
   }
@@ -866,7 +865,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
@@ -880,30 +879,7 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
   };
 
-  public unmountPricingTable = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
-  public mountCheckout = (node: HTMLDivElement, props?: CheckoutProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'Checkout' }).then(controls =>
-      controls.mountComponent({
-        name: 'Checkout',
-        appearanceKey: 'checkout',
-        node,
-        props,
-      }),
-    );
-
-    this.telemetry?.record(eventPrebuiltComponentMounted('Checkout', props));
-  };
-
-  public unmountCheckout = (node: HTMLDivElement): void => {
+  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

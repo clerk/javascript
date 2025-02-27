@@ -17,12 +17,12 @@ export const CheckoutForm = ({
 }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const { commerce } = useClerk();
+  const { __experimental_commerce } = useClerk();
   const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
   const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data } = useFetch(commerce?.getPaymentSources, {});
+  const { data } = useFetch(__experimental_commerce?.getPaymentSources, {});
   const { data: paymentSources } = data || { data: [] };
 
   const didExpandStripePaymentMethods = useCallback(() => {
@@ -30,7 +30,7 @@ export const CheckoutForm = ({
   }, []);
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    return commerce.billing
+    return __experimental_commerce.__experimental_billing
       .confirmCheckout({
         checkoutId: checkout.id,
         paymentSourceId,
@@ -78,7 +78,7 @@ export const CheckoutForm = ({
       return console.log('no payment method');
     }
 
-    const paymentSource = await commerce.addPaymentSource({
+    const paymentSource = await __experimental_commerce.addPaymentSource({
       gateway: 'stripe',
       paymentMethod: 'card',
       paymentToken: payment_method as string,

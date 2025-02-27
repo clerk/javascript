@@ -1,6 +1,6 @@
 import type {
+  __experimental_CommerceBillingNamespace,
   ClerkPaginatedResponse,
-  CommerceBillingNamespace,
   CommerceCheckoutJSON,
   CommerceProductJSON,
   ConfirmCheckoutParams,
@@ -12,7 +12,7 @@ import type {
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import { BaseResource, CommerceCheckout, CommerceProduct } from '../../resources/internal';
 
-export class CommerceBilling implements CommerceBillingNamespace {
+export class __experimental_CommerceBilling implements __experimental_CommerceBillingNamespace {
   getProducts = async (params?: GetProductsParams) => {
     return await BaseResource._fetch({
       path: `/commerce/products`,

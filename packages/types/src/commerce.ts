@@ -1,13 +1,13 @@
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 
-export interface CommerceNamespace {
-  billing: CommerceBillingNamespace;
+export interface __experimental_CommerceNamespace {
+  __experimental_billing: __experimental_CommerceBillingNamespace;
   getPaymentSources: () => Promise<ClerkPaginatedResponse<CommercePaymentSourceResource>>;
   addPaymentSource: (params: AddPaymentSourceParams) => Promise<CommercePaymentSourceResource>;
 }
 
-export interface CommerceBillingNamespace {
+export interface __experimental_CommerceBillingNamespace {
   getProducts: (params?: GetProductsParams) => Promise<ClerkPaginatedResponse<CommerceProductResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;

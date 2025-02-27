@@ -1,5 +1,10 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CheckoutProps, CommerceCheckoutResource, CommercePlanResource, CommerceTotals } from '@clerk/types';
+import type {
+  __experimental_CheckoutProps,
+  CommerceCheckoutResource,
+  CommercePlanResource,
+  CommerceTotals,
+} from '@clerk/types';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -14,13 +19,16 @@ import { CheckoutForm } from './CheckoutForm';
 
 const COMMERCE_STRIPE_PUBLISHABLE_KEY = 'pk_test_AzTn97Yzl4y1OAnov07b5ihT00NNnE0sp7';
 
-export const CheckoutPage = (props: CheckoutProps) => {
+export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
-  const { commerce } = useClerk();
+  const { __experimental_commerce } = useClerk();
   const [checkout, setCheckout] = useState<CommerceCheckoutResource>();
   const stripePromise = useRef<Promise<Stripe | null> | null>(null);
 
-  const { data, isLoading } = useFetch(commerce?.billing.startCheckout, { planId, planPeriod });
+  const { data, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
+    planId,
+    planPeriod,
+  });
 
   useEffect(() => {
     if (data) {

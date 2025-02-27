@@ -1,12 +1,12 @@
 import type {
+  __experimental_CheckoutProps,
+  __experimental_PricingTableProps,
   __internal_UserVerificationProps,
-  CheckoutProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
-  PricingTableProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
@@ -38,8 +38,8 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | PricingTableProps
-  | CheckoutProps
+  | __experimental_PricingTableProps
+  | __experimental_CheckoutProps
   | __internal_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
@@ -100,12 +100,12 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
-export type PricingTableCtx = PricingTableProps & {
+export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
 };
 
-export type CheckoutCtx = CheckoutProps & {
+export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
   mode?: ComponentMode;
   isShowingBlade?: boolean;
@@ -124,7 +124,7 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | PricingTableCtx
-  | CheckoutCtx;
+  | __experimental_PricingTableCtx
+  | __experimental_CheckoutCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

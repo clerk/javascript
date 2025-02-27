@@ -1,22 +1,22 @@
 import type {
+  __experimental_CommerceBillingNamespace,
+  __experimental_CommerceNamespace,
   AddPaymentSourceParams,
   ClerkPaginatedResponse,
-  CommerceBillingNamespace,
-  CommerceNamespace,
   CommercePaymentSourceJSON,
 } from '@clerk/types';
 
 import { BaseResource, CommercePaymentSource } from '../../resources/internal';
-import { CommerceBilling } from './CommerceBilling';
+import { __experimental_CommerceBilling } from './CommerceBilling';
 
-export class Commerce implements CommerceNamespace {
-  public static _billing: CommerceBillingNamespace;
+export class __experimental_Commerce implements __experimental_CommerceNamespace {
+  public static _billing: __experimental_CommerceBillingNamespace;
 
-  get billing(): CommerceBillingNamespace {
-    if (!Commerce._billing) {
-      Commerce._billing = new CommerceBilling();
+  get __experimental_billing(): __experimental_CommerceBillingNamespace {
+    if (!__experimental_Commerce._billing) {
+      __experimental_Commerce._billing = new __experimental_CommerceBilling();
     }
-    return Commerce._billing;
+    return __experimental_Commerce._billing;
   }
 
   addPaymentSource = async (params: AddPaymentSourceParams) => {

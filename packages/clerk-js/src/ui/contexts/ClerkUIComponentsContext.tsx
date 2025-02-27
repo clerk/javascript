@@ -1,15 +1,20 @@
-import type { CheckoutProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type {
+  __experimental_CheckoutProps,
+  __experimental_PricingTableProps,
+  UserButtonProps,
+  WaitlistProps,
+} from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  CheckoutContext,
+  __experimental_CheckoutContext,
+  __experimental_PricingTableContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
-  PricingTableContext,
   SignInContext,
   SignUpContext,
   UserButtonContext,
@@ -82,15 +87,17 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
+        <__experimental_PricingTableContext.Provider
+          value={{ componentName, ...(props as __experimental_PricingTableProps) }}
+        >
           {children}
-        </PricingTableContext.Provider>
+        </__experimental_PricingTableContext.Provider>
       );
     case 'Checkout':
       return (
-        <CheckoutContext.Provider value={{ componentName, ...(props as CheckoutProps) }}>
+        <__experimental_CheckoutContext.Provider value={{ componentName, ...(props as __experimental_CheckoutProps) }}>
           {children}
-        </CheckoutContext.Provider>
+        </__experimental_CheckoutContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

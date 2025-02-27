@@ -153,7 +153,7 @@ export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladePr
 };
 
 const CancelFooter = ({ plan, handleClose }: { plan: CommercePlanResource; handleClose: () => void }) => {
-  const { commerce } = useClerk();
+  const { __experimental_commerce } = useClerk();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -162,7 +162,7 @@ const CancelFooter = ({ plan, handleClose }: { plan: CommercePlanResource; handl
     setHasError(false);
     setIsSubmitting(true);
 
-    await commerce.billing
+    await __experimental_commerce.__experimental_billing
       .cancelSubscription({
         subscriptionId: '123',
       })

@@ -1,4 +1,4 @@
-import { PricingTableContext } from '../../contexts';
+import { __experimental_PricingTableContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { PricingTable } from '../PricingTable';
+import { __experimental_PricingTable } from '../PricingTable';
 
 export const BillingPage = withCardStateProvider(() => {
   const card = useCardState();
@@ -43,9 +43,9 @@ export const BillingPage = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
-              <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                <PricingTable />
-              </PricingTableContext.Provider>
+              <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                <__experimental_PricingTable />
+              </__experimental_PricingTableContext.Provider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
             <TabPanel sx={{ width: '100%' }}>Payment Sources</TabPanel>

@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react';
 
-import type { PricingTableCtx } from '../../types';
+import type { __experimental_PricingTableCtx } from '../../types';
 
-export const PricingTableContext = createContext<PricingTableCtx | null>(null);
+export const __experimental_PricingTableContext = createContext<__experimental_PricingTableCtx | null>(null);
 
 export const usePricingTableContext = () => {
-  const context = useContext(PricingTableContext);
+  const context = useContext(__experimental_PricingTableContext);
 
   if (!context || context.componentName !== 'PricingTable') {
     throw new Error('Clerk: usePricingTableContext called outside PricingTable.');
