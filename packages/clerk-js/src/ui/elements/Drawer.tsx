@@ -11,8 +11,10 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, Flex } from '../customizables';
+import { Box, descriptors, Flex, Icon } from '../customizables';
+import { Close as CloseIcon } from '../icons';
 import { InternalThemeProvider } from '../styledSystem';
+import { IconButton } from './IconButton';
 
 interface DrawerContext {
   isOpen: boolean;
@@ -154,6 +156,7 @@ function Content({ children }: ContentProps) {
       <FloatingFocusManager
         context={context}
         modal
+        initialFocus={refs.floating}
       >
         <Flex
           ref={refs.setFloating}
@@ -189,8 +192,32 @@ function Content({ children }: ContentProps) {
     </FloatingPortal>
   );
 }
+
+function Close() {
+  const { setIsOpen } = useDrawerContext();
+  return (
+    <IconButton
+      elementDescriptor={descriptors.drawerClose}
+      variant='ghost'
+      aria-label='Close modal'
+      onClick={() => setIsOpen(false)}
+      icon={
+        <Icon
+          icon={CloseIcon}
+          size='sm'
+        />
+      }
+      sx={t => ({
+        color: t.colors.$colorTextSecondary,
+        padding: t.space.$3,
+      })}
+    />
+  );
+}
+
 export const Drawer = {
   Root,
   Overlay,
   Content,
+  Close,
 };
