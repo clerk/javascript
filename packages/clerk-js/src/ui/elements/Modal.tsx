@@ -1,9 +1,9 @@
-import { createContextAndHook } from '@clerk/shared/react';
-import { FloatingOverlay } from '@floating-ui/react';
+import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
 import { descriptors, Flex } from '../customizables';
 import { usePopover } from '../hooks';
+import { useScrollLock } from '../hooks/useScrollLock';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
@@ -22,6 +22,7 @@ type ModalProps = React.PropsWithChildren<{
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
+  const { disableScrollLock, enableScrollLock } = useScrollLock();
   const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style } = props;
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
@@ -38,8 +39,15 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       handleOpen?.();
     }
   }, [isOpen]);
-
   const modalCtx = React.useMemo(() => ({ value: canCloseModal === false ? {} : { toggle } }), [toggle, canCloseModal]);
+
+  useSafeLayoutEffect(() => {
+    enableScrollLock();
+
+    return () => {
+      disableScrollLock();
+    };
+  }, []);
 
   return (
     <Popover
@@ -47,8 +55,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       context={context}
       isOpen={isOpen}
     >
-      {/*Avoid using children with FloatingOverlay */}
-      <FloatingOverlay lockScroll />
       <ModalContext.Provider value={modalCtx}>
         <Flex
           id={id}
