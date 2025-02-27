@@ -66,7 +66,7 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import { sessionTaskKeyToRoutePaths } from '../ui/common/tasks';
+import { sessionTaskKeyToRoutePaths, sessionTaskRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -948,7 +948,10 @@ export class Clerk implements ClerkInterface {
     }
 
     const hasSessionToResolve = newSession?.currentTask;
+    console.log({ hasSessionToResolve });
     if (redirectUrl && !beforeEmit && !hasSessionToResolve) {
+      console.log('Transitive state');
+
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1006,14 +1009,14 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    let toURL = new URL(to, window.location.href);
+
     /**
      * Trigger all navigation listeners. In order for modal UI components to close.
      */
     setTimeout(() => {
       this.#emitNavigationListeners();
     }, 0);
-
-    let toURL = new URL(to, window.location.href);
 
     if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
@@ -1122,12 +1125,9 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const referrerIsTaskUrl = window.location.href.includes(sessionTaskKeyToRoutePaths[currentTask.key]);
-    if (referrerIsTaskUrl) {
-      return '';
-    }
-
-    const referrerIsSignUpUrl = window.location.href.startsWith(this.buildSignUpUrl());
+    const origin = new URL(window.location.href);
+    const signUpUrl = new URL(this.buildSignUpUrl());
+    const referrerIsSignUpUrl = origin.pathname.startsWith(signUpUrl.pathname);
 
     return buildURL(
       {
@@ -1262,10 +1262,18 @@ export class Clerk implements ClerkInterface {
 
   public redirectToTask = async (): Promise<unknown> => {
     if (inBrowser()) {
+      const referrerIsTaskUrl = sessionTaskRoutePaths.some(path => window.location.href.includes(path));
+      if (referrerIsTaskUrl) {
+        return;
+      }
+
       return this.navigate(this.buildTaskUrl());
     }
     return;
   };
+
+  // /sign-in -> /sign-in/
+  // /sign-in -> (next factors) -> /sign-in/select-organization -> /dashboard
 
   public handleEmailLinkVerification = async (
     params: HandleEmailLinkVerificationParams,
@@ -1765,9 +1773,9 @@ export class Clerk implements ClerkInterface {
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
-
-      this.#emit();
     }
+
+    this.#emit();
   };
 
   get __unstable__environment(): EnvironmentResource | null | undefined {

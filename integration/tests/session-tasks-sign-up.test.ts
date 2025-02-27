@@ -33,6 +33,7 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.expect.toBeSignedIn();
 
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-up/add-organization');
 
     await fakeUser.deleteIfExists();
   });
@@ -50,7 +51,15 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signUp.enterTestOtpCode();
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-up/add-organization');
     await u.po.signIn.goTo();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-up/add-organization');
+  });
+
+  test('without a session, does not allow to access tasks', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goto('/sign-up/add-organization');
+    expect(u.page.url()).not.toContain('/sign-up/add-organization');
   });
 });

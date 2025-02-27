@@ -134,17 +134,14 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
-
         {sessionTaskRoutePaths.map(path => (
           <Route
             key={path}
             path={path}
-            canActivate={clerk => !!clerk.session?.currentTask}
           >
             <Task />
           </Route>
         ))}
-
         <Route index>
           <SignInStart />
         </Route>

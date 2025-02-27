@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { hasPendingTasksAndSingleSessionModeEnabled, isSignedInAndSingleSessionModeEnabled } from '../../utils';
+import { isSignedInAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -30,6 +30,11 @@ export function withRedirect<P extends AvailableComponentProps>(
 
     const shouldRedirect = condition(clerk, environment, options);
     React.useEffect(() => {
+      // Blocks `afterSignInUrl` or `afterSignUpUrl` redirects on `SignIn/SignUp` render
+      if (clerk.session?.currentTask) {
+        return;
+      }
+
       if (shouldRedirect) {
         if (warning && isDevelopmentFromPublishableKey(clerk.publishableKey)) {
           console.info(warning);
@@ -38,7 +43,7 @@ export function withRedirect<P extends AvailableComponentProps>(
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         navigate(redirectUrl({ clerk, environment, options }));
       }
-    }, []);
+    }, [clerk.session?.currentTask]);
 
     if (shouldRedirect) {
       return null;
@@ -51,24 +56,6 @@ export function withRedirect<P extends AvailableComponentProps>(
 
   return HOC;
 }
-
-export const withRedirectToTasks = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
-  const displayName = Component.displayName || Component.name || 'Component';
-  Component.displayName = displayName;
-
-  const HOC = (props: P) => {
-    return withRedirect(
-      Component,
-      hasPendingTasksAndSingleSessionModeEnabled,
-      ({ clerk }) => clerk.buildTaskUrl(),
-      warnings.cannotRenderComponentWithPendingTasks,
-    )(props);
-  };
-
-  HOC.displayName = `withRedirectToTasks(${displayName})`;
-
-  return HOC;
-};
 
 export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
   const displayName = Component.displayName || Component.name || 'Component';
@@ -107,11 +94,3 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
 
   return HOC;
 };
-
-export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirect(
-    Component,
-    isSignedInAndSingleSessionModeEnabled,
-    ({ environment }) => environment.displayConfig.homeUrl,
-    warnings.cannotRenderComponentWhenSessionExists,
-  );

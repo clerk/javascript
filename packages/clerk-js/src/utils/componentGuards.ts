@@ -10,10 +10,6 @@ export const isSignedInAndSingleSessionModeEnabled: ComponentGuard = (clerk, env
   return !!(clerk.isSignedIn && environment?.authConfig.singleSessionMode);
 };
 
-export const hasPendingTasksAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
-  return !!(clerk.session?.currentTask && environment?.authConfig.singleSessionMode);
-};
-
 export const noUserExists: ComponentGuard = clerk => {
   return !clerk.user;
 };
