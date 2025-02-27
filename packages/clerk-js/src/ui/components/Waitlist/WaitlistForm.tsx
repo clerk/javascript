@@ -47,7 +47,7 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
         return;
       })
       .catch(error => {
-        handleError(error, [], card.setError);
+        handleError(error, [formState.emailAddress], card.setError);
       })
       .finally(() => {
         status.setIdle();
