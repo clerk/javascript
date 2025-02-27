@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.11
+
+### Patch Changes
+
+- Fix issue where `clerk-dev` would attempt to import a lockfile even when one was not present. ([#5246](https://github.com/clerk/javascript/pull/5246)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.10
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.54.1
+
+### Patch Changes
+
+- Fix modal issues by inlining scroll locking mechanism instead of using `<FloatingOverlay/>` which caused issues in Chromium based browsers ([#5244](https://github.com/clerk/javascript/pull/5244)) by [@octoper](https://github.com/octoper)
+
 ## 5.54.0
 
 ### Minor Changes
