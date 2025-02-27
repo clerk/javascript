@@ -1,4 +1,5 @@
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
+import type { SessionStatus } from './session';
 
 export interface Jwt {
   header: JwtHeader;
@@ -55,6 +56,11 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Session ID
    */
   sid: string;
+
+  /**
+   * Session status
+   */
+  sts?: SessionStatus;
 
   /**
    * JWT Not Before - [RFC7519#section-4.1.5](https://tools.ietf.org/html/rfc7519#section-4.1.5).

@@ -1,3 +1,5 @@
+import type { SessionStatus } from 'session';
+
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
@@ -45,6 +47,11 @@ export interface ClerkJWTClaims {
    * Session ID
    */
   sid: string;
+
+  /**
+   * Session status
+   */
+  sts: SessionStatus;
 
   /**
    * JWT Not Before - [RFC7519#section-4.1.5](https://tools.ietf.org/html/rfc7519#section-4.1.5).

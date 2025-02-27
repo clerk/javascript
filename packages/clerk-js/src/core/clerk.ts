@@ -70,6 +70,7 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { sessionTaskKeyToRoutePaths, sessionTaskRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -93,11 +94,11 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
   noUserExists,
   removeClerkQueryParam,
   requiresUserInput,
-  sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
   windowNavigate,
 } from '../utils';
@@ -432,7 +433,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -491,7 +492,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
+    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -942,7 +943,9 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit) {
+    const hasSessionToResolve = newSession?.currentTask;
+    if (redirectUrl && !beforeEmit && !hasSessionToResolve) {
+      console.log('Redirecting within setActive', { redirectUrl });
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
@@ -1000,14 +1003,18 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    /**
-     * Trigger all navigation listeners. In order for modal UI components to close.
-     */
-    setTimeout(() => {
-      this.#emitNavigationListeners();
-    }, 0);
-
     let toURL = new URL(to, window.location.href);
+    const origin = new URL(window.location.href);
+
+    const isOutsideOfUIComponent = !toURL.pathname.startsWith(origin.pathname);
+    if (isOutsideOfUIComponent) {
+      /**
+       * Trigger all navigation listeners. In order for modal UI components to close.
+       */
+      setTimeout(() => {
+        this.#emitNavigationListeners();
+      }, 0);
+    }
 
     if (!this.#allowedRedirectProtocols.includes(toURL.protocol)) {
       console.warn(
@@ -1108,6 +1115,26 @@ export class Clerk implements ClerkInterface {
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
     const initValues = new URLSearchParams(options?.initialValues || {});
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
+  }
+
+  public buildTaskUrl(): string {
+    const currentTask = this.session?.currentTask;
+    if (!currentTask) {
+      return '';
+    }
+
+    const origin = new URL(window.location.href);
+    const signUpUrl = new URL(this.buildSignUpUrl());
+    const referrerIsSignUpUrl = origin.pathname.startsWith(signUpUrl.pathname);
+
+    return buildURL(
+      {
+        // TODO ORGS-531 - Introduce `tasksUrl` as custom option
+        base: referrerIsSignUpUrl ? this.#options.signUpUrl : this.#options.signInUrl,
+        hashPath: sessionTaskKeyToRoutePaths[currentTask.key],
+      },
+      { stringify: true },
+    );
   }
 
   public buildAfterMultiSessionSingleSignOutUrl(): string {
@@ -1227,6 +1254,18 @@ export class Clerk implements ClerkInterface {
   public redirectToWaitlist = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildWaitlistUrl());
+    }
+    return;
+  };
+
+  public redirectToTask = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      const referrerIsTaskUrl = sessionTaskRoutePaths.some(path => window.location.href.includes(path));
+      if (referrerIsTaskUrl) {
+        return;
+      }
+
+      return this.navigate(this.buildTaskUrl());
     }
     return;
   };
