@@ -38,9 +38,18 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
   });
 
-  test('with pending tasks, redirects to tasks when accessing root sign in', async ({ page, context }) => {
+  test.fixme('redirects to after sign-in url when session tasks has been resolved', () => {
+    // todo
+  });
+
+  test.fixme('redirects to after sign-in url when accessing root sign in with a active session', {
+    // todo
+  });
+
+  test('redirects back to tasks when accessing root sign in', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
@@ -49,7 +58,15 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
     await u.po.signIn.goTo();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
+  });
+
+  test('without a session, does not allow to access tasks', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goto('/sign-in/add-organization');
+    expect(u.page.url()).not.toContain('/sign-in/add-organization');
   });
 });

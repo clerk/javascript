@@ -477,11 +477,6 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
-   * Returns the URL where session task get displayed. It appends to `signInUrl` or `signUpUrl` as the base route.
-   */
-  buildTaskUrl(): string;
-
-  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -537,11 +532,6 @@ export interface Clerk {
    * Redirects to the configured URL where <Waitlist/> is mounted.
    */
   redirectToWaitlist: () => void;
-
-  /**
-   * Redirects to the URL to resolve a pending session task
-   */
-  redirectToTaskResolution: () => void;
 
   /**
    * Completes a Google One Tap redirection flow started by

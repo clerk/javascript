@@ -23,8 +23,7 @@ export function Task(): React.ReactNode {
     return null;
   }
 
-  const [task] = session.tasks ?? [];
-  const Content = TaskRegistry[task.key];
+  const Content = TaskRegistry[session.currentTask.key];
 
   return Content ? <Content /> : null;
 }

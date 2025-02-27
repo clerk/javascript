@@ -66,7 +66,6 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
-import { sessionTaskKeyToRoutePaths } from '../ui/common/tasks';
 import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
@@ -90,11 +89,11 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
-  isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
   noUserExists,
   removeClerkQueryParam,
   requiresUserInput,
+  sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
   windowNavigate,
 } from '../utils';
@@ -428,7 +427,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -482,7 +481,7 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (isSignedInAndSingleSessionModeEnabled(this, this.environment)) {
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
           code: 'cannot_render_single_session_enabled',
@@ -947,6 +946,8 @@ export class Clerk implements ClerkInterface {
       beforeUnloadTracker?.stopTracking();
     }
 
+    // Overrides the default behavior of redirects to `afterSignInUrl`
+    // or `afterSignUpUrl` to redirect the user to their assigned tasks
     const hasSessionToResolve = newSession?.currentTask;
     if (redirectUrl && !beforeEmit && !hasSessionToResolve) {
       beforeUnloadTracker?.startTracking();
@@ -1116,29 +1117,6 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
-  public buildTaskUrl(): string {
-    const currentTask = this.session?.currentTask;
-    if (!currentTask) {
-      return '';
-    }
-
-    const referrerIsTaskUrl = window.location.href.includes(sessionTaskKeyToRoutePaths[currentTask.key]);
-    if (referrerIsTaskUrl) {
-      return '';
-    }
-
-    const referrerIsSignUpUrl = window.location.href.startsWith(this.buildSignUpUrl());
-
-    return buildURL(
-      {
-        // TODO ORGS-531 - Introduce `tasksUrl` as custom option
-        base: referrerIsSignUpUrl ? this.#options.signUpUrl : this.#options.signInUrl,
-        hashPath: sessionTaskKeyToRoutePaths[currentTask.key],
-      },
-      { stringify: true },
-    );
-  }
-
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.#options.afterMultiSessionSingleSignOutUrl) {
       return this.buildUrlWithAuth(
@@ -1256,13 +1234,6 @@ export class Clerk implements ClerkInterface {
   public redirectToWaitlist = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildWaitlistUrl());
-    }
-    return;
-  };
-
-  public redirectToTask = async (): Promise<unknown> => {
-    if (inBrowser()) {
-      return this.navigate(this.buildTaskUrl());
     }
     return;
   };
@@ -1765,9 +1736,9 @@ export class Clerk implements ClerkInterface {
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
-
-      this.#emit();
     }
+
+    this.#emit();
   };
 
   get __unstable__environment(): EnvironmentResource | null | undefined {

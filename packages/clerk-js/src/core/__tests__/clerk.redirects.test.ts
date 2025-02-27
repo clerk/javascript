@@ -122,7 +122,6 @@ describe('Clerk singleton - Redirects', () => {
 
       afterEach(() => {
         mockEnvironmentFetch.mockRestore();
-        mockClientFetch.mockRestore();
       });
 
       it('redirects to signInUrl for development instance', async () => {
@@ -221,7 +220,6 @@ describe('Clerk singleton - Redirects', () => {
 
       afterEach(() => {
         mockEnvironmentFetch.mockRestore();
-        mockClientFetch.mockRestore();
       });
 
       const host = 'http://another-test.host';
