@@ -16,10 +16,14 @@ import { Close as CloseIcon } from '../icons';
 import { InternalThemeProvider } from '../styledSystem';
 import { IconButton } from './IconButton';
 
+type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
+
 interface DrawerContext {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   strategy: UseFloatingOptions['strategy'];
+  portalId: FloatingPortalProps['id'];
+  portalRef: FloatingPortalProps['root'];
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -37,9 +41,11 @@ interface RootProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   strategy?: UseFloatingOptions['strategy'];
+  portalId?: FloatingPortalProps['id'];
+  portalRef?: FloatingPortalProps['root'];
 }
 
-function Root({ children, open = false, onOpenChange, strategy = 'fixed' }: RootProps) {
+function Root({ children, open = false, onOpenChange, strategy = 'fixed', portalId, portalRef }: RootProps) {
   const [isOpen, setIsOpen] = React.useState(open);
 
   React.useEffect(() => {
@@ -61,6 +67,8 @@ function Root({ children, open = false, onOpenChange, strategy = 'fixed' }: Root
           isOpen,
           setIsOpen: handleOpenChange,
           strategy,
+          portalId,
+          portalRef,
         }}
       >
         {children}
@@ -118,7 +126,7 @@ interface ContentProps {
 }
 
 function Content({ children }: ContentProps) {
-  const { isOpen, setIsOpen, strategy } = useDrawerContext();
+  const { isOpen, setIsOpen, strategy, portalId, portalRef } = useDrawerContext();
 
   const { refs, context } = useFloating({
     open: isOpen,
@@ -152,7 +160,10 @@ function Content({ children }: ContentProps) {
   if (!isMounted) return null;
 
   return (
-    <FloatingPortal id='card-root'>
+    <FloatingPortal
+      id={portalId}
+      root={portalRef}
+    >
       <FloatingFocusManager
         context={context}
         modal
@@ -199,7 +210,7 @@ function Close() {
     <IconButton
       elementDescriptor={descriptors.drawerClose}
       variant='ghost'
-      aria-label='Close modal'
+      aria-label='Close drawer'
       onClick={() => setIsOpen(false)}
       icon={
         <Icon
