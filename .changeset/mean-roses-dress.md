@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Bug fix: Using `<FloatingOverlay/>` with children causes modals to get blocked on some sites on chromium browsers.
+Fix modal issues by inlining scroll locking mechanism instead of using `<FloatingOverlay/>` which caused issues in Chromium based browsers
