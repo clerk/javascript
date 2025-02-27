@@ -1,3 +1,4 @@
+// Reference: https://github.com/floating-ui/floating-ui/blob/c09c59d6e594c3527888a52ed0f3e8a2978663c2/packages/react/src/components/FloatingOverlay.tsx
 // Avoid Chrome DevTools blue warning.
 export function getPlatform(): string {
   const uaData = (navigator as any).userAgentData as { platform: string } | undefined;
