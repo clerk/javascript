@@ -47,6 +47,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       context={context}
       isOpen={isOpen}
     >
+      {/*Avoid using children with FloatingOverlay */}
       <FloatingOverlay lockScroll />
       <ModalContext.Provider value={modalCtx}>
         <Flex
