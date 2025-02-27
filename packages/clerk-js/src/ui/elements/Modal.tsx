@@ -47,53 +47,52 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       context={context}
       isOpen={isOpen}
     >
-      <FloatingOverlay lockScroll>
-        <ModalContext.Provider value={modalCtx}>
+      <FloatingOverlay lockScroll />
+      <ModalContext.Provider value={modalCtx}>
+        <Flex
+          id={id}
+          ref={overlayRef}
+          elementDescriptor={descriptors.modalBackdrop}
+          style={style}
+          sx={[
+            t => ({
+              animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
+              zIndex: t.zIndices.$modal,
+              backgroundColor: t.colors.$modalBackdrop,
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              overflow: 'auto',
+              width: '100vw',
+              height: ['100vh', '-webkit-fill-available'],
+              position: 'fixed',
+              left: 0,
+              top: 0,
+            }),
+            containerSx,
+          ]}
+        >
           <Flex
-            id={id}
-            ref={overlayRef}
-            elementDescriptor={descriptors.modalBackdrop}
-            style={style}
+            elementDescriptor={descriptors.modalContent}
+            ref={floating}
+            aria-modal='true'
+            role='dialog'
             sx={[
               t => ({
-                animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
-                zIndex: t.zIndices.$modal,
-                backgroundColor: t.colors.$modalBackdrop,
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                overflow: 'auto',
-                width: '100vw',
-                height: ['100vh', '-webkit-fill-available'],
-                position: 'fixed',
-                left: 0,
-                top: 0,
+                position: 'relative',
+                outline: 0,
+                animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
+                margin: `${t.space.$16} 0`,
+                [mqu.sm]: {
+                  margin: `${t.space.$10} 0`,
+                },
               }),
-              containerSx,
+              contentSx,
             ]}
           >
-            <Flex
-              elementDescriptor={descriptors.modalContent}
-              ref={floating}
-              aria-modal='true'
-              role='dialog'
-              sx={[
-                t => ({
-                  position: 'relative',
-                  outline: 0,
-                  animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
-                  margin: `${t.space.$16} 0`,
-                  [mqu.sm]: {
-                    margin: `${t.space.$10} 0`,
-                  },
-                }),
-                contentSx,
-              ]}
-            >
-              {props.children}
-            </Flex>
+            {props.children}
           </Flex>
-        </ModalContext.Provider>
-      </FloatingOverlay>
+        </Flex>
+      </ModalContext.Provider>
     </Popover>
   );
 });
