@@ -2,4 +2,4 @@
 '@clerk/clerk-js': minor
 ---
 
-On `<SignIn/>` mount, load `<SignUp/>` on combined flow.
+Lazily load components related to `<SignUp>` functionality when used with the combined flow in `<SignIn>`.
