@@ -17,6 +17,7 @@ export default function Home() {
       <ul>
         <li>
           <Link href='/page-protected'>Page Protected</Link>
+          <Link href='/protected'>Protected</Link>
         </li>
       </ul>
     </main>
