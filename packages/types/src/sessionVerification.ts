@@ -1,4 +1,11 @@
-import type { BackupCodeFactor, EmailCodeFactor, PasswordFactor, PhoneCodeFactor, TOTPFactor } from './factors';
+import type {
+  BackupCodeFactor,
+  EmailCodeFactor,
+  PasskeyFactor,
+  PasswordFactor,
+  PhoneCodeFactor,
+  TOTPFactor,
+} from './factors';
 import type { ClerkResource } from './resource';
 import type { SessionResource } from './session';
 import type { VerificationResource } from './verification';
@@ -27,5 +34,5 @@ export type ReverificationConfig =
 export type SessionVerificationLevel = 'first_factor' | 'second_factor' | 'multi_factor';
 export type SessionVerificationAfterMinutes = number;
 
-export type SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor;
+export type SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor;
 export type SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
