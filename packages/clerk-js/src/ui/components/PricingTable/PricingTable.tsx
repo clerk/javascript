@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Badge, Button, Col, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
-import { Avatar, Drawer } from '../../elements';
+import { Avatar } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
@@ -69,16 +69,6 @@ export const PricingTable = (props: PricingTableProps) => {
         handleClose={() => setShowPlanDetail(false)}
         plan={selectedPlan}
       />
-      <Drawer.Root
-        open={showCheckout}
-        onOpenChange={setShowCheckout}
-        strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
-      >
-        <Drawer.Overlay />
-        <Drawer.Content>
-          <div>Drawer content goes here</div>
-        </Drawer.Content>
-      </Drawer.Root>
     </InternalThemeProvider>
   );
 };

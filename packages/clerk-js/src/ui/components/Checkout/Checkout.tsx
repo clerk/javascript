@@ -23,8 +23,6 @@ export const Checkout = (props: CheckoutProps) => {
 const AuthenticatedRoutes = withCoreUserGuard((props: CheckoutProps) => {
   const { mode = 'mounted', isShowingBlade = false } = useCheckoutContext();
 
-  return null;
-
   return (
     <CommerceBlade
       isOpen={isShowingBlade}

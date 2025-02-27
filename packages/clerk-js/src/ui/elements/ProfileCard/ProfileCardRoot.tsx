@@ -14,7 +14,6 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
   return (
     <Card.Root
       ref={ref}
-      id='card-root'
       sx={[
         t => ({
           width: t.sizes.$220,
