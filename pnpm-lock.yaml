@@ -476,6 +476,9 @@ importers:
       regenerator-runtime:
         specifier: 0.13.11
         version: 0.13.11
+      tailwind-merge:
+        specifier: 3.0.2
+        version: 3.0.2
     devDependencies:
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
@@ -2934,7 +2937,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -12790,6 +12793,9 @@ packages:
 
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
+
+  tailwind-merge@3.0.2:
+    resolution: {integrity: sha512-l7z+OYZ7mu3DTqrL88RiKrKIqO3NcpEO8V/Od04bNpvk0kiIFndGEoqfuzvj4yuhRkHKjRkII2z+KS2HfPcSxw==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -29672,6 +29678,8 @@ snapshots:
   system-architecture@0.1.0: {}
 
   tabbable@6.2.0: {}
+
+  tailwind-merge@3.0.2: {}
 
   tapable@2.2.1: {}
 
