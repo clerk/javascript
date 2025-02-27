@@ -2,7 +2,7 @@ import { isBrowserOnline } from '@clerk/shared/browser';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import type { Clerk, InstanceType } from '@clerk/types';
+import type { Clerk, InstanceType, TokenResource } from '@clerk/types';
 
 import { createOfflineScheduler } from '../../utils/offlineScheduler';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
@@ -60,9 +60,8 @@ export class AuthCookieService {
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
+      this.navigateOnSessionStatus(token);
     });
-
-    eventBus.on(events.NewSessionTask, () => this.handleSessionTasks());
 
     this.refreshTokenOnFocus();
     this.startPollingForToken();
@@ -153,7 +152,6 @@ export class AuthCookieService {
       if (updateCookieImmediately) {
         this.updateSessionCookie(token);
       }
-      this.handleSessionTasks();
     } catch (e) {
       return this.handleGetTokenError(e);
     }
@@ -227,10 +225,10 @@ export class AuthCookieService {
     return this.clerk.organization?.id === activeOrganizationId;
   }
 
-  private handleSessionTasks() {
-    const hasPendingStatus = this.clerk.session?.status === 'pending';
+  private navigateOnSessionStatus(token: TokenResource | null) {
+    const hasTasks = token?.jwt?.claims.sts === 'pending';
 
-    if (!hasPendingStatus) {
+    if (!hasTasks) {
       return;
     }
 

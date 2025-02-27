@@ -20,11 +20,12 @@ export function Task(): React.ReactNode {
   const session = useSessionContext();
 
   if (!session?.currentTask) {
+    console.log('does not render 🍪');
+
     return null;
   }
 
-  const [task] = session.tasks ?? [];
-  const Content = TaskRegistry[task.key];
+  const Content = TaskRegistry[session.currentTask.key];
 
   return Content ? <Content /> : null;
 }

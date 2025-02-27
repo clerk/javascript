@@ -38,6 +38,7 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
   });
 
   test('with pending tasks, redirects to tasks when accessing root sign in', async ({ page, context }) => {
@@ -49,7 +50,9 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
     await u.po.signIn.goTo();
     await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
+    expect(u.page.url()).toContain('/sign-in/add-organization');
   });
 });

@@ -96,7 +96,6 @@ export const BaseRouter = ({
 
     const isCrossOrigin = toURL.origin !== window.location.origin;
     const isOutsideOfUIComponent = !toURL.pathname.startsWith('/' + basePath);
-    console.log({ isCrossOrigin, isOutsideOfUIComponent });
 
     if (isOutsideOfUIComponent || isCrossOrigin) {
       const res = await clerkNavigate(toURL.href);
