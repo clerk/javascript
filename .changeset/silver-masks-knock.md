@@ -2,4 +2,4 @@
 '@clerk/nextjs': patch
 ---
 
-Bug fix when signing out on Next.js v15. The less aggressive router cache on v15 allows us to resolve immediately.
+Adjusts logic for router cache busting in Next.js 15. Fixes an issue where a server action was getting called unnecessarily during sign out.
