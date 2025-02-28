@@ -38,34 +38,20 @@ const useDrawerContext = () => {
 
 interface RootProps {
   children: React.ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   strategy?: UseFloatingOptions['strategy'];
   portalId?: FloatingPortalProps['id'];
   portalRef?: FloatingPortalProps['root'];
 }
 
-function Root({ children, open = false, onOpenChange, strategy = 'fixed', portalId, portalRef }: RootProps) {
-  const [isOpen, setIsOpen] = React.useState(open);
-
-  React.useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
-
-  const handleOpenChange = React.useCallback(
-    (newOpen: boolean) => {
-      setIsOpen(newOpen);
-      onOpenChange?.(newOpen);
-    },
-    [onOpenChange],
-  );
-
+function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, portalRef }: RootProps) {
   return (
     <InternalThemeProvider>
       <DrawerContext.Provider
         value={{
-          isOpen,
-          setIsOpen: handleOpenChange,
+          isOpen: open,
+          setIsOpen: onOpenChange,
           strategy,
           portalId,
           portalRef,
