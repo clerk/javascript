@@ -46,6 +46,7 @@ export * from './ReversibleContainer';
 export * from './RootBox';
 export * from './Section';
 export * from './Select';
+export * from './SegmentedControl';
 export * from './SuccessPage';
 export * from './Tabs';
 export * from './TagInput';
