@@ -49,6 +49,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
     saml_accounts?: Array<Partial<SamlAccountJSON>>;
     organization_memberships?: Array<string | OrgParams>;
+    session?: Partial<SessionJSON>;
   };
 
   const createPublicUserData = (params: WithUserParams) => {
@@ -62,7 +63,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     } as PublicUserDataJSON;
   };
 
-  const withUser = (params: WithUserParams) => {
+  const withUser = ({ session: sessionOverrides, ...params }: WithUserParams) => {
     baseClient.sessions = baseClient.sessions || [];
 
     // set the first organization as active
@@ -87,6 +88,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       last_active_token: {
         jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg',
       },
+      ...sessionOverrides,
     } as SessionJSON;
     baseClient.sessions.push(session);
   };

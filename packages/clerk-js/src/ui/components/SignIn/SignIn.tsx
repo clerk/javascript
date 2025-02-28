@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { sessionTaskRoutePaths } from '../../../ui/common/tasks';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -19,6 +20,7 @@ import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
 import { SignUpStart } from '../SignUp/SignUpStart';
 import { SignUpVerifyEmail } from '../SignUp/SignUpVerifyEmail';
 import { SignUpVerifyPhone } from '../SignUp/SignUpVerifyPhone';
+import { Task } from '../Task';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
@@ -132,6 +134,14 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
+        {sessionTaskRoutePaths.map(path => (
+          <Route
+            key={path}
+            path={path}
+          >
+            <Task />
+          </Route>
+        ))}
         <Route index>
           <SignInStart />
         </Route>
