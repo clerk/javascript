@@ -95,6 +95,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
         color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
         fontSize: t.fontSizes.$xs,
         minHeight: t.sizes.$6,
+        boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
+        borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
       })}
     >
       {children}
