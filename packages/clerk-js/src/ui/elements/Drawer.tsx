@@ -24,6 +24,9 @@ interface DrawerContext {
   strategy: UseFloatingOptions['strategy'];
   portalId: FloatingPortalProps['id'];
   portalRef: FloatingPortalProps['root'];
+  refs: ReturnType<typeof useFloating>['refs'];
+  context: ReturnType<typeof useFloating>['context'];
+  getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -46,6 +49,15 @@ interface RootProps {
 }
 
 function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, portalRef }: RootProps) {
+  const { refs, context } = useFloating({
+    open,
+    onOpenChange,
+    transform: false,
+    strategy,
+  });
+
+  const { getFloatingProps } = useInteractions([useClick(context), useDismiss(context), useRole(context)]);
+
   return (
     <InternalThemeProvider>
       <DrawerContext.Provider
@@ -55,6 +67,9 @@ function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, port
           strategy,
           portalId,
           portalRef,
+          refs,
+          context,
+          getFloatingProps,
         }}
       >
         {children}
@@ -64,23 +79,12 @@ function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, port
 }
 
 function Overlay() {
-  const { isOpen, setIsOpen, strategy } = useDrawerContext();
-
-  const { refs, context } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-  });
+  const { strategy, refs, context } = useDrawerContext();
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    initial: {
-      opacity: 0,
-    },
-    open: {
-      opacity: 1,
-    },
-    close: {
-      opacity: 0,
-    },
+    initial: { opacity: 0 },
+    open: { opacity: 1 },
+    close: { opacity: 0 },
     common: {
       transitionProperty: 'opacity',
       transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -112,25 +116,12 @@ interface ContentProps {
 }
 
 function Content({ children }: ContentProps) {
-  const { isOpen, setIsOpen, strategy, portalId, portalRef } = useDrawerContext();
-
-  const { refs, context } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    transform: false,
-    strategy,
-  });
+  const { strategy, portalId, portalRef, refs, context, getFloatingProps } = useDrawerContext();
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    initial: {
-      transform: 'translateX(100%)',
-    },
-    open: {
-      transform: 'translateX(0)',
-    },
-    close: {
-      transform: 'translateX(100%)',
-    },
+    initial: { transform: 'translateX(100%)' },
+    open: { transform: 'translateX(0)' },
+    close: { transform: 'translateX(100%)' },
     common: {
       transitionProperty: 'transform',
       transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -140,8 +131,6 @@ function Content({ children }: ContentProps) {
       close: 200,
     },
   });
-
-  const { getFloatingProps } = useInteractions([useClick(context), useDismiss(context), useRole(context)]);
 
   if (!isMounted) return null;
 
