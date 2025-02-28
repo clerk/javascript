@@ -157,6 +157,7 @@ function Content({ children }: ContentProps) {
       >
         <Flex
           ref={refs.setFloating}
+          elementDescriptor={descriptors.drawerRoot}
           {...getFloatingProps()}
           sx={t => ({
             position: strategy,

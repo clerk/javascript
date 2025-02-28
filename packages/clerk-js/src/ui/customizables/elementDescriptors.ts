@@ -75,6 +75,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'dividerText',
   'dividerLine',
 
+  'drawerRoot',
   'drawerOverlay',
   'drawerContent',
   'drawerClose',

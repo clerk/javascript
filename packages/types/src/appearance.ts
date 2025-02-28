@@ -193,6 +193,7 @@ export type ElementsConfig = {
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
+  drawerRoot: WithOptions;
   drawerOverlay: WithOptions;
   drawerContent: WithOptions;
   drawerClose: WithOptions;
