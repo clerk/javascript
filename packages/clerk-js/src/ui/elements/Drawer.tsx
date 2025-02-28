@@ -42,17 +42,41 @@ interface RootProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /**
+   * The strategy to use when positioning the floating element.
+   * @default 'fixed'
+   * @see https://floating-ui.com/docs/useFloating#strategy
+   */
   strategy?: UseFloatingOptions['strategy'];
+  /**
+   * @see https://floating-ui.com/docs/useFloating
+   */
+  floatingProps?: Omit<UseFloatingOptions, 'open' | 'onOpenChange' | 'strategy' | 'transform'>;
+  /**
+   * @see https://floating-ui.com/docs/FloatingPortal
+   */
   portalProps?: FloatingPortalProps;
+  /**
+   * @see https://floating-ui.com/docs/useDismiss
+   */
   dismissProps?: UseDismissProps;
 }
 
-function Root({ children, open, onOpenChange, strategy = 'fixed', portalProps, dismissProps }: RootProps) {
+function Root({
+  children,
+  open,
+  onOpenChange,
+  strategy = 'fixed',
+  floatingProps,
+  portalProps,
+  dismissProps,
+}: RootProps) {
   const { refs, context } = useFloating({
     open,
     onOpenChange,
     transform: false,
     strategy,
+    ...floatingProps,
   });
 
   const { getFloatingProps } = useInteractions([
