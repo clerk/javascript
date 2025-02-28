@@ -891,7 +891,7 @@ export const esES: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: 'Guardar Cambios',
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {
