@@ -1,4 +1,4 @@
-import type { UseFloatingOptions } from '@floating-ui/react';
+import type { UseDismissProps, UseFloatingOptions } from '@floating-ui/react';
 import {
   FloatingFocusManager,
   FloatingPortal,
@@ -22,11 +22,10 @@ interface DrawerContext {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   strategy: UseFloatingOptions['strategy'];
-  portalId: FloatingPortalProps['id'];
-  portalRef: FloatingPortalProps['root'];
   refs: ReturnType<typeof useFloating>['refs'];
   context: ReturnType<typeof useFloating>['context'];
   getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
+  portalProps: FloatingPortalProps;
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -44,11 +43,11 @@ interface RootProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   strategy?: UseFloatingOptions['strategy'];
-  portalId?: FloatingPortalProps['id'];
-  portalRef?: FloatingPortalProps['root'];
+  portalProps?: FloatingPortalProps;
+  dismissProps?: UseDismissProps;
 }
 
-function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, portalRef }: RootProps) {
+function Root({ children, open, onOpenChange, strategy = 'fixed', portalProps, dismissProps }: RootProps) {
   const { refs, context } = useFloating({
     open,
     onOpenChange,
@@ -56,7 +55,11 @@ function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, port
     strategy,
   });
 
-  const { getFloatingProps } = useInteractions([useClick(context), useDismiss(context), useRole(context)]);
+  const { getFloatingProps } = useInteractions([
+    useClick(context),
+    useDismiss(context, dismissProps),
+    useRole(context),
+  ]);
 
   return (
     <InternalThemeProvider>
@@ -65,8 +68,7 @@ function Root({ children, open, onOpenChange, strategy = 'fixed', portalId, port
           isOpen: open,
           setIsOpen: onOpenChange,
           strategy,
-          portalId,
-          portalRef,
+          portalProps: portalProps || {},
           refs,
           context,
           getFloatingProps,
@@ -117,7 +119,7 @@ interface ContentProps {
 
 function Content({ children }: ContentProps) {
   const { animations } = useAppearance().parsedLayout;
-  const { strategy, portalId, portalRef, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, portalProps, refs, context, getFloatingProps } = useDrawerContext();
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
     initial: { transform: 'translateX(100%)' },
@@ -127,19 +129,18 @@ function Content({ children }: ContentProps) {
       transitionProperty: 'transform',
       transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
-    duration: {
-      open: 250,
-      close: 200,
-    },
+    duration: animations
+      ? {
+          open: 250,
+          close: 200,
+        }
+      : undefined,
   });
 
   if (!isMounted) return null;
 
   return (
-    <FloatingPortal
-      id={portalId}
-      root={portalRef}
-    >
+    <FloatingPortal {...portalProps}>
       <FloatingFocusManager
         context={context}
         modal
