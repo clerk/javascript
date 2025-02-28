@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Fix `userProfile.start.profileSection.primaryButton` string in `es-ES` localization
+Update the translation of `userProfile.start.profileSection.primaryButton` in the `es-ES` locale.
