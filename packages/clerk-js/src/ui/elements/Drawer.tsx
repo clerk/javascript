@@ -11,7 +11,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, Flex, Icon } from '../customizables';
+import { Box, descriptors, Flex, Icon, useAppearance } from '../customizables';
 import { Close as CloseIcon } from '../icons';
 import { InternalThemeProvider } from '../styledSystem';
 import { IconButton } from './IconButton';
@@ -116,6 +116,7 @@ interface ContentProps {
 }
 
 function Content({ children }: ContentProps) {
+  const { animations } = useAppearance().parsedLayout;
   const { strategy, portalId, portalRef, refs, context, getFloatingProps } = useDrawerContext();
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -157,7 +158,7 @@ function Content({ children }: ContentProps) {
         >
           <Flex
             elementDescriptor={descriptors.drawerContent}
-            style={transitionStyles}
+            style={animations ? transitionStyles : undefined}
             sx={t => ({
               width: t.sizes.$100,
               backgroundColor: t.colors.$colorBackground,
