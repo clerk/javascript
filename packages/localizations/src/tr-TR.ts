@@ -103,7 +103,7 @@ export const trTR: LocalizationResource = {
     action__suggestionsAccept: 'Katılmak için talepte bulun',
     createOrganization: 'Organizasyon Oluştur',
     invitationAcceptedLabel: 'Katılım başarılı',
-    subtitle: '{{applicationName}} uygulaması ile devam edin',
+    subtitle: '{{applicationName}} ile devam edin',
     suggestionsAcceptedLabel: 'Onay bekleniyor',
     title: 'Bir hesap seçin',
     titleWithoutPersonal: 'Bir organizasyon seçin',
@@ -599,13 +599,12 @@ export const trTR: LocalizationResource = {
       requireNumbers: 'bir sayı içermeli',
       requireSpecialCharacter: 'bir özel karakter içermeli',
       requireUppercase: 'bir büyük harf içermeli',
-      sentencePrefix: 'Şifreniz:',
+      sentencePrefix: 'Şifreniz;',
     },
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     zxcvbn: {
-      couldBeStronger:
-        'Şifreniz kriterleri karşılıyor; birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
+      couldBeStronger: 'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
       goodPassword: 'Harika! Parolanız gerekli tüm gereksinimleri karşılıyor.',
       notEnough: 'Şifreniz yeterince güçlü değil.',
       suggestions: {
@@ -615,8 +614,7 @@ export const trTR: LocalizationResource = {
         capitalization: 'Sadece ilk harfi büyük yazmak yerine rastgele büyük harfler kullanın.',
         dates: 'Kendinizle alakası olan tarihleri kullanmayın.',
         l33t: '"a" yerine "@" kullanmak gibi tahmin edilebilir harf ikamelerinden kaçının.',
-        longerKeyboardPattern:
-          'Daha uzun ve karmaşık klavye desenleri kullanın.',
+        longerKeyboardPattern: 'Daha uzun ve karmaşık klavye desenleri kullanın.',
         noNeed: 'Özel karakter, sayı veya büyük harf kullanmadan da güçlü bir şifre oluşturabilirsiniz.',
         pwned: 'Bu şifre bir veri ihlalinde tespit edildi. Başka bir yerde kullanıyorsanız, değiştirmeniz önerilir.',
         recentYears: 'Günümüze yakın yılları kullanmayın.',
@@ -815,8 +813,7 @@ export const trTR: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Görseli kaldır',
       imageFormSubtitle: 'Görsel yükle',
       imageFormTitle: 'Profil görseli',
-      readonly:
-        'Profil bilgileriniz kurumsal bağlantı üzerinden sağlandığı için düzenlenemez.',
+      readonly: 'Profil bilgileriniz kurumsal bağlantı üzerinden sağlandığı için düzenlenemez.',
       successMessage: 'Profiliniz güncellendi.',
       title: 'Profili güncelle',
     },
