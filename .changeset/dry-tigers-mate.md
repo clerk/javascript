@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fix `Clerk.signOut()` infinite pending when used with Next.js v15. 
+Fixes a bug in `Clerk.signOut()` that was preventing the after sign out redirect from occurring in Next.js v15.
