@@ -51,8 +51,9 @@ function Root({ children, value: controlledValue, defaultValue, onChange, 'aria-
         sx={t => ({
           backgroundColor: t.colors.$neutralAlpha50,
           borderRadius: t.radii.$md,
-          boxShadow:
-            '0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(0, 0, 0, 0.06)',
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$neutralAlpha100,
         })}
       >
         {React.Children.map(children, (child, index) => (
@@ -60,6 +61,9 @@ function Root({ children, value: controlledValue, defaultValue, onChange, 'aria-
             elementDescriptor={descriptors.segmentedControlItem}
             key={index}
             as='li'
+            sx={{
+              display: 'flex',
+            }}
           >
             {child}
           </Box>
@@ -83,6 +87,8 @@ function Button({ children, value }: ButtonProps) {
         padding: `${t.space.$1} ${t.space.$2x5}`,
         backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
         color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+        fontSize: t.fontSizes.$xs,
+        minHeight: t.sizes.$6,
       })}
     >
       {children}
