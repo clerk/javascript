@@ -146,6 +146,12 @@ export type ElementsConfig = {
   actionCard: WithOptions;
   popoverBox: WithOptions;
 
+  disclosureRoot: WithOptions;
+  disclosureTrigger: WithOptions;
+  disclosureContentRoot: WithOptions;
+  disclosureContentBox: WithOptions;
+  disclosureContentInner: WithOptions;
+
   logoBox: WithOptions;
   logoImage: WithOptions;
 

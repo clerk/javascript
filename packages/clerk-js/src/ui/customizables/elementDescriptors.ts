@@ -26,6 +26,13 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'footerItem',
   'popoverBox',
 
+  'disclosureRoot',
+  'disclosureTrigger',
+  'disclosureContent',
+  'disclosureContentRoot',
+  'disclosureContentBox',
+  'disclosureContentInner',
+
   'actionCard',
 
   'logoBox',
