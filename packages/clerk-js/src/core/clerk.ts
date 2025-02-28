@@ -424,6 +424,7 @@ export class Clerk implements ClerkInterface {
     /**
      * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
      * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
+     * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
      */
     await onBeforeSetActive();
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
