@@ -1,5 +1,6 @@
 export * from './BlockButtons';
 export * from './CalloutWithAction';
+export * from './CommerceBlade';
 export * from './constants';
 export * from './EmailLinkStatusCard';
 export * from './EmailLinkVerify';

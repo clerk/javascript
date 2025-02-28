@@ -13,6 +13,8 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CommerceNamespace,
+  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -120,6 +122,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -167,6 +170,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
+  public static _commerce: __experimental_CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -287,6 +291,13 @@ export class Clerk implements ClerkInterface {
 
   get isStandardBrowser(): boolean {
     return this.#options.standardBrowser || false;
+  }
+
+  get __experimental_commerce(): __experimental_CommerceNamespace {
+    if (!Clerk._commerce) {
+      Clerk._commerce = new __experimental_Commerce();
+    }
+    return Clerk._commerce;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -886,6 +897,29 @@ export class Clerk implements ClerkInterface {
   public unmountWaitlist = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
+      controls.mountComponent({
+        name: 'PricingTable',
+        appearanceKey: 'pricingTable',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+  };
+
+  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
   /**
