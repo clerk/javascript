@@ -207,6 +207,10 @@ export const polishedAppearance: Appearance = {
         boxShadow: 'none',
         '&:focus': { boxShadow: 'none' },
       },
+      drawerContent: {
+        borderWidth: 0,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
       cardBox: {
         borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,

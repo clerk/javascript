@@ -13,6 +13,7 @@ export * from './CodeControl';
 export * from './contexts';
 export * from './DevModeNotice';
 export * from './Divider';
+export * from './Drawer';
 export * from './ErrorCard';
 export * from './Form';
 export * from './FormattedPhoneNumber';
