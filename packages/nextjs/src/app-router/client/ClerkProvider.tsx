@@ -75,20 +75,29 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
        *  For more information on cache invalidation, see:
        * https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
        */
-      return new Promise(res => {
-        window.__clerk_internal_invalidateCachePromise = res;
+      return new Promise(resolve => {
+        window.__clerk_internal_invalidateCachePromise = resolve;
 
         const nextVersion = window?.next?.version || '';
 
-        // NOTE: the following code will allow `useReverification()` to work properly when `handlerReverification` is called inside `startTransition`
+        // ATTENTION: Avoid using wrapping code with `startTransition` on versions >= 14
+        // otherwise the fetcher of `useReverification()` will be pending indefinitely when called within `startTransition`.
         if (nextVersion.startsWith('13')) {
           startTransition(() => {
             router.refresh();
           });
-        } else if (nextVersion.startsWith('15') && intent === 'sign-out') {
-          res(); // noop
+        }
+        // On Next.js v15 calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
+        // When a user transitions from "signed in" to "singed out", we clear the `__session` cookie, then we call `__unstable__onBeforeSetActive`.
+        // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
+        // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
+        // SOLUTION:
+        // To mitigate this, since the router cache on version 15 is much less aggressive, we can treat this as a noop and simply resolve the promise.
+        // Once `setActive` performs the navigation, `__unstable__onAfterSetActive` will kick in and perform a router.refresh ensuring the router cache gets clear with the correct authentication context.
+        else if (nextVersion.startsWith('15') && intent === 'sign-out') {
+          resolve(); // noop
         } else {
-          void invalidateCacheAction().then(() => res());
+          void invalidateCacheAction().then(() => resolve());
         }
       });
     };
