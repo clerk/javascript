@@ -117,3 +117,5 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
     </Route>
   );
 };
+
+export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };

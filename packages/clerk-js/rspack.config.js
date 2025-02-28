@@ -85,6 +85,14 @@ const common = ({ mode, disableRHC = false }) => {
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
+          /**
+           * Sign up is shared between the SignUp component and the SignIn component.
+           */
+          signUp: {
+            minChunks: 1,
+            name: 'signup',
+            test: module => module.resource && module.resource.includes('/ui/components/SignUp'),
+          },
           common: {
             minChunks: 1,
             name: 'ui-common',
