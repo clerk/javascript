@@ -79,6 +79,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'drawerContent',
   'drawerClose',
 
+  'segmentedControlRoot',
+  'segmentedControlItem',
+  'segmentedControlButton',
+
   'formHeader',
   'formHeaderTitle',
   'formHeaderSubtitle',
