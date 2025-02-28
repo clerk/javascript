@@ -92,8 +92,13 @@ export abstract class BaseResource {
         console.warn(e);
         return null;
       } else {
-        throw e;
+        console.error(e);
       }
+    }
+
+    if (typeof fapiResponse === 'undefined') {
+      // handle offline case
+      return null;
     }
 
     const { payload, status, statusText, headers } = fapiResponse;

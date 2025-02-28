@@ -43,6 +43,7 @@ type ComponentMode = 'modal' | 'mounted';
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
   mode?: ComponentMode;
+  __status?: 'degraded' | 'loading' | 'loaded';
 };
 
 export type UserVerificationCtx = __internal_UserVerificationProps & {
