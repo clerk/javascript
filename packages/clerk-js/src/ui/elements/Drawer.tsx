@@ -6,6 +6,7 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
+  useMergeRefs,
   useRole,
   useTransitionStyles,
 } from '@floating-ui/react';
@@ -104,8 +105,9 @@ function Root({
   );
 }
 
-function Overlay() {
+const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   const { strategy, refs, context } = useDrawerContext();
+  const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
     initial: { opacity: 0 },
@@ -125,7 +127,7 @@ function Overlay() {
 
   return (
     <Box
-      ref={refs.setFloating}
+      ref={mergedRefs}
       elementDescriptor={descriptors.drawerOverlay}
       style={transitionStyles}
       sx={t => ({
@@ -135,15 +137,18 @@ function Overlay() {
       })}
     />
   );
-}
+});
+
+Overlay.displayName = 'Drawer.Overlay';
 
 interface ContentProps {
   children: React.ReactNode;
 }
 
-function Content({ children }: ContentProps) {
+const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, ref) => {
   const { animations } = useAppearance().parsedLayout;
   const { strategy, portalProps, refs, context, getFloatingProps } = useDrawerContext();
+  const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
     initial: { transform: 'translateX(100%)' },
@@ -171,45 +176,42 @@ function Content({ children }: ContentProps) {
         initialFocus={refs.floating}
       >
         <Flex
-          ref={refs.setFloating}
-          elementDescriptor={descriptors.drawerRoot}
+          ref={mergedRefs}
+          elementDescriptor={descriptors.drawerContent}
           {...getFloatingProps()}
+          style={animations ? transitionStyles : undefined}
           sx={t => ({
             position: strategy,
             insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
             outline: 0,
+            width: t.sizes.$100,
+            backgroundColor: t.colors.$colorBackground,
+            borderStartStartRadius: t.radii.$xl,
+            borderEndStartRadius: t.radii.$xl,
+            borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha100,
+            boxShadow: t.shadows.$cardBoxShadow,
+            zIndex: t.zIndices.$modal,
           })}
         >
-          <Flex
-            elementDescriptor={descriptors.drawerContent}
-            style={animations ? transitionStyles : undefined}
-            sx={t => ({
-              width: t.sizes.$100,
-              backgroundColor: t.colors.$colorBackground,
-              borderStartStartRadius: t.radii.$xl,
-              borderEndStartRadius: t.radii.$xl,
-              borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-              borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-              borderWidth: t.borderWidths.$normal,
-              borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$neutralAlpha100,
-              boxShadow: t.shadows.$cardBoxShadow,
-              zIndex: t.zIndices.$modal,
-            })}
-          >
-            {children}
-          </Flex>
+          {children}
         </Flex>
       </FloatingFocusManager>
     </FloatingPortal>
   );
-}
+});
 
-function Close() {
+Overlay.displayName = 'Drawer.Content';
+
+const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
   const { setIsOpen } = useDrawerContext();
   return (
     <IconButton
+      ref={ref}
       elementDescriptor={descriptors.drawerClose}
       variant='ghost'
       aria-label='Close drawer'
@@ -226,7 +228,9 @@ function Close() {
       })}
     />
   );
-}
+});
+
+Close.displayName = 'Drawer.Close';
 
 export const Drawer = {
   Root,
