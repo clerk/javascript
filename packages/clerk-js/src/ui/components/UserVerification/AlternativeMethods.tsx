@@ -38,7 +38,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
     <Flow.Part part={'alternativeMethods'}>
       <Card.Root>
         <Card.Content>
-          <Header.Root showLogo>
+          <Header.Root>
             <Header.Title localizationKey={localizationKeys('reverification.alternativeMethods.title')} />
             <Header.Subtitle localizationKey={localizationKeys('reverification.alternativeMethods.subtitle')} />
           </Header.Root>
@@ -112,7 +112,7 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
     case 'password':
       return localizationKeys('reverification.alternativeMethods.blockButton__password');
     default:
-      throw `Invalid sign in strategy: "${(factor as any).strategy}"`;
+      throw new Error(`Invalid sign in strategy: "${(factor as any).strategy}"`);
   }
 }
 
@@ -123,5 +123,5 @@ export function getButtonIcon(factor: SessionVerificationFirstFactor) {
     password: LockClosedIcon,
   } as const;
 
-  return icons[factor.strategy as keyof typeof icons];
+  return icons[factor.strategy];
 }

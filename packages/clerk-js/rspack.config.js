@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 const rspack = require('@rspack/core');
 const packageJSON = require('./package.json');
 const path = require('path');
@@ -50,7 +50,6 @@ const common = ({ mode, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        BUILD_ENABLE_NEW_COMPONENTS: JSON.stringify(process.env.BUILD_ENABLE_NEW_COMPONENTS),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -82,7 +81,7 @@ const common = ({ mode, disableRHC = false }) => {
             chunks: 'all',
           },
           coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|ieee754|preact|keccak|buffer|string_decoder|sha\.js|base64-js|safe-buffer|util-deprecate|inherits)[\\/]/,
+            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
             name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
@@ -90,25 +89,13 @@ const common = ({ mode, disableRHC = false }) => {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module =>
-              module.resource &&
-              !module.resource.includes('/ui/components') &&
-              !module.resource.includes('packages/elements') &&
-              !module.resource.includes('packages/ui'),
+            test: module => module.resource && !module.resource.includes('/ui/components'),
           },
           defaultVendors: {
             minChunks: 1,
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             priority: -10,
-          },
-          commonNew: {
-            minChunks: 2,
-            name: 'common-new',
-            chunks(chunk) {
-              return !!chunk.name?.startsWith('rebuild--');
-            },
-            priority: 0,
           },
           react: {
             chunks: 'all',
@@ -174,6 +161,17 @@ const typescriptLoaderProd = () => {
         },
       },
     },
+    {
+      test: /\.m?js$/,
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            targets: packageJSON.browserslist,
+          },
+        },
+      },
+    },
   ];
 };
 
@@ -207,37 +205,13 @@ const typescriptLoaderDev = () => {
 };
 
 /**
- * Used in outputs that utilize chunking, and returns a URL to the stylesheet.
- * @type { () => (import('@rspack/core').RuleSetRule) }
- */
-const clerkUICSSLoader = () => {
-  // This emits a module exporting a URL to the styles.css file.
-  return {
-    test: /packages\/ui\/dist\/styles\.css/,
-    type: 'asset/resource',
-  };
-};
-
-/**
- * Used in outputs that _do not_ utilize chunking, and returns the contents of the stylesheet.
- * @type { () => (import('@rspack/core').RuleSetRule) }
- */
-const clerkUICSSSourceLoader = () => {
-  // This emits a module exporting the contents of the styles.css file.
-  return {
-    test: /packages\/ui\/dist\/styles\.css/,
-    type: 'asset/source',
-  };
-};
-
-/**
  * Used for production builds that have dynamicly loaded chunks.
  * @type { () => (import('@rspack/core').Configuration) }
  * */
 const commonForProdChunked = () => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSLoader()],
+      rules: [svgLoader(), ...typescriptLoaderProd()],
     },
   };
 };
@@ -249,7 +223,7 @@ const commonForProdChunked = () => {
 const commonForProdBundled = () => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd(), clerkUICSSSourceLoader()],
+      rules: [svgLoader(), ...typescriptLoaderProd()],
     },
   };
 };
@@ -485,7 +459,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev(), clerkUICSSLoader()],
+        rules: [svgLoader(), ...typescriptLoaderDev()],
       },
       plugins: [
         new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
@@ -519,6 +493,12 @@ const devConfig = ({ mode, env }) => {
               historyApiFallback: true,
             }
           : {}),
+      },
+      cache: true,
+      experiments: {
+        cache: {
+          type: 'persistent',
+        },
       },
     };
   };

@@ -72,9 +72,9 @@ jobs:
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else pnpm changeset status --since=origin/main; fi
 
-      - name: Lint GitHub Actions Workflows
-        run: pnpm eslint .github
-        shell: bash
+      # - name: Lint GitHub Actions Workflows
+      #   run: pnpm eslint .github
+      #   shell: bash
 
       - name: Check Formatting
         run: pnpm format:check
@@ -264,7 +264,7 @@ jobs:
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
-        run: sudo npm install -g pnpm && sudo --preserve-env pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'

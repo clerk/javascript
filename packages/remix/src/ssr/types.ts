@@ -31,10 +31,9 @@ export type RootAuthLoaderOptions = {
    * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
    */
   loadOrganization?: boolean;
-  authorizedParties?: [];
   signInUrl?: string;
   signUpUrl?: string;
-} & Pick<VerifyTokenOptions, 'audience'> &
+} & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
   MultiDomainAndOrProxy &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &

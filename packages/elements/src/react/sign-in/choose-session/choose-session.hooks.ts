@@ -23,17 +23,17 @@ export function useSignInChooseSessionIsActive() {
   return useActiveTags(routerRef, 'step:choose-session');
 }
 
-export type UseSignInActiveSessionListParams = {
+export type UseSignInSessionListParams = {
   omitCurrent: boolean;
 };
 
-export function useSignInActiveSessionList(params?: UseSignInActiveSessionListParams): SignInActiveSessionListItem[] {
+export function useSignInSessionList(params?: UseSignInSessionListParams): SignInActiveSessionListItem[] {
   const { omitCurrent = true } = params || {};
 
   return SignInRouterCtx.useSelector(state => {
-    const activeSessions = state.context.clerk?.client?.activeSessions || [];
+    const signedInSessions = state.context.clerk?.client?.signedInSessions || [];
     const currentSessionId = state.context.clerk?.session?.id;
-    const filteredSessions = omitCurrent ? activeSessions.filter(s => s.id !== currentSessionId) : activeSessions;
+    const filteredSessions = omitCurrent ? signedInSessions.filter(s => s.id !== currentSessionId) : signedInSessions;
 
     return filteredSessions.map(s => ({
       id: s.id,

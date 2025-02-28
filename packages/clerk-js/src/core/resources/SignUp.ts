@@ -86,7 +86,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
-      const captchaParams = await captchaChallenge.managedOrInvisible();
+      const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signup' });
       if (!captchaParams) {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
@@ -337,6 +337,10 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
     });
+  };
+
+  upsert = (params: SignUpCreateParams | SignUpUpdateParams): Promise<SignUpResource> => {
+    return this.id ? this.update(params) : this.create(params);
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {

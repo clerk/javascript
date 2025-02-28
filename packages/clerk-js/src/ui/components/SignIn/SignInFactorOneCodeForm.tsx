@@ -1,12 +1,12 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
-import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
+import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
@@ -37,22 +37,39 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
+  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
+
   const goBack = () => {
     return navigate('../');
   };
 
-  React.useEffect(() => {
-    if (!props.factorAlreadyPrepared) {
-      prepare();
-    }
-  }, []);
-
   const prepare = () => {
+    if (shouldAvoidPrepare) {
+      return;
+    }
+
     void signIn
       .prepareFirstFactor(props.factor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
+
+  useFetch(
+    shouldAvoidPrepare
+      ? undefined
+      : () =>
+          signIn
+            ?.prepareFirstFactor(props.factor)
+            .then(() => props.onFactorPrepare())
+            .catch(err => handleError(err, [], card.setError)),
+    {
+      name: 'signIn.prepareFirstFactor',
+      factor: props.factor,
+    },
+    {
+      staleTime: 100,
+    },
+  );
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn

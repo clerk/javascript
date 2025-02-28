@@ -1,5 +1,236 @@
 # @clerk/vue
 
+## 1.3.0
+
+### Minor Changes
+
+- Introduce `updateClerkOptions()` utility function to update Clerk options on the fly. ([#5235](https://github.com/clerk/javascript/pull/5235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```vue
+  <script setup>
+  import { updateClerkOptions } from '@clerk/vue';
+  import { dark } from '@clerk/themes';
+  import { frFR } from '@clerk/localizations';
+
+  function enableDarkTheme() {
+    updateClerkOptions({
+      appearance: {
+        baseTheme: dark,
+      },
+    });
+  }
+
+  function changeToFrench() {
+    updateClerkOptions({
+      localization: frFR,
+    });
+  }
+  </script>
+
+  <template>
+    <button @click="enableDarkTheme">Enable Dark Theme</button>
+    <button @click="changeToFrench">Change to French</button>
+  </template>
+  ```
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- The [`exports` map](https://nodejs.org/api/packages.html#conditional-exports) inside `package.json` has been slightly adjusted to allow for [`require(esm)`](https://joyeecheung.github.io/blog/2024/03/18/require-esm-in-node-js/) to work correctly. The `"import"` conditions have been changed to `"default"`. ([#5188](https://github.com/clerk/javascript/pull/5188)) by [@LekoArts](https://github.com/LekoArts)
+
+  You shouldn't see any change in behavior/functionality on your end.
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+
+## 1.2.1
+
+### Patch Changes
+
+- Previously, the `getCurrentOrganizationMembership()` function was duplicated in both `@clerk/vue` and `@clerk/shared/react`. This change moves the function to `@clerk/shared/organization`. ([#5168](https://github.com/clerk/javascript/pull/5168)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Re-export error handling utilities from `@clerk/shared` ([#5155](https://github.com/clerk/javascript/pull/5155)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { useSignIn } from '@clerk/vue';
+  import { isClerkAPIResponseError } from '@clerk/vue/errors';
+
+  // ... form state refs and other setup ...
+  const { signIn } = useSignIn();
+
+  const handleSubmit = async () => {
+    try {
+      const signInAttempt = await signIn.value.create({
+        identifier: email.value,
+        password: password.value,
+      });
+      // ... handle successful sign in ...
+    } catch (err) {
+      // Type guard to safely handle Clerk API errors
+      if (isClerkAPIResponseError(err)) {
+        errors.value = err.errors; // err.errors is properly typed as ClerkAPIError[]
+      }
+    }
+  };
+  </script>
+
+  <template>
+    <!-- Form template here -->
+  </template>
+  ```
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+
+## 1.2.0
+
+### Minor Changes
+
+- Add support for `<OrganizationProfile>` custom pages and links through `<OrganizationSwitcher>` ([#5129](https://github.com/clerk/javascript/pull/5129)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { OrganizationSwitcher } from '@clerk/vue';
+  import Icon from './Icon.vue';
+  </script>
+
+  <template>
+    <header>
+      <OrganizationSwitcher>
+        <OrganizationSwitcher.OrganizationProfilePage
+          label="Custom Page"
+          url="custom"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+          <div>
+            <h1>Custom Organization Profile Page</h1>
+            <p>This is the custom organization profile page</p>
+          </div>
+        </OrganizationSwitcher.OrganizationProfilePage>
+        <OrganizationSwitcher.OrganizationProfileLink
+          label="Homepage"
+          url="/"
+        >
+          <template #labelIcon>
+            <Icon />
+          </template>
+        </OrganizationSwitcher.OrganizationProfileLink>
+      </OrganizationSwitcher>
+    </header>
+  </template>
+  ```
+
+### Patch Changes
+
+- Add the ability to specify an appearance for modal component usages. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adds ability to render custom `<UserProfile>` links inside `<UserButton>` component. ([#5128](https://github.com/clerk/javascript/pull/5128)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup>
+  import { UserButton } from '@clerk/vue';
+  </script>
+
+  <template>
+    <UserButton>
+      <UserButton.UserProfileLink
+        label="Homepage"
+        url="/"
+      >
+        <template #labelIcon>
+          <div>Icon</div>
+        </template>
+      </UserButton.UserProfileLink>
+    </UserButton>
+  </template>
+  ```
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d)]:
+  - @clerk/types@4.46.0
+  - @clerk/shared@2.21.1
+
+## 1.1.11
+
+### Patch Changes
+
+- Remove `customPages` prop types from `<UserProfile />`, `<OrganizationProfile />` and `<UserButton />` to align with runtime behavior. ([#5101](https://github.com/clerk/javascript/pull/5101)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472)]:
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
+## 1.1.10
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/shared@2.20.18
+
+## 1.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+
+## 1.1.8
+
+### Patch Changes
+
+- Improve runtime prop checking of all Vue Clerk components ([#5022](https://github.com/clerk/javascript/pull/5022)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/types@4.44.2
+
+## 1.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5)]:
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+
+## 1.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/shared@2.20.14
+
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/shared@2.20.13
+  - @clerk/types@4.43.0
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/shared@2.20.12
+
 ## 1.1.3
 
 ### Patch Changes

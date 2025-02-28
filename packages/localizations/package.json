@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.9.12",
+  "version": "3.10.8",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -99,14 +99,13 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
-    "lint": "eslint src/"
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
     "@clerk/types": "workspace:^"
   },
-  "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
   },

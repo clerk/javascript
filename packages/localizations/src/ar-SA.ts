@@ -129,6 +129,7 @@ export const arSA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'دعوة',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: undefined,
@@ -459,6 +460,7 @@ export const arSA: LocalizationResource = {
       actionText: 'ليس لديك حساب؟',
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
       titleCombined: undefined,
     },
@@ -538,7 +540,9 @@ export const arSA: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'أنشاء حساب جديد',
+      titleCombined: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -693,6 +697,11 @@ export const arSA: LocalizationResource = {
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'سيتم حذف هذا الإيميل من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول باستخدام عنوان البريد الإلكتروني هذا.',

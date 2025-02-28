@@ -3,5 +3,6 @@
  */
 const fs = undefined;
 const path = undefined;
+const cwd = undefined;
 
-module.exports = { fs, path };
+module.exports = { fs, path, cwd };

@@ -131,6 +131,7 @@ export const esMX: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Eliminar miembro',
         tableHeader__actions: undefined,
@@ -464,6 +465,7 @@ export const esMX: LocalizationResource = {
       actionText: '¿No tiene cuenta?',
       actionText__join_waitlist: undefined,
       subtitle: 'para continuar con {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Iniciar sesión',
       titleCombined: undefined,
     },
@@ -543,7 +545,9 @@ export const esMX: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar con {{applicationName}}',
+      subtitleCombined: 'para continuar con {{applicationName}}',
       title: 'Crea tu cuenta',
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
@@ -701,6 +705,11 @@ export const esMX: LocalizationResource = {
         resendButton: 'Reenviar enlace',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} será eliminado de esta cuenta.',
         messageLine2: 'Ya no podrá iniciar sesión con esta dirección de correo electrónico.',
@@ -811,7 +820,7 @@ export const esMX: LocalizationResource = {
       imageFormTitle: 'Imagen de perfil',
       readonly: 'Tu información de perfil ha sido proporcionada por la conexión de empresa y no se puede editar.',
       successMessage: 'Tu perfil ha sido actualizado.',
-      title: 'Actualizar Cuenta',
+      title: 'Actualizar perfil',
     },
     start: {
       activeDevicesSection: {
@@ -883,7 +892,7 @@ export const esMX: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {

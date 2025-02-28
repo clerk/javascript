@@ -64,6 +64,7 @@ export type GetRolesParams = ClerkPaginationParams;
 
 export type GetMembersParams = ClerkPaginationParams<{
   role?: OrganizationCustomRoleKey[];
+  query?: string;
 }>;
 
 export type GetDomainsParams = ClerkPaginationParams<{

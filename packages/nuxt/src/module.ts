@@ -1,6 +1,7 @@
 import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
 import {
   addComponent,
+  addImports,
   addImportsDir,
   addPlugin,
   addServerHandler,
@@ -96,8 +97,18 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // Add auto-imports for Clerk components and composables
+    // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
+    addImports([
+      {
+        name: 'createRouteMatcher',
+        from: resolver.resolve('./runtime/client'),
+      },
+      {
+        name: 'updateClerkOptions',
+        from: resolver.resolve('./runtime/client'),
+      },
+    ]);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const components: Array<keyof typeof import('@clerk/vue')> = [
@@ -128,6 +139,7 @@ export default defineNuxtModule<ModuleOptions>({
       'RedirectToCreateOrganization',
       'SignedIn',
       'SignedOut',
+      'Waitlist',
     ];
     components.forEach(component => {
       void addComponent({

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.2.9",
+  "version": "2.2.20",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -34,15 +34,14 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "dev": "tsc -p tsconfig.build.json --watch",
-    "lint": "eslint src/"
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
     "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
-  "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.17.0"
   },

@@ -1,6 +1,6 @@
 import { waitForElement } from '@clerk/shared/dom';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaWidgetType } from '@clerk/types';
+import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/types';
 
 import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
@@ -8,6 +8,12 @@ import type { CaptchaOptions } from './types';
 // We use the explicit render mode to be able to control when the widget is rendered.
 // CF docs: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#disable-implicit-rendering
 const CLOUDFLARE_TURNSTILE_ORIGINAL_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+type CaptchaAttributes = {
+  theme?: RenderOptions['theme'];
+  language?: RenderOptions['language'];
+  size: RenderOptions['size'];
+};
 
 interface RenderOptions {
   /**
@@ -58,6 +64,30 @@ interface RenderOptions {
    * @default 'always'
    */
   appearance?: 'always' | 'execute' | 'interaction-only';
+  /**
+   * The widget theme. Can take the following values: light, dark, auto.
+   * The default is auto, which respects the user preference. This can be forced to light or dark by setting the theme accordingly.
+   * @default 'auto'
+   */
+  theme?: CaptchaAppearanceOptions['theme'];
+  /**
+   * The widget size. Can take the following values: normal, flexible, compact.
+   * @default 'normal'
+   */
+  size?: CaptchaAppearanceOptions['size'];
+  /**
+   * Language to display, must be either: auto (default) to use the language that the visitor has chosen,
+   * or an ISO 639-1 two-letter language code (e.g. en) or language and country code (e.g. en-US).
+   * Refer to the list of supported languages for more information.
+   * https://developers.cloudflare.com/turnstile/reference/supported-languages
+   */
+  language?: CaptchaAppearanceOptions['language'];
+  /**
+   * A custom value that can be used to differentiate widgets under the same sitekey
+   * in analytics and which is returned upon validation. This can only contain up to
+   * 32 alphanumeric characters including _ and -.
+   */
+  action?: string;
 }
 
 interface Turnstile {
@@ -81,6 +111,7 @@ export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
 async function loadCaptcha() {
   if (!window.turnstile) {
     await loadCaptchaFromCloudflareURL().catch(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw { captchaError: 'captcha_script_failed_to_load' };
     });
   }
@@ -89,6 +120,10 @@ async function loadCaptcha() {
 
 async function loadCaptchaFromCloudflareURL() {
   try {
+    if (__BUILD_DISABLE_RHC__) {
+      return Promise.reject(new Error('Captcha not supported in this environment'));
+    }
+
     return await loadScript(CLOUDFLARE_TURNSTILE_ORIGINAL_URL, { defer: true });
   } catch (err) {
     console.warn(
@@ -96,6 +131,14 @@ async function loadCaptchaFromCloudflareURL() {
     );
     throw err;
   }
+}
+
+function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
+  const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
+  const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
+  const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
+
+  return { theme, language, size };
 }
 
 /*
@@ -114,6 +157,9 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let captchaToken = '';
   let id = '';
   let turnstileSiteKey = siteKey;
+  let captchaTheme: RenderOptions['theme'];
+  let captchaSize: RenderOptions['size'];
+  let captchaLanguage: RenderOptions['language'];
   let retries = 0;
   let widgetContainerQuerySelector: string | undefined;
   // The backend uses this to determine which Turnstile site-key was used in order to verify the token
@@ -127,7 +173,13 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     captchaWidgetType = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
     await openModal?.();
-    await waitForElement(modalContainerQuerySelector);
+    const modalContainderEl = await waitForElement(modalContainerQuerySelector);
+    if (modalContainderEl) {
+      const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
+      captchaTheme = theme;
+      captchaLanguage = language;
+      captchaSize = size;
+    }
   }
 
   // smart widget with container provided by user
@@ -136,6 +188,11 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     if (visibleDiv) {
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
+      visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
+      const { theme, language, size } = getCaptchaAttibutesFromElemenet(visibleDiv);
+      captchaTheme = theme;
+      captchaLanguage = language;
+      captchaSize = size;
     } else {
       console.error(
         'Cannot initialize Smart CAPTCHA widget because the `clerk-captcha` DOM element was not found; falling back to Invisible CAPTCHA widget. If you are using a custom flow, visit https://clerk.com/docs/custom-flows/bot-sign-up-protection for instructions',
@@ -150,6 +207,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    div.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
     document.body.appendChild(div);
   }
 
@@ -159,6 +217,10 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
         const id = captcha.render(widgetContainerQuerySelector, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
+          theme: captchaTheme || 'auto',
+          size: captchaSize || 'normal',
+          language: captchaLanguage || 'auto',
+          action: opts.action,
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
@@ -173,8 +235,12 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
             } else {
               const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
               if (visibleWidget) {
+                // We unset the max-height to allow the widget to expand
                 visibleWidget.style.maxHeight = 'unset';
-                visibleWidget.style.minHeight = '68px'; // this is the height of the Turnstile widget
+                // We set the min-height to the height of the Turnstile widget
+                // because the widget initially does a small layout shift
+                // and then expands to the correct height
+                visibleWidget.style.minHeight = captchaSize === 'compact' ? '140px' : '68px';
                 visibleWidget.style.marginBottom = '1.5rem';
               }
             }
@@ -219,6 +285,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
       // After a failed challenge remove it
       captcha.remove(id);
     }
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw {
       captchaError: e,
     };

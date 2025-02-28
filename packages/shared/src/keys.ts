@@ -69,14 +69,22 @@ export function parsePublishableKey(
   };
 }
 
-export function isPublishableKey(key: string) {
-  key = key || '';
+/**
+ * Checks if the provided key is a valid publishable key.
+ *
+ * @param key - The key to be checked. Defaults to an empty string if not provided.
+ * @returns `true` if 'key' is a valid publishable key, `false` otherwise.
+ */
+export function isPublishableKey(key: string = '') {
+  try {
+    const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
 
-  const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
+    const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
 
-  const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
-
-  return hasValidPrefix && hasValidFrontendApiPostfix;
+    return hasValidPrefix && hasValidFrontendApiPostfix;
+  } catch {
+    return false;
+  }
 }
 
 export function createDevOrStagingUrlCache() {

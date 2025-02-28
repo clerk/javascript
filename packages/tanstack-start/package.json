@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-start",
-  "version": "0.8.13",
+  "version": "0.11.0",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
@@ -53,8 +53,8 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig"
   },
@@ -63,18 +63,17 @@
     "@clerk/clerk-react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "tslib": "catalog:repo"
+    "tslib": "catalog:repo",
+    "vinxi": "^0.5.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
-    "@tanstack/react-router": "^1.81.9",
-    "@tanstack/start": "^1.81.9",
-    "esbuild-plugin-file-path-extensions": "^2.1.2",
-    "vinxi": "^0.4.1"
+    "@tanstack/react-router": "^1.111.7",
+    "@tanstack/react-start": "^1.111.10",
+    "esbuild-plugin-file-path-extensions": "^2.1.2"
   },
   "peerDependencies": {
-    "@tanstack/react-router": ">=1.81.9",
-    "@tanstack/start": ">=1.81.9",
+    "@tanstack/react-router": ">=1.111.7",
+    "@tanstack/react-start": ">=1.111.10",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },

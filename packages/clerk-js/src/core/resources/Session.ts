@@ -1,6 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { is4xxError } from '@clerk/shared/error';
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
+import { retry } from '@clerk/shared/retry';
 import type {
   ActJWTClaim,
   CheckAuthorization,
@@ -12,6 +12,7 @@ import type {
   SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
+  SessionTask,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -42,6 +43,7 @@ export class Session extends BaseResource implements SessionResource {
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
+  tasks: Array<SessionTask> | null = null;
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -84,7 +86,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    return runWithExponentialBackOff(() => this._getToken(options), {
+    return retry(() => this._getToken(options), {
       shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
     });
   };
@@ -224,6 +226,7 @@ export class Session extends BaseResource implements SessionResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
+    this.tasks = data.tasks;
 
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
@@ -245,6 +248,7 @@ export class Session extends BaseResource implements SessionResource {
       last_active_at: this.lastActiveAt.getTime(),
       last_active_organization_id: this.lastActiveOrganizationId,
       actor: this.actor,
+      tasks: this.tasks,
       user: this.user?.__internal_toSnapshot() || null,
       public_user_data: this.publicUserData.__internal_toSnapshot(),
       last_active_token: this.lastActiveToken?.__internal_toSnapshot() || null,

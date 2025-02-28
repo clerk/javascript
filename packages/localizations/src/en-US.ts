@@ -118,6 +118,7 @@ export const enUS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: 'Search',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -449,6 +450,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
+      subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
     },
@@ -530,7 +532,9 @@ export const enUS: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
+      titleCombined: 'Create your account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -692,6 +696,11 @@ export const enUS: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      enterpriseSSOLink: {
+        formButton: 'Click to sign-in',
+        formSubtitle: 'Complete the sign-in with {{identifier}}',
+      },
+      formHint: "You'll need to verify this email address before it can be added to your account.",
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',
@@ -855,6 +864,7 @@ export const enUS: LocalizationResource = {
         },
       },
       passkeysSection: {
+        primaryButton: 'Add a passkey',
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
         title: 'Passkeys',

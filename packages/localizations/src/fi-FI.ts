@@ -130,6 +130,7 @@ export const fiFI: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Kutsu',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -461,6 +462,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Eikö sinulla ole tiliä?',
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
       titleCombined: undefined,
     },
@@ -509,13 +511,14 @@ export const fiFI: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Hyväksyn {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
+        label__onlyTermsOfService: 'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }} ja {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Lue ja hyväksy ehdot jatkaaksesi',
+        title: 'Käyttöehdot ja tietosuojaseloste',
       },
     },
     phoneCode: {
@@ -540,7 +543,9 @@ export const fiFI: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
+      subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
+      titleCombined: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -696,6 +701,11 @@ export const fiFI: LocalizationResource = {
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
         messageLine2:

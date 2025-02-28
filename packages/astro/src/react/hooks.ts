@@ -9,7 +9,6 @@ import type {
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 
-// @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
 import { $authStore } from '../stores/external';

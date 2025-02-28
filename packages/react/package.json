@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.22.3",
+  "version": "5.24.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -64,11 +64,12 @@
   "scripts": {
     "build": "tsup",
     "postbuild": "node ../../scripts/subpath-workaround.mjs react",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev --env.publish",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
@@ -80,7 +81,6 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "@clerk/localizations": "workspace:*",
     "@clerk/themes": "workspace:*",
     "@types/semver": "^7.5.8"

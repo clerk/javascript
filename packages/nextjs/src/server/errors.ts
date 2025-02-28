@@ -20,23 +20,14 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 
 export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth');
 
-export const authAuthHeaderMissing = (helperName = 'auth') =>
+export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[]) =>
   `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
--  clerkMiddleware() is used in your Next.js Middleware.
+- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js Middleware.
 - Your Middleware matcher is configured to match this route or page.
 - If you are using the src directory, make sure the Middleware file is inside of it.
 
 For more details, see https://clerk.com/docs/quickstarts/nextjs
 `;
-
-export const clockSkewDetected = (verifyMessage: string) =>
-  `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will continuously try to issue new tokens, as the existing ones will be treated as "expired" due to clock skew.
-
-To resolve this issue, make sure your system's clock is set to the correct time (e.g. turn off and on automatic time synchronization).
-
----
-
-${verifyMessage}`;
 
 export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/references/nextjs/clerk-middleware. (code=auth_signature_invalid)`;
 

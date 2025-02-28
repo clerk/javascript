@@ -403,7 +403,6 @@ const Components = (props: ComponentsProps) => {
       startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
       componentName={'UserVerificationModal'}
       modalContainerSx={{ alignItems: 'center' }}
-      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >
       <UserVerificationModal {...userVerificationModal} />
     </LazyModalRenderer>
@@ -463,13 +462,15 @@ const Components = (props: ComponentsProps) => {
   );
 
   const mountedBlankCaptchaModal = (
+    /**
+     * Captcha modal should not close on `Clerk.navigate()`, hence we are not passing `onExternalNavigate`.
+     */
     <LazyModalRenderer
       globalAppearance={state.appearance}
       appearanceKey={'blankCaptcha' as any}
       componentAppearance={{}}
       flowName={'blankCaptcha'}
       onClose={() => componentsControls.closeModal('blankCaptcha')}
-      onExternalNavigate={() => componentsControls.closeModal('blankCaptcha')}
       startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
       componentName={'BlankCaptchaModal'}
       canCloseModal={false}
@@ -517,14 +518,16 @@ const Components = (props: ComponentsProps) => {
           </LazyImpersonationFabProvider>
         )}
 
-        {state.options?.__internal_claimKeylessApplicationUrl && state.options?.__internal_copyInstanceKeysUrl && (
-          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-            <KeylessPrompt
-              claimUrl={state.options.__internal_claimKeylessApplicationUrl}
-              copyKeysUrl={state.options.__internal_copyInstanceKeysUrl}
-            />
-          </LazyImpersonationFabProvider>
-        )}
+        {state.options?.__internal_keyless_claimKeylessApplicationUrl &&
+          state.options?.__internal_keyless_copyInstanceKeysUrl && (
+            <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+              <KeylessPrompt
+                claimUrl={state.options.__internal_keyless_claimKeylessApplicationUrl}
+                copyKeysUrl={state.options.__internal_keyless_copyInstanceKeysUrl}
+                onDismiss={state.options.__internal_keyless_dismissPrompt}
+              />
+            </LazyImpersonationFabProvider>
+          )}
 
         <Suspense>{state.organizationSwitcherPrefetch && <OrganizationSwitcherPrefetch />}</Suspense>
       </LazyProviders>

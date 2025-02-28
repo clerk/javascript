@@ -129,6 +129,7 @@ export const thTH: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'เชิญ',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'ลบสมาชิก',
         tableHeader__actions: 'การดำเนินการ',
@@ -456,6 +457,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่มีบัญชีหรือ?',
       actionText__join_waitlist: 'ต้องการเข้าถึงก่อนใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับกลับ! โปรดเข้าสู่ระบบเพื่อดำเนินการต่อ',
+      subtitleCombined: undefined,
       title: 'เข้าสู่ระบบ {{applicationName}}',
       titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
     },
@@ -537,7 +539,9 @@ export const thTH: LocalizationResource = {
       actionLink__use_phone: 'ใช้โทรศัพท์แทน',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
+      subtitleCombined: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
+      titleCombined: 'สร้างบัญชีของคุณ',
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
@@ -693,6 +697,11 @@ export const thTH: LocalizationResource = {
         resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} จะถูกนำออกจากบัญชีนี้',
         messageLine2: 'คุณจะไม่สามารถเข้าสู่ระบบโดยใช้อีเมลที่อยู่นี้ได้อีกต่อไป',

@@ -429,14 +429,23 @@ export function _SignInStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            {isCombinedFlow ? (
-              <Header.Title localizationKey={localizationKeys('signIn.start.titleCombined')} />
-            ) : (
-              <>
-                <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-                <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
-              </>
-            )}
+            <Header.Title
+              localizationKey={
+                isCombinedFlow ? localizationKeys('signIn.start.titleCombined') : localizationKeys('signIn.start.title')
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signIn.start.subtitleCombined')
+                  : localizationKeys('signIn.start.subtitle')
+              }
+              sx={{
+                '&:empty': {
+                  display: 'none',
+                },
+              }}
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}

@@ -2,20 +2,7 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useTransition } from 'react';
 
-import type { NextClerkProviderProps } from '../../types';
 import { removeBasePath } from '../../utils/removeBasePath';
-
-declare global {
-  interface Window {
-    __clerk_internal_navigations: Record<
-      string,
-      {
-        fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
-        promisesBuffer: Array<() => void> | undefined;
-      }
-    >;
-  }
-}
 
 const getClerkNavigationObject = (name: string) => {
   window.__clerk_internal_navigations ??= {};
@@ -28,7 +15,7 @@ export const useInternalNavFun = (props: {
   windowNav: typeof window.history.pushState | typeof window.history.replaceState | undefined;
   routerNav: AppRouterInstance['push'] | AppRouterInstance['replace'];
   name: string;
-}) => {
+}): NavigationFunction => {
   const { windowNav, routerNav, name } = props;
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -81,8 +68,8 @@ export const useInternalNavFun = (props: {
     }
   }, [pathname, isPending]);
 
-  return useCallback((to: string) => {
-    return getClerkNavigationObject(name).fun(to);
+  return useCallback<NavigationFunction>((to, metadata) => {
+    return getClerkNavigationObject(name).fun(to, metadata);
     // We are not expecting name to change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
