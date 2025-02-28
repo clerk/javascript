@@ -1,14 +1,14 @@
-import type { OrganizationCustomRoleKey } from 'organizationMembership';
-import type { SignInResource } from 'signIn';
-
 import type { SetActive, SignOut } from './clerk';
 import type { ActJWTClaim } from './jwt';
+import type { JwtPayload } from './jwtv2';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
   SignedInSessionResource,
 } from './session';
+import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
@@ -37,6 +37,7 @@ export type UseAuthReturn =
        * The ID for the current session.
        */
       sessionId: undefined;
+      sessionClaims: undefined;
       actor: undefined;
       /**
        * The ID of the user's active organization.
@@ -68,6 +69,7 @@ export type UseAuthReturn =
       isSignedIn: false;
       userId: null;
       sessionId: null;
+      sessionClaims: null;
       actor: null;
       orgId: null;
       orgRole: null;
@@ -81,6 +83,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActJWTClaim | null;
       orgId: null;
       orgRole: null;
@@ -94,6 +97,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActJWTClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
