@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.54.2
+
+### Patch Changes
+
+- Fixes a bug in `Clerk.signOut()` that was preventing the after sign out redirect from occurring in Next.js v15. ([#5171](https://github.com/clerk/javascript/pull/5171)) by [@brkalow](https://github.com/brkalow)
+
 ## 5.54.1
 
 ### Patch Changes

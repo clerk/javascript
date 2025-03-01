@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.24.1
+
+### Patch Changes
+
+- Enhance RedirectToSignIn session check for compatibility with older clerk-js versions ([#5261](https://github.com/clerk/javascript/pull/5261)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.24.0
 
 ### Minor Changes
