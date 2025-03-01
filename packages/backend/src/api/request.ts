@@ -91,11 +91,16 @@ export function buildRequest(options: BuildRequestOptions) {
 
     // Build headers
     const headers: Record<string, any> = {
-      Authorization: `Bearer ${secretKey}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
     };
+
+    if (secretKey) {
+      Object.assign(headers, {
+        Authorization: `Bearer ${secretKey}`,
+      });
+    }
 
     let res: Response | undefined;
     try {
