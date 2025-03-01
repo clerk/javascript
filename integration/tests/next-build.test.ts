@@ -202,7 +202,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // Get the indicator from the build output
       const indicator = getIndicator(app.buildOutput, type);
 
-      const pageLine = app.buildOutput.split('\n').find(msg => msg.includes(page));
+      const pageLine = app.buildOutput.split('\n').find(msg => msg.includes(` ${page}`));
 
       expect(pageLine).toContain(indicator);
     });
