@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.12.2
+
+### Patch Changes
+
+- Adjusts logic for router cache busting in Next.js 15. Fixes an issue where a server action was getting called unnecessarily during sign out. ([#5171](https://github.com/clerk/javascript/pull/5171)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`3d436484eb01b42e0008b6675f4be68f15d21079`](https://github.com/clerk/javascript/commit/3d436484eb01b42e0008b6675f4be68f15d21079)]:
+  - @clerk/clerk-react@5.24.1
+
 ## 6.12.1
 
 ### Patch Changes
