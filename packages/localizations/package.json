@@ -91,7 +91,8 @@
     "th-TH",
     "hu-HU",
     "sr-RS",
-    "hr-HR"
+    "hr-HR",
+    "es-UY"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
