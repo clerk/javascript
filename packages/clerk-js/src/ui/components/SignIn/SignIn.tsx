@@ -39,6 +39,8 @@ function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
 
+  debugger;
+
   return (
     <Flow.Root flow='signIn'>
       <Switch>
@@ -145,6 +147,9 @@ function SignInRoutes(): JSX.Element {
 
 function SignInRoot() {
   const signInContext = useSignInContext();
+
+  debugger;
+
   const normalizedSignUpContext = {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
