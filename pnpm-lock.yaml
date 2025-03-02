@@ -935,7 +935,7 @@ importers:
         specifier: catalog:repo
         version: 2.4.1
       vinxi:
-        specifier: ^0.5.1
+        specifier: ^0.5.3
         version: 0.5.3(@types/node@22.13.4)(db0@0.2.3)(ioredis@5.4.2)(jiti@2.4.2)(terser@5.37.0)(tsx@4.19.2)(typescript@5.6.3)(yaml@2.7.0)
     devDependencies:
       '@tanstack/react-router':

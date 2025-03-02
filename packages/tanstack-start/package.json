@@ -64,7 +64,7 @@
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "tslib": "catalog:repo",
-    "vinxi": "^0.5.1"
+    "vinxi": "^0.5.3"
   },
   "devDependencies": {
     "@tanstack/react-router": "^1.111.7",
