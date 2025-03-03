@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.22.23",
+  "version": "0.23.1",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -63,7 +63,6 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
-    "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"pnpm dev -w @clerk/ui\" \"cd ../ui/theme-builder && pnpm dev\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",

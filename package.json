@@ -10,7 +10,7 @@
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
     "clean": "turbo clean",
-    "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/tailwindcss-transformer --filter=!@clerk/remix --filter=!@clerk/ui --filter=!@clerk/chrome-extension",
+    "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/clerk-expo --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/remix --filter=!@clerk/chrome-extension",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "format": "prettier --write .",
     "format:check": "prettier --cache --check .",
@@ -55,13 +55,13 @@
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",
-    "@arethetypeswrong/cli": "0.17.3",
+    "@arethetypeswrong/cli": "0.17.4",
     "@changesets/cli": "^2.26.2",
     "@changesets/get-github-info": "^0.5.2",
     "@clerk/backend": "workspace:*",
     "@clerk/shared": "workspace:*",
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
     "@emotion/jest": "^11.11.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "9.18.0",
@@ -115,10 +115,10 @@
     "json5": "2.2.3",
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
-    "prettier": "^3.3.3",
+    "prettier": "^3.5.2",
     "prettier-plugin-packagejson": "^2.5.3",
     "prettier-plugin-tailwindcss": "^0.6.3",
-    "publint": "^0.2.4",
+    "publint": "^0.3.6",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rimraf": "6.0.1",
@@ -146,7 +146,7 @@
   "pnpm": {
     "overrides": {
       "jest": "29.7.0",
-      "jest-snapshot-prettier": "npm:prettier@^3"
+      "jest-snapshot-prettier": "npm:prettier@^3.5.2"
     },
     "patchedDependencies": {
       "yalc@1.0.0-pre.53": "patches/yalc@1.0.0-pre.53.patch"
