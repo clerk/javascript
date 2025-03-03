@@ -38,6 +38,7 @@
     "test:integration:expo-web": "E2E_APP_ID=expo.expo-web pnpm test:integration:base --grep @expo-web",
     "test:integration:express": "E2E_APP_ID=express.* pnpm test:integration:base --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes* pnpm test:integration:base --grep @generic",
+    "test:integration:localhost": "pnpm test:integration:base --grep @localhost",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
     "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
