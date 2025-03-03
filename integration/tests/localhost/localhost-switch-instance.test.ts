@@ -13,7 +13,7 @@ import { expect, test } from '@playwright/test';
 import { getPort } from '../../scripts';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
-import { getEnvForMultiAppInstance, prepareApplication } from './utils';
+import { getEnvForMultiAppInstance, prepareApplication } from '../sessions/utils';
 
 test.describe('switching instances on localhost same port @sessions', () => {
   test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });

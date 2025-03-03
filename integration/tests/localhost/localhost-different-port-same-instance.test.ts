@@ -12,7 +12,7 @@ import { expect, test } from '@playwright/test';
 import type { Application } from '../../models/application';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
-import { prepareApplication } from './utils';
+import { prepareApplication } from '../sessions/utils';
 
 test.describe('multiple apps running on localhost using same Clerk instance @sessions', () => {
   test.describe.configure({ mode: 'serial' });
