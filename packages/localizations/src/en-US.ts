@@ -11,6 +11,7 @@ export const enUS: LocalizationResource = {
   badge__unverified: 'Unverified',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  badge__currentPlan: 'Current Plan',
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -86,6 +87,11 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
+  commerce_month: 'Month',
+  commerce_free: 'Free',
+  commerce_getStarted: 'Get started',
+  commerce_manageMembership: 'Manage membership',
+  commerce_switchPlan: 'Switch to this plan',
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
@@ -660,6 +666,14 @@ export const enUS: LocalizationResource = {
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
     },
+    billingPage: {
+      title: 'Billing & Payments',
+      start: {
+        headerTitle__plans: 'Plans',
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentSources: 'Payment Sources',
+      },
+    },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
       formHint__noAccounts: 'There are no available external account providers.',
@@ -769,6 +783,7 @@ export const enUS: LocalizationResource = {
       account: 'Profile',
       description: 'Manage your account info.',
       security: 'Security',
+      billing: 'Billing',
       title: 'Account',
     },
     passkeyScreen: {

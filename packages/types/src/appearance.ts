@@ -666,6 +666,8 @@ export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
+export type PricingTableTheme = Theme;
+export type CheckoutTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -712,4 +714,12 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<Waitlist />` component
    */
   waitlist?: T;
+  /**
+   * Theme overrides that only apply to the `<PricingTable />` component
+   */
+  pricingTable?: T;
+  /**
+   * Theme overrides that only apply to the `<Checkout />` component
+   */
+  checkout?: T;
 };
