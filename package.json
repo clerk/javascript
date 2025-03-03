@@ -42,7 +42,7 @@
     "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
     "test:integration:react-router": "E2E_APP_ID=react-router.* npm run test:integration:base -- --grep @react-router",
-    "test:integration:sessions": "pnpm test:integration:base --grep @sessions",
+    "test:integration:sessions": "DISABLE_WEB_SECURITY=true pnpm test:integration:base --grep @sessions",
     "test:integration:tanstack-router": "E2E_APP_ID=tanstack.router pnpm test:integration:base --grep @tanstack-router",
     "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start pnpm test:integration:base --grep @tanstack-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
