@@ -42,7 +42,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome',
         launchOptions: {
-          args: [process.env.DISABLE_WEB_SECURITY ? '--disable-web-security' : undefined],
+          args: [process.env.DISABLE_WEB_SECURITY ? '--disable-web-security' : ''],
         },
       },
 
