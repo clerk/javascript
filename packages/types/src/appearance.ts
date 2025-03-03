@@ -329,6 +329,7 @@ export type ElementsConfig = {
   planCardFeatures: WithOptions;
   planCardFeaturesList: WithOptions;
   planCardFeaturesListItem: WithOptions<string>;
+  planCardAction: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;

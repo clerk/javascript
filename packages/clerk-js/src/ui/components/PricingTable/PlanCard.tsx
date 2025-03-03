@@ -1,4 +1,5 @@
 import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
+import * as React from 'react';
 
 import { Badge, Box, Button, descriptors, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
 import { Avatar } from '../../elements';
@@ -15,9 +16,9 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const { plan, period, setPeriod, onSelect } = props;
+  const { plan, period, setPeriod, onSelect, props: pricingTableProps } = props;
+  const { ctaPosition, collapseFeatures } = pricingTableProps;
   const isActivePlan = plan.isActiveForPayer;
-  const hasFeatures = plan.features.length;
   return (
     <Box
       key={plan.id}
@@ -25,7 +26,7 @@ export function PlanCard(props: PlanCardProps) {
       elementId={descriptors.planCard.setId(plan.slug)}
       sx={t => ({
         display: 'grid',
-        gridRow: 'span 6',
+        gridRow: collapseFeatures ? 'span 5' : 'span 6',
         gridTemplateRows: 'subgrid',
         rowGap: '0',
         backgroundColor: t.colors.$colorBackground,
@@ -49,7 +50,7 @@ export function PlanCard(props: PlanCardProps) {
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
-          borderBottomWidth: hasFeatures ? t.borderWidths.$normal : '0',
+          borderBottomWidth: t.borderWidths.$normal,
           borderBottomStyle: t.borderStyles.$solid,
           borderBottomColor: t.colors.$neutralAlpha100,
         })}
@@ -139,67 +140,81 @@ export function PlanCard(props: PlanCardProps) {
           ) : null}
         </Box>
       </Box>
-      <Box
-        elementDescriptor={descriptors.planCardFeatures}
-        sx={t => ({
-          background: hasFeatures
-            ? 'transparent'
-            : common.mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50),
-        })}
-      >
+      <ReversibleContainer reverse={ctaPosition === 'top'}>
+        {!collapseFeatures ? (
+          <Box elementDescriptor={descriptors.planCardFeatures}>
+            {plan.features.length > 0 ? (
+              <Box
+                elementDescriptor={descriptors.planCardFeaturesList}
+                as='ul'
+                sx={t => ({
+                  padding: t.space.$4,
+                  display: 'grid',
+                  rowGap: t.space.$3,
+                })}
+              >
+                {plan.features.map(feature => (
+                  <Box
+                    elementDescriptor={descriptors.planCardFeaturesListItem}
+                    elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
+                    key={feature.id}
+                    as='li'
+                  >
+                    <Flex
+                      gap={2}
+                      align='baseline'
+                    >
+                      <Icon
+                        icon={Check}
+                        colorScheme='neutral'
+                        size='sm'
+                      />
+                      <Text>{feature.description || feature.name}</Text>
+                    </Flex>
+                  </Box>
+                ))}
+              </Box>
+            ) : null}
+          </Box>
+        ) : null}
         <Box
-          elementDescriptor={descriptors.planCardFeaturesList}
-          as='ul'
+          elementDescriptor={descriptors.planCardAction}
           sx={t => ({
             padding: t.space.$4,
-            display: 'grid',
-            rowGap: t.space.$3,
+            background: collapseFeatures
+              ? 'transparent'
+              : common.mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50),
+            ...(ctaPosition === 'top'
+              ? {
+                  borderBottomWidth: t.borderWidths.$normal,
+                  borderBottomStyle: t.borderStyles.$solid,
+                  borderBottomColor: t.colors.$neutralAlpha100,
+                }
+              : {
+                  borderTopWidth: collapseFeatures ? '0' : t.borderWidths.$normal,
+                  borderTopStyle: t.borderStyles.$solid,
+                  borderTopColor: t.colors.$neutralAlpha100,
+                }),
           })}
         >
-          {plan.features.map(feature => (
-            <Box
-              elementDescriptor={descriptors.planCardFeaturesListItem}
-              elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
-              key={feature.id}
-              as='li'
-            >
-              <Flex
-                gap={2}
-                align='baseline'
-              >
-                <Icon
-                  icon={Check}
-                  colorScheme='neutral'
-                  size='sm'
-                />
-                <Text>{feature.description || feature.name}</Text>
-              </Flex>
-            </Box>
-          ))}
+          <Button
+            block
+            localizationKey={
+              plan.isActiveForPayer
+                ? localizationKeys('commerce_manageMembership')
+                : localizationKeys('commerce_getStarted')
+            }
+            onClick={() => onSelect(plan)}
+          />
         </Box>
-      </Box>
-      <Box
-        sx={t => ({
-          padding: t.space.$4,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
-          borderTopWidth: hasFeatures ? t.borderWidths.$normal : '0',
-          borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
-        })}
-      >
-        <Button
-          block
-          localizationKey={
-            isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
-          }
-          onClick={() => onSelect(plan)}
-        />
-      </Box>
+      </ReversibleContainer>
     </Box>
   );
+}
+
+function ReversibleContainer(props: React.PropsWithChildren<{ reverse?: boolean }>) {
+  const { children, reverse } = props;
+  return <>{reverse ? React.Children.toArray(children).reverse() : children}</>;
 }
 
 type SegmentedControlOption = {
