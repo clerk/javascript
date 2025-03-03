@@ -322,6 +322,10 @@ export type ElementsConfig = {
 
   planGrid: WithOptions;
   planCard: WithOptions<string>;
+  planCardHeader: WithOptions;
+  planCardAvatar: WithOptions;
+  planCardTitle: WithOptions;
+  planCardDescription: WithOptions;
   planCardFeatures: WithOptions;
   planCardFeaturesList: WithOptions;
   planCardFeaturesListItem: WithOptions<string>;
