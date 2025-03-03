@@ -35,8 +35,7 @@ const useAutoFillPasskey = () => {
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
-  const { userSettings } = useEnvironment();
-  const { passkeySettings, attributes } = userSettings;
+  const { attributes, passkeySettings } = useEnvironment().userSettings;
 
   useEffect(() => {
     async function runAutofillPasskey() {
@@ -59,11 +58,11 @@ const useAutoFillPasskey = () => {
   };
 };
 
-export function _SignInStart(): JSX.Element {
+export function SignInStartComponent(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
-  const { displayConfig, userSettings } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment() ?? {};
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -481,7 +480,7 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.attributes.passkey.enabled &&
+            {userSettings.attributes?.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (
                 <Card.Action elementId={'usePasskey'}>
@@ -568,4 +567,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartComponent));

@@ -30,7 +30,7 @@ export const applyTokensToString = (s: string | undefined, tokens: Tokens): stri
 };
 
 export const useGlobalTokens = (): GlobalTokens => {
-  const { applicationName } = useEnvironment().displayConfig;
+  const { applicationName } = useEnvironment()?.displayConfig ?? {};
   const { client, user } = useClerk();
   // TODO: @nikos decouple captcha from component loading
   const { signIn } = client || {};
