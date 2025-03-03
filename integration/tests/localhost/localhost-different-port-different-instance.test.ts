@@ -16,7 +16,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { prepareApplication } from '../sessions/utils';
 
-test.describe('multiple apps running on localhost using different Clerk instances @sessions', () => {
+test.describe('multiple apps running on localhost using different Clerk instances @localhost', () => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUsers: FakeUser[];

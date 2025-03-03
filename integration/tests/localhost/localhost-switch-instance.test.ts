@@ -15,7 +15,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { getEnvForMultiAppInstance, prepareApplication } from '../sessions/utils';
 
-test.describe('switching instances on localhost same port @sessions', () => {
+test.describe('switching instances on localhost same port @localhost', () => {
   test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });
   const fakeUsers: FakeUser[] = [];
 
