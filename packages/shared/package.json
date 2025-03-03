@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.22.0",
+  "version": "3.0.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -79,7 +79,7 @@
     "authorization",
     "authorization-errors",
     "browser",
-    "callWithRetry",
+    "retry",
     "color",
     "cookie",
     "date",
@@ -122,6 +122,7 @@
   "scripts": {
     "build": "tsup",
     "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "4.46.1",
+  "version": "4.47.0",
   "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "lint": "eslint src",

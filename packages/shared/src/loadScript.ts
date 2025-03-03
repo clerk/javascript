@@ -1,4 +1,4 @@
-import { runWithExponentialBackOff } from './utils';
+import { retry } from './retry';
 
 const NO_DOCUMENT_ERROR = 'loadScript cannot be called when document does not exist';
 const NO_SRC_ERROR = 'loadScript cannot be called without a src';
@@ -52,5 +52,5 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
     });
   };
 
-  return runWithExponentialBackOff(load, { shouldRetry: (_, iterations) => iterations < 5 });
+  return retry(load, { shouldRetry: (_, iterations) => iterations <= 5 });
 }

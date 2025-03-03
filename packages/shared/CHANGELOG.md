@@ -1,5 +1,47 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- This new version introduces the following breaking changes: ([#5144](https://github.com/clerk/javascript/pull/5144)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduced a new `retry` utility function to replace the deprecated `callWithRetry`.
+  - Removed the `callWithRetry` function and its associated tests.
+  - Renamed `runWithExponentialBackOff` to `retry` for consistency.
+
+  Migration steps:
+
+  - Replace any usage of `callWithRetry` with the new `retry` function.
+  - Update import statements from:
+    ```typescript
+    import { callWithRetry } from '@clerk/shared/callWithRetry';
+    ```
+    to:
+    ```typescript
+    import { retry } from '@clerk/shared/retry';
+    ```
+  - Replace any usage of `runWithExponentialBackOff` with `retry`.
+  - Update import statements from:
+    ```typescript
+    import { runWithExponentialBackOff } from '@clerk/shared/utils';
+    ```
+    to:
+    ```typescript
+    import { retry } from '@clerk/shared/retry';
+    ```
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Update `TelemetryCollector` to throttle events after they've been sampled. ([#5236](https://github.com/clerk/javascript/pull/5236)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a)]:
+  - @clerk/types@4.47.0
+
 ## 2.22.0
 
 ### Minor Changes

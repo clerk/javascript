@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { CAPTCHA_ELEMENT_ID } from '../../utils/captcha';
-import { Box } from '../customizables';
+import { Box, useAppearance, useLocalizations } from '../customizables';
 
 /**
  * This component uses a MutationObserver to listen for DOM changes made by our Turnstile logic,
@@ -14,6 +14,11 @@ export const CaptchaElement = () => {
   const maxHeightValueRef = useRef('0');
   const minHeightValueRef = useRef('unset');
   const marginBottomValueRef = useRef('unset');
+  const { parsedCaptcha } = useAppearance();
+  const { locale } = useLocalizations();
+  const captchaTheme = parsedCaptcha?.theme;
+  const captchaSize = parsedCaptcha?.size;
+  const captchaLanguage = parsedCaptcha?.language || locale;
 
   useEffect(() => {
     if (!elementRef.current) return;
@@ -48,6 +53,9 @@ export const CaptchaElement = () => {
         minHeight: minHeightValueRef.current,
         marginBottom: marginBottomValueRef.current,
       }}
+      data-cl-theme={captchaTheme}
+      data-cl-size={captchaSize}
+      data-cl-language={captchaLanguage}
     />
   );
 };
