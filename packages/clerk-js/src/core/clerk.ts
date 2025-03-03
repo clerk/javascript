@@ -1769,7 +1769,7 @@ export class Clerk implements ClerkInterface {
     const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
 
     window.addEventListener('message', async event => {
-      if (event.origin !== window.location.origin) return;
+      if (event.origin !== `https://${accountPortalDomain}`) return;
       if (event.data.session) {
         console.log(`calling setActive with session ${event.data.session} adn redirectUrl ${redirectUrl}`);
         await this.setActive({
