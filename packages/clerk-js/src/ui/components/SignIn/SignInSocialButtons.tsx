@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { buildPopupCallbackURL, buildSSOCallbackURL } from '../../common/redirects';
+import { buildSSOCallbackURL } from '../../common/redirects';
 import { useSignInContext } from '../../contexts';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
@@ -17,7 +17,6 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const { displayConfig } = useEnvironment();
   const ctx = useSignInContext();
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
-  const popupCallbackUrl = buildPopupCallbackURL(ctx, displayConfig.signInUrl);
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
   return (
@@ -26,7 +25,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
       oauthCallback={strategy => {
         const popup = window.open('about:blank', '', 'width=600,height=600');
         return clerk
-          .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popupCallbackUrl, popup })
+          .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={strategy => {

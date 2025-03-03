@@ -588,9 +588,7 @@ export interface Clerk {
     params: AuthenticateWithGoogleOneTapParams,
   ) => Promise<SignInResource | SignUpResource>;
 
-  authenticateWithPopup: (
-    params: AuthenticateWithRedirectParams & { popupCallbackUrl: string; popup: Window | null },
-  ) => Promise<unknown>;
+  authenticateWithPopup: (params: AuthenticateWithRedirectParams & { popup: Window | null }) => Promise<unknown>;
 
   /**
    * Creates an organization, adding the current user as admin.

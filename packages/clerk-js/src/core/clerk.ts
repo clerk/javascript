@@ -1752,13 +1752,22 @@ export class Clerk implements ClerkInterface {
   };
 
   public authenticateWithPopup = async (
-    params: AuthenticateWithRedirectParams & { popupCallbackUrl: string; popup: Window | null },
+    params: AuthenticateWithRedirectParams & { popup: Window | null },
   ): Promise<void> => {
     if (!this.client || !this.environment || !params.popup) {
       return;
     }
 
-    const { redirectUrl, popupCallbackUrl } = params;
+    const accountPortalDomain = this.frontendApi
+      // staging accounts
+      .replace(/clerk\.accountsstage\./, 'accountsstage.')
+      .replace(/clerk\.accounts\.|clerk\./, 'accounts.');
+
+    const { redirectUrl } = params;
+
+    const popupRedirectUrlComplete = `https://${accountPortalDomain}/popup-callback`;
+    const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
+
     window.addEventListener('message', async event => {
       if (event.origin !== window.location.origin) return;
       if (event.data.session) {
@@ -1775,7 +1784,8 @@ export class Clerk implements ClerkInterface {
     });
     await this.client.signIn.authenticateWithPopup({
       ...params,
-      redirectUrlComplete: popupCallbackUrl,
+      redirectUrlComplete: popupRedirectUrlComplete,
+      redirectUrl: popupRedirectUrl,
     });
   };
 

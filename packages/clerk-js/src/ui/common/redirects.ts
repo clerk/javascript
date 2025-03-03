@@ -39,20 +39,6 @@ export function buildSSOCallbackURL(
   });
 }
 
-export function buildPopupCallbackURL(
-  ctx: Partial<SignInContextType | SignUpContextType>,
-  baseUrl: string | undefined = '',
-): string {
-  const { routing, authQueryString, path } = ctx;
-  return buildRedirectUrl({
-    routing,
-    baseUrl,
-    authQueryString,
-    path,
-    endpoint: '/popup-callback',
-  });
-}
-
 type AuthQueryString = string | null | undefined;
 
 type BuildRedirectUrlParams = {
