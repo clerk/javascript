@@ -4,7 +4,6 @@ import React from 'react';
 
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
@@ -145,16 +144,17 @@ function SignInRoutes(): JSX.Element {
 
 function SignInRoot() {
   const signInContext = useSignInContext();
+
   const normalizedSignUpContext = {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
-    ssoCallbackUrl: signInContext.ssoCallbackUrl,
-    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
+    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     signInUrl: signInContext.signInUrl,
+    ssoCallbackUrl: signInContext.ssoCallbackUrl,
     unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
-  } as SignUpContextType;
+  };
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

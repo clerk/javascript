@@ -10,14 +10,35 @@ interface EnvironmentProviderProps {
   value: EnvironmentResource;
 }
 
-function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
+export function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
 }
 
-function useEnvironment(): EnvironmentResource {
+const DISPLAY_CONFIG = {};
+const USER_SETTINGS = {
+  attributes: {},
+  authenticatableSocialStrategies: [],
+  authenticatableStrategies: [],
+  authenticatableStrategiesWithSocial: [],
+  authenticatableStrategiesWithoutSocial: [],
+  emailVerificationRequired: false,
+  enabledFirstFactorIdentifiers: [],
+  passkeySettings: {},
+  passwordResetRequired: false,
+  signUp: {},
+  web3FirstFactors: [],
+};
+
+export function useEnvironment(): EnvironmentResource {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
+
+  console.log('environment context:', context);
+
+  // @ts-expect-error - handle case where displayConfig is not defined
+  if (typeof context.displayConfig === 'undefined') context.displayConfig = DISPLAY_CONFIG;
+  // @ts-expect-error - handle case where userSettings is not defined
+  if (typeof context.userSettings === 'undefined') context.userSettings = USER_SETTINGS;
+
   return context;
 }
-
-export { EnvironmentProvider, useEnvironment };

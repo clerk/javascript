@@ -45,7 +45,7 @@ const FirstFactorConfigs = Object.freeze({
 export type SignInStartIdentifier = 'email_address' | 'username' | 'phone_number' | 'email_address_username';
 export const groupIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
   // Always skip passkey, while passkey can be considered an identifier we want to exclude it in the UI we are delivering
-  let newAttributes: string[] = [...attributes.filter(a => a !== 'passkey')];
+  let newAttributes: string[] = [...(attributes?.filter(a => a !== 'passkey') ?? [])];
 
   //merge email_address and username attributes
   if (['email_address', 'username'].every(r => newAttributes.includes(r))) {

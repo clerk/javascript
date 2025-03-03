@@ -30,19 +30,12 @@ export type SignUpContextType = SignUpCtx & {
 export const SignUpContext = createContext<SignUpCtx | null>(null);
 
 export const useSignUpContext = (): SignUpContextType => {
+  const { navigate, queryParams, queryString } = useRouter();
   const context = useContext(SignUpContext);
-  const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
-  const signUpMode = userSettings.signUp.mode;
+
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow =
-    (signUpMode !== 'restricted' &&
-      Boolean(
-        !options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl) && signUpMode === 'public',
-      )) ||
-    false;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -54,6 +47,32 @@ export const useSignUpContext = (): SignUpContextType => {
   }
 
   const { componentName, mode, ...ctx } = context;
+
+  if (typeof userSettings === 'undefined') {
+    return {
+      afterSignUpUrl: '',
+      afterSignInUrl: '',
+      authQueryString: '',
+      emailLinkRedirectUrl: '',
+      isCombinedFlow: false,
+      navigateAfterSignUp: () => {},
+      queryParams: {},
+      secondFactorUrl: '',
+      signInUrl: '',
+      signUpUrl: '',
+      waitlistUrl: '',
+    };
+  }
+
+  const isCombinedFlow =
+    (userSettings?.signUp?.mode !== 'restricted' &&
+      Boolean(
+        !options.signUpUrl &&
+          options.signInUrl &&
+          !isAbsoluteUrl(options.signInUrl) &&
+          userSettings?.signUp?.mode === 'public',
+      )) ||
+    false;
 
   const redirectUrls = new RedirectUrls(
     options,
