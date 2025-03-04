@@ -14,6 +14,7 @@ import {
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { Task } from '../SessionTask/SessionTask';
 import { SignUpContinue } from '../SignUp/SignUpContinue';
 import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
 import { SignUpStart } from '../SignUp/SignUpStart';
@@ -132,6 +133,13 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
+        {/* Make it type safe based on the possible route paths / introduce abstraction */}
+        <Route
+          path='add-organization'
+          canActivate={clerk => !!clerk.session?.tasks?.length}
+        >
+          <Task />
+        </Route>
         <Route index>
           <SignInStart />
         </Route>

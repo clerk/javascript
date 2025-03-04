@@ -197,7 +197,7 @@ export interface PublicUserData {
 }
 
 export interface SessionTask {
-  key: 'orgs';
+  key: 'org';
 }
 
 export type GetTokenOptions = {

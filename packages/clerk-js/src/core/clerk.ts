@@ -1149,11 +1149,20 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildSessionTaskUrl(): string {
-    if (!this.environment || !this.environment.displayConfig) {
+    const [currentTask] = this.session?.tasks ?? [];
+
+    if (!currentTask || !this.environment || !this.environment.displayConfig) {
       return '';
     }
+
+    // TODO - Make it type safe and abstracted
+    const mapTaskRoutePathFromKey = {
+      orgs: '/add-organization',
+    };
+
     const signInUrl = this.#options['signInUrl'] || this.environment.displayConfig.signInUrl;
-    return buildURL({ base: signInUrl, hashPath: '/add-organization' }, { stringify: true });
+    // TODO - Make it path dynamic by current session task
+    return buildURL({ base: `${signInUrl}`, hashPath: mapTaskRoutePathFromKey[currentTask.key] }, { stringify: true });
   }
 
   #redirectToSatellite = async (): Promise<unknown> => {
