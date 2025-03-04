@@ -28,10 +28,13 @@ export function withRedirect<P extends AvailableComponentProps>(
     const environment = useEnvironment();
     const options = useOptions();
 
-    const shouldRedirect = condition(clerk, environment, options);
+    const hasTasksAndSingleSessionMode = clerk.session?.currentTask && environment?.authConfig.singleSessionMode;
+    const shouldRedirect =
+      // Overrides default redirect guards to not lead with race conditions on redirection for session tasks
+      hasTasksAndSingleSessionMode ? false : condition(clerk, environment, options);
     React.useEffect(() => {
-      // Blocks `afterSignInUrl` or `afterSignUpUrl` redirects on `SignIn/SignUp` render
-      if (clerk.session?.currentTask) {
+      if (hasTasksAndSingleSessionMode) {
+        void clerk.maybeNavigateToTaskResolution(navigate);
         return;
       }
 
@@ -43,7 +46,7 @@ export function withRedirect<P extends AvailableComponentProps>(
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         navigate(redirectUrl({ clerk, environment, options }));
       }
-    }, [clerk.session?.currentTask]);
+    }, [hasTasksAndSingleSessionMode]);
 
     if (shouldRedirect) {
       return null;

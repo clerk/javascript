@@ -23,6 +23,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
+  CustomNavigation,
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
@@ -45,6 +46,7 @@ import type {
   RedirectOptions,
   Resources,
   SDKMetadata,
+  SessionTask,
   SetActiveParams,
   SignedInSessionResource,
   SignInProps,
@@ -65,6 +67,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/types';
+import type { SessionTaskRoutePath } from 'ui/common/tasks';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
@@ -1731,6 +1734,8 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      this.maybeNavigateToTaskResolution(this.navigate);
+
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
@@ -2262,5 +2267,34 @@ export class Clerk implements ClerkInterface {
     }
 
     return allowedProtocols;
+  }
+
+  maybeNavigateToTaskResolution(customNavigate?: (to: string) => Promise<unknown>) {
+    if (!this.session?.currentTask || !inBrowser()) {
+      return;
+    }
+
+    const isOnTaskResolutionPath = window.location.href.includes('navigate-to-task');
+    if (isOnTaskResolutionPath) {
+      return;
+    }
+
+    const url = buildURL({ base: `${this.#options.signInUrl}/navigate-to-task` }, { stringify: true });
+
+    void customNavigate?.(url);
+  }
+
+  navigateToTaskPath(customNavigate?: CustomNavigation) {
+    if (!this.session?.currentTask || !inBrowser()) {
+      return;
+    }
+
+    const taskKeyToRoutePaths: Record<SessionTask['key'], SessionTaskRoutePath> = {
+      org: 'add-organization',
+    };
+
+    const routePath = taskKeyToRoutePaths[this.session.currentTask.key];
+
+    void customNavigate?.(routePath);
   }
 }

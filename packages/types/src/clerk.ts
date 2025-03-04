@@ -560,6 +560,8 @@ export interface Clerk {
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
 
+  maybeNavigateToTaskResolution: (customNavigate?: (to: string) => Promise<unknown>) => void;
+
   /**
    * Authenticates user using their Metamask browser extension
    */

@@ -13,6 +13,7 @@ export * from './QRCode';
 export * from './redirects';
 export * from './RemoveResourceForm';
 export * from './SSOCallback';
+export * from './TaskNavigation';
 export * from './verification';
 export * from './withRedirect';
 export * from './Wizard';

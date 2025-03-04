@@ -28,6 +28,7 @@ import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
+import { SignInTaskNavigation } from './SignInTaskNavigation';
 
 function RedirectToSignIn() {
   const clerk = useClerk();
@@ -134,6 +135,9 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
+        <Route path='navigate-to-task'>
+          <SignInTaskNavigation />
+        </Route>
         {sessionTaskRoutePaths.map(path => (
           <Route
             key={path}
