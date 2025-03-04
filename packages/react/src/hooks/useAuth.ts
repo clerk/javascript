@@ -151,7 +151,7 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: undefined,
+      has: () => false,
       signOut,
       getToken,
     };
