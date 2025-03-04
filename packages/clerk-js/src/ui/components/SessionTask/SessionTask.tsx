@@ -1,11 +1,14 @@
-import { useClerk } from '@clerk/shared/react/index';
-import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionTask } from '@clerk/types';
+import { useSessionContext } from '@clerk/shared/react/index';
+import type { SessionTaskKey } from '@clerk/types';
+import { type ComponentType } from 'react';
 
 import { OrganizationListContext } from '../../contexts';
 import { OrganizationList } from '../OrganizationList';
 
-const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
+/**
+ * @internal
+ */
+const SessionTaskRegistry: Record<SessionTaskKey, ComponentType> = {
   org: () => (
     // TODO - Hide personal workspace within organization list context based on environment
     <OrganizationListContext.Provider value={{ componentName: 'OrganizationList', hidePersonal: true }}>
@@ -17,12 +20,15 @@ const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
 /**
  * @internal
  */
-export function SessionTask({ task }: { task: SessionTask['key'] }): React.ReactNode {
-  const clerk = useClerk();
+export function SessionTask(): React.ReactNode {
+  const session = useSessionContext();
+  const [currentTask] = session?.tasks ?? [];
 
-  clerk.telemetry?.record(eventComponentMounted('SessionTask', { task }));
+  if (!currentTask) {
+    return null;
+  }
 
-  const Content = ContentRegistry[task];
+  const Content = SessionTaskRegistry[currentTask.key];
 
-  return <Content />;
+  return Content ? <Content /> : null;
 }

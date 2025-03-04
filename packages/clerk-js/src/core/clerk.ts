@@ -439,27 +439,6 @@ export class Clerk implements ClerkInterface {
       await onAfterSetActive();
     };
 
-    #handlePendingSession = async (session: PendingSessionResource) => {
-      if (!session.currentTask || !this.environment) {
-        return;
-      }
-
-      if (session?.lastActiveToken) {
-        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
-      }
-
-      if (this.#internalComponentNavigate) {
-        // Handles navigation for UI components
-        await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
-      } else {
-        // Handles navigation for custom flows
-        await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
-      }
-
-      this.#setAccessors(session);
-      this.#emit();
-    };
-
     /**
      * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
      * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
@@ -1077,32 +1056,21 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
-    if (!this.environment) {
+  #handlePendingSession = async (session: PendingSessionResource) => {
+    if (!session.currentTask || !this.environment) {
       return;
     }
 
-    // Handles multi-session scenario when switching from `active`
-    // to `pending`
-    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+    if (session?.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    // Syncs __session and __client_uat, in case the `pending` session
-    // has expired, it needs to trigger a sign-out
-    const token = await session.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
-
-    if (session.currentTask) {
-      await navigateToTask(session.currentTask, {
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
-        options: this.#options,
-        environment: this.environment,
-      });
+    if (this.#internalComponentNavigate) {
+      // Handles navigation for UI components
+      await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
+    } else {
+      // Handles navigation for custom flows
+      await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
     }
 
     this.#setAccessors(session);

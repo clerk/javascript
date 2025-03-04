@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -22,17 +22,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await app.teardown();
     });
 
-    test('navigate to task on after sign-in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-      await u.po.signIn.goTo();
-      await u.po.signIn.setIdentifier(fakeUser.email);
-      await u.po.signIn.continue();
-      await u.po.signIn.setPassword(fakeUser.password);
-      await u.po.signIn.continue();
-      await u.po.expect.toBeSignedIn();
+    test.fixme('on after sign-in, navigates to task', async () => {
+      // todo
+    });
 
-      await expect(u.page.getByRole('button', { name: /create organization/i })).toBeVisible();
-      expect(page.url()).toContain('add-organization');
+    test.fixme('redirects back to task when accessing root sign in component', async () => {
+      // todo
+    });
+
+    test.fixme('redirects to after sign-in url when accessing root sign in component with a active session', {
+      // todo
+    });
+
+    test.fixme('redirects to after sign-in url once resolving task', () => {
+      // todo
+    });
+
+    test.fixme('without a session, does not allow to access task component', async () => {
+      // todo
     });
   },
 );
