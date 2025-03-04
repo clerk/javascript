@@ -77,7 +77,7 @@ export abstract class BaseResource {
       clerkMissingFapiClientInResources();
     }
 
-    let fapiResponse: FapiResponse<J>;
+    let fapiResponse: FapiResponse<J> | undefined;
     const { fetchMaxTries } = opts;
 
     try {

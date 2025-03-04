@@ -11,7 +11,7 @@ const THROTTLE_DURATION_MS = 10 * 1000;
  * Revalidates environment on focus, highly optimized for Keyless mode.
  * Attention: this is not a generic solution, and should not be used for revalidating environment inside UI components that are end-user facing (e.g. SignIn)
  */
-function useRevalidateEnvironment() {
+export function useRevalidateEnvironment() {
   const clerk = useClerk();
   const lastTouchTimestamp = useRef(Date.now());
   const [, forceUpdate] = useReducer(v => v + 1, 0);
@@ -74,5 +74,3 @@ function useRevalidateEnvironment() {
 
   return useEnvironment();
 }
-
-export { useRevalidateEnvironment };

@@ -10,6 +10,11 @@ interface EnvironmentProviderProps {
   value: EnvironmentResource;
 }
 
+type PartialEnvironment = EnvironmentResource & {
+  displayConfig: Partial<EnvironmentResource['displayConfig']>;
+  userSettings: Partial<EnvironmentResource['userSettings']>;
+};
+
 export function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
 }
@@ -29,7 +34,7 @@ const USER_SETTINGS = {
   web3FirstFactors: [],
 };
 
-export function useEnvironment(): Partial<EnvironmentResource> {
+export function useEnvironment(): PartialEnvironment {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
 
