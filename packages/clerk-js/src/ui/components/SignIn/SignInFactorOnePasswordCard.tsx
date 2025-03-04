@@ -68,7 +68,11 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       .then(res => {
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
+            return setActive({
+              session: res.createdSessionId,
+              redirectUrl: afterSignInUrl,
+              beforeEmit: () => navigate('../add-organization'),
+            });
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:

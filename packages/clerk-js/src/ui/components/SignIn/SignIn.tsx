@@ -138,6 +138,15 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
 
+        {SESSION_TASK_PATHS.map(path => (
+          <Route
+            path={path}
+            key={path}
+          >
+            <SignInSessionTask />
+          </Route>
+        ))}
+
         <Route index>
           <SignInStart />
         </Route>
