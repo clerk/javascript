@@ -19,7 +19,8 @@ interface PlanCardProps {
 export function PlanCard(props: PlanCardProps) {
   const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const { ctaPosition = 'bottom', collapseFeatures = false } = pricingTableProps;
-  const hasFeatures = plan.features.length > 0;
+  const totalFeatures = plan.features.length;
+  const hasFeatures = totalFeatures > 0;
   const isActivePlan = plan.isActiveForPayer;
   return (
     <Box
@@ -64,10 +65,7 @@ export function PlanCard(props: PlanCardProps) {
           {isActivePlan ? (
             <Badge
               localizationKey={localizationKeys('badge__currentPlan')}
-              sx={t => ({
-                backgroundColor: t.colors.$primary500,
-                color: t.colors.$white,
-              })}
+              colorScheme='secondary'
             />
           ) : null}
         </Flex>
@@ -96,7 +94,7 @@ export function PlanCard(props: PlanCardProps) {
           gap={2}
           align='center'
           sx={t => ({
-            marginTop: t.space.$3,
+            marginTop: isCompact ? t.space.$2 : t.space.$3,
           })}
         >
           {plan.hasBaseFee ? (
@@ -104,6 +102,7 @@ export function PlanCard(props: PlanCardProps) {
               <Text
                 elementDescriptor={descriptors.planCardFee}
                 variant={isCompact ? 'h2' : 'h1'}
+                colorScheme='body'
               >
                 {plan.currencySymbol}
                 {period === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
@@ -127,6 +126,7 @@ export function PlanCard(props: PlanCardProps) {
               elementDescriptor={descriptors.planCardFee}
               variant={isCompact ? 'h2' : 'h1'}
               localizationKey={localizationKeys('commerce_free')}
+              colorScheme='body'
             />
           )}
         </Flex>
@@ -172,7 +172,7 @@ export function PlanCard(props: PlanCardProps) {
                 display: 'grid',
                 flex: '1',
                 rowGap: isCompact ? t.space.$2 : t.space.$3,
-                maskImage: isCompact ? 'linear-gradient(rgba(0,0,0,1), transparent)' : undefined,
+                maskImage: isCompact && totalFeatures >= 3 ? 'linear-gradient(rgba(0,0,0,1), transparent)' : undefined,
               })}
             >
               {plan.features.slice(0, isCompact ? 3 : plan.features.length).map(feature => (
@@ -191,7 +191,7 @@ export function PlanCard(props: PlanCardProps) {
                       colorScheme='neutral'
                       size='sm'
                     />
-                    <Text>{feature.description || feature.name}</Text>
+                    <Text colorScheme='body'>{feature.description || feature.name}</Text>
                   </Flex>
                 </Box>
               ))}

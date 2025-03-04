@@ -108,6 +108,7 @@ const InitialsAvatarFallback = (props: { initials: string }) => {
     <Text
       as='span'
       sx={{ ...common.centeredFlex('inline-flex'), width: '100%' }}
+      colorScheme='body'
     >
       {initials}
     </Text>
