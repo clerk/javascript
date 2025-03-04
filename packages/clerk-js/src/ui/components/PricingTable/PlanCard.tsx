@@ -12,12 +12,13 @@ interface PlanCardProps {
   period: string;
   setPeriod: (k: string) => void;
   onSelect: (plan: CommercePlanResource) => void;
+  isCompact?: boolean;
   props: __experimental_PricingTableProps;
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const { plan, period, setPeriod, onSelect, props: pricingTableProps } = props;
-  const { ctaPosition, collapseFeatures } = pricingTableProps;
+  const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const { ctaPosition = 'bottom', collapseFeatures = false } = pricingTableProps;
   const hasFeatures = plan.features.length > 0;
   const isActivePlan = plan.isActiveForPayer;
   return (
@@ -28,7 +29,7 @@ export function PlanCard(props: PlanCardProps) {
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: common.mergedColorsBackground(
+        background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
         ),
@@ -43,15 +44,14 @@ export function PlanCard(props: PlanCardProps) {
       <Box
         elementDescriptor={descriptors.planCardHeader}
         sx={t => ({
-          display: 'grid',
-          gridRowGap: t.space.$2,
-          padding: t.space.$4,
+          padding: isCompact ? t.space.$3 : t.space.$4,
         })}
       >
         <Flex
+          elementDescriptor={descriptors.planCardAvatarContainer}
           align='start'
           justify='between'
-          sx={{ width: '100%', gridRow: 1 }}
+          sx={{ width: '100%' }}
         >
           <Avatar
             boxElementDescriptor={descriptors.planCardAvatar}
@@ -71,55 +71,71 @@ export function PlanCard(props: PlanCardProps) {
             />
           ) : null}
         </Flex>
-        <Box>
-          <Heading elementDescriptor={descriptors.planCardTitle}>{plan.name}</Heading>
+        <Heading
+          elementDescriptor={descriptors.planCardTitle}
+          as='h2'
+          textVariant={isCompact ? 'h3' : 'h2'}
+          sx={t => ({
+            marginTop: t.space.$3,
+          })}
+        >
+          {plan.name}
+        </Heading>
+        {!isCompact ? (
           <Text
             elementDescriptor={descriptors.planCardDescription}
             variant='subtitle'
             colorScheme='secondary'
+            aria-hidden={plan.description ? undefined : 'true'}
           >
             {plan.description ? plan.description : '\u00A0'}
           </Text>
-        </Box>
-        <Box>
+        ) : null}
+        <Flex
+          elementDescriptor={descriptors.planCardFeeContainer}
+          gap={2}
+          align='center'
+          sx={t => ({
+            marginTop: t.space.$3,
+          })}
+        >
           {plan.hasBaseFee ? (
-            <Flex
-              gap={2}
-              align='center'
-            >
-              <Text variant='h1'>
+            <>
+              <Text
+                elementDescriptor={descriptors.planCardFee}
+                variant={isCompact ? 'h2' : 'h1'}
+              >
                 {plan.currencySymbol}
                 {period === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
               </Text>
-              <Flex
-                gap={1}
-                align='baseline'
-              >
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                >
-                  /
-                </Text>
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  sx={{ textTransform: 'lowercase' }}
-                  localizationKey={localizationKeys('commerce_month')}
-                />
-              </Flex>
-            </Flex>
+              <Text
+                elementDescriptor={descriptors.planCardFeePeriod}
+                variant='caption'
+                colorScheme='secondary'
+                sx={t => ({
+                  textTransform: 'lowercase',
+                  ':before': {
+                    content: '"/"',
+                    marginInlineEnd: t.space.$1,
+                  },
+                })}
+                localizationKey={localizationKeys('commerce_month')}
+              />
+            </>
           ) : (
             <Text
-              variant='h1'
+              elementDescriptor={descriptors.planCardFee}
+              variant={isCompact ? 'h2' : 'h1'}
               localizationKey={localizationKeys('commerce_free')}
             />
           )}
-        </Box>
+        </Flex>
         <Box
+          elementDescriptor={descriptors.planCardPeriodToggle}
           sx={t => ({
             display: 'flex',
             minHeight: t.space.$6,
+            marginTop: t.space.$3,
           })}
         >
           {plan.hasBaseFee ? (
@@ -140,6 +156,7 @@ export function PlanCard(props: PlanCardProps) {
             elementDescriptor={descriptors.planCardFeatures}
             sx={t => ({
               flex: '1',
+              padding: isCompact ? t.space.$3 : t.space.$4,
               backgroundColor: t.colors.$colorBackground,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
@@ -150,9 +167,8 @@ export function PlanCard(props: PlanCardProps) {
               elementDescriptor={descriptors.planCardFeaturesList}
               as='ul'
               sx={t => ({
-                padding: t.space.$4,
                 display: 'grid',
-                rowGap: t.space.$3,
+                rowGap: isCompact ? t.space.$2 : t.space.$3,
               })}
             >
               {plan.features.map(feature => (
@@ -182,7 +198,7 @@ export function PlanCard(props: PlanCardProps) {
           elementDescriptor={descriptors.planCardAction}
           sx={t => ({
             marginTop: 'auto',
-            padding: t.space.$4,
+            padding: isCompact ? t.space.$3 : t.space.$4,
             borderTopWidth: t.borderWidths.$normal,
             borderTopStyle: t.borderStyles.$solid,
             borderTopColor: t.colors.$neutralAlpha100,
@@ -191,6 +207,7 @@ export function PlanCard(props: PlanCardProps) {
         >
           <Button
             block
+            size={isCompact ? 'xs' : 'sm'}
             localizationKey={
               isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
             }

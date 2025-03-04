@@ -18,6 +18,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   const [selectedPlan, setSelectedPlan] = useState<CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPlanDetail, setShowPlanDetail] = useState(false);
+  const isCompact = mode === 'modal';
 
   const { data: plans } = useFetch(__experimental_commerce?.__experimental_billing.getPlans, 'commerce-plans');
 
@@ -36,7 +37,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         elementDescriptor={descriptors.planGrid}
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 20rem), 1fr))',
+          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${isCompact ? '11.75rem' : '20rem'}), 1fr))`,
           alignItems: 'start',
           gap: '1rem',
           width: '100%',
@@ -50,6 +51,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
             period={planPeriod}
             setPeriod={setPlanPeriod}
             onSelect={selectPlan}
+            isCompact={isCompact}
             props={props}
           />
         ))}

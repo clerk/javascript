@@ -323,6 +323,7 @@ export type ElementsConfig = {
   planGrid: WithOptions;
   planCard: WithOptions<string>;
   planCardHeader: WithOptions;
+  planCardAvatarContainer: WithOptions;
   planCardAvatar: WithOptions;
   planCardTitle: WithOptions;
   planCardDescription: WithOptions;
@@ -330,6 +331,10 @@ export type ElementsConfig = {
   planCardFeaturesList: WithOptions;
   planCardFeaturesListItem: WithOptions<string>;
   planCardAction: WithOptions;
+  planCardPeriodToggle: WithOptions;
+  planCardFeeContainer: WithOptions;
+  planCardFee: WithOptions;
+  planCardFeePeriod: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
