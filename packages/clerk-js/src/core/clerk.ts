@@ -926,6 +926,8 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
+    const hasSessionTaskToResolve = !!newSession?.tasks?.length;
+
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
@@ -937,12 +939,17 @@ export class Clerk implements ClerkInterface {
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
       beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
+
+      // Do not unmount SignIn/SignUp for in-component navigation on new session tasks
+      if (!hasSessionTaskToResolve) {
+        this.#setTransitiveState();
+      }
+
       await beforeEmit(newSession);
       beforeUnloadTracker?.stopTracking();
     }
 
-    if (redirectUrl && !beforeEmit) {
+    if (redirectUrl && !beforeEmit && !hasSessionTaskToResolve) {
       beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
 
