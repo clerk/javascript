@@ -44,8 +44,10 @@ export type AuthenticateRequestOptions = {
    * @internal
    */
   apiClient?: ApiClient;
+  entity?: 'user' | 'machine' | 'any';
 } & VerifyTokenOptions;
 
+export type EntityTypes = 'user' | 'machine' | 'any';
 /**
  * @expand
  */
