@@ -97,9 +97,7 @@ export function buildRequest(options: BuildRequestOptions) {
     };
 
     if (secretKey) {
-      Object.assign(headers, {
-        Authorization: `Bearer ${secretKey}`,
-      });
+      headers.Authorization = `Bearer ${secretKey}`,
     }
 
     let res: Response | undefined;
