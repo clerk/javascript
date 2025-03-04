@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.55.1
+
+### Patch Changes
+
+- Updated dependencies [[`aefaf48071cc7df172011febb4a870526be89d24`](https://github.com/clerk/javascript/commit/aefaf48071cc7df172011febb4a870526be89d24)]:
+  - @clerk/localizations@3.11.1
+
 ## 5.55.0
 
 ### Minor Changes
