@@ -2,7 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_TASK_PATHS, SessionTask } from '../../../core/resources/SessionTask';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
+import { withRedirectToSignInIfNoTasksAvailable } from '../../common';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
 import {
@@ -80,7 +82,6 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
-
         {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
@@ -128,15 +129,42 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
+              {SESSION_TASK_PATHS.map(path => (
+                <Route
+                  path={path}
+                  key={path}
+                >
+                  <SignInSessionTask />
+                </Route>
+              ))}
               <Route index>
                 <LazySignUpContinue />
               </Route>
             </Route>
+
+            {SESSION_TASK_PATHS.map(path => (
+              <Route
+                path={path}
+                key={path}
+              >
+                <SignInSessionTask />
+              </Route>
+            ))}
+
             <Route index>
               <LazySignUpStart />
             </Route>
           </Route>
         )}
+
+        {SESSION_TASK_PATHS.map(path => (
+          <Route
+            path={path}
+            key={path}
+          >
+            <SignInSessionTask />
+          </Route>
+        ))}
 
         <Route index>
           <SignInStart />
@@ -209,3 +237,5 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
     </Route>
   );
 };
+
+const SignInSessionTask = withRedirectToSignInIfNoTasksAvailable(SessionTask);
