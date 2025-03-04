@@ -289,6 +289,7 @@ describe('SignInStart', () => {
         strategy: 'enterprise_sso',
         redirectUrl: 'http://localhost/#/sso-callback',
         redirectUrlComplete: '/',
+        continueSignIn: true,
       });
     });
   });
@@ -312,6 +313,7 @@ describe('SignInStart', () => {
         strategy: 'enterprise_sso',
         redirectUrl: 'http://localhost/#/sso-callback',
         redirectUrlComplete: '/',
+        continueSignIn: true,
       });
     });
   });
