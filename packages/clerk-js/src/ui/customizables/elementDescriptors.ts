@@ -195,6 +195,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'accountSwitcherActionButton',
   'accountSwitcherActionButtonIconBox',
   'accountSwitcherActionButtonIcon',
+  'planCard',
   'planCardHeader',
   'planCardTitle',
   'planCardDescription',
@@ -209,8 +210,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'planCardFee',
   'planCardFeePeriod',
 
-  'planGrid',
-  'planCard',
+  'pricingTable',
 
   'alert',
   'alertIcon',

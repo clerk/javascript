@@ -155,6 +155,7 @@ export function PlanCard(props: PlanCardProps) {
           <Box
             elementDescriptor={descriptors.planCardFeatures}
             sx={t => ({
+              display: 'flex',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
               backgroundColor: t.colors.$colorBackground,
@@ -168,10 +169,12 @@ export function PlanCard(props: PlanCardProps) {
               as='ul'
               sx={t => ({
                 display: 'grid',
+                flex: '1',
                 rowGap: isCompact ? t.space.$2 : t.space.$3,
+                maskImage: isCompact ? 'linear-gradient(rgba(0,0,0,1), transparent)' : undefined,
               })}
             >
-              {plan.features.map(feature => (
+              {plan.features.slice(0, isCompact ? 3 : plan.features.length).map(feature => (
                 <Box
                   elementDescriptor={descriptors.planCardFeaturesListItem}
                   elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}

@@ -34,7 +34,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   return (
     <InternalThemeProvider>
       <Box
-        elementDescriptor={descriptors.planGrid}
+        elementDescriptor={descriptors.pricingTable}
         sx={{
           display: 'grid',
           gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${isCompact ? '11.75rem' : '20rem'}), 1fr))`,

@@ -320,7 +320,7 @@ export type ElementsConfig = {
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
-  planGrid: WithOptions;
+  pricingTable: WithOptions;
   planCard: WithOptions<string>;
   planCardHeader: WithOptions;
   planCardAvatarContainer: WithOptions;
