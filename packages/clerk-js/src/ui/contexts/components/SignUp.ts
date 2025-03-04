@@ -109,6 +109,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   return {
     ...ctx,
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signInUrl,
     signUpUrl,

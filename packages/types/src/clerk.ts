@@ -588,7 +588,10 @@ export interface Clerk {
     params: AuthenticateWithGoogleOneTapParams,
   ) => Promise<SignInResource | SignUpResource>;
 
-  authenticateWithPopup: (params: AuthenticateWithRedirectParams & { popup: Window | null }) => Promise<unknown>;
+  signInWithPopup: (params: AuthenticateWithRedirectParams & { popup: Window | null }) => Promise<unknown>;
+  signUpWithPopup: (
+    params: AuthenticateWithRedirectParams & { popup: Window | null; unsafeMetadata?: SignUpUnsafeMetadata },
+  ) => Promise<unknown>;
 
   /**
    * Creates an organization, adding the current user as admin.
@@ -1075,6 +1078,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   *
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &

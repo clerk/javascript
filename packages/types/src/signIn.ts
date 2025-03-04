@@ -47,7 +47,7 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
 import type {
@@ -225,8 +225,6 @@ export type ResetPasswordParams = {
   password: string;
   signOutOfOtherSessions?: boolean;
 };
-
-export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
 
 export type AuthenticateWithPasskeyParams = {
   flow?: 'autofill' | 'discoverable';

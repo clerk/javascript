@@ -18,7 +18,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  AuthenticateWithRedirectParams,
+  AuthenticateWithPopupParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -1751,8 +1751,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public authenticateWithPopup = async (
-    params: AuthenticateWithRedirectParams & { popup: Window | null },
+  private authenticateWithPopup = async (
+    authenticationType: 'signIn' | 'signUp',
+    params: AuthenticateWithPopupParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
   ): Promise<void> => {
     if (!this.client || !this.environment || !params.popup) {
       return;
@@ -1768,25 +1771,52 @@ export class Clerk implements ClerkInterface {
     const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
     const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
 
-    window.addEventListener('message', async event => {
+    const messageHandler = async (event: MessageEvent) => {
       if (event.origin !== `https://${accountPortalDomain}`) return;
+
+      let shouldRemoveListener = false;
+
       if (event.data.session) {
         console.log(`calling setActive with session ${event.data.session} adn redirectUrl ${redirectUrl}`);
         await this.setActive({
           session: event.data.session,
           redirectUrl: params.redirectUrlComplete,
         });
+        shouldRemoveListener = true;
       } else if (event.data.destination) {
         console.log(`navigating to ${event.data.destination}`);
         console.log(event.data.metadata);
         this.navigate(event.data.destination);
+        shouldRemoveListener = true;
       }
-    });
-    await this.client.signIn.authenticateWithPopup({
+
+      if (shouldRemoveListener) {
+        window.removeEventListener('message', messageHandler);
+      }
+    };
+
+    window.addEventListener('message', messageHandler);
+
+    const authenticateMethod =
+      authenticationType === 'signIn'
+        ? this.client.signIn.authenticateWithPopup
+        : this.client.signUp.authenticateWithPopup;
+
+    await authenticateMethod({
       ...params,
       redirectUrlComplete: popupRedirectUrlComplete,
       redirectUrl: popupRedirectUrl,
     });
+  };
+
+  public signUpWithPopup = async (
+    params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ): Promise<void> => {
+    return this.authenticateWithPopup('signUp', params);
+  };
+
+  public signInWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
+    return this.authenticateWithPopup('signIn', params);
   };
 
   public createOrganization = async ({ name, slug }: CreateOrganizationParams): Promise<OrganizationResource> => {

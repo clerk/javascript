@@ -9,6 +9,11 @@ import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { handleError, web3CallbackErrorHandler } from '../../utils';
 
+const POPUP_PREFERRED_ORIGINS = ['.lovable.app', 'localhost:4000'];
+function originPrefersPopup(): boolean {
+  return POPUP_PREFERRED_ORIGINS.some(origin => window.location.origin.endsWith(origin));
+}
+
 export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean; legalAccepted?: boolean };
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
@@ -25,6 +30,21 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
     <SocialButtons
       {...rest}
       oauthCallback={(strategy: OAuthStrategy) => {
+        if (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup())) {
+          const popup = window.open('about:blank', '', 'width=600,height=800');
+          return clerk
+            .signUpWithPopup({
+              strategy,
+              redirectUrl,
+              redirectUrlComplete,
+              popup,
+              continueSignUp,
+              unsafeMetadata: ctx.unsafeMetadata,
+              legalAccepted: props.legalAccepted,
+            })
+            .catch(err => handleError(err, [], card.setError));
+        }
+
         return signUp
           .authenticateWithRedirect({
             continueSignUp,

@@ -32,7 +32,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
         if (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup())) {
           const popup = window.open('about:blank', '', 'width=600,height=800');
           return clerk
-            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
+            .signInWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
             .catch(err => handleError(err, [], card.setError));
         }
 
