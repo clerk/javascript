@@ -98,7 +98,7 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
-  authenticateWithPopup: (params: AuthenticateWithRedirectParams & { popup: Window | null }) => Promise<void>;
+  authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
@@ -225,6 +225,8 @@ export type ResetPasswordParams = {
   password: string;
   signOutOfOtherSessions?: boolean;
 };
+
+export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
 
 export type AuthenticateWithPasskeyParams = {
   flow?: 'autofill' | 'discoverable';

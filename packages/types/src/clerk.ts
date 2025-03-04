@@ -959,6 +959,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &

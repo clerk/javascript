@@ -1765,7 +1765,7 @@ export class Clerk implements ClerkInterface {
 
     const { redirectUrl } = params;
 
-    const popupRedirectUrlComplete = `https://${accountPortalDomain}/popup-callback`;
+    const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
     const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
 
     window.addEventListener('message', async event => {

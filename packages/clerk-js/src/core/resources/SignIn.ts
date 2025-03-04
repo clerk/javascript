@@ -9,6 +9,7 @@ import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithPasskeyParams,
+  AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
@@ -224,7 +225,10 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+  private authenticateWithRedirectOrPopup = async (
+    params: AuthenticateWithRedirectParams,
+    navigateCallback: (url: URL | string) => void,
+  ): Promise<void> => {
     const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
 
     const { firstFactorVerification } =
@@ -244,41 +248,25 @@ export class SignIn extends BaseResource implements SignInResource {
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
-      windowNavigate(externalVerificationRedirectURL);
+      navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
     }
   };
 
-  public authenticateWithPopup = async (
-    params: AuthenticateWithRedirectParams & { popup: Window | null },
-  ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier, popup } = params || {};
+  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+  };
+
+  public authenticateWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
+    const { popup } = params || {};
     if (!popup) {
       clerkMissingOptionError('popup');
     }
 
-    const { firstFactorVerification } =
-      (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
-        ? await this.prepareFirstFactor({
-            strategy,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-          })
-        : await this.create({
-            strategy,
-            identifier,
-            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-            actionCompleteRedirectUrl: redirectUrlComplete,
-          });
-
-    const { status, externalVerificationRedirectURL } = firstFactorVerification;
-
-    if (status === 'unverified' && externalVerificationRedirectURL) {
-      popup.location.href = externalVerificationRedirectURL.toString();
-    } else {
-      clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
-    }
+    return this.authenticateWithRedirectOrPopup(params, url => {
+      popup.location.href = url instanceof URL ? url.toString() : url;
+    });
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
