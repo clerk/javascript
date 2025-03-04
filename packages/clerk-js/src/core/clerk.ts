@@ -1176,6 +1176,14 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.organizationProfileUrl);
   }
 
+  public buildSessionTaskUrl(): string {
+    if (!this.environment || !this.environment.displayConfig) {
+      return '';
+    }
+    const signInUrl = this.#options['signInUrl'] || this.environment.displayConfig.signInUrl;
+    return buildURL({ base: signInUrl, hashPath: '/add-organization' }, { stringify: true });
+  }
+
   #redirectToSatellite = async (): Promise<unknown> => {
     if (!inBrowser()) {
       return;
