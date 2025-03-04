@@ -1,5 +1,25 @@
 # @clerk/elements
 
+## 0.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`3d436484eb01b42e0008b6675f4be68f15d21079`](https://github.com/clerk/javascript/commit/3d436484eb01b42e0008b6675f4be68f15d21079)]:
+  - @clerk/clerk-react@5.24.1
+
+## 0.23.0
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`b707e942bfd434ff8a3b9a9fadf9d1b694d702c8`](https://github.com/clerk/javascript/commit/b707e942bfd434ff8a3b9a9fadf9d1b694d702c8), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/clerk-react@5.24.0
+
 ## 0.22.23
 
 ### Patch Changes
