@@ -29,8 +29,10 @@ export function withRedirect<P extends AvailableComponentProps>(
     const options = useOptions();
 
     const hasTaskAndSingleSessionMode = !!clerk.session?.tasks && environment?.authConfig.singleSessionMode;
-    const shouldRedirect = hasTaskAndSingleSessionMode || condition(clerk, environment, options);
-    const redirectUrlWithDefault = hasTaskAndSingleSessionMode ? () => clerk.buildSessionTaskUrl() : redirectUrl;
+    const shouldRedirect = hasTaskAndSingleSessionMode ? false : condition(clerk, environment, options);
+    const redirectUrlWithDefault = hasTaskAndSingleSessionMode
+      ? () => clerk.internal__buildSessionTaskUrl()
+      : redirectUrl;
 
     React.useEffect(() => {
       if (shouldRedirect) {

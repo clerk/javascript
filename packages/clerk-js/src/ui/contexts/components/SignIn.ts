@@ -1,8 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
+import { eventBus, events } from '../../../core/events';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
@@ -110,6 +111,22 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+
+  useEffect(() => {
+    eventBus.on(events.InternalComponentNavigate, async resolveNavigation => {
+      const tasksUrl = buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signInUrl,
+        path: ctx.path,
+        endpoint: '/add-organization',
+        authQueryString: null,
+      });
+
+      await navigate(tasksUrl);
+
+      resolveNavigation();
+    });
+  }, []);
 
   return {
     ...(ctx as SignInCtx),

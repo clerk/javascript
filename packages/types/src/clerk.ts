@@ -476,7 +476,7 @@ export interface Clerk {
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
-  buildSessionTaskUrl(): string;
+  internal__buildSessionTaskUrl(): string;
 
   /**
    *

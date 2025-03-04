@@ -80,7 +80,6 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
-
         {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route

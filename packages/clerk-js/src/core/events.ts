@@ -3,6 +3,7 @@ import type { TokenResource } from '@clerk/types';
 export const events = {
   TokenUpdate: 'token:update',
   UserSignOut: 'user:signOut',
+  InternalComponentNavigate: 'task:internalNavigate',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
@@ -13,6 +14,7 @@ type TokenUpdatePayload = { token: TokenResource | null };
 type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
+  [events.InternalComponentNavigate]: () => void;
 };
 
 const createEventBus = () => {
@@ -45,7 +47,11 @@ const createEventBus = () => {
     eventToHandlersMap.set(event, []);
   };
 
-  return { on, dispatch, off };
+  const has = <E extends ClerkEvent>(event: E) => {
+    return !!eventToHandlersMap.has(event);
+  };
+
+  return { on, dispatch, off, has };
 };
 
 export const eventBus = createEventBus();
