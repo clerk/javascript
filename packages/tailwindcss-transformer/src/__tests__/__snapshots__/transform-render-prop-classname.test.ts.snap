@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`render prop with className 1`] = `
-"const Button: React.FC<ButtonProps> = ({ children, className }) => {
-    return <div render={() => <button className="cl-c2153e59">{children}</button>} />;
-  }"
-`;

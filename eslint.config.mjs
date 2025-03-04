@@ -393,13 +393,6 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/ui',
-    files: ['packages/ui/src/**/*'],
-    rules: {
-      'import/no-unresolved': ['error', { ignore: ['^#', '^~', '@clerk/elements/*'] }],
-    },
-  },
-  {
     name: 'packages/upgrade',
     files: ['packages/upgrade/src/**/*'],
     rules: {
