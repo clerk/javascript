@@ -167,6 +167,7 @@ export function PlanCard(props: PlanCardProps) {
             <Box
               elementDescriptor={descriptors.planCardFeaturesList}
               as='ul'
+              role='list'
               sx={t => ({
                 display: 'grid',
                 flex: '1',
