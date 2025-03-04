@@ -57,6 +57,7 @@ type BuildRequestOptions = {
    */
   requireSecretKey?: boolean;
 };
+
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
@@ -91,11 +92,14 @@ export function buildRequest(options: BuildRequestOptions) {
 
     // Build headers
     const headers: Record<string, any> = {
-      Authorization: `Bearer ${secretKey}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
     };
+
+    if (secretKey) {
+      headers.Authorization = `Bearer ${secretKey}`;
+    }
 
     let res: Response | undefined;
     try {
