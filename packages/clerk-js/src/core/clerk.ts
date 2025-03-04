@@ -44,6 +44,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -200,15 +201,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null = null;
+  #internalComponentNavigate: ((to: string) => Promise<unknown>) | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -444,6 +437,27 @@ export class Clerk implements ClerkInterface {
       this.#emit();
 
       await onAfterSetActive();
+    };
+
+    #handlePendingSession = async (session: PendingSessionResource) => {
+      if (!session.currentTask || !this.environment) {
+        return;
+      }
+
+      if (session?.lastActiveToken) {
+        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+      }
+
+      if (this.#internalComponentNavigate) {
+        // Handles navigation for UI components
+        await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
+      } else {
+        // Handles navigation for custom flows
+        await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
+      }
+
+      this.#setAccessors(session);
+      this.#emit();
     };
 
     /**
@@ -971,6 +985,11 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
+    }
+
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
@@ -1117,18 +1136,12 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigationContext = (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => {
-    this.#componentNavigationContext = context;
-
-    return () => (this.#componentNavigationContext = null);
+  public __internal_setComponentNavigate = (navigate: (to: string) => Promise<unknown>): UnsubscribeCallback => {
+    this.#internalComponentNavigate = navigate;
+    const unsubscribe = () => {
+      this.#internalComponentNavigate = null;
+    };
+    return unsubscribe;
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {

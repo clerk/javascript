@@ -28,7 +28,10 @@ export function withRedirect<P extends AvailableComponentProps>(
     const environment = useEnvironment();
     const options = useOptions();
 
-    const shouldRedirect = condition(clerk, environment, options);
+    const hasTaskAndSingleSessionMode = !!clerk.session?.tasks && environment?.authConfig.singleSessionMode;
+    const shouldRedirect = hasTaskAndSingleSessionMode || condition(clerk, environment, options);
+    const redirectUrlWithDefault = hasTaskAndSingleSessionMode ? () => clerk.buildSessionTaskUrl() : redirectUrl;
+
     React.useEffect(() => {
       if (shouldRedirect) {
         if (warning && isDevelopmentFromPublishableKey(clerk.publishableKey)) {
@@ -36,7 +39,7 @@ export function withRedirect<P extends AvailableComponentProps>(
         }
         // TODO: Fix this properly
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        navigate(redirectUrl({ clerk, environment, options }));
+        navigate(redirectUrlWithDefault({ clerk, environment, options }));
       }
     }, []);
 
