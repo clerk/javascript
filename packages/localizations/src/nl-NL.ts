@@ -867,6 +867,7 @@ export const nlNL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

@@ -883,6 +883,7 @@ export const deDE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Entfernen',
         menuAction__rename: 'Umbenennen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

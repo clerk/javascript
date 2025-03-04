@@ -873,6 +873,7 @@ export const fiFI: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Poista',
         menuAction__rename: 'Nimeä uudelleen',
+        primaryButton: undefined,
         title: 'Pääsyavaimet',
       },
       passwordSection: {

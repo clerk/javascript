@@ -875,6 +875,7 @@ export const esES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar Clave de Acceso',
         menuAction__rename: 'Renombrar Clave de Acceso',
+        primaryButton: undefined,
         title: 'Sección de Claves de Acceso',
       },
       passwordSection: {
