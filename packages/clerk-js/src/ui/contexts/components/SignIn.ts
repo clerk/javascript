@@ -7,6 +7,7 @@ import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
+import { useNavigateOnEvent } from '../../hooks/useNavigateOnEvent';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
@@ -21,6 +22,7 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  tasksUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
@@ -112,6 +114,22 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  const tasksUrl = clerk.session?.currentTask
+    ? buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signInUrl,
+        path: ctx.path,
+        endpoint: clerk.session?.currentTask?.__internal_getUrlPath(),
+        authQueryString: null,
+      })
+    : null;
+
+  useNavigateOnEvent({
+    routing: ctx.routing,
+    baseUrl: signInUrl,
+    path: ctx.path,
+  });
+
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
@@ -123,6 +141,7 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    tasksUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,

@@ -7,6 +7,7 @@ import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
+import { useNavigateOnEvent } from '../../hooks/useNavigateOnEvent';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
@@ -22,6 +23,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
+  tasksUrl: string | null;
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
@@ -107,6 +109,22 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
+  const tasksUrl = clerk.session?.currentTask
+    ? buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signUpUrl,
+        path: ctx.path,
+        endpoint: clerk.session?.currentTask?.__internal_getUrlPath(),
+        authQueryString: null,
+      })
+    : null;
+
+  useNavigateOnEvent({
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+    path: ctx.path,
+  });
+
   return {
     ...ctx,
     componentName,
@@ -118,6 +136,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    tasksUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },

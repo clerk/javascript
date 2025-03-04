@@ -438,27 +438,6 @@ export class Clerk implements ClerkInterface {
       await onAfterSetActive();
     };
 
-    #handlePendingSession = async (session: PendingSessionResource) => {
-      if (!session.currentTask || !this.environment) {
-        return;
-      }
-
-      if (session?.lastActiveToken) {
-        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
-      }
-
-      if (this.#internalComponentNavigate) {
-        // Handles navigation for UI components
-        await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
-      } else {
-        // Handles navigation for custom flows
-        await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
-      }
-
-      this.#setAccessors(session);
-      this.#emit();
-    };
-
     /**
      * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
      * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
@@ -1069,6 +1048,27 @@ export class Clerk implements ClerkInterface {
     this.#setAccessors(newSession);
     this.#emit();
     await onAfterSetActive();
+  };
+
+  #handlePendingSession = async (session: PendingSessionResource) => {
+    if (!session.currentTask || !this.environment) {
+      return;
+    }
+
+    if (session?.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+    }
+
+    if (this.#internalComponentNavigate) {
+      // Handles navigation for UI components
+      await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
+    } else {
+      // Handles navigation for custom flows
+      await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
+    }
+
+    this.#setAccessors(session);
+    this.#emit();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
