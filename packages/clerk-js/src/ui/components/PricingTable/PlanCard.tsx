@@ -184,6 +184,9 @@ export function PlanCard(props: PlanCardProps) {
           elementDescriptor={descriptors.planCardAction}
           sx={t => ({
             padding: t.space.$4,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$neutralAlpha100,
             background:
               collapseFeatures || !hasFeatures
                 ? 'transparent'
@@ -191,17 +194,6 @@ export function PlanCard(props: PlanCardProps) {
                     colors.setAlpha(t.colors.$colorBackground, 1),
                     t.colors.$neutralAlpha50,
                   ),
-            ...(ctaPosition === 'top'
-              ? {
-                  borderBottomWidth: t.borderWidths.$normal,
-                  borderBottomStyle: t.borderStyles.$solid,
-                  borderBottomColor: t.colors.$neutralAlpha100,
-                }
-              : {
-                  borderTopWidth: collapseFeatures ? '0' : t.borderWidths.$normal,
-                  borderTopStyle: t.borderStyles.$solid,
-                  borderTopColor: t.colors.$neutralAlpha100,
-                }),
           })}
         >
           <Button
