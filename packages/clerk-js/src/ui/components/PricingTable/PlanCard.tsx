@@ -28,7 +28,10 @@ export function PlanCard(props: PlanCardProps) {
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: t.colors.$colorBackground,
+        backgroundColor: common.mergedColorsBackground(
+          colors.setAlpha(t.colors.$colorBackground, 1),
+          t.colors.$neutralAlpha50,
+        ),
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
@@ -43,10 +46,6 @@ export function PlanCard(props: PlanCardProps) {
           display: 'grid',
           gridRowGap: t.space.$2,
           padding: t.space.$4,
-          background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
-            t.colors.$neutralAlpha50,
-          ),
         })}
       >
         <Flex
@@ -136,64 +135,58 @@ export function PlanCard(props: PlanCardProps) {
         </Box>
       </Box>
       <ReversibleContainer reverse={ctaPosition === 'top'}>
-        {!collapseFeatures ? (
+        {!collapseFeatures && hasFeatures ? (
           <Box
             elementDescriptor={descriptors.planCardFeatures}
             sx={t => ({
-              flex: hasFeatures ? '1' : undefined,
-              borderTopWidth: hasFeatures ? t.borderWidths.$normal : '0',
+              flex: '1',
+              backgroundColor: t.colors.$colorBackground,
+              borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
           >
-            {hasFeatures ? (
-              <Box
-                elementDescriptor={descriptors.planCardFeaturesList}
-                as='ul'
-                sx={t => ({
-                  padding: t.space.$4,
-                  display: 'grid',
-                  rowGap: t.space.$3,
-                })}
-              >
-                {plan.features.map(feature => (
-                  <Box
-                    elementDescriptor={descriptors.planCardFeaturesListItem}
-                    elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
-                    key={feature.id}
-                    as='li'
+            <Box
+              elementDescriptor={descriptors.planCardFeaturesList}
+              as='ul'
+              sx={t => ({
+                padding: t.space.$4,
+                display: 'grid',
+                rowGap: t.space.$3,
+              })}
+            >
+              {plan.features.map(feature => (
+                <Box
+                  elementDescriptor={descriptors.planCardFeaturesListItem}
+                  elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
+                  key={feature.id}
+                  as='li'
+                >
+                  <Flex
+                    gap={2}
+                    align='baseline'
                   >
-                    <Flex
-                      gap={2}
-                      align='baseline'
-                    >
-                      <Icon
-                        icon={Check}
-                        colorScheme='neutral'
-                        size='sm'
-                      />
-                      <Text>{feature.description || feature.name}</Text>
-                    </Flex>
-                  </Box>
-                ))}
-              </Box>
-            ) : null}
+                    <Icon
+                      icon={Check}
+                      colorScheme='neutral'
+                      size='sm'
+                    />
+                    <Text>{feature.description || feature.name}</Text>
+                  </Flex>
+                </Box>
+              ))}
+            </Box>
           </Box>
         ) : null}
         <Box
           elementDescriptor={descriptors.planCardAction}
           sx={t => ({
+            marginTop: 'auto',
             padding: t.space.$4,
             borderTopWidth: t.borderWidths.$normal,
             borderTopStyle: t.borderStyles.$solid,
             borderTopColor: t.colors.$neutralAlpha100,
-            background:
-              collapseFeatures || !hasFeatures
-                ? 'transparent'
-                : common.mergedColorsBackground(
-                    colors.setAlpha(t.colors.$colorBackground, 1),
-                    t.colors.$neutralAlpha50,
-                  ),
+            background: collapseFeatures || !hasFeatures ? t.colors.$colorBackground : undefined,
           })}
         >
           <Button
