@@ -80,7 +80,7 @@ export function isBrowserOnline(): boolean {
   const hasRtt = connection?.rtt !== 0;
   const hasDownlink = connection?.downlink !== 0;
 
-  return isNavigatorOnline && (hasRtt || hasDownlink || !connection);
+  return isNavigatorOnline && (hasRtt || hasDownlink);
 }
 
 /**
