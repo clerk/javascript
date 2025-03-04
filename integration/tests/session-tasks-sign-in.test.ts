@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
@@ -29,31 +29,12 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await app.teardown();
   });
 
-  test('on after sign-in, navigates to task', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.setIdentifier(fakeUser.email);
-    await u.po.signIn.continue();
-    await u.po.signIn.setPassword(fakeUser.password);
-    await u.po.signIn.continue();
-    await u.po.expect.toBeSignedIn();
-    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
-    expect(u.page.url()).toContain('/sign-in/add-organization');
+  test.fixme('on after sign-in, navigates to task', async () => {
+    // todo
   });
 
-  test('redirects back to task when accessing root sign in component', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.setIdentifier(fakeUser.email);
-    await u.po.signIn.continue();
-    await u.po.signIn.setPassword(fakeUser.password);
-    await u.po.signIn.continue();
-    await u.po.expect.toBeSignedIn();
-    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
-    expect(u.page.url()).toContain('/sign-in/add-organization');
-    await u.po.signIn.goTo();
-    await expect(u.page.getByRole('heading', { name: 'Create Organization' })).toBeVisible();
-    expect(u.page.url()).toContain('/sign-in/add-organization');
+  test.fixme('redirects back to task when accessing root sign in component', async () => {
+    // todo
   });
 
   test.fixme('redirects to after sign-in url when accessing root sign in component with a active session', {

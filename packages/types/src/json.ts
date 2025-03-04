@@ -12,7 +12,7 @@ import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './org
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
-import type { SessionStatus, SessionTask } from './session';
+import type { SessionStatus, SessionTaskKey } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
@@ -101,6 +101,10 @@ export interface SignUpJSON extends ClerkResourceJSON {
   verifications: SignUpVerificationsJSON | null;
 }
 
+export interface SessionTaskJSON {
+  key: SessionTaskKey;
+}
+
 export interface SessionJSON extends ClerkResourceJSON {
   object: 'session';
   id: string;
@@ -117,7 +121,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
   actor: ActJWTClaim | null;
-  tasks: Array<SessionTask> | null;
+  tasks: Array<SessionTaskJSON> | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;

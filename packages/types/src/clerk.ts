@@ -479,8 +479,6 @@ export interface Clerk {
    */
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
-  buildSessionTaskUrl(): string;
-
   /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
