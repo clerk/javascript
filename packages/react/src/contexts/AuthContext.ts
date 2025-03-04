@@ -1,9 +1,10 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { ActJWTClaim, OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from '@clerk/types';
+import type { ActJWTClaim, JwtPayload, OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from '@clerk/types';
 
 export type AuthContextValue = {
   userId: string | null | undefined;
   sessionId: string | null | undefined;
+  sessionClaims: JwtPayload | null | undefined;
   actor: ActJWTClaim | null | undefined;
   orgId: string | null | undefined;
   orgRole: OrganizationCustomRoleKey | null | undefined;
