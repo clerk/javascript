@@ -53,25 +53,6 @@ export const useSignInContext = (): SignInContextType => {
 
   const { componentName, mode, __status, ...ctx } = context;
 
-  // if (typeof userSettings === 'undefined') {
-  //   return {
-  //     authQueryString: '',
-  //     emailLinkRedirectUrl: '',
-  //     isCombinedFlow: false,
-  //     navigateAfterSignIn: () => {},
-  //     path: '',
-  //     queryParams: {},
-  //     signInUrl: '',
-  //     signUpContinueUrl: '',
-  //     signUpUrl: '',
-  //     ssoCallbackUrl: '',
-  //     __status: 'degraded',
-  //     transferable: false,
-  //     waitlistUrl: '',
-  //     ...context,
-  //   };
-  // }
-
   const isCombinedFlow =
     (userSettings?.signUp?.mode !== 'restricted' &&
       Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
