@@ -48,6 +48,7 @@ export type {
   UserWebhookEvent,
   WaitlistEntryWebhookEvent,
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
 } from './Webhooks';
 
