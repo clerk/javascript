@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.55.0
+
+### Minor Changes
+
+- Lazily load components related to `<SignUp>` functionality when used with the combined flow in `<SignIn>`. ([#5237](https://github.com/clerk/javascript/pull/5237)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Revert offlineScheduler ([#5279](https://github.com/clerk/javascript/pull/5279)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Display validation error in `<Waitlist />` for email address field correctly ([#5243](https://github.com/clerk/javascript/pull/5243)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`ae53f31442b661c291c4b4cc4cc5152df6c6aa47`](https://github.com/clerk/javascript/commit/ae53f31442b661c291c4b4cc4cc5152df6c6aa47), [`02defeda4d73de9cf34904d76590fd98d4abd3a9`](https://github.com/clerk/javascript/commit/02defeda4d73de9cf34904d76590fd98d4abd3a9), [`79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3`](https://github.com/clerk/javascript/commit/79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3), [`f18318179180b1f95690a4982ba44df9de1c57ab`](https://github.com/clerk/javascript/commit/f18318179180b1f95690a4982ba44df9de1c57ab)]:
+  - @clerk/localizations@3.11.0
+
 ## 5.54.2
 
 ### Patch Changes
