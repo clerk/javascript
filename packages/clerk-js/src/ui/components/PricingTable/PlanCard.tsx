@@ -18,6 +18,7 @@ interface PlanCardProps {
 export function PlanCard(props: PlanCardProps) {
   const { plan, period, setPeriod, onSelect, props: pricingTableProps } = props;
   const { ctaPosition, collapseFeatures } = pricingTableProps;
+  const hasFeatures = plan.features.length > 0;
   const isActivePlan = plan.isActiveForPayer;
   return (
     <Box
@@ -25,10 +26,8 @@ export function PlanCard(props: PlanCardProps) {
       elementDescriptor={descriptors.planCard}
       elementId={descriptors.planCard.setId(plan.slug)}
       sx={t => ({
-        display: 'grid',
-        gridRow: collapseFeatures ? 'span 5' : 'span 6',
-        gridTemplateRows: 'subgrid',
-        rowGap: '0',
+        display: 'flex',
+        flexDirection: 'column',
         backgroundColor: t.colors.$colorBackground,
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
@@ -42,17 +41,12 @@ export function PlanCard(props: PlanCardProps) {
         elementDescriptor={descriptors.planCardHeader}
         sx={t => ({
           display: 'grid',
-          gridRow: 'span 4',
-          gridTemplateRows: 'subgrid',
           gridRowGap: t.space.$2,
           padding: t.space.$4,
           background: common.mergedColorsBackground(
             colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
-          borderBottomWidth: t.borderWidths.$normal,
-          borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
         })}
       >
         <Flex
@@ -85,7 +79,7 @@ export function PlanCard(props: PlanCardProps) {
             variant='subtitle'
             colorScheme='secondary'
           >
-            {plan.description}
+            {plan.description ? plan.description : '\u00A0'}
           </Text>
         </Box>
         <Box>
@@ -124,9 +118,10 @@ export function PlanCard(props: PlanCardProps) {
           )}
         </Box>
         <Box
-          sx={{
+          sx={t => ({
             display: 'flex',
-          }}
+            minHeight: t.space.$6,
+          })}
         >
           {plan.hasBaseFee ? (
             <SegmentedControl
@@ -142,8 +137,16 @@ export function PlanCard(props: PlanCardProps) {
       </Box>
       <ReversibleContainer reverse={ctaPosition === 'top'}>
         {!collapseFeatures ? (
-          <Box elementDescriptor={descriptors.planCardFeatures}>
-            {plan.features.length > 0 ? (
+          <Box
+            elementDescriptor={descriptors.planCardFeatures}
+            sx={t => ({
+              flex: hasFeatures ? '1' : undefined,
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : '0',
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+            })}
+          >
+            {hasFeatures ? (
               <Box
                 elementDescriptor={descriptors.planCardFeaturesList}
                 as='ul'
@@ -181,9 +184,13 @@ export function PlanCard(props: PlanCardProps) {
           elementDescriptor={descriptors.planCardAction}
           sx={t => ({
             padding: t.space.$4,
-            background: collapseFeatures
-              ? 'transparent'
-              : common.mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha50),
+            background:
+              collapseFeatures || !hasFeatures
+                ? 'transparent'
+                : common.mergedColorsBackground(
+                    colors.setAlpha(t.colors.$colorBackground, 1),
+                    t.colors.$neutralAlpha50,
+                  ),
             ...(ctaPosition === 'top'
               ? {
                   borderBottomWidth: t.borderWidths.$normal,
@@ -200,9 +207,7 @@ export function PlanCard(props: PlanCardProps) {
           <Button
             block
             localizationKey={
-              plan.isActiveForPayer
-                ? localizationKeys('commerce_manageMembership')
-                : localizationKeys('commerce_getStarted')
+              isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
             }
             onClick={() => onSelect(plan)}
           />

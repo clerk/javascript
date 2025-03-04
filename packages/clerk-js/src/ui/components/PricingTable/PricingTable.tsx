@@ -36,9 +36,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         sx={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 20rem), 1fr))',
-          gridTemplateRows: 'repeat(4, auto)',
-          columnGap: '1rem',
-          rowGap: '1rem',
+          alignItems: 'start',
+          gap: '1rem',
           width: '100%',
           minWidth: '0',
         }}
