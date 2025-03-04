@@ -2,4 +2,8 @@
 '@clerk/backend': patch
 ---
 
-Added WaitlistEntryJSON and updated WebhookEvent to include WaitlistEntry
+Add waitlist entry types
+- `WaitlistEntryJSON`
+- `WaitlistEntryWebhookEvent`
+
+Update `WebhookEvent` to include `WaitlistEntryWebhookEvent`
