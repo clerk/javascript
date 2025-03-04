@@ -3,7 +3,7 @@ import type { CustomPage, LoadedClerk } from '@clerk/types';
 import { isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
-import { Organization, TickShield, User, Users } from '../icons';
+import { CreditCard, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -241,6 +241,12 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: TickShield,
       path: 'security',
+    },
+    {
+      name: localizationKeys('userProfile.navbar.billing'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+      icon: CreditCard,
+      path: 'billing',
     },
   ];
 

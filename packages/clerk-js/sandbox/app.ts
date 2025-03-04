@@ -16,6 +16,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationProfile',
   'organizationSwitcher',
   'waitlist',
+  'pricingTable',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -73,6 +74,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationProfile: buildComponentControls('organizationProfile'),
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
+  pricingTable: buildComponentControls('pricingTable'),
 };
 
 declare global {
@@ -166,6 +168,9 @@ function addCurrentRouteIndicator(currentRoute: string) {
           __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
         },
       });
+    },
+    '/pricing-table': () => {
+      Clerk.__experimental_mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
