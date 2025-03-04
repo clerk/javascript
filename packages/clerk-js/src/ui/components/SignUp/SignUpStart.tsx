@@ -40,10 +40,11 @@ function _SignUpStart(): JSX.Element {
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
+
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+    getInitialActiveIdentifier(attributes, userSettings.signUp?.progressive),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};

@@ -37,7 +37,7 @@ export type Fields = {
 };
 
 type FieldDeterminationProps = {
-  attributes: Attributes;
+  attributes: Partial<Attributes>;
   activeCommIdentifierType?: ActiveIdentifier;
   hasTicket?: boolean;
   hasEmail?: boolean;
@@ -103,49 +103,50 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
   }
 }
 
-export const getInitialActiveIdentifier = (attributes: Attributes, isProgressiveSignUp: boolean): ActiveIdentifier => {
-  if (emailOrPhone(attributes, isProgressiveSignUp)) {
+export const getInitialActiveIdentifier = (
+  { email_address, phone_number }: Partial<Attributes>,
+  isProgressiveSignUp: boolean,
+): ActiveIdentifier => {
+  if (emailOrPhone({ email_address, phone_number }, isProgressiveSignUp)) {
     // If we are in the case of Email OR Phone, email takes priority
     return 'emailAddress';
   }
 
-  const { email_address, phone_number } = attributes;
-
-  if (email_address.enabled && isProgressiveSignUp ? email_address.required : email_address.used_for_first_factor) {
+  if (email_address?.enabled && isProgressiveSignUp ? email_address.required : email_address?.used_for_first_factor) {
     return 'emailAddress';
   }
 
-  if (phone_number.enabled && isProgressiveSignUp ? phone_number.required : phone_number.used_for_first_factor) {
+  if (phone_number?.enabled && isProgressiveSignUp ? phone_number.required : phone_number?.used_for_first_factor) {
     return 'phoneNumber';
   }
 
   return null;
 };
-
 export function showFormFields(userSettings: UserSettingsResource): boolean {
   const { authenticatableSocialStrategies, web3FirstFactors } = userSettings;
 
   return userSettings.hasValidAuthFactor || (!authenticatableSocialStrategies.length && !web3FirstFactors.length);
 }
 
-export function emailOrPhone(attributes: Attributes, isProgressiveSignUp: boolean) {
-  const { email_address, phone_number } = attributes;
-
+export function emailOrPhone({ email_address, phone_number }: Partial<Attributes>, isProgressiveSignUp: boolean) {
   if (isProgressiveSignUp) {
-    return email_address.enabled && phone_number.enabled && !email_address.required && !phone_number.required;
+    return email_address?.enabled && phone_number?.enabled && !email_address?.required && !phone_number?.required;
   }
 
-  return email_address.used_for_first_factor && phone_number.used_for_first_factor;
+  return email_address?.used_for_first_factor && phone_number?.used_for_first_factor;
 }
 
 function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Field | undefined {
+  console.log('fieldKey', fieldKey);
+  console.log('fieldProps', fieldProps);
+
   switch (fieldKey) {
     case 'emailAddress':
       return getEmailAddressField(fieldProps);
     case 'phoneNumber':
       return getPhoneNumberField(fieldProps);
     case 'password':
-      return getPasswordField(fieldProps.attributes);
+      return getPasswordField(fieldProps.attributes ?? {});
     case 'ticket':
       return getTicketField(fieldProps.hasTicket);
     case 'legalAccepted':
@@ -153,7 +154,7 @@ function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Fiel
     case 'username':
     case 'firstName':
     case 'lastName':
-      return getGenericField(fieldKey, fieldProps.attributes);
+      return getGenericField(fieldKey, fieldProps.attributes ?? {});
     default:
       return;
   }
@@ -169,7 +170,7 @@ function getEmailAddressField({
   if (isProgressiveSignUp) {
     // If there is no ticket, or there is a ticket along with an email, and email address is enabled,
     // we have to show it in the SignUp form
-    const show = (!hasTicket || (hasTicket && hasEmail)) && attributes.email_address.enabled;
+    const show = (!hasTicket || (hasTicket && hasEmail)) && attributes?.email_address?.enabled;
 
     if (!show) {
       return;
@@ -182,14 +183,14 @@ function getEmailAddressField({
     }
 
     return {
-      required: attributes.email_address.required,
+      required: attributes?.email_address?.required ?? false,
       disabled: !!hasTicket && !!hasEmail,
     };
   }
 
   const show =
     (!hasTicket || (hasTicket && hasEmail)) &&
-    attributes.email_address.enabled &&
+    attributes?.email_address?.enabled &&
     attributes.email_address.used_for_first_factor &&
     activeCommIdentifierType === 'emailAddress';
 
@@ -211,7 +212,7 @@ function getPhoneNumberField({
 }: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
     // If there is no ticket and phone number is enabled, we have to show it in the SignUp form
-    const show = attributes.phone_number.enabled;
+    const show = attributes?.phone_number?.enabled;
 
     if (!show) {
       return;
@@ -224,13 +225,13 @@ function getPhoneNumberField({
     }
 
     return {
-      required: attributes.phone_number.required,
+      required: attributes?.phone_number?.required ?? false,
     };
   }
 
   const show =
     !hasTicket &&
-    attributes.phone_number.enabled &&
+    attributes?.phone_number?.enabled &&
     attributes.phone_number.used_for_first_factor &&
     activeCommIdentifierType === 'phoneNumber';
 
@@ -244,16 +245,14 @@ function getPhoneNumberField({
 }
 
 // Currently, password is always enabled so only show if required
-function getPasswordField(attributes: Attributes): Field | undefined {
-  const show = attributes.password.enabled && attributes.password.required;
+function getPasswordField(attributes: Partial<Attributes>): Field | undefined {
+  const show = attributes?.password?.enabled && attributes.password.required;
 
-  if (!show) {
-    return;
-  }
-
-  return {
-    required: attributes.password.required,
-  };
+  return show
+    ? {
+        required: attributes?.password?.required ?? false,
+      }
+    : undefined;
 }
 
 function getTicketField(hasTicket?: boolean): Field | undefined {
@@ -276,16 +275,16 @@ function getLegalAcceptedField(legalConsentRequired?: boolean): Field | undefine
   };
 }
 
-function getGenericField(fieldKey: FieldKey, attributes: Attributes): Field | undefined {
+function getGenericField(fieldKey: FieldKey, attributes: Partial<Attributes>): Field | undefined {
   const attrKey = camelToSnake(fieldKey);
 
   // @ts-expect-error - TS doesn't know that the key exists
-  if (!attributes[attrKey].enabled) {
+  if (!attributes[attrKey]?.enabled) {
     return;
   }
 
   return {
     // @ts-expect-error - TS doesn't know that the key exists
-    required: attributes[attrKey].required,
+    required: attributes[attrKey]?.required,
   };
 }
