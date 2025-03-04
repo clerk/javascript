@@ -1,0 +1,12 @@
+---
+import { getClientSafeEnv } from '@clerk/astro/server';
+import { buildClerkHotloadScript } from '@clerk/astro/server';
+const safeEnv = JSON.stringify(getClientSafeEnv(Astro.locals));
+
+const hotLoadScript = buildClerkHotloadScript(Astro.locals);
+const data = JSON.stringify(Astro.locals.auth());
+---
+
+<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json" set:html={safeEnv}></script>
+<script id="__CLERK_ASTRO_DATA__" type="application/json" set:html={data}></script>
+<Fragment set:html={hotLoadScript} />
