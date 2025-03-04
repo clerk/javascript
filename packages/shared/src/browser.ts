@@ -64,18 +64,23 @@ export function isValidBrowser(): boolean {
  * @returns {boolean}
  */
 export function isBrowserOnline(): boolean {
-  const navigator = inBrowser() ? window?.navigator : null;
-  if (!navigator) {
+  const isNavigatorOnline = inBrowser() ? window?.navigator?.onLine : false;
+  if (!isNavigatorOnline) {
     return false;
   }
 
-  const isNavigatorOnline = navigator?.onLine;
+  // Use experimental properties as additional optional signals. https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility
+  // @ts-ignore connection is not typed
+  const connection = navigator?.connection;
+  if (!connection) {
+    return isNavigatorOnline;
+  }
 
-  // Being extra safe with the experimental `connection` property, as it is not defined in all browsers
-  // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility
-  // @ts-ignore
-  const isExperimentalConnectionOnline = navigator?.connection?.rtt !== 0 && navigator?.connection?.downlink !== 0;
-  return isExperimentalConnectionOnline && isNavigatorOnline;
+  // If connection info exists, use it as an additional signal but don't require both to be non-zero
+  const hasRtt = connection?.rtt !== 0;
+  const hasDownlink = connection?.downlink !== 0;
+
+  return isNavigatorOnline && (hasRtt || hasDownlink || !connection);
 }
 
 /**
