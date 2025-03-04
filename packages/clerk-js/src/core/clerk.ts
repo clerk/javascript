@@ -102,7 +102,6 @@ import {
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -196,7 +195,6 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #sessionTouchOfflineScheduler = createOfflineScheduler();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -2082,16 +2080,12 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      const performTouch = () => {
-        if (this.#touchThrottledUntil > Date.now()) {
-          return;
-        }
-        this.#touchThrottledUntil = Date.now() + 5_000;
+      if (this.#touchThrottledUntil > Date.now()) {
+        return;
+      }
+      this.#touchThrottledUntil = Date.now() + 5_000;
 
-        return this.#touchCurrentSession(this.session);
-      };
-
-      this.#sessionTouchOfflineScheduler.schedule(performTouch);
+      void this.#touchCurrentSession(this.session);
     });
 
     /**
