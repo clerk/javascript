@@ -873,6 +873,7 @@ export const huHU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eltávolítás',
         menuAction__rename: 'Átnevezés',
+        primaryButton: undefined,
         title: 'Passkey-k',
       },
       passwordSection: {

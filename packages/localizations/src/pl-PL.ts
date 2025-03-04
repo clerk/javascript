@@ -881,6 +881,7 @@ export const plPL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Usuń',
         menuAction__rename: 'Zmień nazwę',
+        primaryButton: undefined,
         title: 'Klucze dostępu',
       },
       passwordSection: {

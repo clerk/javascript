@@ -887,6 +887,7 @@ export const ruRU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Удалить',
         menuAction__rename: 'Переименовать',
+        primaryButton: undefined,
         title: 'Ключи доступа',
       },
       passwordSection: {
