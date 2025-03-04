@@ -1,5 +1,5 @@
 ---
-'@clerk/backend': patch
+'@clerk/backend': minor
 ---
 
 Add waitlist entry types
