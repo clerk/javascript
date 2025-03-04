@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useClerk } from '@clerk/shared/react';
 import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
 import { useState } from 'react';
@@ -53,6 +54,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           />
         ))}
       </Box>
+      {/* eslint-disable-next-line react/jsx-pascal-case */}
       <__experimental_CheckoutContext.Provider
         value={{
           componentName: 'Checkout',
@@ -63,6 +65,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
+          {/* eslint-disable-next-line react/jsx-pascal-case */}
           <__experimental_Checkout
             planPeriod={planPeriod}
             planId={selectedPlan?.id}
