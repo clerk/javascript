@@ -28,7 +28,7 @@ import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpStart(): JSX.Element {
+function SignUpStartComponent(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -347,4 +347,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(SignUpStartComponent));
