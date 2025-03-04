@@ -10,14 +10,25 @@ interface EnvironmentProviderProps {
   value: EnvironmentResource;
 }
 
-function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
+type PartialEnvironmentResource = EnvironmentResource & {
+  authConfig: Partial<EnvironmentResource['authConfig']>;
+  displayConfig: Partial<EnvironmentResource['displayConfig']>;
+  organizationSettings: Partial<EnvironmentResource['organizationSettings']>;
+  userSettings: Partial<EnvironmentResource['userSettings']>;
+};
+
+export function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
 }
 
-function useEnvironment(): EnvironmentResource {
+export function useEnvironment(): PartialEnvironmentResource {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
+
+  context.authConfig = context.authConfig ?? {};
+  context.displayConfig = context.displayConfig ?? {};
+  context.organizationSettings = context.organizationSettings ?? {};
+  context.userSettings = context.userSettings ?? {};
+
   return context;
 }
-
-export { EnvironmentProvider, useEnvironment };

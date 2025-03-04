@@ -2,12 +2,12 @@ import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/types';
 
 export type ComponentGuard = (
   clerk: Clerk,
-  environment?: EnvironmentResource | null,
+  environment?: Partial<EnvironmentResource> | null,
   options?: ClerkOptions,
 ) => boolean;
 
 export const sessionExistsAndSingleSessionModeEnabled: ComponentGuard = (clerk, environment) => {
-  return !!(clerk.session && environment?.authConfig.singleSessionMode);
+  return !!(clerk.session && environment?.authConfig?.singleSessionMode);
 };
 
 export const noUserExists: ComponentGuard = clerk => {
@@ -19,5 +19,5 @@ export const noOrganizationExists: ComponentGuard = clerk => {
 };
 
 export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => {
-  return !environment?.organizationSettings.enabled;
+  return !environment?.organizationSettings?.enabled;
 };

@@ -9,11 +9,11 @@ export const normalizeRoutingOptions = ({
   routing?: RoutingStrategy;
   path?: string;
 }): RoutingOptions => {
-  if (!!path && !routing) {
+  if (path && !routing) {
     return { routing: 'path', path };
   }
 
-  if (routing !== 'path' && !!path) {
+  if (path && routing !== 'path') {
     return clerkInvalidRoutingStrategy(routing);
   }
 

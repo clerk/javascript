@@ -7,8 +7,7 @@ import { useEnvironment, useOptions } from '../contexts';
 export function useSupportEmail(): string {
   const Clerk = useClerk();
   const { supportEmail: supportEmailFromOptions } = useOptions();
-  const { displayConfig } = useEnvironment();
-  const { supportEmail: supportEmailFromEnvironment } = displayConfig;
+  const { supportEmail: supportEmailFromEnvironment } = useEnvironment()?.displayConfig ?? {};
 
   const supportDomain = React.useMemo(
     () =>

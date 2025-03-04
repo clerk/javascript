@@ -13,29 +13,37 @@ import type { SignInCtx } from '../../types';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignInContextType = SignInCtx & {
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
+  authQueryString?: string;
+  emailLinkRedirectUrl: string;
+  isCombinedFlow: boolean;
   navigateAfterSignIn: () => any;
   queryParams: ParsedQueryString;
-  signUpUrl: string;
   signInUrl: string;
   signUpContinueUrl: string;
-  authQueryString: string | null;
-  afterSignUpUrl: string;
-  afterSignInUrl: string;
+  signUpUrl: string;
+  ssoCallbackUrl: string;
+  __status: 'degraded' | 'loading' | 'loaded';
   transferable: boolean;
   waitlistUrl: string;
-  emailLinkRedirectUrl: string;
-  ssoCallbackUrl: string;
-  isCombinedFlow: boolean;
+  initialValues?: any;
+  path?: string;
+  routing?: 'hash' | 'virtual';
+  forceRedirectUrl?: string | null;
+  fallbackRedirectUrl?: string | null;
+  withSignUp?: boolean;
 };
 
-export const SignInContext = createContext<SignInCtx | null>(null);
+export const SignInContext = createContext<SignInCtx>({
+  componentName: 'SignIn',
+  __status: 'loading',
+});
 
 export const useSignInContext = (): SignInContextType => {
+  const { navigate, queryParams, queryString } = useRouter();
   const context = useContext(SignInContext);
-  const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
-  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
 
@@ -43,13 +51,14 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
+  const { componentName, mode, __status, ...ctx } = context;
+
   const isCombinedFlow =
-    (signUpMode !== 'restricted' &&
+    (userSettings?.signUp?.mode !== 'restricted' &&
       Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
     context.withSignUp ||
     false;
 
-  const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
     [],
@@ -111,22 +120,23 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  // @ts-expect-error: FIXME
   return {
     ...(ctx as SignInCtx),
-    transferable: ctx.transferable ?? true,
-    componentName,
-    signUpUrl,
-    signInUrl,
-    waitlistUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    emailLinkRedirectUrl,
-    ssoCallbackUrl,
-    navigateAfterSignIn,
-    signUpContinueUrl,
-    queryParams,
-    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
+    componentName,
+    emailLinkRedirectUrl,
+    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     isCombinedFlow,
+    navigateAfterSignIn,
+    queryParams,
+    signInUrl,
+    signUpContinueUrl,
+    signUpUrl,
+    ssoCallbackUrl,
+    transferable: ctx.transferable ?? true,
+    waitlistUrl,
   };
 };
