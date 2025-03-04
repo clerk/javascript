@@ -157,6 +157,7 @@ function SignInRoot() {
   };
 
   return (
+    /* @ts-expect-error: FIXME */
     <SignUpContext.Provider value={normalizedSignUpContext}>
       <SignInRoutes />
     </SignUpContext.Provider>

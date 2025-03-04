@@ -180,7 +180,7 @@ function _SignUpContinue() {
       .finally(() => card.setIdle());
   };
 
-  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
+  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp) ?? false;
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
 
   const headerTitle = !onlyLegalConsentMissing

@@ -13,9 +13,9 @@ import type { SignInCtx } from '../../types';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignInContextType = SignInCtx & {
-  afterSignInUrl: string | null;
-  afterSignUpUrl: string | null;
-  authQueryString: string | null;
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
+  authQueryString?: string;
   emailLinkRedirectUrl: string;
   isCombinedFlow: boolean;
   navigateAfterSignIn: () => any;
@@ -120,22 +120,23 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  // @ts-expect-error: FIXME
   return {
     ...(ctx as SignInCtx),
-    transferable: ctx.transferable ?? true,
-    componentName,
-    signUpUrl,
-    signInUrl,
-    waitlistUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    emailLinkRedirectUrl,
-    ssoCallbackUrl,
-    navigateAfterSignIn,
-    signUpContinueUrl,
-    queryParams,
-    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
+    componentName,
+    emailLinkRedirectUrl,
+    initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     isCombinedFlow,
+    navigateAfterSignIn,
+    queryParams,
+    signInUrl,
+    signUpContinueUrl,
+    signUpUrl,
+    ssoCallbackUrl,
+    transferable: ctx.transferable ?? true,
+    waitlistUrl,
   };
 };

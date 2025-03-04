@@ -10,7 +10,7 @@ interface EnvironmentProviderProps {
   value: EnvironmentResource;
 }
 
-type PartialEnvironment = EnvironmentResource & {
+type PartialEnvironmentResource = EnvironmentResource & {
   authConfig: Partial<EnvironmentResource['authConfig']>;
   displayConfig: Partial<EnvironmentResource['displayConfig']>;
   organizationSettings: Partial<EnvironmentResource['organizationSettings']>;
@@ -21,18 +21,14 @@ export function EnvironmentProvider({ children, value }: EnvironmentProviderProp
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
 }
 
-export function useEnvironment(): PartialEnvironment {
+export function useEnvironment(): PartialEnvironmentResource {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
 
-  // @ts-expect-error - handle case where authConfig is not defined
-  if (typeof context.authConfig === 'undefined') context.authConfig = {};
-  // @ts-expect-error - handle case where displayConfig is not defined
-  if (typeof context.displayConfig === 'undefined') context.displayConfig = {};
-  // @ts-expect-error - handle case where organizationSettings is not defined
-  if (typeof context.organizationSettings === 'undefined') context.organizationSettings = {};
-  // @ts-expect-error - handle case where userSettings is not defined
-  if (typeof context.userSettings === 'undefined') context.userSettings = {};
+  context.authConfig = context.authConfig ?? {};
+  context.displayConfig = context.displayConfig ?? {};
+  context.organizationSettings = context.organizationSettings ?? {};
+  context.userSettings = context.userSettings ?? {};
 
   return context;
 }

@@ -266,7 +266,7 @@ function SignUpStartComponent(): JSX.Element {
     return <LoadingCard />;
   }
 
-  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
+  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp) ?? false;
   const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 

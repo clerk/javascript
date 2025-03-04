@@ -48,22 +48,6 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const { componentName, mode, ...ctx } = context;
 
-  if (typeof userSettings === 'undefined') {
-    return {
-      afterSignUpUrl: '',
-      afterSignInUrl: '',
-      authQueryString: '',
-      emailLinkRedirectUrl: '',
-      isCombinedFlow: false,
-      navigateAfterSignUp: () => {},
-      queryParams: {},
-      secondFactorUrl: '',
-      signInUrl: '',
-      signUpUrl: '',
-      waitlistUrl: '',
-    };
-  }
-
   const isCombinedFlow =
     (userSettings?.signUp?.mode !== 'restricted' &&
       Boolean(
