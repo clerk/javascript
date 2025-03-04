@@ -18,6 +18,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithPopupParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -1347,8 +1348,24 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
+    console.log('handling redirect callback');
     if (!this.loaded || !this.environment || !this.client) {
       return;
+    }
+
+    if (!window.opener) {
+      try {
+        await signIn.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
+      try {
+        await signUp.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
     }
 
     const { displayConfig } = this.environment;
@@ -1370,6 +1387,15 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
     };
+    console.log(JSON.stringify({ su, si }));
+    if (window.opener && window.opener.location.origin === window.location.origin) {
+      window.opener.postMessage(
+        { destination: window.location.href, metadata: JSON.stringify({ su, si }) },
+        window.location.origin,
+      );
+      window.close();
+      return;
+    }
 
     const makeNavigate = (to: string) => () => navigate(to);
 
@@ -1481,9 +1507,12 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
+    console.log('here 1');
+
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
+      console.log('user needs to be created');
       if (params.transferable === false) {
         return navigateToSignIn();
       }
@@ -1518,6 +1547,8 @@ export class Clerk implements ClerkInterface {
       su.externalAccountErrorCode === 'identifier_already_signed_in' &&
       su.externalAccountSessionId;
 
+    console.log('here 2');
+
     const siUserAlreadySignedIn =
       si.firstFactorVerificationStatus === 'failed' &&
       si.firstFactorVerificationErrorCode === 'identifier_already_signed_in' &&
@@ -1535,12 +1566,15 @@ export class Clerk implements ClerkInterface {
     }
 
     if (hasExternalAccountSignUpError(signUp)) {
+      console.log('has external account sign up error');
       return navigateToSignUp();
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
+
+    console.log('here 3');
 
     return navigateToSignIn();
   };
@@ -1713,6 +1747,74 @@ export class Clerk implements ClerkInterface {
         redirectUrl,
       });
     }
+  };
+
+  private authenticateWithPopup = async (
+    authenticationType: 'signIn' | 'signUp',
+    params: AuthenticateWithPopupParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+  ): Promise<void> => {
+    if (!this.client || !this.environment || !params.popup) {
+      return;
+    }
+
+    const accountPortalDomain = this.frontendApi
+      // staging accounts
+      .replace(/clerk\.accountsstage\./, 'accountsstage.')
+      .replace(/clerk\.accounts\.|clerk\./, 'accounts.');
+
+    const { redirectUrl } = params;
+
+    const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
+    const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
+
+    const messageHandler = async (event: MessageEvent) => {
+      if (event.origin !== `https://${accountPortalDomain}`) return;
+
+      let shouldRemoveListener = false;
+
+      if (event.data.session) {
+        console.log(`calling setActive with session ${event.data.session} adn redirectUrl ${redirectUrl}`);
+        await this.setActive({
+          session: event.data.session,
+          redirectUrl: params.redirectUrlComplete,
+        });
+        shouldRemoveListener = true;
+      } else if (event.data.destination) {
+        console.log(`navigating to ${event.data.destination}`);
+        console.log(event.data.metadata);
+        this.navigate(event.data.destination);
+        shouldRemoveListener = true;
+      }
+
+      if (shouldRemoveListener) {
+        window.removeEventListener('message', messageHandler);
+      }
+    };
+
+    window.addEventListener('message', messageHandler);
+
+    const authenticateMethod =
+      authenticationType === 'signIn'
+        ? this.client.signIn.authenticateWithPopup
+        : this.client.signUp.authenticateWithPopup;
+
+    await authenticateMethod({
+      ...params,
+      redirectUrlComplete: popupRedirectUrlComplete,
+      redirectUrl: popupRedirectUrl,
+    });
+  };
+
+  public signUpWithPopup = async (
+    params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ): Promise<void> => {
+    return this.authenticateWithPopup('signUp', params);
+  };
+
+  public signInWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
+    return this.authenticateWithPopup('signIn', params);
   };
 
   public createOrganization = async ({ name, slug }: CreateOrganizationParams): Promise<OrganizationResource> => {

@@ -9,7 +9,7 @@ import type {
 } from './identifiers';
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
@@ -91,6 +91,10 @@ export interface SignUpResource extends ClerkResource {
 
   authenticateWithRedirect: (
     params: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ) => Promise<void>;
+
+  authenticateWithPopup: (
+    params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<void>;
 
   authenticateWithWeb3: (
