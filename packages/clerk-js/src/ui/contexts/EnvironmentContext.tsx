@@ -29,7 +29,7 @@ const USER_SETTINGS = {
   web3FirstFactors: [],
 };
 
-export function useEnvironment(): EnvironmentResource {
+export function useEnvironment(): Partial<EnvironmentResource> {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
 
