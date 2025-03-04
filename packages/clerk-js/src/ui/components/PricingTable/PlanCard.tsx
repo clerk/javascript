@@ -79,14 +79,13 @@ export function PlanCard(props: PlanCardProps) {
         >
           {plan.name}
         </Heading>
-        {!isCompact ? (
+        {!isCompact && plan.description ? (
           <Text
             elementDescriptor={descriptors.planCardDescription}
             variant='subtitle'
             colorScheme='secondary'
-            aria-hidden={plan.description ? undefined : 'true'}
           >
-            {plan.description ? plan.description : '\u00A0'}
+            {plan.description}
           </Text>
         ) : null}
         <Flex
@@ -130,15 +129,14 @@ export function PlanCard(props: PlanCardProps) {
             />
           )}
         </Flex>
-        <Box
-          elementDescriptor={descriptors.planCardPeriodToggle}
-          sx={t => ({
-            display: 'flex',
-            minHeight: t.space.$6,
-            marginTop: t.space.$3,
-          })}
-        >
-          {plan.hasBaseFee ? (
+        {plan.hasBaseFee ? (
+          <Box
+            elementDescriptor={descriptors.planCardPeriodToggle}
+            sx={t => ({
+              display: 'flex',
+              marginTop: t.space.$3,
+            })}
+          >
             <SegmentedControl
               selected={period}
               setSelected={setPeriod}
@@ -147,8 +145,8 @@ export function PlanCard(props: PlanCardProps) {
                 { label: 'Annually', value: 'annual' },
               ]}
             />
-          ) : null}
-        </Box>
+          </Box>
+        ) : null}
       </Box>
       <ReversibleContainer reverse={ctaPosition === 'top'}>
         {!collapseFeatures && hasFeatures ? (
