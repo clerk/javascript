@@ -252,9 +252,10 @@ export const plPL: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'Wprowadź kod weryfikacyjny wysłany na Twój adres e-mail',
       formTitle: 'Kod weryfikacyjny',
-      resendButton: "Nie otrzymałeś kodu? Wyślij ponownie",
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
       subtitle: 'Domena {{domainName}} musi zostać zweryfikowana przez e-mail.',
-      subtitleVerificationCodeScreen: 'Kod weryfikacyjny został wysłany na adres {{emailAddress}}. Wprowadź kod, aby kontynuować.',
+      subtitleVerificationCodeScreen:
+        'Kod weryfikacyjny został wysłany na adres {{emailAddress}}. Wprowadź kod, aby kontynuować.',
       title: 'Zweryfikuj domenę',
     },
   },
@@ -575,20 +576,25 @@ export const plPL: LocalizationResource = {
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
-    form_password_pwned: 'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zamiast tego spróbuj użyć innego hasła.',
+    form_password_pwned:
+      'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zamiast tego spróbuj użyć innego hasła.',
     form_password_pwned__sign_in: 'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zresetuj hasło.',
     form_password_size_in_bytes_exceeded:
       'Twoje hasło przekroczyło maksymalną dozwoloną liczbę bajtów, skróć je lub usuń niektóre znaki specjalne.',
     form_password_validation_failed: 'Podane hasło jest nieprawidłowe',
-    form_username_invalid_character: 'Twoja nazwa użytkownika zawiera nieprawidłowe znaki. Prosimy o używanie wyłącznie liter, cyfr i podkreśleń.',
+    form_username_invalid_character:
+      'Twoja nazwa użytkownika zawiera nieprawidłowe znaki. Prosimy o używanie wyłącznie liter, cyfr i podkreśleń.',
     form_username_invalid_length: 'Nazwa użytkownika musi zawierać od {{min_length}} do {{max_length}} znaków.',
     identification_deletion_failed: 'Nie można usunąć ostatniego identyfikatora.',
-    not_allowed_access: 'Nie masz uprawnień dostępu do tej strony. Jeśli uważasz, że jest to błąd, skontaktuj się z pomocą.',
+    not_allowed_access:
+      'Nie masz uprawnień dostępu do tej strony. Jeśli uważasz, że jest to błąd, skontaktuj się z pomocą.',
     organization_domain_blocked: 'To jest zablokowana domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_common: 'To jest popularna domena dostawcy poczty e-mail. Użyj innej domeny.',
-    organization_domain_exists_for_enterprise_connection: 'Ta domena jest już używana do logowania jednokrotnego w organizacji.',
+    organization_domain_exists_for_enterprise_connection:
+      'Ta domena jest już używana do logowania jednokrotnego w organizacji.',
     organization_membership_quota_exceeded: 'Osiągnięto limit członkostwa w organizacji, w tym zaległych zaproszeń.',
-    organization_minimum_permissions_needed: 'Musi istnieć co najmniej jeden członek organizacji z minimalnymi wymaganymi uprawnieniami.',
+    organization_minimum_permissions_needed:
+      'Musi istnieć co najmniej jeden członek organizacji z minimalnymi wymaganymi uprawnieniami.',
     passkey_already_exists: 'Klucz dostępu jest już zarejestrowany w tym urządzeniu.',
     passkey_not_supported: 'Klucze dostępu nie są obsługiwane przez to urządzenie.',
     passkey_pa_not_supported: 'Rejestracja wymaga platformy uwierzytelniającej, ale urządzenie jej nie obsługuje.',
@@ -742,8 +748,7 @@ export const plPL: LocalizationResource = {
         'Wybierz numer telefonu, aby zarejestrować weryfikację kodem SMS w dwustopniowym procesie uwierzytelniania.',
       subtitle__unavailablePhoneNumbers:
         'Brak dostępnych numerów telefonów do zarejestrowania weryfikacji kodem SMS w dwustopniowym procesie uwierzytelniania.',
-      successMessage1:
-        'Podczas logowania należy dodatkowo wprowadzić kod weryfikacyjny wysłany na ten numer telefonu.',
+      successMessage1: 'Podczas logowania należy dodatkowo wprowadzić kod weryfikacyjny wysłany na ten numer telefonu.',
       successMessage2:
         'Zapisz te kody zapasowe i przechowuj je w bezpiecznym miejscu. Jeśli utracisz dostęp do urządzenia uwierzytelniającego, możesz użyć kodów zapasowych, aby się zalogować.',
       successTitle: 'Weryfikacja kodem SMS włączona',
@@ -792,7 +797,8 @@ export const plPL: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Zaleca się wylogowanie z innych urządzeń, które mogły używać starego hasła.',
-      readonly: 'Obecnie nie można edytować hasła, ponieważ możesz zalogować się tylko za pośrednictwem połączenia firmowego.',
+      readonly:
+        'Obecnie nie można edytować hasła, ponieważ możesz zalogować się tylko za pośrednictwem połączenia firmowego.',
       successMessage__set: 'Twoje hasło zostało ustawione.',
       successMessage__signOutOfOtherSessions: 'Wylogowano z wszystkich innych urządzeń.',
       successMessage__update: 'Twoje hasło zostało zaktualizowane.',
