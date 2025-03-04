@@ -51,29 +51,26 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
   }
 
-  debugger;
-
   const { componentName, mode, __status, ...ctx } = context;
 
-  if (typeof userSettings === 'undefined') {
-    return {
-      afterSignInUrl: null,
-      afterSignUpUrl: null,
-      authQueryString: '',
-      emailLinkRedirectUrl: '',
-      isCombinedFlow: false,
-      navigateAfterSignIn: () => {},
-      queryParams: {},
-      signInUrl: '',
-      signUpContinueUrl: '',
-      signUpUrl: '',
-      ssoCallbackUrl: '',
-      __status: 'degraded',
-      transferable: false,
-      waitlistUrl: '',
-      ...context,
-    };
-  }
+  // if (typeof userSettings === 'undefined') {
+  //   return {
+  //     authQueryString: '',
+  //     emailLinkRedirectUrl: '',
+  //     isCombinedFlow: false,
+  //     navigateAfterSignIn: () => {},
+  //     path: '',
+  //     queryParams: {},
+  //     signInUrl: '',
+  //     signUpContinueUrl: '',
+  //     signUpUrl: '',
+  //     ssoCallbackUrl: '',
+  //     __status: 'degraded',
+  //     transferable: false,
+  //     waitlistUrl: '',
+  //     ...context,
+  //   };
+  // }
 
   const isCombinedFlow =
     (userSettings?.signUp?.mode !== 'restricted' &&
