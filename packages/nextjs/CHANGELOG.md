@@ -1,5 +1,15 @@
 # Change Log
 
+## 6.12.3
+
+### Patch Changes
+
+- Re-export `WaitlistEntryJSON` from `@clerk/nextjs/server`. ([#5148](https://github.com/clerk/javascript/pull/5148)) by [@mackenzienolan](https://github.com/mackenzienolan)
+
+- Updated dependencies [[`4fa5e27e33d229492c77e06ca4b26d552ff3d92f`](https://github.com/clerk/javascript/commit/4fa5e27e33d229492c77e06ca4b26d552ff3d92f), [`29a44b0e5c551e52915f284545699010a87e1a48`](https://github.com/clerk/javascript/commit/29a44b0e5c551e52915f284545699010a87e1a48), [`4d7761a24af5390489653923165e55cbf69a8a6d`](https://github.com/clerk/javascript/commit/4d7761a24af5390489653923165e55cbf69a8a6d)]:
+  - @clerk/backend@1.25.0
+  - @clerk/clerk-react@5.24.1
+
 ## 6.12.2
 
 ### Patch Changes

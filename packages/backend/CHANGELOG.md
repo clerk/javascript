@@ -1,5 +1,22 @@
 # Change Log
 
+## 1.25.0
+
+### Minor Changes
+
+- Add waitlist entry types ([#5148](https://github.com/clerk/javascript/pull/5148)) by [@mackenzienolan](https://github.com/mackenzienolan)
+
+  - `WaitlistEntryJSON`
+  - `WaitlistEntryWebhookEvent`
+
+  Update `WebhookEvent` to include `WaitlistEntryWebhookEvent`
+
+### Patch Changes
+
+- Update `CreateOrganizationInvitationParams.inviterUserId` type to optional ([#5255](https://github.com/clerk/javascript/pull/5255)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Bug fix: Properly remove `Authorization` header on requests that don't require a secret key. ([#5252](https://github.com/clerk/javascript/pull/5252)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 1.24.3
 
 ### Patch Changes
