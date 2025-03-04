@@ -12,8 +12,7 @@ import type {
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
+type CheckAuthorizationWithoutUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
  * Return values of the `useAuth()` hook
@@ -53,7 +52,7 @@ export type UseAuthReturn =
       /**
        * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/references/backend/types/auth-object#has).
        */
-      has: CheckAuthorizationSignedOut;
+      has: CheckAuthorizationWithoutUser;
       /**
        * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
        */
@@ -72,7 +71,7 @@ export type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
+      has: CheckAuthorizationWithoutUser;
       signOut: SignOut;
       getToken: GetToken;
     }

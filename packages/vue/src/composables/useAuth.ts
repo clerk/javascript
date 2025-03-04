@@ -110,7 +110,7 @@ export const useAuth: UseAuth = () => {
         orgId: undefined,
         orgRole: undefined,
         orgSlug: undefined,
-        has: undefined,
+        has: () => false,
         signOut,
         getToken,
       };
@@ -158,7 +158,7 @@ export const useAuth: UseAuth = () => {
         orgId: null,
         orgRole: null,
         orgSlug: null,
-        has: () => false,
+        has,
         signOut,
         getToken,
       };
