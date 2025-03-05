@@ -113,18 +113,20 @@ export const useSignInContext = (): SignInContextType => {
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   useEffect(() => {
-    eventBus.on(events.InternalComponentNavigate, async resolveNavigation => {
+    eventBus.on(events.InternalComponentNavigate, ({ resolveNavigation, session }) => {
+      if (!session.currentTask) {
+        return;
+      }
+
       const tasksUrl = buildRedirectUrl({
         routing: ctx.routing,
         baseUrl: signInUrl,
         path: ctx.path,
-        endpoint: '/add-organization',
+        endpoint: session.currentTask.__internal_getUrlPath(),
         authQueryString: null,
       });
 
-      await navigate(tasksUrl);
-
-      resolveNavigation();
+      void navigate(tasksUrl).then(resolveNavigation);
     });
   }, []);
 

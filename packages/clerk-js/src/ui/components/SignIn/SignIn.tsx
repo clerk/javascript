@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_TASK_PATHS } from '../../../core/resources/SessionTask';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -131,6 +132,16 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpContinue />
               </Route>
             </Route>
+
+            {SESSION_TASK_PATHS.map(path => (
+              <Route
+                path={path}
+                key={path}
+              >
+                <SignInSessionTask />
+              </Route>
+            ))}
+
             <Route index>
               <LazySignUpStart />
             </Route>
