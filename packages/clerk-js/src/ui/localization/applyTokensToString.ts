@@ -30,19 +30,19 @@ export const applyTokensToString = (s: string | undefined, tokens: Tokens): stri
 };
 
 export const useGlobalTokens = (): GlobalTokens => {
-  const { applicationName } = useEnvironment().displayConfig;
+  const { displayConfig } = useEnvironment();
   const { client, user } = useClerk();
   // TODO: @nikos decouple captcha from component loading
   const { signIn } = client || {};
 
   return {
-    applicationName,
-    'signIn.identifier': signIn?.identifier || '',
-    'user.username': user?.username || '',
-    'user.firstName': user?.firstName || '',
-    'user.lastName': user?.lastName || '',
-    'user.primaryEmailAddress': user?.primaryEmailAddress?.emailAddress || '',
-    'user.primaryPhoneNumber': user?.primaryPhoneNumber?.phoneNumber || '',
+    applicationName: displayConfig.applicationName ?? 'unknown',
+    'signIn.identifier': signIn?.identifier ?? '',
+    'user.username': user?.username ?? '',
+    'user.firstName': user?.firstName ?? '',
+    'user.lastName': user?.lastName ?? '',
+    'user.primaryEmailAddress': user?.primaryEmailAddress?.emailAddress ?? '',
+    'user.primaryPhoneNumber': user?.primaryPhoneNumber?.phoneNumber ?? '',
   };
 };
 

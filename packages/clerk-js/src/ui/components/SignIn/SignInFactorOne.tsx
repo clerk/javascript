@@ -31,9 +31,9 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _SignInFactorOne(): JSX.Element {
+function SignInFactorOneInternal(): JSX.Element {
   const signIn = useCoreSignIn();
-  const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const { displayConfig } = useEnvironment();
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
@@ -44,7 +44,11 @@ export function _SignInFactorOne(): JSX.Element {
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
+    currentFactor: determineStartingSignInFactor(
+      availableFactors,
+      signIn.identifier,
+      displayConfig?.preferredSignInStrategy,
+    ),
     prevCurrentFactor: undefined,
   }));
 
@@ -210,4 +214,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal));
