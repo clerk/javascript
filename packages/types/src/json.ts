@@ -571,3 +571,98 @@ export interface WaitlistJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface CommerceFeatureJSON extends ClerkResourceJSON {
+  object: 'commerce_feature';
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  avatar_url: string;
+}
+
+export interface CommercePlanJSON extends ClerkResourceJSON {
+  object: 'commerce_plan';
+  id: string;
+  name: string;
+  amount: number;
+  amount_formatted: string;
+  annual_monthly_amount: number;
+  annual_monthly_amount_formatted: string;
+  currency_symbol: string;
+  currency: string;
+  description: string;
+  is_active_for_payer: boolean;
+  is_recurring: boolean;
+  has_base_fee: boolean;
+  payer_type: string[];
+  publicly_visible: boolean;
+  slug: string;
+  avatar_url: string;
+  features: CommerceFeatureJSON[];
+}
+
+export interface CommerceProductJSON extends ClerkResourceJSON {
+  object: 'commerce_product';
+  id: string;
+  slug: string;
+  currency: string;
+  is_default: boolean;
+  plans: CommercePlanJSON[];
+}
+
+export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_source';
+  id: string;
+  last4: string;
+  payment_method: string;
+  card_type: string;
+}
+
+export interface CommerceInvoiceJSON extends ClerkResourceJSON {
+  object: 'commerce_invoice';
+  id: string;
+  paid_on: number;
+  payment_due_on: number;
+  payment_source_id: string;
+  plan_id: string;
+  status: string;
+  totals: CommerceTotalsJSON;
+}
+
+export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: 'commerce_subscription';
+  id: string;
+  payment_source_id: string;
+  plan: CommercePlanJSON;
+  plan_period: string;
+  status: string;
+}
+
+export interface CommerceMoneyJSON {
+  amount: number;
+  amount_formatted: string;
+  currency: string;
+  currency_symbol: string;
+}
+
+export interface CommerceTotalsJSON {
+  grand_total: CommerceMoneyJSON;
+  subtotal: CommerceMoneyJSON;
+  tax_total: CommerceMoneyJSON;
+  total_due_now?: CommerceMoneyJSON;
+}
+
+export interface CommerceCheckoutJSON extends ClerkResourceJSON {
+  object: 'commerce_checkout';
+  id: string;
+  external_client_secret: string;
+  external_gateway_id: string;
+  invoice?: CommerceInvoiceJSON;
+  payment_source?: CommercePaymentSourceJSON;
+  plan: CommercePlanJSON;
+  plan_period: string;
+  status: string;
+  subscription?: CommerceSubscriptionJSON;
+  totals: CommerceTotalsJSON;
+}

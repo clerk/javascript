@@ -18,3 +18,4 @@ export * from './useDebounce';
 export * from './useClerkModalStateParams';
 export * from './useNavigateToFlowStart';
 export * from './useEnterpriseSSOLink';
+export * from './useCheckout';
