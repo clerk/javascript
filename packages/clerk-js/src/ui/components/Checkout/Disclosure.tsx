@@ -2,7 +2,10 @@ import { useFloating, useMergeRefs, useTransitionStyles } from '@floating-ui/rea
 import * as React from 'react';
 
 import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../../customizables';
+import { useFirstRender } from '../../hooks';
 import { ChevronDown } from '../../icons';
+import { common } from '../../styledSystem';
+import { colors } from '../../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * Disclosure Context
@@ -48,10 +51,12 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
           ref={ref}
           elementDescriptor={descriptors.disclosureRoot}
           sx={t => ({
+            width: '100%',
             borderRadius: t.radii.$lg,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$neutralAlpha100,
+            background: t.colors.$colorBackground,
           })}
         >
           {children}
@@ -90,6 +95,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         fontSize: t.fontSizes.$md,
         justifyContent: 'space-between',
         padding: t.sizes.$3,
+        color: t.colors.$colorText,
       })}
     >
       {children}
@@ -98,6 +104,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         colorScheme='neutral'
         size='md'
         sx={{ rotate: context.isOpen ? '180deg' : '0', transformOrigin: '50%' }}
+        aria-hidden
       />
     </SimpleButton>
   );
@@ -120,7 +127,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   }
   const { isOpen, id } = context;
   const { animations } = useAppearance().parsedLayout;
-
+  const isFirstRender = useFirstRender();
   const { context: floatingContext, refs } = useFloating({
     open: isOpen,
   });
@@ -138,6 +145,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     },
     common: {
       display: 'grid',
+      gridTemplateRows: '0fr',
       transitionProperty: 'grid-template-rows',
       transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
@@ -156,17 +164,21 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   return (
     <Box
       ref={mergedRefs}
-      style={animations ? transitionStyles : undefined}
+      style={animations && !isFirstRender ? transitionStyles : undefined}
       elementDescriptor={descriptors.disclosureContentRoot}
       id={id}
       sx={t => ({
-        backgroundColor: t.colors.$white,
+        backgroundColor: t.colors.$colorBackground,
         borderRadius: 'inherit',
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
         marginInline: `calc(${t.borderWidths.$normal} * -1)`,
         marginBlockEnd: `calc(${t.borderWidths.$normal} * -1)`,
+        background: common.mergedColorsBackground(
+          colors.setAlpha(t.colors.$colorBackground, 1),
+          t.colors.$neutralAlpha50,
+        ),
       })}
     >
       <Box
@@ -181,7 +193,6 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           elementDescriptor={descriptors.disclosureContentInner}
           sx={t => ({
             padding: t.space.$3,
-            backgroundColor: t.colors.$neutralAlpha25,
             borderRadius: 'inherit',
           })}
         >
