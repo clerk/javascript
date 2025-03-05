@@ -1,6 +1,3 @@
-import type { ClerkOptions } from 'clerk';
-
-import type { EnvironmentResource } from './environment';
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -106,8 +103,8 @@ export interface SessionResource extends ClerkResource {
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
-  tasks: Array<SessionTaskResource> | null;
-  currentTask?: SessionTaskResource;
+  tasks: Array<SessionTask> | null;
+  currentTask?: SessionTask;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
@@ -150,6 +147,7 @@ export interface ActiveSessionResource extends SessionResource {
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';
   user: UserResource;
+  currentTask: SessionTask;
 }
 
 /**
@@ -200,12 +198,8 @@ export interface PublicUserData {
   userId?: string;
 }
 
-export type SessionTaskKey = 'org';
-
-export interface SessionTaskResource {
-  key: SessionTaskKey;
-  __internal_getUrlPath: () => string;
-  __internal_getAbsoluteUrl: (options: ClerkOptions, environment?: EnvironmentResource | null) => string;
+export interface SessionTask {
+  key: 'org';
 }
 
 export type GetTokenOptions = {

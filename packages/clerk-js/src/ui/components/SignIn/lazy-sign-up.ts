@@ -7,6 +7,7 @@ const LazySignUpVerifyEmail = lazy(() => preloadSignUp().then(m => ({ default: m
 const LazySignUpStart = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpStart })));
 const LazySignUpSSOCallback = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpSSOCallback })));
 const LazySignUpContinue = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpContinue })));
+const LazySignUpSessionTask = lazy(() => preloadSignUp().then(m => ({ default: m.SessionTask })));
 
 const lazyCompleteSignUpFlow = () =>
   import(/* webpackChunkName: "signUp" */ '../SignUp/util').then(m => m.completeSignUpFlow);
@@ -19,4 +20,5 @@ export {
   LazySignUpSSOCallback,
   LazySignUpContinue,
   lazyCompleteSignUpFlow,
+  LazySignUpSessionTask,
 };

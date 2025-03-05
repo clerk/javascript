@@ -2,8 +2,6 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
-import { SESSION_TASK_PATHS } from '../../../core/resources/SessionTask';
-import { withRedirectToSignUpIfNoTasksAvailable } from '../../../ui/common';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -77,14 +75,9 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
-        {SESSION_TASK_PATHS.map(path => (
-          <Route
-            path={path}
-            key={path}
-          >
-            <SignUpSessionTask />
-          </Route>
-        ))}
+        <Route path='add-organization'>
+          <SessionTask task='org' />
+        </Route>
         <Route index>
           <SignUpStart />
         </Route>
@@ -129,6 +122,4 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   );
 };
 
-const SignUpSessionTask = withRedirectToSignUpIfNoTasksAvailable(SessionTask);
-
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
+export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone, SessionTask };

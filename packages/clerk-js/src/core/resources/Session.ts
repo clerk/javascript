@@ -12,6 +12,7 @@ import type {
   SessionJSONSnapshot,
   SessionResource,
   SessionStatus,
+  SessionTask,
   SessionVerificationJSON,
   SessionVerificationResource,
   SessionVerifyAttemptFirstFactorParams,
@@ -28,7 +29,6 @@ import { clerkInvalidStrategy } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
-import { SessionTask } from './SessionTask';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {
@@ -226,7 +226,7 @@ export class Session extends BaseResource implements SessionResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.tasks = data.tasks?.map(task => new SessionTask(task)) ?? [];
+    this.tasks = data.tasks;
 
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
