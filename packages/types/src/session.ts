@@ -1,5 +1,4 @@
-import type { ClerkOptions } from 'clerk';
-
+import type { ClerkOptions } from './clerk';
 import type { EnvironmentResource } from './environment';
 import type {
   BackupCodeAttempt,
@@ -204,8 +203,8 @@ export type SessionTaskKey = 'org';
 
 export interface SessionTaskResource {
   key: SessionTaskKey;
-  __internal_getUrlPath: () => string;
-  __internal_getAbsoluteUrl: (options: ClerkOptions, environment?: EnvironmentResource | null) => string;
+  __internal_getPath: () => string;
+  __internal_getUrl: (options: ClerkOptions, environment: EnvironmentResource) => string;
 }
 
 export type GetTokenOptions = {

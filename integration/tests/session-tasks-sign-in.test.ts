@@ -17,10 +17,7 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser({
-      withPhoneNumber: true,
-      withUsername: true,
-    });
+    fakeUser = m.services.users.createFakeUser();
     await m.services.users.createBapiUser(fakeUser);
   });
 
@@ -38,7 +35,7 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
 
-    const addOrganizationTask = u.page.getByText(/choose an organization/i);
+    const addOrganizationTask = u.page.getByText(/create organization/i);
     await expect(addOrganizationTask).toBeVisible();
     expect(page.url()).toContain('add-organization');
   });

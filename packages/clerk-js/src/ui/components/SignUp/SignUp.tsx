@@ -131,4 +131,4 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
 
 const SignUpSessionTask = withRedirectToSignUpIfNoTasksAvailable(SessionTask);
 
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
+export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone, SignUpSessionTask };

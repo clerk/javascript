@@ -1,13 +1,12 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
-import { useNavigateOnEvent } from '../../hooks/useNavigateOnEvent';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
@@ -114,16 +113,18 @@ export const useSignUpContext = (): SignUpContextType => {
         routing: ctx.routing,
         baseUrl: signUpUrl,
         path: ctx.path,
-        endpoint: clerk.session?.currentTask?.__internal_getUrlPath(),
+        endpoint: clerk.session?.currentTask.__internal_getPath(),
         authQueryString: null,
       })
     : null;
 
-  useNavigateOnEvent({
-    routing: ctx.routing,
-    baseUrl: signUpUrl,
-    path: ctx.path,
-  });
+  useEffect(() => {
+    const unsubscribe = clerk.__internal_setComponentNavigate((path: string) => navigate(`../${path}`));
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
 
   return {
     ...ctx,

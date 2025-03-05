@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { noTaskExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { noSessionTaskExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -100,7 +100,7 @@ export const withRedirectToSignUpIfNoTasksAvailable = <P extends AvailableCompon
     const signUpCtx = useSignUpContext();
     return withRedirect(
       Component,
-      noTaskExists,
+      noSessionTaskExists,
       ({ clerk }) => signUpCtx.signUpUrl || clerk.buildSignUpUrl(),
       warnings.cannotRenderSessionTaskComponentOnSignUp,
     )(props);
@@ -121,7 +121,7 @@ export const withRedirectToSignInIfNoTasksAvailable = <P extends AvailableCompon
     const signInCtx = useSignInContext();
     return withRedirect(
       Component,
-      noTaskExists,
+      noSessionTaskExists,
       ({ clerk }) => signInCtx.signInUrl || clerk.buildSignInUrl(),
       warnings.cannotRenderSessionTaskComponentOnSignUp,
     )(props);

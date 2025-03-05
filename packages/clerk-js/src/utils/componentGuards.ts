@@ -14,7 +14,7 @@ export const noUserExists: ComponentGuard = clerk => {
   return !clerk.user;
 };
 
-export const noTaskExists: ComponentGuard = clerk => {
+export const noSessionTaskExists: ComponentGuard = clerk => {
   return !clerk.session?.currentTask;
 };
 
