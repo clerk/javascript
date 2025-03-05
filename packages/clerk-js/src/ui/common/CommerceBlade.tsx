@@ -62,7 +62,7 @@ const CommerceBladeContent = ({ isOpen, isFullscreen, children }: CommerceBladeP
           boxShadow:
             '0px 0px 0px 1px rgba(25, 28, 33, 0.06), 0px 15px 35px -5px rgba(25, 28, 33, 0.20), 0px 5px 15px 0px rgba(0, 0, 0, 0.08)',
           zIndex: t.zIndices.$modal,
-          animation: `${isOpen ? animations.checkoutBladeIn : animations.checkoutBladeOut} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+          animation: `${isOpen ? animations.drawerSlideIn : animations.drawerSlideOut} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
         })}
       >
         {children}

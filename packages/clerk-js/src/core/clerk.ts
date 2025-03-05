@@ -169,7 +169,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  public static _commerce: __experimental_CommerceNamespace;
+  private static _commerce: __experimental_CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -293,6 +293,12 @@ export class Clerk implements ClerkInterface {
   }
 
   get __experimental_commerce(): __experimental_CommerceNamespace {
+    if (!this.#options.experimental?.commerce) {
+      throw new Error(
+        'Clerk: commerce functionality is currently in an experimental state. To enable, pass `experimental.commerce = true`.',
+      );
+    }
+
     if (!Clerk._commerce) {
       Clerk._commerce = new __experimental_Commerce();
     }

@@ -98,11 +98,13 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  commerce_month: LocalizationValue;
-  commerce_free: LocalizationValue;
-  commerce_getStarted: LocalizationValue;
-  commerce_manageMembership: LocalizationValue;
-  commerce_switchPlan: LocalizationValue;
+  commerce: {
+    month: LocalizationValue;
+    free: LocalizationValue;
+    getStarted: LocalizationValue;
+    manageMembership: LocalizationValue;
+    switchPlan: LocalizationValue;
+  };
   signUp: {
     start: {
       title: LocalizationValue;

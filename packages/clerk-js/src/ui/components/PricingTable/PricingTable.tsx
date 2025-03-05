@@ -175,7 +175,7 @@ const PlanCard = ({
                     variant='caption'
                     colorScheme='secondary'
                     sx={{ textTransform: 'lowercase' }}
-                    localizationKey={localizationKeys('commerce_month')}
+                    localizationKey={localizationKeys('commerce.month')}
                   />
                 </Flex>
               </Flex>
@@ -191,7 +191,7 @@ const PlanCard = ({
           ) : (
             <Heading
               textVariant={compact ? 'h2' : 'h1'}
-              localizationKey={localizationKeys('commerce_free')}
+              localizationKey={localizationKeys('commerce.free')}
             />
           )}
         </Col>
@@ -240,7 +240,7 @@ const PlanCard = ({
             width: '100%',
           }}
           localizationKey={
-            isActivePlan ? localizationKeys('commerce_manageMembership') : localizationKeys('commerce_getStarted')
+            isActivePlan ? localizationKeys('commerce.manageMembership') : localizationKeys('commerce.getStarted')
           }
           onClick={() => onSelect(plan)}
         />

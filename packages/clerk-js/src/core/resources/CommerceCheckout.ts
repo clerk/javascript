@@ -3,6 +3,7 @@ import type {
   CommerceCheckoutJSON,
   CommerceCheckoutResource,
   CommerceTotals,
+  ConfirmCheckoutParams,
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
@@ -56,6 +57,18 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
         },
         { forceUpdateClient: true },
       )
+    )?.response as unknown as CommerceCheckoutJSON;
+
+    return this.fromJSON(json);
+  }
+
+  public async confirm(params?: ConfirmCheckoutParams): Promise<this> {
+    const json = (
+      await BaseResource._fetch<CommerceCheckoutJSON>({
+        path: `/me/commerce/checkouts/${this.id}/confirm`,
+        method: 'PATCH',
+        body: { paymentSourceId: params?.paymentSourceId } as any,
+      })
     )?.response as unknown as CommerceCheckoutJSON;
 
     return this.fromJSON(json);

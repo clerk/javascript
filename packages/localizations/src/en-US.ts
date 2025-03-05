@@ -87,11 +87,13 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
-  commerce_month: 'Month',
-  commerce_free: 'Free',
-  commerce_getStarted: 'Get started',
-  commerce_manageMembership: 'Manage membership',
-  commerce_switchPlan: 'Switch to this plan',
+  commerce: {
+    month: 'Month',
+    free: 'Free',
+    getStarted: 'Get started',
+    manageMembership: 'Manage membership',
+    switchPlan: 'Switch to this plan',
+  },
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',

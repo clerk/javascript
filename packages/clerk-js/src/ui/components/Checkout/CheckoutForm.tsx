@@ -8,13 +8,7 @@ import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, ChevronDown, CreditCard } from '../../icons';
 
-export const CheckoutForm = ({
-  checkout,
-  onConfirm,
-}: {
-  checkout: CommerceCheckoutResource;
-  onConfirm: (checkout: CommerceCheckoutResource) => void;
-}) => {
+export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { __experimental_commerce } = useClerk();
@@ -30,17 +24,12 @@ export const CheckoutForm = ({
   }, []);
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    return __experimental_commerce.__experimental_billing
-      .confirmCheckout({
-        checkoutId: checkout.id,
-        paymentSourceId,
-      })
-      .then(res => {
-        onConfirm(res);
+    await checkout
+      .confirm({ paymentSourceId })
+      .then(() => {
         setIsSubmitting(false);
       })
-      .catch(err => {
-        console.log(err);
+      .catch(() => {
         setIsSubmitting(false);
       });
   };

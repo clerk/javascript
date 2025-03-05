@@ -11,8 +11,6 @@ export interface __experimental_CommerceBillingNamespace {
   getProducts: (params?: GetProductsParams) => Promise<ClerkPaginatedResponse<CommerceProductResource>>;
   getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
-  confirmCheckout: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
-  cancelSubscription: ({ subscriptionId }: { subscriptionId: string }) => Promise<any>;
 }
 
 export type GetProductsParams = ClerkPaginationParams<{
@@ -88,6 +86,7 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   plan: CommercePlanResource;
   planPeriod: string;
   status: string;
+  cancel: () => Promise<any>;
 }
 
 export interface CommerceMoney {
@@ -110,7 +109,6 @@ export interface CreateCheckoutParams {
 }
 
 export interface ConfirmCheckoutParams {
-  checkoutId: string;
   paymentSourceId?: string;
 }
 
@@ -125,4 +123,5 @@ export interface CommerceCheckoutResource extends ClerkResource {
   status: string;
   totals: CommerceTotals;
   subscription?: CommerceSubscriptionResource;
+  confirm: (params?: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
 }

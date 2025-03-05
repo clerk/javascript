@@ -3,7 +3,6 @@ import type {
   ClerkPaginatedResponse,
   CommerceCheckoutJSON,
   CommerceProductJSON,
-  ConfirmCheckoutParams,
   CreateCheckoutParams,
   GetPlansParams,
   GetProductsParams,
@@ -28,43 +27,22 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     });
   };
 
-  getPlans = async (params?: GetPlansParams) => {
+  getPlans = async (_?: GetPlansParams) => {
     const { data: products } = await this.getProducts();
-    console.log(params);
     const defaultProduct = products.find(product => product.isDefault);
 
-    return defaultProduct?.plans.sort((a, b) => a.amount - b.amount) || [];
+    return defaultProduct?.plans || [];
   };
 
   startCheckout = async (params: CreateCheckoutParams) => {
     const json = (
-      await BaseResource._fetch({
+      await BaseResource._fetch<CommerceCheckoutJSON>({
         path: `/me/commerce/checkouts`,
         method: 'POST',
         body: params as any,
       })
     )?.response as unknown as CommerceCheckoutJSON;
-    return new CommerceCheckout(json);
-  };
 
-  confirmCheckout = async (params: ConfirmCheckoutParams) => {
-    const json = (
-      await BaseResource._fetch({
-        path: `/me/commerce/checkouts/${params.checkoutId}/confirm`,
-        method: 'PATCH',
-        body: { paymentSourceId: params.paymentSourceId } as any,
-      })
-    )?.response as unknown as CommerceCheckoutJSON;
     return new CommerceCheckout(json);
-  };
-
-  cancelSubscription = async ({ subscriptionId }: { subscriptionId: string }) => {
-    const json = (
-      await BaseResource._fetch({
-        path: `/me/commerce/subscriptions/${subscriptionId}`,
-        method: 'DELETE',
-      })
-    )?.response;
-    return json;
   };
 }

@@ -27,4 +27,14 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
 
     return this;
   }
+
+  public async cancel() {
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/subscriptions/${this.id}`,
+        method: 'DELETE',
+      })
+    )?.response;
+    return json;
+  }
 }

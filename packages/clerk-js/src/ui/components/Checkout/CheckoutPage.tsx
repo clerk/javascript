@@ -1,18 +1,12 @@
-import { useClerk } from '@clerk/shared/react';
-import type {
-  __experimental_CheckoutProps,
-  CommerceCheckoutResource,
-  CommercePlanResource,
-  CommerceTotals,
-} from '@clerk/types';
+import type { __experimental_CheckoutProps, CommercePlanResource, CommerceTotals } from '@clerk/types';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
 import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner, Text } from '../../customizables';
-import { useFetch } from '../../hooks';
+import { useCheckout } from '../../hooks';
 import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
@@ -21,25 +15,20 @@ const COMMERCE_STRIPE_PUBLISHABLE_KEY = 'pk_test_AzTn97Yzl4y1OAnov07b5ihT00NNnE0
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
-  const { __experimental_commerce } = useClerk();
-  const [checkout, setCheckout] = useState<CommerceCheckoutResource>();
   const stripePromise = useRef<Promise<Stripe | null> | null>(null);
 
-  const { data, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
+  const { checkout, isLoading } = useCheckout({
     planId,
     planPeriod,
   });
 
   useEffect(() => {
-    if (data) {
-      setCheckout(data);
-      stripePromise.current = loadStripe(COMMERCE_STRIPE_PUBLISHABLE_KEY, { stripeAccount: data.externalGatewayId });
+    if (checkout) {
+      stripePromise.current = loadStripe(COMMERCE_STRIPE_PUBLISHABLE_KEY, {
+        stripeAccount: checkout.externalGatewayId,
+      });
     }
-  }, [data]);
-
-  const onConfirm = (newCheckout: CommerceCheckoutResource) => {
-    setCheckout(newCheckout);
-  };
+  }, [checkout]);
 
   return (
     <>
@@ -96,10 +85,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
             stripe={stripePromise.current}
             options={{ clientSecret: checkout.externalClientSecret }}
           >
-            <CheckoutForm
-              checkout={checkout}
-              onConfirm={onConfirm}
-            />
+            <CheckoutForm checkout={checkout} />
           </Elements>
         </Box>
       )}

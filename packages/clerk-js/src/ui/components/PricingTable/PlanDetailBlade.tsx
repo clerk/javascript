@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource } from '@clerk/types';
 import { useState } from 'react';
 
@@ -84,14 +83,14 @@ export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladePr
                     variant='caption'
                     colorScheme='secondary'
                     sx={{ textTransform: 'lowercase' }}
-                    localizationKey={localizationKeys('commerce_month')}
+                    localizationKey={localizationKeys('commerce.month')}
                   />
                 </Flex>
               </Flex>
             ) : (
               <Text
                 variant='subtitle'
-                localizationKey={localizationKeys('commerce_free')}
+                localizationKey={localizationKeys('commerce.free')}
               />
             )}
           </Col>
@@ -152,8 +151,8 @@ export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladePr
   );
 };
 
-const CancelFooter = ({ plan, handleClose }: { plan: CommercePlanResource; handleClose: () => void }) => {
-  const { __experimental_commerce } = useClerk();
+const CancelFooter = ({ plan }: { plan: CommercePlanResource; handleClose: () => void }) => {
+  // const { __experimental_commerce } = useClerk();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -162,18 +161,13 @@ const CancelFooter = ({ plan, handleClose }: { plan: CommercePlanResource; handl
     setHasError(false);
     setIsSubmitting(true);
 
-    await __experimental_commerce.__experimental_billing
-      .cancelSubscription({
-        subscriptionId: '123',
-      })
-      .then(() => {
-        handleClose();
-        setIsSubmitting(false);
-      })
-      .catch(() => {
-        setHasError(true);
-        setIsSubmitting(false);
-      });
+    // TODO: we need to get a handle on the subscription object in order to cancel it,
+    // but this method doesn't exist yet.
+    //
+    // await subscription.cancel().then(() => {
+    //   setIsSubmitting(false);
+    //   handleClose();
+    // }).catch(() => { setHasError(true); setIsSubmitting(false); });
   };
 
   return (

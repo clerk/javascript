@@ -10,7 +10,7 @@ import { BaseResource, CommercePaymentSource } from '../../resources/internal';
 import { __experimental_CommerceBilling } from './CommerceBilling';
 
 export class __experimental_Commerce implements __experimental_CommerceNamespace {
-  public static _billing: __experimental_CommerceBillingNamespace;
+  private static _billing: __experimental_CommerceBillingNamespace;
 
   get __experimental_billing(): __experimental_CommerceBillingNamespace {
     if (!__experimental_Commerce._billing) {

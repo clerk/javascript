@@ -128,13 +128,13 @@ const navbarSlideIn = keyframes`
   100% {opacity: 1; transform: translateX(0);}
 `;
 
-const checkoutBladeIn = keyframes`
+const drawerSlideIn = keyframes`
   0% { opacity: 0; translate: 100% 0; }
   10% { opacity: 1; }
   100% { opacity: 1; translate: 0; }
 `;
 
-const checkoutBladeOut = keyframes`
+const drawerSlideOut = keyframes`
   0% { opacity: 1; translate: 0; }
   90% { opacity: 1; }
   100% { opacity: 0; translate: 100% 0; }
@@ -155,6 +155,6 @@ export const animations = {
   inDelayAnimation,
   outAnimation,
   notificationAnimation,
-  checkoutBladeIn,
-  checkoutBladeOut,
+  drawerSlideIn,
+  drawerSlideOut,
 };
