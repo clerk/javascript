@@ -15,11 +15,12 @@ export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
   pathRoot = '/environment';
-  authConfig!: AuthConfigResource;
-  displayConfig!: DisplayConfigResource;
-  userSettings!: UserSettingsResource;
-  organizationSettings!: OrganizationSettingsResource;
-  maintenanceMode!: boolean;
+  authConfig: AuthConfigResource = new AuthConfig();
+  displayConfig: DisplayConfigResource = new DisplayConfig();
+  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
+  userSettings: UserSettingsResource = new UserSettings();
+  organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
+  maintenanceMode: boolean = false;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -31,7 +32,10 @@ export class Environment extends BaseResource implements EnvironmentResource {
 
   constructor(data: EnvironmentJSON | EnvironmentJSONSnapshot | null = null) {
     super();
-    this.fromJSON(data);
+
+    if (data) {
+      this.fromJSON(data);
+    }
   }
 
   fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
@@ -58,13 +62,17 @@ export class Environment extends BaseResource implements EnvironmentResource {
   };
 
   protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
-    if (data) {
-      this.authConfig = new AuthConfig(data.auth_config);
-      this.displayConfig = new DisplayConfig(data.display_config);
-      this.userSettings = new UserSettings(data.user_settings);
-      this.organizationSettings = new OrganizationSettings(data.organization_settings);
-      this.maintenanceMode = data.maintenance_mode;
+    if (!data) {
+      return this;
     }
+
+    this.authConfig = new AuthConfig(data.auth_config);
+    // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
+    this.userSettings = new UserSettings(data.user_settings);
+    this.organizationSettings = new OrganizationSettings(data.organization_settings);
+    this.displayConfig = new DisplayConfig(data.display_config);
+    this.maintenanceMode = data.maintenance_mode || this.maintenanceMode;
+
     return this;
   }
 

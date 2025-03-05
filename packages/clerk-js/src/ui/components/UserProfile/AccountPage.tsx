@@ -16,12 +16,12 @@ export const AccountPage = withCardStateProvider(() => {
   const card = useCardState();
   const { user } = useUser();
 
-  const showUsername = attributes.username.enabled;
-  const showEmail = attributes.email_address.enabled;
-  const showPhone = attributes.phone_number.enabled;
+  const showUsername = attributes.username?.enabled;
+  const showEmail = attributes.email_address?.enabled;
+  const showPhone = attributes.phone_number?.enabled;
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showEnterpriseAccounts = user && enterpriseSSO.enabled;
-  const showWeb3 = attributes.web3_wallet.enabled;
+  const showWeb3 = attributes.web3_wallet?.enabled;
 
   const shouldAllowIdentificationCreation =
     !showEnterpriseAccounts ||

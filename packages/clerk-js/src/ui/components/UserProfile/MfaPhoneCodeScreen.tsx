@@ -27,7 +27,7 @@ export const MfaPhoneCodeScreen = withCardStateProvider((props: MfaPhoneCodeScre
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
 
-  const isInstanceWithBackupCodes = useEnvironment().userSettings.attributes.backup_code.enabled;
+  const isInstanceWithBackupCodes = useEnvironment().userSettings.attributes.backup_code?.enabled;
 
   return (
     <Wizard {...wizard.props}>
