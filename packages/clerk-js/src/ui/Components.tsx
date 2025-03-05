@@ -1,5 +1,5 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
-import { createDeferredPromise } from '@clerk/shared/utils';
+import { createDeferredPromise, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationProps,
   Appearance,
@@ -143,7 +143,11 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions) => {
+export const mountComponentRenderer = (
+  clerk: Clerk,
+  environment: EnvironmentResource | undefined,
+  options: ClerkOptions,
+) => {
   // TODO: Init of components should start
   // before /env and /client requests
   let clerkRoot = document.getElementById(ROOT_ELEMENT_ID);
@@ -158,6 +162,11 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
 
   return {
     ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
+      if (!environment) {
+        return new Promise<ComponentControls>(res => {
+          res(new Proxy({}, { get: () => noop }) as ComponentControls);
+        });
+      }
       const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.

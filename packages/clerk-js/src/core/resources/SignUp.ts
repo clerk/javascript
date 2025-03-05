@@ -317,8 +317,15 @@ export class SignUp extends BaseResource implements SignUpResource {
       // to reload the environment and try again one more time with the new environment.
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
-        await SignUp.clerk.__unstable__environment!.reload();
-        return authenticateFn();
+        if (SignUp.clerk.__unstable__environment) {
+          try {
+            await SignUp.clerk.__unstable__environment.reload();
+            return authenticateFn();
+          } catch {
+            // If the environment reload fails, we will throw the original error
+            throw e;
+          }
+        }
       }
       throw e;
     });
@@ -416,7 +423,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       return false;
     }
 
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__unstable__environment?.displayConfig.captchaOauthBypass || [];
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
@@ -424,7 +431,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     if (
       params.transfer &&
-      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
+      captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client?.signIn?.firstFactorVerification?.strategy)
     ) {
       return true;
     }
