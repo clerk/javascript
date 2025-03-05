@@ -8,7 +8,9 @@ import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
+  Form,
   Header,
+  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -318,6 +320,14 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && isLegalConsentEnabled && (
+              <Form.ControlRow elementId='legalAccepted'>
+                <LegalCheckbox
+                  {...formState.legalAccepted.props}
+                  isRequired={fields.legalAccepted?.required}
+                />
+              </Form.ControlRow>
+            )}
             {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
