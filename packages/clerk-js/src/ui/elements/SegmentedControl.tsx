@@ -80,11 +80,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
 
   return (
     <CompositeItem
-      render={htmlProps => {
+      render={compProps => {
         return (
           <SimpleButton
             ref={ref}
-            {...htmlProps}
+            {...compProps}
             elementDescriptor={descriptors.segmentedControlButton}
             variant='unstyled'
             role='radio'
