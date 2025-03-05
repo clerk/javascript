@@ -238,6 +238,10 @@ export class Clerk implements ClerkInterface {
     return this.#loaded;
   }
 
+  get __internal_resiliency(): boolean {
+    return this.#options.experimental?.resiliency ?? false;
+  }
+
   get isSatellite(): boolean {
     if (inBrowser()) {
       return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
@@ -1138,6 +1142,9 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
+    if (!this.__internal_resiliency && (!this.environment || !this.environment.displayConfig)) {
+      return '';
+    }
     const waitlistUrl = this.#options['waitlistUrl'] || this.environment?.displayConfig.waitlistUrl;
     const initValues = new URLSearchParams(options?.initialValues || {});
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
@@ -1345,7 +1352,7 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
-    if (!this.loaded || !this.client) {
+    if (!this.loaded || (!this.environment && !this.__internal_resiliency) || !this.client) {
       return;
     }
 
@@ -1546,7 +1553,7 @@ export class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.loaded || !this.client) {
+    if (!this.loaded || (!this.environment && !this.__internal_resiliency) || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
@@ -1660,7 +1667,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (!this.client || !this.loaded) {
+    if (!this.client || !(this.__internal_resiliency ? this.loaded : this.environment)) {
       return;
     }
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;

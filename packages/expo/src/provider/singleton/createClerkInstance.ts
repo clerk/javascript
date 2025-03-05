@@ -115,7 +115,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
+            const environment = __internal_clerk?.__unstable__environment;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
