@@ -218,6 +218,15 @@ export const polishedAppearance: Appearance = {
       card: {
         ...cardContentStyles(theme),
       },
+      planCard: {
+        borderWidth: 0,
+      },
+      planCardDefault: {
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
+      planCardCompact: {
+        boxShadow: `0px 5px 15px 0px rgba(0, 0, 0, 0.08), ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
+      },
       scrollBox: {
         ...cardContentStyles(theme),
       },
