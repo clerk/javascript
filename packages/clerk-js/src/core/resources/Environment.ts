@@ -17,6 +17,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   pathRoot = '/environment';
   authConfig: AuthConfigResource = new AuthConfig();
   displayConfig: DisplayConfigResource = new DisplayConfig();
+  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
   userSettings: UserSettingsResource = new UserSettings();
   organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
   maintenanceMode: boolean = false;
@@ -66,6 +67,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     }
 
     this.authConfig = new AuthConfig(data.auth_config);
+    // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
     this.userSettings = new UserSettings(data.user_settings);
     this.organizationSettings = new OrganizationSettings(data.organization_settings);
     this.displayConfig = new DisplayConfig(data.display_config);

@@ -37,7 +37,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   saml: SamlSettings = {} as SamlSettings;
   enterpriseSSO: EnterpriseSSOSettings = {} as EnterpriseSSOSettings;
 
+  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
   attributes: Partial<Attributes> = {};
+  // @ts-expect-error - This is a partial object, but we want to ensure that all actions are present.
   actions: Partial<Actions> = {};
   signIn: SignInData = {} as SignInData;
   signUp: SignUpData = {} as SignUpData;
