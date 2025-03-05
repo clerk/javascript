@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
@@ -29,23 +29,39 @@ test.describe('session tasks sign in flow @nextjs', () => {
     await app.teardown();
   });
 
-  test.fixme('on after sign-in, navigates to task', async () => {
-    // todo
+  test('navigate to task on after sign-in', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+
+    const addOrganizationTask = u.page.getByText(/choose an organization/i);
+    await expect(addOrganizationTask).toBeVisible();
+    expect(page.url()).toContain('add-organization');
   });
 
-  test.fixme('redirects back to task when accessing root sign in component', async () => {
-    // todo
-  });
+  test('redirect to task when accessing root sign in component', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
 
-  test.fixme('redirects to after sign-in url when accessing root sign in component with a active session', {
-    // todo
-  });
+    // Navigates to task
+    const addOrganizationTask = u.page.getByText(/choose an organization/i);
+    await expect(addOrganizationTask).toBeVisible();
+    expect(page.url()).toContain('add-organization');
 
-  test.fixme('redirects to after sign-in url once resolving task', () => {
-    // todo
-  });
+    // Tries to go back to root sign-in
+    await u.po.signIn.goTo();
 
-  test.fixme('without a session, does not allow to access task component', async () => {
-    // todo
+    // Get redirected back to task
+    await expect(addOrganizationTask).toBeVisible();
+    expect(page.url()).toContain('add-organization');
   });
 });
