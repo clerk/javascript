@@ -18,7 +18,6 @@ import type {
   SamlAccountConnectionJSON,
   SamlAccountJSON,
   SessionJSON,
-  SessionTaskJSON,
   SignUpJSON,
   SignUpVerificationJSON,
   SignUpVerificationsJSON,
@@ -93,8 +92,6 @@ export type SessionJSONSnapshot = Override<
     user: UserJSONSnapshot | null;
   }
 >;
-
-export type SessionTaskJSONSnapshot = SessionTaskJSON;
 
 export type SignUpJSONSnapshot = Override<
   Nullable<SignUpJSON, 'status'>,
