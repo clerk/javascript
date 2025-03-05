@@ -3,6 +3,10 @@ import React, { createContext, useContext, useState } from 'react';
 
 import { descriptors, Flex, SimpleButton } from '../customizables';
 
+/* -------------------------------------------------------------------------------------------------
+ * SegmentedControl Context
+ * -----------------------------------------------------------------------------------------------*/
+
 type SegmentedControlContextType = {
   currentValue: string | undefined;
   onValueChange: (value: string) => void;
@@ -17,6 +21,10 @@ function useSegmentedControlContext() {
   }
   return context;
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * SegmentedControl.Root
+ * -----------------------------------------------------------------------------------------------*/
 
 interface RootProps {
   children: React.ReactNode;
@@ -56,6 +64,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
                 borderWidth: t.borderWidths.$normal,
                 borderStyle: t.borderStyles.$solid,
                 borderColor: t.colors.$neutralAlpha100,
+                isolation: 'isolate',
               })}
             />
           }
@@ -68,6 +77,10 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
 );
 
 Root.displayName = 'SegmentedControl.Root';
+
+/* -------------------------------------------------------------------------------------------------
+ * SegmentedControl.Button
+ * -----------------------------------------------------------------------------------------------*/
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -90,7 +103,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
             role='radio'
             aria-checked={isSelected}
             onClick={() => onValueChange(value)}
+            isActive={isSelected}
             sx={t => ({
+              position: 'relative',
               padding: `${t.space.$1} ${t.space.$2x5}`,
               backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
               color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
@@ -98,6 +113,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
               minHeight: t.sizes.$6,
               boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
               borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
+              zIndex: 1,
+              ':focus-visible': {
+                zIndex: 2,
+              },
             })}
           >
             {children}
