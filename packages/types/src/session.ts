@@ -1,6 +1,6 @@
 import type { ClerkOptions } from 'clerk';
-import type { EnvironmentResource } from 'environment';
 
+import type { EnvironmentResource } from './environment';
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,

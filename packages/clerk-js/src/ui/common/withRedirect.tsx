@@ -29,7 +29,6 @@ export function withRedirect<P extends AvailableComponentProps>(
     const options = useOptions();
 
     const shouldRedirect = condition(clerk, environment, options);
-
     React.useEffect(() => {
       if (shouldRedirect) {
         if (warning && isDevelopmentFromPublishableKey(clerk.publishableKey)) {
@@ -81,7 +80,7 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     return withRedirect(
       Component,
       sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
+      ({ clerk }) => signUpCtx.tasksUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
       warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
@@ -103,7 +102,7 @@ export const withRedirectToSignUpIfNoTasksAvailable = <P extends AvailableCompon
       Component,
       noTaskExists,
       ({ clerk }) => signUpCtx.signUpUrl || clerk.buildSignUpUrl(),
-      warnings.cannotRenderTaskComponentOnSignUp,
+      warnings.cannotRenderSessionTaskComponentOnSignUp,
     )(props);
   };
 
@@ -124,7 +123,7 @@ export const withRedirectToSignInIfNoTasksAvailable = <P extends AvailableCompon
       Component,
       noTaskExists,
       ({ clerk }) => signInCtx.signInUrl || clerk.buildSignInUrl(),
-      warnings.cannotRenderTaskComponentOnSignUp,
+      warnings.cannotRenderSessionTaskComponentOnSignUp,
     )(props);
   };
 
