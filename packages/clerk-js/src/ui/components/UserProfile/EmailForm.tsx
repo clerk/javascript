@@ -125,7 +125,7 @@ const getTranslationKeyByStrategy = (strategy: PrepareEmailAddressVerificationPa
 function isEmailLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;
   const { email_address } = userSettings.attributes;
-  return email_address.enabled && email_address.verifications.includes('email_link');
+  return Boolean(email_address?.enabled && email_address?.verifications.includes('email_link'));
 }
 
 /**

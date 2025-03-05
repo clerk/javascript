@@ -49,7 +49,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
+    if (passkeySettings.allow_autofill && attributes.passkey?.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -393,7 +393,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
-        passwordEnabled: userSettings.attributes.password.required,
+        passwordEnabled: userSettings.attributes.password?.required ?? false,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -481,7 +481,7 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.attributes.passkey.enabled &&
+            {userSettings.attributes.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (
                 <Card.Action elementId={'usePasskey'}>
