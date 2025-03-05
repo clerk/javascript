@@ -22,6 +22,7 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  tasksUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
@@ -112,6 +113,16 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  const tasksUrl = clerk.session?.currentTask
+    ? buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signInUrl,
+        path: ctx.path,
+        endpoint: clerk.session?.currentTask?.__internal_getUrlPath(),
+        authQueryString: null,
+      })
+    : null;
+
   useEffect(() => {
     eventBus.on(events.InternalComponentNavigate, ({ resolveNavigation, session }) => {
       if (!session.currentTask) {
@@ -141,6 +152,7 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    tasksUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,

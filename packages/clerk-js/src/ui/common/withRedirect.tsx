@@ -6,7 +6,7 @@ import React from 'react';
 
 import { warnings } from '../../core/warnings';
 import type { ComponentGuard } from '../../utils';
-import { sessionExistsAndSingleSessionModeEnabled } from '../../utils';
+import { noTaskExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useEnvironment, useOptions, useSignInContext, useSignUpContext } from '../contexts';
 import { useRouter } from '../router';
 import type { AvailableComponentProps } from '../types';
@@ -28,8 +28,7 @@ export function withRedirect<P extends AvailableComponentProps>(
     const environment = useEnvironment();
     const options = useOptions();
 
-    const hasTaskAndSingleSessionMode = !!clerk.session?.tasks && environment?.authConfig.singleSessionMode;
-    const shouldRedirect = hasTaskAndSingleSessionMode ? false : condition(clerk, environment, options);
+    const shouldRedirect = condition(clerk, environment, options);
 
     React.useEffect(() => {
       if (shouldRedirect) {
@@ -63,7 +62,7 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
     return withRedirect(
       Component,
       sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      ({ clerk }) => signInCtx.tasksUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
       warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
@@ -88,6 +87,48 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
   };
 
   HOC.displayName = `withRedirectToAfterSignUp(${displayName})`;
+
+  return HOC;
+};
+
+export const withRedirectToSignUpIfNoTasksAvailable = <P extends AvailableComponentProps>(
+  Component: ComponentType<P>,
+) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signUpCtx = useSignUpContext();
+    return withRedirect(
+      Component,
+      noTaskExists,
+      ({ clerk }) => signUpCtx.signUpUrl || clerk.buildSignUpUrl(),
+      warnings.cannotRenderTaskComponentOnSignUp,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToSignUpIfNoTasksAvailable(${displayName})`;
+
+  return HOC;
+};
+
+export const withRedirectToSignInIfNoTasksAvailable = <P extends AvailableComponentProps>(
+  Component: ComponentType<P>,
+) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signInCtx = useSignInContext();
+    return withRedirect(
+      Component,
+      noTaskExists,
+      ({ clerk }) => signInCtx.signInUrl || clerk.buildSignInUrl(),
+      warnings.cannotRenderTaskComponentOnSignUp,
+    )(props);
+  };
+
+  HOC.displayName = `withRedirectToSignInIfNoTasksAvailable(${displayName})`;
 
   return HOC;
 };

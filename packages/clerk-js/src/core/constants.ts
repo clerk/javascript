@@ -1,4 +1,4 @@
-import type { SessionTaskKey, SignUpModes } from '@clerk/types';
+import type { SignUpModes } from '@clerk/types';
 
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [
@@ -47,11 +47,6 @@ export const SIGN_UP_MODES: Record<string, SignUpModes> = {
   RESTRICTED: 'restricted',
   WAITLIST: 'waitlist',
 };
-
-export const SESSION_TASK_ROUTE_PATH_BY_KEY: Record<SessionTaskKey, string> = {
-  org: 'add-organization',
-};
-export const SESSION_TASK_ROUTE_PATHS = Object.values(SESSION_TASK_ROUTE_PATH_BY_KEY);
 
 // This is the currently supported version of the Frontend API
 export const SUPPORTED_FAPI_VERSION = '2024-10-01';
