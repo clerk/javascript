@@ -283,12 +283,12 @@ function getGenericField(fieldKey: FieldKey, attributes: Partial<Attributes>): F
   const attrKey = camelToSnake(fieldKey);
 
   // @ts-expect-error - TS doesn't know that the key exists
-  if (!attributes[attrKey].enabled) {
+  if (!attributes[attrKey]?.enabled) {
     return;
   }
 
   return {
     // @ts-expect-error - TS doesn't know that the key exists
-    required: attributes[attrKey].required,
+    required: attributes[attrKey]?.required,
   };
 }
