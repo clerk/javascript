@@ -199,7 +199,6 @@ export type ElementsConfig = {
   drawerClose: WithOptions;
 
   segmentedControlRoot: WithOptions;
-  segmentedControlItem: WithOptions;
   segmentedControlButton: WithOptions;
 
   formHeader: WithOptions<never, ErrorState>;

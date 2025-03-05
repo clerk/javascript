@@ -1,6 +1,7 @@
+import { Composite, CompositeItem } from '@floating-ui/react';
 import React, { createContext, useContext, useState } from 'react';
 
-import { Box, descriptors, Flex, SimpleButton } from '../customizables';
+import { descriptors, Flex, SimpleButton } from '../customizables';
 
 type SegmentedControlContextType = {
   currentValue: string | undefined;
@@ -40,32 +41,27 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
 
     return (
       <SegmentedControlContext.Provider value={{ currentValue, onValueChange: handleValueChange }}>
-        <Flex
-          ref={ref}
-          elementDescriptor={descriptors.segmentedControlRoot}
-          as='ul'
-          aria-label={ariaLabel}
-          sx={t => ({
-            backgroundColor: t.colors.$neutralAlpha50,
-            borderRadius: t.radii.$md,
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-          })}
+        <Composite
+          orientation='horizontal'
+          role='radiogroup'
+          loop={false}
+          render={
+            <Flex
+              ref={ref}
+              elementDescriptor={descriptors.segmentedControlRoot}
+              aria-label={ariaLabel}
+              sx={t => ({
+                backgroundColor: t.colors.$neutralAlpha50,
+                borderRadius: t.radii.$md,
+                borderWidth: t.borderWidths.$normal,
+                borderStyle: t.borderStyles.$solid,
+                borderColor: t.colors.$neutralAlpha100,
+              })}
+            />
+          }
         >
-          {React.Children.map(children, (child, index) => (
-            <Box
-              elementDescriptor={descriptors.segmentedControlItem}
-              key={index}
-              as='li'
-              sx={{
-                display: 'flex',
-              }}
-            >
-              {child}
-            </Box>
-          ))}
-        </Flex>
+          {children}
+        </Composite>
       </SegmentedControlContext.Provider>
     );
   },
@@ -83,24 +79,32 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
   const isSelected = value === currentValue;
 
   return (
-    <SimpleButton
-      ref={ref}
-      elementDescriptor={descriptors.segmentedControlButton}
-      variant='unstyled'
-      aria-selected={isSelected}
-      onClick={() => onValueChange(value)}
-      sx={t => ({
-        padding: `${t.space.$1} ${t.space.$2x5}`,
-        backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
-        color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
-        fontSize: t.fontSizes.$xs,
-        minHeight: t.sizes.$6,
-        boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
-        borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
-      })}
-    >
-      {children}
-    </SimpleButton>
+    <CompositeItem
+      render={htmlProps => {
+        return (
+          <SimpleButton
+            ref={ref}
+            {...htmlProps}
+            elementDescriptor={descriptors.segmentedControlButton}
+            variant='unstyled'
+            role='radio'
+            aria-checked={isSelected}
+            onClick={() => onValueChange(value)}
+            sx={t => ({
+              padding: `${t.space.$1} ${t.space.$2x5}`,
+              backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
+              color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+              fontSize: t.fontSizes.$xs,
+              minHeight: t.sizes.$6,
+              boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
+              borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
+            })}
+          >
+            {children}
+          </SimpleButton>
+        );
+      }}
+    />
   );
 });
 
