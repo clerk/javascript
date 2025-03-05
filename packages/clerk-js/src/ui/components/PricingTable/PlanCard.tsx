@@ -18,14 +18,14 @@ interface PlanCardProps {
 
 export function PlanCard(props: PlanCardProps) {
   const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const { ctaPosition = 'bottom', collapseFeatures = false } = pricingTableProps;
+  const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
   const totalFeatures = plan.features.length;
   const hasFeatures = totalFeatures > 0;
   const isActivePlan = plan.isActiveForPayer;
   return (
     <Box
       key={plan.id}
-      elementDescriptor={descriptors.planCard}
+      elementDescriptor={[descriptors.planCard, isCompact ? descriptors.planCardCompact : descriptors.planCardDefault]}
       elementId={descriptors.planCard.setId(plan.slug)}
       sx={t => ({
         display: 'flex',

@@ -322,6 +322,8 @@ export type ElementsConfig = {
 
   pricingTable: WithOptions;
   planCard: WithOptions<string>;
+  planCardDefault: WithOptions;
+  planCardCompact: WithOptions;
   planCardHeader: WithOptions;
   planCardAvatarContainer: WithOptions;
   planCardAvatar: WithOptions;

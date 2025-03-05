@@ -196,6 +196,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'accountSwitcherActionButtonIconBox',
   'accountSwitcherActionButtonIcon',
   'planCard',
+  'planCardDefault',
+  'planCardCompact',
   'planCardHeader',
   'planCardTitle',
   'planCardDescription',
