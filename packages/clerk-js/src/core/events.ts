@@ -1,21 +1,18 @@
-import type { SessionResource, TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/types';
 
 export const events = {
   TokenUpdate: 'token:update',
   UserSignOut: 'user:signOut',
-  InternalComponentNavigate: 'task:internalNavigate',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
 type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
 
 type TokenUpdatePayload = { token: TokenResource | null };
-type InternalComponentNavigatePayload = { resolveNavigation: () => void; session: SessionResource };
 
 type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
-  [events.InternalComponentNavigate]: InternalComponentNavigatePayload;
 };
 
 const createEventBus = () => {
@@ -48,11 +45,7 @@ const createEventBus = () => {
     eventToHandlersMap.set(event, []);
   };
 
-  const has = <E extends ClerkEvent>(event: E) => {
-    return !!eventToHandlersMap.has(event);
-  };
-
-  return { on, dispatch, off, has };
+  return { on, dispatch, off };
 };
 
 export const eventBus = createEventBus();

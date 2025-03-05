@@ -1,13 +1,17 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  buildRedirectUrl,
+  buildSessionTaskRedirectUrl,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
-import { useNavigateOnEvent } from '../../hooks/useNavigateOnEvent';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
@@ -23,7 +27,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
-  tasksUrl: string | null;
+  taskUrl: string | null;
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
@@ -109,21 +113,17 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
-  const tasksUrl = clerk.session?.currentTask
-    ? buildRedirectUrl({
-        routing: ctx.routing,
-        baseUrl: signUpUrl,
-        path: ctx.path,
-        endpoint: clerk.session?.currentTask?.__internal_getUrlPath(),
-        authQueryString: null,
-      })
+  const taskUrl = clerk.session?.currentTask
+    ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signUpUrl, clerk.session?.currentTask)
     : null;
 
-  useNavigateOnEvent({
-    routing: ctx.routing,
-    baseUrl: signUpUrl,
-    path: ctx.path,
-  });
+  useEffect(() => {
+    clerk.__internal_setComponentNavigate((endpoint: string) =>
+      navigate(
+        buildRedirectUrl({ routing: ctx.routing, path: ctx.path, baseUrl: signUpUrl, endpoint, authQueryString }),
+      ),
+    );
+  }, []);
 
   return {
     ...ctx,
@@ -136,7 +136,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
-    tasksUrl,
+    taskUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
