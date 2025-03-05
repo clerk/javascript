@@ -45,7 +45,8 @@ export const useSignInContext = (): SignInContextType => {
 
   const isCombinedFlow =
     (signUpMode !== 'restricted' &&
-      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
+      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) &&
+      context.withSignUp !== false) ||
     context.withSignUp ||
     false;
 
